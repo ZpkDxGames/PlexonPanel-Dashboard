@@ -38,13 +38,45 @@ npm test
 
 `npm test` performs a clean production build, starts that build locally, checks the dashboard HTML and security headers, and verifies the Firebase readiness response without returning credentials.
 
+## Create the Vercel environment file
+
+The Firebase Admin service-account file does not contain the Firebase Web App configuration. Get the Web App configuration from **Firebase console → Project settings → General → Your apps → Web app**, then copy its six fields into a local file named `firebase-web-config.json` using [`firebase-web-config.example.json`](firebase-web-config.example.json) as the shape.
+
+Keep the downloaded service-account JSON outside this project when possible. Generate the import file without passing any secret value on the command line:
+
+```bash
+npm run env:vercel -- \
+  --service-account "/secure/path/firebase-adminsdk.json" \
+  --web-config "/secure/path/firebase-web-config.json"
+```
+
+If the production gateway already exists, append its public URL and expected audience:
+
+```bash
+npm run env:vercel -- \
+  --service-account "/secure/path/firebase-adminsdk.json" \
+  --web-config "/secure/path/firebase-web-config.json" \
+  --gateway-url "https://gateway.example.com" \
+  --gateway-audience "plexonpanel-gateway"
+```
+
+The command validates that both Firebase files refer to the same project, creates fresh high-entropy pairing and session secrets, and writes `.env.vercel` with restrictive file permissions. It never prints credentials. Import `.env.vercel` in **Vercel project → Settings → Environment Variables → Import .env**, apply it to Production (and Preview only when needed), then delete the local import file after confirming the values exist in Vercel. Mark the server-only variables as Sensitive when your Vercel plan supports that option.
+
+Do not upload `.env.vercel`, the service-account JSON, or `firebase-web-config.json` with the source. They are ignored by Git and by Vercel uploads.
+
 ## Vercel deployment
 
-1. Keep this repository private.
-2. Import it as a standard Next.js project in Vercel. No custom framework preset, output directory, or build command is required.
-3. Configure the public Firebase Web App values and gateway URL for each environment.
-4. Store Firebase Admin fields, session secrets, pairing pepper, and gateway credentials as protected server-only environment variables.
+For a direct browser upload, use the provided ZIP as-is with [Vercel Drop](https://vercel.com/drop). Its archive root contains `package.json`, `app/`, and the rest of the Next.js project directly, so no Root Directory override is needed.
+
+For Git or CLI deployment:
+
+1. Keep the repository private and run deployment from the directory containing `package.json`.
+2. Use the detected **Next.js** framework preset.
+3. Leave **Root Directory** at the project root, **Build Command** at `next build`, and **Output Directory** blank.
+4. Import the environment variables before the production deployment, or redeploy once after adding them.
 5. Run the authenticated session and readiness tests before enabling real data.
+
+Vercel Drop creates a new project for each upload. Connect a private Git repository or use the Vercel CLI when future deployments must keep the same project and production URL.
 
 The expected service boundaries, pairing flow, and Firestore model are documented in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 

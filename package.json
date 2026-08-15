@@ -9,6 +9,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "env:vercel": "node scripts/create-vercel-env.mjs",
     "test": "npm run build && node --test --test-concurrency=1 tests/*.test.mjs",
     "lint": "eslint . --ignore-pattern .next --ignore-pattern node_modules",
     "check": "npm run lint && npm test"

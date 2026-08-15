@@ -1,0 +1,8 @@
+{
+  "apiKey": "copy-from-firebase-console",
+  "authDomain": "your-project.firebaseapp.com",
+  "projectId": "your-project-id",
+  "storageBucket": "copy-from-firebase-console",
+  "messagingSenderId": "copy-from-firebase-console",
+  "appId": "copy-from-firebase-console"
+}
