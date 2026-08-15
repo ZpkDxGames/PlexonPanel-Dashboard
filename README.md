@@ -1,5 +1,4 @@
 # PlexonPanel Dashboard
-
 Private Next.js dashboard for monitoring and managing Paper servers connected through the PlexonPanel plugin.
 
 The interface currently uses clearly labelled preview data. Authentication, pairing, realtime telemetry, and remote actions must not be described as live until their production services are connected and validated.
