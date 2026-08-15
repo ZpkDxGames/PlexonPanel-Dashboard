@@ -1,0 +1,58 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isMember(organizationId) {
+      return signedIn()
+        && exists(/databases/$(database)/documents/organizations/$(organizationId)/members/$(request.auth.uid));
+    }
+
+    function canReadServer(serverId) {
+      return signedIn()
+        && exists(/databases/$(database)/documents/servers/$(serverId))
+        && isMember(get(/databases/$(database)/documents/servers/$(serverId)).data.organizationId);
+    }
+
+    match /users/{userId} {
+      allow read: if signedIn() && request.auth.uid == userId;
+      allow write: if false;
+    }
+
+    match /organizations/{organizationId} {
+      allow read: if isMember(organizationId);
+      allow write: if false;
+
+      match /members/{userId} {
+        allow read: if isMember(organizationId);
+        allow write: if false;
+      }
+
+      match /auditEvents/{eventId} {
+        allow read: if isMember(organizationId);
+        allow write: if false;
+      }
+
+      match /pairingChallenges/{challengeId} {
+        allow read, write: if false;
+      }
+    }
+
+    match /servers/{serverId} {
+      allow read: if canReadServer(serverId);
+      allow write: if false;
+
+      match /{collection}/{document=**} {
+        allow read: if canReadServer(serverId);
+        allow write: if false;
+      }
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
