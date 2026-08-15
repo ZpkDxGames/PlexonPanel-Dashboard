@@ -4,5 +4,6 @@
   "projectId": "your-project-id",
   "storageBucket": "copy-from-firebase-console",
   "messagingSenderId": "copy-from-firebase-console",
-  "appId": "copy-from-firebase-console"
+  "appId": "copy-from-firebase-console",
+  "measurementId": "optional-copy-from-firebase-console"
 }

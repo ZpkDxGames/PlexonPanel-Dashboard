@@ -53,6 +53,7 @@ test("creates a complete Vercel env file without logging credentials", async () 
       storageBucket: "test-project.firebasestorage.app",
       messagingSenderId: "123456789",
       appId: "1:123456789:web:test",
+      measurementId: "G-TEST123456",
     }),
   );
 
@@ -74,6 +75,7 @@ test("creates a complete Vercel env file without logging credentials", async () 
 
   const environment = await readFile(outputPath, "utf8");
   assert.match(environment, /NEXT_PUBLIC_FIREBASE_PROJECT_ID="test-project"/);
+  assert.match(environment, /NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID="G-TEST123456"/);
   assert.match(environment, /NEXT_PUBLIC_PLEXON_GATEWAY_URL="https:\/\/gateway\.example\.com"/);
   assert.match(environment, /FIREBASE_ADMIN_CLIENT_EMAIL="firebase-admin@example\.invalid"/);
   assert.match(environment, /FIREBASE_ADMIN_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\\n/);

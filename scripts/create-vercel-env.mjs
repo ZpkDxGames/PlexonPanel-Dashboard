@@ -15,8 +15,9 @@ Usage:
     [--output .env.vercel] [--force]
 
 The Web config file must be JSON containing apiKey, authDomain, projectId,
-storageBucket, messagingSenderId, and appId. Secret values are read only from
-the service-account file or generated locally; never pass them as arguments.`;
+storageBucket, messagingSenderId, and appId. measurementId is optional. Secret
+values are read only from the service-account file or generated locally; never
+pass them as arguments.`;
 
 function parseArguments(argv) {
   const parsed = {
@@ -84,6 +85,15 @@ function requireString(record, key, label) {
   const value = record?.[key];
   if (typeof value !== "string" || value.trim().length === 0) {
     throw new Error(`${label} is missing the required field ${key}`);
+  }
+  return value.trim();
+}
+
+function optionalString(record, key, label) {
+  const value = record?.[key];
+  if (value === undefined || value === null || value === "") return "";
+  if (typeof value !== "string") {
+    throw new Error(`${label} field ${key} must be a string when provided`);
   }
   return value.trim();
 }
@@ -163,6 +173,11 @@ async function main() {
       "Firebase Web configuration",
     ),
     appId: requireString(webConfig, "appId", "Firebase Web configuration"),
+    measurementId: optionalString(
+      webConfig,
+      "measurementId",
+      "Firebase Web configuration",
+    ),
   };
 
   if (client.projectId !== adminProjectId) {
@@ -180,6 +195,10 @@ async function main() {
     dotenvLine("NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID", client.messagingSenderId),
     dotenvLine("NEXT_PUBLIC_FIREBASE_APP_ID", client.appId),
   ];
+
+  if (client.measurementId) {
+    lines.push(dotenvLine("NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID", client.measurementId));
+  }
 
   const gatewayUrl = normalizeGatewayUrl(options.gatewayUrl);
   if (gatewayUrl) lines.push(dotenvLine("NEXT_PUBLIC_PLEXON_GATEWAY_URL", gatewayUrl));

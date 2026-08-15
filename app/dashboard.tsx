@@ -119,7 +119,7 @@ export default function Dashboard() {
           ))}
         </nav>
         <div className="sidebar-footer">
-          <div className="connection-card"><span className="status-beacon"><i /></span><div><strong>Gateway online</strong><span>48 ms latency</span></div></div>
+          <div className="connection-card"><span className="status-beacon"><i /></span><div><strong>Gateway preview</strong><span>Not connected yet</span></div></div>
           <button className="profile-button" aria-label="Open profile menu"><span className="avatar">ZD</span><span className="profile-copy"><strong>Administrator</strong><small>Owner</small></span><span className="more-dots">•••</span></button>
         </div>
       </aside>
@@ -137,9 +137,9 @@ export default function Dashboard() {
             <>
               <section className="welcome-row">
                 <div><p className="eyebrow">Command center</p><h1>Good evening, Administrator.</h1><p>Here is what is happening across your server right now.</p></div>
-                <div className="server-health"><span className="health-pulse"><i /></span><div><span>Server status</span><strong>Online</strong></div><div className="health-divider" /><div><span>Runtime</span><strong>{overview.server.platform} {overview.server.version}</strong></div></div>
+                <div className="server-health"><span className="health-pulse"><i /></span><div><span>Data status</span><strong>Preview</strong></div><div className="health-divider" /><div><span>Runtime</span><strong>{overview.server.platform} {overview.server.version}</strong></div></div>
               </section>
-              <section className="stats-grid" aria-label="Live server statistics">
+              <section className="stats-grid" aria-label="Preview server statistics">
                 {overview.stats.map((stat, index) => (
                   <article className="stat-card" key={stat.label}><div className={`stat-orb orb-${index + 1}`} aria-hidden="true"><span>{stat.label === "TPS" ? "T" : stat.label === "MSPT" ? "ms" : stat.label === "Players" ? "P" : "↑"}</span></div><div className="stat-copy"><span>{stat.label}</span><strong>{stat.value}</strong><small className={stat.tone}><i />{stat.detail}</small></div><button className="card-link" aria-label={`View ${stat.label} details`}><Icon name="chevron" /></button></article>
                 ))}
@@ -147,18 +147,18 @@ export default function Dashboard() {
 
               <section className="dashboard-grid">
                 <article className="panel performance-panel">
-                  <div className="panel-heading"><div><p className="eyebrow">Performance</p><h2>TPS history</h2></div><div className="chart-legend"><span><i /> Live TPS</span><button>Last hour <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4" /></svg></button></div></div>
+                  <div className="panel-heading"><div><p className="eyebrow">Performance</p><h2>TPS history</h2></div><div className="chart-legend"><span><i /> Demo TPS</span><button>Last hour <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4" /></svg></button></div></div>
                   <div className="chart-summary"><strong>19.98</strong><span>Current TPS</span><b>+0.04%</b></div><Sparkline points={overview.tpsHistory} />
                 </article>
 
                 <article className="panel resources-panel">
-                  <div className="panel-heading"><div><p className="eyebrow">Host machine</p><h2>Resource usage</h2></div><span className="live-badge"><i /> Live</span></div>
+                  <div className="panel-heading"><div><p className="eyebrow">Host machine</p><h2>Resource usage</h2></div><span className="live-badge"><i /> Preview</span></div>
                   <div className="resource-list">{overview.resources.map((resource) => <div className="resource" key={resource.label}><div className="resource-heading"><span>{resource.label}</span><strong>{resource.displayValue}</strong></div><div className="progress-track"><span className={resource.tone} style={{ width: `${resource.value}%` }} /></div><small>{resource.detail}<b>{resource.value}% used</b></small></div>)}</div>
                   <button className="text-button">Open resource monitor <Icon name="arrow" /></button>
                 </article>
 
                 <article className="panel activity-panel">
-                  <div className="panel-heading"><div><p className="eyebrow">Live feed</p><h2>Recent activity</h2></div><button className="secondary-button small">View all</button></div>
+                  <div className="panel-heading"><div><p className="eyebrow">Preview feed</p><h2>Recent activity</h2></div><button className="secondary-button small">View all</button></div>
                   <div className="activity-list">{overview.activity.map((event) => <div className="activity-item" key={event.id}><ActivityMarker category={event.category} /><div><strong>{event.title}</strong><span>{event.detail}</span></div><time>{event.time}</time></div>)}</div>
                 </article>
               </section>

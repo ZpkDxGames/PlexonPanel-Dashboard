@@ -39,7 +39,7 @@ npm test
 
 ## Create the Vercel environment file
 
-The Firebase Admin service-account file does not contain the Firebase Web App configuration. Get the Web App configuration from **Firebase console → Project settings → General → Your apps → Web app**, then copy its six fields into a local file named `firebase-web-config.json` using [`firebase-web-config.example.json`](firebase-web-config.example.json) as the shape.
+The Firebase Admin service-account file does not contain the Firebase Web App configuration. Get the Web App configuration from **Firebase console → Project settings → General → Your apps → Web app**, then copy its six required fields and optional Analytics `measurementId` into a local file named `firebase-web-config.json` using [`firebase-web-config.example.json`](firebase-web-config.example.json) as the shape.
 
 Keep the downloaded service-account JSON outside this project when possible. Generate the import file without passing any secret value on the command line:
 
@@ -76,6 +76,9 @@ For Git or CLI deployment:
 5. Run the authenticated session and readiness tests before enabling real data.
 
 Vercel Drop creates a new project for each upload. Connect a private Git repository or use the Vercel CLI when future deployments must keep the same project and production URL.
+
+For the complete private-repository, environment-import, preview-branch, and
+production rollout sequence, follow [the Vercel deployment checklist](docs/VERCEL_DEPLOYMENT.md).
 
 The expected service boundaries, pairing flow, and Firestore model are documented in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 

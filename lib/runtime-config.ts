@@ -5,6 +5,7 @@ export interface FirebaseClientConfig {
   storageBucket: string;
   messagingSenderId: string;
   appId: string;
+  measurementId?: string;
 }
 
 export const firebaseClientConfig: FirebaseClientConfig = {
@@ -14,12 +15,20 @@ export const firebaseClientConfig: FirebaseClientConfig = {
   storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET ?? "",
   messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID ?? "",
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID ?? "",
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID || undefined,
 };
 
 export const plexonGatewayUrl = process.env.NEXT_PUBLIC_PLEXON_GATEWAY_URL ?? "";
 
 export function hasFirebaseClientConfig(config = firebaseClientConfig): boolean {
-  return Object.values(config).every((value) => value.trim().length > 0);
+  return [
+    config.apiKey,
+    config.authDomain,
+    config.projectId,
+    config.storageBucket,
+    config.messagingSenderId,
+    config.appId,
+  ].every((value) => value.trim().length > 0);
 }
 
 export function hasRealtimeGateway(): boolean {

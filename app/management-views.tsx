@@ -93,7 +93,7 @@ function PlayerDrawer({
           <div><span>Play time</span><strong>{player.playTime}</strong></div>
           <div><span>Current world</span><strong>{player.world}</strong></div>
         </div>
-        <div className="drawer-section"><p className="eyebrow">Quick actions</p><button onClick={() => onAction(`Message composer opened for ${player.name}.`)}>Send private message <span>→</span></button><button onClick={() => onAction(`${player.name} would be teleported to spawn.`)}>Teleport to spawn <span>→</span></button><button onClick={() => onAction(`${player.name} would be removed after confirmation.`)}>Kick from server <span>→</span></button></div>
+        <div className="drawer-section"><p className="eyebrow">Quick actions</p><button onClick={() => onAction(`Message composer opened for ${player.name}.`)}>Send private message <span>→</span></button><button disabled title="Teleportation is not supported by the Paper agent yet">Teleport to spawn <span>Unavailable</span></button><button onClick={() => onAction(`${player.name} would be removed after confirmation.`)}>Kick from server <span>→</span></button></div>
         <div className="drawer-warning"><span>!</span><p><strong>Remote actions are disabled in preview mode.</strong>Every production action will require permission checks and an audit record.</p></div>
       </aside>
     </div>
@@ -154,7 +154,7 @@ function ConsoleView() {
 
   return (
     <section className="module-view console-module">
-      <SectionHeading kicker="Remote console" title="Server console" copy="Search output, isolate errors, and securely issue approved commands." actions={<><span className="console-session"><i /> Session secured</span><button className="secondary-button" onClick={() => setPaused((value) => !value)}>{paused ? "Resume stream" : "Pause stream"}</button></>} />
+      <SectionHeading kicker="Remote console" title="Server console" copy="Search output, isolate errors, and securely issue approved commands." actions={<><span className="console-session"><i /> Preview session</span><button className="secondary-button" onClick={() => setPaused((value) => !value)}>{paused ? "Resume stream" : "Pause stream"}</button></>} />
       <article className="console-panel">
         <div className="console-toolbar"><div className="console-levels">{(["ALL", "INFO", "WARN", "ERROR"] as const).map((item) => <button key={item} className={`${level === item ? "active" : ""} ${item.toLowerCase()}`} onClick={() => setLevel(item)}>{item}</button>)}</div><SearchField value={query} onChange={setQuery} placeholder="Search console output" /><button className="console-clear" onClick={() => setEntries([])}>Clear</button></div>
         <div className="console-output" aria-live="polite">
@@ -185,7 +185,7 @@ function ChatView() {
 
   return (
     <section className="module-view chat-module">
-      <SectionHeading kicker="PlexonChats bridge" title="Live chat" copy="Follow the global channel and join the conversation from one moderated view." actions={<span className="integration-pill"><i /> PlexonChats connected</span>} />
+      <SectionHeading kicker="PlexonChats bridge" title="Chat preview" copy="Follow the global channel and join the conversation from one moderated view." actions={<span className="integration-pill"><i /> Preview bridge</span>} />
       <div className="chat-layout">
         <article className="chat-panel">
           <header className="chat-header"><div><span className="channel-hash">#</span><div><strong>{channel} channel</strong><small>{channel === "Global" ? "84 players can see this channel" : "4 staff members can see this channel"}</small></div></div><button aria-label="Chat options">•••</button></header>
@@ -218,8 +218,8 @@ function PluginsView() {
   );
 }
 
-function Toggle({ checked, onChange, label }: { checked: boolean; onChange: () => void; label: string }) {
-  return <button className={`toggle ${checked ? "checked" : ""}`} role="switch" aria-checked={checked} aria-label={label} onClick={onChange}><span /></button>;
+function Toggle({ checked, onChange, label, disabled = false }: { checked: boolean; onChange: () => void; label: string; disabled?: boolean }) {
+  return <button className={`toggle ${checked ? "checked" : ""}`} role="switch" aria-checked={checked} aria-label={label} onClick={onChange} disabled={disabled}><span /></button>;
 }
 
 function SecurityView({ onPairServer }: { onPairServer: () => void }) {
@@ -234,7 +234,7 @@ function SecurityView({ onPairServer }: { onPairServer: () => void }) {
         <article className="security-score"><div className="score-ring"><strong>94</strong><span>/ 100</span></div><div><p className="eyebrow">Security posture</p><h3>Excellent protection</h3><p>Two recommendations remain before production launch.</p><div className="score-items"><span><i className="good" />Signed server identity</span><span><i className="good" />Role-based access</span><span><i className="warn" />Require MFA for owners</span></div></div></article>
       </div>
       <div className="security-columns">
-        <article className="policy-panel"><header><div><p className="eyebrow">Remote policy</p><h3>Allowed capabilities</h3></div><span>Changes are audited</span></header><div className="policy-list"><div><span className="policy-icon">›_</span><div><strong>Console access</strong><p>Run allowlisted commands through the gateway.</p></div><Toggle checked={policies.console} onChange={() => flip("console")} label="Console access" /></div><div><span className="policy-icon">P</span><div><strong>Player moderation</strong><p>Kick, ban, message, and teleport players.</p></div><Toggle checked={policies.moderation} onChange={() => flip("moderation")} label="Player moderation" /></div><div><span className="policy-icon">#</span><div><strong>Chat interaction</strong><p>Read and send messages through PlexonChats.</p></div><Toggle checked={policies.chat} onChange={() => flip("chat")} label="Chat interaction" /></div><div><span className="policy-icon">◆</span><div><strong>Plugin actions</strong><p>Enable, disable, or reload installed plugins.</p></div><Toggle checked={policies.pluginActions} onChange={() => flip("pluginActions")} label="Plugin actions" /></div><div><span className="policy-icon">!</span><div><strong>Error capture</strong><p>Fingerprint exceptions found in server logs.</p></div><Toggle checked={policies.errorCapture} onChange={() => flip("errorCapture")} label="Error capture" /></div></div></article>
+        <article className="policy-panel"><header><div><p className="eyebrow">Remote policy</p><h3>Allowed capabilities</h3></div><span>Changes are audited</span></header><div className="policy-list"><div><span className="policy-icon">›_</span><div><strong>Console access</strong><p>Run allowlisted commands through the gateway.</p></div><Toggle checked={policies.console} onChange={() => flip("console")} label="Console access" /></div><div><span className="policy-icon">P</span><div><strong>Player moderation</strong><p>Kick, ban, and message players.</p></div><Toggle checked={policies.moderation} onChange={() => flip("moderation")} label="Player moderation" /></div><div><span className="policy-icon">#</span><div><strong>Chat interaction</strong><p>Read and send messages through PlexonChats.</p></div><Toggle checked={policies.chat} onChange={() => flip("chat")} label="Chat interaction" /></div><div><span className="policy-icon">◆</span><div><strong>Plugin actions</strong><p>Unavailable in Paper agent v0.1.0.</p></div><Toggle checked={policies.pluginActions} onChange={() => flip("pluginActions")} label="Plugin actions unavailable" disabled /></div><div><span className="policy-icon">!</span><div><strong>Error capture</strong><p>Fingerprint exceptions found in server logs.</p></div><Toggle checked={policies.errorCapture} onChange={() => flip("errorCapture")} label="Error capture" /></div></div></article>
         <article className="audit-panel"><header><div><p className="eyebrow">Immutable record</p><h3>Recent audit events</h3></div><button>View all</button></header><div className="audit-list">{demoAudit.map((item) => <div key={item.id}><span className={`audit-result ${item.result}`}>{item.result === "success" ? "✓" : "!"}</span><div><strong>{item.action}</strong><p>{item.actor} · {item.target}</p></div><time>{item.time}</time></div>)}</div></article>
       </div>
     </section>
