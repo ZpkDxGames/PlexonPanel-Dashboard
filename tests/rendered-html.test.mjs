@@ -58,10 +58,10 @@ before(async () => {
       env: {
         ...process.env,
         NODE_ENV: "production",
-        FIREBASE_ADMIN_PROJECT_ID: "test-project",
-        FIREBASE_ADMIN_CLIENT_EMAIL: "test@example.invalid",
-        FIREBASE_ADMIN_PRIVATE_KEY:
-          "-----BEGIN PRIVATE KEY-----\\nTEST\\n-----END PRIVATE KEY-----\\n",
+        NEXT_PUBLIC_PLEXON_GATEWAY_URL: "https://gateway.example.invalid",
+        PLEXON_GATEWAY_INTERNAL_KEY: "i".repeat(48),
+        GATEWAY_DASHBOARD_TOKEN_SECRET: "t".repeat(48),
+        SESSION_COOKIE_SECRET: "s".repeat(48),
       },
       stdio: ["ignore", "pipe", "pipe"],
     },
@@ -100,12 +100,13 @@ test("renders the PlexonPanel dashboard shell", async () => {
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
   assert.equal(response.headers.get("x-content-type-options"), "nosniff");
   assert.equal(response.headers.get("x-frame-options"), "DENY");
+  assert.match(response.headers.get("content-security-policy") ?? "", /frame-ancestors 'none'/);
 
   const html = await response.text();
   assert.match(html, /<title>PlexonPanel Dashboard<\/title>/i);
 });
 
-test("reports Firebase Admin readiness without exposing credentials", async () => {
+test("reports gateway readiness without exposing credentials", async () => {
   const response = await fetch(`${baseUrl}/api/system/status`, {
     headers: { accept: "application/json" },
   });
@@ -114,6 +115,8 @@ test("reports Firebase Admin readiness without exposing credentials", async () =
   assert.equal(response.headers.get("cache-control"), "no-store");
   assert.deepEqual(await response.json(), {
     service: "plexonpanel-dashboard",
-    firebaseAdminConfigured: true,
+    gatewayConfigured: true,
+    sessionConfigured: true,
+    protocolVersion: 2,
   });
 });

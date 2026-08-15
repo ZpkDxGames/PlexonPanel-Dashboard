@@ -45,3 +45,8 @@ export interface DashboardOverview {
   tpsHistory: TimelinePoint[];
   activity: ActivityEvent[];
 }
+
+export interface DashboardWorkspace {
+  overview: DashboardOverview;
+  management: import("./management-data").ManagementData;
+}

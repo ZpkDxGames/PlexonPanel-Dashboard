@@ -1,76 +1,134 @@
-# Vercel deployment checklist
+# Release deployment checklist
 
-Use this checklist for the private PlexonPanel dashboard repository. Never add
-Firebase service-account JSON files, `.env.vercel`, `.env.local`, pairing codes,
-or generated session secrets to Git.
+Use the review branches first. Never add `.env.vercel`, `.env.gateway`, a
+Firebase service-account JSON, or either Ed25519 private key to Git.
 
-## 1. Prepare the Firebase Web App configuration
+## 1. Finish Firebase and Google Cloud setup
 
-1. Open Firebase Console.
-2. Select the PlexonPanel project.
-3. Open **Project settings → General → Your apps**.
-4. Register or select the dashboard Web App.
-5. Choose the **Config** SDK snippet.
-6. Create a temporary local `firebase-web-config.json` using
-   `firebase-web-config.example.json` as the shape.
+1. Confirm Firestore is running in Native mode in `plexonpanel---database`.
+2. Deploy `firebase/firestore.rules`; protocol v2 intentionally denies all
+   direct browser access.
+3. Enable a Firestore TTL policy for the collection-group field `deleteAt`.
+4. Create a dedicated Cloud Run runtime service account.
+5. Grant that runtime identity the minimum Firestore access needed by the
+   gateway. Do not upload the service-account JSON to Vercel.
+6. Enable Cloud Run, Cloud Build/Artifact Registry, Firestore, and Secret Manager
+   APIs in the Google Cloud project.
 
-The six required Web App fields and optional Analytics measurement ID are
-browser-visible identifiers. Database authorization must still be enforced with
-Firebase Authentication, Security Rules, server-side membership checks, and App
-Check.
+## 2. Create coordinated release secrets
 
-## 2. Generate the Vercel import file locally
-
-Keep the Firebase Admin service-account JSON outside the repository. From the
-dashboard root, run:
+Generate the files locally. The gateway URL may be left blank for the first
+Cloud Run deployment; rerun with `--force` after Cloud Run assigns the URL,
+while preserving the already-deployed shared secrets and gateway identity.
 
 ```bash
 npm run env:vercel -- \
   --service-account "/secure/path/firebase-adminsdk.json" \
-  --web-config "/secure/path/firebase-web-config.json"
+  --web-config "/secure/path/firebase-web-config.json" \
+  --dashboard-origin "https://YOUR-DASHBOARD.vercel.app"
 ```
 
-This creates `.env.vercel` with file mode `0600`, validates that both Firebase
-files belong to the same project, and generates independent pairing and session
-secrets. It does not print credential values.
+The generator creates `.env.vercel` and `.env.gateway` with mode `0600`, does
+not print secrets, and never copies the Firebase Admin private key. Before
+regenerating, preserve these stable values in Secret Manager:
 
-Leave the gateway URL and audience unset until the production gateway exists.
-When they are available, use the optional `--gateway-url` and
-`--gateway-audience` arguments documented in `README.md`.
+- `PAIRING_CODE_PEPPER`
+- `PLEXON_GATEWAY_INTERNAL_KEY`
+- `GATEWAY_DASHBOARD_TOKEN_SECRET`
+- `GATEWAY_ED25519_PRIVATE_KEY`
 
-## 3. Connect the private GitHub repository to Vercel
+The first three values shared with Vercel must remain identical. Gateway key
+rotation requires updating every plugin's public-key setting.
 
-1. Make `ZpkDxGames/PlexonPanel-Dashboard` private.
-2. In Vercel, create or open the PlexonPanel Dashboard project.
-3. Connect that exact GitHub repository.
-4. Confirm that the Vercel GitHub App can read the private repository.
-5. Keep **Framework Preset** set to **Next.js**.
-6. Keep **Root Directory** at the repository root.
-7. Keep **Build Command** at the detected `next build` default.
-8. Leave **Output Directory** blank.
-9. Use Node.js 22 or newer.
+When both generated files still exist, rerunning with `--force` preserves the
+shared secrets, session secret, and gateway identity while updating URLs. If the
+files were deleted, recover the stable gateway values from Secret Manager
+instead of generating a second trust set.
 
-## 4. Import variables safely
+## 3. Deploy the gateway to Cloud Run
 
-1. Open **Vercel project → Settings → Environment Variables**.
-2. Choose **Import .env** and select `.env.vercel`.
-3. Apply public Firebase values to Preview and Production.
-4. Apply server-only values to the environments that require authenticated
-   server behavior.
-5. Mark server-only values as Sensitive when the plan supports it.
-6. Verify that none of the Admin or session variables starts with
-   `NEXT_PUBLIC_`.
-7. Delete the local `.env.vercel` and temporary Web config after confirming the
-   Vercel values.
+1. Build from repository root with `gateway/cloudbuild.yaml` or
+   `gateway/Dockerfile`.
+2. Deploy the container on port `8080` with request timeout `3600` seconds.
+3. Set minimum instances to `1` and maximum instances to `1` for release v2.
+4. Attach the dedicated runtime service account.
+5. Mount the four secrets above from Secret Manager.
+6. Set `FIREBASE_ADMIN_PROJECT_ID` and an exact comma-separated
+   `ALLOWED_DASHBOARD_ORIGINS` value.
+7. Permit unauthenticated network invocation: agent/dashboard WebSocket routes
+   perform application-layer authentication, while every internal HTTPS route
+   requires the internal bearer key.
+8. Confirm `GET /healthz` returns `protocolVersion: 2`.
 
-## 5. Deploy through a review branch
+Once Cloud Run supplies its HTTPS URL, rerun the environment generator with
+`--gateway-url` but do not rotate the stored shared secrets. Copy the URL into
+both Vercel gateway URL variables.
 
-1. Push `agent/vercel-dashboard-refresh` to GitHub.
-2. Vercel automatically creates a Preview deployment for the branch.
-3. Check desktop and mobile layouts and `/api/system/status`.
-4. Open a pull request into `main`.
-5. Merge only after the clean build and preview review pass.
-6. The merge to `main` creates the Production deployment.
+## 4. Configure Vercel
 
-Changing an environment variable only affects new deployments. Redeploy after
-every environment-variable change.
+1. Keep `ZpkDxGames/PlexonPanel-Dashboard` private and connect it to the existing
+   Vercel project.
+2. Use the Next.js preset, repository root, detected build command, no custom
+   output directory, and Node.js 22 or newer.
+3. Import the completed `.env.vercel` into Preview and Production.
+4. Mark the three server-only secrets as Sensitive where supported.
+5. Remove any old `FIREBASE_ADMIN_CLIENT_EMAIL`,
+   `FIREBASE_ADMIN_PRIVATE_KEY`, `PAIRING_CODE_PEPPER`, or
+   `PLEXON_GATEWAY_AUDIENCE` variables from Vercel; protocol v2 does not use
+   them there.
+6. Redeploy after every environment-variable change.
+
+Required Vercel runtime values:
+
+```text
+NEXT_PUBLIC_PLEXON_GATEWAY_URL
+PLEXON_GATEWAY_HTTP_URL
+PLEXON_GATEWAY_INTERNAL_KEY
+GATEWAY_DASHBOARD_TOKEN_SECRET
+SESSION_COOKIE_SECRET
+```
+
+The Firebase Web identifiers may remain; they are public and optional. They do
+not authorize access to Firestore.
+
+## 5. Review the dashboard branch
+
+1. Push `agent/vercel-dashboard-refresh`.
+2. Open its Vercel Preview deployment.
+3. Check desktop, tablet, and mobile pairing screens.
+4. Confirm `/api/system/status` returns HTTP 200 with `gatewayConfigured: true`
+   and `sessionConfigured: true`.
+5. Confirm an unauthenticated `/api/session` request returns 401 and no demo
+   state appears.
+6. Do not merge until the gateway origin allowlist contains the Preview origin
+   used for the end-to-end pairing test.
+
+## 6. Build and configure the Paper plugin
+
+1. Build `agent/pairing-protocol-v2` with Java 25.
+2. Copy `GATEWAY_ED25519_PUBLIC_KEY` from the protected gateway output into
+   `plugins/PlexonPanel/config.yml` as `gateway.public-key`.
+3. Set `gateway.url` to the Cloud Run WebSocket URL ending in `/v1/agent`.
+4. Keep remote actions disabled initially; enable only required local
+   capabilities and explicit console allow patterns.
+5. Start the server and run `/plexonpanel diagnostics`; require
+   `Gateway authenticated: true`.
+
+## 7. End-to-end acceptance
+
+1. Run `/plexonpanel pair` from the server console.
+2. Verify the code appears only after gateway registration and expires after
+   five minutes.
+3. Enter it once in the dashboard; a second claim must fail.
+4. Reload the page and restart the Paper server; the authorized device and
+   server identity should restore automatically.
+5. Verify live telemetry, players, plugins, bounded console, and chat.
+6. Test only actions enabled in `config.yml`, then inspect the audit records.
+7. Run `/plexonpanel unpair`; the open dashboard must lose authorization.
+8. Merge the reviewed branches and let the Vercel `main` deployment become
+   Production.
+
+After successful import/deployment, securely remove the local generated env
+files. They can be recreated only if the stable secrets are first recovered
+from Secret Manager; accidental regeneration would break the deployed trust
+relationship.

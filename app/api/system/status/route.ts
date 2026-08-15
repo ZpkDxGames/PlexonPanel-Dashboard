@@ -1,18 +1,23 @@
-import { hasFirebaseAdminEnvironment } from "@/lib/server/firebase-admin";
+import { hasGatewayEnvironment } from "@/lib/server/gateway";
+import { hasDashboardSessionEnvironment } from "@/lib/server/session";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export async function GET() {
-  const firebaseAdminConfigured = hasFirebaseAdminEnvironment();
+  const gatewayConfigured = hasGatewayEnvironment();
+  const sessionConfigured = hasDashboardSessionEnvironment();
+  const ready = gatewayConfigured && sessionConfigured;
 
   return Response.json(
     {
       service: "plexonpanel-dashboard",
-      firebaseAdminConfigured,
+      gatewayConfigured,
+      sessionConfigured,
+      protocolVersion: 2,
     },
     {
-      status: firebaseAdminConfigured ? 200 : 503,
+      status: ready ? 200 : 503,
       headers: { "Cache-Control": "no-store" },
     },
   );

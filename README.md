@@ -1,85 +1,84 @@
 # PlexonPanel Dashboard
-Private Next.js dashboard for monitoring and managing Paper servers connected through the PlexonPanel plugin.
 
-The interface currently uses clearly labelled preview data. Authentication, pairing, realtime telemetry, and remote actions must not be described as live until their production services are connected and validated.
+Private Next.js dashboard and Cloud Run gateway for PlexonPanel protocol v2.
+The Paper plugin opens an outbound signed WebSocket to the gateway; a browser is
+authorized with the plugin's one-use six-digit PIN and receives bounded live
+state through the dashboard.
 
-## Included interface
+## Release capabilities
 
-- TPS, MSPT, uptime, CPU, memory, and disk monitoring
-- Player search, session details, and guarded moderation previews
-- Searchable console output with error and warning filters
-- PlexonChats global-channel interaction preview
-- Plugin inventory, compatibility, and update states
-- Server pairing, remote-policy, and audit-history previews
-- Responsive desktop and mobile layouts
+- one-use, five-minute server pairing PINs
+- persistent server UUID plus Ed25519 identity binding
+- `HttpOnly`, signed authorized-device browser sessions
+- live TPS, MSPT, uptime, host resources, players, plugins, console, and chat
+- locally governed console, player-message, player-kick, and global-chat actions
+- Firestore-backed identity, device authorization, latest state, and audit data
+- responsive desktop, tablet, and mobile UI with no fabricated preview fallback
+
+The browser never receives a Firebase Admin credential and never reads
+Firestore directly. `localStorage` contains only the harmless active-navigation
+preference. Authentication remains in an `HttpOnly` cookie.
+
+## Repository layout
+
+- `app/` — Vercel dashboard and same-origin API handlers
+- `gateway/` — Cloud Run HTTP/WebSocket gateway
+- `firebase/` — deny-by-default browser rules and index configuration
+- `docs/ARCHITECTURE.md` — protocol and trust boundaries
+- `docs/VERCEL_DEPLOYMENT.md` — ordered release checklist
 
 ## Requirements
 
 - Node.js 22.13 or newer
 - npm 10 or newer
+- Firestore Native mode in the Firebase project
+- Google Cloud Run and Secret Manager for the gateway
 
-## Local development
+## Local validation
 
 ```bash
 npm ci
-cp .env.example .env.local
-npm run dev
+npm run check
 ```
 
-The UI can run without Firebase values, but `/api/system/status` returns `503` until the three `FIREBASE_ADMIN_*` variables have valid-looking values.
+For dashboard development, copy `.env.example` to `.env.local`. Pairing and
+live data require a running gateway; the interface deliberately shows an
+unavailable state instead of pretending that demo data is live.
 
-## Validation
+## Coordinated environment files
 
-```bash
-npm run lint
-npm test
-```
-
-`npm test` performs a clean production build, starts that build locally, checks the dashboard HTML and security headers, and verifies the Firebase readiness response without returning credentials.
-
-## Create the Vercel environment file
-
-The Firebase Admin service-account file does not contain the Firebase Web App configuration. Get the Web App configuration from **Firebase console → Project settings → General → Your apps → Web app**, then copy its six required fields and optional Analytics `measurementId` into a local file named `firebase-web-config.json` using [`firebase-web-config.example.json`](firebase-web-config.example.json) as the shape.
-
-Keep the downloaded service-account JSON outside this project when possible. Generate the import file without passing any secret value on the command line:
-
-```bash
-npm run env:vercel -- \
-  --service-account "/secure/path/firebase-adminsdk.json" \
-  --web-config "/secure/path/firebase-web-config.json"
-```
-
-If the production gateway already exists, append its public URL and expected audience:
+The generator accepts the Firebase files only as local inputs. It validates
+that they belong to the same project, but never copies the service-account
+email or private key into Vercel or Cloud Run output.
 
 ```bash
 npm run env:vercel -- \
   --service-account "/secure/path/firebase-adminsdk.json" \
   --web-config "/secure/path/firebase-web-config.json" \
-  --gateway-url "https://gateway.example.com" \
-  --gateway-audience "plexonpanel-gateway"
+  --gateway-url "https://YOUR-GATEWAY.run.app" \
+  --dashboard-origin "https://YOUR-DASHBOARD.vercel.app"
 ```
 
-The command validates that both Firebase files refer to the same project, creates fresh high-entropy pairing and session secrets, and writes `.env.vercel` with restrictive file permissions. It never prints credentials. Import `.env.vercel` in **Vercel project → Settings → Environment Variables → Import .env**, apply it to Production (and Preview only when needed), then delete the local import file after confirming the values exist in Vercel. Mark the server-only variables as Sensitive when your Vercel plan supports that option.
+This creates ignored, mode-`0600` files:
 
-Do not upload `.env.vercel`, the service-account JSON, or `firebase-web-config.json` with the source. They are ignored by Git and by Vercel uploads.
+- `.env.vercel` — import into the Vercel project
+- `.env.gateway` — move values into Cloud Run/Secret Manager
 
-## Vercel deployment
+The two files contain matching internal API and dashboard-token secrets. The
+gateway file also contains the generated Ed25519 public key; copy only that
+public value into the Paper plugin's `gateway.public-key` setting. Never commit
+either output.
 
-For a direct browser upload, use the provided ZIP as-is with [Vercel Drop](https://vercel.com/drop). Its archive root contains `package.json`, `app/`, and the rest of the Next.js project directly, so no Root Directory override is needed.
+Firebase Web App identifiers are public by design and remain optional for
+Analytics or future browser SDK use. They do not authorize Firestore access.
+Cloud Run should use its runtime service account through Application Default
+Credentials, not a service-account JSON stored in Vercel.
 
-For Git or CLI deployment:
+## Deployment
 
-1. Keep the repository private and run deployment from the directory containing `package.json`.
-2. Use the detected **Next.js** framework preset.
-3. Leave **Root Directory** at the project root, **Build Command** at `next build`, and **Output Directory** blank.
-4. Import the environment variables before the production deployment, or redeploy once after adding them.
-5. Run the authenticated session and readiness tests before enabling real data.
+Follow [docs/VERCEL_DEPLOYMENT.md](docs/VERCEL_DEPLOYMENT.md). Deploy the gateway
+first, update the Vercel variables with its URL, deploy the review branch, then
+configure the plugin with the gateway WebSocket URL and public key.
 
-Vercel Drop creates a new project for each upload. Connect a private Git repository or use the Vercel CLI when future deployments must keep the same project and production URL.
-
-For the complete private-repository, environment-import, preview-branch, and
-production rollout sequence, follow [the Vercel deployment checklist](docs/VERCEL_DEPLOYMENT.md).
-
-The expected service boundaries, pairing flow, and Firestore model are documented in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
-
-Never commit `.env.local`, Firebase service-account JSON files, private signing keys, pairing codes, or session secrets.
+Never commit `.env*`, Firebase service-account JSON, gateway private keys,
+pairing codes, or session secrets.
