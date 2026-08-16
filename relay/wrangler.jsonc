@@ -16,7 +16,7 @@
     }
   ],
   "vars": {
-    "DASHBOARD_ORIGINS": "http://localhost:3000"
+    "DASHBOARD_ORIGINS": "https://plexon-panel-dashboard-git-agent-ver-21d7ef-zpkdxgames-projects.vercel.app"
   },
   "observability": {
     "enabled": false
