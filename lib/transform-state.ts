@@ -1,3 +1,4 @@
+import { normalizeCpuLoad } from "./cpu-load.js";
 import type { DashboardWorkspace, ResourceMetric, TimelinePoint } from "./dashboard-types";
 import type {
   AgentCapabilities,
@@ -239,7 +240,7 @@ function uniqueConsoleEntries(entries: ConsoleEntry[]): ConsoleEntry[] {
 }
 
 function resources(system: Record<string, unknown>): ResourceMetric[] {
-  const cpu = percentage(finiteNumber(system.systemCpuLoad) * 100);
+  const cpu = normalizeCpuLoad(system.systemCpuLoad);
   const memoryTotal = positiveNumber(system.physicalMemoryTotalBytes) || positiveNumber(system.jvmHeapMaximumBytes);
   const memoryUsed = positiveNumber(system.physicalMemoryUsedBytes) || positiveNumber(system.jvmHeapUsedBytes);
   const diskTotal = positiveNumber(system.diskTotalBytes);
@@ -248,7 +249,7 @@ function resources(system: Record<string, unknown>): ResourceMetric[] {
   const memoryPercent = memoryTotal ? percentage((memoryUsed / memoryTotal) * 100) : 0;
   const diskPercent = diskTotal ? percentage((diskUsed / diskTotal) * 100) : 0;
   return [
-    { label: "CPU load", value: cpu, displayValue: cpu ? `${cpu}%` : "Unavailable", detail: `${positiveInteger(system.availableProcessors) || "—"} cores reported`, tone: "cyan" },
+    { label: "CPU load", value: cpu.percent, displayValue: cpu.available ? `${cpu.percent}%` : "Unavailable", detail: `${positiveInteger(system.availableProcessors) || "—"} cores reported`, tone: "cyan" },
     { label: "Memory", value: memoryPercent, displayValue: memoryTotal ? `${formatBytes(memoryUsed)} / ${formatBytes(memoryTotal)}` : "Unavailable", detail: memoryTotal ? `${formatBytes(Math.max(0, memoryTotal - memoryUsed))} available` : "Host memory not reported", tone: "violet" },
     { label: "Disk", value: diskPercent, displayValue: diskTotal ? `${formatBytes(diskUsed)} / ${formatBytes(diskTotal)}` : "Unavailable", detail: diskTotal ? `${formatBytes(diskUsable)} available` : "Disk usage not reported", tone: "green" },
   ];
