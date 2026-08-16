@@ -59,4 +59,4 @@ await writeFile(publicPath, JSON.stringify({ GATEWAY_ED25519_PUBLIC_KEY: publicK
 await chmod(publicPath, 0o600);
 
 console.log(`Created protected relay files at ${outputPath}, ${secretsPath}, and ${publicPath}.`);
-console.log("No credential value was printed. Copy the public key into wrangler.jsonc and the Paper plugin config.");
+console.log("No credential value was printed. Upload the secrets file with Wrangler, then pin the public key in the Paper plugin config.");
