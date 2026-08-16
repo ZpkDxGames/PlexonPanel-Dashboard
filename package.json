@@ -1,6 +1,6 @@
 {
   "name": "plexonpanel-dashboard",
-  "version": "1.0.0-rc.1",
+  "version": "1.0.0-rc.2",
   "private": true,
   "engines": {
     "node": ">=22.13.0"
@@ -9,17 +9,17 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "gateway:build": "tsc -p gateway/tsconfig.json",
-    "gateway:keygen": "node gateway/scripts/generate-identity.mjs",
-    "gateway:start": "node gateway/dist/index.js",
-    "gateway:test": "npm run gateway:build && node --test gateway/tests/*.test.mjs",
+    "relay:build": "tsc -p relay/tsconfig.json",
+    "relay:keygen": "node relay/scripts/generate-secrets.mjs",
+    "relay:dev": "npx wrangler@latest dev --config relay/wrangler.jsonc",
+    "relay:deploy": "npx wrangler@latest deploy --config relay/wrangler.jsonc",
+    "relay:test": "npm run relay:build && node --test relay/tests/*.test.mjs",
     "env:vercel": "node scripts/create-vercel-env.mjs",
-    "test": "npm run build && node --test --test-concurrency=1 tests/*.test.mjs",
+    "test": "node scripts/build-test.mjs && node --test --test-concurrency=1 tests/*.test.mjs",
     "lint": "eslint . --ignore-pattern .next --ignore-pattern node_modules",
-    "check": "npm run lint && npm run gateway:test && npm test"
+    "check": "npm run lint && npm run relay:test && npm test"
   },
   "dependencies": {
-    "firebase-admin": "^14.2.0",
     "next": "16.3.1",
     "react": "19.2.6",
     "react-dom": "19.2.6"

@@ -9,16 +9,16 @@ import type {
 
 const colors = ["violet", "cyan", "green", "amber", "rose"];
 
-export function transformGatewayState(gateway: Record<string, unknown>): DashboardWorkspace {
-  const serverDocument = record(gateway.server);
-  const persisted = record(gateway.state);
-  const live = record(gateway.liveState);
+export function transformRelayState(relay: Record<string, unknown>): DashboardWorkspace {
+  const serverDocument = record(relay.server);
+  const persisted = record(relay.state);
+  const live = record(relay.liveState);
   const server = record(live.server ?? persisted.server);
   const system = record(live.system ?? persisted.system);
   const playersEnvelope = record(live.players ?? persisted.players);
   const pluginsEnvelope = record(live.plugins ?? persisted.plugins);
   const errorsEnvelope = record(live.errors ?? persisted.errors);
-  const connectionStatus = gateway.connectionStatus === "online" ? "online" : "offline";
+  const connectionStatus = relay.connectionStatus === "online" ? "online" : "offline";
   const players = array(playersEnvelope.players).map(playerRecord).filter(notNull);
   const plugins = array(pluginsEnvelope.plugins).map(pluginRecord).filter(notNull);
   const consoleEntries = array(errorsEnvelope.lines).map(consoleRecord).filter(notNull);
@@ -29,7 +29,7 @@ export function transformGatewayState(gateway: Record<string, unknown>): Dashboa
   const onlinePlayers = positiveInteger(server.onlinePlayers);
   const uptime = positiveNumber(system.processUptimeMillis);
   const capabilities = capabilityRecord(serverDocument.capabilities);
-  const audit = array(gateway.audit).map(auditRecord).filter(notNull);
+  const audit = array(relay.audit).map(auditRecord).filter(notNull);
 
   return {
     overview: {
@@ -91,7 +91,7 @@ export function transformGatewayState(gateway: Record<string, unknown>): Dashboa
   };
 }
 
-export function applyGatewayEvent(
+export function applyRelayEvent(
   current: DashboardWorkspace,
   eventType: string,
   body: Record<string, unknown>,
@@ -103,7 +103,7 @@ export function applyGatewayEvent(
       ...current,
       management: {
         ...current.management,
-        chatMessages: [...current.management.chatMessages, message].slice(-200),
+        chatMessages: [...current.management.chatMessages.filter((item) => item.id !== message.id), message].slice(-200),
       },
     };
   }
@@ -125,7 +125,7 @@ export function applyGatewayEvent(
       },
     };
   }
-  const gateway: Record<string, unknown> = {
+  const relay: Record<string, unknown> = {
     connectionStatus: current.overview.server.status === "online" ? "online" : "offline",
     server: {
       serverId: current.management.identity.serverId,
@@ -136,7 +136,7 @@ export function applyGatewayEvent(
     },
     liveState: {},
   };
-  const live = gateway.liveState as Record<string, unknown>;
+  const live = relay.liveState as Record<string, unknown>;
   const slot = ({
     "telemetry.server": "server",
     "telemetry.system": "system",
@@ -146,8 +146,35 @@ export function applyGatewayEvent(
   } as Record<string, string>)[eventType];
   if (!slot) return current;
   live[slot] = body;
-  const next = transformGatewayState(gateway);
+  const next = transformRelayState(relay);
   return mergeWorkspace(current, next, slot);
+}
+
+export function applyRelayReady(
+  current: DashboardWorkspace | null,
+  server: Record<string, unknown>,
+  connectionStatus: unknown,
+): DashboardWorkspace {
+  const next = transformRelayState({ server, connectionStatus });
+  if (!current || current.management.identity.serverId !== next.management.identity.serverId) return next;
+  return {
+    ...current,
+    overview: {
+      ...current.overview,
+      server: {
+        ...current.overview.server,
+        id: next.overview.server.id,
+        status: next.overview.server.status,
+        version: next.overview.server.version === "Unknown" ? current.overview.server.version : next.overview.server.version,
+        lastSeen: next.overview.server.lastSeen === "Unknown" ? current.overview.server.lastSeen : next.overview.server.lastSeen,
+      },
+    },
+    management: {
+      ...current.management,
+      identity: next.management.identity,
+      capabilities: next.management.capabilities,
+    },
+  };
 }
 
 export function applyConnectionStatus(
@@ -195,9 +222,20 @@ function mergeWorkspace(current: DashboardWorkspace, next: DashboardWorkspace, s
     ...current,
     management: {
       ...current.management,
-      consoleEntries: [...current.management.consoleEntries, ...next.management.consoleEntries].slice(-200),
+      consoleEntries: uniqueConsoleEntries([...current.management.consoleEntries, ...next.management.consoleEntries]).slice(-200),
     },
   };
+}
+
+function uniqueConsoleEntries(entries: ConsoleEntry[]): ConsoleEntry[] {
+  const seen = new Set<string>();
+  const result: ConsoleEntry[] = [];
+  for (const entry of entries) {
+    if (seen.has(entry.id)) continue;
+    seen.add(entry.id);
+    result.push(entry);
+  }
+  return result;
 }
 
 function resources(system: Record<string, unknown>): ResourceMetric[] {
@@ -226,7 +264,7 @@ function activity(players: PlayerRecord[], plugins: PluginRecord[], consoleEntri
   if (players[0]) result.push({ id: `player-${players[0].id}`, category: "player" as const, title: `${players[0].name} is online`, detail: `${players[0].world} · ${players[0].ping} ms`, time: "Latest snapshot" });
   result.push({ id: "plugins-current", category: "plugin" as const, title: "Plugin inventory synchronized", detail: `${plugins.filter((plugin) => plugin.status === "enabled").length} enabled · ${plugins.filter((plugin) => plugin.status === "disabled").length} disabled`, time: "Latest snapshot" });
   if (consoleEntries[0]) result.push({ id: `error-${consoleEntries[0].id}`, category: "system" as const, title: `${consoleEntries[0].level} captured`, detail: consoleEntries[0].message, time: consoleEntries[0].time });
-  result.push({ id: "identity-current", category: "security" as const, title: "Cryptographic server identity verified", detail: "Ed25519 challenge completed by the gateway", time: "Current connection" });
+  result.push({ id: "identity-current", category: "security" as const, title: "Cryptographic server identity verified", detail: "Ed25519 challenge completed by the relay", time: "Current connection" });
   return result.slice(0, 4);
 }
 

@@ -1,134 +1,200 @@
-# Release deployment checklist
+# Database-less rc.2 deployment checklist
 
-Use the review branches first. Never add `.env.vercel`, `.env.gateway`, a
-Firebase service-account JSON, or either Ed25519 private key to Git.
+This is the ordered path for the review branches:
 
-## 1. Finish Firebase and Google Cloud setup
+- dashboard: `agent/vercel-dashboard-refresh`
+- plugin: `agent/pairing-protocol-v2`
 
-1. Confirm Firestore is running in Native mode in `plexonpanel---database`.
-2. Deploy `firebase/firestore.rules`; protocol v2 intentionally denies all
-   direct browser access.
-3. Enable a Firestore TTL policy for the collection-group field `deleteAt`.
-4. Create a dedicated Cloud Run runtime service account.
-5. Grant that runtime identity the minimum Firestore access needed by the
-   gateway. Do not upload the service-account JSON to Vercel.
-6. Enable Cloud Run, Cloud Build/Artifact Registry, Firestore, and Secret Manager
-   APIs in the Google Cloud project.
+Firebase billing, Firestore rules, TTL policies, Firebase Admin JSON, and
+Firebase Web configuration are not used. Do not upload any of them to Vercel.
 
-## 2. Create coordinated release secrets
+## 1. Prepare the dashboard checkout
 
-Generate the files locally. The gateway URL may be left blank for the first
-Cloud Run deployment; rerun with `--force` after Cloud Run assigns the URL,
-while preserving the already-deployed shared secrets and gateway identity.
+From Windows Command Prompt in the existing dashboard repository:
 
-```bash
-npm run env:vercel -- \
-  --service-account "/secure/path/firebase-adminsdk.json" \
-  --web-config "/secure/path/firebase-web-config.json" \
-  --dashboard-origin "https://YOUR-DASHBOARD.vercel.app"
+```bat
+git fetch origin
+git switch agent/vercel-dashboard-refresh
+git status --short
+node --version
+npm --version
+npm ci
 ```
 
-The generator creates `.env.vercel` and `.env.gateway` with mode `0600`, does
-not print secrets, and never copies the Firebase Admin private key. Before
-regenerating, preserve these stable values in Secret Manager:
+Use Node.js 22.13 or newer. `git status --short` should show only changes you
+intend to keep. Do not clone the repository inside an existing checkout.
 
-- `PAIRING_CODE_PEPPER`
-- `PLEXON_GATEWAY_INTERNAL_KEY`
-- `GATEWAY_DASHBOARD_TOKEN_SECRET`
-- `GATEWAY_ED25519_PRIVATE_KEY`
+Validate before deployment:
 
-The first three values shared with Vercel must remain identical. Gateway key
-rotation requires updating every plugin's public-key setting.
+```bat
+npm run check
+```
 
-When both generated files still exist, rerunning with `--force` preserves the
-shared secrets, session secret, and gateway identity while updating URLs. If the
-files were deleted, recover the stable gateway values from Secret Manager
-instead of generating a second trust set.
+## 2. Create the relay identity once
 
-## 3. Deploy the gateway to Cloud Run
+Run from the dashboard repository root:
 
-1. Build from repository root with `gateway/cloudbuild.yaml` or
-   `gateway/Dockerfile`.
-2. Deploy the container on port `8080` with request timeout `3600` seconds.
-3. Set minimum instances to `1` and maximum instances to `1` for release v2.
-4. Attach the dedicated runtime service account.
-5. Mount the four secrets above from Secret Manager.
-6. Set `FIREBASE_ADMIN_PROJECT_ID` and an exact comma-separated
-   `ALLOWED_DASHBOARD_ORIGINS` value.
-7. Permit unauthenticated network invocation: agent/dashboard WebSocket routes
-   perform application-layer authentication, while every internal HTTPS route
-   requires the internal bearer key.
-8. Confirm `GET /healthz` returns `protocolVersion: 2`.
+```bat
+npm run relay:keygen
+```
 
-Once Cloud Run supplies its HTTPS URL, rerun the environment generator with
-`--gateway-url` but do not rotate the stored shared secrets. Copy the URL into
-both Vercel gateway URL variables.
+This creates three ignored files without printing credentials:
 
-## 4. Configure Vercel
+- `relay/.dev.vars` — local relay development bindings
+- `relay/.relay-secrets.json` — Cloudflare secret-bulk input
+- `relay/.relay-public.json` — public key to pin in the Paper plugin
 
-1. Keep `ZpkDxGames/PlexonPanel-Dashboard` private and connect it to the existing
-   Vercel project.
-2. Use the Next.js preset, repository root, detected build command, no custom
-   output directory, and Node.js 22 or newer.
-3. Import the completed `.env.vercel` into Preview and Production.
-4. Mark the three server-only secrets as Sensitive where supported.
-5. Remove any old `FIREBASE_ADMIN_CLIENT_EMAIL`,
-   `FIREBASE_ADMIN_PRIVATE_KEY`, `PAIRING_CODE_PEPPER`, or
-   `PLEXON_GATEWAY_AUDIENCE` variables from Vercel; protocol v2 does not use
-   them there.
-6. Redeploy after every environment-variable change.
+Back up the two secret files in a secure password manager or encrypted storage.
+Do not commit or send them in an issue. Do not run `--force` after deployment:
+rotating this key requires updating every configured plugin.
 
-Required Vercel runtime values:
+## 3. Set the exact dashboard origins
+
+Edit `relay/wrangler.jsonc`. Replace `DASHBOARD_ORIGINS` with the exact Vercel
+origins allowed to pair and open dashboard sockets. Multiple origins are
+comma-separated, with no paths:
+
+```json
+"DASHBOARD_ORIGINS": "https://YOUR-PROJECT.vercel.app,https://YOUR-BRANCH-ALIAS.vercel.app"
+```
+
+Do not use `*`. Use the stable Production domain and the exact Preview/branch
+alias shown by Vercel for acceptance testing. Redeploy the relay whenever this
+allowlist changes.
+
+## 4. Deploy the free Cloudflare relay
+
+Sign in and perform an initial deployment:
+
+```bat
+npx wrangler@latest login
+npx wrangler@latest deploy --config relay/wrangler.jsonc
+```
+
+Immediately upload the generated bindings and deploy the final version:
+
+```bat
+npx wrangler@latest secret bulk relay/.relay-secrets.json --config relay/wrangler.jsonc
+npx wrangler@latest deploy --config relay/wrangler.jsonc
+```
+
+If `secret bulk` offers to create or deploy the Worker, accept the operation.
+Do not paste the secret values into `wrangler.jsonc`.
+
+Cloudflare prints a URL similar to:
 
 ```text
-NEXT_PUBLIC_PLEXON_GATEWAY_URL
-PLEXON_GATEWAY_HTTP_URL
-PLEXON_GATEWAY_INTERNAL_KEY
-GATEWAY_DASHBOARD_TOKEN_SECRET
-SESSION_COOKIE_SECRET
+https://plexonpanel-relay.YOUR-SUBDOMAIN.workers.dev
 ```
 
-The Firebase Web identifiers may remain; they are public and optional. They do
-not authorize access to Firestore.
+Open its health route:
 
-## 5. Review the dashboard branch
+```text
+https://plexonpanel-relay.YOUR-SUBDOMAIN.workers.dev/healthz
+```
 
-1. Push `agent/vercel-dashboard-refresh`.
-2. Open its Vercel Preview deployment.
-3. Check desktop, tablet, and mobile pairing screens.
-4. Confirm `/api/system/status` returns HTTP 200 with `gatewayConfigured: true`
-   and `sessionConfigured: true`.
-5. Confirm an unauthenticated `/api/session` request returns 401 and no demo
-   state appears.
-6. Do not merge until the gateway origin allowlist contains the Preview origin
-   used for the end-to-end pairing test.
+Require `ok: true`, `protocolVersion: 2`, and
+`storage: "coordination-only"`. The returned public key must match
+`relay/.relay-public.json`.
 
-## 6. Build and configure the Paper plugin
+## 5. Create and import the Vercel file
 
-1. Build `agent/pairing-protocol-v2` with Java 25.
-2. Copy `GATEWAY_ED25519_PUBLIC_KEY` from the protected gateway output into
-   `plugins/PlexonPanel/config.yml` as `gateway.public-key`.
-3. Set `gateway.url` to the Cloud Run WebSocket URL ending in `/v1/agent`.
-4. Keep remote actions disabled initially; enable only required local
-   capabilities and explicit console allow patterns.
-5. Start the server and run `/plexonpanel diagnostics`; require
-   `Gateway authenticated: true`.
+Generate the complete Vercel import file:
 
-## 7. End-to-end acceptance
+```bat
+npm run env:vercel -- --relay-url "https://plexonpanel-relay.YOUR-SUBDOMAIN.workers.dev"
+```
 
-1. Run `/plexonpanel pair` from the server console.
-2. Verify the code appears only after gateway registration and expires after
+Import `.env.vercel` into both Preview and Production in Vercel. It contains
+only:
+
+```text
+NEXT_PUBLIC_PLEXON_RELAY_URL
+```
+
+Delete obsolete Firebase and old gateway variables from the Vercel project,
+including `FIREBASE_ADMIN_*`, `NEXT_PUBLIC_FIREBASE_*`,
+`PLEXON_GATEWAY_*`, cookie secrets, and pairing peppers. rc.2 does not read
+them. Redeploy after changing environment variables.
+
+Vercel settings:
+
+1. Repository: private `ZpkDxGames/PlexonPanel-Dashboard`.
+2. Framework: Next.js.
+3. Root directory: repository root.
+4. Build command/output: detected defaults.
+5. Node.js: 22 or newer.
+6. Git branch for review: `agent/vercel-dashboard-refresh`.
+
+Open the Preview URL and confirm the full-size pairing page renders. A missing
+or blocked IndexedDB workspace must show a real error, never demo server data.
+
+## 6. Build the Paper plugin branch
+
+In the PlexonPanel plugin checkout:
+
+```bat
+git fetch origin
+git switch agent/pairing-protocol-v2
+git status --short
+gradlew.bat clean test :agent:jar
+```
+
+The plugin requires Java 25. The output is:
+
+```text
+agent\build\libs\PlexonPanel-1.0.0-rc.2.jar
+```
+
+Copy the JAR into the disposable Paper 26.2 server's `plugins` folder and start
+the server once to generate configuration.
+
+## 7. Configure the plugin
+
+Open `plugins/PlexonPanel/config.yml` and set:
+
+```yaml
+gateway:
+  enabled: true
+  url: "wss://plexonpanel-relay.YOUR-SUBDOMAIN.workers.dev/v1/agent"
+  public-key: "PASTE_GATEWAY_ED25519_PUBLIC_KEY_FROM_relay/.relay-public.json"
+  require-signed-messages: true
+```
+
+The public key is safe to copy; the private key is not. Keep all remote actions
+disabled for the first connection. Restart Paper, then run:
+
+```text
+/plexonpanel diagnostics
+/plexonpanel status
+```
+
+Require an authenticated relay connection before pairing.
+
+## 8. End-to-end acceptance
+
+1. Run `/plexonpanel pair` from the Paper console.
+2. Confirm the code appears only after relay registration and expires after
    five minutes.
-3. Enter it once in the dashboard; a second claim must fail.
-4. Reload the page and restart the Paper server; the authorized device and
-   server identity should restore automatically.
-5. Verify live telemetry, players, plugins, bounded console, and chat.
-6. Test only actions enabled in `config.yml`, then inspect the audit records.
-7. Run `/plexonpanel unpair`; the open dashboard must lose authorization.
-8. Merge the reviewed branches and let the Vercel `main` deployment become
-   Production.
+3. Enter it in the Vercel Preview dashboard.
+4. Confirm a second claim of the same code fails.
+5. Verify live TPS/system metrics, players, plugins, and enabled console/chat
+   streams.
+6. Reload the browser. The bounded IndexedDB workspace should restore and then
+   refresh from Paper.
+7. Restart Paper. The same server UUID/key should reconnect automatically.
+8. Enable one safe action at a time in `config.yml`, test it, and inspect
+   `plugins/PlexonPanel/audit/`.
+9. Run `/plexonpanel unpair`. The open dashboard must disconnect and every old
+   browser credential must fail on reconnect.
+10. Check Cloudflare usage before merging the review branches.
 
-After successful import/deployment, securely remove the local generated env
-files. They can be recreated only if the stable secrets are first recovered
-from Secret Manager; accidental regeneration would break the deployed trust
-relationship.
+## 9. Publish the reviewed branches
+
+After every acceptance item passes, commit the intended files, push both
+review branches, and update their pull requests. Merge the dashboard only after
+the Cloudflare origin allowlist contains the final Production domain. Let
+Vercel redeploy `main`, then repeat pairing once against Production.
+
+Keep `relay/.dev.vars`, `relay/.relay-secrets.json`, `.env.vercel`, plugin
+identity files, pairing codes, logs, and browser credentials out of Git.

@@ -3,11 +3,16 @@ node_modules/
 .next/
 out/
 gateway/dist/
+relay/dist/
 
 # Local and generated environment files
 .env
 .env.*
 !.env.example
+.dev.vars
+.dev.vars.*
+.relay-public.json
+.relay-secrets.json
 
 # Firebase credentials and local Web App configuration
 *firebase-adminsdk*.json

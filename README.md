@@ -1,38 +1,66 @@
 # PlexonPanel Dashboard
 
-Private Next.js dashboard and Cloud Run gateway for PlexonPanel protocol v2.
-The Paper plugin opens an outbound signed WebSocket to the gateway; a browser is
-authorized with the plugin's one-use six-digit PIN and receives bounded live
-state through the dashboard.
+PlexonPanel is a database-less, real-time control surface for a Paper server.
+The plugin opens an outbound signed WebSocket, a small Cloudflare Worker relays
+live frames, and the Next.js dashboard renders them on Vercel. Vercel does not
+receive a Firebase credential and neither hosted component stores telemetry,
+console output, chat, or player history in an application database.
 
-## Release capabilities
+> **Release status:** `1.0.0-rc.2` is intended for review on a disposable Paper
+> 26.2 server before production use.
 
-- one-use, five-minute server pairing PINs
-- persistent server UUID plus Ed25519 identity binding
-- `HttpOnly`, signed authorized-device browser sessions
-- live TPS, MSPT, uptime, host resources, players, plugins, console, and chat
-- locally governed console, player-message, player-kick, and global-chat actions
-- Firestore-backed identity, device authorization, latest state, and audit data
-- responsive desktop, tablet, and mobile UI with no fabricated preview fallback
+## What ships in rc.2
 
-The browser never receives a Firebase Admin credential and never reads
-Firestore directly. `localStorage` contains only the harmless active-navigation
-preference. Authentication remains in an `HttpOnly` cookie.
+- plugin-generated, one-use six-digit pairing codes with five-minute expiry
+- persistent server UUID and Ed25519 identity binding
+- exact dashboard-origin allowlisting and per-address pairing throttling
+- scoped browser-device credentials that can be revoked with `/plexonpanel unpair`
+- live TPS, MSPT, uptime, resources, players, plugins, bounded console, and chat
+- locally governed console, player, whitelist, ban, and global-chat actions
+- automatic reconnect plus fresh server, system, player, plugin, and console snapshots
+- responsive desktop, tablet, and mobile layouts in the Plexon dark-navy,
+  cyan, violet, green, and amber visual family
+
+## Data ownership
+
+| Location | Stored data |
+| --- | --- |
+| Paper server | persistent server UUID/private key, plugin settings, rotating local action audit |
+| Cloudflare Durable Objects | public server identity, pairing generation, and short-lived pairing/rate metadata only |
+| Vercel | application code and static/runtime assets only |
+| Browser IndexedDB | one scoped device credential and a bounded workspace snapshot for this origin |
+| Browser `localStorage` | active navigation section only |
+
+Live telemetry is TLS-protected in transit and protocol messages between the
+relay and plugin are signed. This is not end-to-end encryption: the relay must
+process live frames in memory to route them. The application deliberately does
+not persist those frames at the relay.
+
+## Why Firebase is not required
+
+The dashboard is a live viewer, so a central telemetry database adds cost,
+retention responsibility, and another failure mode without being required for
+the core experience. Users must never place Firebase Admin/service-account keys
+in a browser or repository. Firebase Web configuration identifiers are not
+secret, but they also do not replace authorization rules. A separate,
+operator-owned archive exporter can be added later without changing the live
+protocol.
 
 ## Repository layout
 
-- `app/` — Vercel dashboard and same-origin API handlers
-- `gateway/` — Cloud Run HTTP/WebSocket gateway
-- `firebase/` — deny-by-default browser rules and index configuration
-- `docs/ARCHITECTURE.md` — protocol and trust boundaries
-- `docs/VERCEL_DEPLOYMENT.md` — ordered release checklist
+- `app/` — responsive Next.js dashboard
+- `lib/` — relay client, IndexedDB workspace, and live-state transforms
+- `relay/` — Cloudflare Worker and Durable Object relay
+- `docs/ARCHITECTURE.md` — protocol, retention, and trust boundaries
+- `docs/VERCEL_DEPLOYMENT.md` — ordered Windows-friendly release checklist
 
 ## Requirements
 
 - Node.js 22.13 or newer
 - npm 10 or newer
-- Firestore Native mode in the Firebase project
-- Google Cloud Run and Secret Manager for the gateway
+- Cloudflare account with Workers and Durable Objects enabled
+- Vercel project for this private repository
+- the matching PlexonPanel rc.2 Paper plugin
 
 ## Local validation
 
@@ -41,44 +69,35 @@ npm ci
 npm run check
 ```
 
-For dashboard development, copy `.env.example` to `.env.local`. Pairing and
-live data require a running gateway; the interface deliberately shows an
-unavailable state instead of pretending that demo data is live.
+For dashboard development, copy `.env.example` to `.env.local` and set the
+public HTTPS relay origin. The UI shows a real unavailable/offline state when
+the relay or Paper server is absent; it never substitutes fabricated live data.
 
-## Coordinated environment files
+## Vercel environment file
 
-The generator accepts the Firebase files only as local inputs. It validates
-that they belong to the same project, but never copies the service-account
-email or private key into Vercel or Cloud Run output.
+After the relay has a `workers.dev` URL, create the complete Vercel import:
 
 ```bash
 npm run env:vercel -- \
-  --service-account "/secure/path/firebase-adminsdk.json" \
-  --web-config "/secure/path/firebase-web-config.json" \
-  --gateway-url "https://YOUR-GATEWAY.run.app" \
-  --dashboard-origin "https://YOUR-DASHBOARD.vercel.app"
+  --relay-url "https://YOUR-RELAY.workers.dev"
 ```
 
-This creates ignored, mode-`0600` files:
+The ignored `.env.vercel` contains one public value:
 
-- `.env.vercel` — import into the Vercel project
-- `.env.gateway` — move values into Cloud Run/Secret Manager
+```text
+NEXT_PUBLIC_PLEXON_RELAY_URL
+```
 
-The two files contain matching internal API and dashboard-token secrets. The
-gateway file also contains the generated Ed25519 public key; copy only that
-public value into the Paper plugin's `gateway.public-key` setting. Never commit
-either output.
-
-Firebase Web App identifiers are public by design and remain optional for
-Analytics or future browser SDK use. They do not authorize Firestore access.
-Cloud Run should use its runtime service account through Application Default
-Credentials, not a service-account JSON stored in Vercel.
+No Firebase, service-account, session-cookie, or server-side Vercel secret is
+used by rc.2.
 
 ## Deployment
 
-Follow [docs/VERCEL_DEPLOYMENT.md](docs/VERCEL_DEPLOYMENT.md). Deploy the gateway
-first, update the Vercel variables with its URL, deploy the review branch, then
-configure the plugin with the gateway WebSocket URL and public key.
+Follow [the release checklist](docs/VERCEL_DEPLOYMENT.md). Deploy the relay,
+import the one-variable Vercel file, redeploy the dashboard branch, configure
+the plugin with the relay WebSocket URL and pinned public key, and then perform
+the pairing acceptance test.
 
-Never commit `.env*`, Firebase service-account JSON, gateway private keys,
-pairing codes, or session secrets.
+Never commit `.env*`, `.dev.vars`, `.relay-secrets.json`, an Ed25519 private
+key, a pairing code, browser credentials, server logs, or Firebase
+service-account JSON.

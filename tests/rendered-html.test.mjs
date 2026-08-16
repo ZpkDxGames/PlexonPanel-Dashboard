@@ -58,10 +58,7 @@ before(async () => {
       env: {
         ...process.env,
         NODE_ENV: "production",
-        NEXT_PUBLIC_PLEXON_GATEWAY_URL: "https://gateway.example.invalid",
-        PLEXON_GATEWAY_INTERNAL_KEY: "i".repeat(48),
-        GATEWAY_DASHBOARD_TOKEN_SECRET: "t".repeat(48),
-        SESSION_COOKIE_SECRET: "s".repeat(48),
+        NEXT_PUBLIC_PLEXON_RELAY_URL: "https://relay.example.invalid",
       },
       stdio: ["ignore", "pipe", "pipe"],
     },
@@ -100,23 +97,19 @@ test("renders the PlexonPanel dashboard shell", async () => {
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
   assert.equal(response.headers.get("x-content-type-options"), "nosniff");
   assert.equal(response.headers.get("x-frame-options"), "DENY");
-  assert.match(response.headers.get("content-security-policy") ?? "", /frame-ancestors 'none'/);
+  const contentSecurityPolicy = response.headers.get("content-security-policy") ?? "";
+  assert.match(contentSecurityPolicy, /frame-ancestors 'none'/);
+  assert.match(contentSecurityPolicy, /connect-src 'self' https:\/\/relay\.example\.invalid wss:\/\/relay\.example\.invalid/);
+  assert.doesNotMatch(contentSecurityPolicy, /connect-src[^;]*\shttps:\s/);
 
   const html = await response.text();
   assert.match(html, /<title>PlexonPanel Dashboard<\/title>/i);
 });
 
-test("reports gateway readiness without exposing credentials", async () => {
+test("does not expose the removed server-side session API", async () => {
   const response = await fetch(`${baseUrl}/api/system/status`, {
     headers: { accept: "application/json" },
   });
 
-  assert.equal(response.status, 200);
-  assert.equal(response.headers.get("cache-control"), "no-store");
-  assert.deepEqual(await response.json(), {
-    service: "plexonpanel-dashboard",
-    gatewayConfigured: true,
-    sessionConfigured: true,
-    protocolVersion: 2,
-  });
+  assert.equal(response.status, 404);
 });
