@@ -1,12 +1,7 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ActionError, sendDashboardAction } from "../lib/data-source";
-import {
-  number,
-  records,
-  str,
-  type JsonMap,
-} from "../lib/control-state";
+import { number, records, str, type JsonMap } from "../lib/control-state";
 import { SCOPES } from "../lib/scopes";
 import {
   ActionButton,
@@ -113,7 +108,8 @@ export function FilesView(props: ViewProps) {
     [syntax, setSyntax] = useState(false),
     [download, setDownload] = useState<number | null>(null);
   const controller = useRef<AbortController | null>(null);
-  const kind: "PAPER" | "HOST" = selected?.kind ?? (props.state.ready?.agents.host ? "HOST" : "PAPER");
+  const kind: "PAPER" | "HOST" =
+    selected?.kind ?? (props.state.ready?.agents.host ? "HOST" : "PAPER");
   const allowed = props.can("files.list", kind),
     listing = useQuery("files.list", { root, path, page }, allowed, kind),
     entries = records(listing.data.entries, 100).filter((e) =>
@@ -121,11 +117,18 @@ export function FilesView(props: ViewProps) {
     ),
     dirty = selected !== null && content !== selected.original;
   const setUnsaved = props.setUnsaved;
-  useEffect(() => { setUnsaved?.(dirty); return () => setUnsaved?.(false); }, [dirty, setUnsaved]);
+  useEffect(() => {
+    setUnsaved?.(dirty);
+    return () => setUnsaved?.(false);
+  }, [dirty, setUnsaved]);
   useEffect(() => {
     if (!dirty) return;
-    const warn = (event: BeforeUnloadEvent) => {event.preventDefault();event.returnValue="";};
-    window.addEventListener("beforeunload",warn);return()=>window.removeEventListener("beforeunload",warn);
+    const warn = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = "";
+    };
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
   }, [dirty]);
   const changeDirectory = (next: string) => {
     if (
@@ -144,8 +147,16 @@ export function FilesView(props: ViewProps) {
     if (dirty && !window.confirm("Discard unsaved edits?")) return;
     setError("");
     if (!canRead || !props.can("files.read", kind)) {
-      setSelected({path: file, sha256: "", original: "", editable: false, kind});
-      setContent(""); setDiff(false); return;
+      setSelected({
+        path: file,
+        sha256: "",
+        original: "",
+        editable: false,
+        kind,
+      });
+      setContent("");
+      setDiff(false);
+      return;
     }
     try {
       const result = await sendDashboardAction(
@@ -323,7 +334,13 @@ export function FilesView(props: ViewProps) {
                   onClick={() => {
                     const next = (path ? path + "/" : "") + str(e.name);
                     if (e.directory) changeDirectory(next);
-                    else void open(next, e.editable === true || (next.toLowerCase().endsWith(".sql") && Number(e.size) <= 24576));
+                    else
+                      void open(
+                        next,
+                        e.editable === true ||
+                          (next.toLowerCase().endsWith(".sql") &&
+                            Number(e.size) <= 24576),
+                      );
                   }}
                 >
                   <span aria-hidden>{e.directory ? "▱" : "▤"}</span>
@@ -635,9 +652,9 @@ function Syntax({ content }: { content: string }) {
   );
 }
 export function BackupsView(props: ViewProps) {
-  const [page,setPage] = useState(0);
+  const [page, setPage] = useState(0);
   const allowed = props.can("backup.list", "HOST"),
-    query = useQuery("backup.list", {page}, allowed, "HOST"),
+    query = useQuery("backup.list", { page }, allowed, "HOST"),
     [restore, setRestore] = useState<{
       id: string;
       token: string;
@@ -861,7 +878,23 @@ export function BackupsView(props: ViewProps) {
           </button>
         </div>
       )}
-      <div className="cr-actions"><button className="cr-button" disabled={page===0} onClick={()=>setPage(p=>p-1)}>Previous</button><span>Page {page+1}</span><button className="cr-button" disabled={query.data.hasMore!==true} onClick={()=>setPage(p=>p+1)}>Next</button></div>
+      <div className="cr-actions">
+        <button
+          className="cr-button"
+          disabled={page === 0}
+          onClick={() => setPage((p) => p - 1)}
+        >
+          Previous
+        </button>
+        <span>Page {page + 1}</span>
+        <button
+          className="cr-button"
+          disabled={query.data.hasMore !== true}
+          onClick={() => setPage((p) => p + 1)}
+        >
+          Next
+        </button>
+      </div>
       {restore && (
         <Panel title="Confirm stopped-server restore">
           <div className="cr-form cr-pad">
@@ -1263,8 +1296,11 @@ export function AccessView(
   );
 }
 export function SettingsView(props: ViewProps & { reconnect: () => void }) {
-  const [density,setDensity] = useState("comfortable");
-  useEffect(()=>{const value=localStorage.getItem("plexonpanel-density")??"comfortable";Promise.resolve().then(()=>setDensity(value));},[]);
+  const [density, setDensity] = useState("comfortable");
+  useEffect(() => {
+    const value = localStorage.getItem("plexonpanel-density") ?? "comfortable";
+    Promise.resolve().then(() => setDensity(value));
+  }, []);
   const ready = props.state.ready;
   return (
     <>
@@ -1293,7 +1329,24 @@ export function SettingsView(props: ViewProps & { reconnect: () => void }) {
           </button>
         </div>
       </Panel>
-      <Panel title="Appearance"><label className="cr-pad">Table density<select value={density} onChange={e=>{const value=e.target.value;setDensity(value);localStorage.setItem("plexonpanel-density",value);document.documentElement.dataset.plexonDensity=value;}}><option value="comfortable">Comfortable</option><option value="compact">Compact</option></select></label><p className="cr-hint cr-pad">Saved only in this browser.</p></Panel>
+      <Panel title="Appearance">
+        <label className="cr-pad">
+          Table density
+          <select
+            value={density}
+            onChange={(e) => {
+              const value = e.target.value;
+              setDensity(value);
+              localStorage.setItem("plexonpanel-density", value);
+              document.documentElement.dataset.plexonDensity = value;
+            }}
+          >
+            <option value="comfortable">Comfortable</option>
+            <option value="compact">Compact</option>
+          </select>
+        </label>
+        <p className="cr-hint cr-pad">Saved only in this browser.</p>
+      </Panel>
       <Panel title="Local capabilities">
         <div className="cr-table-wrap">
           <table>

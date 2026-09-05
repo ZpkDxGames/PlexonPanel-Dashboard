@@ -1,103 +1,21 @@
-# PlexonPanel Dashboard
+# PlexonPanel Dashboard 2.0.0
 
-PlexonPanel is a database-less, real-time control surface for a Paper server.
-The plugin opens an outbound signed WebSocket, a small Cloudflare Worker relays
-live frames, and the Next.js dashboard renders them on Vercel. Vercel does not
-receive a Firebase credential and neither hosted component stores telemetry,
-console output, chat, or player history in an application database.
+Responsive Next.js/Vercel control room and outbound Cloudflare relay for protocol 3. **Review candidate: live production acceptance remains pending.** Upgrade together with [Paper/host agents](https://github.com/ZpkDxGames/PlexonPanel).
 
-> **Release status:** `1.0.0-rc.2` is intended for review on a disposable Paper
-> 26.2 server before production use.
+Twelve sections: Overview, Performance, Players, Console, Chat, Plugins, Files, Backups, Server, Audit, Access and Settings. Features include isolated server workspaces, rolling charts, scoped typed actions with final results, file conflicts/diff, verified downloads and explicit offline/expired/revoked states.
 
-## What ships in rc.2
+Pair with `/plexonpanel pair <role>` locally. Codes are one-use for five minutes; the operator chooses the role. The browser submits only its label/code. Relay and agent independently check the current grant and local capabilities; Owner cannot override local policy.
 
-- plugin-generated, one-use six-digit pairing codes with five-minute expiry
-- persistent server UUID and Ed25519 identity binding
-- exact dashboard-origin allowlisting and per-address pairing throttling
-- scoped browser-device credentials that can be revoked with `/plexonpanel unpair`
-- live TPS, MSPT, uptime, resources, players, plugins, bounded console, and chat
-- locally governed console, player, whitelist, ban, and global-chat actions
-- automatic reconnect plus fresh server, system, player, plugin, and console snapshots
-- responsive desktop, tablet, and mobile layouts in the Plexon dark-navy,
-  cyan, violet, green, and amber visual family
-
-## Data ownership
-
-| Location | Stored data |
-| --- | --- |
-| Paper server | persistent server UUID/private key, plugin settings, rotating local action audit |
-| Cloudflare Durable Objects | public server identity, pairing generation, and short-lived pairing/rate metadata only |
-| Vercel | application code and static/runtime assets only |
-| Browser IndexedDB | one scoped device credential and a bounded workspace snapshot for this origin |
-| Browser `localStorage` | active navigation section only |
-
-Live telemetry is TLS-protected in transit and protocol messages between the
-relay and plugin are signed. This is not end-to-end encryption: the relay must
-process live frames in memory to route them. The application deliberately does
-not persist those frames at the relay.
-
-## Why Firebase is not required
-
-The dashboard is a live viewer, so a central telemetry database adds cost,
-retention responsibility, and another failure mode without being required for
-the core experience. Users must never place Firebase Admin/service-account keys
-in a browser or repository. Firebase Web configuration identifiers are not
-secret, but they also do not replace authorization rules. A separate,
-operator-owned archive exporter can be added later without changing the live
-protocol.
-
-## Repository layout
-
-- `app/` — responsive Next.js dashboard
-- `lib/` — relay client, IndexedDB workspace, and live-state transforms
-- `relay/` — Cloudflare Worker and Durable Object relay
-- `docs/ARCHITECTURE.md` — protocol, retention, and trust boundaries
-- `docs/VERCEL_DEPLOYMENT.md` — ordered Windows-friendly release checklist
-
-## Requirements
-
-- Node.js 22.13 or newer
-- npm 10 or newer
-- Cloudflare account with Workers and Durable Objects enabled
-- Vercel project for this private repository
-- the matching PlexonPanel rc.2 Paper plugin
-
-## Local validation
-
-```bash
+```sh
 npm ci
 npm run check
+npm run relay:smoke
 ```
 
-For dashboard development, copy `.env.example` to `.env.local` and set the
-public HTTPS relay origin. The UI shows a real unavailable/offline state when
-the relay or Paper server is absent; it never substitutes fabricated live data.
+Use Node 24 and the lockfile. `check` runs lint, types, relay security tests, a production build and client/state/SSR/tool tests. Smoke bundles without deploying and runs actual local workerd using ephemeral keys, with no account credentials.
 
-## Vercel environment file
+For development set `.env.local` with `NEXT_PUBLIC_PLEXON_RELAY_URL` and run `npm run dev`. This public HTTPS relay origin is the only required Vercel variable. Never put signing keys/tokens/server credentials in NEXT_PUBLIC variables. Development eval support is excluded from production CSP. No QA route/dataset is shipped.
 
-After the relay has a `workers.dev` URL, create the complete Vercel import:
+Read [deployment](docs/VERCEL_DEPLOYMENT.md), [architecture](docs/ARCHITECTURE.md), [protocol](docs/PROTOCOL.md), [operations](docs/OPERATIONS.md) and [validation](docs/VALIDATION.md). Preserve Cloudflare namespace/signing identity during migration; protocol 3 invalidates unscoped rc.2 tokens and requires local re-pairing.
 
-```bash
-npm run env:vercel -- \
-  --relay-url "https://YOUR-RELAY.workers.dev"
-```
-
-The ignored `.env.vercel` contains one public value:
-
-```text
-NEXT_PUBLIC_PLEXON_RELAY_URL
-```
-
-No Firebase, service-account, session-cookie, or server-side Vercel secret is
-used by rc.2.
-
-## Deployment
-
-Follow [the release checklist](docs/VERCEL_DEPLOYMENT.md). Deploy the relay,
-import the one-variable Vercel file, redeploy the dashboard branch, configure
-the plugin with the relay WebSocket URL and pinned public key, and then perform
-the pairing acceptance test.
-
-Never commit `.env*`, `.dev.vars`, `.relay-secrets.json`, an Ed25519 private
-key, a pairing code, browser credentials, server logs, or Firebase
-service-account JSON.
+No Firebase, telemetry database, Vercel server credential, inbound Minecraft administration port, shell or RCON is required. Cloudflare stores identity/access/pairing coordination only. History is bounded browser state; audit/backups remain on agents, with optional configured rclone copies.

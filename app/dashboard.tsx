@@ -240,10 +240,12 @@ function Confirm({ value }: { value: Confirmation }) {
         This operation will run on your server using this device&apos;s local
         permissions.
       </p>
-      {Boolean(value.parameters.path ||
-        value.parameters.playerId ||
-        value.parameters.deviceId ||
-        value.parameters.backupId) && (
+      {Boolean(
+        value.parameters.path ||
+          value.parameters.playerId ||
+          value.parameters.deviceId ||
+          value.parameters.backupId,
+      ) && (
         <code className="cr-confirm-target">
           {String(
             value.parameters.path ??
@@ -282,9 +284,14 @@ export default function Dashboard() {
     [reconnect, setReconnect] = useState(0),
     [confirmation, setConfirmation] = useState<Confirmation | null>(null);
   const unsaved = useRef(false);
-  const setUnsaved = useCallback((dirty: boolean) => { unsaved.current = dirty; }, []);
-  const leaveEditor = () => !unsaved.current || window.confirm("Discard unsaved file edits?");
-  const navigate = (next: Section) => {if(next !== section && leaveEditor())setSection(next);};
+  const setUnsaved = useCallback((dirty: boolean) => {
+    unsaved.current = dirty;
+  }, []);
+  const leaveEditor = () =>
+    !unsaved.current || window.confirm("Discard unsaved file edits?");
+  const navigate = (next: Section) => {
+    if (next !== section && leaveEditor()) setSection(next);
+  };
   const restore = useCallback(async () => {
     try {
       const c = await loadRelayCredential();
@@ -307,8 +314,12 @@ export default function Dashboard() {
   }, []);
   useEffect(() => {
     let current = true;
-    void Promise.resolve().then(() => { if (current) return restore(); });
-    return () => { current = false; };
+    void Promise.resolve().then(() => {
+      if (current) return restore();
+    });
+    return () => {
+      current = false;
+    };
   }, [restore]);
   useEffect(() => {
     if (!notice) return;
@@ -329,7 +340,8 @@ export default function Dashboard() {
       socket: WebSocket | null = null,
       retry: ReturnType<typeof setTimeout> | undefined,
       heartbeat: ReturnType<typeof setInterval> | undefined;
-    document.documentElement.dataset.plexonDensity = localStorage.getItem("plexonpanel-density") ?? "comfortable";
+    document.documentElement.dataset.plexonDensity =
+      localStorage.getItem("plexonpanel-density") ?? "comfortable";
     const connect = async () => {
       if (stopped) return;
       setPhase(attempt ? "reconnecting" : "connecting");
@@ -347,7 +359,7 @@ export default function Dashboard() {
           }
           bindLiveSocket(socket);
           attempt = 0;
-          setState(current => ({ ...current, ready: null }));
+          setState((current) => ({ ...current, ready: null }));
           setError("");
           heartbeat = setInterval(() => {
             if (socket?.readyState === WebSocket.OPEN)
@@ -375,7 +387,11 @@ export default function Dashboard() {
               socket?.close(4008, "Protocol mismatch");
               return;
             }
-            if (message.type === "dashboard.ready" && message.protocolVersion === 3) setPhase("live");
+            if (
+              message.type === "dashboard.ready" &&
+              message.protocolVersion === 3
+            )
+              setPhase("live");
             if (handleRelayControlMessage(message)) return;
             if (message.type === "relay.error") {
               setError(str(message.error, "Relay rejected a message"));
@@ -446,7 +462,13 @@ export default function Dashboard() {
     (action: string, requestedKind?: "PAPER" | "HOST") => {
       const ready = state.ready;
       if (!ready || phase !== "live") return false;
-      if((action === "player.op" || action === "player.deop" || action.startsWith("backup.restore")) && ready.device.role !== "Owner") return false;
+      if (
+        (action === "player.op" ||
+          action === "player.deop" ||
+          action.startsWith("backup.restore")) &&
+        ready.device.role !== "Owner"
+      )
+        return false;
       let kind =
         requestedKind ??
         (action.startsWith("backup.") ||
@@ -600,7 +622,9 @@ export default function Dashboard() {
               onChange={(e) => {
                 if (!leaveEditor()) return;
                 setSection("Overview");
-                void selectRelayCredential(e.target.value).then(restore).catch(e=>setNotice(e.message));
+                void selectRelayCredential(e.target.value)
+                  .then(restore)
+                  .catch((e) => setNotice(e.message));
               }}
             >
               {credentials.map((c) => (
@@ -662,10 +686,7 @@ export default function Dashboard() {
             {state.ready?.device.role ?? credential?.role ?? "Paired"}
           </Badge>
           <small>{state.ready?.device.name ?? credential?.name}</small>
-          <button
-            className="cr-text-button"
-            onClick={() => navigate("Access")}
-          >
+          <button className="cr-text-button" onClick={() => navigate("Access")}>
             Manage access →
           </button>
         </div>

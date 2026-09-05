@@ -70,7 +70,9 @@ export async function loadRelayCredential(): Promise<RelayCredential | null> {
   if (!selected) return null;
   const c = await read<RelayCredential>(`credential:${selected}`);
   if (valid(c)) return c;
-  await remove(`credential:${selected}`); await remove(`cache:${selected}`); await remove("selected");
+  await remove(`credential:${selected}`);
+  await remove(`cache:${selected}`);
+  await remove("selected");
   return null;
 }
 export async function selectRelayCredential(id: string): Promise<void> {

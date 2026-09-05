@@ -44,7 +44,7 @@ export interface ControlState {
   hostSystem: JsonMap;
   service: JsonMap;
   worlds: JsonMap[];
-  inventoryIds?: {players?: string; plugins?: string};
+  inventoryIds?: { players?: string; plugins?: string };
   players: JsonMap[];
   plugins: JsonMap[];
   console: JsonMap[];
@@ -122,11 +122,23 @@ export function applyControlMessage(
       break;
     case "inventory.players":
     case "inventory.plugins": {
-      const field = message.eventType === "inventory.players" ? "players" : "plugins";
+      const field =
+        message.eventType === "inventory.players" ? "players" : "plugins";
       const offset = number(body.offset) ?? 0;
-      if (offset && (state.inventoryIds?.[field] !== body.snapshotId || state[field].length !== offset)) return state;
-      next[field] = [...(offset ? state[field] : []), ...records(body[field], 100)].slice(0, field === "players" ? 512 : 256);
-      next.inventoryIds = {...state.inventoryIds, [field]: str(body.snapshotId)};
+      if (
+        offset &&
+        (state.inventoryIds?.[field] !== body.snapshotId ||
+          state[field].length !== offset)
+      )
+        return state;
+      next[field] = [
+        ...(offset ? state[field] : []),
+        ...records(body[field], 100),
+      ].slice(0, field === "players" ? 512 : 256);
+      next.inventoryIds = {
+        ...state.inventoryIds,
+        [field]: str(body.snapshotId),
+      };
       break;
     }
     case "console.lines":

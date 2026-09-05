@@ -1,6 +1,4 @@
-# Cloudflare and Vercel deployment
-
-Production remains gated on both repositories' acceptance record. These are operator instructions, not an automatic deployment.
+# Cloudflare relay deployment
 
 ## Relay
 
@@ -16,14 +14,5 @@ Bindings: PAIRING_CODE_PEPPER, ACCESS_TOKEN_SECRET, GATEWAY_ED25519_PRIVATE_KEY 
 
 Run check and relay:smoke first. Smoke uses temporary workerd storage and ephemeral keys, without deployment. After live acceptance/approval, `npm run relay:deploy`. Verify `/healthz` reports 2.0.0/protocol 3 and the pinned public key. Configure this key and WSS `/v1/agent` on both agents. Wrangler is pinned in package/lockfile.
 
-## Dashboard
 
-Use repository root, Next.js, Node 24, `npm ci`, `npm run build`. The only required Vercel variable is:
-
-```dotenv
-NEXT_PUBLIC_PLEXON_RELAY_URL=https://YOUR-RELAY.workers.dev
-```
-
-`npm run env:vercel -- --relay-url https://YOUR-RELAY.workers.dev` creates an ignored import file. Rebuild after URL changes because the client/CSP includes it. No Firebase or server-side Vercel credential is needed. Preview origins require explicit relay allowlisting; do not promote a preview before acceptance.
-
-During a maintenance window upgrade relay with preserved keys first, matching dashboard next, then stopped-server Paper JAR and optional host. Verify the Paper UUID/fingerprint, re-pair an Observer, test denials/revocation, then grant only needed roles. Rollback is coordinated with saved configurations/baselines; never delete identities/namespaces to make old tokens work.
+Use the coordinated upgrade/rollback steps in [DEPLOYMENT](DEPLOYMENT.md).

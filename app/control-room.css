@@ -1352,4 +1352,7 @@
   }
 }
 
-html[data-plexon-density="compact"] .control-room td, html[data-plexon-density="compact"] .control-room th { padding-block: 8px; }
+html[data-plexon-density="compact"] .control-room td,
+html[data-plexon-density="compact"] .control-room th {
+  padding-block: 8px;
+}

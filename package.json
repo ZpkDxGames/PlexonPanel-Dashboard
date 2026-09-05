@@ -11,14 +11,15 @@
     "start": "next start",
     "relay:build": "tsc -p relay/tsconfig.json",
     "relay:keygen": "node relay/scripts/generate-secrets.mjs",
-    "relay:dev": "npx wrangler@latest dev --config relay/wrangler.jsonc",
-    "relay:deploy": "npx wrangler@latest deploy --config relay/wrangler.jsonc",
+    "relay:dev": "wrangler dev --config relay/wrangler.jsonc",
+    "relay:deploy": "wrangler deploy --config relay/wrangler.jsonc",
     "relay:test": "npm run relay:build && node --test relay/tests/*.test.mjs",
     "env:vercel": "node scripts/create-vercel-env.mjs",
     "test": "node scripts/transpile-tests.mjs && node scripts/build-test.mjs && node --test --test-concurrency=1 tests/*.test.mjs",
     "lint": "eslint . --ignore-pattern .next --ignore-pattern node_modules",
     "check": "npm run lint && npm run typecheck && npm run relay:test && npm test",
-    "typecheck": "tsc --noEmit && npm run relay:build"
+    "typecheck": "tsc --noEmit && npm run relay:build",
+    "relay:smoke": "npm run relay:build && node scripts/relay-smoke.mjs"
   },
   "dependencies": {
     "next": "16.3.1",
@@ -32,6 +33,7 @@
     "@types/react-dom": "19.2.3",
     "eslint": "9.39.4",
     "eslint-config-next": "16.3.1",
+    "miniflare": "5.20260903.0-alpha",
     "tailwindcss": "4.2.1",
     "typescript": "5.9.3",
     "wrangler": "4.129.0"

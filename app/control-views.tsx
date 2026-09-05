@@ -516,10 +516,26 @@ export function PerformanceView(props: ViewProps) {
       </div>
       <Panel title="Tick sample statistics">
         <div className="cr-stat-grid">
-          <Stat label="Minimum" value={metric(s.server.minimumSampleTickMillis, " ms")} detail="Recent Paper tick sample" />
-          <Stat label="Average" value={metric(s.server.averageTickMillis, " ms")} detail="Paper rolling tick time" />
-          <Stat label="95th percentile" value={metric(s.server.p95TickMillis, " ms")} detail="Recent Paper tick sample" />
-          <Stat label="Maximum" value={metric(s.server.maximumSampleTickMillis, " ms")} detail="Recent Paper tick sample" />
+          <Stat
+            label="Minimum"
+            value={metric(s.server.minimumSampleTickMillis, " ms")}
+            detail="Recent Paper tick sample"
+          />
+          <Stat
+            label="Average"
+            value={metric(s.server.averageTickMillis, " ms")}
+            detail="Paper rolling tick time"
+          />
+          <Stat
+            label="95th percentile"
+            value={metric(s.server.p95TickMillis, " ms")}
+            detail="Recent Paper tick sample"
+          />
+          <Stat
+            label="Maximum"
+            value={metric(s.server.maximumSampleTickMillis, " ms")}
+            detail="Recent Paper tick sample"
+          />
         </div>
       </Panel>
       <Panel title="Memory and garbage collection">
@@ -546,9 +562,24 @@ export function PerformanceView(props: ViewProps) {
           />
         </div>
       </Panel>
-      <Panel title="Linux load averages"><div className="cr-stat-grid">
-        {[1,5,15].map(minutes => <Stat key={minutes} label={`${minutes} minute${minutes>1?'s':''}`} value={metric((s.ready?.agents.host?s.hostSystem:s.system)[`loadAverage${minutes}m`], "", 2)} detail="Runnable and uninterruptible tasks" />)}
-      </div></Panel>
+      <Panel title="Linux load averages">
+        <div className="cr-stat-grid">
+          {[1, 5, 15].map((minutes) => (
+            <Stat
+              key={minutes}
+              label={`${minutes} minute${minutes > 1 ? "s" : ""}`}
+              value={metric(
+                (s.ready?.agents.host ? s.hostSystem : s.system)[
+                  `loadAverage${minutes}m`
+                ],
+                "",
+                2,
+              )}
+              detail="Runnable and uninterruptible tasks"
+            />
+          ))}
+        </div>
+      </Panel>
       <Panel title="Worlds">
         <WorldTable worlds={s.worlds} />
       </Panel>
@@ -962,7 +993,9 @@ export function ConsoleView(props: ViewProps) {
                       : [],
                   );
                   if (
-                    /^(?:tps|mspt|list|version|plugins|spark (?:tps|health))$/i.test(value.replace(/^\//, ""))
+                    /^(?:tps|mspt|list|version|plugins|spark (?:tps|health))$/i.test(
+                      value.replace(/^\//, ""),
+                    )
                   )
                     setHistory((h) =>
                       [value, ...h.filter((c) => c !== value)].slice(0, 20),

@@ -13,7 +13,10 @@ const env = {
 };
 
 test("health describes coordination-only storage", async () => {
-  const response = await relayWorker.fetch(new Request("https://relay.example/healthz"), env);
+  const response = await relayWorker.fetch(
+    new Request("https://relay.example/healthz"),
+    env,
+  );
   assert.equal(response.status, 200);
   assert.deepEqual(await response.json(), {
     ok: true,
@@ -26,30 +29,48 @@ test("health describes coordination-only storage", async () => {
 });
 
 test("pairing rejects a non-allowlisted browser before lookup", async () => {
-  const response = await relayWorker.fetch(new Request("https://relay.example/v1/pairings/claim", {
-    method: "POST",
-    headers: { Origin: "https://attacker.example", "Content-Type": "application/json" },
-    body: JSON.stringify({ code: "123456" }),
-  }), env);
+  const response = await relayWorker.fetch(
+    new Request("https://relay.example/v1/pairings/claim", {
+      method: "POST",
+      headers: {
+        Origin: "https://attacker.example",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ code: "123456" }),
+    }),
+    env,
+  );
   assert.equal(response.status, 403);
   assert.equal(response.headers.get("access-control-allow-origin"), null);
 });
 
 test("pairing returns a bounded error for invalid JSON", async () => {
-  const response = await relayWorker.fetch(new Request("https://relay.example/v1/pairings/claim", {
-    method: "POST",
-    headers: { Origin: "https://dashboard.example", "Content-Type": "application/json" },
-    body: "not-json",
-  }), env);
+  const response = await relayWorker.fetch(
+    new Request("https://relay.example/v1/pairings/claim", {
+      method: "POST",
+      headers: {
+        Origin: "https://dashboard.example",
+        "Content-Type": "application/json",
+      },
+      body: "not-json",
+    }),
+    env,
+  );
   assert.equal(response.status, 400);
-  assert.equal(response.headers.get("access-control-allow-origin"), "https://dashboard.example");
+  assert.equal(
+    response.headers.get("access-control-allow-origin"),
+    "https://dashboard.example",
+  );
   assert.match((await response.json()).error, /valid JSON/);
 });
 
 test("dashboard session validation requires a credential", async () => {
-  const response = await relayWorker.fetch(new Request("https://relay.example/v1/dashboard/session", {
-    headers: { Origin: "https://dashboard.example" },
-  }), env);
+  const response = await relayWorker.fetch(
+    new Request("https://relay.example/v1/dashboard/session", {
+      headers: { Origin: "https://dashboard.example" },
+    }),
+    env,
+  );
   assert.equal(response.status, 401);
   assert.match((await response.json()).error, /credential is required/);
 });
@@ -92,52 +113,110 @@ test("pairing issues a scoped credential only after the room consumes its challe
         }
         claimed = true;
         const claim = await request.json();
-        const now = Math.floor(Date.now()/1000);
-        return Response.json({ generation: 7, fingerprint: registration.fingerprint, device: { deviceId: claim.deviceId, name: claim.name, role: "Observer", scopes: ["telemetry.view"], issuedAt: now, expiresAt: now+3600,lastSeen:now } });
+        const now = Math.floor(Date.now() / 1000);
+        return Response.json({
+          generation: 7,
+          fingerprint: registration.fingerprint,
+          device: {
+            deviceId: claim.deviceId,
+            name: claim.name,
+            role: "Observer",
+            scopes: ["telemetry.view"],
+            issuedAt: now,
+            expiresAt: now + 3600,
+            lastSeen: now,
+          },
+        });
       },
     }),
   };
-  const pairedEnv = { ...env, PAIRING_DIRECTORY: pairingDirectory, SERVER_ROOMS: serverRooms };
-  const response = await relayWorker.fetch(new Request("https://relay.example/v1/pairings/claim", {
-    method: "POST",
-    headers: {
-      Origin: "https://dashboard.example",
-      "CF-Connecting-IP": "203.0.113.10",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ code: "123456" }),
-  }), pairedEnv);
+  const pairedEnv = {
+    ...env,
+    PAIRING_DIRECTORY: pairingDirectory,
+    SERVER_ROOMS: serverRooms,
+  };
+  const response = await relayWorker.fetch(
+    new Request("https://relay.example/v1/pairings/claim", {
+      method: "POST",
+      headers: {
+        Origin: "https://dashboard.example",
+        "CF-Connecting-IP": "203.0.113.10",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ code: "123456" }),
+    }),
+    pairedEnv,
+  );
   assert.equal(response.status, 200);
   const body = await response.json();
   assert.equal(body.serverId, serverId);
   assert.equal(body.fingerprint, registration.fingerprint);
   assert.match(body.websocketUrl, /^wss:\/\/relay\.example\/v1\/dashboard$/);
-  const access = await verifyDashboardAccess(body.accessToken, pairedEnv.ACCESS_TOKEN_SECRET);
+  const access = await verifyDashboardAccess(
+    body.accessToken,
+    pairedEnv.ACCESS_TOKEN_SECRET,
+  );
   assert.equal(access.serverId, serverId);
   assert.equal(access.generation, 7);
 
-  const session = await relayWorker.fetch(new Request("https://relay.example/v1/dashboard/session", {
-    headers: { Origin: "https://dashboard.example", Authorization: `Bearer ${body.accessToken}` },
-  }), pairedEnv);
+  const session = await relayWorker.fetch(
+    new Request("https://relay.example/v1/dashboard/session", {
+      headers: {
+        Origin: "https://dashboard.example",
+        Authorization: `Bearer ${body.accessToken}`,
+      },
+    }),
+    pairedEnv,
+  );
   assert.equal(session.status, 200);
   assert.equal((await session.json()).serverId, serverId);
 
-  const replay = await relayWorker.fetch(new Request("https://relay.example/v1/pairings/claim", {
-    method: "POST",
-    headers: { Origin: "https://dashboard.example", "Content-Type": "application/json" },
-    body: JSON.stringify({ code: "123456" }),
-  }), pairedEnv);
+  const replay = await relayWorker.fetch(
+    new Request("https://relay.example/v1/pairings/claim", {
+      method: "POST",
+      headers: {
+        Origin: "https://dashboard.example",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ code: "123456" }),
+    }),
+    pairedEnv,
+  );
   assert.equal(replay.status, 403);
 });
 
-
-test("pairing does not accept client-selected roles or scopes",async()=>{
- for(const extra of [{role:"Owner"},{scopes:["files.write"]},{generation:99}]){
-  const response=await relayWorker.fetch(new Request("https://relay.example/v1/pairings/claim",{method:"POST",headers:{Origin:"https://dashboard.example"},body:JSON.stringify({code:"123456",...extra})}),env);
-  assert.equal(response.status,400);
- }
+test("pairing does not accept client-selected roles or scopes", async () => {
+  for (const extra of [
+    { role: "Owner" },
+    { scopes: ["files.write"] },
+    { generation: 99 },
+  ]) {
+    const response = await relayWorker.fetch(
+      new Request("https://relay.example/v1/pairings/claim", {
+        method: "POST",
+        headers: { Origin: "https://dashboard.example" },
+        body: JSON.stringify({ code: "123456", ...extra }),
+      }),
+      env,
+    );
+    assert.equal(response.status, 400);
+  }
 });
-test("chunked pairing payloads are bounded without Content-Length",async()=>{
- const body=new ReadableStream({start(c){c.enqueue(new TextEncoder().encode("x".repeat(5000)));c.close();}});
- const response=await relayWorker.fetch(new Request("https://relay.example/v1/pairings/claim",{method:"POST",headers:{Origin:"https://dashboard.example"},body,duplex:"half"}),env);assert.equal(response.status,400);
+test("chunked pairing payloads are bounded without Content-Length", async () => {
+  const body = new ReadableStream({
+    start(c) {
+      c.enqueue(new TextEncoder().encode("x".repeat(5000)));
+      c.close();
+    },
+  });
+  const response = await relayWorker.fetch(
+    new Request("https://relay.example/v1/pairings/claim", {
+      method: "POST",
+      headers: { Origin: "https://dashboard.example" },
+      body,
+      duplex: "half",
+    }),
+    env,
+  );
+  assert.equal(response.status, 400);
 });

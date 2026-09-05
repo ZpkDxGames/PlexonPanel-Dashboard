@@ -80,7 +80,12 @@ interface SocketAttachment {
   sessionNonce?: string;
   sequence?: number;
   recent?: string[];
-  pending?: {requestId: string; kind: AgentKind; action: string; expires: number}[];
+  pending?: {
+    requestId: string;
+    kind: AgentKind;
+    action: string;
+    expires: number;
+  }[];
   access?: DashboardAccess;
   rate?: number[];
   transferRate?: number[];
@@ -499,7 +504,9 @@ export class ServerRoom {
   private pairingWaiters = new Map<
     string,
     {
-      resolve: (value: { device: Device; generation: number; revision: number } | null) => void;
+      resolve: (
+        value: { device: Device; generation: number; revision: number } | null,
+      ) => void;
       deviceId: string;
       timer: ReturnType<typeof setTimeout>;
     }
@@ -513,9 +520,16 @@ export class ServerRoom {
     private readonly env: Env,
   ) {
     // Only request routing metadata is attached; never file, console or command contents.
-    for(const socket of state.getWebSockets("dashboard")) {
+    for (const socket of state.getWebSockets("dashboard")) {
       const a = socket.deserializeAttachment() as SocketAttachment;
-      for(const p of a.pending ?? []) if(p.expires > Date.now()) this.pending.set(p.requestId,{deviceId:a.deviceId!,kind:p.kind,action:p.action,expires:p.expires});
+      for (const p of a.pending ?? [])
+        if (p.expires > Date.now())
+          this.pending.set(p.requestId, {
+            deviceId: a.deviceId!,
+            kind: p.kind,
+            action: p.action,
+            expires: p.expires,
+          });
     }
   }
   async fetch(request: Request): Promise<Response> {
@@ -538,55 +552,63 @@ export class ServerRoom {
         pending.lookupId !== body.lookupId ||
         pending.challengeId !== body.challengeId ||
         !this.agents("PAPER").length ||
-        this.pairingWaiters.size || this.claiming
+        this.pairingWaiters.size ||
+        this.claiming
       )
         return json({ ok: false }, 403);
       this.claiming = true;
       try {
-      delete metadata.currentPairing;
-      await this.state.storage.put(METADATA_KEY, metadata);
-      const deviceId = requiredUuid(body.deviceId, "deviceId"),
-        name = requiredText(body.name, "name", 64);
-      const grant = await new Promise<{
-        device: Device;
-        generation: number;
-        revision: number;
-      } | null>((resolve) => {
-        const timer = setTimeout(() => {
-          this.pairingWaiters.delete(pending.requestId);
-          resolve(null);
-        }, 10000);
-        this.pairingWaiters.set(pending.requestId, {
-          resolve,
-          deviceId,
-          timer,
+        delete metadata.currentPairing;
+        await this.state.storage.put(METADATA_KEY, metadata);
+        const deviceId = requiredUuid(body.deviceId, "deviceId"),
+          name = requiredText(body.name, "name", 64);
+        const grant = await new Promise<{
+          device: Device;
+          generation: number;
+          revision: number;
+        } | null>((resolve) => {
+          const timer = setTimeout(() => {
+            this.pairingWaiters.delete(pending.requestId);
+            resolve(null);
+          }, 10000);
+          this.pairingWaiters.set(pending.requestId, {
+            resolve,
+            deviceId,
+            timer,
+          });
+          void this.sendToAgent("PAPER", "pairing.consume", {
+            requestId: pending.requestId,
+            deviceId,
+            name,
+          }).catch(() => {
+            clearTimeout(timer);
+            this.pairingWaiters.delete(pending.requestId);
+            resolve(null);
+          });
         });
-        void this.sendToAgent("PAPER", "pairing.consume", {
-          requestId: pending.requestId,
-          deviceId,
-          name,
-        }).catch(() => {
-          clearTimeout(timer);
-          this.pairingWaiters.delete(pending.requestId);
-          resolve(null);
+        if (!grant) return json({ ok: false }, 403);
+        const latest = await this.metadata();
+        if (
+          latest.generation > grant.generation ||
+          (latest.generation === grant.generation &&
+            latest.revision > grant.revision)
+        )
+          return json({ ok: false }, 403);
+        if (latest.generation !== grant.generation) latest.devices = [];
+        latest.generation = grant.generation;
+        latest.revision = grant.revision;
+        latest.devices = latest.devices.filter((d) => d.deviceId !== deviceId);
+        latest.devices.push(grant.device);
+        latest.paired = true;
+        await this.state.storage.put(METADATA_KEY, latest);
+        await this.scheduleExpiry(latest);
+        return json({
+          ...grant,
+          fingerprint: latest.identity?.fingerprint ?? "unknown",
         });
-      });
-      if (!grant) return json({ ok: false }, 403);
-      const latest = await this.metadata();
-      if(latest.generation > grant.generation || (latest.generation === grant.generation && latest.revision > grant.revision)) return json({ok:false},403);
-      if(latest.generation !== grant.generation) latest.devices = [];
-      latest.generation = grant.generation;
-      latest.revision = grant.revision;
-      latest.devices = latest.devices.filter((d) => d.deviceId !== deviceId);
-      latest.devices.push(grant.device);
-      latest.paired = true;
-      await this.state.storage.put(METADATA_KEY, latest);
-      await this.scheduleExpiry(latest);
-      return json({
-        ...grant,
-        fingerprint: latest.identity?.fingerprint ?? "unknown",
-      });
-      } finally { this.claiming = false; }
+      } finally {
+        this.claiming = false;
+      }
     }
     if (request.headers.get("Upgrade")?.toLowerCase() !== "websocket")
       return json({ ok: false }, 426);
@@ -646,26 +668,38 @@ export class ServerRoom {
     socket: WebSocket,
     message: ArrayBuffer | string,
   ): Promise<void> {
-    const size = typeof message === "string" ? new TextEncoder().encode(message).byteLength : MAX_ENVELOPE_BYTES + 1;
-    if(size > MAX_ENVELOPE_BYTES || this.queuedBytes + size > 1048576){socket.close(4008,"Message queue limit exceeded");return;}
-    this.queuedBytes += size;
-    const task = this.messages.then(async () => {
-    const a = socket.deserializeAttachment() as SocketAttachment;
-    try {
-      if (a.role === "agent") await this.agentMessage(socket, a, message as string);
-      else await this.dashboardMessage(socket, a, message as string);
-    } catch {
-      if (a.role === "agent") socket.close(4008, "Protocol message rejected");
-      else
-        socket.send(
-          JSON.stringify({
-            type: "relay.error",
-            code: "INVALID_REQUEST",
-            error: "The request was rejected.",
-          }),
-        );
+    const size =
+      typeof message === "string"
+        ? new TextEncoder().encode(message).byteLength
+        : MAX_ENVELOPE_BYTES + 1;
+    if (size > MAX_ENVELOPE_BYTES || this.queuedBytes + size > 1048576) {
+      socket.close(4008, "Message queue limit exceeded");
+      return;
     }
-    }).finally(() => { this.queuedBytes -= size; });
+    this.queuedBytes += size;
+    const task = this.messages
+      .then(async () => {
+        const a = socket.deserializeAttachment() as SocketAttachment;
+        try {
+          if (a.role === "agent")
+            await this.agentMessage(socket, a, message as string);
+          else await this.dashboardMessage(socket, a, message as string);
+        } catch {
+          if (a.role === "agent")
+            socket.close(4008, "Protocol message rejected");
+          else
+            socket.send(
+              JSON.stringify({
+                type: "relay.error",
+                code: "INVALID_REQUEST",
+                error: "The request was rejected.",
+              }),
+            );
+        }
+      })
+      .finally(() => {
+        this.queuedBytes -= size;
+      });
     this.messages = task.catch(() => {});
     await task;
   }
@@ -716,8 +750,8 @@ export class ServerRoom {
       a.fingerprint = fingerprint;
       a.challenge = randomToken(32);
       a.challengeExpiry = Date.now() + 15000;
-      a.sessionNonce = requiredUuid(body._session,"session nonce");
-      if(body._sequence !== 1) throw new Error("Invalid initial sequence");
+      a.sessionNonce = requiredUuid(body._session, "session nonce");
+      if (body._sequence !== 1) throw new Error("Invalid initial sequence");
       a.sequence = 1;
       a.recent = [envelope.messageId];
       socket.serializeAttachment(a);
@@ -731,11 +765,18 @@ export class ServerRoom {
       !(await verifyEnvelope(envelope, await importAgentPublicKey(a.publicKey)))
     )
       throw new Error("Invalid signature");
-    if(body._session !== a.sessionNonce || !Number.isSafeInteger(body._sequence) || Number(body._sequence) <= (a.sequence ?? 0) || a.recent?.includes(envelope.messageId)) throw new Error("Session replay rejected");
+    if (
+      body._session !== a.sessionNonce ||
+      !Number.isSafeInteger(body._sequence) ||
+      Number(body._sequence) <= (a.sequence ?? 0) ||
+      a.recent?.includes(envelope.messageId)
+    )
+      throw new Error("Session replay rejected");
     a.sequence = Number(body._sequence);
     // The monotonic sequence rejects replay for the entire connection without an unbounded attachment.
-    a.recent = [...(a.recent ?? []),envelope.messageId].slice(-32);
-    delete body._session; delete body._sequence;
+    a.recent = [...(a.recent ?? []), envelope.messageId].slice(-32);
+    delete body._session;
+    delete body._sequence;
     socket.serializeAttachment(a);
     if (envelope.type === "agent.challenge_response") {
       if (
@@ -759,7 +800,12 @@ export class ServerRoom {
       delete a.candidate;
       socket.serializeAttachment(a);
       for (const other of this.agents(a.kind)) {
-        if (other !== socket) {const previous = other.deserializeAttachment() as SocketAttachment;previous.authenticated=false;other.serializeAttachment(previous);other.close(4002, "Agent reconnected");}
+        if (other !== socket) {
+          const previous = other.deserializeAttachment() as SocketAttachment;
+          previous.authenticated = false;
+          other.serializeAttachment(previous);
+          other.close(4002, "Agent reconnected");
+        }
       }
       await this.sendGateway(socket, a.serverId, "gateway.authenticated", {
         protocolVersion: 3,
@@ -799,7 +845,9 @@ export class ServerRoom {
         validDevice(body.device) &&
         body.device.deviceId === waiter.deviceId &&
         Number.isSafeInteger(body.generation) &&
-        Number(body.generation) > 0 && Number.isSafeInteger(body.revision) && Number(body.revision) > 0
+        Number(body.generation) > 0 &&
+        Number.isSafeInteger(body.revision) &&
+        Number(body.revision) > 0
       )
         waiter.resolve({
           device: body.device,
@@ -879,7 +927,9 @@ export class ServerRoom {
       this.pending.delete(requestId);
       for (const peer of this.state.getWebSockets("dashboard")) {
         const access = peer.deserializeAttachment() as SocketAttachment;
-        access.pending = (access.pending ?? []).filter(p => p.requestId !== requestId && p.expires > Date.now());
+        access.pending = (access.pending ?? []).filter(
+          (p) => p.requestId !== requestId && p.expires > Date.now(),
+        );
         peer.serializeAttachment(access);
         if (
           access.deviceId === pending.deviceId &&
@@ -1003,9 +1053,14 @@ export class ServerRoom {
         if (p.expires < Date.now()) this.pending.delete(key);
       if (this.pending.has(id)) throw new Error("DUPLICATE_REQUEST");
       if (this.pending.size >= 64) throw new Error("BUSY");
-      const attachedPending = (a.pending ?? []).filter(p => p.expires > Date.now());
-      if(attachedPending.length >= 32) throw new Error("BUSY");
-      a.pending = [...attachedPending,{requestId:id,kind,action,expires:Date.now()+15*60000}];
+      const attachedPending = (a.pending ?? []).filter(
+        (p) => p.expires > Date.now(),
+      );
+      if (attachedPending.length >= 32) throw new Error("BUSY");
+      a.pending = [
+        ...attachedPending,
+        { requestId: id, kind, action, expires: Date.now() + 15 * 60000 },
+      ];
       socket.serializeAttachment(a);
       this.pending.set(id, {
         deviceId: a.deviceId!,
