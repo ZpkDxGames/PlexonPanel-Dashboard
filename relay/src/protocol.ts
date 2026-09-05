@@ -1,6 +1,6 @@
-const VERSION = 2;
-export const MAX_ENVELOPE_BYTES = 1_048_576;
-const MAX_BODY_BYTES = 524_288;
+const VERSION = 3;
+export const MAX_ENVELOPE_BYTES = 131_072;
+const MAX_BODY_BYTES = 65_536;
 const MESSAGE_TYPE = /^[a-z][a-z0-9_.-]{0,95}$/;
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const ENVELOPE_FIELDS = [
@@ -38,7 +38,7 @@ export function decodeEnvelope(text: string): DecodedEnvelope {
   }
   if (!isRecord(raw)) throw new Error("Protocol envelope must be an object");
   if (Object.keys(raw).sort().join("\n") !== ENVELOPE_FIELDS.join("\n")) {
-    throw new Error("Protocol envelope fields do not match version 2");
+    throw new Error("Protocol envelope fields do not match version 3");
   }
   const envelope = raw as unknown as ProtocolEnvelope;
   validateEnvelope(envelope);
@@ -46,7 +46,7 @@ export function decodeEnvelope(text: string): DecodedEnvelope {
   if (bodyBytes.byteLength > MAX_BODY_BYTES) throw new Error("Protocol body is too large");
   let body: unknown;
   try {
-    body = JSON.parse(new TextDecoder().decode(bodyBytes));
+    body = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bodyBytes));
   } catch {
     throw new Error("Protocol body is not valid JSON");
   }
@@ -167,12 +167,13 @@ function validateEnvelope(envelope: ProtocolEnvelope): void {
   if (typeof envelope.messageId !== "string" || !UUID.test(envelope.messageId)) throw new Error("Invalid message ID");
   if (typeof envelope.serverId !== "string" || !UUID.test(envelope.serverId)) throw new Error("Invalid server ID");
   if (typeof envelope.timestamp !== "string" || envelope.timestamp.length > 64) throw new Error("Invalid timestamp");
-  if (typeof envelope.body !== "string" || envelope.body.length < 2 || envelope.body.length > MAX_BODY_BYTES * 2) {
+  if (typeof envelope.body !== "string" || envelope.body.length < 2 || envelope.body.length > MAX_BODY_BYTES * 2 || !/^[A-Za-z0-9_-]+$/.test(envelope.body)) {
     throw new Error("Invalid protocol body");
   }
-  if (typeof envelope.signature !== "string" || envelope.signature.length !== 86) throw new Error("Invalid signature");
+  if (typeof envelope.signature !== "string" || !(/^[A-Za-z0-9_-]{86}$/).test(envelope.signature)) throw new Error("Invalid signature");
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }
+

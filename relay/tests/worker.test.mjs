@@ -18,7 +18,8 @@ test("health describes coordination-only storage", async () => {
   assert.deepEqual(await response.json(), {
     ok: true,
     service: "plexonpanel-relay",
-    protocolVersion: 2,
+    version: "2.0.0",
+    protocolVersion: 3,
     storage: "coordination-only",
     gatewayPublicKey: "public-test-key",
   });
@@ -82,7 +83,7 @@ test("pairing issues a scoped credential only after the room consumes its challe
         const path = new URL(request.url).pathname;
         if (path === "/validate") {
           const validation = await request.json();
-          return validation.generation === 7
+          return validation.access?.generation === 7
             ? Response.json({ ok: true })
             : Response.json({ ok: false }, { status: 403 });
         }
@@ -90,7 +91,9 @@ test("pairing issues a scoped credential only after the room consumes its challe
           return Response.json({ ok: false }, { status: 403 });
         }
         claimed = true;
-        return Response.json({ generation: 7, fingerprint: registration.fingerprint });
+        const claim = await request.json();
+        const now = Math.floor(Date.now()/1000);
+        return Response.json({ generation: 7, fingerprint: registration.fingerprint, device: { deviceId: claim.deviceId, name: claim.name, role: "Observer", scopes: ["telemetry.view"], issuedAt: now, expiresAt: now+3600,lastSeen:now } });
       },
     }),
   };
@@ -125,4 +128,16 @@ test("pairing issues a scoped credential only after the room consumes its challe
     body: JSON.stringify({ code: "123456" }),
   }), pairedEnv);
   assert.equal(replay.status, 403);
+});
+
+
+test("pairing does not accept client-selected roles or scopes",async()=>{
+ for(const extra of [{role:"Owner"},{scopes:["files.write"]},{generation:99}]){
+  const response=await relayWorker.fetch(new Request("https://relay.example/v1/pairings/claim",{method:"POST",headers:{Origin:"https://dashboard.example"},body:JSON.stringify({code:"123456",...extra})}),env);
+  assert.equal(response.status,400);
+ }
+});
+test("chunked pairing payloads are bounded without Content-Length",async()=>{
+ const body=new ReadableStream({start(c){c.enqueue(new TextEncoder().encode("x".repeat(5000)));c.close();}});
+ const response=await relayWorker.fetch(new Request("https://relay.example/v1/pairings/claim",{method:"POST",headers:{Origin:"https://dashboard.example"},body,duplex:"half"}),env);assert.equal(response.status,400);
 });

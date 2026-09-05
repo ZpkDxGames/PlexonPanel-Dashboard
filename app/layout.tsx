@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "./control-room.css";
 
 export const metadata: Metadata = {
   title: "PlexonPanel Dashboard",
@@ -21,3 +22,4 @@ export default function RootLayout({
     </html>
   );
 }
+

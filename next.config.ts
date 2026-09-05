@@ -38,7 +38,7 @@ const nextConfig: NextConfig = {
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           {
             key: "Content-Security-Policy",
-            value: `default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; img-src 'self' data:; font-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src ${relayConnectSources()}; upgrade-insecure-requests`,
+            value: `default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; img-src 'self' data:; font-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'${process.env.NODE_ENV === "production" ? "" : " 'unsafe-eval'"}; connect-src ${relayConnectSources()};${process.env.NODE_ENV === "production" ? " upgrade-insecure-requests" : ""}`,
           },
           {
             key: "Permissions-Policy",
@@ -51,3 +51,4 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+

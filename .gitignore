@@ -33,3 +33,6 @@ coverage/
 Thumbs.db
 .idea/
 .vscode/
+
+
+.test-dist/
