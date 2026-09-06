@@ -1,4 +1,5 @@
-.cr21-filter-toolbar {
+.cr21-filter-toolbar,
+.cr21-audit-toolbar {
   display: flex;
   align-items: end;
   flex-wrap: wrap;
@@ -10,21 +11,26 @@
   background: var(--cr21-surface-1);
 }
 
-.cr21-filter-toolbar label {
+.cr21-filter-toolbar label,
+.cr21-audit-toolbar label {
   display: grid;
   gap: 5px;
   color: var(--cr21-text-muted);
   font-size: 9px;
   font-weight: 650;
+  text-transform: capitalize;
 }
 
-.cr21-filter-toolbar .cr-search {
+.cr21-filter-toolbar .cr-search,
+.cr21-audit-toolbar .wide {
   flex: 1 1 260px;
   min-width: 190px;
 }
 
 .cr21-filter-toolbar input,
-.cr21-filter-toolbar select {
+.cr21-filter-toolbar select,
+.cr21-audit-toolbar input,
+.cr21-audit-toolbar select {
   min-width: 132px;
   height: var(--cr21-control-height);
   padding: 0 10px;
@@ -150,14 +156,38 @@
 }
 
 .cr21-shell .cr-person > div strong,
-.cr21-shell .cr-person > div small {
+.cr21-shell .cr-person > div small,
+.cr21-shell table td > small {
   display: block;
 }
 
-.cr21-shell .cr-person > div small {
+.cr21-shell .cr-person > div small,
+.cr21-shell table td > small {
   margin-top: 3px;
   color: var(--cr21-text-muted);
   font-size: 8px;
+}
+
+.cr21-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.cr21-pagination > span {
+  color: var(--cr21-text-muted);
+  font-size: 9px;
+}
+
+.cr21-audit-json {
+  max-height: 340px;
+  margin-top: 14px;
+  overflow: auto;
+  border: 1px solid var(--cr21-border-soft);
+  border-radius: 11px;
+  background: #080d14;
 }
 
 html[data-plexon-density="compact"] .cr21-shell .cr-panel-head {
@@ -176,7 +206,8 @@ html[data-plexon-density="compact"] .cr21-metric-card {
 }
 
 @media (max-width: 768px) {
-  .cr21-filter-toolbar {
+  .cr21-filter-toolbar,
+  .cr21-audit-toolbar {
     align-items: stretch;
   }
 
@@ -184,7 +215,12 @@ html[data-plexon-density="compact"] .cr21-metric-card {
   .cr21-filter-toolbar .cr-search,
   .cr21-filter-toolbar input,
   .cr21-filter-toolbar select,
-  .cr21-filter-toolbar > .cr-button {
+  .cr21-filter-toolbar > .cr-button,
+  .cr21-audit-toolbar > label,
+  .cr21-audit-toolbar .wide,
+  .cr21-audit-toolbar input,
+  .cr21-audit-toolbar select,
+  .cr21-audit-toolbar > .cr-button {
     width: 100%;
   }
 
@@ -199,6 +235,10 @@ html[data-plexon-density="compact"] .cr21-metric-card {
 
   .cr21-console {
     min-height: 300px;
+  }
+
+  .cr21-pagination {
+    justify-content: space-between;
   }
 }
 
