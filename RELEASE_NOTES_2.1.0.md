@@ -14,7 +14,13 @@ Browser telemetry remains bounded local history. Closing the browser does not im
 
 ## Management workflow improvements
 
-The existing Players, Console, Chat, Plugins, Files, Backups, Audit, Access, and Settings implementations remain available and inherit the updated 2.1 control/surface styling. Existing scope/capability checks continue to be authoritative.
+Players now provides search, world filtering, sorting by name/ping/session/world, online counts, and a structured management drawer for overview, permitted actions, and moderation. Player controls continue to be hidden or disabled by the intersection of device scope and local Paper capability policy.
+
+Console now includes severity segments, search, pause/resume, follow-tail, timestamp and wrap controls, local display clearing, line copy, visible-output copy, browser-session log export, and bounded command history. Pausing or clearing the browser view does not stop the authorized WebSocket stream or delete server logs.
+
+Chat now includes search, pause/resume, follow-tail, local clear, message copy, scoped sending, and an optional MiniMessage control only when the corresponding scope and capability are present. PlexonChats is identified only when explicit integration data indicates it is active.
+
+Plugins now provides search, enabled/disabled filtering, name/version sorting, inventory counts, and a details drawer for available metadata. Dedicated reload remains controlled by local plugin policy; no generic Bukkit/Paper reload was added.
 
 ## Server lifecycle UX
 
@@ -24,15 +30,19 @@ Long lifecycle actions expose a client-observed operation timeline and only incl
 
 ## File manager improvements
 
-The existing protocol-3 file manager remains constrained to configured roots, capability checks, path validation, size limits, and hash-based conflict handling. Dashboard 2.1 does not expand host filesystem authority.
+The protocol-3 file manager retains its configured-root boundaries, capability checks, path validation, size limits, chunk verification, hash-based conflict handling, diff review, and explicit write/delete safeguards. Dashboard 2.1 restyles the workspace without expanding host filesystem authority.
 
 ## Backup experience
 
-Existing create/list/download/delete/restore workflows and restore confirmation safeguards remain in place. Backup state stays authoritative on the host or configured off-site provider rather than being moved into Vercel or a new database.
+The existing create/list/download/delete/restore workflows retain host-authoritative progress and restore safeguards, including preparation and server-identity confirmation where required. Backup state stays authoritative on the host or configured off-site provider rather than being moved into Vercel or a new database.
 
 ## Access & audit improvements
 
-Known operation failure codes now map to clearer operator guidance, including capability-disabled, scope-denied, Owner-required, busy, server-must-be-stopped, and restore-recovery states. Raw exception internals and secrets are not exposed through these messages.
+Audit now provides Paper/Host source selection, server-side filters, search over loaded records, pagination, result badges, entry inspection, request-ID copy, and JSON copy while retaining the local agent as the authoritative source.
+
+Access now provides device search, role filtering, current-device and expired-state indicators, scope inspection, and guarded revocation. Connected/disconnected status is not inferred from last-seen timestamps.
+
+Known operation failure codes map to clearer operator guidance, including capability-disabled, scope-denied, Owner-required, busy, server-must-be-stopped, and restore-recovery states. Raw exception internals and secrets are not exposed through these messages.
 
 ## Responsive/mobile improvements
 
