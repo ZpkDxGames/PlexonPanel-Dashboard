@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import "./control-room.css";
+import "./control-room-2-1.css";
 
 export const metadata: Metadata = {
   title: "PlexonPanel Dashboard",
