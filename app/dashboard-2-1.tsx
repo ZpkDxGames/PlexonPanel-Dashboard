@@ -39,6 +39,7 @@ import {
   PlayersView21,
   PluginsView21,
 } from "./management-views-2-1";
+import { AccessView21, AuditView21 } from "./infrastructure-views-2-1";
 import { OverviewView21, PerformanceView21 } from "./monitoring-views-2-1";
 import { ServerView21 } from "./server-view-2-1";
 
@@ -48,12 +49,6 @@ const FilesView = dynamic(
 );
 const BackupsView = dynamic(() =>
   import("./advanced-views").then((module) => module.BackupsView),
-);
-const AuditView = dynamic(() =>
-  import("./advanced-views").then((module) => module.AuditView),
-);
-const AccessView = dynamic(() =>
-  import("./advanced-views").then((module) => module.AccessView),
 );
 const SettingsView = dynamic(() =>
   import("./advanced-views").then((module) => module.SettingsView),
@@ -73,15 +68,8 @@ const sections = [
   "Access",
   "Settings",
 ] as const;
-
 type Section = (typeof sections)[number];
-type Phase =
-  | "loading"
-  | "unpaired"
-  | "connecting"
-  | "live"
-  | "reconnecting"
-  | "error";
+type Phase = "loading" | "unpaired" | "connecting" | "live" | "reconnecting";
 type Confirmation = {
   action: string;
   parameters: JsonMap;
@@ -105,9 +93,14 @@ type IconName =
   | "search"
   | "chevron"
   | "menu"
-  | "panel"
-  | "copy";
+  | "panel";
 
+const navGroups: { label: string; sections: Section[] }[] = [
+  { label: "MONITOR", sections: ["Overview", "Performance", "Players"] },
+  { label: "COMMUNICATION", sections: ["Console", "Chat"] },
+  { label: "MANAGE", sections: ["Plugins", "Files", "Backups"] },
+  { label: "SYSTEM", sections: ["Server", "Audit", "Access", "Settings"] },
+];
 const iconBySection: Record<Section, IconName> = {
   Overview: "overview",
   Performance: "performance",
@@ -122,163 +115,43 @@ const iconBySection: Record<Section, IconName> = {
   Access: "access",
   Settings: "settings",
 };
-
-const navGroups: { label: string; sections: Section[] }[] = [
-  { label: "MONITOR", sections: ["Overview", "Performance", "Players"] },
-  { label: "COMMUNICATION", sections: ["Console", "Chat"] },
-  { label: "MANAGE", sections: ["Plugins", "Files", "Backups"] },
-  { label: "SYSTEM", sections: ["Server", "Audit", "Access", "Settings"] },
-];
+const iconPaths: Record<IconName, string> = {
+  overview: "M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z",
+  performance: "M3 18l5-6 4 3 8-10M16 5h4v4",
+  players: "M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-6 9c.5-4 2.5-6 6-6s5.5 2 6 6M16 7a3 3 0 0 1 0 6M16 15c3 0 4.5 1.5 5 5",
+  console: "M4 5h16v14H4zM8 9l3 3-3 3M13 15h4",
+  chat: "M4 5h16v11H9l-5 4z",
+  plugins: "M8 3v5H3v8h5v5h8v-5h5V8h-5V3z",
+  files: "M3 7h7l2 2h9v10H3zM3 7V5h7l2 2",
+  backups: "M5 8a8 8 0 1 1-1 8M5 3v5H0M12 7v5l3 2",
+  server: "M3 4h18v6H3zM3 14h18v6H3zM7 7h.01M7 17h.01M11 7h6M11 17h6",
+  audit: "M6 3h12v18H6zM9 8h6M9 12h6M9 16h4",
+  access: "M12 3l8 4v5c0 5-3 8-8 9-5-1-8-4-8-9V7zM9 12l2 2 4-4",
+  settings: "M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8ZM12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6 7 7M17 17l1.4 1.4M18.4 5.6 17 7M7 17l-1.4 1.4",
+  refresh: "M20 6v5h-5M4 18v-5h5M6 9a7 7 0 0 1 12-2l2 4M4 13l2 4a7 7 0 0 0 12-2",
+  bolt: "M13 2 5 13h6l-1 9 9-12h-6z",
+  search: "M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14Zm5-2 5 5",
+  chevron: "m8 10 4 4 4-4",
+  menu: "M4 7h16M4 12h16M4 17h16",
+  panel: "M4 4h16v16H4zM8 8h8v8H8z",
+};
 
 function Icon({ name, size = 18 }: { name: IconName; size?: number }) {
-  const common = {
-    width: size,
-    height: size,
-    viewBox: "0 0 24 24",
-    fill: "none",
-    stroke: "currentColor",
-    strokeWidth: 1.8,
-    strokeLinecap: "round" as const,
-    strokeLinejoin: "round" as const,
-    "aria-hidden": true,
-  };
-  switch (name) {
-    case "overview":
-      return (
-        <svg {...common}>
-          <rect x="3" y="3" width="7" height="7" rx="2" />
-          <rect x="14" y="3" width="7" height="7" rx="2" />
-          <rect x="3" y="14" width="7" height="7" rx="2" />
-          <rect x="14" y="14" width="7" height="7" rx="2" />
-        </svg>
-      );
-    case "performance":
-      return (
-        <svg {...common}>
-          <path d="M3 17l5-5 4 3 7-8" />
-          <path d="M16 7h3v3" />
-        </svg>
-      );
-    case "players":
-      return (
-        <svg {...common}>
-          <circle cx="9" cy="8" r="3" />
-          <path d="M3.5 19c.6-3.3 2.4-5 5.5-5s4.9 1.7 5.5 5" />
-          <circle cx="17" cy="9" r="2" />
-          <path d="M15.5 14.5c2.8-.3 4.6 1.2 5 4.5" />
-        </svg>
-      );
-    case "console":
-      return (
-        <svg {...common}>
-          <rect x="3" y="4" width="18" height="16" rx="3" />
-          <path d="M7 9l3 3-3 3M12.5 15H17" />
-        </svg>
-      );
-    case "chat":
-      return (
-        <svg {...common}>
-          <path d="M4 5h16v11H9l-5 4V5z" />
-        </svg>
-      );
-    case "plugins":
-      return (
-        <svg {...common}>
-          <path d="M8 3v5H3v8h5v5h8v-5h5V8h-5V3H8z" />
-        </svg>
-      );
-    case "files":
-      return (
-        <svg {...common}>
-          <path d="M3 6h7l2 2h9v11H3z" />
-          <path d="M3 6V4h7l2 2" />
-        </svg>
-      );
-    case "backups":
-      return (
-        <svg {...common}>
-          <path d="M5 8a8 8 0 1 1-1 8" />
-          <path d="M5 3v5H0" />
-          <path d="M12 7v5l3 2" />
-        </svg>
-      );
-    case "server":
-      return (
-        <svg {...common}>
-          <rect x="3" y="4" width="18" height="6" rx="2" />
-          <rect x="3" y="14" width="18" height="6" rx="2" />
-          <path d="M7 7h.01M7 17h.01M11 7h6M11 17h6" />
-        </svg>
-      );
-    case "audit":
-      return (
-        <svg {...common}>
-          <path d="M6 3h12v18H6z" />
-          <path d="M9 8h6M9 12h6M9 16h4" />
-        </svg>
-      );
-    case "access":
-      return (
-        <svg {...common}>
-          <path d="M12 3l8 4v5c0 5-3.1 8-8 9-4.9-1-8-4-8-9V7z" />
-          <path d="M9 12l2 2 4-4" />
-        </svg>
-      );
-    case "settings":
-      return (
-        <svg {...common}>
-          <circle cx="12" cy="12" r="3" />
-          <path d="M19 12a7 7 0 0 0-.1-1l2-1.5-2-3.4-2.5 1a7 7 0 0 0-1.7-1L14.4 3h-4l-.4 3.1a7 7 0 0 0-1.7 1l-2.5-1-2 3.4 2 1.5a7 7 0 0 0 0 2l-2 1.5 2 3.4 2.5-1a7 7 0 0 0 1.7 1l.4 3.1h4l.4-3.1a7 7 0 0 0 1.7-1l2.5 1 2-3.4-2-1.5c.1-.3.1-.7.1-1z" />
-        </svg>
-      );
-    case "refresh":
-      return (
-        <svg {...common}>
-          <path d="M20 6v5h-5" />
-          <path d="M4 18v-5h5" />
-          <path d="M6.1 9a7 7 0 0 1 11.7-2.6L20 11M4 13l2.2 4.6A7 7 0 0 0 18 15" />
-        </svg>
-      );
-    case "bolt":
-      return (
-        <svg {...common}>
-          <path d="M13 2L5 13h6l-1 9 9-12h-6z" />
-        </svg>
-      );
-    case "search":
-      return (
-        <svg {...common}>
-          <circle cx="11" cy="11" r="7" />
-          <path d="M16 16l5 5" />
-        </svg>
-      );
-    case "chevron":
-      return (
-        <svg {...common}>
-          <path d="M8 10l4 4 4-4" />
-        </svg>
-      );
-    case "menu":
-      return (
-        <svg {...common}>
-          <path d="M4 7h16M4 12h16M4 17h16" />
-        </svg>
-      );
-    case "copy":
-      return (
-        <svg {...common}>
-          <rect x="8" y="8" width="11" height="11" rx="2" />
-          <path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3" />
-        </svg>
-      );
-    default:
-      return (
-        <svg {...common}>
-          <path d="M4 4h16v16H4z" />
-          <path d="M8 8h8v8H8z" />
-        </svg>
-      );
-  }
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+    >
+      <path d={iconPaths[name]} />
+    </svg>
+  );
 }
 
 function Brand({ compact = false }: { compact?: boolean }) {
@@ -330,8 +203,7 @@ function Pairing({
         </div>
         <div className="cr-pair-steps">
           <span>
-            <b>01</b> Run <code>/plexonpanel pair</code> in Minecraft or the
-            server console.
+            <b>01</b> Run <code>/plexonpanel pair</code> locally.
           </span>
           <span>
             <b>02</b> Enter the one-use code before its five-minute expiry.
@@ -350,8 +222,8 @@ function Pairing({
           <Badge tone="cyan">Secure device pairing</Badge>
           <h2>Pair this browser</h2>
           <p>
-            The local operator chooses your role. Without a role argument,
-            pairing defaults to Observer.
+            The local operator chooses your role. Pairing defaults to Observer
+            when no role is supplied.
           </p>
           <form
             className="cr-form"
@@ -360,14 +232,9 @@ function Pairing({
               setBusy(true);
               setError("");
               void pairDashboardServer(code, name)
-                .then(() => {
-                  setCode("");
-                  return done();
-                })
+                .then(() => done())
                 .catch((reason) => {
-                  setError(
-                    reason instanceof Error ? reason.message : "Pairing failed",
-                  );
+                  setError(reason instanceof Error ? reason.message : "Pairing failed");
                   setBusy(false);
                 });
             }}
@@ -415,8 +282,8 @@ function Pairing({
             )}
           </form>
           <p className="cr-hint">
-            Server identity is protected by Ed25519 signatures. Telemetry and
-            file contents are not stored by the relay.
+            Server identity is signed. Telemetry and file contents are not stored
+            by the relay.
           </p>
         </div>
       </section>
@@ -460,10 +327,7 @@ function Confirm({ value }: { value: Confirmation }) {
         <button className="cr-button" onClick={() => value.resolve(false)}>
           Cancel
         </button>
-        <button
-          className="cr-button danger"
-          onClick={() => value.resolve(true)}
-        >
+        <button className="cr-button danger" onClick={() => value.resolve(true)}>
           Confirm operation
         </button>
       </div>
@@ -480,18 +344,14 @@ function Freshness({ phase, updatedAt }: { phase: Phase; updatedAt: number }) {
   if (phase !== "live")
     return <span className="cr21-freshness stale">Disconnected</span>;
   if (!updatedAt)
-    return (
-      <span className="cr21-freshness waiting">Waiting for sample</span>
-    );
+    return <span className="cr21-freshness waiting">Waiting for sample</span>;
   const seconds = Math.max(
     0,
     Math.floor((Math.max(now, updatedAt) - updatedAt) / 1000),
   );
   if (seconds <= 15)
     return (
-      <span className="cr21-freshness live">
-        Live · updated {seconds}s ago
-      </span>
+      <span className="cr21-freshness live">Live · updated {seconds}s ago</span>
     );
   if (seconds <= 30)
     return <span className="cr21-freshness">Updated {seconds}s ago</span>;
@@ -525,11 +385,11 @@ function CommandPalette({
     if (open) ref.current?.showModal();
     else if (ref.current?.open) ref.current.close();
   }, [open]);
-  const finishClose = () => {
+  const finish = () => {
     setQuery("");
     close();
   };
-  const items: { label: string; action: () => void; visible?: boolean }[] = [
+  const actions: { label: string; action: () => void; visible?: boolean }[] = [
     ...sections.map((section) => ({
       label: `Go to ${section}`,
       action: () => navigate(section),
@@ -538,20 +398,16 @@ function CommandPalette({
     {
       label: "Create backup",
       visible: can("backup.create", "HOST"),
-      action: () => {
-        void run("backup.create", {}, "HOST");
-      },
+      action: () => void run("backup.create", {}, "HOST"),
     },
     {
       label: "Restart server",
       visible: can("server.restart", "HOST"),
-      action: () => {
-        void run("server.restart", {}, "HOST");
-      },
+      action: () => void run("server.restart", {}, "HOST"),
     },
     { label: "Copy diagnostics", action: copyDiagnostics },
   ];
-  const visible = items.filter(
+  const visible = actions.filter(
     (item) =>
       item.visible !== false &&
       item.label.toLowerCase().includes(query.toLowerCase()),
@@ -562,7 +418,7 @@ function CommandPalette({
       ref={ref}
       onCancel={(event) => {
         event.preventDefault();
-        finishClose();
+        finish();
       }}
     >
       <div className="cr21-command-search">
@@ -581,7 +437,7 @@ function CommandPalette({
             key={item.label}
             onClick={() => {
               item.action();
-              finishClose();
+              finish();
             }}
           >
             {item.label}
@@ -595,9 +451,7 @@ function CommandPalette({
 export default function Dashboard21() {
   const [credential, setCredential] = useState<RelayCredential | null>(null);
   const [credentials, setCredentials] = useState<RelayCredential[]>([]);
-  const [state, setState] = useState<ControlState>(() =>
-    emptyControlState(""),
-  );
+  const [state, setState] = useState<ControlState>(() => emptyControlState(""));
   const [phase, setPhase] = useState<Phase>("loading");
   const [section, setSection] = useState<Section>("Overview");
   const [error, setError] = useState("");
@@ -664,13 +518,11 @@ export default function Dashboard21() {
       current = false;
     };
   }, [restore]);
-
   useEffect(() => {
     if (!notice) return;
     const timer = window.setTimeout(() => setNotice(""), 6500);
     return () => window.clearTimeout(timer);
   }, [notice]);
-
   useEffect(() => {
     if (!credential || !state.updatedAt) return;
     const timer = window.setTimeout(() => {
@@ -678,12 +530,10 @@ export default function Dashboard21() {
     }, 1000);
     return () => window.clearTimeout(timer);
   }, [state, credential]);
-
   useEffect(() => {
     document.documentElement.dataset.plexonDensity =
       localStorage.getItem("plexonpanel-density") ?? "comfortable";
   }, []);
-
   useEffect(() => {
     const handler = (event: KeyboardEvent) => {
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
@@ -702,7 +552,6 @@ export default function Dashboard21() {
     let socket: WebSocket | null = null;
     let retry: ReturnType<typeof setTimeout> | undefined;
     let heartbeat: ReturnType<typeof setInterval> | undefined;
-
     const schedule = () => {
       if (stopped) return;
       attempt += 1;
@@ -713,7 +562,6 @@ export default function Dashboard21() {
           (0.8 + Math.random() * 0.4),
       );
     };
-
     const connect = async () => {
       if (stopped) return;
       setPhase(attempt ? "reconnecting" : "connecting");
@@ -793,9 +641,7 @@ export default function Dashboard21() {
         };
         socket.onerror = () => {
           if (!stopped)
-            setError(
-              "Relay connection unavailable. Reconnecting automatically…",
-            );
+            setError("Relay connection unavailable. Reconnecting automatically…");
         };
       } catch (reason) {
         if (stopped) return;
@@ -811,7 +657,6 @@ export default function Dashboard21() {
         schedule();
       }
     };
-
     void connect();
     return () => {
       stopped = true;
@@ -892,9 +737,7 @@ export default function Dashboard21() {
       }
       try {
         const result = await sendDashboardAction(action, parameters, kind);
-        setNotice(
-          str(result.data.message, result.message || "Operation completed."),
-        );
+        setNotice(str(result.data.message, result.message || "Operation completed."));
         return result;
       } catch (reason) {
         setNotice(operationText(reason));
@@ -912,17 +755,11 @@ export default function Dashboard21() {
     setPhase("unpaired");
     setCredentials(await listRelayCredentials());
   };
-
   const refreshCurrent = useCallback(() => {
     if (
-      [
-        "Overview",
-        "Performance",
-        "Players",
-        "Console",
-        "Chat",
-        "Plugins",
-      ].includes(section)
+      ["Overview", "Performance", "Players", "Console", "Chat", "Plugins"].includes(
+        section,
+      )
     ) {
       if (section === "Performance")
         setNotice(
@@ -945,13 +782,11 @@ export default function Dashboard21() {
     setRefreshRevision((value) => value + 1);
     setNotice(`Refreshing ${section.toLowerCase()}…`);
   }, [section, state.updatedAt]);
-
   const copyDiagnostics = useCallback(() => {
     void navigator.clipboard
       .writeText(diagnostics(state))
       .then(() => setNotice("Safe diagnostics copied."));
   }, [state]);
-
   const resetHistory = useCallback(
     () => setState((current) => ({ ...current, history: [] })),
     [],
@@ -965,7 +800,6 @@ export default function Dashboard21() {
         error={error}
       />
     );
-
   if (phase === "loading")
     return (
       <main className="cr-loading">
@@ -982,7 +816,6 @@ export default function Dashboard21() {
     connected: phase === "live",
     setUnsaved,
   };
-
   let view: React.ReactNode;
   switch (section) {
     case "Overview":
@@ -1013,11 +846,11 @@ export default function Dashboard21() {
       view = <ServerView21 {...props} />;
       break;
     case "Audit":
-      view = <AuditView {...props} />;
+      view = <AuditView21 {...props} />;
       break;
     case "Access":
       view = (
-        <AccessView {...props} forget={forget} pair={() => setPairing(true)} />
+        <AccessView21 {...props} forget={forget} pair={() => setPairing(true)} />
       );
       break;
     case "Settings":
@@ -1041,9 +874,7 @@ export default function Dashboard21() {
   const host = Boolean(state.ready?.agents.host);
 
   return (
-    <div
-      className={`cr21-shell ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}
-    >
+    <div className={`cr21-shell ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}>
       <button
         className="cr21-mobile-menu"
         aria-label="Open navigation"
@@ -1067,10 +898,7 @@ export default function Dashboard21() {
             onClick={() => {
               const next = !sidebarCollapsed;
               setSidebarCollapsed(next);
-              localStorage.setItem(
-                "plexonpanel-sidebar-collapsed",
-                String(next),
-              );
+              localStorage.setItem("plexonpanel-sidebar-collapsed", String(next));
             }}
           >
             <span>{sidebarCollapsed ? "›" : "‹"}</span>
@@ -1119,10 +947,7 @@ export default function Dashboard21() {
             <>
               <Badge tone="cyan">{role}</Badge>
               <small>{state.ready?.device.name ?? credential?.name}</small>
-              <button
-                className="cr-text-button"
-                onClick={() => navigate("Access")}
-              >
+              <button className="cr-text-button" onClick={() => navigate("Access")}>
                 Manage access
               </button>
             </>
@@ -1165,14 +990,12 @@ export default function Dashboard21() {
               <strong>{serverName}</strong>
             )}
           </div>
-
           <div className="cr21-agent-pills">
             <span data-online={paper}>
-              <i />
-              {paper ? "Paper" : "Paper offline"}
+              <i /> {paper ? "Paper" : "Paper offline"}
             </span>
             <span data-online={host}>
-              <i />
+              <i />{" "}
               {host
                 ? "Host"
                 : state.ready?.agents.hostInstalled
@@ -1180,9 +1003,7 @@ export default function Dashboard21() {
                   : "Host not installed"}
             </span>
           </div>
-
           <Freshness phase={phase} updatedAt={state.updatedAt} />
-
           <div className="cr21-topbar-actions">
             <button
               className="cr21-icon-button"
@@ -1194,25 +1015,16 @@ export default function Dashboard21() {
             </button>
             <details className="cr21-quick-actions">
               <summary className="cr-button">
-                <Icon name="bolt" size={16} />
-                Quick actions
+                <Icon name="bolt" size={16} /> Quick actions
               </summary>
               <div>
                 {can("server.restart", "HOST") && (
-                  <button
-                    onClick={() => {
-                      void run("server.restart", {}, "HOST");
-                    }}
-                  >
+                  <button onClick={() => void run("server.restart", {}, "HOST")}>
                     Restart server
                   </button>
                 )}
                 {can("backup.create", "HOST") && (
-                  <button
-                    onClick={() => {
-                      void run("backup.create", {}, "HOST");
-                    }}
-                  >
+                  <button onClick={() => void run("backup.create", {}, "HOST")}>
                     Create backup
                   </button>
                 )}
@@ -1230,10 +1042,7 @@ export default function Dashboard21() {
               <span>Command</span>
               <kbd>⌘K</kbd>
             </button>
-            <button
-              className="cr21-role-button"
-              onClick={() => navigate("Access")}
-            >
+            <button className="cr21-role-button" onClick={() => navigate("Access")}>
               <span>{role}</span>
               <Icon name="chevron" size={14} />
             </button>
@@ -1248,8 +1057,7 @@ export default function Dashboard21() {
           <div className="cr21-page-meta">
             <Freshness phase={phase} updatedAt={state.updatedAt} />
             <button className="cr-button" onClick={refreshCurrent}>
-              <Icon name="refresh" size={15} />
-              Refresh
+              <Icon name="refresh" size={15} /> Refresh
             </button>
           </div>
         </div>
@@ -1272,7 +1080,6 @@ export default function Dashboard21() {
             </div>
           )
         )}
-
         {error && phase === "live" && (
           <p className="cr-alert" role="alert">
             {error}
@@ -1285,7 +1092,6 @@ export default function Dashboard21() {
         >
           {view}
         </main>
-
         <footer className="cr21-footer">
           <span>Local authority · Signed protocol 3</span>
           <span>PlexonPanel Dashboard 2.1.0</span>
@@ -1295,10 +1101,7 @@ export default function Dashboard21() {
       {notice && (
         <div className="cr-toast cr21-toast" role="status" aria-live="polite">
           <span>{notice}</span>
-          <button
-            aria-label="Dismiss notification"
-            onClick={() => setNotice("")}
-          >
+          <button aria-label="Dismiss notification" onClick={() => setNotice("")}>
             ×
           </button>
         </div>
