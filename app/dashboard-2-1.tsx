@@ -51,7 +51,7 @@ const BackupsView = dynamic(() =>
   import("./advanced-views").then((module) => module.BackupsView),
 );
 const SettingsView = dynamic(() =>
-  import("./advanced-views").then((module) => module.SettingsView),
+  import("./settings-view-2-1").then((module) => module.SettingsView21),
 );
 
 const sections = [
@@ -118,17 +118,21 @@ const iconBySection: Record<Section, IconName> = {
 const iconPaths: Record<IconName, string> = {
   overview: "M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z",
   performance: "M3 18l5-6 4 3 8-10M16 5h4v4",
-  players: "M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-6 9c.5-4 2.5-6 6-6s5.5 2 6 6M16 7a3 3 0 0 1 0 6M16 15c3 0 4.5 1.5 5 5",
+  players:
+    "M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-6 9c.5-4 2.5-6 6-6s5.5 2 6 6M16 7a3 3 0 0 1 0 6M16 15c3 0 4.5 1.5 5 5",
   console: "M4 5h16v14H4zM8 9l3 3-3 3M13 15h4",
   chat: "M4 5h16v11H9l-5 4z",
   plugins: "M8 3v5H3v8h5v5h8v-5h5V8h-5V3z",
   files: "M3 7h7l2 2h9v10H3zM3 7V5h7l2 2",
   backups: "M5 8a8 8 0 1 1-1 8M5 3v5H0M12 7v5l3 2",
-  server: "M3 4h18v6H3zM3 14h18v6H3zM7 7h.01M7 17h.01M11 7h6M11 17h6",
+  server:
+    "M3 4h18v6H3zM3 14h18v6H3zM7 7h.01M7 17h.01M11 7h6M11 17h6",
   audit: "M6 3h12v18H6zM9 8h6M9 12h6M9 16h4",
   access: "M12 3l8 4v5c0 5-3 8-8 9-5-1-8-4-8-9V7zM9 12l2 2 4-4",
-  settings: "M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8ZM12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6 7 7M17 17l1.4 1.4M18.4 5.6 17 7M7 17l-1.4 1.4",
-  refresh: "M20 6v5h-5M4 18v-5h5M6 9a7 7 0 0 1 12-2l2 4M4 13l2 4a7 7 0 0 0 12-2",
+  settings:
+    "M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8ZM12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6 7 7M17 17l1.4 1.4M18.4 5.6 17 7M7 17l-1.4 1.4",
+  refresh:
+    "M20 6v5h-5M4 18v-5h5M6 9a7 7 0 0 1 12-2l2 4M4 13l2 4a7 7 0 0 0 12-2",
   bolt: "M13 2 5 13h6l-1 9 9-12h-6z",
   search: "M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14Zm5-2 5 5",
   chevron: "m8 10 4 4 4-4",
@@ -234,7 +238,9 @@ function Pairing({
               void pairDashboardServer(code, name)
                 .then(() => done())
                 .catch((reason) => {
-                  setError(reason instanceof Error ? reason.message : "Pairing failed");
+                  setError(
+                    reason instanceof Error ? reason.message : "Pairing failed",
+                  );
                   setBusy(false);
                 });
             }}
@@ -470,15 +476,12 @@ export default function Dashboard21() {
   }, []);
   const leaveEditor = () =>
     !unsaved.current || window.confirm("Discard unsaved file edits?");
-  const navigate = useCallback(
-    (next: Section) => {
-      if (next !== section && !leaveEditor()) return;
-      setSection(next);
-      localStorage.setItem("plexonpanel-last-section", next);
-      setSidebarOpen(false);
-    },
-    [section],
-  );
+  const navigate = (next: Section) => {
+    if (next !== section && !leaveEditor()) return;
+    setSection(next);
+    localStorage.setItem("plexonpanel-last-section", next);
+    setSidebarOpen(false);
+  };
 
   const restore = useCallback(async () => {
     try {
@@ -737,7 +740,9 @@ export default function Dashboard21() {
       }
       try {
         const result = await sendDashboardAction(action, parameters, kind);
-        setNotice(str(result.data.message, result.message || "Operation completed."));
+        setNotice(
+          str(result.data.message, result.message || "Operation completed."),
+        );
         return result;
       } catch (reason) {
         setNotice(operationText(reason));
