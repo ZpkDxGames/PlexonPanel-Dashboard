@@ -32,15 +32,13 @@ import {
 } from "../lib/control-state";
 import { canAction, HIGH_RISK } from "../lib/scopes";
 import { operationText } from "../lib/operation-messages";
+import { Badge, Empty, type ViewProps } from "./control-views";
 import {
-  Badge,
-  ChatView,
-  ConsoleView,
-  Empty,
-  PlayersView,
-  PluginsView,
-  type ViewProps,
-} from "./control-views";
+  ChatView21,
+  ConsoleView21,
+  PlayersView21,
+  PluginsView21,
+} from "./management-views-2-1";
 import { OverviewView21, PerformanceView21 } from "./monitoring-views-2-1";
 import { ServerView21 } from "./server-view-2-1";
 
@@ -994,16 +992,16 @@ export default function Dashboard21() {
       view = <PerformanceView21 props={props} resetHistory={resetHistory} />;
       break;
     case "Players":
-      view = <PlayersView {...props} />;
+      view = <PlayersView21 {...props} />;
       break;
     case "Console":
-      view = <ConsoleView {...props} />;
+      view = <ConsoleView21 {...props} />;
       break;
     case "Chat":
-      view = <ChatView {...props} />;
+      view = <ChatView21 {...props} />;
       break;
     case "Plugins":
-      view = <PluginsView {...props} />;
+      view = <PluginsView21 {...props} />;
       break;
     case "Files":
       view = <FilesView {...props} />;
