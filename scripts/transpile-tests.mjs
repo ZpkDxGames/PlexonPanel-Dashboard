@@ -7,6 +7,8 @@ for (const file of [
   "lib/scopes.ts",
   "lib/data-source.ts",
   "lib/browser-store.ts",
+  "lib/lifecycle-state.ts",
+  "lib/operation-messages.ts",
   "app/control-views.tsx",
   "app/advanced-views.tsx",
 ]) {
