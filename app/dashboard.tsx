@@ -1,174 +1,754 @@
 "use client";
-
-import { useEffect, useMemo, useState } from "react";
-import { demoDataSource } from "../lib/data-source";
-import type { ActivityEvent, DashboardOverview, TimelinePoint } from "../lib/dashboard-types";
-import ManagementViews from "./management-views";
-
-type Section = "overview" | "players" | "console" | "chat" | "plugins" | "security";
-
-const navigation: { id: Section; label: string; icon: string }[] = [
-  { id: "overview", label: "Overview", icon: "grid" },
-  { id: "players", label: "Players", icon: "users" },
-  { id: "console", label: "Console", icon: "terminal" },
-  { id: "chat", label: "Global chat", icon: "chat" },
-  { id: "plugins", label: "Plugins", icon: "puzzle" },
-  { id: "security", label: "Security", icon: "shield" },
-];
-
-function Icon({ name }: { name: string }) {
-  const paths: Record<string, React.ReactNode> = {
-    grid: <><rect x="3" y="3" width="7" height="7" rx="2" /><rect x="14" y="3" width="7" height="7" rx="2" /><rect x="3" y="14" width="7" height="7" rx="2" /><rect x="14" y="14" width="7" height="7" rx="2" /></>,
-    users: <><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" /></>,
-    terminal: <><path d="m4 17 6-5-6-5" /><path d="M12 19h8" /></>,
-    chat: <path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4Z" />,
-    puzzle: <path d="M19.4 15a1.7 1.7 0 0 0 0-3.4H17V9.2a1.7 1.7 0 1 0-3.4 0V11H10V7.4a1.7 1.7 0 1 0-3.4 0V11H3v6h3.6v-1.2a1.7 1.7 0 1 1 3.4 0V19h7v-4Z" />,
-    shield: <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" />,
-    bell: <><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" /><path d="M13.7 21a2 2 0 0 1-3.4 0" /></>,
-    chevron: <path d="m9 18 6-6-6-6" />,
-    plus: <><path d="M12 5v14" /><path d="M5 12h14" /></>,
-    close: <><path d="m6 6 12 12" /><path d="m18 6-12 12" /></>,
-    arrow: <path d="M5 12h14m-5-5 5 5-5 5" />,
-  };
-
-  return <svg className="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{paths[name]}</svg>;
-}
-
-function Sparkline({ points }: { points: TimelinePoint[] }) {
-  const plotted = useMemo(() => {
-    const min = Math.min(...points.map((point) => point.value)) - 0.03;
-    const max = Math.max(...points.map((point) => point.value)) + 0.02;
-    return points.map((point, index) => {
-      const x = (index / Math.max(points.length - 1, 1)) * 100;
-      const y = 78 - ((point.value - min) / (max - min)) * 56;
-      return `${x.toFixed(2)},${y.toFixed(2)}`;
-    }).join(" ");
-  }, [points]);
-
+import dynamic from "next/dynamic";
+import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  bindLiveSocket,
+  DashboardRequestError,
+  handleRelayControlMessage,
+  logoutDashboard,
+  pairDashboardServer,
+  requestLiveConnection,
+  sendDashboardAction,
+  type ActionCompletion,
+} from "../lib/data-source";
+import {
+  clearBrowserWorkspace,
+  listRelayCredentials,
+  loadControlCache,
+  loadRelayCredential,
+  saveControlCache,
+  selectRelayCredential,
+  type RelayCredential,
+} from "../lib/browser-store";
+import {
+  applyControlMessage,
+  emptyControlState,
+  record,
+  str,
+  type ControlState,
+  type JsonMap,
+} from "../lib/control-state";
+import { canAction, HIGH_RISK } from "../lib/scopes";
+import {
+  Badge,
+  ChatView,
+  ConsoleView,
+  Empty,
+  OverviewView,
+  PerformanceView,
+  PlayersView,
+  PluginsView,
+  type ViewProps,
+} from "./control-views";
+const FilesView = dynamic(
+  () => import("./advanced-views").then((m) => m.FilesView),
+  { loading: () => <Empty title="Opening files…" /> },
+);
+const BackupsView = dynamic(() =>
+  import("./advanced-views").then((m) => m.BackupsView),
+);
+const ServerView = dynamic(() =>
+  import("./advanced-views").then((m) => m.ServerView),
+);
+const AuditView = dynamic(() =>
+  import("./advanced-views").then((m) => m.AuditView),
+);
+const AccessView = dynamic(() =>
+  import("./advanced-views").then((m) => m.AccessView),
+);
+const SettingsView = dynamic(() =>
+  import("./advanced-views").then((m) => m.SettingsView),
+);
+const sections = [
+  "Overview",
+  "Performance",
+  "Players",
+  "Console",
+  "Chat",
+  "Plugins",
+  "Files",
+  "Backups",
+  "Server",
+  "Audit",
+  "Access",
+  "Settings",
+] as const;
+type Section = (typeof sections)[number];
+type Phase =
+  | "loading"
+  | "unpaired"
+  | "connecting"
+  | "live"
+  | "reconnecting"
+  | "error";
+type Confirmation = {
+  action: string;
+  parameters: JsonMap;
+  resolve: (approved: boolean) => void;
+};
+function Brand() {
   return (
-    <div className="chart" aria-label="TPS performance over the last hour">
-      <div className="chart-grid" aria-hidden="true"><span /><span /><span /></div>
-      <svg viewBox="0 0 100 88" preserveAspectRatio="none" aria-hidden="true">
-        <defs><linearGradient id="tps-fill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#6ee7d7" stopOpacity="0.28" /><stop offset="100%" stopColor="#6ee7d7" stopOpacity="0" /></linearGradient></defs>
-        <polygon points={`0,88 ${plotted} 100,88`} fill="url(#tps-fill)" />
-        <polyline points={plotted} className="chart-line-glow" />
-        <polyline points={plotted} className="chart-line" />
-      </svg>
-      <div className="chart-axis" aria-hidden="true"><span>{points[0]?.label}</span><span>{points[Math.floor(points.length / 2)]?.label}</span><span>{points[points.length - 1]?.label}</span></div>
+    <div className="cr-brand">
+      <span>P</span>
+      <strong>
+        Plexon<span>Panel</span>
+      </strong>
+      <small>2.0</small>
     </div>
   );
 }
-
-function ActivityMarker({ category }: { category: ActivityEvent["category"] }) {
-  const glyph = { player: "P", plugin: "◆", system: "↻", security: "S" }[category];
-  return <span className={`activity-marker ${category}`}>{glyph}</span>;
-}
-
-function PairServerModal({ onClose }: { onClose: () => void }) {
-  const [pairingCode, setPairingCode] = useState("");
-  const [isWaiting, setIsWaiting] = useState(false);
-  const isValid = /^\d{6}$/.test(pairingCode);
-
-  function submitPairing(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (isValid) setIsWaiting(true);
-  }
-
+function Pairing({
+  done,
+  cancel,
+  error: initialError,
+}: {
+  done: () => Promise<void>;
+  cancel?: () => void;
+  error?: string;
+}) {
+  const [code, setCode] = useState(""),
+    [name, setName] = useState("My browser"),
+    [busy, setBusy] = useState(false),
+    [error, setError] = useState(initialError ?? "");
   return (
-    <div className="modal-backdrop" role="presentation" onMouseDown={onClose}>
-      <section className="pair-modal" role="dialog" aria-modal="true" aria-labelledby="pair-title" onMouseDown={(event) => event.stopPropagation()}>
-        <button className="icon-button modal-close" onClick={onClose} aria-label="Close"><Icon name="close" /></button>
-        <div className="modal-emblem" aria-hidden="true"><span /></div>
-        <p className="eyebrow">Secure connection</p>
-        <h2 id="pair-title">Pair a Paper server</h2>
-        <p className="modal-copy">Run <code>/plexonpanel pair</code> in your server console, then enter the one-time code shown there.</p>
-        <form onSubmit={submitPairing}>
-          <label htmlFor="pairing-code">Six-digit pairing code</label>
-          <input id="pairing-code" className="pair-input" inputMode="numeric" autoComplete="one-time-code" maxLength={6} placeholder="000000" value={pairingCode} onChange={(event) => setPairingCode(event.target.value.replace(/\D/g, "").slice(0, 6))} autoFocus />
-          <button className="primary-button pair-submit" type="submit" disabled={!isValid}>
-            {isWaiting ? <><span className="button-spinner" /> Waiting for server</> : <>Pair server <Icon name="arrow" /></>}
-          </button>
-        </form>
-        <div className="modal-note"><span className="note-dot" />Preview mode validates the flow without storing your code.</div>
+    <main className="cr-pair-screen">
+      <section className="cr-pair-copy">
+        <Brand />
+        <div>
+          <span className="cr-eyebrow">Plexon server control room</span>
+          <h1>
+            Your server.
+            <br />
+            Within reach.
+          </h1>
+          <p>
+            Monitor Paper, manage players, and operate your server through
+            locally controlled access.
+          </p>
+        </div>
+        <div className="cr-pair-steps">
+          <span>
+            <b>01</b> Run <code>/plexonpanel pair</code> in Minecraft or the
+            server console.
+          </span>
+          <span>
+            <b>02</b> Enter the one-use code before its five-minute expiry.
+          </span>
+          <span>
+            <b>03</b> Open the control room with the role granted locally.
+          </span>
+        </div>
+        <small>
+          Monitoring only by default. Your server keeps control of every
+          capability.
+        </small>
       </section>
-    </div>
+      <section className="cr-pair-form">
+        <div>
+          <Badge tone="cyan">Secure device pairing</Badge>
+          <h2>Pair this browser</h2>
+          <p>
+            The local operator chooses your role. Without a role argument,
+            pairing defaults to Observer.
+          </p>
+          <form
+            className="cr-form"
+            onSubmit={(e) => {
+              e.preventDefault();
+              setBusy(true);
+              setError("");
+              void pairDashboardServer(code, name)
+                .then(() => {
+                  setCode("");
+                  return done();
+                })
+                .catch((e) => {
+                  setError(e instanceof Error ? e.message : "Pairing failed");
+                  setBusy(false);
+                });
+            }}
+          >
+            <label>
+              Device name
+              <input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                maxLength={64}
+                required
+                autoComplete="off"
+              />
+            </label>
+            <label>
+              Six-digit pairing code
+              <input
+                className="cr-code"
+                value={code}
+                onChange={(e) =>
+                  setCode(e.target.value.replace(/\D/g, "").slice(0, 6))
+                }
+                maxLength={6}
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                placeholder="000000"
+                required
+              />
+            </label>
+            {error && (
+              <p className="cr-alert" role="alert">
+                {error}
+              </p>
+            )}
+            <button
+              className="cr-button primary"
+              disabled={busy || !/^\d{6}$/.test(code)}
+            >
+              {busy ? "Waiting for local approval…" : "Open control room →"}
+            </button>
+            {cancel && (
+              <button type="button" className="cr-button" onClick={cancel}>
+                Back to server
+              </button>
+            )}
+          </form>
+          <p className="cr-hint">
+            Server identity is protected by Ed25519 signatures. Telemetry and
+            file contents are not stored by the relay.
+          </p>
+        </div>
+      </section>
+    </main>
   );
 }
-
-export default function Dashboard() {
-  const [activeSection, setActiveSection] = useState<Section>("overview");
-  const [overview, setOverview] = useState<DashboardOverview | null>(null);
-  const [showPairing, setShowPairing] = useState(false);
-
-  useEffect(() => { demoDataSource.getOverview().then(setOverview); }, []);
-
-  if (!overview) {
-    return <main className="loading-screen"><div className="brand-mark large" aria-hidden="true">P</div><span>Preparing your command center</span></main>;
-  }
-
+function Confirm({ value }: { value: Confirmation }) {
+  const dialog = useRef<HTMLDialogElement>(null);
+  useEffect(() => {
+    dialog.current?.showModal();
+  }, []);
   return (
-    <div className="dashboard-shell">
-      <aside className="sidebar">
-        <a className="brand" href="#main" aria-label="PlexonPanel home"><span className="brand-mark">P</span><span className="brand-name">Plexon<span>Panel</span></span></a>
-        <nav className="primary-nav" aria-label="Dashboard navigation">
-          <p className="nav-caption">Workspace</p>
-          {navigation.map((item) => (
-            <button key={item.id} className={`nav-item ${activeSection === item.id ? "active" : ""}`} onClick={() => setActiveSection(item.id)} aria-current={activeSection === item.id ? "page" : undefined}>
-              <Icon name={item.icon} /><span>{item.label}</span>{item.id === "players" && <b>84</b>}
+    <dialog
+      className="cr-confirm"
+      ref={dialog}
+      aria-labelledby="confirm-title"
+      onCancel={(e) => {
+        e.preventDefault();
+        value.resolve(false);
+      }}
+    >
+      <Badge tone="amber">Confirm operation</Badge>
+      <h2 id="confirm-title">{value.action.replaceAll(".", " ")}</h2>
+      <p>
+        This operation will run on your server using this device&apos;s local
+        permissions.
+      </p>
+      {Boolean(
+        value.parameters.path ||
+          value.parameters.playerId ||
+          value.parameters.deviceId ||
+          value.parameters.backupId,
+      ) && (
+        <code className="cr-confirm-target">
+          {String(
+            value.parameters.path ??
+              value.parameters.playerId ??
+              value.parameters.deviceId ??
+              value.parameters.backupId,
+          )}
+        </code>
+      )}
+      {value.action === "console.execute" && (
+        <pre className="cr-output">{str(value.parameters.command)}</pre>
+      )}
+      <div className="cr-actions">
+        <button className="cr-button" onClick={() => value.resolve(false)}>
+          Cancel
+        </button>
+        <button
+          className="cr-button danger"
+          onClick={() => value.resolve(true)}
+        >
+          Confirm operation
+        </button>
+      </div>
+    </dialog>
+  );
+}
+export default function Dashboard() {
+  const [credential, setCredential] = useState<RelayCredential | null>(null),
+    [credentials, setCredentials] = useState<RelayCredential[]>([]),
+    [state, setState] = useState<ControlState>(() => emptyControlState("")),
+    [phase, setPhase] = useState<Phase>("loading"),
+    [section, setSection] = useState<Section>("Overview"),
+    [error, setError] = useState(""),
+    [notice, setNotice] = useState(""),
+    [pairing, setPairing] = useState(false),
+    [reconnect, setReconnect] = useState(0),
+    [confirmation, setConfirmation] = useState<Confirmation | null>(null);
+  const unsaved = useRef(false);
+  const setUnsaved = useCallback((dirty: boolean) => {
+    unsaved.current = dirty;
+  }, []);
+  const leaveEditor = () =>
+    !unsaved.current || window.confirm("Discard unsaved file edits?");
+  const navigate = (next: Section) => {
+    if (next !== section && leaveEditor()) setSection(next);
+  };
+  const restore = useCallback(async () => {
+    try {
+      const c = await loadRelayCredential();
+      setCredentials(await listRelayCredentials());
+      setCredential(c);
+      setState(
+        c
+          ? ((await loadControlCache(c.serverId)) ??
+              emptyControlState(c.serverId))
+          : emptyControlState(""),
+      );
+      setPairing(false);
+      setPhase(c ? "connecting" : "unpaired");
+    } catch (e) {
+      setError(
+        e instanceof Error ? e.message : "Browser storage is unavailable",
+      );
+      setPhase("unpaired");
+    }
+  }, []);
+  useEffect(() => {
+    let current = true;
+    void Promise.resolve().then(() => {
+      if (current) return restore();
+    });
+    return () => {
+      current = false;
+    };
+  }, [restore]);
+  useEffect(() => {
+    if (!notice) return;
+    const timer = setTimeout(() => setNotice(""), 6000);
+    return () => clearTimeout(timer);
+  }, [notice]);
+  useEffect(() => {
+    if (!credential || !state.updatedAt) return;
+    const timer = setTimeout(() => {
+      void saveControlCache(state).catch(() => {});
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [state, credential]);
+  useEffect(() => {
+    if (!credential) return;
+    let stopped = false,
+      attempt = 0,
+      socket: WebSocket | null = null,
+      retry: ReturnType<typeof setTimeout> | undefined,
+      heartbeat: ReturnType<typeof setInterval> | undefined;
+    document.documentElement.dataset.plexonDensity =
+      localStorage.getItem("plexonpanel-density") ?? "comfortable";
+    const connect = async () => {
+      if (stopped) return;
+      setPhase(attempt ? "reconnecting" : "connecting");
+      try {
+        const grant = await requestLiveConnection();
+        if (stopped || grant.serverId !== credential.serverId) return;
+        socket = new WebSocket(grant.websocketUrl, [
+          "plexonpanel-v3",
+          `auth.${grant.token}`,
+        ]);
+        socket.onopen = () => {
+          if (stopped) {
+            socket?.close();
+            return;
+          }
+          bindLiveSocket(socket);
+          attempt = 0;
+          setState((current) => ({ ...current, ready: null }));
+          setError("");
+          heartbeat = setInterval(() => {
+            if (socket?.readyState === WebSocket.OPEN)
+              socket.send(JSON.stringify({ type: "dashboard.ping" }));
+          }, 20000);
+        };
+        socket.onmessage = (event) => {
+          if (
+            stopped ||
+            typeof event.data !== "string" ||
+            event.data.length > 131072
+          )
+            return;
+          try {
+            const message = record(JSON.parse(event.data));
+            if (message.serverId && message.serverId !== credential.serverId)
+              return;
+            if (
+              message.type === "dashboard.ready" &&
+              message.protocolVersion !== 3
+            ) {
+              setError(
+                "Protocol mismatch. Upgrade the relay and agents to protocol 3.",
+              );
+              socket?.close(4008, "Protocol mismatch");
+              return;
+            }
+            if (
+              message.type === "dashboard.ready" &&
+              message.protocolVersion === 3
+            )
+              setPhase("live");
+            if (handleRelayControlMessage(message)) return;
+            if (message.type === "relay.error") {
+              setError(str(message.error, "Relay rejected a message"));
+              return;
+            }
+            setState((current) => applyControlMessage(current, message));
+          } catch {
+            setError("The relay sent an invalid message.");
+          }
+        };
+        socket.onclose = (event) => {
+          if (heartbeat) clearInterval(heartbeat);
+          if (stopped) return;
+          bindLiveSocket(null);
+          if (event.code === 4003) {
+            setError(
+              "This device was revoked or expired. Generate a new local pairing code.",
+            );
+            void clearBrowserWorkspace().then(() => {
+              setCredential(null);
+              setState(emptyControlState(""));
+              setPhase("unpaired");
+            });
+            return;
+          }
+          schedule();
+        };
+        socket.onerror = () => {
+          if (!stopped)
+            setError(
+              "Relay connection unavailable. Reconnecting automatically…",
+            );
+        };
+      } catch (e) {
+        if (stopped) return;
+        if (e instanceof DashboardRequestError && e.status === 401) {
+          setError(e.message);
+          await clearBrowserWorkspace();
+          setCredential(null);
+          setState(emptyControlState(""));
+          setPhase("unpaired");
+          return;
+        }
+        setError(e instanceof Error ? e.message : "Relay unavailable");
+        schedule();
+      }
+    };
+    const schedule = () => {
+      if (stopped) return;
+      attempt++;
+      setPhase("reconnecting");
+      retry = setTimeout(
+        () => void connect(),
+        Math.min(30000, 1000 * 2 ** Math.min(attempt, 5)) *
+          (0.8 + Math.random() * 0.4),
+      );
+    };
+    void connect();
+    return () => {
+      stopped = true;
+      if (retry) clearTimeout(retry);
+      if (heartbeat) clearInterval(heartbeat);
+      bindLiveSocket(null);
+      socket?.close(1000, "Workspace changed");
+    };
+  }, [credential, reconnect]);
+  const can = useCallback(
+    (action: string, requestedKind?: "PAPER" | "HOST") => {
+      const ready = state.ready;
+      if (!ready || phase !== "live") return false;
+      if (
+        (action === "player.op" ||
+          action === "player.deop" ||
+          action.startsWith("backup.restore")) &&
+        ready.device.role !== "Owner"
+      )
+        return false;
+      let kind =
+        requestedKind ??
+        (action.startsWith("backup.") ||
+        (action.startsWith("server.") && action !== "server.status")
+          ? "HOST"
+          : "PAPER");
+      if (
+        !requestedKind &&
+        (action.startsWith("files.") || action === "server.status") &&
+        ready.agents.host
+      )
+        kind = "HOST";
+      return (
+        (kind === "HOST" ? ready.agents.host : ready.agents.paper) &&
+        canAction(
+          action,
+          ready.device.scopes,
+          kind === "HOST"
+            ? ready.server.hostCapabilities
+            : ready.server.paperCapabilities,
+        )
+      );
+    },
+    [state.ready, phase],
+  );
+  const run = useCallback(
+    async (
+      action: string,
+      parameters: JsonMap,
+      kind?: "PAPER" | "HOST",
+    ): Promise<ActionCompletion> => {
+      if (!can(action, kind)) {
+        const e = new Error(
+          "This action is unavailable for the current device or local policy.",
+        );
+        setNotice(e.message);
+        throw e;
+      }
+      if (
+        HIGH_RISK.has(action) ||
+        action === "console.execute" ||
+        action === "plugin.command.reload"
+      ) {
+        const approved = await new Promise<boolean>((resolve) =>
+          setConfirmation({
+            action,
+            parameters,
+            resolve: (ok) => {
+              setConfirmation(null);
+              resolve(ok);
+            },
+          }),
+        );
+        if (!approved) throw new Error("Cancelled");
+        parameters = { ...parameters, confirmed: true };
+      }
+      try {
+        const result = await sendDashboardAction(action, parameters, kind);
+        setNotice(str(result.data.message, result.message));
+        return result;
+      } catch (e) {
+        setNotice(e instanceof Error ? e.message : "Operation failed");
+        throw e;
+      }
+    },
+    [can],
+  );
+  const forget = async () => {
+    if (!leaveEditor()) return;
+    await logoutDashboard();
+    setCredential(null);
+    setState(emptyControlState(""));
+    setPhase("unpaired");
+    setCredentials(await listRelayCredentials());
+  };
+  if (pairing || phase === "unpaired")
+    return (
+      <Pairing
+        done={restore}
+        {...(credential ? { cancel: () => setPairing(false) } : {})}
+        error={error}
+      />
+    );
+  if (phase === "loading")
+    return (
+      <main className="cr-loading">
+        <Brand />
+        <p>Opening your browser workspace…</p>
+      </main>
+    );
+  const props: ViewProps = {
+    state,
+    can,
+    run,
+    notice: setNotice,
+    connected: phase === "live",
+    setUnsaved,
+  };
+  let view: React.ReactNode;
+  switch (section) {
+    case "Overview":
+      view = <OverviewView {...props} />;
+      break;
+    case "Performance":
+      view = <PerformanceView {...props} />;
+      break;
+    case "Players":
+      view = <PlayersView {...props} />;
+      break;
+    case "Console":
+      view = <ConsoleView {...props} />;
+      break;
+    case "Chat":
+      view = <ChatView {...props} />;
+      break;
+    case "Plugins":
+      view = <PluginsView {...props} />;
+      break;
+    case "Files":
+      view = <FilesView {...props} />;
+      break;
+    case "Backups":
+      view = <BackupsView {...props} />;
+      break;
+    case "Server":
+      view = <ServerView {...props} />;
+      break;
+    case "Audit":
+      view = <AuditView {...props} />;
+      break;
+    case "Access":
+      view = (
+        <AccessView {...props} forget={forget} pair={() => setPairing(true)} />
+      );
+      break;
+    case "Settings":
+      view = (
+        <SettingsView {...props} reconnect={() => setReconnect((n) => n + 1)} />
+      );
+  }
+  return (
+    <div className="control-room">
+      <aside className="cr-sidebar">
+        <Brand />
+        <div className="cr-workspace-label">SERVER WORKSPACE</div>
+        {credentials.length > 1 ? (
+          <label className="cr-server-select">
+            Selected server
+            <select
+              value={credential?.serverId}
+              onChange={(e) => {
+                if (!leaveEditor()) return;
+                setSection("Overview");
+                void selectRelayCredential(e.target.value)
+                  .then(restore)
+                  .catch((e) => setNotice(e.message));
+              }}
+            >
+              {credentials.map((c) => (
+                <option key={c.serverId} value={c.serverId}>
+                  {c.serverId.slice(0, 8)} · {c.role}
+                </option>
+              ))}
+            </select>
+          </label>
+        ) : (
+          <div className="cr-server-card">
+            <span
+              className={`cr-dot ${state.ready?.agents.paper ? "online" : ""}`}
+            />
+            <div>
+              <strong>{str(state.server.serverName, "Plexon server")}</strong>
+              <small>
+                Paper {state.ready?.server.minecraftVersion ?? "26.2"}
+              </small>
+            </div>
+          </div>
+        )}
+        <nav className="cr-nav" aria-label="Control room pages">
+          {sections.map((name, i) => (
+            <button
+              key={name}
+              className={section === name ? "active" : ""}
+              aria-current={section === name ? "page" : undefined}
+              onClick={() => navigate(name)}
+            >
+              <span className="cr-nav-symbol" aria-hidden>
+                {
+                  [
+                    "◫",
+                    "⌁",
+                    "♙",
+                    "›_",
+                    "◌",
+                    "◇",
+                    "▱",
+                    "▤",
+                    "◉",
+                    "≡",
+                    "⌘",
+                    "⚙",
+                  ][i]
+                }
+              </span>
+              {name}
+              {name === "Console" &&
+                state.console.some((l) => l.level === "ERROR") && (
+                  <i className="cr-nav-alert" />
+                )}
             </button>
           ))}
         </nav>
-        <div className="sidebar-footer">
-          <div className="connection-card"><span className="status-beacon"><i /></span><div><strong>Gateway online</strong><span>48 ms latency</span></div></div>
-          <button className="profile-button" aria-label="Open profile menu"><span className="avatar">ZD</span><span className="profile-copy"><strong>Administrator</strong><small>Owner</small></span><span className="more-dots">•••</span></button>
+        <div className="cr-sidebar-foot">
+          <Badge tone="cyan">
+            {state.ready?.device.role ?? credential?.role ?? "Paired"}
+          </Badge>
+          <small>{state.ready?.device.name ?? credential?.name}</small>
+          <button className="cr-text-button" onClick={() => navigate("Access")}>
+            Manage access →
+          </button>
         </div>
       </aside>
-
-      <main className="main-area" id="main">
-        <header className="topbar">
-          <button className="server-switcher" aria-label="Choose a server"><span className="server-cube" aria-hidden="true"><i /></span><span><small>Active server</small><strong>{overview.server.name}</strong></span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4" /></svg></button>
-          <div className="topbar-actions"><span className="demo-pill"><i /> Preview data</span><button className="icon-button notification-button" aria-label="Notifications"><Icon name="bell" /><span /></button><button className="primary-button compact" onClick={() => setShowPairing(true)}><Icon name="plus" /> Pair server</button></div>
+      <div className="cr-main">
+        <header className="cr-header">
+          <div>
+            <small>CONTROL ROOM / {section.toUpperCase()}</small>
+            <h1>{section}</h1>
+          </div>
+          <div className="cr-header-status">
+            <Badge tone={phase === "live" ? "green" : "amber"}>
+              {phase === "live"
+                ? "Relay connected"
+                : phase === "connecting"
+                  ? "Connecting"
+                  : "Reconnecting"}
+            </Badge>
+            <span className="cr-device">
+              {state.ready?.device.name ?? credential?.name ?? "Browser"}
+            </span>
+          </div>
         </header>
-
-        <div className="page-content">
-          {activeSection !== "overview" ? (
-            <ManagementViews section={activeSection} onPairServer={() => setShowPairing(true)} />
-          ) : (
-            <>
-              <section className="welcome-row">
-                <div><p className="eyebrow">Command center</p><h1>Good evening, Administrator.</h1><p>Here is what is happening across your server right now.</p></div>
-                <div className="server-health"><span className="health-pulse"><i /></span><div><span>Server status</span><strong>Online</strong></div><div className="health-divider" /><div><span>Runtime</span><strong>{overview.server.platform} {overview.server.version}</strong></div></div>
-              </section>
-              <section className="stats-grid" aria-label="Live server statistics">
-                {overview.stats.map((stat, index) => (
-                  <article className="stat-card" key={stat.label}><div className={`stat-orb orb-${index + 1}`} aria-hidden="true"><span>{stat.label === "TPS" ? "T" : stat.label === "MSPT" ? "ms" : stat.label === "Players" ? "P" : "↑"}</span></div><div className="stat-copy"><span>{stat.label}</span><strong>{stat.value}</strong><small className={stat.tone}><i />{stat.detail}</small></div><button className="card-link" aria-label={`View ${stat.label} details`}><Icon name="chevron" /></button></article>
-                ))}
-              </section>
-
-              <section className="dashboard-grid">
-                <article className="panel performance-panel">
-                  <div className="panel-heading"><div><p className="eyebrow">Performance</p><h2>TPS history</h2></div><div className="chart-legend"><span><i /> Live TPS</span><button>Last hour <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4" /></svg></button></div></div>
-                  <div className="chart-summary"><strong>19.98</strong><span>Current TPS</span><b>+0.04%</b></div><Sparkline points={overview.tpsHistory} />
-                </article>
-
-                <article className="panel resources-panel">
-                  <div className="panel-heading"><div><p className="eyebrow">Host machine</p><h2>Resource usage</h2></div><span className="live-badge"><i /> Live</span></div>
-                  <div className="resource-list">{overview.resources.map((resource) => <div className="resource" key={resource.label}><div className="resource-heading"><span>{resource.label}</span><strong>{resource.displayValue}</strong></div><div className="progress-track"><span className={resource.tone} style={{ width: `${resource.value}%` }} /></div><small>{resource.detail}<b>{resource.value}% used</b></small></div>)}</div>
-                  <button className="text-button">Open resource monitor <Icon name="arrow" /></button>
-                </article>
-
-                <article className="panel activity-panel">
-                  <div className="panel-heading"><div><p className="eyebrow">Live feed</p><h2>Recent activity</h2></div><button className="secondary-button small">View all</button></div>
-                  <div className="activity-list">{overview.activity.map((event) => <div className="activity-item" key={event.id}><ActivityMarker category={event.category} /><div><strong>{event.title}</strong><span>{event.detail}</span></div><time>{event.time}</time></div>)}</div>
-                </article>
-              </section>
-            </>
-          )}
+        {phase !== "live" ? (
+          <div className="cr-banner amber">
+            {error || "Connecting to the relay…"}
+            {state.cached &&
+              " Showing a bounded browser cache; actions are disabled."}
+            <button onClick={() => setReconnect((n) => n + 1)}>
+              Retry now
+            </button>
+          </div>
+        ) : (
+          !state.ready?.agents.paper && (
+            <div className="cr-banner">
+              {state.ready?.agents.host
+                ? "Paper is offline. The host companion is connected."
+                : "The relay is reachable. Waiting for an authenticated Paper or host agent."}
+            </div>
+          )
+        )}
+        {error && phase === "live" && <p className="cr-alert">{error}</p>}
+        <main className="cr-content" key={`${credential?.serverId}-${section}`}>
+          {view}
+        </main>
+        <footer className="cr-footer">
+          <span>Local authority · Signed protocol 3</span>
+          <span>PlexonPanel 2.0.0</span>
+        </footer>
+      </div>
+      {notice && (
+        <div className="cr-toast" role="status">
+          {notice}
+          <button
+            aria-label="Dismiss notification"
+            onClick={() => setNotice("")}
+          >
+            ×
+          </button>
         </div>
-      </main>
-
-      <nav className="mobile-nav" aria-label="Mobile dashboard navigation">{navigation.slice(0, 5).map((item) => <button key={item.id} className={activeSection === item.id ? "active" : ""} onClick={() => setActiveSection(item.id)} aria-label={item.label}><Icon name={item.icon} /><span>{item.id === "chat" ? "Chat" : item.label}</span></button>)}</nav>
-      {showPairing && <PairServerModal onClose={() => setShowPairing(false)} />}
+      )}
+      {confirmation && <Confirm value={confirmation} />}
     </div>
   );
 }

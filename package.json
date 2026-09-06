@@ -1,20 +1,27 @@
 {
   "name": "plexonpanel-dashboard",
-  "version": "0.1.0",
+  "version": "2.0.0",
   "private": true,
   "engines": {
     "node": ">=22.13.0"
   },
   "scripts": {
-    "dev": "next dev",
+    "dev": "node scripts/dev.mjs",
     "build": "next build",
     "start": "next start",
-    "test": "npm run build && node --test --test-concurrency=1 tests/*.test.mjs",
+    "relay:build": "tsc -p relay/tsconfig.json",
+    "relay:keygen": "node relay/scripts/generate-secrets.mjs",
+    "relay:dev": "wrangler dev --config relay/wrangler.jsonc",
+    "relay:deploy": "wrangler deploy --config relay/wrangler.jsonc",
+    "relay:test": "npm run relay:build && node --test relay/tests/*.test.mjs",
+    "env:vercel": "node scripts/create-vercel-env.mjs",
+    "test": "node scripts/transpile-tests.mjs && node scripts/build-test.mjs && node --test --test-concurrency=1 tests/*.test.mjs",
     "lint": "eslint . --ignore-pattern .next --ignore-pattern node_modules",
-    "check": "npm run lint && npm test"
+    "check": "npm run lint && npm run typecheck && npm run relay:test && npm test",
+    "typecheck": "tsc --noEmit && npm run relay:build",
+    "relay:smoke": "npm run relay:build && node scripts/relay-smoke.mjs"
   },
   "dependencies": {
-    "firebase-admin": "^14.2.0",
     "next": "16.3.1",
     "react": "19.2.6",
     "react-dom": "19.2.6"
@@ -26,8 +33,10 @@
     "@types/react-dom": "19.2.3",
     "eslint": "9.39.4",
     "eslint-config-next": "16.3.1",
+    "miniflare": "5.20260903.0-alpha",
     "tailwindcss": "4.2.1",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "wrangler": "4.129.0"
   },
   "type": "module",
   "displayName": "PlexonPanel Dashboard"

@@ -1,0 +1,43 @@
+# Dependencies and Next.js output
+node_modules/
+.next/
+out/
+gateway/dist/
+relay/dist/
+
+# Local and generated environment files
+.env
+.env.*
+!.env.example
+.dev.vars
+.dev.vars.*
+.relay-public.json
+.relay-secrets.json
+
+# Firebase credentials and local Web App configuration
+*firebase-adminsdk*.json
+*service-account*.json
+firebase-web-config.json
+
+# Vercel project metadata
+.vercel/
+
+# Logs, reports, and local caches
+*.log
+coverage/
+.eslintcache
+*.tsbuildinfo
+
+# Editor and operating-system files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+
+.test-dist/
+
+# Local Worker state
+.wrangler/
+relay/.wrangler/
+relay/.test-dist/

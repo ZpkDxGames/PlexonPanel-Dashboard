@@ -1,0 +1,12 @@
+.env
+.env.*
+!.env.example
+*firebase-adminsdk*.json
+*service-account*.json
+firebase-web-config.json
+relay/.dev.vars*
+relay/.relay-secrets.json
+relay/.relay-public.json
+relay/dist/
+coverage/
+*.log
