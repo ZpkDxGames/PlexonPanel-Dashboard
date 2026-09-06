@@ -167,10 +167,12 @@ function TelemetryChart({
   history,
   spec,
   windowMinutes,
+  status,
 }: {
   history: Sample[];
   spec: ChartSpec;
   windowMinutes: number;
+  status: "live" | "paused" | "disconnected";
 }) {
   const svgRef = useRef<SVGSVGElement>(null);
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
@@ -222,7 +224,17 @@ function TelemetryChart({
     <Panel
       title={spec.label}
       className="cr21-chart-card"
-      aside={<Badge tone="green">Live</Badge>}
+      aside={
+        <Badge
+          tone={status === "live" ? "green" : status === "paused" ? "amber" : "quiet"}
+        >
+          {status === "live"
+            ? "Live"
+            : status === "paused"
+              ? "View paused"
+              : "Disconnected"}
+        </Badge>
+      }
     >
       <div className="cr21-chart-summary">
         <div>
@@ -531,17 +543,23 @@ export function OverviewView21(props: ViewProps) {
     [
       "Memory",
       bytes(host.physicalMemoryUsedBytes),
-      `${bytes(host.physicalMemoryAvailableBytes)} available`,
+      number(host.physicalMemoryAvailableBytes) === null
+        ? "Host memory availability unavailable"
+        : `${bytes(host.physicalMemoryAvailableBytes)} available`,
     ],
     [
       "Disk",
       bytes(host.diskUsedBytes),
-      `${bytes(host.diskUsableBytes)} available`,
+      number(host.diskUsableBytes) === null
+        ? "Host disk availability unavailable"
+        : `${bytes(host.diskUsableBytes)} available`,
     ],
     [
       "JVM Heap",
       bytes(state.system.jvmHeapUsedBytes),
-      `${bytes(state.system.jvmHeapMaximumBytes)} maximum`,
+      number(state.system.jvmHeapMaximumBytes) === null
+        ? "JVM heap maximum unavailable"
+        : `${bytes(state.system.jvmHeapMaximumBytes)} maximum`,
     ],
   ];
   return (
@@ -560,6 +578,7 @@ export function OverviewView21(props: ViewProps) {
           history={state.history}
           spec={CHARTS[0]}
           windowMinutes={5}
+          status={props.connected ? "live" : "disconnected"}
         />
         <HealthSummary props={props} />
       </div>
@@ -582,12 +601,14 @@ export function OverviewView21(props: ViewProps) {
             }
           />
           <div className="cr21-status-item">
-            <span className="cr-dot online" />
+            <span className={`cr-dot ${props.connected ? "online" : ""}`} />
             <div>
               <strong>Relay</strong>
               <small>Protocol 3</small>
             </div>
-            <Badge tone="green">Live</Badge>
+            <Badge tone={props.connected ? "green" : "quiet"}>
+              {props.connected ? "Live" : "Disconnected"}
+            </Badge>
           </div>
         </div>
       </Panel>
@@ -685,7 +706,8 @@ export function PerformanceView21({
         <div>
           <strong>Performance workspace</strong>
           <span>
-            Browser-local rolling history · live telemetry remains connected
+            Browser-local rolling history ·{" "}
+            {props.connected ? "live telemetry connected" : "telemetry disconnected"}
           </span>
         </div>
         <SegmentedWindow
@@ -732,8 +754,10 @@ export function PerformanceView21({
       </div>
       {paused && (
         <div className="cr21-state-banner">
-          Charts paused locally. WebSocket telemetry and server-side collection
-          are still running.
+          Charts paused locally.{" "}
+          {props.connected
+            ? "WebSocket telemetry remains connected."
+            : "The dashboard is disconnected; the visible history remains frozen locally."}
         </div>
       )}
       <div className="cr21-chart-grid">
@@ -743,6 +767,13 @@ export function PerformanceView21({
             history={history}
             spec={spec}
             windowMinutes={windowMinutes}
+            status={
+              paused
+                ? "paused"
+                : props.connected
+                  ? "live"
+                  : "disconnected"
+            }
           />
         ))}
       </div>

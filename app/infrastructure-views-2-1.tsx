@@ -259,7 +259,11 @@ function AuditDialog21({
 }) {
   const ref = useRef<HTMLDialogElement>(null);
   useEffect(() => {
-    ref.current?.showModal();
+    const dialog = ref.current;
+    if (dialog && !dialog.open) dialog.showModal();
+    return () => {
+      if (dialog?.open) dialog.close();
+    };
   }, []);
   const json = JSON.stringify(entry, null, 2);
   return (
@@ -515,7 +519,11 @@ function DeviceDialog21({
 }) {
   const ref = useRef<HTMLDialogElement>(null);
   useEffect(() => {
-    ref.current?.showModal();
+    const dialog = ref.current;
+    if (dialog && !dialog.open) dialog.showModal();
+    return () => {
+      if (dialog?.open) dialog.close();
+    };
   }, []);
   const scopes = Array.isArray(device.scopes) ? device.scopes.map(String) : [];
   return (

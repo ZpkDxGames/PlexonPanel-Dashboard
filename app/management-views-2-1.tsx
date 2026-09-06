@@ -198,7 +198,11 @@ function PlayerDrawer21({
   const [coordinates, setCoordinates] = useState({ x: "", y: "", z: "" });
   const ref = useRef<HTMLDialogElement>(null);
   useEffect(() => {
-    ref.current?.showModal();
+    const dialog = ref.current;
+    if (dialog && !dialog.open) dialog.showModal();
+    return () => {
+      if (dialog?.open) dialog.close();
+    };
   }, []);
   const base = { playerId: player.uuid };
   const permittedActions = [
@@ -766,7 +770,15 @@ export function ChatView21(props: ViewProps) {
 
       <Panel
         title="Global chat"
-        aside={paused ? <Badge tone="amber">View paused</Badge> : <Badge>Live channel</Badge>}
+        aside={
+          paused ? (
+            <Badge tone="amber">View paused</Badge>
+          ) : (
+            <Badge tone={props.connected ? "green" : "quiet"}>
+              {props.connected ? "Live channel" : "Disconnected"}
+            </Badge>
+          )
+        }
       >
         <div className="cr-chat cr21-chat" ref={viewport}>
           {messages.length ? (
@@ -1014,7 +1026,11 @@ function PluginDialog21({
 }: ViewProps & { plugin: JsonMap; close: () => void }) {
   const ref = useRef<HTMLDialogElement>(null);
   useEffect(() => {
-    ref.current?.showModal();
+    const dialog = ref.current;
+    if (dialog && !dialog.open) dialog.showModal();
+    return () => {
+      if (dialog?.open) dialog.close();
+    };
   }, []);
   return (
     <dialog

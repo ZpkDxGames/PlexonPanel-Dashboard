@@ -31,6 +31,10 @@ import {
   type JsonMap,
 } from "../lib/control-state";
 import { canAction, HIGH_RISK } from "../lib/scopes";
+import {
+  lifecycleActionAllowed,
+  normalizeServiceState,
+} from "../lib/lifecycle-state";
 import { operationText } from "../lib/operation-messages";
 import { Badge, Empty, type ViewProps } from "./control-views";
 import {
@@ -300,7 +304,11 @@ function Pairing({
 function Confirm({ value }: { value: Confirmation }) {
   const ref = useRef<HTMLDialogElement>(null);
   useEffect(() => {
-    ref.current?.showModal();
+    const dialog = ref.current;
+    if (dialog && !dialog.open) dialog.showModal();
+    return () => {
+      if (dialog?.open) dialog.close();
+    };
   }, []);
   const target =
     value.parameters.path ??
@@ -374,6 +382,7 @@ function CommandPalette({
   navigate,
   run,
   can,
+  restartAvailable,
   refresh,
   copyDiagnostics,
 }: {
@@ -382,14 +391,16 @@ function CommandPalette({
   navigate: (section: Section) => void;
   run: ViewProps["run"];
   can: ViewProps["can"];
+  restartAvailable: boolean;
   refresh: () => void;
   copyDiagnostics: () => void;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
   const [query, setQuery] = useState("");
   useEffect(() => {
-    if (open) ref.current?.showModal();
-    else if (ref.current?.open) ref.current.close();
+    const dialog = ref.current;
+    if (open && dialog && !dialog.open) dialog.showModal();
+    else if (!open && dialog?.open) dialog.close();
   }, [open]);
   const finish = () => {
     setQuery("");
@@ -408,7 +419,7 @@ function CommandPalette({
     },
     {
       label: "Restart server",
-      visible: can("server.restart", "HOST"),
+      visible: restartAvailable,
       action: () => void run("server.restart", {}, "HOST"),
     },
     { label: "Copy diagnostics", action: copyDiagnostics },
@@ -422,6 +433,7 @@ function CommandPalette({
     <dialog
       className="cr21-command"
       ref={ref}
+      aria-label="Command palette"
       onCancel={(event) => {
         event.preventDefault();
         finish();
@@ -431,6 +443,7 @@ function CommandPalette({
         <Icon name="search" />
         <input
           autoFocus
+          aria-label="Search commands and pages"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           placeholder="Search pages and allowed actions"
@@ -513,13 +526,8 @@ export default function Dashboard21() {
   }, []);
 
   useEffect(() => {
-    let current = true;
-    void Promise.resolve().then(() => {
-      if (current) return restore();
-    });
-    return () => {
-      current = false;
-    };
+    const timer = window.setTimeout(() => void restore(), 0);
+    return () => window.clearTimeout(timer);
   }, [restore]);
   useEffect(() => {
     if (!notice) return;
@@ -538,6 +546,9 @@ export default function Dashboard21() {
       localStorage.getItem("plexonpanel-density") ?? "comfortable";
   }, []);
   useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, [section, credential?.serverId]);
+  useEffect(() => {
     const handler = (event: KeyboardEvent) => {
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
         event.preventDefault();
@@ -547,6 +558,14 @@ export default function Dashboard21() {
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, []);
+  useEffect(() => {
+    if (!sidebarOpen) return;
+    const handler = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setSidebarOpen(false);
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [sidebarOpen]);
 
   useEffect(() => {
     if (!credential) return;
@@ -877,13 +896,23 @@ export default function Dashboard21() {
   const role = state.ready?.device.role ?? credential?.role ?? "Paired";
   const paper = Boolean(state.ready?.agents.paper);
   const host = Boolean(state.ready?.agents.host);
+  const restartAvailable =
+    can("server.restart", "HOST") &&
+    lifecycleActionAllowed(
+      "restart",
+      normalizeServiceState(state.service.state, paper),
+    );
 
   return (
-    <div className={`cr21-shell ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}>
+    <div
+      className={`control-room cr21-shell ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}
+    >
       <button
         className="cr21-mobile-menu"
-        aria-label="Open navigation"
-        onClick={() => setSidebarOpen(true)}
+        aria-label={sidebarOpen ? "Close navigation" : "Open navigation"}
+        aria-expanded={sidebarOpen}
+        aria-controls="control-room-navigation"
+        onClick={() => setSidebarOpen((open) => !open)}
       >
         <Icon name="menu" />
       </button>
@@ -894,7 +923,10 @@ export default function Dashboard21() {
           onClick={() => setSidebarOpen(false)}
         />
       )}
-      <aside className={`cr21-sidebar ${sidebarOpen ? "mobile-open" : ""}`}>
+      <aside
+        id="control-room-navigation"
+        className={`cr21-sidebar ${sidebarOpen ? "mobile-open" : ""}`}
+      >
         <div className="cr21-sidebar-head">
           <Brand compact={sidebarCollapsed} />
           <button
@@ -1023,7 +1055,7 @@ export default function Dashboard21() {
                 <Icon name="bolt" size={16} /> Quick actions
               </summary>
               <div>
-                {can("server.restart", "HOST") && (
+                {restartAvailable && (
                   <button onClick={() => void run("server.restart", {}, "HOST")}>
                     Restart server
                   </button>
@@ -1118,6 +1150,7 @@ export default function Dashboard21() {
         navigate={navigate}
         run={run}
         can={can}
+        restartAvailable={restartAvailable}
         refresh={refreshCurrent}
         copyDiagnostics={copyDiagnostics}
       />
