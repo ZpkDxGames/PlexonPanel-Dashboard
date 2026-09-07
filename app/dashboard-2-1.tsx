@@ -173,7 +173,7 @@ function Brand({ compact = false }: { compact?: boolean }) {
           <strong>
             Plexon<span>Panel</span>
           </strong>
-          <small>Control Room · 2.1</small>
+          <small>Control Room · 2.2.0</small>
         </div>
       )}
     </div>

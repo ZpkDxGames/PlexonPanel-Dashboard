@@ -93,7 +93,7 @@ function Brand() {
       <strong>
         Plexon<span>Panel</span>
       </strong>
-      <small>2.0</small>
+      <small>2.2.0</small>
     </div>
   );
 }
