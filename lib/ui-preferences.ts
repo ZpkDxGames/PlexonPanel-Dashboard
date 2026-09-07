@@ -1,6 +1,8 @@
 export const UI_PREFERENCES_KEY = "plexonpanel-ui-preferences-v1";
 export const UI_PREFERENCES_MAX_BYTES = 8192;
 
+export type DisplayUpdateRateMs = 0 | 250 | 500 | 1000 | 2000;
+
 export type UiPreferencesV1 = {
   schemaVersion: 1;
   theme: "system" | "dark" | "light";
@@ -21,6 +23,7 @@ export type UiPreferencesV1 = {
   motion: "system" | "full" | "reduced" | "off";
   livePulse: boolean;
   pageTransitions: boolean;
+  displayUpdateRateMs: DisplayUpdateRateMs;
 };
 
 export type ResolvedUiPresentation = {
@@ -58,6 +61,7 @@ export function createDefaultUiPreferences(
     motion: "system",
     livePulse: true,
     pageTransitions: true,
+    displayUpdateRateMs: 500,
   };
 }
 
@@ -141,6 +145,11 @@ export function parseUiPreferences(
       typeof source.pageTransitions === "boolean"
         ? source.pageTransitions
         : defaults.pageTransitions,
+    displayUpdateRateMs: oneOf(
+      source.displayUpdateRateMs,
+      [0, 250, 500, 1000, 2000] as const,
+      defaults.displayUpdateRateMs,
+    ),
   };
 }
 
@@ -188,7 +197,7 @@ export function saveUiPreferences(
 ): void {
   const normalized = parseUiPreferences(preferences, preferences);
   storage.setItem(UI_PREFERENCES_KEY, JSON.stringify(normalized));
-  // Compatibility bridge while the remaining 2.2 views are migrated.
+  // Compatibility bridge while the remaining 2.x view modules are migrated.
   storage.setItem("plexonpanel-density", normalized.density);
   storage.setItem(
     "plexonpanel-performance-window",
