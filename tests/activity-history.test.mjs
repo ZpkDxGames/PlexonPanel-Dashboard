@@ -109,3 +109,46 @@ test("invalid or host presence messages are not persisted", () => {
     restore();
   }
 });
+
+test("presence history follows the active Paper agent session", () => {
+  const restore = fakeBrowser();
+  try {
+    capturePresenceHistoryMessage({
+      type: "dashboard.ready",
+      protocolVersion: 3,
+      serverId: "server-session-test",
+      server: { paperSession: "paper-session-current" },
+    });
+
+    capturePresenceHistoryMessage(
+      presence({
+        serverId: "server-session-test",
+        agentSession: "paper-session-stale",
+        body: {
+          ...presence().body,
+          eventId: "stale-event",
+        },
+      }),
+    );
+    assert.equal(loadActivityHistory("server-session-test").length, 0);
+
+    capturePresenceHistoryMessage(
+      presence({
+        serverId: "server-session-test",
+        agentSession: "paper-session-current",
+        body: {
+          ...presence().body,
+          eventId: "current-event",
+          observedAt: "2026-09-07T20:10:00.000Z",
+        },
+      }),
+    );
+    assert.equal(loadActivityHistory("server-session-test").length, 1);
+    assert.equal(
+      loadActivityHistory("server-session-test")[0].eventId,
+      "current-event",
+    );
+  } finally {
+    restore();
+  }
+});
