@@ -36,7 +36,8 @@ import {
   normalizeServiceState,
 } from "../lib/lifecycle-state";
 import { operationText } from "../lib/operation-messages";
-import { Badge, Empty, type ViewProps } from "./control-views";
+import { useUiPreferences } from "../components/ui-preferences-provider";
+import { Badge, type ViewProps } from "./control-views";
 import {
   ChatView21,
   ConsoleView21,
@@ -47,13 +48,6 @@ import { AccessView21, AuditView21 } from "./infrastructure-views-2-1";
 import { OverviewView21, PerformanceView21 } from "./monitoring-views-2-1";
 import { ServerView21 } from "./server-view-2-1";
 
-const FilesView = dynamic(
-  () => import("./advanced-views").then((module) => module.FilesView),
-  { loading: () => <Empty title="Opening files…" /> },
-);
-const BackupsView = dynamic(() =>
-  import("./advanced-views").then((module) => module.BackupsView),
-);
 const SettingsView = dynamic(() =>
   import("./settings-view-2-1").then((module) => module.SettingsView21),
 );
@@ -65,8 +59,6 @@ const sections = [
   "Console",
   "Chat",
   "Plugins",
-  "Files",
-  "Backups",
   "Server",
   "Audit",
   "Access",
@@ -79,6 +71,7 @@ type Confirmation = {
   parameters: JsonMap;
   resolve: (approved: boolean) => void;
 };
+type StateUpdater = ControlState | ((current: ControlState) => ControlState);
 type IconName =
   | "overview"
   | "performance"
@@ -86,8 +79,6 @@ type IconName =
   | "console"
   | "chat"
   | "plugins"
-  | "files"
-  | "backups"
   | "server"
   | "audit"
   | "access"
@@ -102,8 +93,8 @@ type IconName =
 const navGroups: { label: string; sections: Section[] }[] = [
   { label: "MONITOR", sections: ["Overview", "Performance", "Players"] },
   { label: "COMMUNICATION", sections: ["Console", "Chat"] },
-  { label: "MANAGE", sections: ["Plugins", "Files", "Backups"] },
-  { label: "SYSTEM", sections: ["Server", "Audit", "Access", "Settings"] },
+  { label: "MANAGE", sections: ["Plugins", "Server"] },
+  { label: "CONTROL", sections: ["Audit", "Access", "Settings"] },
 ];
 const iconBySection: Record<Section, IconName> = {
   Overview: "overview",
@@ -112,8 +103,6 @@ const iconBySection: Record<Section, IconName> = {
   Console: "console",
   Chat: "chat",
   Plugins: "plugins",
-  Files: "files",
-  Backups: "backups",
   Server: "server",
   Audit: "audit",
   Access: "access",
@@ -127,8 +116,6 @@ const iconPaths: Record<IconName, string> = {
   console: "M4 5h16v14H4zM8 9l3 3-3 3M13 15h4",
   chat: "M4 5h16v11H9l-5 4z",
   plugins: "M8 3v5H3v8h5v5h8v-5h5V8h-5V3z",
-  files: "M3 7h7l2 2h9v10H3zM3 7V5h7l2 2",
-  backups: "M5 8a8 8 0 1 1-1 8M5 3v5H0M12 7v5l3 2",
   server:
     "M3 4h18v6H3zM3 14h18v6H3zM7 7h.01M7 17h.01M11 7h6M11 17h6",
   audit: "M6 3h12v18H6zM9 8h6M9 12h6M9 16h4",
@@ -173,7 +160,7 @@ function Brand({ compact = false }: { compact?: boolean }) {
           <strong>
             Plexon<span>Panel</span>
           </strong>
-          <small>Control Room · 2.2.0</small>
+          <small>Control Room · 3.0.0</small>
         </div>
       )}
     </div>
@@ -381,7 +368,6 @@ function CommandPalette({
   close,
   navigate,
   run,
-  can,
   restartAvailable,
   refresh,
   copyDiagnostics,
@@ -390,7 +376,6 @@ function CommandPalette({
   close: () => void;
   navigate: (section: Section) => void;
   run: ViewProps["run"];
-  can: ViewProps["can"];
   restartAvailable: boolean;
   refresh: () => void;
   copyDiagnostics: () => void;
@@ -412,11 +397,6 @@ function CommandPalette({
       action: () => navigate(section),
     })),
     { label: "Refresh current page", action: refresh },
-    {
-      label: "Create backup",
-      visible: can("backup.create", "HOST"),
-      action: () => void run("backup.create", {}, "HOST"),
-    },
     {
       label: "Restart server",
       visible: restartAvailable,
@@ -468,6 +448,7 @@ function CommandPalette({
 }
 
 export default function Dashboard21() {
+  const { preferences } = useUiPreferences();
   const [credential, setCredential] = useState<RelayCredential | null>(null);
   const [credentials, setCredentials] = useState<RelayCredential[]>([]);
   const [state, setState] = useState<ControlState>(() => emptyControlState(""));
@@ -483,6 +464,65 @@ export default function Dashboard21() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const unsaved = useRef(false);
+  const authoritativeState = useRef<ControlState>(state);
+  const displayTimer = useRef<number | null>(null);
+  const displayDirty = useRef(false);
+  const displayRateRef = useRef(preferences.displayUpdateRateMs);
+  displayRateRef.current = preferences.displayUpdateRateMs;
+
+  const flushDisplayedState = useCallback(() => {
+    if (displayTimer.current !== null) {
+      window.clearTimeout(displayTimer.current);
+      displayTimer.current = null;
+    }
+    displayDirty.current = false;
+    setState(authoritativeState.current);
+  }, []);
+
+  const commitState = useCallback(
+    (updater: StateUpdater, immediate = false) => {
+      const next =
+        typeof updater === "function"
+          ? updater(authoritativeState.current)
+          : updater;
+      authoritativeState.current = next;
+      if (immediate || displayRateRef.current === 0) {
+        flushDisplayedState();
+        return;
+      }
+      displayDirty.current = true;
+      if (displayTimer.current === null) {
+        displayTimer.current = window.setTimeout(
+          flushDisplayedState,
+          displayRateRef.current,
+        );
+      }
+    },
+    [flushDisplayedState],
+  );
+
+  useEffect(() => {
+    if (!displayDirty.current) return;
+    if (displayTimer.current !== null) {
+      window.clearTimeout(displayTimer.current);
+      displayTimer.current = null;
+    }
+    if (preferences.displayUpdateRateMs === 0) {
+      flushDisplayedState();
+      return;
+    }
+    displayTimer.current = window.setTimeout(
+      flushDisplayedState,
+      preferences.displayUpdateRateMs,
+    );
+  }, [preferences.displayUpdateRateMs, flushDisplayedState]);
+
+  useEffect(
+    () => () => {
+      if (displayTimer.current !== null) window.clearTimeout(displayTimer.current);
+    },
+    [],
+  );
 
   const setUnsaved = useCallback((dirty: boolean) => {
     unsaved.current = dirty;
@@ -501,15 +541,17 @@ export default function Dashboard21() {
       const selected = await loadRelayCredential();
       setCredentials(await listRelayCredentials());
       setCredential(selected);
-      setState(
-        selected
-          ? ((await loadControlCache(selected.serverId)) ??
-              emptyControlState(selected.serverId))
-          : emptyControlState(""),
-      );
+      const restored = selected
+        ? ((await loadControlCache(selected.serverId)) ??
+            emptyControlState(selected.serverId))
+        : emptyControlState("");
+      authoritativeState.current = restored;
+      setState(restored);
       const storedSection = localStorage.getItem("plexonpanel-last-section");
       if (storedSection && sections.includes(storedSection as Section))
         setSection(storedSection as Section);
+      else if (storedSection)
+        localStorage.setItem("plexonpanel-last-section", "Overview");
       setSidebarCollapsed(
         localStorage.getItem("plexonpanel-sidebar-collapsed") === "true",
       );
@@ -541,10 +583,6 @@ export default function Dashboard21() {
     }, 1000);
     return () => window.clearTimeout(timer);
   }, [state, credential]);
-  useEffect(() => {
-    document.documentElement.dataset.plexonDensity =
-      localStorage.getItem("plexonpanel-density") ?? "comfortable";
-  }, []);
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: "auto" });
   }, [section, credential?.serverId]);
@@ -601,14 +639,17 @@ export default function Dashboard21() {
           }
           bindLiveSocket(socket);
           attempt = 0;
-          setState((current) => ({
-            ...current,
-            ready: null,
-            players: [],
-            pendingPlayerSnapshot: undefined,
-            presenceDeltas: [],
-            presenceEventIds: [],
-          }));
+          commitState(
+            (current) => ({
+              ...current,
+              ready: null,
+              players: [],
+              pendingPlayerSnapshot: undefined,
+              presenceDeltas: [],
+              presenceEventIds: [],
+            }),
+            true,
+          );
           setError("");
           heartbeat = setInterval(() => {
             if (socket?.readyState === WebSocket.OPEN)
@@ -631,7 +672,7 @@ export default function Dashboard21() {
               message.protocolVersion !== 3
             ) {
               setError(
-                "Protocol mismatch. PlexonPanel Dashboard 2.2 requires protocol 3 agents and relay.",
+                "Protocol mismatch. PlexonPanel Dashboard 3.0 requires protocol 3 agents and relay.",
               );
               socket?.close(4008, "Protocol mismatch");
               return;
@@ -646,7 +687,15 @@ export default function Dashboard21() {
               setError(str(message.error, "Relay rejected a message"));
               return;
             }
-            setState((current) => applyControlMessage(current, message));
+            const eventType = str(message.eventType, "");
+            const immediate =
+              message.type === "dashboard.ready" ||
+              eventType === "service.status" ||
+              eventType === "backup.progress";
+            commitState(
+              applyControlMessage(authoritativeState.current, message),
+              immediate,
+            );
           } catch {
             setError("The relay sent an invalid message.");
           }
@@ -655,21 +704,26 @@ export default function Dashboard21() {
           if (heartbeat) clearInterval(heartbeat);
           if (stopped) return;
           bindLiveSocket(null);
-          setState((current) => ({
-            ...current,
-            ready: null,
-            players: [],
-            pendingPlayerSnapshot: undefined,
-            presenceDeltas: [],
-            presenceEventIds: [],
-          }));
+          commitState(
+            (current) => ({
+              ...current,
+              ready: null,
+              players: [],
+              pendingPlayerSnapshot: undefined,
+              presenceDeltas: [],
+              presenceEventIds: [],
+            }),
+            true,
+          );
           if (event.code === 4003) {
             setError(
               "This device was revoked or expired. Generate a new local pairing code.",
             );
             void clearBrowserWorkspace().then(() => {
               setCredential(null);
-              setState(emptyControlState(""));
+              const empty = emptyControlState("");
+              authoritativeState.current = empty;
+              setState(empty);
               setPhase("unpaired");
             });
             return;
@@ -686,7 +740,9 @@ export default function Dashboard21() {
           setError(reason.message);
           await clearBrowserWorkspace();
           setCredential(null);
-          setState(emptyControlState(""));
+          const empty = emptyControlState("");
+          authoritativeState.current = empty;
+          setState(empty);
           setPhase("unpaired");
           return;
         }
@@ -702,7 +758,7 @@ export default function Dashboard21() {
       bindLiveSocket(null);
       socket?.close(1000, "Workspace changed");
     };
-  }, [credential, reconnect]);
+  }, [credential, reconnect, commitState]);
 
   const can = useCallback(
     (action: string, requestedKind?: "PAPER" | "HOST") => {
@@ -790,7 +846,9 @@ export default function Dashboard21() {
     if (!leaveEditor()) return;
     await logoutDashboard();
     setCredential(null);
-    setState(emptyControlState(""));
+    const empty = emptyControlState("");
+    authoritativeState.current = empty;
+    setState(empty);
     setPhase("unpaired");
     setCredentials(await listRelayCredentials());
   };
@@ -836,10 +894,9 @@ export default function Dashboard21() {
       .writeText(diagnostics(state))
       .then(() => setNotice("Safe diagnostics copied."));
   }, [state]);
-  const resetHistory = useCallback(
-    () => setState((current) => ({ ...current, history: [] })),
-    [],
-  );
+  const resetHistory = useCallback(() => {
+    commitState((current) => ({ ...current, history: [] }), true);
+  }, [commitState]);
 
   if (pairing || phase === "unpaired")
     return (
@@ -885,12 +942,6 @@ export default function Dashboard21() {
     case "Plugins":
       view = <PluginsView21 {...props} />;
       break;
-    case "Files":
-      view = <FilesView {...props} />;
-      break;
-    case "Backups":
-      view = <BackupsView {...props} />;
-      break;
     case "Server":
       view = <ServerView21 {...props} />;
       break;
@@ -930,7 +981,7 @@ export default function Dashboard21() {
 
   return (
     <div
-      className={`control-room cr21-shell ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}
+      className={`control-room cr21-shell cr30-shell ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}
     >
       <button
         className="cr21-mobile-menu"
@@ -1085,13 +1136,8 @@ export default function Dashboard21() {
                     Restart server
                   </button>
                 )}
-                {can("backup.create", "HOST") && (
-                  <button onClick={() => void run("backup.create", {}, "HOST")}>
-                    Create backup
-                  </button>
-                )}
                 <button onClick={() => navigate("Console")}>Open console</button>
-                <button onClick={() => navigate("Files")}>Open files</button>
+                <button onClick={() => navigate("Players")}>Open players</button>
                 <button onClick={copyDiagnostics}>Copy diagnostics</button>
                 <button onClick={refreshCurrent}>Refresh current view</button>
               </div>
@@ -1156,7 +1202,7 @@ export default function Dashboard21() {
         </main>
         <footer className="cr21-footer">
           <span>Local authority · Signed protocol 3</span>
-          <span>PlexonPanel Dashboard 2.2.0</span>
+          <span>PlexonPanel Dashboard 3.0.0</span>
         </footer>
       </div>
 
@@ -1174,7 +1220,6 @@ export default function Dashboard21() {
         close={() => setPaletteOpen(false)}
         navigate={navigate}
         run={run}
-        can={can}
         restartAvailable={restartAvailable}
         refresh={refreshCurrent}
         copyDiagnostics={copyDiagnostics}
