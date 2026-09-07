@@ -30,6 +30,7 @@ import {
   type ControlState,
   type JsonMap,
 } from "../lib/control-state";
+import { isImmediateControlMessage } from "../lib/display-cadence";
 import { canAction, HIGH_RISK } from "../lib/scopes";
 import {
   lifecycleActionAllowed,
@@ -161,7 +162,7 @@ function Brand({ compact = false }: { compact?: boolean }) {
           <strong>
             Plexon<span>Panel</span>
           </strong>
-          <small>Control Room · 3.0.0</small>
+          <small>Control Room · 3.0.1</small>
         </div>
       )}
     </div>
@@ -346,22 +347,18 @@ function Freshness({ phase, updatedAt }: { phase: Phase; updatedAt: number }) {
   if (phase !== "live")
     return <span className="cr21-freshness stale">Disconnected</span>;
   if (!updatedAt)
-    return <span className="cr21-freshness waiting">Waiting for sample</span>;
+    return <span className="cr21-freshness waiting">Waiting for telemetry</span>;
   const seconds = Math.max(
     0,
     Math.floor((Math.max(now, updatedAt) - updatedAt) / 1000),
   );
-  if (seconds <= 15)
+  if (seconds <= 3)
     return (
-      <span className="cr21-freshness live">Live · updated {seconds}s ago</span>
+      <span className="cr21-freshness live">Live · sample {seconds}s ago</span>
     );
-  if (seconds <= 30)
-    return <span className="cr21-freshness">Updated {seconds}s ago</span>;
-  if (seconds <= 60)
-    return <span className="cr21-freshness stale">Stale · {seconds}s</span>;
-  return (
-    <span className="cr21-freshness stale">Connection/data unavailable</span>
-  );
+  if (seconds <= 10)
+    return <span className="cr21-freshness">Delayed · {seconds}s</span>;
+  return <span className="cr21-freshness stale">Telemetry stale · {seconds}s</span>;
 }
 
 function CommandPalette({
@@ -676,7 +673,7 @@ export default function Dashboard21() {
               message.protocolVersion !== 3
             ) {
               setError(
-                "Protocol mismatch. PlexonPanel Dashboard 3.0 requires protocol 3 agents and relay.",
+                "Protocol mismatch. PlexonPanel Dashboard 3.0.1 requires protocol 3 agents and relay.",
               );
               socket?.close(4008, "Protocol mismatch");
               return;
@@ -691,14 +688,9 @@ export default function Dashboard21() {
               setError(str(message.error, "Relay rejected a message"));
               return;
             }
-            const eventType = str(message.eventType, "");
-            const immediate =
-              message.type === "dashboard.ready" ||
-              eventType === "service.status" ||
-              eventType === "backup.progress";
             commitState(
               applyControlMessage(authoritativeState.current, message),
-              immediate,
+              isImmediateControlMessage(message),
             );
           } catch {
             setError("The relay sent an invalid message.");
@@ -874,8 +866,8 @@ export default function Dashboard21() {
     ) {
       if (section === "Performance")
         setNotice(
-          state.updatedAt
-            ? `Latest pushed telemetry received at ${new Date(state.updatedAt).toLocaleTimeString()}.`
+          state.telemetryUpdatedAt
+            ? `Latest pushed telemetry received at ${new Date(state.telemetryUpdatedAt).toLocaleTimeString()}.`
             : "Waiting for the first pushed telemetry sample.",
         );
       else if (section === "Console" || section === "Chat")
@@ -892,7 +884,7 @@ export default function Dashboard21() {
     }
     setRefreshRevision((value) => value + 1);
     setNotice(`Refreshing ${section.toLowerCase()}…`);
-  }, [can, run, section, state.updatedAt]);
+  }, [can, run, section, state.telemetryUpdatedAt, state.updatedAt]);
   const copyDiagnostics = useCallback(() => {
     void navigator.clipboard
       .writeText(diagnostics(state))
@@ -976,6 +968,7 @@ export default function Dashboard21() {
   const role = state.ready?.device.role ?? credential?.role ?? "Paired";
   const paper = Boolean(state.ready?.agents.paper);
   const host = Boolean(state.ready?.agents.host);
+  const telemetryUpdatedAt = state.telemetryUpdatedAt || state.updatedAt;
   const restartAvailable =
     can("server.restart", "HOST") &&
     lifecycleActionAllowed(
@@ -1120,7 +1113,7 @@ export default function Dashboard21() {
                   : "Host not installed"}
             </span>
           </div>
-          <Freshness phase={phase} updatedAt={state.updatedAt} />
+          <Freshness phase={phase} updatedAt={telemetryUpdatedAt} />
           <div className="cr21-topbar-actions">
             <button
               className="cr21-icon-button"
@@ -1167,7 +1160,7 @@ export default function Dashboard21() {
             <h1>{section}</h1>
           </div>
           <div className="cr21-page-meta">
-            <Freshness phase={phase} updatedAt={state.updatedAt} />
+            <Freshness phase={phase} updatedAt={telemetryUpdatedAt} />
             <button className="cr-button" onClick={refreshCurrent}>
               <Icon name="refresh" size={15} /> Refresh
             </button>
@@ -1206,7 +1199,7 @@ export default function Dashboard21() {
         </main>
         <footer className="cr21-footer">
           <span>Local authority · Signed protocol 3</span>
-          <span>PlexonPanel Dashboard 3.0.0</span>
+          <span>PlexonPanel Dashboard 3.0.1</span>
         </footer>
       </div>
 
