@@ -17,6 +17,7 @@ for (const file of [
   "components/player-head.tsx",
   "app/control-views.tsx",
   "app/management-views-legacy.tsx",
+  "app/console-view-3-0.tsx",
   "app/players-view-2-3.tsx",
   "app/management-views-2-1.tsx",
   "app/advanced-views.tsx",
