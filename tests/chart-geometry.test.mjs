@@ -6,6 +6,7 @@ import {
   nearestValueIndex,
   resolveDomain,
   seriesStats,
+  thinSegment,
   windowedPoints,
 } from "../.test-dist/lib/chart-geometry.js";
 
@@ -44,6 +45,19 @@ test("gap segmentation never connects across missing samples", () => {
     [4],
     [6],
   ]);
+});
+
+test("high-frequency SVG thinning stays bounded and preserves local extrema", () => {
+  const points = Array.from({ length: 4_000 }, (_, index) => ({
+    at: index,
+    value: index === 1777 ? 999 : index === 2333 ? -50 : index % 100,
+  }));
+  const thinned = thinSegment(points, 800);
+  assert.ok(thinned.length <= 800);
+  assert.equal(thinned[0].at, 0);
+  assert.equal(thinned.at(-1).at, 3999);
+  assert.ok(thinned.some((point) => point.value === 999));
+  assert.ok(thinned.some((point) => point.value === -50));
 });
 
 test("percentage, capacity and adaptive domains are stable and truthful", () => {
