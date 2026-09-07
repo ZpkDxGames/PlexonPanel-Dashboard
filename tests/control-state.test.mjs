@@ -77,15 +77,111 @@ test("cross-server and incompatible-ready events cannot contaminate the workspac
 });
 test("inventory pagination never combines snapshots or appends a missing first page", () => {
   let s = emptyControlState(id);
-  const chunk = (snapshotId, offset, players) =>
-    event("inventory.players", { snapshotId, offset, players });
+  const chunk = (snapshotId, offset, players, complete = false) =>
+    event("inventory.players", {
+      snapshotId,
+      offset,
+      players,
+      complete,
+      capturedAt: "2026-09-06T12:00:00Z",
+    });
   assert.equal(applyControlMessage(s, chunk("a", 1, [{ name: "second" }])), s);
   s = applyControlMessage(s, chunk("a", 0, [{ name: "first" }]));
+  assert.deepEqual(s.players, [], "an incomplete roster is not authoritative");
   assert.equal(applyControlMessage(s, chunk("b", 1, [{ name: "wrong" }])), s);
-  s = applyControlMessage(s, chunk("a", 1, [{ name: "second" }]));
+  s = applyControlMessage(s, chunk("a", 1, [{ name: "second" }], true));
   assert.deepEqual(
     s.players.map((p) => p.name),
     ["first", "second"],
+  );
+});
+test("presence deltas are idempotent and an old session cannot remove a reconnect", () => {
+  let s = emptyControlState(id);
+  const joined = event("players.presence", {
+    eventId: "event-1",
+    sessionId: "session-1",
+    uuid: "player-1",
+    name: "Alex",
+    state: "JOINED",
+    observedAt: "2026-09-06T12:00:01Z",
+  });
+  s = applyControlMessage(s, joined);
+  assert.equal(s.players.length, 1);
+  assert.equal(applyControlMessage(s, joined), s, "duplicate event is ignored");
+  s = applyControlMessage(
+    s,
+    event("players.presence", {
+      ...joined.body,
+      eventId: "event-2",
+      sessionId: "session-2",
+      observedAt: "2026-09-06T12:00:02Z",
+    }),
+  );
+  s = applyControlMessage(
+    s,
+    event("players.presence", {
+      ...joined.body,
+      eventId: "event-3",
+      state: "LEFT",
+      observedAt: "2026-09-06T12:00:03Z",
+    }),
+  );
+  assert.equal(s.players[0].sessionId, "session-2");
+});
+test("a complete snapshot replays only deltas newer than its capture", () => {
+  let s = {
+    ...emptyControlState(id),
+    ready: {
+      ...ready,
+      server: { ...ready.server, paperSession: "paper-session" },
+    },
+  };
+  s = applyControlMessage(
+    s,
+    {
+      ...event("players.presence", {
+        eventId: "event-after",
+        sessionId: "session-new",
+        uuid: "new-player",
+        name: "New",
+        state: "JOINED",
+        observedAt: "2026-09-06T12:00:00.000000001Z",
+      }),
+      agentSession: "paper-session",
+    },
+  );
+  s = applyControlMessage(
+    s,
+    {
+      ...event("inventory.players", {
+        snapshotId: "snapshot",
+        offset: 0,
+        complete: true,
+        capturedAt: "2026-09-06T12:00:00Z",
+        players: [
+          { uuid: "existing", name: "Existing", sessionId: "session-existing" },
+        ],
+      }),
+      agentSession: "paper-session",
+    },
+  );
+  assert.deepEqual(
+    s.players.map((player) => player.name).sort(),
+    ["Existing", "New"],
+  );
+  assert.equal(
+    applyControlMessage(s, {
+      ...event("players.presence", {
+        eventId: "foreign-event",
+        sessionId: "foreign",
+        uuid: "foreign",
+        name: "Foreign",
+        state: "JOINED",
+        observedAt: "2026-09-06T12:00:02Z",
+      }),
+      agentSession: "old-paper-session",
+    }),
+    s,
   );
 });
 test("console and cache remain bounded and exclude players, files and action results", () => {
@@ -108,6 +204,8 @@ test("console and cache remain bounded and exclude players, files and action res
   assert.equal(s.console.length, 600);
   assert.equal(c.console.length, 200);
   assert.equal(c.players.length, 0);
+  assert.equal(c.presenceDeltas.length, 0);
+  assert.equal(c.presenceEventIds.length, 0);
   assert.ok(!JSON.stringify(c).includes("private file content"));
   assert.ok(!JSON.stringify(c).includes("192.0.2.1"));
   assert.equal(c.cached, true);

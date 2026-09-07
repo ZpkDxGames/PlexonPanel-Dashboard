@@ -47,6 +47,55 @@
   gap: 5px;
 }
 
+.cr21-player-tabs {
+  margin: 0 0 10px;
+  padding-inline: 4px;
+}
+
+.cr21-bounded {
+  margin: 0;
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(245, 158, 11, .2);
+  background: rgba(245, 158, 11, .07);
+  color: #f3c875;
+  font-size: .8125rem;
+  line-height: 1.5;
+}
+
+.cr21-block-id {
+  display: block;
+  margin-top: 3px;
+  color: var(--cr21-text-muted);
+  font-size: .75rem;
+}
+
+.cr21-load-more {
+  display: flex;
+  justify-content: center;
+  padding: 14px;
+  border-top: 1px solid var(--cr21-border-soft);
+}
+
+.cr21-session-list {
+  display: grid;
+  gap: 7px;
+  margin: 10px 0 14px;
+  padding: 0;
+  list-style: none;
+}
+
+.cr21-session-list li {
+  display: grid;
+  grid-template-columns: minmax(72px, .6fr) minmax(140px, 1.5fr) minmax(52px, .5fr);
+  gap: 10px;
+  padding: 9px 10px;
+  border: 1px solid var(--cr21-border-soft);
+  border-radius: 9px;
+  background: var(--cr21-surface-1);
+  color: var(--cr21-text-secondary);
+  font-size: .8125rem;
+}
+
 .cr21-player-drawer {
   width: min(600px, 100vw);
   border-left-color: var(--cr21-border-strong);
@@ -246,6 +295,11 @@ html[data-plexon-density="compact"] .cr21-metric-card {
   .cr21-player-drawer {
     width: 100vw;
     max-width: none;
+  }
+
+  .cr21-session-list li {
+    grid-template-columns: 1fr;
+    gap: 3px;
   }
 
   .cr21-console {

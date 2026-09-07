@@ -14,7 +14,7 @@ npx wrangler secret bulk relay/.relay-secrets.json --config relay/wrangler.jsonc
 
 Bindings: PAIRING_CODE_PEPPER, ACCESS_TOKEN_SECRET, GATEWAY_ED25519_PRIVATE_KEY and GATEWAY_ED25519_PUBLIC_KEY. Only the public key is shareable. Never paste secrets into PRs/issues/chat/build logs.
 
-Run check and relay:smoke first. Smoke uses temporary workerd storage and ephemeral keys, without deployment. After live acceptance/approval, `npm run relay:deploy`. Verify `/healthz` reports 2.0.0/protocol 3 and the pinned public key. Configure this key and WSS `/v1/agent` on both agents. Wrangler is pinned in package/lockfile.
+Run check and relay:smoke first. Smoke uses temporary workerd storage and ephemeral keys, without deployment. After live acceptance/approval, `npm run relay:deploy`. Verify `/healthz` reports 2.2.0/protocol 3 and the pinned public key. Configure this key and WSS `/v1/agent` on both agents. Wrangler is pinned in package/lockfile.
 
 ## Dashboard
 

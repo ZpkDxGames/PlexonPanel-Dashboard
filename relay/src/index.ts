@@ -89,6 +89,7 @@ interface SocketAttachment {
   access?: DashboardAccess;
   rate?: number[];
   transferRate?: number[];
+  snapshotRate?: number;
 }
 interface DirectoryRate {
   windowStartedAt: number;
@@ -96,6 +97,8 @@ interface DirectoryRate {
 }
 const UUID =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const UTC_INSTANT =
+  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,9})?Z$/;
 const METADATA_KEY = "room-metadata",
   DIRECTORY_NAME = "pairing-directory-v3",
   INTERNAL_HEADER = "X-Plexon-Internal";
@@ -104,6 +107,7 @@ const AGENT_EVENTS = new Set([
   "telemetry.system",
   "telemetry.worlds",
   "inventory.players",
+  "players.presence",
   "inventory.plugins",
   "console.lines",
   "chat.message",
@@ -150,7 +154,7 @@ const relayWorker = {
         {
           ok: true,
           service: "plexonpanel-relay",
-          version: "2.0.0",
+          version: "2.2.0",
           protocolVersion: 3,
           storage: "coordination-only",
           gatewayPublicKey: env.GATEWAY_ED25519_PUBLIC_KEY,
@@ -956,6 +960,7 @@ export class ServerRoom {
       )
     )
       throw new Error("Event not allowed for host");
+    if (envelope.type === "players.presence") validatePresenceEvent(body);
     for (const peer of this.state.getWebSockets("dashboard")) {
       const d = peer.deserializeAttachment() as SocketAttachment;
       if (!currentAccess(m, d.access)) continue;
@@ -972,6 +977,8 @@ export class ServerRoom {
             type: "server.event",
             serverId: a.serverId,
             agentKind: a.kind,
+            agentSession: a.sessionNonce,
+            agentSequence: a.sequence,
             eventType: envelope.type,
             body: filtered,
             receivedAt: new Date().toISOString(),
@@ -1011,6 +1018,7 @@ export class ServerRoom {
         new TextEncoder().encode(JSON.stringify(parameters)).byteLength > 49152
       )
         throw new Error("INVALID_PARAMETERS");
+      validateActionParameters(action, parameters);
       const transfer = action.endsWith(".chunk");
       const rate = ((transfer ? a.transferRate : a.rate) ?? []).filter(
         (t) => t > Date.now() - 10000,
@@ -1043,12 +1051,20 @@ export class ServerRoom {
           throw new Error("INVALID_PARAMETERS");
         kind = message.agentKind;
       }
+      if (action.startsWith("players.") && kind !== "PAPER")
+        throw new Error("INVALID_PARAMETERS");
       const identity = kind === "HOST" ? m.hostIdentity : m.identity;
       if (identity?.capabilities[scope] !== true)
         throw new Error("CAPABILITY_DISABLED");
       const agent = this.agents(kind)[0];
       if (!agent)
         throw new Error(kind === "HOST" ? "HOST_OFFLINE" : "PAPER_OFFLINE");
+      if (action === "players.snapshot.request") {
+        if ((a.snapshotRate ?? 0) > Date.now() - 5000)
+          throw new Error("RATE_LIMITED");
+        a.snapshotRate = Date.now();
+        socket.serializeAttachment(a);
+      }
       for (const [key, p] of this.pending)
         if (p.expires < Date.now()) this.pending.delete(key);
       if (this.pending.has(id)) throw new Error("DUPLICATE_REQUEST");
@@ -1209,7 +1225,7 @@ export class ServerRoom {
       type: "dashboard.ready",
       serverId: a.serverId,
       protocolVersion: 3,
-      version: "2.0.0",
+      version: "2.2.0",
       connectionStatus: this.agents("PAPER").length ? "online" : "offline",
       agents: {
         paper: this.agents("PAPER").length > 0,
@@ -1226,6 +1242,11 @@ export class ServerRoom {
         paperCapabilities: m.identity?.capabilities ?? {},
         hostCapabilities: m.hostIdentity?.capabilities ?? {},
         hostVersion: m.hostIdentity?.pluginVersion ?? null,
+        paperSession: (
+          this.agents("PAPER")[0]?.deserializeAttachment() as
+            | SocketAttachment
+            | undefined
+        )?.sessionNonce,
         paired: m.paired,
       },
       receivedAt: new Date().toISOString(),
@@ -1357,12 +1378,149 @@ export function filterEvent(
             const copy = { ...p };
             if (!has("players.address")) delete copy.address;
             if (!has("players.location")) delete copy.position;
+            if (!has("players.history.view")) {
+              delete copy.firstSeenAt;
+              delete copy.lastLoginAt;
+            }
             return copy;
           })
       : [];
     return { ...body, players };
   }
+  if (type === "players.presence") {
+    if (!has("players.view")) return null;
+    const copy = { ...body };
+    if (!has("players.history.view")) {
+      delete copy.sessionStartedAt;
+      delete copy.sessionEndedAt;
+      delete copy.sessionDurationMillis;
+      delete copy.termination;
+      delete copy.persistenceState;
+    }
+    return copy;
+  }
   return null;
+}
+
+function validateActionParameters(
+  action: string,
+  parameters: Record<string, unknown>,
+): void {
+  if (action === "players.snapshot.request") {
+    if (Object.keys(parameters).length) throw new Error("INVALID_PARAMETERS");
+    return;
+  }
+  if (action !== "players.history.list") return;
+  const allowed = new Set(["query", "status", "from", "to", "cursor", "limit"]);
+  if (Object.keys(parameters).some((key) => !allowed.has(key)))
+    throw new Error("INVALID_PARAMETERS");
+  if (
+    parameters.query !== undefined &&
+    (typeof parameters.query !== "string" ||
+      parameters.query.length > 64 ||
+      /[\0\r\n]/.test(parameters.query))
+  )
+    throw new Error("INVALID_PARAMETERS");
+  if (
+    parameters.status !== undefined &&
+    !["ALL", "ONLINE", "OFFLINE"].includes(String(parameters.status))
+  )
+    throw new Error("INVALID_PARAMETERS");
+  const from = optionalInstant(parameters.from),
+    to = optionalInstant(parameters.to);
+  if (from !== undefined && to !== undefined && to < from)
+    throw new Error("INVALID_PARAMETERS");
+  if (
+    parameters.cursor !== undefined &&
+    (typeof parameters.cursor !== "string" ||
+      parameters.cursor.length > 512 ||
+      !/^[A-Za-z0-9_-]*$/.test(parameters.cursor))
+  )
+    throw new Error("INVALID_PARAMETERS");
+  if (
+    parameters.limit !== undefined &&
+    (!Number.isSafeInteger(parameters.limit) ||
+      Number(parameters.limit) < 1 ||
+      Number(parameters.limit) > 100)
+  )
+    throw new Error("INVALID_PARAMETERS");
+}
+
+function optionalInstant(value: unknown): number | undefined {
+  if (value === undefined) return undefined;
+  if (typeof value !== "string" || value.length > 40 || !value.trim())
+    throw new Error("INVALID_PARAMETERS");
+  const parsed = Date.parse(value);
+  if (!UTC_INSTANT.test(value) || !Number.isFinite(parsed))
+    throw new Error("INVALID_PARAMETERS");
+  return parsed;
+}
+
+function validatePresenceEvent(body: Record<string, unknown>): void {
+  const allowed = new Set([
+    "eventId",
+    "sessionId",
+    "uuid",
+    "name",
+    "state",
+    "observedAt",
+    "sessionStartedAt",
+    "sessionEndedAt",
+    "sessionDurationMillis",
+    "termination",
+    "persistenceState",
+  ]);
+  if (Object.keys(body).some((key) => !allowed.has(key)))
+    throw new Error("Invalid presence event");
+  requiredUuid(body.eventId, "eventId");
+  requiredUuid(body.sessionId, "sessionId");
+  requiredUuid(body.uuid, "uuid");
+  const name = requiredText(body.name, "name", 64);
+  if (/[\0-\x1f\x7f]/.test(name)) throw new Error("Invalid name");
+  if (body.state !== "JOINED" && body.state !== "LEFT")
+    throw new Error("Invalid presence state");
+  const observed = strictInstant(body.observedAt, "observedAt"),
+    started = strictInstant(body.sessionStartedAt, "sessionStartedAt");
+  if (started > observed + 5000) throw new Error("Invalid presence timestamps");
+  if (!["OPEN", "QUIT", "KICK", "UNKNOWN_DISCONNECT"].includes(
+    body.termination as string,
+  ))
+    throw new Error("Invalid presence termination");
+  if (!["DISABLED", "QUEUED", "DEGRADED"].includes(
+    body.persistenceState as string,
+  ))
+    throw new Error("Invalid persistence state");
+  if (body.state === "JOINED") {
+    if (
+      body.termination !== "OPEN" ||
+      body.sessionEndedAt !== null ||
+      body.sessionDurationMillis !== null
+    )
+      throw new Error("Invalid joined presence event");
+    return;
+  }
+  if (body.termination === "OPEN") throw new Error("Invalid left presence event");
+  if (body.termination === "UNKNOWN_DISCONNECT") {
+    if (body.sessionEndedAt !== null || body.sessionDurationMillis !== null)
+      throw new Error("Invalid unknown disconnect");
+    return;
+  }
+  const ended = strictInstant(body.sessionEndedAt, "sessionEndedAt");
+  if (
+    ended !== observed ||
+    ended < started ||
+    !Number.isSafeInteger(body.sessionDurationMillis) ||
+    Number(body.sessionDurationMillis) !== ended - started
+  )
+    throw new Error("Invalid closed presence event");
+}
+
+function strictInstant(value: unknown, name: string): number {
+  const text = requiredText(value, name, 40),
+    parsed = Date.parse(text);
+  if (!UTC_INSTANT.test(text) || !Number.isFinite(parsed))
+    throw new Error(`Invalid ${name}`);
+  return parsed;
 }
 function actionError(error: unknown): string {
   const code = error instanceof Error ? error.message : "DENIED";

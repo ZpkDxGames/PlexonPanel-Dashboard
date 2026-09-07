@@ -173,7 +173,7 @@ function Brand({ compact = false }: { compact?: boolean }) {
           <strong>
             Plexon<span>Panel</span>
           </strong>
-          <small>Control Room · 2.1</small>
+          <small>Control Room · 2.2.0</small>
         </div>
       )}
     </div>
@@ -601,7 +601,14 @@ export default function Dashboard21() {
           }
           bindLiveSocket(socket);
           attempt = 0;
-          setState((current) => ({ ...current, ready: null }));
+          setState((current) => ({
+            ...current,
+            ready: null,
+            players: [],
+            pendingPlayerSnapshot: undefined,
+            presenceDeltas: [],
+            presenceEventIds: [],
+          }));
           setError("");
           heartbeat = setInterval(() => {
             if (socket?.readyState === WebSocket.OPEN)
@@ -624,7 +631,7 @@ export default function Dashboard21() {
               message.protocolVersion !== 3
             ) {
               setError(
-                "Protocol mismatch. PlexonPanel Dashboard 2.1 requires protocol 3 agents and relay.",
+                "Protocol mismatch. PlexonPanel Dashboard 2.2 requires protocol 3 agents and relay.",
               );
               socket?.close(4008, "Protocol mismatch");
               return;
@@ -648,6 +655,14 @@ export default function Dashboard21() {
           if (heartbeat) clearInterval(heartbeat);
           if (stopped) return;
           bindLiveSocket(null);
+          setState((current) => ({
+            ...current,
+            ready: null,
+            players: [],
+            pendingPlayerSnapshot: undefined,
+            presenceDeltas: [],
+            presenceEventIds: [],
+          }));
           if (event.code === 4003) {
             setError(
               "This device was revoked or expired. Generate a new local pairing code.",
@@ -780,8 +795,18 @@ export default function Dashboard21() {
     setCredentials(await listRelayCredentials());
   };
   const refreshCurrent = useCallback(() => {
+    if (section === "Players") {
+      if (!can("players.snapshot.request", "PAPER")) {
+        setNotice(
+          "A fresh player snapshot requires a connected Paper agent, players.view scope, and local telemetry capability.",
+        );
+      } else {
+        void run("players.snapshot.request", {}, "PAPER").catch(() => {});
+      }
+      return;
+    }
     if (
-      ["Overview", "Performance", "Players", "Console", "Chat", "Plugins"].includes(
+      ["Overview", "Performance", "Console", "Chat", "Plugins"].includes(
         section,
       )
     ) {
@@ -805,7 +830,7 @@ export default function Dashboard21() {
     }
     setRefreshRevision((value) => value + 1);
     setNotice(`Refreshing ${section.toLowerCase()}…`);
-  }, [section, state.updatedAt]);
+  }, [can, run, section, state.updatedAt]);
   const copyDiagnostics = useCallback(() => {
     void navigator.clipboard
       .writeText(diagnostics(state))
@@ -1131,7 +1156,7 @@ export default function Dashboard21() {
         </main>
         <footer className="cr21-footer">
           <span>Local authority · Signed protocol 3</span>
-          <span>PlexonPanel Dashboard 2.1.0</span>
+          <span>PlexonPanel Dashboard 2.2.0</span>
         </footer>
       </div>
 

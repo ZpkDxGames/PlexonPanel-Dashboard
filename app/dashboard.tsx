@@ -93,7 +93,7 @@ function Brand() {
       <strong>
         Plexon<span>Panel</span>
       </strong>
-      <small>2.0</small>
+      <small>2.2.0</small>
     </div>
   );
 }
@@ -734,7 +734,7 @@ export default function Dashboard() {
         </main>
         <footer className="cr-footer">
           <span>Local authority · Signed protocol 3</span>
-          <span>PlexonPanel 2.0.0</span>
+          <span>PlexonPanel Dashboard 2.2.0</span>
         </footer>
       </div>
       {notice && (
