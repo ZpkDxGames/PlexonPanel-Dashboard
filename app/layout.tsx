@@ -4,6 +4,7 @@ import "./control-room.css";
 import "./control-room-2-1.css";
 import "./management-2-1.css";
 import "./visual-motion.css";
+import "./player-head.css";
 import { UiPreferencesProvider } from "../components/ui-preferences-provider";
 
 export const metadata: Metadata = {
