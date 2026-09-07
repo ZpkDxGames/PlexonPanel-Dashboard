@@ -1,3 +1,4 @@
+import { capturePresenceHistoryMessage } from "./activity-history";
 import type { JsonMap } from "./control-state";
 
 const IMMEDIATE_EVENT_TYPES = new Set([
@@ -12,8 +13,13 @@ const IMMEDIATE_EVENT_TYPES = new Set([
 /**
  * Browser display throttling applies only to presentation-heavy state.
  * Operational streams, presence, lifecycle, and action state must remain immediate.
+ *
+ * Presence capture is best-effort browser-only persistence. It never changes
+ * whether a control message is immediate and it does not modify the relay or
+ * Paper protocol contract.
  */
 export function isImmediateControlMessage(message: JsonMap): boolean {
+  capturePresenceHistoryMessage(message);
   if (message.type === "dashboard.ready") return true;
   return (
     message.type === "server.event" &&
