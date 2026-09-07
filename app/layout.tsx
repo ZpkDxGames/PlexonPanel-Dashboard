@@ -3,6 +3,8 @@ import "./globals.css";
 import "./control-room.css";
 import "./control-room-2-1.css";
 import "./management-2-1.css";
+import "./visual-motion.css";
+import { UiPreferencesProvider } from "../components/ui-preferences-provider";
 
 export const metadata: Metadata = {
   title: "PlexonPanel Dashboard",
@@ -19,8 +21,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body>{children}</body>
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script src="/ui-preferences-init.js" />
+      </head>
+      <body>
+        <UiPreferencesProvider>{children}</UiPreferencesProvider>
+      </body>
     </html>
   );
 }
