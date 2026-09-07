@@ -60,6 +60,38 @@ export function gapSegments(points: readonly TimedValue[]): TimedValue[][] {
   return segments;
 }
 
+/**
+ * Reduce a continuous finite segment for SVG rendering while preserving its
+ * first/last values plus local extrema. Statistics continue to use raw points.
+ */
+export function thinSegment(
+  points: readonly TimedValue[],
+  maximumPoints = 800,
+): TimedValue[] {
+  if (points.length <= maximumPoints || maximumPoints < 4) return [...points];
+  const bucketCount = Math.max(1, Math.floor(maximumPoints / 4));
+  const bucketSize = Math.ceil(points.length / bucketCount);
+  const result: TimedValue[] = [];
+
+  for (let start = 0; start < points.length; start += bucketSize) {
+    const bucket = points.slice(start, Math.min(points.length, start + bucketSize));
+    if (!bucket.length) continue;
+    let minimumIndex = 0;
+    let maximumIndex = 0;
+    for (let index = 1; index < bucket.length; index += 1) {
+      const value = bucket[index].value as number;
+      if (value < (bucket[minimumIndex].value as number)) minimumIndex = index;
+      if (value > (bucket[maximumIndex].value as number)) maximumIndex = index;
+    }
+    const indexes = Array.from(
+      new Set([0, minimumIndex, maximumIndex, bucket.length - 1]),
+    ).sort((a, b) => a - b);
+    for (const index of indexes) result.push(bucket[index]);
+  }
+
+  return result;
+}
+
 export function nearestValueIndex(
   points: readonly TimedValue[],
   targetAt: number,
