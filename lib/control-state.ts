@@ -65,7 +65,7 @@ export interface ControlState {
   cached: boolean;
 }
 
-export const CONTROL_HISTORY_RETENTION_MS = 32 * 60_000;
+export const CONTROL_HISTORY_RETENTION_MS = 35 * 60_000;
 export const CONTROL_HISTORY_MAX_POINTS = 8192;
 
 export function emptyControlState(serverId: string): ControlState {
@@ -299,7 +299,7 @@ export function applyControlMessage(
     next = {
       ...next,
       telemetryUpdatedAt: receivedAt,
-      history: appendHistory(next.history, sample, receivedAt),
+      history: appendHistory(next.history, sample),
     };
   }
   return next;
@@ -325,7 +325,9 @@ export function safeCache(state: ControlState): ControlState {
 }
 export function diagnostics(state: ControlState): string {
   const host = state.ready?.agents.host ? state.hostSystem : {},
-    paper = state.ready?.agents.paper ? state.system : {};
+    paper = state.ready?.agents.paper ? state.system : {},
+    hostCpu = number(host.hostCpuPercent),
+    paperCpu = number(paper.processCpuPercent);
   return [
     `PlexonPanel Dashboard 3.0.1 / Protocol 3`,
     `Paper agent: ${state.ready?.server.pluginVersion ?? "unknown"}`,
@@ -336,18 +338,15 @@ export function diagnostics(state: ControlState): string {
     `OS / architecture: ${str(host.operatingSystem, str(paper.operatingSystem))} / ${str(host.architecture, str(paper.architecture))}`,
     `TPS: ${Array.isArray(state.server.tps) ? state.server.tps.join(" / ") : "unavailable"}`,
     `MSPT: ${number(state.server.averageTickMillis) ?? "unavailable"}`,
-    `Host CPU: ${number(host.hostCpuPercent) ?? "unavailable"}%`,
-    `Paper process CPU: ${number(paper.processCpuPercent) ?? "unavailable"}%`,
+    `Host CPU: ${hostCpu === null ? "unavailable" : `${hostCpu}%`}`,
+    `Paper process CPU: ${paperCpu === null ? "unavailable" : `${paperCpu}%`}`,
     `JVM heap bytes: ${number(paper.jvmHeapUsedBytes) ?? "unavailable"}`,
   ].join("\n");
 }
 
-function appendHistory(
-  history: Sample[],
-  sample: Sample,
-  receivedAt: number,
-): Sample[] {
-  const cutoff = receivedAt - CONTROL_HISTORY_RETENTION_MS;
+function appendHistory(history: Sample[], sample: Sample): Sample[] {
+  const latestAt = Math.max(sample.at, history.at(-1)?.at ?? sample.at);
+  const cutoff = latestAt - CONTROL_HISTORY_RETENTION_MS;
   const retained = history.filter((point) => point.at >= cutoff);
   const sameAt = retained.findIndex((point) => point.at === sample.at);
   if (sameAt >= 0) retained[sameAt] = sample;
