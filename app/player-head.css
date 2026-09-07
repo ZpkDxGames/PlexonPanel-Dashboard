@@ -1,0 +1,51 @@
+.cr23-player-head {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  overflow: hidden;
+  border: 1px solid var(--cr21-border-strong);
+  border-radius: 9px;
+  background: var(--cr21-surface-3);
+  color: var(--cr21-text-primary);
+  font-size: .72rem;
+  font-weight: 800;
+  line-height: 1;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.025);
+}
+.cr23-player-head::after {
+  content: "";
+  position: absolute;
+  right: 1px;
+  bottom: 1px;
+  width: 7px;
+  height: 7px;
+  border: 2px solid var(--cr21-surface-1);
+  border-radius: 999px;
+  background: var(--cr23-neutral);
+  z-index: 3;
+}
+.cr23-player-head.online::after { background: var(--cr21-success); }
+.cr23-player-head img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  image-rendering: pixelated;
+  object-fit: cover;
+}
+.cr23-player-head img.loaded { opacity: 1; }
+.cr23-player-head-fallback { position: relative; z-index: 0; }
+.cr23-player-head-0 { background: linear-gradient(145deg, #173047, #101c2a); }
+.cr23-player-head-1 { background: linear-gradient(145deg, #302556, #19182f); }
+.cr23-player-head-2 { background: linear-gradient(145deg, #173c35, #10251f); }
+.cr23-player-head-3 { background: linear-gradient(145deg, #48331b, #2a1d12); }
+.cr23-player-head-4 { background: linear-gradient(145deg, #45243b, #291723); }
+.cr23-player-head-5 { background: linear-gradient(145deg, #263550, #151f31); }
+html[data-plexon-theme="light"] .cr23-player-head-0 { background: #dcebf6; }
+html[data-plexon-theme="light"] .cr23-player-head-1 { background: #e8e2fa; }
+html[data-plexon-theme="light"] .cr23-player-head-2 { background: #dcefe6; }
+html[data-plexon-theme="light"] .cr23-player-head-3 { background: #f4e9d7; }
+html[data-plexon-theme="light"] .cr23-player-head-4 { background: #f2e0e9; }
+html[data-plexon-theme="light"] .cr23-player-head-5 { background: #e0e8f4; }
