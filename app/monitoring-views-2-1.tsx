@@ -13,77 +13,66 @@ import {
   time,
   type ViewProps,
 } from "./control-views";
+import { diagnostics, number, str, type Sample } from "../lib/control-state";
 import {
-  diagnostics,
-  number,
-  str,
-  type Sample,
-} from "../lib/control-state";
+  buildSvgPaths,
+  gapSegments,
+  nearestValueIndex,
+  resolveDomain,
+  seriesStats,
+  windowedPoints,
+  type TimedValue,
+} from "../lib/chart-geometry";
+import { useUiPreferences } from "../components/ui-preferences-provider";
 
 type HistoryField = keyof Omit<Sample, "at">;
-
 type ChartSpec = {
   field: HistoryField;
   label: string;
   shortLabel: string;
   format: (value: number) => string;
   domain?: [number, number];
+  percentage?: boolean;
   reference?: { value: number; label: string };
+  series: 1 | 2 | 3 | 4 | 5 | 6;
 };
 
 const CHARTS: ChartSpec[] = [
-  {
-    field: "tps",
-    label: "TPS",
-    shortLabel: "TPS",
-    format: (n) => n.toFixed(2),
-    domain: [0, 20],
-    reference: { value: 18, label: "18 degraded reference" },
-  },
-  {
-    field: "mspt",
-    label: "MSPT",
-    shortLabel: "MSPT",
-    format: (n) => `${n.toFixed(2)} ms`,
-    reference: { value: 50, label: "50 ms tick budget" },
-  },
-  {
-    field: "hostCpu",
-    label: "Host CPU",
-    shortLabel: "CPU",
-    format: (n) => `${n.toFixed(1)}%`,
-    domain: [0, 100],
-  },
-  {
-    field: "processCpu",
-    label: "Paper process CPU",
-    shortLabel: "Paper CPU",
-    format: (n) => `${n.toFixed(1)}%`,
-    domain: [0, 100],
-  },
-  {
-    field: "memory",
-    label: "Host memory used",
-    shortLabel: "Memory",
-    format: (n) => bytes(n),
-  },
-  {
-    field: "heap",
-    label: "JVM heap used",
-    shortLabel: "Heap",
-    format: (n) => bytes(n),
-  },
+  { field: "tps", label: "TPS", shortLabel: "TPS", format: (n) => n.toFixed(2), domain: [0, 20], reference: { value: 18, label: "18 degraded reference" }, series: 1 },
+  { field: "mspt", label: "MSPT", shortLabel: "MSPT", format: (n) => `${n.toFixed(2)} ms`, reference: { value: 50, label: "50 ms tick budget" }, series: 2 },
+  { field: "hostCpu", label: "Host CPU", shortLabel: "CPU", format: (n) => `${n.toFixed(1)}%`, percentage: true, series: 3 },
+  { field: "processCpu", label: "Paper process CPU", shortLabel: "Paper CPU", format: (n) => `${n.toFixed(1)}%`, percentage: true, series: 4 },
+  { field: "memory", label: "Host memory used", shortLabel: "Memory", format: (n) => bytes(n), series: 5 },
+  { field: "heap", label: "JVM heap used", shortLabel: "Heap", format: (n) => bytes(n), series: 6 },
 ];
 
-function percentile(values: number[], percentileValue: number) {
-  if (!values.length) return null;
-  const sorted = [...values].sort((a, b) => a - b);
-  const index = Math.min(
-    sorted.length - 1,
-    Math.max(0, Math.ceil((percentileValue / 100) * sorted.length) - 1,
-    ),
-  );
-  return sorted[index];
+function sampleValue(sample: Sample, field: HistoryField): number | null {
+  const value = sample[field];
+  return typeof value === "number" && Number.isFinite(value) ? value : null;
+}
+
+function displayTime(at: number, zone: "local" | "utc") {
+  const date = new Date(at);
+  return zone === "utc"
+    ? `${date.toLocaleTimeString(undefined, { timeZone: "UTC" })} UTC`
+    : date.toLocaleTimeString();
+}
+
+function sampleFreshnessText(at: number, tailAt: number) {
+  const age = Math.max(0, tailAt - at);
+  if (age < 1_000) return "latest sample";
+  if (age < 60_000) return `${Math.floor(age / 1_000)}s before latest`;
+  return `${Math.floor(age / 60_000)}m before latest`;
+}
+
+function trendText(points: readonly TimedValue[]) {
+  const values = points.map((point) => point.value).filter((value): value is number => value !== null);
+  if (values.length < 2) return "not enough samples for a trend";
+  const first = values[0];
+  const last = values[values.length - 1];
+  const delta = (last - first) / Math.max(1, Math.abs(first));
+  if (Math.abs(delta) < 0.02) return "roughly flat";
+  return delta > 0 ? "rising" : "falling";
 }
 
 function downloadBlob(filename: string, body: string, type: string) {
@@ -99,389 +88,242 @@ function downloadBlob(filename: string, body: string, type: string) {
 }
 
 function exportHistory(history: Sample[], format: "csv" | "json") {
-  const stamp = new Date()
-    .toISOString()
-    .replaceAll(":", "")
-    .replace(/\.\d{3}Z$/, "Z");
+  const stamp = new Date().toISOString().replaceAll(":", "").replace(/\.\d{3}Z$/, "Z");
   if (format === "json") {
-    downloadBlob(
-      `plexonpanel-performance-${stamp}.json`,
-      JSON.stringify(history, null, 2),
-      "application/json",
-    );
+    downloadBlob(`plexonpanel-performance-${stamp}.json`, JSON.stringify(history, null, 2), "application/json");
     return;
   }
-  const columns: (keyof Sample)[] = [
-    "at",
-    "tps",
-    "mspt",
-    "hostCpu",
-    "processCpu",
-    "heap",
-    "memory",
-    "players",
-    "gc",
-  ];
+  const columns: (keyof Sample)[] = ["at", "tps", "mspt", "hostCpu", "processCpu", "heap", "memory", "players", "gc"];
   const rows = history.map((sample) =>
-    columns
-      .map((column) =>
-        column === "at"
-          ? new Date(sample.at).toISOString()
-          : sample[column] === null
-            ? ""
-            : String(sample[column]),
-      )
-      .join(","),
+    columns.map((column) => column === "at" ? new Date(sample.at).toISOString() : sample[column] === null ? "" : String(sample[column])).join(","),
   );
-  downloadBlob(
-    `plexonpanel-performance-${stamp}.csv`,
-    [columns.join(","), ...rows].join("\n"),
-    "text/csv;charset=utf-8",
-  );
+  downloadBlob(`plexonpanel-performance-${stamp}.csv`, [columns.join(","), ...rows].join("\n"), "text/csv;charset=utf-8");
 }
 
-function SegmentedWindow({
-  value,
-  onChange,
-}: {
-  value: number;
-  onChange: (value: number) => void;
-}) {
+function SegmentedWindow({ value, onChange }: { value: number; onChange: (value: 1 | 5 | 15 | 30) => void }) {
   return (
     <div className="cr21-segmented" aria-label="Chart time window">
-      {[1, 5, 15, 30].map((minutes) => (
-        <button
-          key={minutes}
-          type="button"
-          aria-pressed={value === minutes}
-          onClick={() => onChange(minutes)}
-        >
-          {minutes}m
-        </button>
+      {([1, 5, 15, 30] as const).map((minutes) => (
+        <button key={minutes} type="button" aria-pressed={value === minutes} onClick={() => onChange(minutes)}>{minutes}m</button>
       ))}
     </div>
   );
 }
 
-function TelemetryChart({
-  history,
-  spec,
-  windowMinutes,
-  status,
-}: {
+function TelemetryChart({ history, spec, windowMinutes, status, capacity }: {
   history: Sample[];
   spec: ChartSpec;
   windowMinutes: number;
   status: "live" | "paused" | "disconnected";
+  capacity?: number | null;
 }) {
+  const { preferences } = useUiPreferences();
   const svgRef = useRef<SVGSVGElement>(null);
-  const [hoverIndex, setHoverIndex] = useState<number | null>(null);
-  const end = history.at(-1)?.at ?? 0;
-  const points = useMemo(
-    () =>
-      history.filter(
-        (point) => point.at >= end - windowMinutes * 60_000,
-      ),
-    [history, end, windowMinutes],
-  );
-  const samples = points.filter((point) => point[spec.field] !== null);
-  const values = samples.map((point) => point[spec.field] as number);
-  const current = values.at(-1) ?? null;
-  const minimum = values.length ? Math.min(...values) : null;
-  const maximum = values.length ? Math.max(...values) : null;
-  const average = values.length
-    ? values.reduce((sum, value) => sum + value, 0) / values.length
-    : null;
-  const p95 = percentile(values, 95);
-  const start = points.at(0)?.at ?? end;
-  const rawMin = minimum ?? 0;
-  const rawMax = maximum ?? 1;
-  const padding = Math.max(1, (rawMax - rawMin) * 0.12);
-  const lower = spec.domain?.[0] ?? Math.max(0, rawMin - padding);
-  const upper =
-    spec.domain?.[1] ??
-    Math.max(rawMax + padding, spec.reference?.value ?? 0, lower + 1);
-  const xFor = (at: number) =>
-    62 + ((at - start) / Math.max(1, end - start)) * 638;
-  const yFor = (value: number) =>
-    178 - ((value - lower) / Math.max(0.001, upper - lower)) * 142;
-  let path = "";
-  let gap = true;
-  for (const point of points) {
-    const value = point[spec.field];
-    if (value === null) {
-      gap = true;
-      continue;
-    }
-    path += `${gap ? "M" : "L"}${xFor(point.at).toFixed(1)},${yFor(value).toFixed(1)} `;
-    gap = false;
-  }
-  const hover = hoverIndex === null ? null : (points[hoverIndex] ?? null);
-  const hoverValue = hover?.[spec.field] ?? null;
+  const viewportRef = useRef<HTMLDivElement>(null);
+  const [inspectIndex, setInspectIndex] = useState<number | null>(null);
+  const [documentVisible, setDocumentVisible] = useState(true);
+  const [inViewport, setInViewport] = useState(true);
+  const points = useMemo(() => windowedPoints(history, windowMinutes), [history, windowMinutes]);
+  const series = useMemo<TimedValue[]>(() => points.map((point) => ({ at: point.at, value: sampleValue(point, spec.field) })), [points, spec.field]);
+  const values = series.map((point) => point.value).filter((value): value is number => value !== null);
+  const stats = seriesStats(series);
+  const [lower, upper] = resolveDomain(values, { fixed: spec.domain, percentage: spec.percentage, capacity, reference: spec.reference?.value });
+  const end = points.at(-1)?.at ?? history.at(-1)?.at ?? 0;
+  const start = points.at(0)?.at ?? Math.max(0, end - windowMinutes * 60_000);
+  const xFor = (at: number) => 62 + ((at - start) / Math.max(1, end - start)) * 638;
+  const yFor = (value: number) => 178 - ((value - lower) / Math.max(0.001, upper - lower)) * 142;
+  const paths = buildSvgPaths(gapSegments(series), xFor, yFor, 178);
+  const inspected = inspectIndex === null ? null : points[inspectIndex] ?? null;
+  const inspectedValue = inspected ? sampleValue(inspected, spec.field) : null;
   const ticks = [upper, lower + (upper - lower) / 2, lower];
+  const descriptionId = `chart-description-${spec.field}`;
+  const gradientId = `chart-gradient-${spec.field}`;
+  const liveTailActive = status === "live" && documentVisible && inViewport && preferences.livePulse;
+
+  useEffect(() => {
+    const updateVisibility = () => setDocumentVisible(!document.hidden);
+    document.addEventListener("visibilitychange", updateVisibility);
+    queueMicrotask(updateVisibility);
+    return () => document.removeEventListener("visibilitychange", updateVisibility);
+  }, []);
+
+  useEffect(() => {
+    if (!viewportRef.current || typeof IntersectionObserver === "undefined") return;
+    const observer = new IntersectionObserver((entries) => setInViewport(entries[0]?.isIntersecting ?? true), { rootMargin: "120px" });
+    observer.observe(viewportRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  const moveInspection = (direction: -1 | 1) => {
+    if (!series.length) return;
+    let index = inspectIndex ?? (direction < 0 ? series.length : -1);
+    for (let count = 0; count < series.length; count += 1) {
+      index += direction;
+      if (index < 0 || index >= series.length) break;
+      if (series[index].value !== null) {
+        setInspectIndex(index);
+        break;
+      }
+    }
+  };
+
+  const noDataTitle = !points.length
+    ? status === "disconnected" ? "No samples while disconnected" : "Waiting for first sample"
+    : "Metric unavailable in this telemetry window";
 
   return (
     <Panel
       title={spec.label}
       className="cr21-chart-card"
       aside={
-        <Badge
-          tone={status === "live" ? "green" : status === "paused" ? "amber" : "quiet"}
-        >
-          {status === "live"
-            ? "Live"
-            : status === "paused"
-              ? "View paused"
-              : "Disconnected"}
-        </Badge>
+        <div className="cr23-chart-state">
+          <span className="cr23-live-tail" data-active={liveTailActive || undefined}><i /> {status === "live" ? "Live tail" : status === "paused" ? "Paused" : "Offline"}</span>
+          <Badge tone={status === "live" ? "green" : status === "paused" ? "amber" : "quiet"}>{status === "live" ? "Live" : status === "paused" ? "View paused" : "Disconnected"}</Badge>
+        </div>
       }
     >
       <div className="cr21-chart-summary">
-        <div>
-          <span>Current</span>
-          <strong>
-            {current === null ? "Unavailable" : spec.format(current)}
-          </strong>
-        </div>
+        <div><span>Current</span><strong>{stats.current === null ? "Unavailable" : spec.format(stats.current)}</strong></div>
         <dl>
-          <div>
-            <dt>Min</dt>
-            <dd>{minimum === null ? "—" : spec.format(minimum)}</dd>
-          </div>
-          <div>
-            <dt>Avg</dt>
-            <dd>{average === null ? "—" : spec.format(average)}</dd>
-          </div>
-          <div>
-            <dt>Max</dt>
-            <dd>{maximum === null ? "—" : spec.format(maximum)}</dd>
-          </div>
-          <div>
-            <dt>P95</dt>
-            <dd>{p95 === null ? "—" : spec.format(p95)}</dd>
-          </div>
+          <div><dt>Min</dt><dd>{stats.minimum === null ? "—" : spec.format(stats.minimum)}</dd></div>
+          <div><dt>Avg</dt><dd>{stats.average === null ? "—" : spec.format(stats.average)}</dd></div>
+          <div><dt>Max</dt><dd>{stats.maximum === null ? "—" : spec.format(stats.maximum)}</dd></div>
+          <div><dt>P95</dt><dd>{stats.p95 === null ? "—" : spec.format(stats.p95)}</dd></div>
         </dl>
       </div>
-      {values.length ? (
-        <div className="cr21-chart-stage">
+      {stats.count ? (
+        <div className="cr21-chart-stage" ref={viewportRef}>
+          <p id={descriptionId} className="sr-only">
+            {spec.label} over the last {windowMinutes} minutes is {trendText(series)}. Latest value {stats.current === null ? "unavailable" : spec.format(stats.current)}. {stats.count} available samples; missing samples are rendered as gaps. Focus the chart and use the left and right arrow keys to inspect samples.
+          </p>
           <svg
             ref={svgRef}
-            className="cr21-chart"
+            className={`cr21-chart cr23-series-${spec.series}`}
             viewBox="0 0 720 210"
             role="img"
-            aria-label={`${spec.label}: current ${current === null ? "unavailable" : spec.format(current)}, minimum ${minimum === null ? "unavailable" : spec.format(minimum)}, average ${average === null ? "unavailable" : spec.format(average)}, maximum ${maximum === null ? "unavailable" : spec.format(maximum)}`}
-            onPointerLeave={() => setHoverIndex(null)}
+            tabIndex={0}
+            aria-describedby={descriptionId}
+            aria-label={`${spec.label}: current ${stats.current === null ? "unavailable" : spec.format(stats.current)}, minimum ${stats.minimum === null ? "unavailable" : spec.format(stats.minimum)}, average ${stats.average === null ? "unavailable" : spec.format(stats.average)}, maximum ${stats.maximum === null ? "unavailable" : spec.format(stats.maximum)}`}
+            onFocus={() => { if (inspectIndex === null) moveInspection(-1); }}
+            onKeyDown={(event) => {
+              if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+                event.preventDefault();
+                moveInspection(event.key === "ArrowLeft" ? -1 : 1);
+              }
+              if (event.key === "Escape") setInspectIndex(null);
+            }}
+            onPointerLeave={() => setInspectIndex(null)}
             onPointerMove={(event) => {
-              if (!points.length) return;
+              if (!series.length) return;
               const rect = svgRef.current?.getBoundingClientRect();
               if (!rect) return;
               const x = ((event.clientX - rect.left) / rect.width) * 720;
-              const ratioX = Math.max(
-                0,
-                Math.min(1, (x - 62) / 638),
-              );
-              const target = start + ratioX * Math.max(1, end - start);
-              let nearest = 0;
-              let distance = Number.POSITIVE_INFINITY;
-              points.forEach((point, index) => {
-                const nextDistance = Math.abs(point.at - target);
-                if (nextDistance < distance) {
-                  distance = nextDistance;
-                  nearest = index;
-                }
-              });
-              setHoverIndex(nearest);
+              const ratioX = Math.max(0, Math.min(1, (x - 62) / 638));
+              setInspectIndex(nearestValueIndex(series, start + ratioX * Math.max(1, end - start)));
             }}
           >
-            {[36, 107, 178].map((y) => (
-              <line
-                key={y}
-                x1="62"
-                x2="700"
-                y1={y}
-                y2={y}
-                className="cr21-gridline"
-              />
-            ))}
+            <defs>
+              <linearGradient id={gradientId} x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0%" stopColor="var(--cr23-series)" stopOpacity="0.22" />
+                <stop offset="100%" stopColor="var(--cr23-series)" stopOpacity="0" />
+              </linearGradient>
+            </defs>
+            {[36, 107, 178].map((y) => <line key={y} x1="62" x2="700" y1={y} y2={y} className="cr21-gridline" />)}
             {ticks.map((tick, index) => (
-              <text
-                key={index}
-                x="55"
-                y={[40, 111, 182][index]}
-                textAnchor="end"
-                className="cr21-axis-label"
-              >
-                {spec.field === "memory" || spec.field === "heap"
-                  ? bytes(tick)
-                  : tick.toFixed(tick >= 100 ? 0 : 1)}
+              <text key={index} x="55" y={[40, 111, 182][index]} textAnchor="end" className="cr21-axis-label">
+                {spec.field === "memory" || spec.field === "heap" ? bytes(tick) : tick.toFixed(tick >= 100 ? 0 : 1)}
               </text>
             ))}
-            {spec.reference &&
-              spec.reference.value >= lower &&
-              spec.reference.value <= upper && (
-                <>
-                  <line
-                    x1="62"
-                    x2="700"
-                    y1={yFor(spec.reference.value)}
-                    y2={yFor(spec.reference.value)}
-                    className="cr21-reference-line"
-                  />
-                  <text
-                    x="694"
-                    y={Math.max(15, yFor(spec.reference.value) - 5)}
-                    textAnchor="end"
-                    className="cr21-reference-label"
-                  >
-                    {spec.reference.label}
-                  </text>
-                </>
-              )}
-            <path d={path} className="cr21-trend" />
-            {hover && hoverValue !== null && (
+            {spec.reference && spec.reference.value >= lower && spec.reference.value <= upper && (
               <>
-                <line
-                  x1={xFor(hover.at)}
-                  x2={xFor(hover.at)}
-                  y1="26"
-                  y2="178"
-                  className="cr21-crosshair"
-                />
-                <circle
-                  cx={xFor(hover.at)}
-                  cy={yFor(hoverValue)}
-                  r="4"
-                  className="cr21-sample-dot"
-                />
+                <rect x="62" width="638" y={Math.max(30, yFor(spec.reference.value) - 4)} height="8" className="cr23-reference-band" />
+                <line x1="62" x2="700" y1={yFor(spec.reference.value)} y2={yFor(spec.reference.value)} className="cr21-reference-line" />
+                <text x="694" y={Math.max(15, yFor(spec.reference.value) - 7)} textAnchor="end" className="cr21-reference-label">{spec.reference.label}</text>
               </>
             )}
-            <text x="62" y="201" className="cr21-axis-label">
-              {new Date(start).toLocaleTimeString()}
-            </text>
-            <text
-              x="700"
-              y="201"
-              textAnchor="end"
-              className="cr21-axis-label"
-            >
-              {new Date(end).toLocaleTimeString()}
-            </text>
+            {preferences.chartStyle === "area" && paths.area && <path d={paths.area} fill={`url(#${gradientId})`} className="cr23-chart-area" />}
+            <path d={paths.line} className="cr21-trend" />
+            {inspected && inspectedValue !== null && (
+              <>
+                <line x1={xFor(inspected.at)} x2={xFor(inspected.at)} y1="26" y2="178" className="cr21-crosshair" />
+                <circle cx={xFor(inspected.at)} cy={yFor(inspectedValue)} r="4" className="cr21-sample-dot" />
+              </>
+            )}
+            <text x="62" y="201" className="cr21-axis-label">{displayTime(start, preferences.timeZone)}</text>
+            <text x="700" y="201" textAnchor="end" className="cr21-axis-label">{displayTime(end, preferences.timeZone)}</text>
           </svg>
-          {hover && hoverValue !== null && (
-            <div className="cr21-chart-tooltip">
-              <strong>{new Date(hover.at).toLocaleTimeString()}</strong>
+          {inspected && inspectedValue !== null && (
+            <div className="cr21-chart-tooltip" title={`UTC: ${new Date(inspected.at).toISOString()}`}>
+              <strong>{displayTime(inspected.at, preferences.timeZone)}</strong>
               <span>{spec.shortLabel}</span>
-              <b>{spec.format(hoverValue)}</b>
-              {hover.tps !== null && spec.field !== "tps" && (
-                <small>TPS {hover.tps.toFixed(2)}</small>
-              )}
-              {hover.mspt !== null && spec.field !== "mspt" && (
-                <small>MSPT {hover.mspt.toFixed(2)} ms</small>
-              )}
+              <b>{spec.format(inspectedValue)}</b>
+              <small>{sampleFreshnessText(inspected.at, end)}</small>
+              {inspected.tps !== null && spec.field !== "tps" && <small>TPS {inspected.tps.toFixed(2)}</small>}
+              {inspected.mspt !== null && spec.field !== "mspt" && <small>MSPT {inspected.mspt.toFixed(2)} ms</small>}
             </div>
           )}
         </div>
       ) : (
-        <Empty title="Waiting for first sample">
-          Keep this browser open to build rolling browser-local history.
+        <Empty title={noDataTitle}>
+          {points.length
+            ? "This metric is unsupported or absent in the received samples. Other telemetry remains available."
+            : status === "disconnected"
+              ? "Reconnect to resume authoritative live telemetry. Existing browser-local samples remain bounded."
+              : "Keep this browser open to build bounded browser-local history."}
         </Empty>
       )}
-      <div className="cr21-chart-caption">
-        <span>Browser-local rolling history</span>
-        <span>{points.length} samples</span>
-      </div>
+      <div className="cr21-chart-caption"><span>Browser-local rolling history · raw samples</span><span>{points.length} samples · {stats.count} values</span></div>
     </Panel>
+  );
+}
+
+function Sparkline({ history, field, label, value, detail, series }: {
+  history: Sample[];
+  field: HistoryField;
+  label: string;
+  value: string;
+  detail: string;
+  series: 1 | 2 | 3 | 4 | 5 | 6;
+}) {
+  const points = windowedPoints(history, 5);
+  const values: TimedValue[] = points.map((point) => ({ at: point.at, value: sampleValue(point, field) }));
+  const finite = values.map((point) => point.value).filter((entry): entry is number => entry !== null);
+  const [lower, upper] = resolveDomain(finite, { percentage: field === "hostCpu" || field === "processCpu", fixed: field === "tps" ? [0, 20] : undefined });
+  const start = points.at(0)?.at ?? 0;
+  const end = points.at(-1)?.at ?? start + 1;
+  const xFor = (at: number) => 4 + ((at - start) / Math.max(1, end - start)) * 192;
+  const yFor = (entry: number) => 46 - ((entry - lower) / Math.max(0.001, upper - lower)) * 40;
+  const paths = buildSvgPaths(gapSegments(values), xFor, yFor, 46);
+  return (
+    <div className={`cr21-metric-card cr23-spark-card cr23-series-${series}`}>
+      <span>{label}</span><strong>{value}</strong>
+      <svg viewBox="0 0 200 50" className="cr23-sparkline" role="img" aria-label={`${label} five-minute sparkline; ${finite.length} available samples, with missing data shown as gaps.`}><path d={paths.line} /></svg>
+      <small>{detail}</small>
+    </div>
   );
 }
 
 function HealthSummary({ props }: { props: ViewProps }) {
   const state = props.state;
   const host = state.ready?.agents.host ? state.hostSystem : state.system;
-  const tps = Array.isArray(state.server.tps)
-    ? number(state.server.tps[0])
-    : null;
+  const tps = Array.isArray(state.server.tps) ? number(state.server.tps[0]) : null;
   const mspt = number(state.server.averageTickMillis);
-  const memory = ratio(
-    host.physicalMemoryUsedBytes,
-    host.physicalMemoryTotalBytes,
-  );
+  const memory = ratio(host.physicalMemoryUsedBytes, host.physicalMemoryTotalBytes);
   const disk = number(host.diskUsedPercent);
   const enough = tps !== null && mspt !== null;
   const checks: { text: string; state: "ok" | "warn" | "bad" }[] = [];
-  if (tps !== null)
-    checks.push({
-      text: `TPS ${tps.toFixed(2)}`,
-      state: tps >= 19 ? "ok" : tps >= 18 ? "warn" : "bad",
-    });
-  if (mspt !== null)
-    checks.push({
-      text: `Tick time ${mspt.toFixed(2)} ms`,
-      state: mspt < 40 ? "ok" : mspt < 50 ? "warn" : "bad",
-    });
-  checks.push({
-    text: state.ready?.agents.paper
-      ? "Paper agent connected"
-      : "Paper agent disconnected",
-    state: state.ready?.agents.paper ? "ok" : "bad",
-  });
-  if (state.ready?.agents.hostInstalled)
-    checks.push({
-      text: state.ready?.agents.host
-        ? "Host companion connected"
-        : "Host companion disconnected",
-      state: state.ready?.agents.host ? "ok" : "warn",
-    });
-  if (memory !== null)
-    checks.push({
-      text: `Memory ${memory.toFixed(0)}% used`,
-      state: memory < 85 ? "ok" : memory < 95 ? "warn" : "bad",
-    });
-  if (disk !== null)
-    checks.push({
-      text: `Disk ${disk.toFixed(0)}% used`,
-      state: disk < 85 ? "ok" : disk < 95 ? "warn" : "bad",
-    });
-  const worst = checks.some((check) => check.state === "bad")
-    ? "bad"
-    : checks.some((check) => check.state === "warn")
-      ? "warn"
-      : "ok";
+  if (tps !== null) checks.push({ text: `TPS ${tps.toFixed(2)}`, state: tps >= 19 ? "ok" : tps >= 18 ? "warn" : "bad" });
+  if (mspt !== null) checks.push({ text: `Tick time ${mspt.toFixed(2)} ms`, state: mspt < 40 ? "ok" : mspt < 50 ? "warn" : "bad" });
+  checks.push({ text: state.ready?.agents.paper ? "Paper agent connected" : "Paper agent disconnected", state: state.ready?.agents.paper ? "ok" : "bad" });
+  if (state.ready?.agents.hostInstalled) checks.push({ text: state.ready?.agents.host ? "Host companion connected" : "Host companion disconnected", state: state.ready?.agents.host ? "ok" : "warn" });
+  if (memory !== null) checks.push({ text: `Memory ${memory.toFixed(0)}% used`, state: memory < 85 ? "ok" : memory < 95 ? "warn" : "bad" });
+  if (disk !== null) checks.push({ text: `Disk ${disk.toFixed(0)}% used`, state: disk < 85 ? "ok" : disk < 95 ? "warn" : "bad" });
+  const worst = checks.some((check) => check.state === "bad") ? "bad" : checks.some((check) => check.state === "warn") ? "warn" : "ok";
   return (
-    <Panel
-      title="Server health"
-      aside={
-        <Badge
-          tone={!enough ? "quiet" : worst === "ok" ? "green" : "amber"}
-        >
-          {!enough
-            ? "Unavailable"
-            : worst === "ok"
-              ? "Healthy"
-              : worst === "warn"
-                ? "Degraded"
-                : "Needs attention"}
-        </Badge>
-      }
-    >
-      {!enough ? (
-        <Empty title="Health unavailable">
-          Waiting for enough live telemetry to calculate a browser-side health
-          summary.
-        </Empty>
-      ) : (
+    <Panel title="Server health" aside={<Badge tone={!enough ? "quiet" : worst === "ok" ? "green" : "amber"}>{!enough ? "Unavailable" : worst === "ok" ? "Healthy" : worst === "warn" ? "Degraded" : "Needs attention"}</Badge>}>
+      {!enough ? <Empty title="Health unavailable">Waiting for enough live telemetry to calculate a browser-side health summary.</Empty> : (
         <div className="cr21-health-list">
-          {checks.map((check) => (
-            <div key={check.text} data-state={check.state}>
-              <span>
-                {check.state === "ok"
-                  ? "✓"
-                  : check.state === "warn"
-                    ? "!"
-                    : "×"}
-              </span>
-              {check.text}
-            </div>
-          ))}
+          {checks.map((check) => <div key={check.text} data-state={check.state}><span>{check.state === "ok" ? "✓" : check.state === "warn" ? "!" : "×"}</span>{check.text}</div>)}
         </div>
       )}
     </Panel>
@@ -491,362 +333,106 @@ function HealthSummary({ props }: { props: ViewProps }) {
 function WorldTable({ worlds }: { worlds: Record<string, unknown>[] }) {
   if (!worlds.length) return <Empty title="No world snapshot yet" />;
   return (
-    <div className="cr-table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>World</th>
-            <th>Chunks</th>
-            <th>Entities</th>
-            <th>Players</th>
-          </tr>
-        </thead>
-        <tbody>
-          {worlds.map((world) => (
-            <tr key={str(world.name)}>
-              <td>{str(world.name)}</td>
-              <td>{String(world.loadedChunks ?? "—")}</td>
-              <td>{String(world.entities ?? "—")}</td>
-              <td>{String(world.players ?? "—")}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <div className="cr-table-wrap"><table>
+      <thead><tr><th>World</th><th>Chunks</th><th>Entities</th><th>Players</th></tr></thead>
+      <tbody>{worlds.map((world) => <tr key={str(world.name)}><td>{str(world.name)}</td><td>{String(world.loadedChunks ?? "—")}</td><td>{String(world.entities ?? "—")}</td><td>{String(world.players ?? "—")}</td></tr>)}</tbody>
+    </table></div>
   );
 }
 
 export function OverviewView21(props: ViewProps) {
   const { state } = props;
   const host = state.ready?.agents.host ? state.hostSystem : state.system;
-  const tps = Array.isArray(state.server.tps) ? state.server.tps[0] : null;
-  const warnings = state.console
-    .filter((line) => line.level === "WARN" || line.level === "ERROR")
-    .slice(-5)
-    .reverse();
-  const metrics = [
-    ["TPS", metric(tps, "", 2), "1 minute average"],
-    [
-      "MSPT",
-      metric(state.server.averageTickMillis, " ms", 2),
-      "Average tick time",
-    ],
-    [
-      "Players",
-      number(state.server.onlinePlayers) === null
-        ? "—"
-        : `${state.server.onlinePlayers} / ${state.server.maximumPlayers ?? "—"}`,
-      "Current Paper session",
-    ],
-    ["Uptime", duration(state.system.processUptimeMillis), "Paper process"],
-    ["CPU", metric(host.hostCpuPercent, "%"), "Host utilization"],
-    [
-      "Memory",
-      bytes(host.physicalMemoryUsedBytes),
-      number(host.physicalMemoryAvailableBytes) === null
-        ? "Host memory availability unavailable"
-        : `${bytes(host.physicalMemoryAvailableBytes)} available`,
-    ],
-    [
-      "Disk",
-      bytes(host.diskUsedBytes),
-      number(host.diskUsableBytes) === null
-        ? "Host disk availability unavailable"
-        : `${bytes(host.diskUsableBytes)} available`,
-    ],
-    [
-      "JVM Heap",
-      bytes(state.system.jvmHeapUsedBytes),
-      number(state.system.jvmHeapMaximumBytes) === null
-        ? "JVM heap maximum unavailable"
-        : `${bytes(state.system.jvmHeapMaximumBytes)} maximum`,
-    ],
-  ];
+  const tps = Array.isArray(state.server.tps) ? number(state.server.tps[0]) : null;
+  const mspt = number(state.server.averageTickMillis);
+  const hostConnected = Boolean(state.ready?.agents.host);
+  const cpuField: HistoryField = hostConnected ? "hostCpu" : "processCpu";
+  const cpuValue = hostConnected ? host.hostCpuPercent : state.system.processCpuPercent;
+  const memoryField: HistoryField = hostConnected ? "memory" : "heap";
+  const memoryValue = hostConnected ? host.physicalMemoryUsedBytes : state.system.jvmHeapUsedBytes;
+  const warnings = state.console.filter((line) => line.level === "WARN" || line.level === "ERROR").slice(-5).reverse();
   return (
     <>
-      <div className="cr21-metric-grid">
-        {metrics.map(([label, value, detail]) => (
-          <div className="cr21-metric-card" key={label}>
-            <span>{label}</span>
-            <strong>{value}</strong>
-            <small>{detail}</small>
-          </div>
-        ))}
+      <div className="cr21-metric-grid cr23-overview-signals">
+        <Sparkline history={state.history} field="tps" label="TPS / MSPT health" value={tps === null ? "—" : tps.toFixed(2)} detail={mspt === null ? "MSPT unavailable" : `MSPT ${mspt.toFixed(2)} ms`} series={1} />
+        <Sparkline history={state.history} field={cpuField} label={hostConnected ? "Host CPU" : "Paper process CPU"} value={metric(cpuValue, "%", 1)} detail={hostConnected ? "Host utilization" : "Paper process utilization"} series={3} />
+        <Sparkline history={state.history} field={memoryField} label={hostConnected ? "Host memory" : "JVM heap"} value={bytes(memoryValue)} detail={hostConnected ? "Host memory used" : "JVM heap used"} series={5} />
+        <Sparkline history={state.history} field="players" label="Online players" value={number(state.server.onlinePlayers) === null ? "—" : String(state.server.onlinePlayers)} detail={`Maximum ${state.server.maximumPlayers ?? "—"}`} series={6} />
+      </div>
+      <div className="cr21-metric-grid compact cr23-supporting-signals">
+        <div className="cr21-metric-card"><span>Uptime</span><strong>{duration(state.system.processUptimeMillis)}</strong><small>Paper process</small></div>
+        <div className="cr21-metric-card"><span>Disk</span><strong>{bytes(host.diskUsedBytes)}</strong><small>{number(host.diskUsableBytes) === null ? "Availability unavailable" : `${bytes(host.diskUsableBytes)} available`}</small></div>
       </div>
       <div className="cr21-two-wide">
-        <TelemetryChart
-          history={state.history}
-          spec={CHARTS[0]}
-          windowMinutes={5}
-          status={props.connected ? "live" : "disconnected"}
-        />
         <HealthSummary props={props} />
-      </div>
-      <Panel title="Infrastructure status" className="cr21-status-panel">
-        <div className="cr21-status-strip">
-          <Agent
-            name="Paper agent"
-            online={Boolean(state.ready?.agents.paper)}
-            detail={
-              state.ready?.server.pluginVersion ?? "Waiting for identity"
-            }
-          />
-          <Agent
-            name="Host companion"
-            online={Boolean(state.ready?.agents.host)}
-            detail={
-              state.ready?.agents.hostInstalled
-                ? (state.ready.server.hostVersion ?? "Disconnected")
-                : "Not installed"
-            }
-          />
-          <div className="cr21-status-item">
-            <span className={`cr-dot ${props.connected ? "online" : ""}`} />
-            <div>
-              <strong>Relay</strong>
-              <small>Protocol 3</small>
-            </div>
-            <Badge tone={props.connected ? "green" : "quiet"}>
-              {props.connected ? "Live" : "Disconnected"}
-            </Badge>
+        <Panel title="Infrastructure status" className="cr21-status-panel">
+          <div className="cr21-status-strip">
+            <Agent name="Paper agent" online={Boolean(state.ready?.agents.paper)} detail={state.ready?.server.pluginVersion ?? "Waiting for identity"} />
+            <Agent name="Host companion" online={Boolean(state.ready?.agents.host)} detail={state.ready?.agents.hostInstalled ? (state.ready.server.hostVersion ?? "Disconnected") : "Not installed"} />
+            <div className="cr21-status-item"><span className={`cr-dot ${props.connected ? "online" : ""}`} /><div><strong>Relay</strong><small>Protocol 3</small></div><Badge tone={props.connected ? "green" : "quiet"}>{props.connected ? "Live" : "Disconnected"}</Badge></div>
           </div>
-        </div>
-      </Panel>
+        </Panel>
+      </div>
       <div className="cr21-two-wide">
-        <Panel title="World activity">
-          <WorldTable worlds={state.worlds} />
-        </Panel>
+        <Panel title="World activity"><WorldTable worlds={state.worlds} /></Panel>
         <Panel title="Recent warnings">
-          {warnings.length ? (
-            <div className="cr-events">
-              {warnings.map((line, index) => (
-                <div key={`${line.fingerprint}-${index}`}>
-                  <Badge tone={line.level === "ERROR" ? "amber" : "quiet"}>
-                    {str(line.level)}
-                  </Badge>
-                  <p>{str(line.content)}</p>
-                  <small>{time(line.capturedAt)}</small>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <Empty title="No warnings in this browser session">
-              Warnings appear here only when the authorized console stream
-              provides them.
-            </Empty>
-          )}
+          {warnings.length ? <div className="cr-events">{warnings.map((line, index) => <div key={`${line.fingerprint}-${index}`}><Badge tone={line.level === "ERROR" ? "amber" : "quiet"}>{str(line.level)}</Badge><p>{str(line.content)}</p><small>{time(line.capturedAt)}</small></div>)}</div> : <Empty title="No warnings in this browser session">Warnings appear here only when the authorized console stream provides them.</Empty>}
         </Panel>
       </div>
-      <div className="cr21-inline-actions">
-        <button
-          className="cr-button"
-          onClick={() =>
-            void navigator.clipboard
-              .writeText(diagnostics(state))
-              .then(() => props.notice("Safe diagnostics copied."))
-          }
-        >
-          Copy safe diagnostics
-        </button>
-      </div>
+      <div className="cr21-inline-actions"><button className="cr-button" onClick={() => void navigator.clipboard.writeText(diagnostics(state)).then(() => props.notice("Safe diagnostics copied."))}>Copy safe diagnostics</button></div>
     </>
   );
 }
 
-export function PerformanceView21({
-  props,
-  resetHistory,
-}: {
-  props: ViewProps;
-  resetHistory: () => void;
-}) {
-  const [windowMinutes, setWindowMinutes] = useState(() => {
-    if (typeof window === "undefined") return 5;
-    const stored = Number(
-      localStorage.getItem("plexonpanel-performance-window"),
-    );
-    return [1, 5, 15, 30].includes(stored) ? stored : 5;
-  });
+export function PerformanceView21({ props, resetHistory }: { props: ViewProps; resetHistory: () => void }) {
+  const { preferences, updatePreference } = useUiPreferences();
+  const windowMinutes = preferences.chartWindowMinutes;
   const [paused, setPaused] = useState(false);
-  const [frozenHistory, setFrozenHistory] = useState<Sample[]>(
-    props.state.history,
-  );
-
-  useEffect(() => {
-    localStorage.setItem(
-      "plexonpanel-performance-window",
-      String(windowMinutes),
-    );
-  }, [windowMinutes]);
-
+  const [frozenHistory, setFrozenHistory] = useState<Sample[]>(props.state.history);
   const history = paused ? frozenHistory : props.state.history;
-  const host = props.state.ready?.agents.host
-    ? props.state.hostSystem
-    : props.state.system;
-
+  const host = props.state.ready?.agents.host ? props.state.hostSystem : props.state.system;
   const togglePause = () => {
-    if (paused) {
-      setPaused(false);
-      return;
-    }
+    if (paused) { setPaused(false); return; }
     setFrozenHistory(props.state.history);
     setPaused(true);
   };
-
   const clearHistory = () => {
-    if (!window.confirm("Clear only this browser's rolling telemetry history?"))
-      return;
+    if (!window.confirm("Clear only this browser's rolling telemetry history?")) return;
     resetHistory();
     setFrozenHistory([]);
   };
+  const capacityFor = (field: HistoryField) => field === "memory" ? number(host.physicalMemoryTotalBytes) : field === "heap" ? number(props.state.system.jvmHeapMaximumBytes) : null;
 
   return (
     <>
       <div className="cr21-performance-toolbar">
-        <div>
-          <strong>Performance workspace</strong>
-          <span>
-            Browser-local rolling history ·{" "}
-            {props.connected ? "live telemetry connected" : "telemetry disconnected"}
-          </span>
-        </div>
-        <SegmentedWindow
-          value={windowMinutes}
-          onChange={setWindowMinutes}
-        />
-        <button className="cr-button" onClick={togglePause}>
-          {paused ? "Resume charts" : "Pause charts"}
-        </button>
-        <button
-          className="cr-button"
-          onClick={() =>
-            props.notice(
-              props.state.updatedAt
-                ? `Latest pushed sample: ${new Date(props.state.updatedAt).toLocaleTimeString()}.`
-                : "Waiting for the first telemetry sample.",
-            )
-          }
-        >
-          Refresh latest
-        </button>
-        <details className="cr21-menu">
-          <summary className="cr-button">Export / history</summary>
-          <div>
-            <button onClick={() => exportHistory(history, "csv")}>
-              Export CSV
-            </button>
-            <button onClick={() => exportHistory(history, "json")}>
-              Export JSON
-            </button>
-            <button onClick={clearHistory}>Reset local history</button>
-          </div>
-        </details>
-        <button
-          className="cr-button"
-          onClick={() =>
-            void navigator.clipboard
-              .writeText(diagnostics(props.state))
-              .then(() => props.notice("Safe diagnostics copied."))
-          }
-        >
-          Copy diagnostics
-        </button>
+        <div><strong>Performance workspace</strong><span>Browser-local rolling history · {props.connected ? "live telemetry connected" : "telemetry disconnected"}</span></div>
+        <SegmentedWindow value={windowMinutes} onChange={(value) => updatePreference("chartWindowMinutes", value)} />
+        <button className="cr-button" onClick={togglePause}>{paused ? "Resume charts" : "Pause charts"}</button>
+        <button className="cr-button" onClick={() => props.notice(props.state.updatedAt ? `Latest pushed sample: ${new Date(props.state.updatedAt).toLocaleTimeString()}.` : "Waiting for the first telemetry sample.")}>Refresh latest</button>
+        <details className="cr21-menu"><summary className="cr-button">Export / history</summary><div><button onClick={() => exportHistory(history, "csv")}>Export CSV</button><button onClick={() => exportHistory(history, "json")}>Export JSON</button><button onClick={clearHistory}>Reset local history</button></div></details>
+        <button className="cr-button" onClick={() => void navigator.clipboard.writeText(diagnostics(props.state)).then(() => props.notice("Safe diagnostics copied."))}>Copy diagnostics</button>
       </div>
-      {paused && (
-        <div className="cr21-state-banner">
-          Charts paused locally.{" "}
-          {props.connected
-            ? "WebSocket telemetry remains connected."
-            : "The dashboard is disconnected; the visible history remains frozen locally."}
-        </div>
-      )}
+      {paused && <div className="cr21-state-banner">Charts paused locally. {props.connected ? "WebSocket telemetry remains connected and new raw samples continue to arrive." : "The dashboard is disconnected; the visible history remains frozen locally."}</div>}
       <div className="cr21-chart-grid">
-        {CHARTS.map((spec) => (
-          <TelemetryChart
-            key={spec.field}
-            history={history}
-            spec={spec}
-            windowMinutes={windowMinutes}
-            status={
-              paused
-                ? "paused"
-                : props.connected
-                  ? "live"
-                  : "disconnected"
-            }
-          />
-        ))}
+        {CHARTS.map((spec) => <TelemetryChart key={spec.field} history={history} spec={spec} windowMinutes={windowMinutes} capacity={capacityFor(spec.field)} status={paused ? "paused" : props.connected ? "live" : "disconnected"} />)}
       </div>
       <Panel title="Tick statistics">
         <div className="cr21-metric-grid compact">
           {[
-            [
-              "Minimum",
-              metric(props.state.server.minimumSampleTickMillis, " ms"),
-              "Recent Paper tick sample",
-            ],
-            [
-              "Average",
-              metric(props.state.server.averageTickMillis, " ms"),
-              "Paper rolling tick time",
-            ],
-            [
-              "95th percentile",
-              metric(props.state.server.p95TickMillis, " ms"),
-              "Recent Paper tick sample",
-            ],
-            [
-              "Maximum",
-              metric(props.state.server.maximumSampleTickMillis, " ms"),
-              "Recent Paper tick sample",
-            ],
-            [
-              "Heap used",
-              bytes(props.state.system.jvmHeapUsedBytes),
-              `Committed ${bytes(props.state.system.jvmHeapCommittedBytes)}`,
-            ],
-            [
-              "GC pauses",
-              metric(props.state.system.gcPauseTotalMillis, " ms", 0),
-              `${props.state.system.gcCollections ?? "—"} collections since start`,
-            ],
-            [
-              "Disk used",
-              bytes(host.diskUsedBytes),
-              `${bytes(host.diskUsableBytes)} available`,
-            ],
-            [
-              "Process RSS",
-              bytes(props.state.system.processRssBytes),
-              `Swap ${bytes(props.state.system.swapUsedBytes)}`,
-            ],
-          ].map(([label, value, detail]) => (
-            <div className="cr21-metric-card" key={label}>
-              <span>{label}</span>
-              <strong>{value}</strong>
-              <small>{detail}</small>
-            </div>
-          ))}
+            ["Minimum", metric(props.state.server.minimumSampleTickMillis, " ms"), "Recent Paper tick sample"],
+            ["Average", metric(props.state.server.averageTickMillis, " ms"), "Paper rolling tick time"],
+            ["95th percentile", metric(props.state.server.p95TickMillis, " ms"), "Recent Paper tick sample"],
+            ["Maximum", metric(props.state.server.maximumSampleTickMillis, " ms"), "Recent Paper tick sample"],
+            ["Heap used", bytes(props.state.system.jvmHeapUsedBytes), `Committed ${bytes(props.state.system.jvmHeapCommittedBytes)}`],
+            ["GC pauses", metric(props.state.system.gcPauseTotalMillis, " ms", 0), `${props.state.system.gcCollections ?? "—"} collections since start`],
+            ["Disk used", bytes(host.diskUsedBytes), `${bytes(host.diskUsableBytes)} available`],
+            ["Process RSS", bytes(props.state.system.processRssBytes), `Swap ${bytes(props.state.system.swapUsedBytes)}`],
+          ].map(([label, value, detail]) => <div className="cr21-metric-card" key={label}><span>{label}</span><strong>{value}</strong><small>{detail}</small></div>)}
         </div>
       </Panel>
-      <Panel title="Load averages">
-        <div className="cr21-metric-grid compact">
-          {[1, 5, 15].map((minutes) => (
-            <div className="cr21-metric-card" key={minutes}>
-              <span>
-                {minutes} minute{minutes > 1 ? "s" : ""}
-              </span>
-              <strong>
-                {metric(host[`loadAverage${minutes}m`], "", 2)}
-              </strong>
-              <small>Runnable and uninterruptible tasks</small>
-            </div>
-          ))}
-        </div>
-      </Panel>
-      <Panel title="World statistics">
-        <WorldTable worlds={props.state.worlds} />
-      </Panel>
+      <Panel title="Load averages"><div className="cr21-metric-grid compact">{[1, 5, 15].map((minutes) => <div className="cr21-metric-card" key={minutes}><span>{minutes} minute{minutes > 1 ? "s" : ""}</span><strong>{metric(host[`loadAverage${minutes}m`], "", 2)}</strong><small>Runnable and uninterruptible tasks</small></div>)}</div></Panel>
+      <Panel title="World statistics"><WorldTable worlds={props.state.worlds} /></Panel>
     </>
   );
 }

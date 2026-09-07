@@ -2,6 +2,7 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import ts from "typescript";
 await mkdir(".test-dist/lib", { recursive: true });
 await mkdir(".test-dist/app", { recursive: true });
+await mkdir(".test-dist/components", { recursive: true });
 for (const file of [
   "lib/control-state.ts",
   "lib/scopes.ts",
@@ -9,7 +10,14 @@ for (const file of [
   "lib/browser-store.ts",
   "lib/lifecycle-state.ts",
   "lib/operation-messages.ts",
+  "lib/ui-preferences.ts",
+  "lib/avatar-provider.ts",
+  "lib/chart-geometry.ts",
+  "components/ui-preferences-provider.tsx",
+  "components/player-head.tsx",
   "app/control-views.tsx",
+  "app/management-views-legacy.tsx",
+  "app/players-view-2-3.tsx",
   "app/management-views-2-1.tsx",
   "app/advanced-views.tsx",
 ]) {
