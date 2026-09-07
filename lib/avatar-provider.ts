@@ -6,6 +6,9 @@ export type AvatarProvider = {
   hasSizePlaceholder: boolean;
 };
 
+export const DEFAULT_PLAYER_HEAD_URL_TEMPLATE =
+  "https://mc-heads.net/avatar/{uuid}/{size}";
+
 const UUID_DASHED = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const UUID_PLAIN = /^[0-9a-f]{32}$/i;
 const CONTROL = /[\u0000-\u001f\u007f]/;
@@ -18,6 +21,14 @@ function count(value: string, token: string): number {
 function loopback(hostname: string): boolean {
   const host = hostname.toLowerCase();
   return host === "localhost" || host === "127.0.0.1" || host === "::1";
+}
+
+export function resolveAvatarProviderTemplate(value: unknown): string | null {
+  if (typeof value !== "string" || !value.trim()) {
+    return DEFAULT_PLAYER_HEAD_URL_TEMPLATE;
+  }
+  const configured = value.trim();
+  return configured.toLowerCase() === "disabled" ? null : configured;
 }
 
 export function normalizePlayerUuid(value: unknown): string | null {

@@ -1,5 +1,8 @@
 import type { NextConfig } from "next";
-import { avatarCspOrigin } from "./lib/avatar-provider";
+import {
+  avatarCspOrigin,
+  resolveAvatarProviderTemplate,
+} from "./lib/avatar-provider";
 
 function relayConnectSources(): string {
   const sources = new Set(["'self'"]);
@@ -27,7 +30,9 @@ function relayConnectSources(): string {
 function imageSources(): string {
   const sources = new Set(["'self'", "data:"]);
   const origin = avatarCspOrigin(
-    process.env.NEXT_PUBLIC_PLEXON_PLAYER_HEAD_URL_TEMPLATE,
+    resolveAvatarProviderTemplate(
+      process.env.NEXT_PUBLIC_PLEXON_PLAYER_HEAD_URL_TEMPLATE,
+    ),
     process.env.NODE_ENV === "production",
   );
   if (origin) sources.add(origin);

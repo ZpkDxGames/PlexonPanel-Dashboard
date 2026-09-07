@@ -5,6 +5,7 @@ import {
   buildPlayerHeadUrl,
   createAvatarProvider,
   normalizePlayerUuid,
+  resolveAvatarProviderTemplate,
   type PlayerHeadSize,
 } from "../lib/avatar-provider";
 import { useUiPreferences } from "./ui-preferences-provider";
@@ -13,7 +14,7 @@ const MAX_ROSTER = 512;
 const urlMemo = new Map<string, string | null>();
 const failed = new Set<string>();
 const provider = createAvatarProvider(
-  process.env.NEXT_PUBLIC_PLEXON_PLAYER_HEAD_URL_TEMPLATE,
+  resolveAvatarProviderTemplate(process.env.NEXT_PUBLIC_PLEXON_PLAYER_HEAD_URL_TEMPLATE),
   { production: process.env.NODE_ENV === "production" },
 );
 

@@ -17,7 +17,10 @@ import {
   type ResolvedUiPresentation,
   type UiPreferencesV1,
 } from "../lib/ui-preferences";
-import { createAvatarProvider } from "../lib/avatar-provider";
+import {
+  createAvatarProvider,
+  resolveAvatarProviderTemplate,
+} from "../lib/avatar-provider";
 
 type UiPreferencesContextValue = {
   preferences: UiPreferencesV1;
@@ -77,9 +80,12 @@ function applyPresentation(
 
 export function UiPreferencesProvider({ children }: { children: ReactNode }) {
   const avatarProviderAvailable = Boolean(
-    createAvatarProvider(process.env.NEXT_PUBLIC_PLEXON_PLAYER_HEAD_URL_TEMPLATE, {
-      production: process.env.NODE_ENV === "production",
-    }),
+    createAvatarProvider(
+      resolveAvatarProviderTemplate(
+        process.env.NEXT_PUBLIC_PLEXON_PLAYER_HEAD_URL_TEMPLATE,
+      ),
+      { production: process.env.NODE_ENV === "production" },
+    ),
   );
   const [preferences, setPreferences] = useState<UiPreferencesV1>(() =>
     createDefaultUiPreferences(avatarProviderAvailable),
