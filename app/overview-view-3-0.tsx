@@ -1,7 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import { Badge, Empty, Panel, bytes, duration, metric, time, type ViewProps } from "./control-views";
 import { diagnostics, number, str, type Sample } from "../lib/control-state";
+import { ActivityHistoryModal } from "./activity-history-modal";
 
 type MetricField = "tps" | "mspt" | "hostCpu" | "processCpu" | "heap" | "memory" | "players";
 type Tone = "healthy" | "warning" | "critical" | "neutral";
@@ -104,6 +106,7 @@ function WorldActivity({ worlds }: { worlds: Record<string, unknown>[] }) {
 
 export function OverviewView30(props: ViewProps) {
   const { state } = props;
+  const [historyOpen, setHistoryOpen] = useState(false);
   const paper = Boolean(state.ready?.agents.paper);
   const hostConnected = Boolean(state.ready?.agents.host);
   const hostInstalled = Boolean(state.ready?.agents.hostInstalled);
@@ -138,7 +141,6 @@ export function OverviewView30(props: ViewProps) {
       detail: event.state === "LEFT" ? "Player presence ended" : "Player presence started",
       at: event.observedAt,
     }));
-  const activityHistoryHref = `/activity?serverId=${encodeURIComponent(state.serverId)}`;
 
   return (
     <div className="cr30-overview-stack">
@@ -247,9 +249,13 @@ export function OverviewView30(props: ViewProps) {
           aside={(
             <span className="cr30-activity-actions">
               <Badge>{activity.length} recent</Badge>
-              <a className="cr30-activity-history-link" href={activityHistoryHref}>
+              <button
+                type="button"
+                className="cr30-activity-history-link"
+                onClick={() => setHistoryOpen(true)}
+              >
                 View history
-              </a>
+              </button>
             </span>
           )}
         >
@@ -288,6 +294,12 @@ export function OverviewView30(props: ViewProps) {
         </button>
         <span>Paper and Host metrics remain separate authority domains.</span>
       </div>
+
+      <ActivityHistoryModal
+        serverId={state.serverId}
+        open={historyOpen}
+        onClose={() => setHistoryOpen(false)}
+      />
     </div>
   );
 }
