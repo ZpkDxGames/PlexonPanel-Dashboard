@@ -469,7 +469,10 @@ export default function Dashboard21() {
   const displayTimer = useRef<number | null>(null);
   const displayDirty = useRef(false);
   const displayRateRef = useRef(preferences.displayUpdateRateMs);
-  displayRateRef.current = preferences.displayUpdateRateMs;
+
+  useEffect(() => {
+    displayRateRef.current = preferences.displayUpdateRateMs;
+  }, [preferences.displayUpdateRateMs]);
 
   const flushDisplayedState = useCallback(() => {
     if (displayTimer.current !== null) {
