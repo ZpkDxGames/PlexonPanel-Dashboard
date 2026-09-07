@@ -100,9 +100,12 @@ export function PlayersView21(props: ViewProps) {
   const historyTabAvailable = historyScope && historyCapability;
 
   useEffect(() => {
-    setPresenceNow(Date.now());
-    const timer = window.setTimeout(() => setPresenceNow(Date.now()), 6500);
-    return () => window.clearTimeout(timer);
+    const refreshTimer = window.setTimeout(() => setPresenceNow(Date.now()), 0);
+    const settleTimer = window.setTimeout(() => setPresenceNow(Date.now()), 6500);
+    return () => {
+      window.clearTimeout(refreshTimer);
+      window.clearTimeout(settleTimer);
+    };
   }, [props.state.presenceEventIds.length]);
 
   const recentlyChanged = useMemo(() => {
