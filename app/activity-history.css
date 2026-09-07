@@ -1,0 +1,31 @@
+.cr30-activity-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.cr30-activity-history-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 28px;
+  padding: 0 9px;
+  border: 1px solid var(--cr21-border-soft, rgba(137, 197, 205, 0.16));
+  border-radius: var(--cr21-radius-control, 8px);
+  background: rgba(255, 255, 255, 0.025);
+  color: var(--cr21-text, #e8f6f7);
+  font-size: 0.72rem;
+  font-weight: 650;
+  text-decoration: none;
+  transition: border-color 120ms ease, background 120ms ease, color 120ms ease;
+}
+
+.cr30-activity-history-link:hover,
+.cr30-activity-history-link:focus-visible {
+  border-color: rgba(95, 219, 242, 0.45);
+  background: rgba(95, 219, 242, 0.06);
+  color: var(--cr21-accent, #72e5f5);
+  outline: none;
+}

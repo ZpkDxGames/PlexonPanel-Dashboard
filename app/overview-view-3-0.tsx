@@ -138,6 +138,7 @@ export function OverviewView30(props: ViewProps) {
       detail: event.state === "LEFT" ? "Player presence ended" : "Player presence started",
       at: event.observedAt,
     }));
+  const activityHistoryHref = `/activity?serverId=${encodeURIComponent(state.serverId)}`;
 
   return (
     <div className="cr30-overview-stack">
@@ -241,7 +242,17 @@ export function OverviewView30(props: ViewProps) {
           )}
         </Panel>
 
-        <Panel title="Recent activity" aside={<Badge>{activity.length} recent</Badge>}>
+        <Panel
+          title="Recent activity"
+          aside={(
+            <span className="cr30-activity-actions">
+              <Badge>{activity.length} recent</Badge>
+              <a className="cr30-activity-history-link" href={activityHistoryHref}>
+                View history
+              </a>
+            </span>
+          )}
+        >
           {activity.length ? (
             <div className="cr30-activity-list">
               {activity.map((item) => (
