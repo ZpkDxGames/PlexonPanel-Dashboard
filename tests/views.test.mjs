@@ -9,6 +9,7 @@ import {
   PluginsView,
   OverviewView,
 } from "../.test-dist/app/control-views.js";
+import { OverviewView30 } from "../.test-dist/app/overview-view-3-0.js";
 import {
   FilesView,
   BackupsView,
@@ -63,6 +64,12 @@ test("uploaded-looking log content and plugin names remain escaped text", () => 
     assert.ok(!html.includes("<script>alert(1)</script>"));
     assert.ok(!html.includes("<img src=x"));
   }
+});
+test("3.0 activity history opens in place instead of navigating away", () => {
+  const html = renderToStaticMarkup(React.createElement(OverviewView30, props));
+  assert.match(html, />View history<\/button>/);
+  assert.doesNotMatch(html, /\/activity\?serverId=/);
+  assert.match(html, /Player activity history/);
 });
 test("Players distinguishes missing scope, local policy and older agents", () => {
   const baseReady = {
