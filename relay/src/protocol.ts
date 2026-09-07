@@ -56,7 +56,35 @@ export function decodeEnvelope(text: string): DecodedEnvelope {
     throw new Error("Protocol body is not valid JSON");
   }
   if (!isRecord(body)) throw new Error("Protocol body must be an object");
-  return { envelope, body };
+  return { envelope, body: normalizeLegacyBody(envelope.type, body) };
+}
+
+/**
+ * PlexonPanel 3.0.1's Java Gson encoder omitted null-valued map entries.
+ * Protocol 3 presence JOIN/unknown-disconnect records define end time and
+ * duration as nullable fields, so normalize those two omissions back to null
+ * before the strict event validator runs. The signed envelope itself is never
+ * changed; signature verification still covers the exact received bytes.
+ */
+function normalizeLegacyBody(
+  type: string,
+  body: Record<string, unknown>,
+): Record<string, unknown> {
+  if (type !== "players.presence") return body;
+  if (
+    Object.prototype.hasOwnProperty.call(body, "sessionEndedAt") &&
+    Object.prototype.hasOwnProperty.call(body, "sessionDurationMillis")
+  )
+    return body;
+  return {
+    ...body,
+    ...(Object.prototype.hasOwnProperty.call(body, "sessionEndedAt")
+      ? {}
+      : { sessionEndedAt: null }),
+    ...(Object.prototype.hasOwnProperty.call(body, "sessionDurationMillis")
+      ? {}
+      : { sessionDurationMillis: null }),
+  };
 }
 
 export function assertFreshEnvelope(
