@@ -11,6 +11,7 @@ for (const file of [
   "lib/operation-messages.ts",
   "lib/ui-preferences.ts",
   "lib/avatar-provider.ts",
+  "lib/chart-geometry.ts",
   "app/control-views.tsx",
   "app/management-views-2-1.tsx",
   "app/advanced-views.tsx",
