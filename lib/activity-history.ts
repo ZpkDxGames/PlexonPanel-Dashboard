@@ -11,7 +11,9 @@ export interface PresenceHistoryEvent {
 
 const STORAGE_PREFIX = "plexonpanel.activity-history.v1:";
 const MAX_EVENTS = 5000;
+const MAX_SESSION_TRACKING = 32;
 const CHANGE_EVENT = "plexonpanel:activity-history-changed";
+const paperSessions = new Map<string, string>();
 
 function storage(): Storage | null {
   if (typeof window === "undefined") return null;
@@ -32,9 +34,27 @@ function boundedString(value: unknown, maximum: number): string | null {
     : null;
 }
 
+function object(value: unknown): Record<string, unknown> | null {
+  return value !== null && typeof value === "object" && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : null;
+}
+
+function rememberPaperSession(serverId: string, session: string | null): void {
+  if (!session) {
+    paperSessions.delete(serverId);
+    return;
+  }
+  if (!paperSessions.has(serverId) && paperSessions.size >= MAX_SESSION_TRACKING) {
+    const oldest = paperSessions.keys().next().value as string | undefined;
+    if (oldest) paperSessions.delete(oldest);
+  }
+  paperSessions.set(serverId, session);
+}
+
 function normalizeEvent(value: unknown): PresenceHistoryEvent | null {
-  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
-  const source = value as Record<string, unknown>;
+  const source = object(value);
+  if (!source) return null;
   const eventId = boundedString(source.eventId, 160);
   const uuid = boundedString(source.uuid, 64);
   const name = boundedString(source.name, 64);
@@ -138,6 +158,19 @@ export function listActivityHistoryServers(): string[] {
 export function capturePresenceHistoryMessage(
   message: Record<string, unknown>,
 ): void {
+  const serverId = boundedString(message.serverId, 128);
+  if (!serverId) return;
+
+  if (message.type === "dashboard.ready") {
+    if (message.protocolVersion !== 3) return;
+    const server = object(message.server);
+    rememberPaperSession(
+      serverId,
+      server ? boundedString(server.paperSession, 160) : null,
+    );
+    return;
+  }
+
   if (
     message.type !== "server.event" ||
     message.eventType !== "players.presence" ||
@@ -145,11 +178,16 @@ export function capturePresenceHistoryMessage(
   )
     return;
 
-  const serverId = boundedString(message.serverId, 128);
-  if (!serverId || !message.body || typeof message.body !== "object" || Array.isArray(message.body))
+  const expectedPaperSession = paperSessions.get(serverId);
+  if (
+    expectedPaperSession &&
+    boundedString(message.agentSession, 160) !== expectedPaperSession
+  )
     return;
 
-  const body = message.body as Record<string, unknown>;
+  const body = object(message.body);
+  if (!body) return;
+
   const event = normalizeEvent({
     eventId: body.eventId,
     uuid: body.uuid,
