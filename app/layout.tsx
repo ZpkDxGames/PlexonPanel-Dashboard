@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import "./globals.css";
 import "./control-room.css";
 import "./control-room-2-1.css";
@@ -23,10 +24,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        <script src="/ui-preferences-init.js" />
-      </head>
       <body>
+        <Script src="/ui-preferences-init.js" strategy="beforeInteractive" />
         <UiPreferencesProvider>{children}</UiPreferencesProvider>
       </body>
     </html>
