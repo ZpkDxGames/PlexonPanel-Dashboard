@@ -1,5 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { emptyControlState } from "../.test-dist/lib/control-state.js";
@@ -9,7 +10,6 @@ import {
   PluginsView,
   OverviewView,
 } from "../.test-dist/app/control-views.js";
-import { OverviewView30 } from "../.test-dist/app/overview-view-3-0.js";
 import {
   FilesView,
   BackupsView,
@@ -65,11 +65,15 @@ test("uploaded-looking log content and plugin names remain escaped text", () => 
     assert.ok(!html.includes("<img src=x"));
   }
 });
-test("3.0 activity history opens in place instead of navigating away", () => {
-  const html = renderToStaticMarkup(React.createElement(OverviewView30, props));
-  assert.match(html, />View history<\/button>/);
-  assert.doesNotMatch(html, /\/activity\?serverId=/);
-  assert.match(html, /Player activity history/);
+test("3.0 activity history opens in place instead of navigating away", async () => {
+  const source = await readFile(
+    new URL("../app/overview-view-3-0.tsx", import.meta.url),
+    "utf8",
+  );
+  assert.match(source, /setHistoryOpen\(true\)/);
+  assert.match(source, /<ActivityHistoryModal/);
+  assert.doesNotMatch(source, /\/activity\?serverId=/);
+  assert.doesNotMatch(source, /href=\{activityHistoryHref\}/);
 });
 test("Players distinguishes missing scope, local policy and older agents", () => {
   const baseReady = {
