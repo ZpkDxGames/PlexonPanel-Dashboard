@@ -7,6 +7,7 @@ import "./management-2-1.css";
 import "./visual-motion.css";
 import "./player-head.css";
 import "./player-workspace-2-3.css";
+import "./control-room-3-0.css";
 import { UiPreferencesProvider } from "../components/ui-preferences-provider";
 
 export const metadata: Metadata = {
