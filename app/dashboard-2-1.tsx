@@ -45,7 +45,8 @@ import {
   PluginsView21,
 } from "./management-views-2-1";
 import { AccessView21, AuditView21 } from "./infrastructure-views-2-1";
-import { OverviewView21, PerformanceView21 } from "./monitoring-views-2-1";
+import { PerformanceView21 } from "./monitoring-views-2-1";
+import { OverviewView30 } from "./overview-view-3-0";
 import { ServerView21 } from "./server-view-2-1";
 
 const SettingsView = dynamic(() =>
@@ -528,7 +529,7 @@ export default function Dashboard21() {
     unsaved.current = dirty;
   }, []);
   const leaveEditor = () =>
-    !unsaved.current || window.confirm("Discard unsaved file edits?");
+    !unsaved.current || window.confirm("Discard unsaved changes?");
   const navigate = (next: Section) => {
     if (next !== section && !leaveEditor()) return;
     setSection(next);
@@ -925,7 +926,7 @@ export default function Dashboard21() {
   let view: React.ReactNode;
   switch (section) {
     case "Overview":
-      view = <OverviewView21 {...props} />;
+      view = <OverviewView30 {...props} />;
       break;
     case "Performance":
       view = <PerformanceView21 props={props} resetHistory={resetHistory} />;
