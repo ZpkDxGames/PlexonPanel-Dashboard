@@ -9,6 +9,8 @@ for (const file of [
   "lib/browser-store.ts",
   "lib/lifecycle-state.ts",
   "lib/operation-messages.ts",
+  "lib/ui-preferences.ts",
+  "lib/avatar-provider.ts",
   "app/control-views.tsx",
   "app/management-views-2-1.tsx",
   "app/advanced-views.tsx",
