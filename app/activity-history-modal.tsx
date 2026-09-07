@@ -54,7 +54,6 @@ export function ActivityHistoryModal({
   const [stateFilter, setStateFilter] = useState<StateFilter>("ALL");
   const [sortOrder, setSortOrder] = useState<SortOrder>("NEWEST");
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -65,12 +64,7 @@ export function ActivityHistoryModal({
 
   useEffect(() => {
     if (!open || !serverId) return;
-    setLoading(true);
-    setVisibleCount(PAGE_SIZE);
-    const refresh = () => {
-      setEvents(loadActivityHistory(serverId));
-      setLoading(false);
-    };
+    const refresh = () => setEvents(loadActivityHistory(serverId));
     const timer = window.setTimeout(refresh, 0);
     const unsubscribe = subscribeActivityHistory(serverId, refresh);
     const focusTimer = window.setTimeout(() => searchRef.current?.focus(), 0);
@@ -80,10 +74,6 @@ export function ActivityHistoryModal({
       unsubscribe();
     };
   }, [open, serverId]);
-
-  useEffect(() => {
-    setVisibleCount(PAGE_SIZE);
-  }, [query, sortOrder, stateFilter]);
 
   const filtered = useMemo(() => {
     const needle = query.trim().toLowerCase();
@@ -101,17 +91,17 @@ export function ActivityHistoryModal({
     });
   }, [events, query, sortOrder, stateFilter]);
 
-  const visible = filtered.slice(0, visibleCount);
+  const visibleLength = Math.min(visibleCount, filtered.length);
   const groups = useMemo(() => {
     const result = new Map<string, PresenceHistoryEvent[]>();
-    for (const event of visible) {
+    for (const event of filtered.slice(0, visibleCount)) {
       const label = dayLabel(event.observedAt);
       const list = result.get(label) ?? [];
       list.push(event);
       result.set(label, list);
     }
     return [...result.entries()];
-  }, [visible]);
+  }, [filtered, visibleCount]);
 
   const joins = events.filter((event) => event.state === "JOINED").length;
   const leaves = events.filter((event) => event.state === "LEFT").length;
@@ -159,12 +149,18 @@ export function ActivityHistoryModal({
             placeholder="Search player name or UUID"
             aria-label="Search player activity"
             value={query}
-            onChange={(event) => setQuery(event.target.value)}
+            onChange={(event) => {
+              setQuery(event.target.value);
+              setVisibleCount(PAGE_SIZE);
+            }}
           />
           <select
             aria-label="Filter activity type"
             value={stateFilter}
-            onChange={(event) => setStateFilter(event.target.value as StateFilter)}
+            onChange={(event) => {
+              setStateFilter(event.target.value as StateFilter);
+              setVisibleCount(PAGE_SIZE);
+            }}
           >
             <option value="ALL">All activity</option>
             <option value="JOINED">Joins only</option>
@@ -173,7 +169,10 @@ export function ActivityHistoryModal({
           <select
             aria-label="Sort activity"
             value={sortOrder}
-            onChange={(event) => setSortOrder(event.target.value as SortOrder)}
+            onChange={(event) => {
+              setSortOrder(event.target.value as SortOrder);
+              setVisibleCount(PAGE_SIZE);
+            }}
           >
             <option value="NEWEST">Newest first</option>
             <option value="OLDEST">Oldest first</option>
@@ -197,9 +196,7 @@ export function ActivityHistoryModal({
         </section>
 
         <div className="cr30-activity-modal-scroll">
-          {loading ? (
-            <div className="cr30-activity-modal-empty">Loading browser history…</div>
-          ) : groups.length ? (
+          {groups.length ? (
             <section className="cr30-activity-modal-groups" aria-label="Stored player activity">
               {groups.map(([label, group]) => (
                 <article className="cr30-activity-modal-group" key={label}>
@@ -236,13 +233,13 @@ export function ActivityHistoryModal({
             </div>
           )}
 
-          {!loading && visible.length < filtered.length && (
+          {visibleLength < filtered.length && (
             <div className="cr30-activity-load-more">
               <button type="button" onClick={() => setVisibleCount((count) => count + PAGE_SIZE)}>
-                Load {Math.min(PAGE_SIZE, filtered.length - visible.length).toLocaleString()} more
+                Load {Math.min(PAGE_SIZE, filtered.length - visibleLength).toLocaleString()} more
               </button>
               <span>
-                Showing {visible.length.toLocaleString()} of {filtered.length.toLocaleString()} matching events
+                Showing {visibleLength.toLocaleString()} of {filtered.length.toLocaleString()} matching events
               </span>
             </div>
           )}
