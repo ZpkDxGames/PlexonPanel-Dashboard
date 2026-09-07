@@ -259,7 +259,7 @@ export function ServerView21(props: ViewProps) {
             ["Minecraft", props.state.ready?.server.minecraftVersion],
             ["Paper agent", props.state.ready?.server.pluginVersion],
             ["Host agent", props.state.ready?.server.hostVersion],
-            ["Dashboard", "2.2.0"],
+            ["Dashboard", "2.3.0"],
             ["Protocol", "3"],
           ].map(([label, value]) => (
             <div key={String(label)}>
