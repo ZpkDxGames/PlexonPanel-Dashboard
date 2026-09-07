@@ -312,7 +312,7 @@ export function safeCache(state: ControlState): ControlState {
 export function diagnostics(state: ControlState): string {
   const host = state.ready?.agents.host ? state.hostSystem : state.system;
   return [
-    `PlexonPanel Dashboard 2.2.0 / Protocol 3`,
+    `PlexonPanel Dashboard 3.0.0 / Protocol 3`,
     `Paper agent: ${state.ready?.server.pluginVersion ?? "unknown"}`,
     `Host agent: ${state.ready?.server.hostVersion ?? "not installed"}`,
     `Paper connected: ${Boolean(state.ready?.agents.paper)}`,
