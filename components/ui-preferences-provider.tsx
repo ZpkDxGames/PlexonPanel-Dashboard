@@ -22,10 +22,17 @@ import {
   resolveAvatarProviderTemplate,
 } from "../lib/avatar-provider";
 
+export type AvatarProviderStatus =
+  | "built-in"
+  | "custom"
+  | "disabled"
+  | "invalid";
+
 type UiPreferencesContextValue = {
   preferences: UiPreferencesV1;
   resolved: ResolvedUiPresentation;
   avatarProviderAvailable: boolean;
+  avatarProviderStatus: AvatarProviderStatus;
   updatePreference: <K extends keyof UiPreferencesV1>(
     key: K,
     value: UiPreferencesV1[K],
@@ -44,6 +51,7 @@ const UiPreferencesContext = createContext<UiPreferencesContextValue>({
   preferences: fallbackPreferences,
   resolved: fallbackResolved,
   avatarProviderAvailable: false,
+  avatarProviderStatus: "invalid",
   updatePreference: () => undefined,
   resetPreferences: () => undefined,
 });
@@ -78,15 +86,30 @@ function applyPresentation(
   root.dataset.plexonPageTransitions = preferences.pageTransitions ? "on" : "off";
 }
 
+function resolveProviderState() {
+  const configured = process.env.NEXT_PUBLIC_PLEXON_PLAYER_HEAD_URL_TEMPLATE;
+  const resolvedTemplate = resolveAvatarProviderTemplate(configured);
+  const provider = createAvatarProvider(resolvedTemplate, {
+    production: process.env.NODE_ENV === "production",
+  });
+  const trimmed = typeof configured === "string" ? configured.trim() : "";
+  const status: AvatarProviderStatus =
+    trimmed.toLowerCase() === "disabled"
+      ? "disabled"
+      : trimmed
+        ? provider
+          ? "custom"
+          : "invalid"
+        : provider
+          ? "built-in"
+          : "invalid";
+  return { available: Boolean(provider), status };
+}
+
 export function UiPreferencesProvider({ children }: { children: ReactNode }) {
-  const avatarProviderAvailable = Boolean(
-    createAvatarProvider(
-      resolveAvatarProviderTemplate(
-        process.env.NEXT_PUBLIC_PLEXON_PLAYER_HEAD_URL_TEMPLATE,
-      ),
-      { production: process.env.NODE_ENV === "production" },
-    ),
-  );
+  const providerState = resolveProviderState();
+  const avatarProviderAvailable = providerState.available;
+  const avatarProviderStatus = providerState.status;
   const [preferences, setPreferences] = useState<UiPreferencesV1>(() =>
     createDefaultUiPreferences(avatarProviderAvailable),
   );
@@ -139,6 +162,7 @@ export function UiPreferencesProvider({ children }: { children: ReactNode }) {
       preferences,
       resolved,
       avatarProviderAvailable,
+      avatarProviderStatus,
       updatePreference(key, nextValue) {
         setPreferences((current) => {
           const next = { ...current, [key]: nextValue } as UiPreferencesV1;
@@ -158,7 +182,12 @@ export function UiPreferencesProvider({ children }: { children: ReactNode }) {
         applyPresentation(next, presentation);
       },
     }),
-    [avatarProviderAvailable, preferences, resolved],
+    [
+      avatarProviderAvailable,
+      avatarProviderStatus,
+      preferences,
+      resolved,
+    ],
   );
 
   return (
