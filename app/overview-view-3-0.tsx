@@ -107,25 +107,27 @@ export function OverviewView30(props: ViewProps) {
   const paper = Boolean(state.ready?.agents.paper);
   const hostConnected = Boolean(state.ready?.agents.host);
   const hostInstalled = Boolean(state.ready?.agents.hostInstalled);
-  const host = hostConnected ? state.hostSystem : state.system;
+  const host = state.hostSystem;
   const tps = Array.isArray(state.server.tps) ? number(state.server.tps[0]) : null;
   const mspt = number(state.server.averageTickMillis);
-  const cpuField: MetricField = hostConnected ? "hostCpu" : "processCpu";
-  const cpuValue = number(hostConnected ? host.hostCpuPercent : state.system.processCpuPercent);
-  const memoryField: MetricField = hostConnected ? "memory" : "heap";
-  const memoryValue = number(hostConnected ? host.physicalMemoryUsedBytes : state.system.jvmHeapUsedBytes);
-  const memoryMax = number(hostConnected ? host.physicalMemoryTotalBytes : state.system.jvmHeapMaximumBytes) ?? undefined;
+  const paperCpu = paper ? number(state.system.processCpuPercent) : null;
+  const paperHeap = paper ? number(state.system.jvmHeapUsedBytes) : null;
+  const paperHeapMax = paper ? number(state.system.jvmHeapMaximumBytes) ?? undefined : undefined;
+  const hostCpu = hostConnected ? number(host.hostCpuPercent) : null;
+  const hostMemory = hostConnected ? number(host.physicalMemoryUsedBytes) : null;
+  const hostMemoryMax = hostConnected ? number(host.physicalMemoryTotalBytes) ?? undefined : undefined;
   const players = number(state.server.onlinePlayers);
   const playerMax = number(state.server.maximumPlayers) ?? undefined;
-  const overall = !props.connected ? "Offline" : paper ? "Live" : "Degraded";
-  const overallTone = !props.connected ? "amber" : paper ? "green" : "amber";
+  const overall = !props.connected ? "Offline" : paper || hostConnected ? paper && (!hostInstalled || hostConnected) ? "Live" : "Degraded" : "Degraded";
+  const overallTone = overall === "Live" ? "green" : "amber";
 
   const warnings: { title: string; detail: string; tone: Tone }[] = [];
   if (!paper) warnings.push({ title: "Paper agent offline", detail: "Paper-authoritative telemetry and player operations are unavailable.", tone: "critical" });
-  if (hostInstalled && !hostConnected) warnings.push({ title: "Host companion offline", detail: "Host-authoritative lifecycle and host telemetry may be unavailable.", tone: "warning" });
+  if (hostInstalled && !hostConnected) warnings.push({ title: "Host companion offline", detail: "Host-authoritative lifecycle and machine telemetry are unavailable.", tone: "warning" });
   if (tps !== null && tps < 18) warnings.push({ title: "TPS degraded", detail: `Current TPS is ${tps.toFixed(2)}.`, tone: tps < 15 ? "critical" : "warning" });
   if (mspt !== null && mspt > 50) warnings.push({ title: "Tick budget exceeded", detail: `Current average MSPT is ${mspt.toFixed(2)} ms.`, tone: mspt > 80 ? "critical" : "warning" });
-  if (cpuValue !== null && cpuValue >= 90) warnings.push({ title: "CPU pressure", detail: `${hostConnected ? "Host" : "Paper process"} CPU is ${cpuValue.toFixed(1)}%.`, tone: "warning" });
+  if (hostCpu !== null && hostCpu >= 90) warnings.push({ title: "Host CPU pressure", detail: `Machine CPU is ${hostCpu.toFixed(1)}%.`, tone: "warning" });
+  if (paperCpu !== null && paperCpu >= 90) warnings.push({ title: "Paper process CPU pressure", detail: `Paper process CPU is ${paperCpu.toFixed(1)}%.`, tone: "warning" });
 
   const activity = state.presenceDeltas
     .slice(-8)
@@ -141,26 +143,26 @@ export function OverviewView30(props: ViewProps) {
     <div className="cr30-overview-stack">
       <section className="cr30-status-strip" aria-label="Server status summary">
         <div className="cr30-status-primary">
-          <span className={`cr-dot ${props.connected && paper ? "online" : ""}`} />
+          <span className={`cr-dot ${props.connected && (paper || hostConnected) ? "online" : ""}`} />
           <div>
             <small>Overall</small>
             <strong>{overall}</strong>
           </div>
-          <Badge tone={overallTone}>{props.connected ? "Connected" : "Disconnected"}</Badge>
+          <Badge tone={overallTone}>{props.connected ? "Relay connected" : "Disconnected"}</Badge>
         </div>
         <div><small>Paper</small><strong>{paper ? "Live" : "Offline"}</strong></div>
         <div><small>Host</small><strong>{hostConnected ? "Live" : hostInstalled ? "Offline" : "Not installed"}</strong></div>
         <div><small>Minecraft</small><strong>{state.ready?.server.minecraftVersion ?? "—"}</strong></div>
-        <div><small>Uptime</small><strong>{duration(state.system.processUptimeMillis)}</strong></div>
+        <div><small>Paper uptime</small><strong>{duration(state.system.processUptimeMillis)}</strong></div>
         <div><small>Players</small><strong>{players === null ? "—" : `${players}${playerMax ? ` / ${playerMax}` : ""}`}</strong></div>
-        <div><small>Last update</small><strong>{state.updatedAt ? new Date(state.updatedAt).toLocaleTimeString() : "Waiting"}</strong></div>
+        <div><small>Telemetry</small><strong>{state.telemetryUpdatedAt ? new Date(state.telemetryUpdatedAt).toLocaleTimeString() : "Waiting"}</strong></div>
       </section>
 
       <section className="cr30-primary-signals" aria-label="Primary server signals">
         <MetricSignal
           label="TPS"
           value={tps === null ? "—" : tps.toFixed(2)}
-          detail="20 target"
+          detail="Paper · 20 target"
           history={state.history}
           field="tps"
           maximum={20}
@@ -169,38 +171,57 @@ export function OverviewView30(props: ViewProps) {
         <MetricSignal
           label="MSPT"
           value={mspt === null ? "—" : `${mspt.toFixed(2)} ms`}
-          detail="50 ms tick budget"
+          detail="Paper · 50 ms tick budget"
           history={state.history}
           field="mspt"
           maximum={Math.max(55, mspt ?? 0)}
           tone={mspt === null ? "neutral" : mspt > 80 ? "critical" : mspt > 50 ? "warning" : "healthy"}
         />
         <MetricSignal
-          label={hostConnected ? "Host CPU" : "Paper CPU"}
-          value={cpuValue === null ? "—" : `${cpuValue.toFixed(1)}%`}
-          detail={hostConnected ? "Host utilization" : "Process utilization"}
+          label="Paper process CPU"
+          value={paperCpu === null ? "—" : `${paperCpu.toFixed(1)}%`}
+          detail="Paper JVM process"
           history={state.history}
-          field={cpuField}
+          field="processCpu"
           maximum={100}
-          tone={cpuValue === null ? "neutral" : cpuValue >= 95 ? "critical" : cpuValue >= 85 ? "warning" : "healthy"}
+          tone={paperCpu === null ? "neutral" : paperCpu >= 95 ? "critical" : paperCpu >= 85 ? "warning" : "healthy"}
         />
         <MetricSignal
-          label={hostConnected ? "Host memory" : "JVM heap"}
-          value={bytes(memoryValue)}
-          detail={memoryMax ? `${bytes(memoryMax)} capacity` : "Capacity unavailable"}
+          label="JVM heap"
+          value={bytes(paperHeap)}
+          detail={paperHeapMax ? `${bytes(paperHeapMax)} capacity` : "Paper JVM"}
           history={state.history}
-          field={memoryField}
-          maximum={memoryMax}
-          tone="neutral"
+          field="heap"
+          maximum={paperHeapMax}
         />
+        {hostConnected && (
+          <MetricSignal
+            label="Host CPU"
+            value={hostCpu === null ? "—" : `${hostCpu.toFixed(1)}%`}
+            detail="Machine-wide Linux CPU"
+            history={state.history}
+            field="hostCpu"
+            maximum={100}
+            tone={hostCpu === null ? "neutral" : hostCpu >= 95 ? "critical" : hostCpu >= 85 ? "warning" : "healthy"}
+          />
+        )}
+        {hostConnected && (
+          <MetricSignal
+            label="Host memory"
+            value={bytes(hostMemory)}
+            detail={hostMemoryMax ? `${bytes(hostMemoryMax)} machine capacity` : "Host machine memory"}
+            history={state.history}
+            field="memory"
+            maximum={hostMemoryMax}
+          />
+        )}
         <MetricSignal
           label="Players"
           value={players === null ? "—" : String(players)}
-          detail={playerMax ? `${playerMax} slots` : "Maximum unavailable"}
+          detail={playerMax ? `${playerMax} slots` : "Paper player count"}
           history={state.history}
           field="players"
           maximum={playerMax}
-          tone="neutral"
         />
       </section>
 
@@ -233,7 +254,7 @@ export function OverviewView30(props: ViewProps) {
             </div>
           ) : (
             <Empty title="No recent presence activity">
-              Player joins and leaves appear here when Paper supplies authorized presence events.
+              Player joins and leaves appear here immediately when Paper supplies authorized presence events.
             </Empty>
           )}
         </Panel>
@@ -254,7 +275,7 @@ export function OverviewView30(props: ViewProps) {
         >
           Copy safe diagnostics
         </button>
-        <span>{metric(state.system.processCpuPercent, "%", 1)} Paper process CPU · {bytes(state.system.jvmHeapUsedBytes)} JVM heap</span>
+        <span>Paper and Host metrics remain separate authority domains.</span>
       </div>
     </div>
   );

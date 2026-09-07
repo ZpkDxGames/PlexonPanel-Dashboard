@@ -1,7 +1,8 @@
 "use client";
 
 import { Badge, Panel, type ViewProps } from "./control-views";
-import { diagnostics } from "../lib/control-state";
+import { diagnostics, number } from "../lib/control-state";
+import { displayRateLabel } from "../lib/display-cadence";
 import { useUiPreferences } from "../components/ui-preferences-provider";
 
 function SelectField<T extends string | number>({
@@ -75,9 +76,17 @@ export function SettingsView21(props: ViewProps & { reconnect: () => void }) {
     preferences,
     resolved,
     avatarProviderAvailable,
+    avatarProviderStatus,
     updatePreference,
     resetPreferences,
   } = useUiPreferences();
+  const hostSourceInterval = number(props.state.hostSystem.sourceIntervalMillis);
+  const providerLabel = {
+    "built-in": "Built-in provider",
+    custom: "Custom deployment provider",
+    disabled: "Disabled by deployment",
+    invalid: "Invalid provider configuration",
+  }[avatarProviderStatus];
 
   return (
     <div className="cr30-settings-stack">
@@ -231,8 +240,8 @@ export function SettingsView21(props: ViewProps & { reconnect: () => void }) {
               onChange={(value) => updatePreference("playerHeads", value)}
               hint={
                 avatarProviderAvailable
-                  ? "Remote heads are optional and never block the roster."
-                  : "Unavailable because no valid deployment avatar provider is configured."
+                  ? `${providerLabel}. Remote heads are optional and never block the roster.`
+                  : `${providerLabel}. The deterministic local fallback remains available.`
               }
             />
             <SelectField
@@ -283,13 +292,15 @@ export function SettingsView21(props: ViewProps & { reconnect: () => void }) {
                 { value: 2000, label: "Low activity · 2 seconds" },
               ]}
               onChange={(value) => updatePreference("displayUpdateRateMs", value)}
-              hint="Controls how frequently incoming data is committed to the visible interface. It does not make Paper or Host produce telemetry faster than their configured source intervals."
+              hint="Controls how often accepted live telemetry is painted to this browser. Paper and Host publish fast source telemetry where supported; critical connection, authorization, lifecycle and action state is always applied immediately."
             />
-            <p className="cr30-setting-note">
-              The WebSocket remains connected and validates every authorized message.
-              Critical connection, authorization, lifecycle and action states are never
-              intentionally delayed by this preference.
-            </p>
+            <div className="cr30-setting-note">
+              {ready?.agents.host && hostSourceInterval !== null && (
+                <span>Host metrics source: ~{hostSourceInterval} ms</span>
+              )}
+              {ready?.agents.paper && <span>Paper health source: agent-configured</span>}
+              <span>Browser display: {displayRateLabel(preferences.displayUpdateRateMs)}</span>
+            </div>
           </section>
         </div>
 
@@ -299,7 +310,7 @@ export function SettingsView21(props: ViewProps & { reconnect: () => void }) {
           </button>
           <span className="cr-hint">
             This changes presentation only. It does not forget credentials,
-            revoke this device or clear server data.
+            revoke this device, change Paper/Host policy or clear server data.
           </span>
         </div>
       </Panel>
@@ -355,11 +366,11 @@ export function SettingsView21(props: ViewProps & { reconnect: () => void }) {
 
         <Panel title="About">
           <dl className="cr-details cr-pad">
-            <div><dt>Dashboard</dt><dd>PlexonPanel Dashboard 3.0.0</dd></div>
+            <div><dt>Dashboard</dt><dd>PlexonPanel Dashboard 3.0.1</dd></div>
             <div><dt>Wire protocol</dt><dd>3</dd></div>
             <div><dt>Paper agent</dt><dd>{ready?.server.pluginVersion ?? "Unavailable"}</dd></div>
             <div><dt>Host companion</dt><dd>{ready?.server.hostVersion ?? "Unavailable"}</dd></div>
-            <div><dt>Avatar provider</dt><dd>{avatarProviderAvailable ? "Deployment configured" : "Disabled / unavailable"}</dd></div>
+            <div><dt>Avatar provider</dt><dd>{providerLabel}</dd></div>
           </dl>
         </Panel>
       </div>

@@ -61,8 +61,13 @@ export interface ControlState {
   history: Sample[];
   backupProgress: JsonMap | null;
   updatedAt: number;
+  telemetryUpdatedAt: number;
   cached: boolean;
 }
+
+export const CONTROL_HISTORY_RETENTION_MS = 35 * 60_000;
+export const CONTROL_HISTORY_MAX_POINTS = 8192;
+
 export function emptyControlState(serverId: string): ControlState {
   return {
     serverId,
@@ -81,6 +86,7 @@ export function emptyControlState(serverId: string): ControlState {
     history: [],
     backupProgress: null,
     updatedAt: 0,
+    telemetryUpdatedAt: 0,
     cached: false,
   };
 }
@@ -106,6 +112,12 @@ export function number(value: unknown): number | null {
 export function str(value: unknown, fallback = "—"): string {
   return typeof value === "string" ? value : fallback;
 }
+export function capturedAtMillis(value: unknown): number | null {
+  if (typeof value !== "string" || !value) return null;
+  const parsed = Date.parse(value);
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : null;
+}
+
 export function applyControlMessage(
   state: ControlState,
   message: JsonMap,
@@ -150,7 +162,8 @@ export function applyControlMessage(
     agentSession !== state.ready.server.paperSession
   )
     return state;
-  let next = { ...state, updatedAt: Date.now(), cached: false };
+  const receivedAt = Date.now();
+  let next = { ...state, updatedAt: receivedAt, cached: false };
   switch (message.eventType) {
     case "telemetry.server":
       next.server = body;
@@ -263,9 +276,12 @@ export function applyControlMessage(
     default:
       return state;
   }
-  if (String(message.eventType).startsWith("telemetry.")) {
-    const at = Math.floor(Date.now() / 5000) * 5000,
-      host = next.ready?.agents.host ? next.hostSystem : next.system,
+  if (
+    message.eventType === "telemetry.server" ||
+    message.eventType === "telemetry.system"
+  ) {
+    const at = capturedAtMillis(body.capturedAt) ?? receivedAt,
+      host = next.ready?.agents.host ? next.hostSystem : {},
       paper = next.ready?.agents.paper ? next.system : {},
       server = next.ready?.agents.paper ? next.server : {},
       tps = Array.isArray(server.tps) ? number(server.tps[0]) : null;
@@ -282,12 +298,8 @@ export function applyControlMessage(
     };
     next = {
       ...next,
-      history: [
-        ...next.history.filter(
-          (p) => p.at !== at && p.at >= Date.now() - 1800000,
-        ),
-        sample,
-      ].slice(-361),
+      telemetryUpdatedAt: receivedAt,
+      history: appendHistory(next.history, sample),
     };
   }
   return next;
@@ -305,25 +317,42 @@ export function safeCache(state: ControlState): ControlState {
     backupProgress: null,
     console: records(state.console, 600).slice(-200),
     chat: records(state.chat, 200).slice(-100),
-    history: Array.isArray(state.history) ? state.history.slice(-361) : [],
+    history: Array.isArray(state.history)
+      ? state.history.slice(-CONTROL_HISTORY_MAX_POINTS)
+      : [],
     cached: true,
   };
 }
 export function diagnostics(state: ControlState): string {
-  const host = state.ready?.agents.host ? state.hostSystem : state.system;
+  const host = state.ready?.agents.host ? state.hostSystem : {},
+    paper = state.ready?.agents.paper ? state.system : {},
+    hostCpu = number(host.hostCpuPercent),
+    paperCpu = number(paper.processCpuPercent);
   return [
-    `PlexonPanel Dashboard 3.0.0 / Protocol 3`,
+    `PlexonPanel Dashboard 3.0.1 / Protocol 3`,
     `Paper agent: ${state.ready?.server.pluginVersion ?? "unknown"}`,
     `Host agent: ${state.ready?.server.hostVersion ?? "not installed"}`,
     `Paper connected: ${Boolean(state.ready?.agents.paper)}`,
     `Host connected: ${Boolean(state.ready?.agents.host)}`,
-    `Java: ${str(state.system.javaVersion)}`,
-    `OS / architecture: ${str(host.operatingSystem)} / ${str(host.architecture)}`,
+    `Java: ${str(paper.javaVersion)}`,
+    `OS / architecture: ${str(host.operatingSystem, str(paper.operatingSystem))} / ${str(host.architecture, str(paper.architecture))}`,
     `TPS: ${Array.isArray(state.server.tps) ? state.server.tps.join(" / ") : "unavailable"}`,
     `MSPT: ${number(state.server.averageTickMillis) ?? "unavailable"}`,
-    `Host CPU: ${number(host.hostCpuPercent) ?? "unavailable"}%`,
-    `JVM heap bytes: ${number(state.system.jvmHeapUsedBytes) ?? "unavailable"}`,
+    `Host CPU: ${hostCpu === null ? "unavailable" : `${hostCpu}%`}`,
+    `Paper process CPU: ${paperCpu === null ? "unavailable" : `${paperCpu}%`}`,
+    `JVM heap bytes: ${number(paper.jvmHeapUsedBytes) ?? "unavailable"}`,
   ].join("\n");
+}
+
+function appendHistory(history: Sample[], sample: Sample): Sample[] {
+  const latestAt = Math.max(sample.at, history.at(-1)?.at ?? sample.at);
+  const cutoff = latestAt - CONTROL_HISTORY_RETENTION_MS;
+  const retained = history.filter((point) => point.at >= cutoff);
+  const sameAt = retained.findIndex((point) => point.at === sample.at);
+  if (sameAt >= 0) retained[sameAt] = sample;
+  else retained.push(sample);
+  retained.sort((a, b) => a.at - b.at);
+  return retained.slice(-CONTROL_HISTORY_MAX_POINTS);
 }
 
 function applyPresence(players: JsonMap[], delta: JsonMap): JsonMap[] {
@@ -358,8 +387,10 @@ function instantAfter(value: string, boundary: string): boolean {
   const instant = instantParts(value),
     other = instantParts(boundary);
   if (!instant || !other) return false;
-  return instant.seconds > other.seconds ||
-    (instant.seconds === other.seconds && instant.fraction > other.fraction);
+  return (
+    instant.seconds > other.seconds ||
+    (instant.seconds === other.seconds && instant.fraction > other.fraction)
+  );
 }
 
 function instantParts(

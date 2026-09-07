@@ -13,24 +13,28 @@ import {
   time,
   type ViewProps,
 } from "./control-views";
-import { diagnostics, number, str, type Sample } from "../lib/control-state";
+import { diagnostics, number, str, type JsonMap, type Sample } from "../lib/control-state";
+import { displayRateLabel } from "../lib/display-cadence";
 import {
   buildSvgPaths,
   gapSegments,
   nearestValueIndex,
   resolveDomain,
   seriesStats,
+  thinSegment,
   windowedPoints,
   type TimedValue,
 } from "../lib/chart-geometry";
 import { useUiPreferences } from "../components/ui-preferences-provider";
 
 type HistoryField = keyof Omit<Sample, "at">;
+type ChartSource = "paper-health" | "paper-system" | "host-system";
 type ChartSpec = {
   field: HistoryField;
   label: string;
   shortLabel: string;
   format: (value: number) => string;
+  source: ChartSource;
   domain?: [number, number];
   percentage?: boolean;
   reference?: { value: number; label: string };
@@ -38,12 +42,12 @@ type ChartSpec = {
 };
 
 const CHARTS: ChartSpec[] = [
-  { field: "tps", label: "TPS", shortLabel: "TPS", format: (n) => n.toFixed(2), domain: [0, 20], reference: { value: 18, label: "18 degraded reference" }, series: 1 },
-  { field: "mspt", label: "MSPT", shortLabel: "MSPT", format: (n) => `${n.toFixed(2)} ms`, reference: { value: 50, label: "50 ms tick budget" }, series: 2 },
-  { field: "hostCpu", label: "Host CPU", shortLabel: "CPU", format: (n) => `${n.toFixed(1)}%`, percentage: true, series: 3 },
-  { field: "processCpu", label: "Paper process CPU", shortLabel: "Paper CPU", format: (n) => `${n.toFixed(1)}%`, percentage: true, series: 4 },
-  { field: "memory", label: "Host memory used", shortLabel: "Memory", format: (n) => bytes(n), series: 5 },
-  { field: "heap", label: "JVM heap used", shortLabel: "Heap", format: (n) => bytes(n), series: 6 },
+  { field: "tps", label: "TPS", shortLabel: "TPS", format: (n) => n.toFixed(2), source: "paper-health", domain: [0, 20], reference: { value: 18, label: "18 degraded reference" }, series: 1 },
+  { field: "mspt", label: "MSPT", shortLabel: "MSPT", format: (n) => `${n.toFixed(2)} ms`, source: "paper-health", reference: { value: 50, label: "50 ms tick budget" }, series: 2 },
+  { field: "hostCpu", label: "Host CPU", shortLabel: "Host CPU", format: (n) => `${n.toFixed(1)}%`, source: "host-system", percentage: true, series: 3 },
+  { field: "processCpu", label: "Paper process CPU", shortLabel: "Paper CPU", format: (n) => `${n.toFixed(1)}%`, source: "paper-system", percentage: true, series: 4 },
+  { field: "memory", label: "Host memory used", shortLabel: "Host memory", format: (n) => bytes(n), source: "host-system", series: 5 },
+  { field: "heap", label: "JVM heap used", shortLabel: "JVM heap", format: (n) => bytes(n), source: "paper-system", series: 6 },
 ];
 
 function sampleValue(sample: Sample, field: HistoryField): number | null {
@@ -63,6 +67,20 @@ function sampleFreshnessText(at: number, tailAt: number) {
   if (age < 1_000) return "latest sample";
   if (age < 60_000) return `${Math.floor(age / 1_000)}s before latest`;
   return `${Math.floor(age / 60_000)}m before latest`;
+}
+
+function sourceAgeText(capturedAt: number | null) {
+  if (capturedAt === null) return "Sample age unavailable";
+  const age = Math.max(0, Date.now() - capturedAt);
+  if (age < 1_000) return `Last sample ${(age / 1000).toFixed(1)}s ago`;
+  if (age < 60_000) return `Last sample ${(age / 1000).toFixed(age < 10_000 ? 1 : 0)}s ago`;
+  return `Last sample ${Math.floor(age / 60_000)}m ago`;
+}
+
+function capturedAt(recordValue: JsonMap) {
+  const raw = str(recordValue.capturedAt, "");
+  const parsed = raw ? Date.parse(raw) : Number.NaN;
+  return Number.isFinite(parsed) ? parsed : null;
 }
 
 function trendText(points: readonly TimedValue[]) {
@@ -110,12 +128,24 @@ function SegmentedWindow({ value, onChange }: { value: number; onChange: (value:
   );
 }
 
-function TelemetryChart({ history, spec, windowMinutes, status, capacity }: {
+function TelemetryChart({
+  history,
+  spec,
+  windowMinutes,
+  status,
+  capacity,
+  sourceLabel,
+  sourceIntervalMs,
+  sourceCapturedAt,
+}: {
   history: Sample[];
   spec: ChartSpec;
   windowMinutes: number;
   status: "live" | "paused" | "disconnected";
   capacity?: number | null;
+  sourceLabel: string;
+  sourceIntervalMs: number | null;
+  sourceCapturedAt: number | null;
 }) {
   const { preferences } = useUiPreferences();
   const svgRef = useRef<SVGSVGElement>(null);
@@ -132,13 +162,18 @@ function TelemetryChart({ history, spec, windowMinutes, status, capacity }: {
   const start = points.at(0)?.at ?? Math.max(0, end - windowMinutes * 60_000);
   const xFor = (at: number) => 62 + ((at - start) / Math.max(1, end - start)) * 638;
   const yFor = (value: number) => 178 - ((value - lower) / Math.max(0.001, upper - lower)) * 142;
-  const paths = buildSvgPaths(gapSegments(series), xFor, yFor, 178);
+  const renderSegments = useMemo(
+    () => gapSegments(series).map((segment) => thinSegment(segment, 800)),
+    [series],
+  );
+  const paths = buildSvgPaths(renderSegments, xFor, yFor, 178);
   const inspected = inspectIndex === null ? null : points[inspectIndex] ?? null;
   const inspectedValue = inspected ? sampleValue(inspected, spec.field) : null;
   const ticks = [upper, lower + (upper - lower) / 2, lower];
   const descriptionId = `chart-description-${spec.field}`;
   const gradientId = `chart-gradient-${spec.field}`;
   const liveTailActive = status === "live" && documentVisible && inViewport && preferences.livePulse;
+  const sourceCadence = sourceIntervalMs === null ? sourceLabel : `${sourceLabel} ~${sourceIntervalMs} ms`;
 
   useEffect(() => {
     const updateVisibility = () => setDocumentVisible(!document.hidden);
@@ -191,10 +226,14 @@ function TelemetryChart({ history, spec, windowMinutes, status, capacity }: {
           <div><dt>P95</dt><dd>{stats.p95 === null ? "—" : spec.format(stats.p95)}</dd></div>
         </dl>
       </div>
+      <div className="cr21-chart-caption">
+        <span>{sourceCadence} · Display {displayRateLabel(preferences.displayUpdateRateMs)}</span>
+        <span>{sourceAgeText(sourceCapturedAt)}</span>
+      </div>
       {stats.count ? (
         <div className="cr21-chart-stage" ref={viewportRef}>
           <p id={descriptionId} className="sr-only">
-            {spec.label} over the last {windowMinutes} minutes is {trendText(series)}. Latest value {stats.current === null ? "unavailable" : spec.format(stats.current)}. {stats.count} available samples; missing samples are rendered as gaps. Focus the chart and use the left and right arrow keys to inspect samples.
+            {spec.label} over the last {windowMinutes} minutes is {trendText(series)}. Latest value {stats.current === null ? "unavailable" : spec.format(stats.current)}. {stats.count} available source samples; missing samples are rendered as gaps. Focus the chart and use the left and right arrow keys to inspect samples.
           </p>
           <svg
             ref={svgRef}
@@ -268,11 +307,11 @@ function TelemetryChart({ history, spec, windowMinutes, status, capacity }: {
           {points.length
             ? "This metric is unsupported or absent in the received samples. Other telemetry remains available."
             : status === "disconnected"
-              ? "Reconnect to resume authoritative live telemetry. Existing browser-local samples remain bounded."
+              ? "Reconnect the owning agent to resume authoritative telemetry. Existing browser-local samples remain bounded."
               : "Keep this browser open to build bounded browser-local history."}
         </Empty>
       )}
-      <div className="cr21-chart-caption"><span>Browser-local rolling history · raw samples</span><span>{points.length} samples · {stats.count} values</span></div>
+      <div className="cr21-chart-caption"><span>Browser-local rolling history · source timestamps</span><span>{points.length} samples · {stats.count} values</span></div>
     </Panel>
   );
 }
@@ -293,7 +332,7 @@ function Sparkline({ history, field, label, value, detail, series }: {
   const end = points.at(-1)?.at ?? start + 1;
   const xFor = (at: number) => 4 + ((at - start) / Math.max(1, end - start)) * 192;
   const yFor = (entry: number) => 46 - ((entry - lower) / Math.max(0.001, upper - lower)) * 40;
-  const paths = buildSvgPaths(gapSegments(values), xFor, yFor, 46);
+  const paths = buildSvgPaths(gapSegments(values).map((segment) => thinSegment(segment, 240)), xFor, yFor, 46);
   return (
     <div className={`cr21-metric-card cr23-spark-card cr23-series-${series}`}>
       <span>{label}</span><strong>{value}</strong>
@@ -390,7 +429,9 @@ export function PerformanceView21({ props, resetHistory }: { props: ViewProps; r
   const [paused, setPaused] = useState(false);
   const [frozenHistory, setFrozenHistory] = useState<Sample[]>(props.state.history);
   const history = paused ? frozenHistory : props.state.history;
-  const host = props.state.ready?.agents.host ? props.state.hostSystem : props.state.system;
+  const hostConnected = Boolean(props.state.ready?.agents.host);
+  const paperConnected = Boolean(props.state.ready?.agents.paper);
+  const host = props.state.hostSystem;
   const togglePause = () => {
     if (paused) { setPaused(false); return; }
     setFrozenHistory(props.state.history);
@@ -401,37 +442,64 @@ export function PerformanceView21({ props, resetHistory }: { props: ViewProps; r
     resetHistory();
     setFrozenHistory([]);
   };
-  const capacityFor = (field: HistoryField) => field === "memory" ? number(host.physicalMemoryTotalBytes) : field === "heap" ? number(props.state.system.jvmHeapMaximumBytes) : null;
+  const capacityFor = (field: HistoryField) => field === "memory" && hostConnected ? number(host.physicalMemoryTotalBytes) : field === "heap" && paperConnected ? number(props.state.system.jvmHeapMaximumBytes) : null;
+  const sourceRecord = (spec: ChartSpec) => spec.source === "host-system" ? props.state.hostSystem : spec.source === "paper-system" ? props.state.system : props.state.server;
+  const sourceLabel = (spec: ChartSpec) => spec.source === "host-system" ? "Host source" : spec.source === "paper-system" ? "Paper JVM source" : "Paper health source";
+  const chartStatus = (spec: ChartSpec): "live" | "paused" | "disconnected" => {
+    const sourceConnected = spec.source === "host-system" ? hostConnected : paperConnected;
+    return !sourceConnected || !props.connected ? "disconnected" : paused ? "paused" : "live";
+  };
 
   return (
     <>
       <div className="cr21-performance-toolbar">
-        <div><strong>Performance workspace</strong><span>Browser-local rolling history · {props.connected ? "live telemetry connected" : "telemetry disconnected"}</span></div>
+        <div><strong>Performance workspace</strong><span>Browser-local source history · Paper and Host remain independently authoritative</span></div>
         <SegmentedWindow value={windowMinutes} onChange={(value) => updatePreference("chartWindowMinutes", value)} />
         <button className="cr-button" onClick={togglePause}>{paused ? "Resume charts" : "Pause charts"}</button>
-        <button className="cr-button" onClick={() => props.notice(props.state.updatedAt ? `Latest pushed sample: ${new Date(props.state.updatedAt).toLocaleTimeString()}.` : "Waiting for the first telemetry sample.")}>Refresh latest</button>
+        <button className="cr-button" onClick={() => props.notice(props.state.telemetryUpdatedAt ? `Latest pushed telemetry: ${new Date(props.state.telemetryUpdatedAt).toLocaleTimeString()}.` : "Waiting for the first telemetry sample.")}>Refresh latest</button>
         <details className="cr21-menu"><summary className="cr-button">Export / history</summary><div><button onClick={() => exportHistory(history, "csv")}>Export CSV</button><button onClick={() => exportHistory(history, "json")}>Export JSON</button><button onClick={clearHistory}>Reset local history</button></div></details>
         <button className="cr-button" onClick={() => void navigator.clipboard.writeText(diagnostics(props.state)).then(() => props.notice("Safe diagnostics copied."))}>Copy diagnostics</button>
       </div>
-      {paused && <div className="cr21-state-banner">Charts paused locally. {props.connected ? "WebSocket telemetry remains connected and new raw samples continue to arrive." : "The dashboard is disconnected; the visible history remains frozen locally."}</div>}
+      {paused && <div className="cr21-state-banner">Charts paused locally. {props.connected ? "WebSocket telemetry remains connected and authoritative samples continue to arrive." : "The dashboard is disconnected; the visible history remains frozen locally."}</div>}
       <div className="cr21-chart-grid">
-        {CHARTS.map((spec) => <TelemetryChart key={spec.field} history={history} spec={spec} windowMinutes={windowMinutes} capacity={capacityFor(spec.field)} status={paused ? "paused" : props.connected ? "live" : "disconnected"} />)}
+        {CHARTS.map((spec) => {
+          const source = sourceRecord(spec);
+          return (
+            <TelemetryChart
+              key={spec.field}
+              history={history}
+              spec={spec}
+              windowMinutes={windowMinutes}
+              capacity={capacityFor(spec.field)}
+              status={chartStatus(spec)}
+              sourceLabel={sourceLabel(spec)}
+              sourceIntervalMs={number(source.sourceIntervalMillis)}
+              sourceCapturedAt={capturedAt(source)}
+            />
+          );
+        })}
       </div>
-      <Panel title="Tick statistics">
+      <Panel title="Tick and process statistics">
         <div className="cr21-metric-grid compact">
           {[
             ["Minimum", metric(props.state.server.minimumSampleTickMillis, " ms"), "Recent Paper tick sample"],
             ["Average", metric(props.state.server.averageTickMillis, " ms"), "Paper rolling tick time"],
             ["95th percentile", metric(props.state.server.p95TickMillis, " ms"), "Recent Paper tick sample"],
             ["Maximum", metric(props.state.server.maximumSampleTickMillis, " ms"), "Recent Paper tick sample"],
-            ["Heap used", bytes(props.state.system.jvmHeapUsedBytes), `Committed ${bytes(props.state.system.jvmHeapCommittedBytes)}`],
-            ["GC pauses", metric(props.state.system.gcPauseTotalMillis, " ms", 0), `${props.state.system.gcCollections ?? "—"} collections since start`],
-            ["Disk used", bytes(host.diskUsedBytes), `${bytes(host.diskUsableBytes)} available`],
-            ["Process RSS", bytes(props.state.system.processRssBytes), `Swap ${bytes(props.state.system.swapUsedBytes)}`],
+            ["JVM heap used", bytes(props.state.system.jvmHeapUsedBytes), `Committed ${bytes(props.state.system.jvmHeapCommittedBytes)}`],
+            ["Paper process RSS", bytes(props.state.system.processRssBytes), `Paper swap ${bytes(props.state.system.swapUsedBytes)}`],
+            ["GC pauses", metric(props.state.system.gcPauseTotalMillis, " ms", 0), `${props.state.system.gcCollections ?? "—"} collections since Paper start`],
+            ["Host disk used", hostConnected ? bytes(host.diskUsedBytes) : "Unavailable", hostConnected ? `${bytes(host.diskUsableBytes)} available` : "Host companion disconnected"],
           ].map(([label, value, detail]) => <div className="cr21-metric-card" key={label}><span>{label}</span><strong>{value}</strong><small>{detail}</small></div>)}
         </div>
       </Panel>
-      <Panel title="Load averages"><div className="cr21-metric-grid compact">{[1, 5, 15].map((minutes) => <div className="cr21-metric-card" key={minutes}><span>{minutes} minute{minutes > 1 ? "s" : ""}</span><strong>{metric(host[`loadAverage${minutes}m`], "", 2)}</strong><small>Runnable and uninterruptible tasks</small></div>)}</div></Panel>
+      <Panel title="Host load averages">
+        {hostConnected ? (
+          <div className="cr21-metric-grid compact">{[1, 5, 15].map((minutes) => <div className="cr21-metric-card" key={minutes}><span>{minutes} minute{minutes > 1 ? "s" : ""}</span><strong>{metric(host[`loadAverage${minutes}m`], "", 2)}</strong><small>Machine-wide runnable and uninterruptible tasks</small></div>)}</div>
+        ) : (
+          <Empty title="Host companion disconnected">Machine load averages are Host-owned and are not inferred from Paper telemetry.</Empty>
+        )}
+      </Panel>
       <Panel title="World statistics"><WorldTable worlds={props.state.worlds} /></Panel>
     </>
   );

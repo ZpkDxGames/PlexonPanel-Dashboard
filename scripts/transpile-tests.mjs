@@ -5,6 +5,7 @@ await mkdir(".test-dist/app", { recursive: true });
 await mkdir(".test-dist/components", { recursive: true });
 for (const file of [
   "lib/control-state.ts",
+  "lib/display-cadence.ts",
   "lib/scopes.ts",
   "lib/data-source.ts",
   "lib/browser-store.ts",

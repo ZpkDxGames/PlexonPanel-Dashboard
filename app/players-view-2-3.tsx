@@ -23,6 +23,16 @@ function lower(value: unknown) {
   return str(value, "").toLowerCase();
 }
 
+function playerNames(player: JsonMap) {
+  const name = str(player.name, "Unknown player");
+  const displayName = str(player.displayName, "").trim();
+  return {
+    name,
+    displayName: displayName && displayName !== name ? displayName : "",
+    primary: displayName || name,
+  };
+}
+
 function Timestamp({ value }: { value: unknown }) {
   const date = new Date(str(value, ""));
   const valid = Number.isFinite(date.getTime());
@@ -79,6 +89,7 @@ export function PlayersView21(props: ViewProps) {
   const [historyError, setHistoryError] = useState("");
   const [historyPolicyDisabled, setHistoryPolicyDisabled] = useState(false);
   const [selectedHistory, setSelectedHistory] = useState<string | null>(null);
+  const [presenceNow, setPresenceNow] = useState(() => Date.now());
   const ready = props.state.ready;
   const historyScope = Boolean(ready?.device.scopes.includes("players.history.view"));
   const historyCapabilityKnown = Boolean(
@@ -87,13 +98,37 @@ export function PlayersView21(props: ViewProps) {
   const historyCapability = ready?.server.paperCapabilities["players.history.view"] === true;
   const paperOnline = Boolean(ready?.agents.paper);
   const historyTabAvailable = historyScope && historyCapability;
+
+  useEffect(() => {
+    const refreshTimer = window.setTimeout(() => setPresenceNow(Date.now()), 0);
+    const settleTimer = window.setTimeout(() => setPresenceNow(Date.now()), 6500);
+    return () => {
+      window.clearTimeout(refreshTimer);
+      window.clearTimeout(settleTimer);
+    };
+  }, [props.state.presenceEventIds.length]);
+
+  const recentlyChanged = useMemo(() => {
+    const cutoff = presenceNow - 6000;
+    return new Set(
+      props.state.presenceDeltas
+        .filter((delta) => {
+          const observedAt = Date.parse(str(delta.observedAt, ""));
+          return Number.isFinite(observedAt) && observedAt >= cutoff && observedAt <= presenceNow + 1000;
+        })
+        .map((delta) => str(delta.uuid, ""))
+        .filter(Boolean),
+    );
+  }, [presenceNow, props.state.presenceDeltas]);
+
   const worlds = useMemo(
     () => Array.from(new Set(props.state.players.map((player) => str(player.world, "")).filter(Boolean))).sort((a, b) => a.localeCompare(b)),
     [props.state.players],
   );
   const players = useMemo(() => {
+    const query = search.toLowerCase();
     const filtered = props.state.players.filter((player) => {
-      const matchesSearch = lower(player.name).includes(search.toLowerCase()) || lower(player.uuid).includes(search.toLowerCase());
+      const matchesSearch = lower(player.name).includes(query) || lower(player.displayName).includes(query) || lower(player.uuid).includes(query);
       const matchesWorld = worldFilter === "ALL" || str(player.world) === worldFilter;
       return matchesSearch && matchesWorld;
     });
@@ -101,7 +136,7 @@ export function PlayersView21(props: ViewProps) {
       if (sort === "ping") return (number(a.pingMillis) ?? Number.MAX_SAFE_INTEGER) - (number(b.pingMillis) ?? Number.MAX_SAFE_INTEGER);
       if (sort === "session") return (number(b.onlineDurationMillis) ?? 0) - (number(a.onlineDurationMillis) ?? 0);
       if (sort === "world") return str(a.world).localeCompare(str(b.world)) || str(a.name).localeCompare(str(b.name));
-      return str(a.name).localeCompare(str(b.name));
+      return playerNames(a).primary.localeCompare(playerNames(b).primary);
     });
   }, [props.state.players, search, worldFilter, sort]);
   const player = props.state.players.find((item) => item.uuid === selected);
@@ -173,7 +208,7 @@ export function PlayersView21(props: ViewProps) {
       {tab === "online" || !historyTabAvailable ? (
         <>
           <div className="cr21-filter-toolbar">
-            <label className="cr-search">Search players<input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Username or UUID" /></label>
+            <label className="cr-search">Search players<input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Name, display name or UUID" /></label>
             <label>World<select value={worldFilter} onChange={(event) => setWorldFilter(event.target.value)}><option value="ALL">All worlds</option>{worlds.map((world) => <option key={world}>{world}</option>)}</select></label>
             <label>Sort<select value={sort} onChange={(event) => setSort(event.target.value as PlayerSort)}><option value="name">Name</option><option value="ping">Ping</option><option value="session">Session time</option><option value="world">World</option></select></label>
             <Badge>{props.state.players.length} online</Badge>
@@ -198,13 +233,19 @@ export function PlayersView21(props: ViewProps) {
                 <div className="cr23-player-cards">
                   {players.map((item) => {
                     const uuid = str(item.uuid, "");
-                    const name = str(item.name, "Unknown player");
+                    const names = playerNames(item);
                     const shownUuid = displayedUuid(uuid, preferences.playerUuid);
+                    const highlighted = preferences.liveRowHighlight && recentlyChanged.has(uuid);
                     return (
-                      <article className={`cr23-player-card${preferences.liveRowHighlight ? " live" : ""}`} key={uuid}>
+                      <article className={`cr23-player-card${highlighted ? " live" : ""}`} key={uuid}>
                         <div className="cr23-player-card-identity">
-                          <PlayerHead uuid={uuid} name={name} size={rowHeadSize} online />
-                          <div><strong>{name}</strong>{shownUuid && <small>{shownUuid}</small>}<span><i /> Online</span></div>
+                          <PlayerHead uuid={uuid} name={names.name} size={rowHeadSize} online />
+                          <div>
+                            <strong>{names.primary}</strong>
+                            {names.displayName && <small>{names.name}</small>}
+                            {shownUuid && <small>{shownUuid}</small>}
+                            <span><i /> Online</span>
+                          </div>
                         </div>
                         <dl>
                           <div><dt>World</dt><dd>{str(item.world)}</dd></div>
@@ -223,11 +264,12 @@ export function PlayersView21(props: ViewProps) {
                     <tbody>
                       {players.map((item) => {
                         const uuid = str(item.uuid, "");
-                        const name = str(item.name, "Unknown player");
+                        const names = playerNames(item);
                         const shownUuid = displayedUuid(uuid, preferences.playerUuid);
+                        const highlighted = preferences.liveRowHighlight && recentlyChanged.has(uuid);
                         return (
-                          <tr key={uuid} className={preferences.liveRowHighlight ? "cr23-live-player-row" : undefined}>
-                            <td><div className="cr-person"><PlayerHead uuid={uuid} name={name} size={rowHeadSize} online /><div><strong>{name}</strong>{shownUuid && <small>{shownUuid}</small>}</div></div></td>
+                          <tr key={uuid} className={highlighted ? "cr23-live-player-row" : undefined}>
+                            <td><div className="cr-person"><PlayerHead uuid={uuid} name={names.name} size={rowHeadSize} online /><div><strong>{names.primary}</strong>{names.displayName && <small>{names.name}</small>}{shownUuid && <small>{shownUuid}</small>}</div></div></td>
                             <td>{str(item.world)}</td><td>{metric(item.pingMillis, " ms", 0)}</td><td>{str(item.gameMode).toLowerCase()}</td><td>{duration(item.onlineDurationMillis)}</td>
                             <td><button className="cr-button" onClick={() => setSelected(uuid)}>Manage</button></td>
                           </tr>
@@ -334,14 +376,33 @@ function PlayerDrawer23({ player, previousSessions, historyAvailable, close, ...
   const base = { playerId: player.uuid };
   const permittedActions = ["message", "heal", "feed", "teleport", "gamemode", "kick", "ban", "unban", "whitelist.add", "whitelist.remove", "kill", "op", "deop"].filter((action) => props.can(`player.${action}`));
   const uuid = str(player.uuid, "");
-  const name = str(player.name, "Unknown player");
+  const names = playerNames(player);
+  const detailRows: Array<[string, unknown]> = [
+    ["UUID", player.uuid],
+    ...(names.displayName ? [["Display name", names.displayName] as [string, unknown]] : []),
+    ["World", player.world],
+    ["Game mode", player.gameMode],
+    ["Ping", metric(player.pingMillis, " ms", 0)],
+    ["Health", `${player.health ?? "—"} / ${player.maximumHealth ?? "—"}`],
+    ["Food", player.food],
+    ["XP level", player.experienceLevel],
+    ...(typeof player.op === "boolean" ? [["Operator", player.op ? "Yes" : "No"] as [string, unknown]] : []),
+    ...(typeof player.whitelisted === "boolean" ? [["Whitelisted", player.whitelisted ? "Yes" : "No"] as [string, unknown]] : []),
+    ["Online", duration(player.onlineDurationMillis)],
+    ["Session started", time(player.sessionStartedAt)],
+    ["Session ID", player.sessionId],
+    ...(typeof player.firstSeenAt === "string" ? [["First observed", time(player.firstSeenAt)] as [string, unknown]] : []),
+    ...(typeof player.lastLoginAt === "string" ? [["Last login", time(player.lastLoginAt)] as [string, unknown]] : []),
+    ...(player.position && typeof player.position === "object" ? [["Position", JSON.stringify(player.position)] as [string, unknown]] : []),
+    ...(typeof player.address === "string" && player.address ? [["IP address", player.address] as [string, unknown]] : []),
+  ];
 
   return (
     <dialog className="cr-drawer cr21-player-drawer" ref={ref} onCancel={close} aria-labelledby="player-title">
       <div className="cr-panel-head cr23-player-drawer-head">
         <div className="cr23-player-drawer-identity">
-          <PlayerHead uuid={uuid} name={name} size={64} online />
-          <div><small>Player management · online now</small><h2 id="player-title">{name}</h2><span>{uuid}</span></div>
+          <PlayerHead uuid={uuid} name={names.name} size={64} online />
+          <div><small>Player management · online now</small><h2 id="player-title">{names.primary}</h2><span>{names.displayName ? `${names.name} · ${uuid}` : uuid}</span></div>
         </div>
         <button className="cr-button" onClick={close} aria-label="Close player details">×</button>
       </div>
@@ -352,15 +413,11 @@ function PlayerDrawer23({ player, previousSessions, historyAvailable, close, ...
       {tab === "Overview" ? (
         <div className="cr21-drawer-section">
           <dl className="cr-details">
-            {[
-              ["UUID", player.uuid], ["World", player.world], ["Game mode", player.gameMode], ["Ping", metric(player.pingMillis, " ms", 0)],
-              ["Health", `${player.health ?? "—"} / ${player.maximumHealth ?? "—"}`], ["Food", player.food], ["XP level", player.experienceLevel],
-              ["Online", duration(player.onlineDurationMillis)], ["Session started", time(player.sessionStartedAt)], ["Session ID", player.sessionId],
-              ...(typeof player.firstSeenAt === "string" ? [["First observed", time(player.firstSeenAt)]] : []),
-              ...(typeof player.lastLoginAt === "string" ? [["Last login", time(player.lastLoginAt)]] : []),
-              ["Position", player.position ? JSON.stringify(player.position) : "Not shared"], ["IP address", player.address ?? "Not shared"],
-            ].map(([label, value]) => <div key={String(label)}><dt>{String(label)}</dt><dd>{String(value ?? "—")}</dd></div>)}
+            {detailRows.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{String(value ?? "—")}</dd></div>)}
           </dl>
+          {!detailRows.some(([label]) => label === "Position" || label === "IP address") && (
+            <p className="cr-hint">Location and address are omitted when local Paper policy or the device grant does not authorize them.</p>
+          )}
           <p className="cr-hint">{permittedActions.length ? `${permittedActions.length} player actions are allowed for this device and current local policy.` : "This device has read-only access to player details."}</p>
           {historyAvailable && (
             <div className="cr21-drawer-section">
