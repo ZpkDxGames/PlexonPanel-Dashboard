@@ -74,8 +74,8 @@ test("unknown action codes retain the sanitized agent message", () => {
   assert.equal(mapped.detail, "Operation was rejected safely");
 });
 
-test("safe diagnostics identify Dashboard 2.1 without changing protocol 3", () => {
+test("safe diagnostics identify Dashboard 2.2 without changing protocol 3", () => {
   const output = diagnostics(emptyControlState("test-server"));
-  assert.match(output, /PlexonPanel Dashboard 2\.1\.0 \/ Protocol 3/);
+  assert.match(output, /PlexonPanel Dashboard 2\.2\.0 \/ Protocol 3/);
   assert.doesNotMatch(output, /Dashboard 2\.0\.0/);
 });

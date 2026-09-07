@@ -1,76 +1,46 @@
-# PlexonPanel Dashboard 2.1.0
+# PlexonPanel Dashboard 2.2.0
 
-PlexonPanel Dashboard is a responsive Next.js/Vercel control room for protocol 3 PlexonPanel Paper and Host agents. Version 2.1 focuses on the operator experience: a more compact control-room shell, clearer connection and freshness states, stronger browser-local telemetry tooling, safer lifecycle controls, and more consistent management surfaces.
+PlexonPanel Dashboard is a responsive Next.js/Vercel control room with a Cloudflare Durable Object relay for signed protocol-3 Paper and Host agents. Dashboard 2.2 is the companion release for PlexonPanel agent 3.0.0: it adds live player-presence reconciliation, Paper-owned bounded history, and real roster refresh while retaining compatibility with older protocol-3 agents.
 
-The dashboard keeps the existing twelve workspaces: Overview, Performance, Players, Console, Chat, Plugins, Files, Backups, Server, Audit, Access, and Settings. Existing scoped actions, file conflict/diff handling, backup safeguards, isolated server workspaces, local audit sources, and explicit offline/expired/revoked states remain part of the protocol-3 design.
+## Player presence in 2.2
 
-## Dashboard 2.1 highlights
+- The Online roster applies immediate Paper `players.presence` deltas, de-duplicates event/session identity, and reconciles only after a complete multipart `inventory.players` snapshot.
+- Socket/authenticated Paper session changes clear the roster. Cached browser state never presents a player as authoritatively online.
+- Refresh invokes Paper-authorized `players.snapshot.request`, coalesced server-side and independently rate-limited to once per device per five seconds.
+- The integrated History tab appears only when both the immutable grant and current Paper capability contain `players.history.view`.
+- History queries are strict, newest-first, cursor-paginated, bounded to 100 entries per page, and served from the Paper-local journal. Results remain in memory and are excluded from IndexedDB.
+- Missing scope, disabled local policy, older Paper agents, reconnecting, Paper offline, loading, empty, bounded, and query-failure states are distinct.
+- Offline history details are read-only. Online actions retain their existing scope/capability checks.
 
-- Compact graphite/navy control-room shell with cyan Plexon accent, grouped navigation, responsive mobile drawer, and consistent focus states.
-- Global server identity, Paper/Host connection indicators, freshness status, quick actions, and `Ctrl/Cmd + K` command palette.
-- Overview health summary derived only from telemetry currently available to the browser. Missing telemetry is shown as unavailable rather than fabricated.
-- Performance workspace with 1/5/15/30-minute browser-local windows, pause/resume, chart hover/crosshair, axes, current/min/avg/max/P95 summaries, CSV/JSON export, and local-history reset.
-- Browser-local rolling history remains bounded and is never presented as server-side historical storage.
-- Server lifecycle controls are gated by actual `active`, `inactive`, `activating`, `deactivating`, and `failed` service state so impossible actions such as Start-while-active are disabled.
-- Action failures map known protocol/agent codes to operator-facing guidance without exposing raw exception internals or secrets.
-- Existing management pages inherit the 2.1 surface/control styling while retaining their protocol-3 behavior and authorization checks.
+Existing credentials do not gain the new scope. Observer remains current-roster-only; a local operator must explicitly revoke/re-pair a qualifying Moderator, Administrator, or Owner device after enabling history on Paper. Owner cannot bypass disabled history.
 
-## Pairing and authority
+## Authority and storage
 
-Pair a browser locally with `/plexonpanel pair <role>`. Pairing codes are one-use and expire after five minutes. The local operator chooses the role; the browser cannot escalate itself. The relay and the selected Paper/Host agent independently validate scopes and local capabilities, and Owner operations still cannot bypass local policy.
+The relay verifies current scope/capability, rejects Host player events, validates presence/history fields, strips history-only fields from unauthorized recipients, and keeps action results private. It stores identity/access/pairing coordination only. Player inventories, presence bodies, history results, telemetry, file bodies, and action results are never written to Durable Object storage.
 
-The authorization path remains:
+Browser credentials bind audience, protocol, server/device IDs, immutable role/scopes, generation, and expiry. Relay and executing agent independently authorize every action. The dashboard cannot enable local Paper policy, choose filesystem roots, or invent login/logout timestamps.
 
-```text
-Browser credential
-      ↓
-Cloudflare relay scope validation
-      ↓
-Paper / Host agent validation
-      ↓
-Local capability policy
-      ↓
-Operation
-```
-
-## Validation
+## Validate
 
 Use Node 24 and the committed lockfile:
 
 ```sh
 npm ci
-npm run lint
-npm run typecheck
-npm test
-npm run relay:test
+npm run check
 npm run relay:smoke
 npm run build
 ```
 
-The aggregate validation command remains:
-
-```sh
-npm run check
-```
+`npm run check` runs ESLint, application and relay TypeScript, relay tests, client/state/UI tests, and a production Next build. Smoke uses temporary workerd storage and ephemeral keys; it is not deployed or live Paper acceptance.
 
 ## Development and deployment
 
-For development, set `.env.local` with:
+Configure only the public relay origin in `.env.local`:
 
 ```text
 NEXT_PUBLIC_PLEXON_RELAY_URL=https://plexonpanel-relay.plexonpanel.workers.dev
 ```
 
-Then run `npm run dev`. The public HTTPS relay origin is the only required Vercel variable. Never place access tokens, relay signing keys, Paper/Host private keys, pairing secrets, or server credentials in `NEXT_PUBLIC_*` variables.
+Never place access tokens, relay signing keys, Paper/Host private keys, pairing secrets, or server credentials in `NEXT_PUBLIC_*`. Deploy with the existing signing identity, Durable Object namespace, and identity pins intact. Dashboard 2.2 and agent 3.0.0 remain on wire protocol 3 and `/v1`; no identity rotation or database migration is required.
 
-The production dashboard origin is `https://plexon-panel-dashboard.vercel.app`. Do not hardcode preview deployment URLs into application logic.
-
-Read [deployment](docs/VERCEL_DEPLOYMENT.md), [architecture](docs/ARCHITECTURE.md), [protocol](docs/PROTOCOL.md), [operations](docs/OPERATIONS.md), and [validation](docs/VALIDATION.md).
-
-## Compatibility and storage
-
-Dashboard 2.1 remains on **protocol 3**. A UI release does not rotate the relay signing identity, replace the Cloudflare Worker, reset Durable Objects, or require a new telemetry database. Existing paired protocol-3 credentials remain compatible unless a separate security migration explicitly says otherwise.
-
-No Firebase, telemetry database, Vercel server credential, inbound Minecraft administration port, shell, or RCON is required. Cloudflare stores identity/access/pairing coordination only. Telemetry history is bounded browser-local state; authoritative audit and backups remain on the agents/host, with optional configured off-site copies.
-
-See [RELEASE_NOTES_2.1.0.md](RELEASE_NOTES_2.1.0.md) for the release summary.
+Read [release notes](RELEASE_NOTES_2.2.0.md), [protocol](docs/PROTOCOL.md), [architecture](docs/ARCHITECTURE.md), [operations](docs/OPERATIONS.md), [security](docs/SECURITY.md), [deployment](docs/VERCEL_DEPLOYMENT.md), and [validation](docs/VALIDATION.md).

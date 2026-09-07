@@ -10,6 +10,7 @@ for (const file of [
   "lib/lifecycle-state.ts",
   "lib/operation-messages.ts",
   "app/control-views.tsx",
+  "app/management-views-2-1.tsx",
   "app/advanced-views.tsx",
 ]) {
   const source = await readFile(file, "utf8");

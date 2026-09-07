@@ -1,6 +1,6 @@
 # Protocol 3 contract
 
-Product version 2.0.0, wire version 3. Routes retain `/v1`; protocol 2 is explicitly incompatible. Paper and host initiate WSS `/v1/agent?serverId=<uuid>&agentKind=PAPER|HOST` with `X-PlexonPanel-Protocol: 3`.
+Dashboard/relay version 2.2.0 is compatible with PlexonPanel agent bundle 3.0.0; wire version remains 3. Routes retain `/v1`; protocol 2 is explicitly incompatible. Paper and host initiate WSS `/v1/agent?serverId=<uuid>&agentKind=PAPER|HOST` with `X-PlexonPanel-Protocol: 3`.
 
 ## Envelope
 
@@ -46,6 +46,18 @@ Browser sends `{type:"dashboard.action",requestId,action,parameters,agentKind?}`
 
 Parameters: at most 16 keys / 49,152 bytes. Per-device limits: 20 actions or 160 chunks per 10 seconds, 32 pending requests; room limit 64 pending. Agents have independent bounded gates. Intent UUIDs survive process restart through the local audit replay window. Commands/messages/file bodies are excluded from audit parameters.
 
-Inventory batches use snapshotId, offset, complete and truncated, targeting ≤48 KiB. Clients discard mismatched/out-of-order batches. Recipient filters independently remove player location/address, full-console levels and disabled events. Host cannot spoof Paper telemetry.
+Inventory batches use `snapshotId`, `capturedAt`, `offset`, `complete`, and `truncated`, targeting ≤48 KiB. Clients stage player pages until complete, discard mismatched/out-of-order pages, replay only deltas newer than the snapshot capture instant, and clear the roster at a socket or authenticated Paper-session boundary. Recipient filters independently remove player location/address, history-only fields, full-console levels, and disabled events. Host cannot spoof Paper telemetry or player presence.
+
+### Agent 3.0 player additions
+
+| Name | Direction | Contract |
+| --- | --- | --- |
+| `players.presence` | Paper event | Strict minimal `JOINED`/`LEFT` delta under `players.view`; Host is rejected. Event/session IDs are de-duplicated in a bounded client set. |
+| `players.history.list` | Dashboard action | Paper-only; requires both `players.history.view` and the current Paper capability. Query, status, UTC range, opaque cursor, and limit (1–100) are strict. |
+| `players.snapshot.request` | Dashboard action | Paper-only under `players.view`; no parameters; independently limited to once per device per five seconds. |
+
+Presence timestamps are UTC ISO-8601 instants. Null logout/duration means unknown and must not be replaced with a browser observation. Optional `inventory.players` fields include `sessionId`/`sessionStartedAt`; `firstSeenAt` and `lastLoginAt` are forwarded only to a recipient with authorized, locally enabled history.
+
+History responses contain `entries`, nullable `nextCursor`, `hasMore`, `boundedWindow`, `capturedAt`, and `historyEnabled`. They are delivered through the existing private `action.result` route to the requesting device only. The Durable Object persists neither responses nor presence/player-inventory bodies. Older protocol-3 agents omit these optional events/capabilities without breaking the Online view.
 
 Transfers use start → ordered 16 KiB chunks → cancellation/expiry, with final SHA-256 verification. File bodies and action results are transient. Durable Object storage contains identity/access/pairing coordination only; bounded socket attachments retain pending routing metadata across hibernation. Cloudflare's attachment limit is [16,384 bytes](https://developers.cloudflare.com/durable-objects/best-practices/websockets/); signed session sequences avoid unbounded replay arrays.

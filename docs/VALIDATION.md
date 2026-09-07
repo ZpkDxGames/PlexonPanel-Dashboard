@@ -1,26 +1,28 @@
 # Validation and release acceptance
 
-Status: review candidate; production release is blocked on live gates. Source baselines: Paper `2e3bbf34c486cbc595b1d6b503281f4fc0c72f19`, dashboard `d1583af58017ee2aad2538a0ae5cec74f97e71b3`.
+Status: Dashboard 2.2.0 / agent 3.0.0 review candidate. Production deployment and stable Java publication remain blocked on real live gates. Source baselines were plugin `6317bfbba1990cd8a96852b03f8097a524f745db` and dashboard `98166f7d9b3851a1c96d160c2b5eefc3b231c58f`.
 
-## Local evidence
+## Automated evidence
 
-The completed local checks passed **53 Java tests** (44 shared protocol, 3 Paper, 6 host), **27 relay tests** and **22 dashboard/client/tool tests**. Lint and TypeScript passed. Next 16.3.1 built only `/` and the standard not-found route. Java/Javadoc and both JARs built; Javadoc reports missing-comment warnings. Actual local workerd passed v3 authentication, one-use pairing, browser session, bounded telemetry, scoped denial and live revocation. Environment: Linux x64, Temurin 25.0.4.1, Gradle 9.7.0 and Node 24.19.0. Final branch CI rechecks recovered source.
+The implementation branch passes ESLint, application TypeScript, relay TypeScript, a Next 16.3.1 production build, **29 relay tests**, and **34 dashboard/client/UI tests** on the development workspace. Added coverage includes Paper-only/strict presence routing, scope/capability filtering, private/no-storage history results, snapshot rate limits, atomic multipart roster reconciliation, duplicate/session isolation, cache exclusion, older-agent and policy/scope states, and read-only offline details.
 
-Visual QA used synthetic server-rendered instances of actual components/styles at desktop, 768-pixel tablet and 390-pixel phone widths. Cards/navigation/tables were reviewed. This was fixture review, not authenticated live-server E2E. Temporary QA routes/datasets were removed before production build.
+`npm run relay:smoke` uses actual local workerd with temporary state and ephemeral keys. It validates protocol-3 authentication, pairing/session routing, bounded telemetry, authorization denial and live revocation, but it is still a simulation—not a real Paper server or deployed Cloudflare/Vercel acceptance result.
 
 ## Live gates still pending
 
-| Gate                            | Required evidence                                                                                                                                              | Blocker                                           |
-| ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
-| Disposable Paper 26.2 / Java 25 | Startup/reload/disable, identity, pairing/expiry/revocation, GUI permissions/clicks, real telemetry, chat/console, all typed operations and plugin integration | Disposable server and operator setup/EULA         |
-| Ubuntu 24.04 ARM64              | Actual non-root OS permissions, systemd/polkit allow/deny, host independence and ARM Java                                                                      | Target host access                                |
-| Cloudflare + Vercel             | Deployed identity migration, origins/CSP, browser pairing/denial, private results, reconnect/hibernation and server isolation                                  | Deployment accounts and approved test environment |
-| rclone                          | Fixed remote/config, offsite integrity/retrieval, failures and retention                                                                                       | Disposable configured remote                      |
-| Restore interruption            | Save lease watchdog, emergency archive, interrupted rename boundaries, repeated recovery and gameplay after deliberate startup                                 | Disposable Paper/systemd environment              |
-| 30-minute stability             | TPS/MSPT baseline comparison, bounded memory/queues, high-volume streams and outages/reconnect                                                                 | Representative loaded server                      |
+| Gate | Required evidence | Blocker |
+| --- | --- | --- |
+| Paper presence lifecycle | Real Paper 26.2/Java 25 join, quit, kick, rapid reconnect, reload, restart, disabled history, closed-dashboard history and multi-page query. | Disposable server, controlled players and operator setup. |
+| Crash/orphan recovery | Forced Paper termination followed by honest `UNKNOWN_DISCONNECT`, no fabricated exact end/duration, and no duplicate closure. | Disposable failure environment. |
+| Realtime reconciliation | One-tick-plus-network delta target, relay/dashboard outage and reconnect, fresh complete snapshot, manual refresh/coalescing/rate limit, no stale online roster. | Paired Paper and relay environment. |
+| Permissions/privacy | Observer/current roster, qualifying new grants/history, old grant unchanged, Owner denied while local history is off; journal/browser/relay/log/audit inspection. | Controlled role devices and storage inspection. |
+| Mixed protocol-3 versions | New dashboard with 2.0 Paper, 3.0 Paper with older UI/relay, and all-current; preserve UUID/fingerprint/grants/revocation. | Retained reviewed artifacts and disposable deployment. |
+| Responsive/browser QA | Authenticated Players tabs, filters, tables and drawers at desktop, tablet and phone widths with keyboard/screen-reader checks. | Live browser/Paper data environment. |
+| Cloudflare + Vercel | Existing signing identity/namespace/pins, origins/CSP, private results, hibernation, reconnect and server isolation. | Approved deployment accounts/environment. |
+| 30-minute representative load | Baseline versus 3.0 event latency, snapshot duration, TPS/MSPT, heap, queue depth, journal/index size, saturation and reconnect behavior. | Representative loaded Paper server. |
 
-Record exact commits/JAR hashes, hardware/OS/Java/Paper versions, configurations and sanitized outcomes. Never commit secrets, player data, raw logs or backup bodies as evidence.
+Record exact paired commits, artifact hashes, Paper/Java/OS/browser versions, configuration differences, timestamps and sanitized outcomes. Never commit credentials, private player records, raw logs, production configuration or test-account secrets.
 
-## Release gate
+## Release rule
 
-Finish paired CI and all live checks. Update the agent repository's `docs/release-gates.json` with true results and concrete evidence, then review/merge the paired PRs and deliberately create aligned `v2.0.0`. The manually dispatched workflow checks all evidence and creates only a draft release from an existing tag. It does not auto-publish or overwrite releases. Review artifacts/checksums, publish deliberately and deploy during coordinated maintenance. No production merge/tag/deployment/release is authorized by passing unit tests alone.
+Review and merge the paired plugin/dashboard revisions only after their final CI is green and the compatibility relationship is explicit. Preserve protocol 3, relay signing identity, Durable Object data, Paper identity and existing grants. Deploy deliberately during a coordinated maintenance window. A green unit/build/smoke run must never be described as real paired-server acceptance.

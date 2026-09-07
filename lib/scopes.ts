@@ -2,6 +2,7 @@ export const SCOPES = [
   "overview.view",
   "telemetry.view",
   "players.view",
+  "players.history.view",
   "players.location",
   "players.address",
   "console.view.errors",
@@ -86,6 +87,8 @@ Object.assign(ACTION_SCOPES, {
   "settings.view": "settings.view",
   "files.download.chunk": "files.download",
   "files.transfer.cancel": "files.download",
+  "players.history.list": "players.history.view",
+  "players.snapshot.request": "players.view",
 });
 export function validScopes(value: unknown): value is string[] {
   return (

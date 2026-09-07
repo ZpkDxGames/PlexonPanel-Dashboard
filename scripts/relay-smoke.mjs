@@ -141,12 +141,17 @@ try {
     protocolVersion: 3,
     publicKey: key.publicKey,
     publicKeyFingerprint: fingerprint,
-    pluginVersion: "2.0.0",
+    pluginVersion: "3.0.0",
     paperVersion: "Paper 26.2",
     minecraftVersion: "26.2",
     javaVersion: "25",
     operatingSystem: "Linux",
-    capabilities: { "overview.view": true, "telemetry.view": true },
+    capabilities: {
+      "overview.view": true,
+      "telemetry.view": true,
+      "players.view": true,
+      "players.history.view": true,
+    },
     hostPublicKey: "",
   });
   const nonce = (await nextAgent((m) => m.type === "gateway.challenge")).body
@@ -164,7 +169,7 @@ try {
     expiresAt: new Date(Date.now() + 60000).toISOString(),
     fingerprint,
     role: "Observer",
-    scopes: ["overview.view", "telemetry.view"],
+    scopes: ["overview.view", "telemetry.view", "players.view"],
   });
   await nextAgent((m) => m.type === "pairing.registered");
   const pending = mf.dispatchFetch(`${base}/v1/pairings/claim`, {
@@ -182,7 +187,7 @@ try {
       deviceId: consume.deviceId,
       name: consume.name,
       role: "Observer",
-      scopes: ["overview.view", "telemetry.view"],
+      scopes: ["overview.view", "telemetry.view", "players.view"],
       issuedAt: now,
       expiresAt: now + 3600,
       lastSeen: now,
@@ -214,6 +219,30 @@ try {
       m.eventType === "telemetry.system" &&
       m.body.hostCpuPercent === 0,
   );
+  const observedAt = new Date().toISOString(),
+    sessionStartedAt = new Date(Date.now() - 60000).toISOString();
+  await send("players.presence", {
+    eventId: randomUUID(),
+    sessionId: randomUUID(),
+    uuid: randomUUID(),
+    name: "RelaySmokePlayer",
+    state: "LEFT",
+    observedAt,
+    sessionStartedAt,
+    sessionEndedAt: observedAt,
+    sessionDurationMillis: Date.parse(observedAt) - Date.parse(sessionStartedAt),
+    termination: "QUIT",
+    persistenceState: "QUEUED",
+  });
+  const presence = await nextBrowser(
+    (m) =>
+      m.type === "server.event" &&
+      m.eventType === "players.presence" &&
+      m.body.name === "RelaySmokePlayer",
+  );
+  assert.equal(presence.body.state, "LEFT");
+  assert.equal(presence.body.sessionStartedAt, undefined);
+  assert.equal(presence.body.termination, undefined);
   browser.send(
     JSON.stringify({
       type: "dashboard.action",

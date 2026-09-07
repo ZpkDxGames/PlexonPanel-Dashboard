@@ -21,7 +21,7 @@ test("health describes coordination-only storage", async () => {
   assert.deepEqual(await response.json(), {
     ok: true,
     service: "plexonpanel-relay",
-    version: "2.0.0",
+    version: "2.2.0",
     protocolVersion: 3,
     storage: "coordination-only",
     gatewayPublicKey: "public-test-key",

@@ -471,12 +471,21 @@ test("pairing rejects local revocation racing approval", async () => {
 });
 test("events filter player addresses, locations, console levels and local capabilities", () => {
   const body = {
-    players: [{ name: "Player", address: "203.0.113.1", position: { x: 10 } }],
+    players: [
+      {
+        name: "Player",
+        address: "203.0.113.1",
+        position: { x: 10 },
+        firstSeenAt: "2026-09-06T10:00:00Z",
+        lastLoginAt: "2026-09-06T11:00:00Z",
+        sessionStartedAt: "2026-09-06T11:00:00Z",
+      },
+    ],
   };
   const caps = Object.fromEntries(SCOPES.map((s) => [s, true]));
   assert.deepEqual(
     filterEvent("inventory.players", body, ["players.view"], caps).players,
-    [{ name: "Player" }],
+    [{ name: "Player", sessionStartedAt: "2026-09-06T11:00:00Z" }],
   );
   assert.equal(
     filterEvent(
@@ -491,6 +500,83 @@ test("events filter player addresses, locations, console levels and local capabi
     filterEvent("telemetry.system", {}, ["telemetry.view"], {}),
     null,
   );
+});
+test("presence is Paper-only, validated, scope-filtered and never stored", async () => {
+  const f = await fixture(["players.view"]);
+  const paper = await attach(f);
+  const body = {
+    eventId: randomUUID(),
+    sessionId: randomUUID(),
+    uuid: randomUUID(),
+    name: "HistoryPrivacyFixture",
+    state: "LEFT",
+    observedAt: "2026-09-06T12:05:00Z",
+    sessionStartedAt: "2026-09-06T12:00:00Z",
+    sessionEndedAt: "2026-09-06T12:05:00Z",
+    sessionDurationMillis: 300000,
+    termination: "QUIT",
+    persistenceState: "QUEUED",
+  };
+  await paper.send("players.presence", body);
+  const routed = f.browser.sent.at(-1).body;
+  assert.equal(routed.name, body.name);
+  assert.equal(routed.sessionId, body.sessionId);
+  assert.equal(routed.sessionStartedAt, undefined);
+  assert.equal(routed.termination, undefined);
+  assert.ok(
+    !JSON.stringify([...f.st.storage.values]).includes("HistoryPrivacyFixture"),
+  );
+
+  const hostFixture = await fixture(["players.view"]);
+  const host = await attach(hostFixture, "HOST");
+  await host.send("players.presence", body);
+  assert.equal(host.socket.closed.code, 4008);
+
+  const malformedFixture = await fixture(["players.view"]);
+  const malformed = await attach(malformedFixture);
+  await malformed.send("players.presence", { ...body, name: "bad\nname" });
+  assert.equal(malformed.socket.closed.code, 4008);
+
+  const unknownFixture = await fixture(["players.view"]);
+  const unknown = await attach(unknownFixture);
+  await unknown.send("players.presence", { ...body, relayOnly: true });
+  assert.equal(unknown.socket.closed.code, 4008);
+});
+test("history and snapshot actions enforce new scope, capability, fields and rate", async () => {
+  const observer = await fixture(["players.view"]);
+  await attach(observer);
+  await action(observer, "players.history.list", { status: "ALL" });
+  assert.equal(observer.browser.sent.at(-1).code, "SCOPE_DENIED");
+
+  const f = await fixture(["players.view", "players.history.view"], "Moderator");
+  await attach(f);
+  await action(f, "players.history.list", { status: "INVALID" });
+  assert.equal(f.browser.sent.at(-1).code, "INVALID_PARAMETERS");
+  await action(f, "players.history.list", {
+    query: "Alex",
+    status: "ALL",
+    from: "2026-09-01T00:00:00Z",
+    to: "2026-09-06T00:00:00Z",
+    limit: 50,
+  });
+  assert.equal(f.browser.sent.at(-1).type, "dashboard.action_queued");
+  await action(f, "players.snapshot.request", {}, f.browser, randomUUID(), "HOST");
+  assert.equal(f.browser.sent.at(-1).code, "INVALID_PARAMETERS");
+  await action(f, "players.snapshot.request", {});
+  assert.equal(f.browser.sent.at(-1).type, "dashboard.action_queued");
+  await action(f, "players.snapshot.request", {});
+  assert.equal(f.browser.sent.at(-1).code, "RATE_LIMITED");
+
+  const disabled = await fixture(
+    ["players.view", "players.history.view"],
+    "Moderator",
+  );
+  await attach(disabled);
+  const metadata = await disabled.st.storage.get("room-metadata");
+  metadata.identity.capabilities["players.history.view"] = false;
+  await disabled.st.storage.put("room-metadata", metadata);
+  await action(disabled, "players.history.list", {});
+  assert.equal(disabled.browser.sent.at(-1).code, "CAPABILITY_DISABLED");
 });
 test("directory rate limit, code expiry and internal route authentication are enforced", async () => {
   const st = state(),

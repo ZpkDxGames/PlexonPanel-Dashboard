@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ActionButton,
   Badge,
@@ -11,13 +11,25 @@ import {
   time,
   type ViewProps,
 } from "./control-views";
-import { number, str, type JsonMap } from "../lib/control-state";
+import { number, records, str, type JsonMap } from "../lib/control-state";
+import { sendDashboardAction } from "../lib/data-source";
 
 type PlayerSort = "name" | "ping" | "session" | "world";
 type PluginSort = "name" | "version";
 
 function lower(value: unknown) {
   return str(value, "").toLowerCase();
+}
+
+function Timestamp({ value }: { value: unknown }) {
+  const date = new Date(str(value, ""));
+  const valid = Number.isFinite(date.getTime());
+  const iso = valid ? date.toISOString() : undefined;
+  return (
+    <time dateTime={iso} title={iso ? `UTC: ${iso}` : undefined}>
+      {time(value)}
+    </time>
+  );
 }
 
 function downloadText(filename: string, body: string, type = "text/plain") {
@@ -32,10 +44,41 @@ function downloadText(filename: string, body: string, type = "text/plain") {
 }
 
 export function PlayersView21(props: ViewProps) {
+  const [tab, setTab] = useState<"online" | "history">("online");
   const [search, setSearch] = useState("");
   const [worldFilter, setWorldFilter] = useState("ALL");
   const [sort, setSort] = useState<PlayerSort>("name");
   const [selected, setSelected] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+  const [historyQuery, setHistoryQuery] = useState("");
+  const [historyStatus, setHistoryStatus] = useState("ALL");
+  const [historyFrom, setHistoryFrom] = useState("");
+  const [historyTo, setHistoryTo] = useState("");
+  const [historyEntries, setHistoryEntries] = useState<JsonMap[]>([]);
+  const [historyCursor, setHistoryCursor] = useState("");
+  const [historyMore, setHistoryMore] = useState(false);
+  const [historyBounded, setHistoryBounded] = useState(false);
+  const [historyCapturedAt, setHistoryCapturedAt] = useState("");
+  const [historyLoaded, setHistoryLoaded] = useState(false);
+  const [historyBusy, setHistoryBusy] = useState(false);
+  const [historyError, setHistoryError] = useState("");
+  const [historyPolicyDisabled, setHistoryPolicyDisabled] = useState(false);
+  const [selectedHistory, setSelectedHistory] = useState<string | null>(null);
+  const ready = props.state.ready;
+  const historyScope = Boolean(
+    ready?.device.scopes.includes("players.history.view"),
+  );
+  const historyCapabilityKnown = Boolean(
+    ready &&
+      Object.prototype.hasOwnProperty.call(
+        ready.server.paperCapabilities,
+        "players.history.view",
+      ),
+  );
+  const historyCapability =
+    ready?.server.paperCapabilities["players.history.view"] === true;
+  const paperOnline = Boolean(ready?.agents.paper);
+  const historyTabAvailable = historyScope && historyCapability;
   const worlds = useMemo(
     () =>
       Array.from(
@@ -49,7 +92,9 @@ export function PlayersView21(props: ViewProps) {
   );
   const players = useMemo(() => {
     const filtered = props.state.players.filter((player) => {
-      const matchesSearch = lower(player.name).includes(search.toLowerCase());
+      const matchesSearch =
+        lower(player.name).includes(search.toLowerCase()) ||
+        lower(player.uuid).includes(search.toLowerCase());
       const matchesWorld =
         worldFilter === "ALL" || str(player.world) === worldFilter;
       return matchesSearch && matchesWorld;
@@ -68,16 +113,110 @@ export function PlayersView21(props: ViewProps) {
     });
   }, [props.state.players, search, worldFilter, sort]);
   const player = props.state.players.find((item) => item.uuid === selected);
+  const historyRecord = historyEntries.find(
+    (entry) => entry.eventId === selectedHistory,
+  );
+
+  const loadHistory = useCallback(
+    async (append = false) => {
+      if (!historyTabAvailable || !props.connected || !paperOnline) return;
+      if (historyFrom && historyTo && historyFrom > historyTo) {
+        setHistoryError("The From date must not be after the To date.");
+        setHistoryLoaded(true);
+        return;
+      }
+      setHistoryBusy(true);
+      setHistoryError("");
+      try {
+        const parameters: JsonMap = {
+          query: historyQuery.trim(),
+          status: historyStatus,
+          limit: 50,
+        };
+        if (historyFrom)
+          parameters.from = new Date(`${historyFrom}T00:00:00`).toISOString();
+        if (historyTo)
+          parameters.to = new Date(`${historyTo}T23:59:59.999`).toISOString();
+        if (append && historyCursor) parameters.cursor = historyCursor;
+        const result = await sendDashboardAction(
+          "players.history.list",
+          parameters,
+          "PAPER",
+        );
+        const data = result.data;
+        if (data.historyEnabled !== true) {
+          setHistoryPolicyDisabled(true);
+          setHistoryEntries([]);
+          setHistoryMore(false);
+          setHistoryCursor("");
+        } else {
+          const entries = records(data.entries, 100);
+          setHistoryPolicyDisabled(false);
+          setHistoryEntries((current) =>
+            (append ? [...current, ...entries] : entries).slice(0, 500),
+          );
+          setHistoryCursor(str(data.nextCursor, ""));
+          setHistoryMore(data.hasMore === true);
+          setHistoryBounded(data.boundedWindow === true);
+          setHistoryCapturedAt(str(data.capturedAt, ""));
+        }
+        setHistoryLoaded(true);
+      } catch (reason) {
+        setHistoryError(
+          reason instanceof Error
+            ? reason.message
+            : "The Paper agent could not read player history.",
+        );
+      } finally {
+        setHistoryBusy(false);
+      }
+    }, [
+      historyCursor,
+      historyFrom,
+      historyQuery,
+      historyStatus,
+      historyTabAvailable,
+      historyTo,
+      paperOnline,
+      props.connected,
+    ]);
+
+  const historyUnavailable = !historyScope
+    ? "This device grant does not include player history. Existing grants stay unchanged; pair a newly approved Moderator, Administrator, or Owner device to add it."
+    : !historyCapabilityKnown
+      ? "This Paper agent predates the player-history capability. Online players remain available; upgrade the agent to use history."
+      : !historyCapability
+        ? "Player history is disabled by local Paper policy. Enable player-history locally and restart or reload the agent before granting access."
+        : "";
 
   return (
     <>
-      <div className="cr21-filter-toolbar">
+      <div className="cr-tabs cr21-player-tabs" aria-label="Player views">
+        <button aria-pressed={tab === "online"} onClick={() => setTab("online")}>
+          Online
+        </button>
+        {historyTabAvailable && (
+          <button
+            aria-pressed={tab === "history"}
+            onClick={() => {
+              setTab("history");
+              if (!historyLoaded && !historyBusy) void loadHistory(false);
+            }}
+          >
+            History
+          </button>
+        )}
+      </div>
+
+      {tab === "online" || !historyTabAvailable ? (
+        <>
+          <div className="cr21-filter-toolbar">
         <label className="cr-search">
           Search players
           <input
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder="Username"
+            placeholder="Username or UUID"
           />
         </label>
         <label>
@@ -107,17 +246,35 @@ export function PlayersView21(props: ViewProps) {
         <Badge>{props.state.players.length} online</Badge>
         <button
           className="cr-button"
-          onClick={() =>
-            props.notice(
-              "Player inventory is pushed live by the Paper agent; the current snapshot is already in use.",
-            )
-          }
+          disabled={refreshing || !props.can("players.snapshot.request")}
+          onClick={() => {
+            setRefreshing(true);
+            void props
+              .run("players.snapshot.request", {}, "PAPER")
+              .finally(() => setRefreshing(false));
+          }}
         >
-          Refresh
+          {refreshing ? "Requesting…" : "Refresh"}
         </button>
       </div>
 
-      <Panel title="Online players" aside={<Badge>{players.length} shown</Badge>}>
+          <Panel
+            title="Online players"
+            aside={
+              <div className="cr21-panel-badges">
+                <Badge>{players.length} shown</Badge>
+                <Badge tone={props.connected && paperOnline ? "green" : "amber"}>
+                  {!props.connected
+                    ? "Reconnecting"
+                    : !paperOnline
+                      ? "Paper offline"
+                      : props.state.pendingPlayerSnapshot
+                        ? "Reconciling"
+                        : "Live"}
+                </Badge>
+              </div>
+            }
+          >
         {players.length ? (
           <div className="cr-table-wrap">
             <table>
@@ -163,33 +320,317 @@ export function PlayersView21(props: ViewProps) {
             </table>
           </div>
         ) : (
-          <Empty
-            title={
-              search || worldFilter !== "ALL"
-                ? "No players match these filters"
-                : "No players online"
-            }
-          />
+          !props.connected ? (
+            <Empty title="Roster unavailable while reconnecting">
+              A fresh authoritative snapshot will replace the roster after the
+              signed session reconnects.
+            </Empty>
+          ) : !paperOnline ? (
+            <Empty title="Paper agent offline">
+              Cached players are not shown as online. Reconnect Paper to load a
+              current roster.
+            </Empty>
+          ) : props.state.pendingPlayerSnapshot ? (
+            <Empty title="Loading the current roster">
+              Multipart snapshot data is staged until Paper marks it complete.
+            </Empty>
+          ) : (
+            <Empty
+              title={
+                search || worldFilter !== "ALL"
+                  ? "No players match these filters"
+                  : "No players online"
+              }
+            />
+          )
         )}
       </Panel>
+
+          {historyUnavailable && (
+            <Panel title="Player history">
+              <p className="cr-hint cr-pad">{historyUnavailable}</p>
+            </Panel>
+          )}
+        </>
+      ) : (
+        <>
+          <div className="cr21-filter-toolbar">
+            <label className="cr-search">
+              Search history
+              <input
+                value={historyQuery}
+                maxLength={64}
+                onChange={(event) => setHistoryQuery(event.target.value)}
+                placeholder="Username or UUID"
+              />
+            </label>
+            <label>
+              Status
+              <select
+                value={historyStatus}
+                onChange={(event) => setHistoryStatus(event.target.value)}
+              >
+                <option value="ALL">All observations</option>
+                <option value="ONLINE">Joined</option>
+                <option value="OFFLINE">Left</option>
+              </select>
+            </label>
+            <label>
+              From
+              <input
+                type="date"
+                value={historyFrom}
+                onChange={(event) => setHistoryFrom(event.target.value)}
+              />
+            </label>
+            <label>
+              To
+              <input
+                type="date"
+                value={historyTo}
+                onChange={(event) => setHistoryTo(event.target.value)}
+              />
+            </label>
+            <button
+              className="cr-button"
+              disabled={historyBusy || !props.connected || !paperOnline}
+              onClick={() => void loadHistory(false)}
+            >
+              {historyBusy ? "Loading…" : "Search"}
+            </button>
+          </div>
+
+          <Panel
+            title="Paper-owned presence history"
+            aside={
+              historyCapturedAt ? (
+                <Badge>Captured {time(historyCapturedAt)}</Badge>
+              ) : undefined
+            }
+          >
+            {!props.connected ? (
+              <Empty title="History paused while reconnecting">
+                History is queried directly from Paper and is not served from
+                browser cache.
+              </Empty>
+            ) : !paperOnline ? (
+              <Empty title="Paper agent offline">
+                Reconnect Paper to query its local presence journal.
+              </Empty>
+            ) : historyPolicyDisabled ? (
+              <Empty title="History disabled by local policy">
+                No persistent journal is available. This setting cannot be
+                enabled remotely.
+              </Empty>
+            ) : historyError ? (
+              <Empty title="History query failed">
+                {historyError} Check Paper diagnostics, then retry this bounded
+                query.
+              </Empty>
+            ) : historyBusy && !historyLoaded ? (
+              <Empty title="Loading player history" />
+            ) : historyEntries.length ? (
+              <>
+                {historyBounded && (
+                  <p className="cr21-bounded" role="status">
+                    This result is bounded by retention or scan limits and may
+                    not include every older observation.
+                  </p>
+                )}
+                <div className="cr-table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Player</th>
+                        <th>Observation</th>
+                        <th>When</th>
+                        <th>Duration</th>
+                        <th>Termination</th>
+                        <th>Details</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {historyEntries.map((entry) => (
+                        <tr key={str(entry.eventId)}>
+                          <td>
+                            <strong>{str(entry.name)}</strong>
+                            <small className="cr21-block-id">
+                              {str(entry.uuid).slice(0, 8)}
+                            </small>
+                          </td>
+                          <td>{entry.state === "JOINED" ? "Joined" : "Left"}</td>
+                          <td>
+                            <Timestamp value={entry.observedAt} />
+                          </td>
+                          <td>{duration(entry.sessionDurationMillis)}</td>
+                          <td>
+                            {entry.termination === "UNKNOWN_DISCONNECT"
+                              ? "Unknown disconnect"
+                              : str(entry.termination).toLowerCase()}
+                          </td>
+                          <td>
+                            <button
+                              className="cr-button"
+                              onClick={() => setSelectedHistory(str(entry.eventId))}
+                            >
+                              Inspect
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                {historyMore && (
+                  <div className="cr21-load-more">
+                    <button
+                      className="cr-button"
+                      disabled={historyBusy}
+                      onClick={() => void loadHistory(true)}
+                    >
+                      {historyBusy ? "Loading…" : "Load older observations"}
+                    </button>
+                  </div>
+                )}
+              </>
+            ) : historyLoaded ? (
+              <Empty title="No matching history">
+                Paper returned no presence observations for these bounded
+                filters.
+              </Empty>
+            ) : (
+              <Empty title="Loading player history" />
+            )}
+          </Panel>
+        </>
+      )}
 
       {player && (
         <PlayerDrawer21
           key={selected}
           {...props}
           player={player}
+          previousSessions={historyEntries.filter(
+            (entry) =>
+              entry.uuid === player.uuid &&
+              entry.state === "LEFT" &&
+              entry.sessionId !== player.sessionId,
+          )}
+          historyAvailable={historyTabAvailable}
           close={() => setSelected(null)}
+        />
+      )}
+      {historyRecord &&
+        tab === "history" &&
+        historyTabAvailable &&
+        props.connected &&
+        paperOnline && (
+        <HistoryPlayerDrawer21
+          entry={historyRecord}
+          entries={historyEntries.filter(
+            (entry) => entry.uuid === historyRecord.uuid,
+          )}
+          close={() => setSelectedHistory(null)}
         />
       )}
     </>
   );
 }
 
+export function HistoryPlayerDrawer21({
+  entry,
+  entries,
+  close,
+}: {
+  entry: JsonMap;
+  entries: JsonMap[];
+  close: () => void;
+}) {
+  const ref = useRef<HTMLDialogElement>(null);
+  useEffect(() => {
+    const dialog = ref.current;
+    if (dialog && !dialog.open) dialog.showModal();
+    return () => {
+      if (dialog?.open) dialog.close();
+    };
+  }, []);
+  return (
+    <dialog
+      className="cr-drawer cr21-player-drawer"
+      ref={ref}
+      onCancel={close}
+      aria-labelledby="history-player-title"
+    >
+      <div className="cr-panel-head">
+        <div>
+          <small>Presence observation · read only</small>
+          <h2 id="history-player-title">{str(entry.name)}</h2>
+        </div>
+        <button className="cr-button" onClick={close} aria-label="Close history details">
+          ×
+        </button>
+      </div>
+      <dl className="cr-details cr21-drawer-section">
+        {[
+          ["UUID", str(entry.uuid, "Unknown")],
+          ["State", str(entry.state, "Unknown")],
+          ["Observed", <Timestamp key="observed" value={entry.observedAt} />],
+          [
+            "Session started",
+            <Timestamp key="started" value={entry.sessionStartedAt} />,
+          ],
+          [
+            "Session ended",
+            entry.sessionEndedAt ? (
+              <Timestamp key="ended" value={entry.sessionEndedAt} />
+            ) : (
+              "Unknown"
+            ),
+          ],
+          ["Duration", duration(entry.sessionDurationMillis)],
+          ["Termination", str(entry.termination, "Unknown")],
+          ["Session ID", str(entry.sessionId, "Unknown")],
+        ].map(([label, value]) => (
+          <div key={String(label)}>
+            <dt>{String(label)}</dt>
+            <dd>{value ?? "Unknown"}</dd>
+          </div>
+        ))}
+      </dl>
+      <div className="cr21-drawer-section">
+        <h3>Loaded observations for this player</h3>
+        <ul className="cr21-session-list">
+          {entries.slice(0, 12).map((item) => (
+            <li key={str(item.eventId)}>
+              <strong>{item.state === "JOINED" ? "Joined" : "Left"}</strong>
+              <span>
+                <Timestamp value={item.observedAt} />
+              </span>
+              <span>{duration(item.sessionDurationMillis)}</span>
+            </li>
+          ))}
+        </ul>
+        <p className="cr-hint">
+          Offline history rows expose no player actions. Only observations in
+          the currently loaded bounded result are shown here.
+        </p>
+      </div>
+    </dialog>
+  );
+}
+
 function PlayerDrawer21({
   player,
+  previousSessions,
+  historyAvailable,
   close,
   ...props
-}: ViewProps & { player: JsonMap; close: () => void }) {
+}: ViewProps & {
+  player: JsonMap;
+  previousSessions: JsonMap[];
+  historyAvailable: boolean;
+  close: () => void;
+}) {
   const [tab, setTab] = useState("Overview");
   const [message, setMessage] = useState("");
   const [reason, setReason] = useState("");
@@ -268,6 +709,14 @@ function PlayerDrawer21({
               ["Food", player.food],
               ["XP level", player.experienceLevel],
               ["Online", duration(player.onlineDurationMillis)],
+              ["Session started", time(player.sessionStartedAt)],
+              ["Session ID", player.sessionId],
+              ...(typeof player.firstSeenAt === "string"
+                ? [["First observed", time(player.firstSeenAt)]]
+                : []),
+              ...(typeof player.lastLoginAt === "string"
+                ? [["Last login", time(player.lastLoginAt)]]
+                : []),
               [
                 "Position",
                 player.position ? JSON.stringify(player.position) : "Not shared",
@@ -285,6 +734,27 @@ function PlayerDrawer21({
               ? `${permittedActions.length} player actions are allowed for this device and current local policy.`
               : "This device has read-only access to player details."}
           </p>
+          {historyAvailable && (
+            <div className="cr21-drawer-section">
+              <h3>Previous sessions</h3>
+              {previousSessions.length ? (
+                <ul className="cr21-session-list">
+                  {previousSessions.slice(0, 12).map((session) => (
+                    <li key={str(session.eventId)}>
+                      <strong>{time(session.sessionStartedAt)}</strong>
+                      <span>{time(session.sessionEndedAt)}</span>
+                      <span>{duration(session.sessionDurationMillis)}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="cr-hint">
+                  Open the History tab to load bounded previous-session data
+                  from Paper. History is never inferred from browser state.
+                </p>
+              )}
+            </div>
+          )}
         </div>
       ) : tab === "Actions" ? (
         <div className="cr-form cr21-drawer-section">

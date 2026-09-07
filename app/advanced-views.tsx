@@ -1029,7 +1029,7 @@ export function ServerView(props: ViewProps) {
             ["Minecraft", props.state.ready?.server.minecraftVersion],
             ["Paper agent", props.state.ready?.server.pluginVersion],
             ["Host agent", props.state.ready?.server.hostVersion],
-            ["Dashboard", "2.0.0"],
+            ["Dashboard", "2.2.0"],
             ["Protocol", "3"],
           ].map(([k, v]) => (
             <div key={String(k)}>

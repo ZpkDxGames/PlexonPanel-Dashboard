@@ -105,7 +105,7 @@ export function SettingsView21(
           <dl className="cr-details cr-pad">
             <div>
               <dt>Dashboard</dt>
-              <dd>PlexonPanel Dashboard 2.1.0</dd>
+              <dd>PlexonPanel Dashboard 2.2.0</dd>
             </div>
             <div>
               <dt>Wire protocol</dt>
