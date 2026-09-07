@@ -4,9 +4,8 @@ import { Badge, Panel, type ViewProps } from "./control-views";
 import { diagnostics } from "../lib/control-state";
 import { SCOPES } from "../lib/scopes";
 import { useUiPreferences } from "../components/ui-preferences-provider";
-import type { UiPreferencesV1 } from "../lib/ui-preferences";
 
-function SelectField<K extends keyof UiPreferencesV1>({
+function SelectField<T extends string | number>({
   label,
   value,
   options,
@@ -14,9 +13,9 @@ function SelectField<K extends keyof UiPreferencesV1>({
   hint,
 }: {
   label: string;
-  value: UiPreferencesV1[K];
-  options: Array<{ value: UiPreferencesV1[K]; label: string }>;
-  onChange: (value: UiPreferencesV1[K]) => void;
+  value: T;
+  options: Array<{ value: T; label: string }>;
+  onChange: (value: T) => void;
   hint?: string;
 }) {
   return (
@@ -30,9 +29,7 @@ function SelectField<K extends keyof UiPreferencesV1>({
         }}
       >
         {options.map((option) => (
-          <option key={String(option.value)} value={String(option.value)}>
-            {option.label}
-          </option>
+          <option key={String(option.value)} value={String(option.value)}>{option.label}</option>
         ))}
       </select>
       {hint && <small>{hint}</small>}
@@ -40,13 +37,7 @@ function SelectField<K extends keyof UiPreferencesV1>({
   );
 }
 
-function ToggleField({
-  label,
-  checked,
-  onChange,
-  hint,
-  disabled = false,
-}: {
+function ToggleField({ label, checked, onChange, hint, disabled = false }: {
   label: string;
   checked: boolean;
   onChange: (value: boolean) => void;
@@ -55,31 +46,15 @@ function ToggleField({
 }) {
   return (
     <label className="cr23-field cr23-check">
-      <span>
-        <span>{label}</span>
-        {hint && <small>{hint}</small>}
-      </span>
-      <input
-        type="checkbox"
-        checked={checked}
-        disabled={disabled}
-        onChange={(event) => onChange(event.target.checked)}
-      />
+      <span><span>{label}</span>{hint && <small>{hint}</small>}</span>
+      <input type="checkbox" checked={checked} disabled={disabled} onChange={(event) => onChange(event.target.checked)} />
     </label>
   );
 }
 
-export function SettingsView21(
-  props: ViewProps & { reconnect: () => void },
-) {
+export function SettingsView21(props: ViewProps & { reconnect: () => void }) {
   const ready = props.state.ready;
-  const {
-    preferences,
-    resolved,
-    avatarProviderAvailable,
-    updatePreference,
-    resetPreferences,
-  } = useUiPreferences();
+  const { preferences, resolved, avatarProviderAvailable, updatePreference, resetPreferences } = useUiPreferences();
 
   return (
     <>
@@ -90,33 +65,20 @@ export function SettingsView21(
             <SelectField
               label="Color theme"
               value={preferences.theme}
-              options={[
-                { value: "system", label: "System" },
-                { value: "dark", label: "Dark" },
-                { value: "light", label: "Light" },
-              ]}
+              options={[{ value: "system", label: "System" }, { value: "dark", label: "Dark" }, { value: "light", label: "Light" }]}
               onChange={(value) => updatePreference("theme", value)}
               hint={`Currently resolved to ${resolved.theme}.`}
             />
             <SelectField
               label="Accent"
               value={preferences.accent}
-              options={[
-                { value: "cyan", label: "Cyan" },
-                { value: "violet", label: "Violet" },
-                { value: "emerald", label: "Emerald" },
-                { value: "amber", label: "Amber" },
-              ]}
+              options={[{ value: "cyan", label: "Cyan" }, { value: "violet", label: "Violet" }, { value: "emerald", label: "Emerald" }, { value: "amber", label: "Amber" }]}
               onChange={(value) => updatePreference("accent", value)}
             />
             <SelectField
               label="Contrast"
               value={preferences.contrast}
-              options={[
-                { value: "system", label: "System" },
-                { value: "standard", label: "Standard" },
-                { value: "high", label: "High" },
-              ]}
+              options={[{ value: "system", label: "System" }, { value: "standard", label: "Standard" }, { value: "high", label: "High" }]}
               onChange={(value) => updatePreference("contrast", value)}
               hint={`Currently resolved to ${resolved.contrast}.`}
             />
@@ -127,30 +89,19 @@ export function SettingsView21(
             <SelectField
               label="Density"
               value={preferences.density}
-              options={[
-                { value: "compact", label: "Compact" },
-                { value: "comfortable", label: "Comfortable" },
-                { value: "spacious", label: "Spacious" },
-              ]}
+              options={[{ value: "compact", label: "Compact" }, { value: "comfortable", label: "Comfortable" }, { value: "spacious", label: "Spacious" }]}
               onChange={(value) => updatePreference("density", value)}
             />
             <SelectField
               label="Text scale"
               value={preferences.textScale}
-              options={[
-                { value: 100, label: "100%" },
-                { value: 112.5, label: "112.5%" },
-                { value: 125, label: "125%" },
-              ]}
+              options={[{ value: 100, label: "100%" }, { value: 112.5, label: "112.5%" }, { value: 125, label: "125%" }]}
               onChange={(value) => updatePreference("textScale", value)}
             />
             <SelectField
               label="Mobile player rows"
               value={preferences.mobilePlayerRows}
-              options={[
-                { value: "cards", label: "Cards" },
-                { value: "table", label: "Table" },
-              ]}
+              options={[{ value: "cards", label: "Cards" }, { value: "table", label: "Table" }]}
               onChange={(value) => updatePreference("mobilePlayerRows", value)}
             />
           </section>
@@ -162,36 +113,21 @@ export function SettingsView21(
               checked={avatarProviderAvailable && preferences.playerHeads}
               disabled={!avatarProviderAvailable}
               onChange={(value) => updatePreference("playerHeads", value)}
-              hint={
-                avatarProviderAvailable
-                  ? "Remote heads are optional and never block the roster."
-                  : "Unavailable because no valid deployment avatar provider is configured."
-              }
+              hint={avatarProviderAvailable ? "Remote heads are optional and never block the roster." : "Unavailable because no valid deployment avatar provider is configured."}
             />
             <SelectField
               label="Head size"
               value={preferences.playerHeadSize}
-              options={[
-                { value: "small", label: "Small" },
-                { value: "medium", label: "Medium" },
-              ]}
+              options={[{ value: "small", label: "Small" }, { value: "medium", label: "Medium" }]}
               onChange={(value) => updatePreference("playerHeadSize", value)}
             />
             <SelectField
               label="UUID display"
               value={preferences.playerUuid}
-              options={[
-                { value: "hidden", label: "Hidden" },
-                { value: "short", label: "Short" },
-                { value: "full", label: "Full" },
-              ]}
+              options={[{ value: "hidden", label: "Hidden" }, { value: "short", label: "Short" }, { value: "full", label: "Full" }]}
               onChange={(value) => updatePreference("playerUuid", value)}
             />
-            <ToggleField
-              label="Live row highlight"
-              checked={preferences.liveRowHighlight}
-              onChange={(value) => updatePreference("liveRowHighlight", value)}
-            />
+            <ToggleField label="Live row highlight" checked={preferences.liveRowHighlight} onChange={(value) => updatePreference("liveRowHighlight", value)} />
           </section>
 
           <section className="cr23-preference-group">
@@ -199,45 +135,26 @@ export function SettingsView21(
             <SelectField
               label="Default window"
               value={preferences.chartWindowMinutes}
-              options={[
-                { value: 1, label: "1 minute" },
-                { value: 5, label: "5 minutes" },
-                { value: 15, label: "15 minutes" },
-                { value: 30, label: "30 minutes" },
-              ]}
+              options={[{ value: 1, label: "1 minute" }, { value: 5, label: "5 minutes" }, { value: 15, label: "15 minutes" }, { value: 30, label: "30 minutes" }]}
               onChange={(value) => updatePreference("chartWindowMinutes", value)}
             />
             <SelectField
               label="Chart style"
               value={preferences.chartStyle}
-              options={[
-                { value: "line", label: "Line" },
-                { value: "area", label: "Area" },
-              ]}
+              options={[{ value: "line", label: "Line" }, { value: "area", label: "Area" }]}
               onChange={(value) => updatePreference("chartStyle", value)}
             />
-            <ToggleField
-              label="Grid"
-              checked={preferences.chartGrid}
-              onChange={(value) => updatePreference("chartGrid", value)}
-            />
+            <ToggleField label="Grid" checked={preferences.chartGrid} onChange={(value) => updatePreference("chartGrid", value)} />
             <SelectField
               label="Chart layout"
               value={preferences.chartLayout}
-              options={[
-                { value: "auto", label: "Auto" },
-                { value: "single", label: "Single column" },
-                { value: "double", label: "Two columns" },
-              ]}
+              options={[{ value: "auto", label: "Auto" }, { value: "single", label: "Single column" }, { value: "double", label: "Two columns" }]}
               onChange={(value) => updatePreference("chartLayout", value)}
             />
             <SelectField
               label="Timestamp display"
               value={preferences.timeZone}
-              options={[
-                { value: "local", label: "Browser local" },
-                { value: "utc", label: "UTC" },
-              ]}
+              options={[{ value: "local", label: "Browser local" }, { value: "utc", label: "UTC" }]}
               onChange={(value) => updatePreference("timeZone", value)}
             />
           </section>
@@ -247,34 +164,17 @@ export function SettingsView21(
             <SelectField
               label="Motion profile"
               value={preferences.motion}
-              options={[
-                { value: "system", label: "System" },
-                { value: "full", label: "Full" },
-                { value: "reduced", label: "Reduced" },
-                { value: "off", label: "Off" },
-              ]}
+              options={[{ value: "system", label: "System" }, { value: "full", label: "Full" }, { value: "reduced", label: "Reduced" }, { value: "off", label: "Off" }]}
               onChange={(value) => updatePreference("motion", value)}
               hint={`Currently resolved to ${resolved.motion}. OS reduced-motion remains a safety floor.`}
             />
-            <ToggleField
-              label="Live pulses"
-              checked={preferences.livePulse}
-              onChange={(value) => updatePreference("livePulse", value)}
-            />
-            <ToggleField
-              label="Page transitions"
-              checked={preferences.pageTransitions}
-              onChange={(value) => updatePreference("pageTransitions", value)}
-            />
+            <ToggleField label="Live pulses" checked={preferences.livePulse} onChange={(value) => updatePreference("livePulse", value)} />
+            <ToggleField label="Page transitions" checked={preferences.pageTransitions} onChange={(value) => updatePreference("pageTransitions", value)} />
           </section>
         </div>
         <div className="cr23-settings-actions">
-          <button className="cr-button" onClick={resetPreferences}>
-            Reset appearance settings
-          </button>
-          <span className="cr-hint">
-            This reset changes presentation only. It does not forget credentials, revoke this device, or clear server data.
-          </span>
+          <button className="cr-button" onClick={resetPreferences}>Reset appearance settings</button>
+          <span className="cr-hint">This reset changes presentation only. It does not forget credentials, revoke this device, or clear server data.</span>
         </div>
       </Panel>
 
@@ -286,9 +186,7 @@ export function SettingsView21(
             <div><dt>Fingerprint</dt><dd>{ready?.server.fingerprint ?? "Unavailable"}</dd></div>
             <div><dt>Device role</dt><dd>{ready?.device.role ?? "Unknown"}</dd></div>
           </dl>
-          <div className="cr-actions cr-pad">
-            <button className="cr-button" onClick={props.reconnect}>Reconnect</button>
-          </div>
+          <div className="cr-actions cr-pad"><button className="cr-button" onClick={props.reconnect}>Reconnect</button></div>
         </Panel>
 
         <Panel title="Data & refresh">
@@ -316,14 +214,7 @@ export function SettingsView21(
         <Panel title="Diagnostics">
           <div className="cr-pad">
             <p>Copy a safe support snapshot containing versions, protocol, connection state, capabilities and non-sensitive runtime state.</p>
-            <button
-              className="cr-button"
-              onClick={() => void navigator.clipboard
-                .writeText(diagnostics(props.state))
-                .then(() => props.notice("Safe diagnostics copied."))}
-            >
-              Copy safe diagnostics
-            </button>
+            <button className="cr-button" onClick={() => void navigator.clipboard.writeText(diagnostics(props.state)).then(() => props.notice("Safe diagnostics copied."))}>Copy safe diagnostics</button>
             <p className="cr-hint">Access tokens, pairing codes, private keys and relay secrets are not included.</p>
           </div>
         </Panel>
@@ -331,9 +222,7 @@ export function SettingsView21(
         <Panel title="Local capabilities">
           <div className="cr-table-wrap">
             <table>
-              <thead>
-                <tr><th>Scope</th><th>Paper policy</th><th>Host policy</th><th>This device</th></tr>
-              </thead>
+              <thead><tr><th>Scope</th><th>Paper policy</th><th>Host policy</th><th>This device</th></tr></thead>
               <tbody>
                 {SCOPES.map((scope) => (
                   <tr key={scope}>
