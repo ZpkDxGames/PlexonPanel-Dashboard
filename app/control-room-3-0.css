@@ -1,0 +1,668 @@
+/* PlexonPanel Dashboard 3.0 — authoritative Control Room presentation layer. */
+:root {
+  --cr30-space-1: 4px;
+  --cr30-space-2: 8px;
+  --cr30-space-3: 12px;
+  --cr30-space-4: 16px;
+  --cr30-space-5: 20px;
+  --cr30-space-6: 24px;
+  --cr30-space-7: 32px;
+
+  --cr30-motion-instant: 80ms;
+  --cr30-motion-fast: 140ms;
+  --cr30-motion-standard: 220ms;
+  --cr30-motion-slow: 320ms;
+  --cr30-ease-standard: cubic-bezier(.2, .8, .2, 1);
+  --cr30-ease-enter: cubic-bezier(.16, 1, .3, 1);
+  --cr30-ease-exit: cubic-bezier(.4, 0, 1, 1);
+
+  --cr30-z-content: 1;
+  --cr30-z-sticky: 20;
+  --cr30-z-sidebar: 40;
+  --cr30-z-scrim: 60;
+  --cr30-z-popover: 80;
+  --cr30-z-toast: 100;
+  --cr30-z-drawer: 120;
+  --cr30-z-modal: 140;
+  --cr30-z-command: 160;
+
+  --cr30-content-max: 2200px;
+  --cr30-panel-pad: 16px;
+  --cr30-touch-target: 44px;
+}
+
+/* 3.0 never globally scales the dashboard. Composition changes instead. */
+.cr21-shell {
+  container-type: inline-size;
+  container-name: control-room-shell;
+  --cr21-sidebar-width: 232px;
+  --cr21-sidebar-collapsed: 68px;
+  background:
+    radial-gradient(circle at 82% -10%, color-mix(in srgb, var(--cr21-accent) 8%, transparent), transparent 32%),
+    linear-gradient(180deg, color-mix(in srgb, var(--cr21-bg) 94%, #111a27), var(--cr21-bg));
+}
+
+.cr21-main {
+  min-width: 0;
+  container-type: inline-size;
+  container-name: control-room-main;
+}
+
+.cr21-content {
+  width: min(100%, var(--cr30-content-max));
+  min-width: 0;
+  align-self: center;
+  container-type: inline-size;
+  container-name: workspace;
+  padding-inline: clamp(16px, 2.1vw, 30px);
+  padding-bottom: var(--cr30-space-7);
+}
+
+.cr21-content > *,
+.cr21-content section,
+.cr21-content article,
+.cr21-content div,
+.cr21-topbar > *,
+.cr21-page-head > * {
+  min-width: 0;
+}
+
+.cr21-sidebar {
+  z-index: var(--cr30-z-sidebar);
+  padding: 12px 10px;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--cr23-canvas-sidebar) 96%, var(--cr21-accent) 4%), var(--cr23-canvas-sidebar));
+}
+
+.cr21-sidebar-head {
+  padding: 3px 4px 10px;
+}
+
+.cr21-server-identity {
+  gap: var(--cr30-space-2);
+  margin: 3px 3px 13px;
+  padding: 10px;
+}
+
+.cr21-nav-group {
+  margin-bottom: 10px;
+}
+
+.cr21-nav-label {
+  padding: 0 9px 5px;
+  font-size: .68rem;
+  letter-spacing: .14em;
+}
+
+.cr21-nav button {
+  min-height: 40px;
+  gap: 10px;
+  margin-block: 2px;
+  padding-inline: 10px;
+}
+
+.cr21-nav button.active {
+  border-color: color-mix(in srgb, var(--cr21-accent) 22%, transparent);
+  background: linear-gradient(90deg, var(--cr21-accent-soft), color-mix(in srgb, var(--cr21-accent-soft) 40%, transparent));
+}
+
+.cr21-topbar {
+  z-index: var(--cr30-z-sticky);
+  min-height: 60px;
+  grid-template-columns: minmax(170px, 1fr) auto auto auto;
+  gap: clamp(8px, 1.3vw, 18px);
+  padding: 8px clamp(16px, 2vw, 28px);
+  background: color-mix(in srgb, var(--cr21-bg) 94%, transparent);
+  backdrop-filter: blur(12px);
+}
+
+.cr21-topbar-actions {
+  min-width: 0;
+  flex-wrap: nowrap;
+}
+
+.cr21-quick-actions > div,
+.cr21-menu > div {
+  z-index: var(--cr30-z-popover);
+}
+
+.cr21-page-head {
+  width: min(100%, var(--cr30-content-max));
+  align-self: center;
+  align-items: center;
+  padding: 18px clamp(16px, 2.1vw, 30px) 11px;
+}
+
+.cr21-page-head h1 {
+  margin-top: 3px;
+  font-size: clamp(1.35rem, 2vw, 1.8rem);
+}
+
+.cr21-page-meta {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.cr21-footer {
+  width: min(100%, var(--cr30-content-max));
+  align-self: center;
+  margin-top: auto;
+  padding: 10px clamp(16px, 2.1vw, 30px) 14px;
+}
+
+/* Enforced 3.0 spacing contracts. */
+.cr21-shell .cr-panel,
+.cr21-shell .cr21-panel {
+  min-width: 0;
+}
+
+.cr21-shell .cr-panel-head,
+.cr21-shell .cr21-panel-head {
+  gap: var(--cr30-space-3);
+}
+
+.cr21-shell .cr-panel p,
+.cr21-shell .cr21-panel p,
+.cr21-shell .cr-panel li,
+.cr21-shell .cr21-panel li,
+.cr21-shell .cr-hint,
+.cr21-shell .cr-details dd,
+.cr21-shell .cr-details dt {
+  line-height: 1.5;
+}
+
+.cr21-shell .cr-pad {
+  padding: var(--cr30-panel-pad);
+}
+
+.cr21-shell .cr-actions {
+  gap: var(--cr30-space-2);
+  flex-wrap: wrap;
+}
+
+.cr21-shell .cr-details {
+  gap: var(--cr30-space-2);
+}
+
+.cr21-shell .cr-details > div {
+  gap: var(--cr30-space-3);
+}
+
+.cr21-shell table td,
+.cr21-shell table th {
+  vertical-align: middle;
+}
+
+.cr21-shell td,
+.cr21-shell th,
+.cr21-shell button,
+.cr21-shell input,
+.cr21-shell select,
+.cr21-shell textarea,
+.cr21-shell code,
+.cr21-shell pre {
+  min-width: 0;
+}
+
+.cr21-shell pre,
+.cr21-shell code,
+.cr21-shell .cr-confirm-target {
+  overflow-wrap: anywhere;
+}
+
+/* Overview and telemetry recompose by available container width. */
+.cr21-metric-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 205px), 1fr));
+  gap: var(--cr30-space-3);
+  margin-bottom: var(--cr30-space-3);
+}
+
+.cr21-metric-grid.compact {
+  gap: var(--cr30-space-3);
+}
+
+.cr21-metric-card,
+.cr23-spark-card {
+  min-height: 112px;
+  padding: 15px;
+}
+
+.cr21-chart-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 430px), 1fr));
+  gap: var(--cr30-space-4);
+}
+
+.cr21-chart-card {
+  min-width: 0;
+  overflow: clip;
+}
+
+.cr21-chart-stage {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.cr21-chart {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  height: auto;
+  max-height: 300px;
+}
+
+.cr21-chart-summary {
+  gap: var(--cr30-space-3);
+}
+
+.cr21-chart-summary dl {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--cr30-space-2);
+}
+
+.cr21-chart-tooltip {
+  max-width: min(260px, calc(100% - 24px));
+}
+
+/* Settings 3.0: simple grouped surface, not a giant capabilities matrix. */
+.cr30-settings-stack {
+  display: grid;
+  gap: var(--cr30-space-4);
+}
+
+.cr30-settings-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: var(--cr30-space-3);
+}
+
+.cr30-browser-data-group {
+  grid-column: span 2;
+}
+
+.cr30-setting-note {
+  margin: 4px 0 0;
+  padding: 10px 12px;
+  border: 1px solid var(--cr21-border-soft);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--cr21-accent) 5%, transparent);
+  color: var(--cr21-text-muted);
+  font-size: .78rem;
+}
+
+.cr30-diagnostics-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: var(--cr30-space-3);
+}
+
+.cr30-copy-stack {
+  display: grid;
+  gap: var(--cr30-space-3);
+}
+
+.cr30-copy-stack > * {
+  margin: 0;
+}
+
+/* Viewport-correct native top-layer overlays. Native dialogs remain in the
+   browser top layer, and these rules remove content-column centering math. */
+dialog.cr21-dialog,
+dialog.cr21-command {
+  position: fixed !important;
+  inset: 0 !important;
+  margin: auto !important;
+  transform: none !important;
+  box-sizing: border-box;
+  max-height: calc(100dvh - max(32px, env(safe-area-inset-top) + env(safe-area-inset-bottom) + 16px));
+  overflow: auto;
+}
+
+dialog.cr21-dialog {
+  z-index: var(--cr30-z-modal);
+  width: min(520px, calc(100vw - 32px));
+  max-width: calc(100vw - 32px);
+  padding: clamp(18px, 3vw, 26px);
+}
+
+dialog.cr21-command {
+  z-index: var(--cr30-z-command);
+  width: min(680px, calc(100vw - 32px));
+  max-width: calc(100vw - 32px);
+}
+
+dialog.cr21-dialog::backdrop,
+dialog.cr21-command::backdrop {
+  background: rgba(2, 5, 9, .74);
+  backdrop-filter: blur(3px);
+}
+
+.cr21-dialog .cr-actions {
+  margin-top: var(--cr30-space-5);
+  justify-content: flex-end;
+}
+
+.cr21-command-search {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.cr21-toast {
+  z-index: var(--cr30-z-toast);
+  max-width: min(460px, calc(100vw - 24px));
+  overflow-wrap: anywhere;
+  bottom: max(16px, env(safe-area-inset-bottom));
+  right: max(16px, env(safe-area-inset-right));
+}
+
+.cr21-mobile-menu {
+  z-index: calc(var(--cr30-z-sidebar) + 2);
+}
+
+.cr21-sidebar-scrim {
+  z-index: var(--cr30-z-scrim);
+}
+
+/* Restrained 3.0 interaction motion. */
+html[data-plexon-motion="full"] .cr21-nav button,
+html[data-plexon-motion="full"] .cr-button,
+html[data-plexon-motion="full"] .cr21-icon-button,
+html[data-plexon-motion="full"] .cr21-command-button,
+html[data-plexon-motion="full"] .cr21-role-button {
+  transition-duration: var(--cr30-motion-fast);
+  transition-timing-function: var(--cr30-ease-standard);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  html[data-plexon-motion="full"] .cr21-metric-card:hover,
+  html[data-plexon-motion="full"] .cr23-spark-card:hover {
+    transform: translateY(-1px);
+    border-color: color-mix(in srgb, var(--cr21-accent) 18%, var(--cr21-border-soft));
+    transition:
+      transform var(--cr30-motion-fast) var(--cr30-ease-standard),
+      border-color var(--cr30-motion-fast) var(--cr30-ease-standard);
+  }
+
+  html[data-plexon-motion="full"] .cr-button:active:not(:disabled) {
+    transform: translateY(1px);
+  }
+}
+
+/* Container-first adaptation for workspaces. */
+@container workspace (max-width: 960px) {
+  .cr21-chart-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cr30-browser-data-group {
+    grid-column: auto;
+  }
+}
+
+@container workspace (max-width: 680px) {
+  .cr21-metric-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .cr21-chart-summary {
+    align-items: stretch;
+  }
+
+  .cr21-chart-summary dl {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .cr21-reference-label {
+    font-size: 10px;
+  }
+
+  .cr23-preference-grid,
+  .cr30-settings-grid,
+  .cr30-diagnostics-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@container workspace (max-width: 420px) {
+  .cr21-metric-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cr21-metric-card,
+  .cr23-spark-card {
+    min-height: 0;
+  }
+
+  .cr21-chart-summary dl {
+    gap: 6px;
+  }
+}
+
+/* Global shell changes remain viewport-driven. */
+@media (max-width: 1180px) {
+  .cr21-topbar {
+    grid-template-columns: minmax(150px, 1fr) auto auto;
+  }
+
+  .cr21-topbar > .cr21-freshness {
+    display: none;
+  }
+
+  .cr21-command-button kbd,
+  .cr21-role-button svg {
+    display: none;
+  }
+}
+
+@media (max-width: 980px) {
+  .cr21-topbar {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .cr21-agent-pills {
+    display: none;
+  }
+
+  .cr21-topbar-actions {
+    justify-content: flex-end;
+  }
+
+  .cr21-quick-actions > summary {
+    padding-inline: 10px;
+  }
+
+  .cr21-quick-actions > summary:not(:focus-visible) {
+    font-size: 0;
+  }
+
+  .cr21-quick-actions > summary svg {
+    margin: 0;
+  }
+}
+
+@media (max-width: 760px) {
+  .cr21-topbar {
+    min-height: 58px;
+    padding-left: 62px;
+    padding-right: 12px;
+    gap: 8px;
+  }
+
+  .cr21-topbar-server .cr21-kicker {
+    display: none;
+  }
+
+  .cr21-topbar-server > strong,
+  .cr21-server-select {
+    max-width: min(52vw, 250px);
+  }
+
+  .cr21-command-button span,
+  .cr21-command-button kbd,
+  .cr21-role-button span,
+  .cr21-quick-actions > summary {
+    display: none;
+  }
+
+  .cr21-command-button,
+  .cr21-role-button,
+  .cr21-icon-button {
+    width: 40px;
+    height: 40px;
+    justify-content: center;
+    padding: 0;
+  }
+
+  .cr21-page-head {
+    align-items: flex-start;
+    padding-top: 14px;
+  }
+
+  .cr21-page-meta > .cr21-freshness {
+    display: none;
+  }
+
+  .cr21-page-meta .cr-button {
+    min-height: 40px;
+  }
+
+  .cr21-footer {
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  dialog.cr21-command {
+    width: calc(100vw - 16px);
+    max-width: calc(100vw - 16px);
+    max-height: calc(100dvh - 16px);
+    border-radius: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .cr21-content {
+    padding-inline: 12px;
+    padding-bottom: 20px;
+  }
+
+  .cr21-page-head {
+    padding-inline: 12px;
+    gap: 10px;
+  }
+
+  .cr21-page-head > div > span {
+    display: none;
+  }
+
+  .cr21-page-head h1 {
+    margin: 0;
+    font-size: 1.35rem;
+  }
+
+  .cr21-page-meta .cr-button {
+    font-size: 0;
+    width: 40px;
+    padding: 0;
+    justify-content: center;
+  }
+
+  .cr23-preference-grid,
+  .cr30-settings-grid {
+    padding: 10px;
+  }
+
+  .cr23-preference-group {
+    padding: 12px;
+  }
+
+  dialog.cr21-dialog {
+    width: calc(100vw - 16px);
+    max-width: calc(100vw - 16px);
+    max-height: calc(100dvh - 16px);
+    padding: 18px;
+    border-radius: 16px;
+  }
+
+  .cr21-dialog .cr-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Wide + short laptop: save vertical room without shrinking readable controls. */
+@media (min-width: 900px) and (max-height: 800px) {
+  .cr21-sidebar {
+    padding-block: 8px;
+  }
+
+  .cr21-sidebar-head {
+    min-height: 44px;
+    padding-bottom: 7px;
+  }
+
+  .cr21-server-identity {
+    margin-bottom: 8px;
+    padding-block: 8px;
+  }
+
+  .cr21-nav-group {
+    margin-bottom: 6px;
+  }
+
+  .cr21-nav-label {
+    padding-bottom: 3px;
+  }
+
+  .cr21-nav button {
+    min-height: 36px;
+  }
+
+  .cr21-topbar {
+    min-height: 54px;
+    padding-block: 6px;
+  }
+
+  .cr21-page-head {
+    padding-top: 12px;
+    padding-bottom: 8px;
+  }
+
+  .cr21-footer {
+    padding-block: 8px 10px;
+  }
+}
+
+/* Ultra-wide monitors gain useful columns, not enormous text panels. */
+@media (min-width: 2200px) {
+  .cr21-metric-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .cr21-chart-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .cr30-settings-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (pointer: coarse) {
+  .cr21-shell button,
+  .cr21-shell summary,
+  .cr21-shell select,
+  .cr21-shell input[type="button"],
+  .cr21-shell input[type="submit"] {
+    min-height: var(--cr30-touch-target);
+  }
+
+  .cr21-nav button {
+    min-height: var(--cr30-touch-target);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cr21-shell *,
+  .cr21-shell *::before,
+  .cr21-shell *::after {
+    scroll-behavior: auto !important;
+  }
+}
