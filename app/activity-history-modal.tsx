@@ -210,7 +210,7 @@ export function ActivityHistoryModal({
                         <PlayerHead
                           uuid={event.uuid}
                           name={event.name}
-                          size={38}
+                          size={40}
                           online={event.state === "JOINED"}
                         />
                         <div className="cr30-activity-modal-identity">
