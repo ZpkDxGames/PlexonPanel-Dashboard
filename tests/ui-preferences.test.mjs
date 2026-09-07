@@ -49,7 +49,7 @@ test("strict parsing drops unknown and corrupt preference values", () => {
 
 test("oversized or invalid stored JSON falls back safely", () => {
   const defaults = createDefaultUiPreferences(true);
-  assert.deepEqual(parseUiPreferencesText("{"), defaults), defaults);
+  assert.deepEqual(parseUiPreferencesText("{", defaults), defaults);
   assert.deepEqual(parseUiPreferencesText("x".repeat(9000), defaults), defaults);
 });
 
