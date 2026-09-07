@@ -1,0 +1,203 @@
+/* Dashboard 2.3 presentation tokens and motion layer. */
+:root {
+  --cr23-canvas-page: var(--cr21-bg);
+  --cr23-canvas-sidebar: #090e16;
+  --cr23-canvas-inset: #080d15;
+  --cr23-surface-base: var(--cr21-surface-1);
+  --cr23-surface-raised: var(--cr21-surface-2);
+  --cr23-surface-overlay: var(--cr21-surface-3);
+  --cr23-surface-hover: var(--cr21-surface-hover);
+  --cr23-surface-selected: color-mix(in srgb, var(--cr21-accent) 12%, var(--cr21-surface-2));
+  --cr23-border-subtle: var(--cr21-border-soft);
+  --cr23-border-default: rgba(148, 163, 184, 0.2);
+  --cr23-border-strong: var(--cr21-border-strong);
+  --cr23-border-focus: var(--cr21-accent);
+  --cr23-text-primary: var(--cr21-text-primary);
+  --cr23-text-secondary: var(--cr21-text-secondary);
+  --cr23-text-muted: var(--cr21-text-muted);
+  --cr23-text-inverse: #061017;
+  --cr23-text-link: var(--cr21-accent-hover);
+  --cr23-info: #63c7ff;
+  --cr23-success: var(--cr21-success);
+  --cr23-warning: var(--cr21-warning);
+  --cr23-danger: var(--cr21-danger);
+  --cr23-neutral: #95a3b6;
+  --cr23-chart-1: var(--cr21-accent);
+  --cr23-chart-2: var(--cr21-violet);
+  --cr23-chart-3: var(--cr21-success);
+  --cr23-chart-4: var(--cr21-warning);
+  --cr23-chart-5: #ff8fb3;
+  --cr23-chart-6: #72a7ff;
+  --cr23-chart-grid: rgba(148, 163, 184, 0.14);
+  --cr23-chart-axis: var(--cr21-text-muted);
+  --cr23-chart-threshold: var(--cr21-warning);
+  --cr23-chart-selection: var(--cr21-accent);
+  --cr23-radius-control: var(--cr21-radius-control);
+  --cr23-radius-card: var(--cr21-radius-card);
+  --cr23-radius-drawer: 20px;
+  --cr23-radius-pill: 999px;
+  --cr23-shadow-card: var(--cr21-shadow);
+  --cr23-shadow-sticky: 0 10px 28px rgba(0, 0, 0, 0.2);
+  --cr23-shadow-drawer: 0 24px 80px rgba(0, 0, 0, 0.34);
+  --cr23-space-control: 8px;
+  --cr23-space-card: 16px;
+  --cr23-motion-instant: 90ms;
+  --cr23-motion-fast: 150ms;
+  --cr23-motion-standard: 220ms;
+  --cr23-motion-deliberate: 300ms;
+  --cr23-ease: cubic-bezier(.2, .8, .2, 1);
+}
+
+html[data-plexon-accent="violet"] {
+  --cr21-accent: #9b8cff;
+  --cr21-accent-hover: #b4a9ff;
+  --cr21-accent-soft: rgba(155, 140, 255, .14);
+}
+html[data-plexon-accent="emerald"] {
+  --cr21-accent: #49d89d;
+  --cr21-accent-hover: #75e5b8;
+  --cr21-accent-soft: rgba(73, 216, 157, .14);
+}
+html[data-plexon-accent="amber"] {
+  --cr21-accent: #efb84f;
+  --cr21-accent-hover: #f5ca78;
+  --cr21-accent-soft: rgba(239, 184, 79, .14);
+}
+
+html[data-plexon-theme="light"] {
+  color-scheme: light;
+  --cr21-bg: #eef3f8;
+  --cr21-surface-1: #ffffff;
+  --cr21-surface-2: #f6f9fc;
+  --cr21-surface-3: #edf3f8;
+  --cr21-surface-hover: #e8f0f7;
+  --cr21-border-soft: rgba(43, 60, 78, .12);
+  --cr21-border-strong: rgba(43, 60, 78, .26);
+  --cr21-text-primary: #152232;
+  --cr21-text-secondary: #425369;
+  --cr21-text-muted: #68798d;
+  --cr23-canvas-sidebar: #f6f9fc;
+  --cr23-canvas-inset: #e8eef5;
+  --cr23-chart-grid: rgba(43, 60, 78, .12);
+  --cr21-shadow: 0 14px 38px rgba(45, 61, 80, .10);
+}
+html[data-plexon-theme="light"] .cr21-sidebar {
+  background: var(--cr23-canvas-sidebar);
+}
+html[data-plexon-theme="light"] .cr21-shell {
+  background:
+    radial-gradient(circle at 75% -15%, color-mix(in srgb, var(--cr21-accent) 10%, transparent), transparent 34%),
+    var(--cr21-bg);
+}
+
+html[data-plexon-contrast="high"] {
+  --cr21-border-soft: rgba(148, 163, 184, .38);
+  --cr21-border-strong: rgba(220, 231, 242, .68);
+  --cr21-text-muted: #b6c0ce;
+}
+html[data-plexon-theme="light"][data-plexon-contrast="high"] {
+  --cr21-border-soft: rgba(24, 39, 54, .38);
+  --cr21-border-strong: rgba(24, 39, 54, .7);
+  --cr21-text-muted: #4e5e70;
+}
+html[data-plexon-contrast="high"] :focus-visible {
+  outline: 3px solid var(--cr21-accent) !important;
+  outline-offset: 3px;
+}
+
+html[data-plexon-text-scale="112.5"] { font-size: 112.5%; }
+html[data-plexon-text-scale="125"] { font-size: 125%; }
+
+html[data-plexon-density="spacious"] .cr21-shell table td,
+html[data-plexon-density="spacious"] .cr21-shell table th {
+  padding-block: 15px;
+}
+html[data-plexon-density="spacious"] .cr21-panel-head { min-height: 58px; }
+
+.cr23-preference-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  padding: 16px;
+}
+.cr23-preference-group {
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid var(--cr21-border-soft);
+  border-radius: var(--cr21-radius-card);
+  background: var(--cr21-surface-2);
+}
+.cr23-preference-group h3 {
+  margin: 0 0 12px;
+  font-size: .9rem;
+}
+.cr23-field {
+  display: grid;
+  gap: 6px;
+  margin: 0 0 12px;
+  color: var(--cr21-text-secondary);
+  font-size: .82rem;
+}
+.cr23-field:last-child { margin-bottom: 0; }
+.cr23-field > span:first-child { font-weight: 700; color: var(--cr21-text-primary); }
+.cr23-field small { color: var(--cr21-text-muted); line-height: 1.45; }
+.cr23-check {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+}
+.cr23-check input { width: 20px; height: 20px; }
+.cr23-settings-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  padding: 0 16px 16px;
+}
+
+html[data-plexon-motion="full"] .cr21-panel,
+html[data-plexon-motion="full"] .cr21-nav button,
+html[data-plexon-motion="full"] .cr-button,
+html[data-plexon-motion="full"] .cr21-player-drawer {
+  transition-duration: var(--cr23-motion-fast);
+  transition-timing-function: var(--cr23-ease);
+}
+html[data-plexon-motion="full"][data-plexon-page-transitions="on"] .cr21-content {
+  animation: cr23-content-in var(--cr23-motion-standard) var(--cr23-ease) both;
+}
+html[data-plexon-motion="full"][data-plexon-live-pulse="on"] .cr21-live-dot {
+  animation: cr23-live-pulse 1.8s ease-in-out infinite;
+}
+html[data-plexon-motion="reduced"] *,
+html[data-plexon-motion="off"] * {
+  scroll-behavior: auto !important;
+}
+html[data-plexon-motion="reduced"] * {
+  animation-duration: 80ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 80ms !important;
+  transition-property: opacity, color, background-color, border-color !important;
+}
+html[data-plexon-motion="off"] * {
+  animation: none !important;
+  transition: none !important;
+}
+
+@keyframes cr23-content-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes cr23-live-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .58; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .cr23-preference-grid { grid-template-columns: 1fr; padding: 12px; }
+  .cr23-preference-group { padding: 12px; }
+}
