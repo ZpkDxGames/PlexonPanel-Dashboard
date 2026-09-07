@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { PlayerHead } from "../../components/player-head";
 import {
@@ -41,15 +42,16 @@ function eventTime(event: PresenceHistoryEvent): string {
 function useServerHistory(serverId: string) {
   const [events, setEvents] = useState<PresenceHistoryEvent[]>([]);
   useEffect(() => {
-    if (!serverId) {
-      setEvents([]);
-      return;
-    }
+    if (!serverId) return;
     const refresh = () => setEvents(loadActivityHistory(serverId));
-    refresh();
-    return subscribeActivityHistory(serverId, refresh);
+    const timer = window.setTimeout(refresh, 0);
+    const unsubscribe = subscribeActivityHistory(serverId, refresh);
+    return () => {
+      window.clearTimeout(timer);
+      unsubscribe();
+    };
   }, [serverId]);
-  return events;
+  return serverId ? events : [];
 }
 
 export default function ActivityPage() {
@@ -61,11 +63,19 @@ export default function ActivityPage() {
   const events = useServerHistory(serverId);
 
   useEffect(() => {
-    const available = listActivityHistoryServers();
-    const requested = new URLSearchParams(window.location.search).get("serverId") ?? "";
-    const selected = requested || available[0] || "";
-    setServers(available.includes(selected) || !selected ? available : [selected, ...available]);
-    setServerId(selected);
+    const timer = window.setTimeout(() => {
+      const available = listActivityHistoryServers();
+      const requested =
+        new URLSearchParams(window.location.search).get("serverId") ?? "";
+      const selected = requested || available[0] || "";
+      setServers(
+        available.includes(selected) || !selected
+          ? available
+          : [selected, ...available],
+      );
+      setServerId(selected);
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, []);
 
   const updateServer = (next: string) => {
@@ -119,9 +129,9 @@ export default function ActivityPage() {
               The dashboard does not request additional plugin telemetry for this page.
             </p>
           </div>
-          <a className={styles.back} href="/">
+          <Link className={styles.back} href="/">
             ← Back to dashboard
-          </a>
+          </Link>
         </header>
 
         {servers.length > 1 && (
