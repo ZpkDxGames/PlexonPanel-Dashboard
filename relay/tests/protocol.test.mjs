@@ -43,6 +43,43 @@ test("signs and verifies protocol v3 envelopes with Ed25519", async () => {
   );
 });
 
+test("normalizes omitted nullable fields from 3.0.1 presence JOIN envelopes", async () => {
+  const { privateKey, publicKey } = generateKeyPairSync("ed25519");
+  const privateKeyBase64 = privateKey
+    .export({ format: "der", type: "pkcs8" })
+    .toString("base64");
+  const publicKeyBase64 = publicKey
+    .export({ format: "der", type: "spki" })
+    .toString("base64");
+  const encoded = await signEnvelope(
+    "players.presence",
+    "4e34679e-30b6-4f68-a50e-a10dfdb2724d",
+    {
+      eventId: "66431911-ce8c-48f3-9846-4754a8af21ef",
+      sessionId: "92435470-1a9d-4dfc-a0e9-0b66f229a504",
+      uuid: "b13187d8-f13d-4ad8-a6cc-2e0d7df95750",
+      name: "Alex",
+      state: "JOINED",
+      observedAt: "2026-09-07T20:00:00Z",
+      sessionStartedAt: "2026-09-07T20:00:00Z",
+      termination: "OPEN",
+      persistenceState: "QUEUED",
+    },
+    privateKeyBase64,
+  );
+  const decoded = decodeEnvelope(encoded);
+
+  assert.equal(decoded.body.sessionEndedAt, null);
+  assert.equal(decoded.body.sessionDurationMillis, null);
+  assert.equal(
+    await verifyEnvelope(
+      decoded.envelope,
+      await importAgentPublicKey(publicKeyBase64),
+    ),
+    true,
+  );
+});
+
 test("issues scoped dashboard credentials and rejects expiry", async () => {
   const secret = "a".repeat(64);
   const issuedAt = 1_700_000_000;
