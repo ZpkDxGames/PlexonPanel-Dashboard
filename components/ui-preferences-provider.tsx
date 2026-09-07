@@ -94,9 +94,13 @@ export function UiPreferencesProvider({ children }: { children: ReactNode }) {
     };
 
     const loaded = loadUiPreferences(localStorage, avatarProviderAvailable);
-    setPreferences(loaded);
     saveUiPreferences(localStorage, loaded);
-    refresh(loaded);
+    const initialPresentation = resolveUiPresentation(loaded, systemState());
+    applyPresentation(loaded, initialPresentation);
+    queueMicrotask(() => {
+      setPreferences(loaded);
+      setResolved(initialPresentation);
+    });
 
     const media = [
       window.matchMedia?.("(prefers-color-scheme: dark)"),
@@ -104,10 +108,11 @@ export function UiPreferencesProvider({ children }: { children: ReactNode }) {
       window.matchMedia?.("(prefers-reduced-motion: reduce)"),
     ].filter(Boolean) as MediaQueryList[];
 
-    const onMedia = () => setPreferences((current) => {
-      refresh(current);
-      return current;
-    });
+    const onMedia = () =>
+      setPreferences((current) => {
+        refresh(current);
+        return current;
+      });
     const onStorage = (event: StorageEvent) => {
       if (event.key !== UI_PREFERENCES_KEY) return;
       const next = loadUiPreferences(localStorage, avatarProviderAvailable);
@@ -123,29 +128,32 @@ export function UiPreferencesProvider({ children }: { children: ReactNode }) {
     };
   }, [avatarProviderAvailable]);
 
-  const value = useMemo<UiPreferencesContextValue>(() => ({
-    preferences,
-    resolved,
-    avatarProviderAvailable,
-    updatePreference(key, nextValue) {
-      setPreferences((current) => {
-        const next = { ...current, [key]: nextValue } as UiPreferencesV1;
+  const value = useMemo<UiPreferencesContextValue>(
+    () => ({
+      preferences,
+      resolved,
+      avatarProviderAvailable,
+      updatePreference(key, nextValue) {
+        setPreferences((current) => {
+          const next = { ...current, [key]: nextValue } as UiPreferencesV1;
+          saveUiPreferences(localStorage, next);
+          const presentation = resolveUiPresentation(next, systemState());
+          setResolved(presentation);
+          applyPresentation(next, presentation);
+          return next;
+        });
+      },
+      resetPreferences() {
+        const next = createDefaultUiPreferences(avatarProviderAvailable);
         saveUiPreferences(localStorage, next);
         const presentation = resolveUiPresentation(next, systemState());
+        setPreferences(next);
         setResolved(presentation);
         applyPresentation(next, presentation);
-        return next;
-      });
-    },
-    resetPreferences() {
-      const next = createDefaultUiPreferences(avatarProviderAvailable);
-      saveUiPreferences(localStorage, next);
-      const presentation = resolveUiPresentation(next, systemState());
-      setPreferences(next);
-      setResolved(presentation);
-      applyPresentation(next, presentation);
-    },
-  }), [avatarProviderAvailable, preferences, resolved]);
+      },
+    }),
+    [avatarProviderAvailable, preferences, resolved],
+  );
 
   return (
     <UiPreferencesContext.Provider value={value}>
