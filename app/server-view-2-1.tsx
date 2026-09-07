@@ -50,12 +50,12 @@ function OperationTimeline({ pending }: { pending: PendingOperation }) {
     <div className="cr21-operation" aria-live="polite">
       {steps.map((step) => {
         const index = order.indexOf(step.id);
-        const state =
+        const stepState =
           index < current ? "done" : index === current ? "current" : "next";
         return (
-          <div key={step.id} data-state={state}>
+          <div key={step.id} data-state={stepState}>
             <span>
-              {state === "done" ? "✓" : state === "current" ? "•" : "○"}
+              {stepState === "done" ? "✓" : stepState === "current" ? "•" : "○"}
             </span>
             <strong>{step.label}</strong>
           </div>
@@ -68,18 +68,19 @@ function OperationTimeline({ pending }: { pending: PendingOperation }) {
 export function ServerView21(props: ViewProps) {
   const hostAvailable = Boolean(props.state.ready?.agents.host);
   const paperOnline = Boolean(props.state.ready?.agents.paper);
-  const kind = hostAvailable ? "HOST" : "PAPER";
   const query = useQuery(
     "server.status",
     {},
-    props.can("server.status", kind),
-    kind,
+    hostAvailable && props.can("server.status", "HOST"),
+    "HOST",
   );
   const service = useMemo(
     () => ({ ...query.data, ...props.state.service }),
     [query.data, props.state.service],
   );
-  const state = normalizeServiceState(service.state, paperOnline);
+  // systemd lifecycle state is Host-owned. Paper connectivity is displayed
+  // separately and must never be used to fabricate an active service state.
+  const state = normalizeServiceState(service.state, false);
   const [pending, setPending] = useState<PendingOperation | null>(null);
 
   const effectivePending =
@@ -117,15 +118,15 @@ export function ServerView21(props: ViewProps) {
         <div>
           <strong>Server lifecycle</strong>
           <span>
-            Actions are gated by actual service state and local host policy.
+            systemd state and lifecycle actions are Host-authoritative and locally policy-gated.
           </span>
         </div>
         <button
           className="cr-button"
-          disabled={query.busy}
+          disabled={query.busy || !hostAvailable || !props.can("server.status", "HOST")}
           onClick={query.refresh}
         >
-          {query.busy ? "Refreshing…" : "Refresh status"}
+          {query.busy ? "Refreshing…" : "Refresh Host status"}
         </button>
       </div>
 
@@ -148,43 +149,45 @@ export function ServerView21(props: ViewProps) {
             }
           />
           <div className="cr21-status-item">
-            <span className={`cr-dot ${state === "active" ? "online" : ""}`} />
+            <span className={`cr-dot ${hostAvailable && state === "active" ? "online" : ""}`} />
             <div>
               <strong>{str(service.service, "Server service")}</strong>
-              <small>systemd lifecycle state</small>
+              <small>Host systemd lifecycle state</small>
             </div>
-            <Badge tone={stateTone(state)}>{state}</Badge>
+            <Badge tone={hostAvailable ? stateTone(state) : "quiet"}>
+              {hostAvailable ? state : "Host unavailable"}
+            </Badge>
           </div>
         </div>
       </Panel>
 
       <Panel
         title="Lifecycle controls"
-        aside={<Badge tone={stateTone(state)}>{state}</Badge>}
+        aside={<Badge tone={hostAvailable ? stateTone(state) : "quiet"}>{hostAvailable ? state : "Host unavailable"}</Badge>}
       >
         <div className="cr21-lifecycle-card">
-          {state === "failed" && (
+          {state === "failed" && hostAvailable && (
             <div className="cr21-state-banner danger">
               <strong>Service failed.</strong> Review host audit or systemd logs,
               then use Start only after the underlying cause is understood.
             </div>
           )}
-          {(state === "activating" || state === "deactivating") && (
+          {(state === "activating" || state === "deactivating") && hostAvailable && (
             <div className="cr21-state-banner">
               The service is {state}. Conflicting lifecycle actions are disabled
               until systemd reports a stable state.
             </div>
           )}
-          {state === "unknown" && (
+          {state === "unknown" && hostAvailable && (
             <div className="cr21-state-banner">
-              Lifecycle state is unavailable. Refresh server status before
-              issuing a host action.
+              Host lifecycle state is unavailable. Refresh Host status before
+              issuing a lifecycle action.
             </div>
           )}
           {!hostAvailable && (
             <Empty title="Host companion unavailable">
-              Server start, graceful stop, restart, and backups require the
-              authenticated Host companion. Paper monitoring remains available.
+              Server start, graceful stop and restart require the authenticated
+              Host companion. Paper monitoring can remain live independently.
             </Empty>
           )}
           <div className="cr21-lifecycle-actions">
@@ -225,18 +228,9 @@ export function ServerView21(props: ViewProps) {
             </ActionButton>
           </div>
           <dl className="cr21-lifecycle-rules">
-            <div>
-              <dt>Active</dt>
-              <dd>Start disabled · Stop enabled · Restart enabled</dd>
-            </div>
-            <div>
-              <dt>Inactive</dt>
-              <dd>Start enabled · Stop disabled · Restart disabled</dd>
-            </div>
-            <div>
-              <dt>Transitioning</dt>
-              <dd>Conflicting lifecycle actions disabled</dd>
-            </div>
+            <div><dt>Active</dt><dd>Start disabled · Stop enabled · Restart enabled</dd></div>
+            <div><dt>Inactive</dt><dd>Start enabled · Stop disabled · Restart disabled</dd></div>
+            <div><dt>Transitioning</dt><dd>Conflicting lifecycle actions disabled</dd></div>
           </dl>
           {effectivePending && <OperationTimeline pending={effectivePending} />}
           {query.error && (
@@ -250,16 +244,18 @@ export function ServerView21(props: ViewProps) {
       <Panel title="Runtime details">
         <dl className="cr-details cr-pad">
           {[
-            ["Service", service.service],
-            ["State", state],
-            ["PID", service.pid],
-            ["Java", props.state.system.javaVersion],
-            ["Operating system", props.state.system.operatingSystem],
-            ["Architecture", props.state.system.architecture],
+            ["Host service", hostAvailable ? service.service : undefined],
+            ["Host service state", hostAvailable ? state : undefined],
+            ["Host service PID", hostAvailable ? service.pid : undefined],
+            ["Host operating system", hostAvailable ? props.state.hostSystem.operatingSystem : undefined],
+            ["Host architecture", hostAvailable ? props.state.hostSystem.architecture : undefined],
+            ["Paper Java", paperOnline ? props.state.system.javaVersion : undefined],
+            ["Paper operating system", paperOnline ? props.state.system.operatingSystem : undefined],
+            ["Paper architecture", paperOnline ? props.state.system.architecture : undefined],
             ["Minecraft", props.state.ready?.server.minecraftVersion],
             ["Paper agent", props.state.ready?.server.pluginVersion],
             ["Host agent", props.state.ready?.server.hostVersion],
-            ["Dashboard", "2.3.0"],
+            ["Dashboard", "3.0.1"],
             ["Protocol", "3"],
           ].map(([label, value]) => (
             <div key={String(label)}>
