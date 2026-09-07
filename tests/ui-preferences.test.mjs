@@ -24,6 +24,7 @@ test("UI preferences use provider-aware safe defaults", () => {
   assert.equal(createDefaultUiPreferences(true).playerHeads, true);
   assert.equal(createDefaultUiPreferences().theme, "system");
   assert.equal(createDefaultUiPreferences().motion, "system");
+  assert.equal(createDefaultUiPreferences().displayUpdateRateMs, 500);
 });
 
 test("strict parsing drops unknown and corrupt preference values", () => {
@@ -35,6 +36,7 @@ test("strict parsing drops unknown and corrupt preference values", () => {
     textScale: 900,
     chartWindowMinutes: 30,
     chartGrid: false,
+    displayUpdateRateMs: 1000,
     unknown: "do-not-keep",
   });
   assert.equal(parsed.schemaVersion, 1);
@@ -44,7 +46,15 @@ test("strict parsing drops unknown and corrupt preference values", () => {
   assert.equal(parsed.textScale, 100);
   assert.equal(parsed.chartWindowMinutes, 30);
   assert.equal(parsed.chartGrid, false);
+  assert.equal(parsed.displayUpdateRateMs, 1000);
   assert.equal(Object.hasOwn(parsed, "unknown"), false);
+});
+
+test("invalid display update rates migrate to the balanced default", () => {
+  assert.equal(parseUiPreferences({ displayUpdateRateMs: 333 }).displayUpdateRateMs, 500);
+  assert.equal(parseUiPreferences({ displayUpdateRateMs: -1 }).displayUpdateRateMs, 500);
+  assert.equal(parseUiPreferences({ displayUpdateRateMs: 0 }).displayUpdateRateMs, 0);
+  assert.equal(parseUiPreferences({ displayUpdateRateMs: 2000 }).displayUpdateRateMs, 2000);
 });
 
 test("oversized or invalid stored JSON falls back safely", () => {
@@ -63,6 +73,7 @@ test("legacy density and chart window migrate without touching other keys", () =
   assert.equal(migrated.density, "compact");
   assert.equal(migrated.chartWindowMinutes, 15);
   assert.equal(migrated.playerHeads, true);
+  assert.equal(migrated.displayUpdateRateMs, 500);
   saveUiPreferences(local, migrated);
   assert.ok(local.value(UI_PREFERENCES_KEY));
   assert.equal(local.value("plexonpanel-last-section"), "Players");
@@ -74,6 +85,7 @@ test("saved schema mirrors temporary legacy compatibility keys", () => {
     ...createDefaultUiPreferences(),
     density: "spacious",
     chartWindowMinutes: 30,
+    displayUpdateRateMs: 250,
   };
   saveUiPreferences(local, preferences);
   assert.equal(local.value("plexonpanel-density"), "spacious");
