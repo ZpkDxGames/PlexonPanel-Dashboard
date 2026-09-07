@@ -1,5 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { emptyControlState } from "../.test-dist/lib/control-state.js";
@@ -63,6 +64,16 @@ test("uploaded-looking log content and plugin names remain escaped text", () => 
     assert.ok(!html.includes("<script>alert(1)</script>"));
     assert.ok(!html.includes("<img src=x"));
   }
+});
+test("3.0 activity history opens in place instead of navigating away", async () => {
+  const source = await readFile(
+    new URL("../app/overview-view-3-0.tsx", import.meta.url),
+    "utf8",
+  );
+  assert.match(source, /setHistoryOpen\(true\)/);
+  assert.match(source, /<ActivityHistoryModal/);
+  assert.doesNotMatch(source, /\/activity\?serverId=/);
+  assert.doesNotMatch(source, /href=\{activityHistoryHref\}/);
 });
 test("Players distinguishes missing scope, local policy and older agents", () => {
   const baseReady = {

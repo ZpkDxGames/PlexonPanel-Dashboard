@@ -16,9 +16,11 @@
   border-radius: var(--cr21-radius-control, 8px);
   background: rgba(255, 255, 255, 0.025);
   color: var(--cr21-text, #e8f6f7);
+  font: inherit;
   font-size: 0.72rem;
   font-weight: 650;
   text-decoration: none;
+  cursor: pointer;
   transition: border-color 120ms ease, background 120ms ease, color 120ms ease;
 }
 
@@ -28,4 +30,403 @@
   background: rgba(95, 219, 242, 0.06);
   color: var(--cr21-accent, #72e5f5);
   outline: none;
+}
+
+dialog.cr30-activity-dialog {
+  width: min(1040px, calc(100vw - 32px));
+  max-width: 1040px;
+  height: min(820px, calc(100vh - 48px));
+  max-height: calc(100vh - 48px);
+  margin: auto;
+  padding: 0;
+  border: 1px solid color-mix(in srgb, var(--cr21-border, #24374b) 84%, var(--cr21-accent, #72e5f5) 16%);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--cr21-bg, #07101a) 97%, #122031);
+  color: var(--cr21-text, #e8f6f7);
+  box-shadow: 0 28px 90px rgba(0, 0, 0, .55), 0 0 0 1px rgba(255, 255, 255, .02) inset;
+  overflow: hidden;
+}
+
+dialog.cr30-activity-dialog::backdrop {
+  background: rgba(2, 5, 9, .72);
+  backdrop-filter: blur(3px);
+}
+
+.cr30-activity-modal-shell {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+.cr30-activity-modal-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 20px 22px 16px;
+  border-bottom: 1px solid var(--cr21-border-soft, rgba(137, 197, 205, .14));
+  background: linear-gradient(180deg, rgba(255,255,255,.025), transparent);
+}
+
+.cr30-activity-modal-head > div {
+  min-width: 0;
+}
+
+.cr30-activity-modal-head > div > span {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--cr21-accent, #72e5f5);
+  font-size: .67rem;
+  font-weight: 700;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+}
+
+.cr30-activity-modal-head h2 {
+  margin: 0;
+  font-size: clamp(1.25rem, 2vw, 1.65rem);
+  line-height: 1.2;
+}
+
+.cr30-activity-modal-head p {
+  max-width: 720px;
+  margin: 7px 0 0;
+  color: var(--cr21-muted, #8fa4b8);
+  font-size: .82rem;
+  line-height: 1.45;
+}
+
+.cr30-activity-close {
+  flex: 0 0 auto;
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--cr21-border-soft, rgba(137, 197, 205, .16));
+  border-radius: 10px;
+  background: rgba(255, 255, 255, .025);
+  color: var(--cr21-text, #e8f6f7);
+  font-size: 1.45rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.cr30-activity-close:hover,
+.cr30-activity-close:focus-visible {
+  border-color: rgba(95, 219, 242, .42);
+  background: rgba(95, 219, 242, .07);
+  outline: none;
+}
+
+.cr30-activity-modal-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  padding: 14px 22px 0;
+}
+
+.cr30-activity-modal-stats article {
+  min-width: 0;
+  padding: 11px 12px;
+  border: 1px solid var(--cr21-border-soft, rgba(137, 197, 205, .13));
+  border-radius: 10px;
+  background: rgba(255,255,255,.018);
+}
+
+.cr30-activity-modal-stats small,
+.cr30-activity-modal-stats strong {
+  display: block;
+}
+
+.cr30-activity-modal-stats small {
+  color: var(--cr21-muted, #8fa4b8);
+  font-size: .68rem;
+}
+
+.cr30-activity-modal-stats strong {
+  margin-top: 4px;
+  font-size: 1.08rem;
+}
+
+.cr30-activity-modal-controls {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(130px, auto) minmax(130px, auto) auto;
+  gap: 9px;
+  padding: 12px 22px 14px;
+}
+
+.cr30-activity-modal-controls input,
+.cr30-activity-modal-controls select,
+.cr30-activity-modal-controls button,
+.cr30-activity-load-more button {
+  min-height: 38px;
+  border: 1px solid var(--cr21-border-soft, rgba(137, 197, 205, .16));
+  border-radius: 9px;
+  background: rgba(255,255,255,.025);
+  color: var(--cr21-text, #e8f6f7);
+  font: inherit;
+  font-size: .76rem;
+}
+
+.cr30-activity-modal-controls input,
+.cr30-activity-modal-controls select {
+  padding: 0 11px;
+}
+
+.cr30-activity-modal-controls select option {
+  background: var(--cr21-bg, #07101a);
+  color: var(--cr21-text, #e8f6f7);
+}
+
+.cr30-activity-modal-controls input:focus-visible,
+.cr30-activity-modal-controls select:focus-visible,
+.cr30-activity-modal-controls button:focus-visible,
+.cr30-activity-load-more button:focus-visible {
+  border-color: rgba(95, 219, 242, .5);
+  outline: 2px solid rgba(95, 219, 242, .13);
+  outline-offset: 1px;
+}
+
+.cr30-activity-clear {
+  padding: 0 12px;
+  color: #e4a3a3 !important;
+  cursor: pointer;
+}
+
+.cr30-activity-clear:disabled {
+  opacity: .45;
+  cursor: default;
+}
+
+.cr30-activity-modal-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: 0 22px 18px;
+  scrollbar-gutter: stable;
+}
+
+.cr30-activity-modal-groups {
+  display: grid;
+  gap: 13px;
+}
+
+.cr30-activity-modal-group {
+  overflow: hidden;
+  border: 1px solid var(--cr21-border-soft, rgba(137, 197, 205, .13));
+  border-radius: 11px;
+  background: rgba(255,255,255,.014);
+}
+
+.cr30-activity-modal-group > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 38px;
+  padding: 0 12px;
+  border-bottom: 1px solid var(--cr21-border-soft, rgba(137, 197, 205, .11));
+  background: rgba(255,255,255,.018);
+}
+
+.cr30-activity-modal-group > header strong {
+  font-size: .77rem;
+}
+
+.cr30-activity-modal-group > header span {
+  color: var(--cr21-muted, #8fa4b8);
+  font-size: .67rem;
+}
+
+.cr30-activity-modal-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 11px;
+  min-height: 58px;
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(137, 197, 205, .075);
+}
+
+.cr30-activity-modal-row:last-child {
+  border-bottom: 0;
+}
+
+.cr30-activity-modal-identity {
+  min-width: 0;
+}
+
+.cr30-activity-modal-identity strong,
+.cr30-activity-modal-identity small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cr30-activity-modal-identity strong {
+  font-size: .8rem;
+}
+
+.cr30-activity-modal-identity small {
+  margin-top: 3px;
+  color: var(--cr21-muted, #8fa4b8);
+  font-size: .64rem;
+}
+
+.cr30-activity-modal-meta {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 9px;
+}
+
+.cr30-activity-modal-meta > span {
+  display: inline-flex;
+  min-width: 58px;
+  min-height: 24px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 7px;
+  border: 1px solid rgba(137, 197, 205, .15);
+  border-radius: 999px;
+  font-size: .61rem;
+  font-weight: 750;
+  letter-spacing: .04em;
+}
+
+.cr30-activity-modal-meta > span[data-state="JOINED"] {
+  border-color: rgba(71, 211, 132, .25);
+  background: rgba(71, 211, 132, .07);
+  color: #79daa3;
+}
+
+.cr30-activity-modal-meta > span[data-state="LEFT"] {
+  border-color: rgba(232, 157, 91, .25);
+  background: rgba(232, 157, 91, .07);
+  color: #e7b181;
+}
+
+.cr30-activity-modal-meta time {
+  color: var(--cr21-muted, #8fa4b8);
+  font-size: .68rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.cr30-activity-modal-empty {
+  display: grid;
+  min-height: 180px;
+  place-items: center;
+  padding: 24px;
+  border: 1px dashed var(--cr21-border-soft, rgba(137, 197, 205, .14));
+  border-radius: 11px;
+  color: var(--cr21-muted, #8fa4b8);
+  text-align: center;
+  font-size: .8rem;
+}
+
+.cr30-activity-load-more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 16px 0 2px;
+}
+
+.cr30-activity-load-more button {
+  padding: 0 13px;
+  cursor: pointer;
+}
+
+.cr30-activity-load-more span {
+  color: var(--cr21-muted, #8fa4b8);
+  font-size: .68rem;
+}
+
+.cr30-activity-modal-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 10px 22px 12px;
+  border-top: 1px solid var(--cr21-border-soft, rgba(137, 197, 205, .12));
+  color: var(--cr21-muted, #8fa4b8);
+  font-size: .66rem;
+}
+
+@media (max-width: 760px) {
+  dialog.cr30-activity-dialog {
+    width: calc(100vw - 16px);
+    height: calc(100vh - 16px);
+    max-height: calc(100vh - 16px);
+    border-radius: 13px;
+  }
+
+  .cr30-activity-modal-head {
+    padding: 16px;
+  }
+
+  .cr30-activity-modal-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 12px 16px 0;
+  }
+
+  .cr30-activity-modal-controls {
+    grid-template-columns: 1fr 1fr;
+    padding: 11px 16px 13px;
+  }
+
+  .cr30-activity-modal-controls input {
+    grid-column: 1 / -1;
+  }
+
+  .cr30-activity-clear {
+    grid-column: 1 / -1;
+  }
+
+  .cr30-activity-modal-scroll {
+    padding: 0 16px 14px;
+  }
+
+  .cr30-activity-modal-row {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .cr30-activity-modal-meta {
+    grid-column: 2;
+    justify-content: flex-start;
+  }
+
+  .cr30-activity-modal-foot {
+    padding-inline: 16px;
+  }
+}
+
+@media (max-width: 430px) {
+  .cr30-activity-modal-controls {
+    grid-template-columns: 1fr;
+  }
+
+  .cr30-activity-modal-controls input,
+  .cr30-activity-clear {
+    grid-column: auto;
+  }
+
+  .cr30-activity-modal-head p {
+    font-size: .76rem;
+  }
+
+  .cr30-activity-modal-identity small {
+    max-width: 180px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cr30-activity-history-link,
+  .cr30-activity-close {
+    transition: none;
+  }
 }
