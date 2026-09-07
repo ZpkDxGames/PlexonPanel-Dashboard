@@ -10,6 +10,7 @@ import "./player-workspace-2-3.css";
 import "./control-room-3-0.css";
 import "./workspaces-3-0.css";
 import "./overview-3-0.css";
+import "./activity-history.css";
 import { UiPreferencesProvider } from "../components/ui-preferences-provider";
 
 export const metadata: Metadata = {
