@@ -1,0 +1,969 @@
+/* PlexonPanel Dashboard 3.0.2 — visual structure and responsive refinement.
+ * Presentation-only overrides. No protocol, authority, lifecycle, telemetry,
+ * access, relay, or state semantics are changed here.
+ */
+
+:root {
+  --cr31-page-max: 1760px;
+  --cr31-page-gutter: clamp(14px, 2vw, 30px);
+  --cr31-section-gap: clamp(14px, 1.4vw, 22px);
+  --cr31-card-gap: clamp(10px, 1vw, 16px);
+  --cr31-surface-radius: 18px;
+  --cr31-card-radius: 15px;
+  --cr31-control-radius: 11px;
+  --cr31-panel-border: color-mix(in srgb, var(--cr21-border-soft) 82%, transparent);
+  --cr31-divider: color-mix(in srgb, var(--cr21-border-soft) 70%, transparent);
+  --cr31-surface-major: color-mix(in srgb, var(--cr21-surface-1) 94%, #162233 6%);
+  --cr31-surface-card: color-mix(in srgb, var(--cr21-surface-1) 97%, #1a293c 3%);
+}
+
+/* --------------------------------------------------------------------------
+   Global shell and hierarchy
+   -------------------------------------------------------------------------- */
+
+.cr21-shell {
+  --cr21-sidebar-width: 224px;
+}
+
+.cr21-content,
+.cr21-page-head,
+.cr21-footer {
+  width: min(100%, var(--cr31-page-max));
+}
+
+.cr21-content {
+  padding-inline: var(--cr31-page-gutter);
+  padding-bottom: clamp(24px, 3vw, 40px);
+}
+
+.cr21-content:has(.cr21-performance-toolbar) {
+  --cr31-page-max: 1900px;
+}
+
+.cr21-content:has(.cr30-settings-stack),
+.cr21-content:has(.cr30-access-stack) {
+  --cr31-page-max: 1480px;
+}
+
+.cr21-page-head {
+  gap: 20px;
+  padding: 22px var(--cr31-page-gutter) 15px;
+}
+
+.cr21-page-head > div:first-child {
+  min-width: 0;
+}
+
+.cr21-page-head > div > span {
+  color: color-mix(in srgb, var(--cr21-text-muted) 86%, var(--cr21-accent) 14%);
+  font-size: .69rem;
+  letter-spacing: .14em;
+}
+
+.cr21-page-head h1 {
+  margin-top: 5px;
+  font-size: clamp(1.45rem, 1.9vw, 1.95rem);
+  line-height: 1.05;
+  letter-spacing: -.038em;
+}
+
+.cr21-page-meta {
+  gap: 8px;
+}
+
+.cr21-shell .cr-panel,
+.cr21-shell .cr21-panel {
+  overflow: clip;
+  border-color: var(--cr31-panel-border);
+  border-radius: var(--cr31-surface-radius);
+  background: var(--cr31-surface-major);
+}
+
+.cr21-shell .cr-panel-head,
+.cr21-shell .cr21-panel-head {
+  min-height: 52px;
+  padding: 14px 17px;
+  border-bottom-color: var(--cr31-divider);
+}
+
+.cr21-shell .cr-panel-head h2,
+.cr21-shell .cr21-panel-head h2 {
+  font-size: .9rem;
+  font-weight: 720;
+  letter-spacing: -.012em;
+}
+
+.cr21-shell .cr-button,
+.cr21-command-button,
+.cr21-role-button,
+.cr21-icon-button,
+.cr21-collapse {
+  border-radius: var(--cr31-control-radius);
+}
+
+.cr21-shell .cr-button {
+  min-height: 40px;
+  padding-inline: 12px;
+  font-weight: 620;
+}
+
+.cr21-shell .cr-button:disabled {
+  opacity: .42;
+  filter: saturate(.72);
+}
+
+/* --------------------------------------------------------------------------
+   Sidebar and top bar
+   -------------------------------------------------------------------------- */
+
+.cr21-sidebar {
+  padding: 13px 10px 11px;
+}
+
+.cr21-sidebar-head {
+  min-height: 54px;
+}
+
+.cr21-server-identity {
+  margin: 5px 3px 17px;
+  padding: 11px;
+  border-color: color-mix(in srgb, var(--cr21-border-soft) 70%, transparent);
+  background: color-mix(in srgb, var(--cr21-surface-1) 88%, transparent);
+}
+
+.cr21-nav-group {
+  margin-bottom: 14px;
+}
+
+.cr21-nav-label {
+  padding-bottom: 7px;
+}
+
+.cr21-nav button {
+  min-height: 42px;
+  margin-block: 2px;
+}
+
+.cr21-nav button.active {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--cr21-accent) 8%, transparent);
+}
+
+.cr21-sidebar-foot {
+  gap: 7px;
+  padding-top: 13px;
+}
+
+.cr21-topbar {
+  grid-template-columns: minmax(180px, 1fr) auto auto auto;
+  gap: clamp(8px, 1vw, 16px);
+  min-height: 64px;
+  padding: 9px var(--cr31-page-gutter);
+  border-bottom-color: var(--cr31-divider);
+}
+
+.cr21-agent-pills {
+  gap: 7px;
+}
+
+.cr21-agent-pills span {
+  min-height: 30px;
+  padding-inline: 10px;
+  border-color: color-mix(in srgb, var(--cr21-border-soft) 82%, transparent);
+  background: color-mix(in srgb, var(--cr21-surface-1) 75%, transparent);
+}
+
+.cr21-topbar-actions {
+  gap: 8px;
+}
+
+.cr21-command-button,
+.cr21-role-button,
+.cr21-icon-button {
+  min-height: 38px;
+}
+
+.cr21-quick-actions > div,
+.cr21-menu > div {
+  padding: 7px;
+  border-radius: 13px;
+}
+
+/* --------------------------------------------------------------------------
+   Overview — one summary surface, adaptive signals, compact empty states
+   -------------------------------------------------------------------------- */
+
+.cr30-overview-stack {
+  gap: var(--cr31-section-gap);
+}
+
+.cr30-status-strip {
+  grid-template-columns: minmax(210px, 1.35fr) repeat(6, minmax(105px, .8fr));
+  gap: 0;
+  overflow: hidden;
+  border-color: var(--cr31-panel-border);
+  border-radius: var(--cr31-surface-radius);
+  background: var(--cr31-surface-major);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, .12);
+}
+
+.cr30-status-strip > div {
+  position: relative;
+  min-height: 68px;
+  padding: 12px 15px;
+  background: transparent;
+}
+
+.cr30-status-strip > div + div::before {
+  content: "";
+  position: absolute;
+  inset: 12px auto 12px 0;
+  width: 1px;
+  background: var(--cr31-divider);
+}
+
+.cr30-status-primary {
+  padding-inline: 16px !important;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--cr21-accent) 7%, transparent), transparent 75%) !important;
+}
+
+.cr30-status-strip > div > small {
+  font-size: .65rem;
+  letter-spacing: .08em;
+}
+
+.cr30-status-strip > div > strong {
+  font-size: .8rem;
+}
+
+.cr30-primary-signals {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  gap: var(--cr31-card-gap);
+}
+
+.cr30-signal-card {
+  min-height: 146px;
+  padding: 15px 16px 14px;
+  border-color: color-mix(in srgb, var(--cr21-border-soft) 72%, transparent);
+  border-radius: var(--cr31-card-radius);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--cr30-signal) 3.5%, transparent), transparent 52%),
+    var(--cr31-surface-card);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .08);
+}
+
+.cr30-signal-heading > span {
+  font-size: .76rem;
+}
+
+.cr30-signal-card > strong {
+  margin-top: 1px;
+  font-size: clamp(1.45rem, 2vw, 1.9rem);
+}
+
+.cr30-signal-meta {
+  gap: 12px;
+}
+
+.cr30-overview-columns {
+  gap: var(--cr31-section-gap);
+}
+
+.cr30-health-list article,
+.cr30-activity-list article {
+  padding: 12px 16px;
+  border-bottom-color: var(--cr31-divider);
+}
+
+.cr30-overview-columns .cr-empty {
+  min-height: 0;
+  padding: 24px 20px;
+  text-align: left;
+}
+
+.cr30-overview-columns .cr-empty-mark {
+  display: none;
+}
+
+.cr30-overview-columns .cr-empty h3 {
+  margin: 0 0 5px;
+  font-size: .9rem;
+}
+
+.cr30-overview-columns .cr-empty p {
+  max-width: 46rem;
+  margin: 0;
+  color: var(--cr21-text-muted);
+  font-size: .76rem;
+  line-height: 1.5;
+}
+
+.cr30-world-grid {
+  gap: var(--cr31-card-gap);
+  padding: 16px;
+}
+
+.cr30-world-grid article {
+  border-color: color-mix(in srgb, var(--cr21-border-soft) 70%, transparent);
+  background: color-mix(in srgb, var(--cr21-surface-2) 82%, transparent);
+}
+
+/* --------------------------------------------------------------------------
+   Performance — deliberate toolbar and calmer chart/stat hierarchy
+   -------------------------------------------------------------------------- */
+
+.cr21-performance-toolbar,
+.cr21-page-toolbar {
+  gap: 10px;
+  margin-bottom: var(--cr31-section-gap);
+  padding: 13px 14px;
+  border-color: var(--cr31-panel-border);
+  border-radius: var(--cr31-surface-radius);
+  background: var(--cr31-surface-major);
+}
+
+.cr21-performance-toolbar > div:first-child,
+.cr21-page-toolbar > div:first-child {
+  min-width: min(100%, 260px);
+  padding-right: 8px;
+}
+
+.cr21-performance-toolbar > div:first-child strong,
+.cr21-page-toolbar > div:first-child strong {
+  font-size: .9rem;
+}
+
+.cr21-performance-toolbar > div:first-child span,
+.cr21-page-toolbar > div:first-child span {
+  margin-top: 4px;
+  line-height: 1.45;
+}
+
+.cr21-segmented {
+  min-height: 40px;
+  height: auto;
+  gap: 3px;
+  padding: 4px;
+  border-color: color-mix(in srgb, var(--cr21-border-soft) 86%, transparent);
+  background: color-mix(in srgb, var(--cr21-bg) 72%, var(--cr21-surface-1));
+}
+
+.cr21-segmented button {
+  min-width: 46px;
+  min-height: 32px;
+  padding: 0 11px;
+  border-radius: 8px;
+  font-weight: 650;
+}
+
+.cr21-segmented button[aria-pressed="true"] {
+  background: color-mix(in srgb, var(--cr21-accent) 12%, var(--cr21-surface-3));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--cr21-accent) 20%, var(--cr21-border-soft));
+}
+
+.cr21-chart-grid {
+  gap: var(--cr31-section-gap);
+  margin-bottom: var(--cr31-section-gap);
+}
+
+.cr21-chart-card {
+  border-radius: var(--cr31-surface-radius);
+  background: var(--cr31-surface-major);
+}
+
+.cr21-chart-card .cr-panel-head {
+  padding-bottom: 12px;
+}
+
+.cr21-chart-summary {
+  grid-template-columns: minmax(145px, .55fr) minmax(0, 1.45fr);
+  gap: 20px;
+  padding: 16px 17px 7px;
+}
+
+.cr21-chart-summary > div > span {
+  font-size: .68rem;
+  letter-spacing: .09em;
+}
+
+.cr21-chart-summary > div > strong {
+  margin-top: 6px;
+  font-size: clamp(1.45rem, 2vw, 1.85rem);
+}
+
+.cr21-chart-summary dl {
+  align-items: center;
+  gap: 0;
+}
+
+.cr21-chart-summary dl > div {
+  position: relative;
+  padding: 3px 12px;
+  border-radius: 0;
+  background: transparent;
+}
+
+.cr21-chart-summary dl > div + div {
+  border-left: 1px solid var(--cr31-divider);
+}
+
+.cr21-chart-summary dt {
+  font-size: .66rem;
+  letter-spacing: .055em;
+}
+
+.cr21-chart-summary dd {
+  margin-top: 5px;
+  color: var(--cr21-text-primary);
+  font-size: .78rem;
+  font-weight: 650;
+}
+
+.cr21-chart-caption {
+  gap: 14px;
+  padding: 4px 17px 13px;
+  line-height: 1.45;
+}
+
+.cr21-chart-stage {
+  min-height: 248px;
+  padding: 2px 12px 0;
+}
+
+.cr21-chart {
+  min-height: 230px;
+}
+
+.cr21-chart-tooltip {
+  border-color: color-mix(in srgb, var(--cr21-border-strong) 80%, transparent);
+  background: color-mix(in srgb, #08101a 96%, transparent);
+}
+
+/* --------------------------------------------------------------------------
+   Server — unified infrastructure, state-first lifecycle, definition layout
+   -------------------------------------------------------------------------- */
+
+.cr21-status-panel .cr21-status-strip {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  background: transparent;
+}
+
+.cr21-status-panel .cr21-status-strip .cr-agent,
+.cr21-status-panel .cr21-status-strip .cr21-status-item {
+  position: relative;
+  min-height: 82px;
+  padding: 15px 17px;
+  background: transparent;
+}
+
+.cr21-status-panel .cr21-status-strip > * + * {
+  border-left: 1px solid var(--cr31-divider);
+}
+
+.cr21-lifecycle-card {
+  padding: 18px;
+}
+
+.cr21-lifecycle-actions {
+  gap: 10px;
+  margin: 16px 0 18px;
+}
+
+.cr21-lifecycle-actions .cr-button {
+  min-width: 112px;
+}
+
+.cr21-lifecycle-rules {
+  grid-template-columns: 1fr;
+  gap: 0;
+  margin-top: 18px;
+  border-top: 1px solid var(--cr31-divider);
+  border-bottom: 1px solid var(--cr31-divider);
+}
+
+.cr21-lifecycle-rules > div {
+  display: grid;
+  grid-template-columns: minmax(110px, .35fr) minmax(0, 1fr);
+  gap: 18px;
+  align-items: baseline;
+  padding: 10px 2px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.cr21-lifecycle-rules > div + div {
+  border-top: 1px solid var(--cr31-divider);
+}
+
+.cr21-lifecycle-rules dt {
+  color: var(--cr21-text-secondary);
+}
+
+.cr21-lifecycle-rules dd {
+  margin: 0;
+}
+
+.cr21-operation {
+  gap: 8px;
+  margin-top: 16px;
+  padding: 11px 12px;
+  border-color: var(--cr31-panel-border);
+  background: color-mix(in srgb, var(--cr21-surface-2) 68%, transparent);
+}
+
+.cr21-content > .cr-panel .cr-details.cr-pad {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 245px), 1fr));
+  gap: 0 22px;
+  padding: 8px 17px 17px;
+}
+
+.cr21-content > .cr-panel .cr-details.cr-pad > div {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr);
+  gap: 12px;
+  align-items: baseline;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--cr31-divider);
+}
+
+.cr21-content > .cr-panel .cr-details.cr-pad dt {
+  color: var(--cr21-text-muted);
+  font-size: .73rem;
+}
+
+.cr21-content > .cr-panel .cr-details.cr-pad dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: var(--cr21-text-primary);
+  font-size: .78rem;
+  font-weight: 620;
+  text-align: right;
+}
+
+/* --------------------------------------------------------------------------
+   Shared workspaces
+   -------------------------------------------------------------------------- */
+
+.cr30-audit-stack,
+.cr30-access-stack,
+.cr30-console-stack,
+.cr30-settings-stack {
+  gap: var(--cr31-section-gap);
+}
+
+.cr30-audit-toolbar,
+.cr30-device-toolbar,
+.cr21-page-toolbar {
+  border-color: var(--cr31-panel-border);
+}
+
+.cr30-capability-grid,
+.cr23-preference-grid,
+.cr30-settings-grid,
+.cr30-diagnostics-grid {
+  gap: var(--cr31-card-gap);
+}
+
+.cr30-capability-card,
+.cr23-preference-group,
+.cr30-device-facts > div {
+  border-color: color-mix(in srgb, var(--cr21-border-soft) 72%, transparent);
+}
+
+.cr21-shell .cr-table-wrap {
+  border-color: var(--cr31-panel-border);
+}
+
+/* --------------------------------------------------------------------------
+   Dialogs, focus, reduced motion
+   -------------------------------------------------------------------------- */
+
+dialog.cr21-dialog,
+dialog.cr21-command,
+dialog.cr21-player-drawer {
+  overscroll-behavior: contain;
+}
+
+dialog.cr21-dialog,
+dialog.cr21-command {
+  position: fixed !important;
+  inset: 0 !important;
+  margin: auto !important;
+  transform: none !important;
+}
+
+.cr21-shell :is(button, summary, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--cr21-accent) 74%, white 10%);
+  outline-offset: 2px;
+}
+
+/* --------------------------------------------------------------------------
+   Responsive composition
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 1280px) {
+  .cr21-shell {
+    --cr21-sidebar-width: 208px;
+  }
+
+  .cr21-topbar {
+    grid-template-columns: minmax(150px, 1fr) auto auto;
+  }
+
+  .cr21-topbar > .cr21-freshness {
+    display: none;
+  }
+}
+
+@media (max-width: 1100px) {
+  .cr21-shell,
+  .cr21-shell.sidebar-collapsed {
+    grid-template-columns: 1fr;
+  }
+
+  .cr21-sidebar {
+    position: fixed;
+    left: 0;
+    width: min(280px, 86vw);
+    transform: translateX(-105%);
+    box-shadow: var(--cr21-shadow);
+  }
+
+  .cr21-sidebar.mobile-open {
+    transform: translateX(0);
+  }
+
+  .cr21-mobile-menu {
+    position: fixed;
+    left: 12px;
+    top: 14px;
+    z-index: calc(var(--cr30-z-sidebar) + 2);
+    display: grid;
+    background: #0c1420;
+  }
+
+  .cr21-sidebar-scrim {
+    position: fixed;
+    inset: 0;
+    display: block;
+    border: 0;
+    background: rgba(2,5,9,.62);
+  }
+
+  .cr21-collapse {
+    display: none;
+  }
+
+  .cr21-topbar {
+    padding-left: 60px;
+  }
+
+  .cr21-shell.sidebar-collapsed .cr21-sidebar {
+    width: min(280px, 86vw);
+  }
+
+  .cr21-shell.sidebar-collapsed .cr21-sidebar .cr21-brand > div,
+  .cr21-shell.sidebar-collapsed .cr21-nav-label,
+  .cr21-shell.sidebar-collapsed .cr21-nav button span,
+  .cr21-shell.sidebar-collapsed .cr21-sidebar-foot > * {
+    display: initial;
+  }
+
+  .cr21-shell.sidebar-collapsed .cr21-nav button {
+    justify-content: flex-start;
+    padding-inline: 10px;
+  }
+
+  .cr21-shell.sidebar-collapsed .cr21-sidebar-head {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+}
+
+@container workspace (max-width: 1120px) {
+  .cr30-status-strip {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .cr30-status-primary {
+    grid-column: span 2;
+  }
+
+  .cr30-status-strip > div:nth-child(5)::before {
+    display: none;
+  }
+}
+
+@container workspace (max-width: 900px) {
+  .cr21-performance-toolbar,
+  .cr21-page-toolbar {
+    align-items: stretch;
+  }
+
+  .cr21-performance-toolbar > div:first-child,
+  .cr21-page-toolbar > div:first-child {
+    flex: 1 0 100%;
+    width: 100%;
+    margin: 0 0 2px;
+  }
+
+  .cr21-chart-grid,
+  .cr30-overview-columns {
+    grid-template-columns: 1fr;
+  }
+
+  .cr21-status-panel .cr21-status-strip {
+    grid-template-columns: 1fr;
+  }
+
+  .cr21-status-panel .cr21-status-strip > * + * {
+    border-left: 0;
+    border-top: 1px solid var(--cr31-divider);
+  }
+}
+
+@media (max-width: 860px) {
+  .cr21-topbar {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    gap: 7px;
+  }
+
+  .cr21-topbar-actions {
+    gap: 6px;
+  }
+
+  .cr21-command-button span,
+  .cr21-command-button kbd,
+  .cr21-role-button span {
+    display: none;
+  }
+
+  .cr21-command-button,
+  .cr21-role-button,
+  .cr21-icon-button {
+    width: 38px;
+    padding: 0;
+    justify-content: center;
+  }
+}
+
+@container workspace (max-width: 720px) {
+  .cr30-status-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .cr30-status-primary {
+    grid-column: 1 / -1;
+  }
+
+  .cr30-status-strip > div + div::before {
+    inset: 10px auto 10px 0;
+  }
+
+  .cr30-status-strip > div:nth-child(2n + 2)::before {
+    display: none;
+  }
+
+  .cr21-chart-summary {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .cr21-chart-summary dl {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    row-gap: 10px;
+  }
+
+  .cr21-chart-summary dl > div {
+    padding: 7px 10px;
+  }
+
+  .cr21-chart-summary dl > div:nth-child(3) {
+    border-left: 0;
+  }
+
+  .cr21-chart-summary dl > div:nth-child(n + 3) {
+    border-top: 1px solid var(--cr31-divider);
+  }
+
+  .cr21-chart-caption {
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .cr21-content > .cr-panel .cr-details.cr-pad {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .cr21-topbar {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    min-height: 60px;
+    padding-right: 10px;
+  }
+
+  .cr21-agent-pills {
+    display: flex !important;
+    gap: 4px;
+  }
+
+  .cr21-agent-pills span {
+    width: 31px;
+    min-width: 31px;
+    height: 31px;
+    min-height: 31px;
+    justify-content: center;
+    gap: 0;
+    padding: 0;
+    font-size: 0;
+  }
+
+  .cr21-agent-pills span i {
+    display: none;
+  }
+
+  .cr21-agent-pills span::after {
+    font-size: .68rem;
+    font-weight: 800;
+  }
+
+  .cr21-agent-pills span:first-child::after { content: "P"; }
+  .cr21-agent-pills span:nth-child(2)::after { content: "H"; }
+
+  .cr21-agent-pills span[data-online="true"]::after {
+    color: var(--cr21-success);
+  }
+
+  .cr21-command-button,
+  .cr21-role-button {
+    display: none;
+  }
+
+  .cr21-quick-actions > summary {
+    width: 38px;
+    justify-content: center;
+    padding: 0;
+    font-size: 0;
+  }
+
+  .cr21-quick-actions > summary svg {
+    margin: 0;
+  }
+
+  .cr21-page-head {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    padding-top: 17px;
+  }
+
+  .cr21-page-meta {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+
+@container workspace (max-width: 520px) {
+  .cr30-primary-signals {
+    grid-template-columns: 1fr;
+  }
+
+  .cr30-signal-card {
+    min-height: 136px;
+  }
+
+  .cr21-performance-toolbar .cr-button,
+  .cr21-performance-toolbar .cr21-menu,
+  .cr21-performance-toolbar .cr21-menu > summary {
+    flex: 1 1 calc(50% - 6px);
+  }
+
+  .cr21-performance-toolbar .cr21-menu > summary {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .cr21-segmented {
+    width: 100%;
+  }
+
+  .cr21-segmented button {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .cr21-chart-stage {
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: thin;
+  }
+
+  .cr21-chart {
+    min-width: 520px;
+  }
+
+  .cr21-lifecycle-rules > div {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+
+  .cr21-lifecycle-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .cr21-lifecycle-actions .cr-button {
+    width: 100%;
+  }
+
+  .cr21-content > .cr-panel .cr-details.cr-pad > div {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+
+  .cr21-content > .cr-panel .cr-details.cr-pad dd {
+    text-align: left;
+  }
+}
+
+@media (max-width: 480px) {
+  .cr21-content {
+    padding-inline: 11px;
+  }
+
+  .cr21-page-head {
+    padding-inline: 11px;
+  }
+
+  .cr21-topbar-server > strong,
+  .cr21-server-select {
+    max-width: min(47vw, 190px);
+  }
+
+  .cr30-status-strip > div {
+    min-height: 62px;
+    padding: 10px 11px;
+  }
+
+  .cr30-status-primary {
+    min-height: 68px !important;
+  }
+
+  .cr21-shell .cr-panel-head,
+  .cr21-shell .cr21-panel-head {
+    padding-inline: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cr21-shell *,
+  .cr21-shell *::before,
+  .cr21-shell *::after {
+    animation: none !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
