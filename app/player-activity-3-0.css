@@ -1,0 +1,282 @@
+/* Dashboard 3.0.2 — player activity belongs to the Players workspace. */
+
+/* Remove the old Overview-side activity card and let Health summary use the width. */
+.cr30-overview-columns:has(> .cr-panel .cr30-activity-actions) {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.cr30-overview-columns > .cr-panel:has(.cr30-activity-actions) {
+  display: none;
+}
+
+/* The old disabled-policy placeholder is replaced by richer context below. */
+.cr21-content:has(> .cr31-player-activity-panel)
+  > .cr-panel:has(> .cr-hint.cr-pad) {
+  display: none;
+}
+
+.cr31-player-activity-panel {
+  margin-top: var(--cr31-section-gap, 16px);
+}
+
+.cr31-player-activity-badges {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+.cr31-player-activity-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--cr21-border-soft);
+}
+
+.cr31-player-activity-summary > div {
+  position: relative;
+  min-width: 0;
+  padding: 13px 14px 12px;
+}
+
+.cr31-player-activity-summary > div + div::before {
+  content: "";
+  position: absolute;
+  inset: 12px auto 12px 0;
+  width: 1px;
+  background: var(--cr31-divider, var(--cr21-border-soft));
+}
+
+.cr31-player-activity-summary small,
+.cr31-player-activity-summary strong {
+  display: block;
+}
+
+.cr31-player-activity-summary small {
+  color: var(--cr21-text-muted);
+  font-size: .66rem;
+  font-weight: 680;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.cr31-player-activity-summary strong {
+  margin-top: 4px;
+  font-size: 1.05rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.cr31-player-activity-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(270px, .7fr);
+  min-width: 0;
+}
+
+.cr31-player-activity-feed {
+  min-width: 0;
+  border-right: 1px solid var(--cr21-border-soft);
+}
+
+.cr31-player-activity-feed > article {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto minmax(130px, auto);
+  align-items: center;
+  gap: 12px;
+  min-height: 60px;
+  padding: 9px 16px;
+  border-bottom: 1px solid color-mix(in srgb, var(--cr21-border-soft) 72%, transparent);
+}
+
+.cr31-player-activity-feed > article:last-child {
+  border-bottom: 0;
+}
+
+.cr31-player-activity-feed > article:hover {
+  background: color-mix(in srgb, var(--cr21-accent) 3%, transparent);
+}
+
+.cr31-player-activity-identity {
+  min-width: 0;
+}
+
+.cr31-player-activity-identity strong,
+.cr31-player-activity-identity small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cr31-player-activity-identity strong {
+  font-size: .8rem;
+}
+
+.cr31-player-activity-identity small {
+  margin-top: 3px;
+  color: var(--cr21-text-muted);
+  font-size: .64rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.cr31-player-activity-feed > article > span {
+  display: inline-flex;
+  min-width: 58px;
+  min-height: 25px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 8px;
+  border: 1px solid var(--cr21-border-soft);
+  border-radius: 999px;
+  font-size: .63rem;
+  font-weight: 750;
+  letter-spacing: .025em;
+}
+
+.cr31-player-activity-feed > article > span[data-state="JOINED"] {
+  border-color: color-mix(in srgb, var(--cr21-success) 38%, var(--cr21-border-soft));
+  background: color-mix(in srgb, var(--cr21-success) 8%, transparent);
+  color: var(--cr21-success);
+}
+
+.cr31-player-activity-feed > article > span[data-state="LEFT"] {
+  border-color: color-mix(in srgb, var(--cr21-warning) 34%, var(--cr21-border-soft));
+  background: color-mix(in srgb, var(--cr21-warning) 7%, transparent);
+  color: var(--cr21-warning);
+}
+
+.cr31-player-activity-feed time {
+  color: var(--cr21-text-muted);
+  font-size: .68rem;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.cr31-player-activity-feed .cr-empty {
+  min-height: 190px;
+}
+
+.cr31-player-history-context {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 20px;
+  min-width: 0;
+  padding: 18px;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--cr21-accent) 3.5%, transparent), transparent 55%),
+    color-mix(in srgb, var(--cr21-surface-2) 70%, transparent);
+}
+
+.cr31-player-history-kicker {
+  display: block;
+  margin-bottom: 7px;
+  color: var(--cr21-accent);
+  font-size: .64rem;
+  font-weight: 750;
+  letter-spacing: .11em;
+  text-transform: uppercase;
+}
+
+.cr31-player-history-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.cr31-player-history-status strong {
+  font-size: .84rem;
+}
+
+.cr31-player-history-context p {
+  margin: 9px 0 0;
+  color: var(--cr21-text-secondary);
+  font-size: .74rem;
+  line-height: 1.52;
+}
+
+.cr31-player-history-actions {
+  display: grid;
+  gap: 9px;
+}
+
+.cr31-player-history-actions .cr-button {
+  width: 100%;
+}
+
+.cr31-player-history-actions small {
+  color: var(--cr21-text-muted);
+  font-size: .65rem;
+  line-height: 1.45;
+}
+
+@media (max-width: 980px) {
+  .cr31-player-activity-body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cr31-player-activity-feed {
+    border-right: 0;
+    border-bottom: 1px solid var(--cr21-border-soft);
+  }
+
+  .cr31-player-history-context {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(220px, 320px);
+    align-items: end;
+  }
+}
+
+@media (max-width: 720px) {
+  .cr31-player-activity-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 0 12px;
+  }
+
+  .cr31-player-activity-summary > div:nth-child(3)::before {
+    display: none;
+  }
+
+  .cr31-player-activity-summary > div:nth-child(n + 3) {
+    border-top: 1px solid var(--cr21-border-soft);
+  }
+
+  .cr31-player-activity-feed > article {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 10px;
+    padding-inline: 13px;
+  }
+
+  .cr31-player-activity-feed time {
+    grid-column: 2 / -1;
+    text-align: left;
+  }
+
+  .cr31-player-history-context {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .cr31-player-activity-badges .cr-badge:last-child {
+    display: none;
+  }
+
+  .cr31-player-activity-feed > article {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .cr31-player-activity-feed > article > span,
+  .cr31-player-activity-feed time {
+    grid-column: 2;
+    justify-self: start;
+  }
+
+  .cr31-player-activity-feed time {
+    margin-top: -5px;
+  }
+}
