@@ -109,7 +109,7 @@ function PlayerActivityPanel({
                 <PlayerHead
                   uuid={event.uuid}
                   name={event.name}
-                  size={38}
+                  size={40}
                   online={event.state === "JOINED"}
                 />
                 <div className="cr31-player-activity-identity">
