@@ -1,0 +1,34 @@
+[Unit]
+Description=PlexonPanel Standalone Relay
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=plexonpanel-relay
+Group=plexonpanel-relay
+WorkingDirectory=/opt/plexonpanel-relay/app
+EnvironmentFile=/etc/plexonpanel-relay/relay.env
+ExecStart=/usr/bin/node /opt/plexonpanel-relay/app/relay/dist/standalone/server.js
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=20
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+LockPersonality=true
+RestrictSUIDSGID=true
+RestrictRealtime=true
+RestrictNamespaces=true
+SystemCallArchitectures=native
+ReadWritePaths=/var/lib/plexonpanel-relay
+
+[Install]
+WantedBy=multi-user.target
