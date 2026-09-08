@@ -18,6 +18,7 @@
     "relay:standalone:dev": "npm run relay:build && node --watch relay/dist/standalone/server.js",
     "relay:standalone:start": "node relay/dist/standalone/server.js",
     "relay:standalone:smoke": "npm run relay:build && node relay/tests/standalone-smoke.mjs",
+    "relay:standalone:package": "npm run relay:build && node relay/scripts/package-standalone.mjs",
     "relay:test": "npm run relay:build && node --test relay/tests/*.test.mjs",
     "env:vercel": "node scripts/create-vercel-env.mjs",
     "test": "node scripts/transpile-tests.mjs && node scripts/build-test.mjs && node --test --test-concurrency=1 tests/*.test.mjs",
