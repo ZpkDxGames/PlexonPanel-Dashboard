@@ -45,6 +45,7 @@ export class Storage {
 class Socket {
   sent = [];
   closed = null;
+  failSend = false;
   attachment;
   listener;
   serializeAttachment(value) {
@@ -58,6 +59,7 @@ class Socket {
     return structuredClone(this.attachment);
   }
   send(text) {
+    if (this.failSend) throw new Error("simulated send failure");
     this.sent.push(JSON.parse(text));
     this.listener?.(text);
   }
@@ -365,13 +367,52 @@ test("expiry alarms reject expired devices and a host cannot invent a grant", as
     revision: 2,
     devices: [f.d, device(SCOPES, "Owner")],
   });
-  assert.equal(host.socket.closed.code, 4008);
+  assert.equal(host.socket.closed, null);
+  assert.deepEqual(
+    (await f.st.storage.get("room-metadata")).devices.map((d) => d.deviceId),
+    [f.d.deviceId],
+  );
   const m = await f.st.storage.get("room-metadata");
   m.devices[0].expiresAt = Math.floor(Date.now() / 1000) - 1;
   await f.st.storage.put("room-metadata", m);
   await f.room.alarm();
   assert.equal(f.browser.closed.code, 4003);
 });
+test("broken Dashboard fan-out cannot disconnect an authenticated Paper agent", async () => {
+  const f = await fixture();
+  const paper = await attach(f);
+  f.browser.failSend = true;
+  await paper.send("telemetry.system", { hostCpuPercent: 1 });
+  assert.equal(paper.socket.closed, null);
+  assert.equal(paper.socket.attachment.authenticated, true);
+  assert.equal(f.browser.closed.code, 1011);
+});
+
+test("broken Host peer delivery cannot retroactively reject healthy Paper", async () => {
+  const f = await fixture();
+  const host = await attach(f, "HOST");
+  host.socket.failSend = true;
+  const paper = await attach(f);
+  assert.equal(paper.socket.closed, null);
+  assert.equal(paper.socket.attachment.authenticated, true);
+  assert.equal(host.socket.closed.code, 1011);
+});
+
+test("broken Paper peer delivery cannot retroactively reject healthy Host", async () => {
+  const f = await fixture();
+  const paper = await attach(f);
+  paper.socket.failSend = true;
+  const host = await attach(f, "HOST");
+  await host.send("backup.coordination", {
+    requestId: randomUUID(),
+    leaseId: randomUUID(),
+    operation: "prepare",
+  });
+  assert.equal(host.socket.closed, null);
+  assert.equal(host.socket.attachment.authenticated, true);
+  assert.equal(paper.socket.closed.code, 1011);
+});
+
 test("client cannot exceed command, transfer, parameter or in-flight request limits", async () => {
   const f = await fixture(["files.download"]);
   await attach(f);

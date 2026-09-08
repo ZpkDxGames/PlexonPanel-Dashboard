@@ -329,7 +329,7 @@ export function diagnostics(state: ControlState): string {
     hostCpu = number(host.hostCpuPercent),
     paperCpu = number(paper.processCpuPercent);
   return [
-    `PlexonPanel Dashboard 3.0.1 / Protocol 3`,
+    `PlexonPanel Dashboard 3.0.2 / Protocol 3`,
     `Paper agent: ${state.ready?.server.pluginVersion ?? "unknown"}`,
     `Host agent: ${state.ready?.server.hostVersion ?? "not installed"}`,
     `Paper connected: ${Boolean(state.ready?.agents.paper)}`,

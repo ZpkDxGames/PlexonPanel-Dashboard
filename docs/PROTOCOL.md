@@ -61,3 +61,9 @@ Presence timestamps are UTC ISO-8601 instants. Null logout/duration means unknow
 History responses contain `entries`, nullable `nextCursor`, `hasMore`, `boundedWindow`, `capturedAt`, and `historyEnabled`. They are delivered through the existing private `action.result` route to the requesting device only. The Durable Object persists neither responses nor presence/player-inventory bodies. Older protocol-3 agents omit these optional events/capabilities without breaking the Online view.
 
 Transfers use start → ordered 16 KiB chunks → cancellation/expiry, with final SHA-256 verification. File bodies and action results are transient. Durable Object storage contains identity/access/pairing coordination only; bounded socket attachments retain pending routing metadata across hibernation. Cloudflare's attachment limit is [16,384 bytes](https://developers.cloudflare.com/durable-objects/best-practices/websockets/); signed session sequences avoid unbounded replay arrays.
+
+## 3.0.2 post-authentication reliability
+
+After envelope, server, signature, session/replay, type and body validation succeeds, the agent packet is accepted. Dashboard fan-out, peer-agent delivery, Durable Object notifications and other post-authentication side effects are failure-isolated. A stale or broken destination may be discarded, but that failure cannot retroactively turn a valid sender packet into protocol corruption.
+
+Host `access.sync` remains removal-only. Safe stale or divergent Host snapshots are ignored and diagnosed without disconnecting the authenticated Host; malformed, replayed or tampered traffic still fails closed.

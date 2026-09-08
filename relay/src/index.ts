@@ -72,6 +72,7 @@ interface SocketAttachment {
   deviceId?: string;
   generation?: number;
   authenticated?: boolean;
+  authenticatedAt?: number;
   publicKey?: string;
   fingerprint?: string;
   challenge?: string;
@@ -154,7 +155,7 @@ const relayWorker = {
         {
           ok: true,
           service: "plexonpanel-relay",
-          version: "2.2.0",
+          version: "3.0.2",
           protocolVersion: 3,
           storage: "coordination-only",
           gatewayPublicKey: env.GATEWAY_ED25519_PUBLIC_KEY,
@@ -584,7 +585,8 @@ export class ServerRoom {
             requestId: pending.requestId,
             deviceId,
             name,
-          }).catch(() => {
+          }).then((sent) => {
+            if (sent) return;
             clearTimeout(timer);
             this.pairingWaiters.delete(pending.requestId);
             resolve(null);
@@ -655,7 +657,7 @@ export class ServerRoom {
         )
           other.close(4002, "Device reconnected");
       }
-      socket.send(JSON.stringify(this.ready(metadata, attachment)));
+      this.safeDashboardSend(socket, this.ready(metadata, attachment), attachment);
       await this.sendToAgent("PAPER", "gateway.snapshot_request", {});
       await this.sendToAgent("HOST", "gateway.snapshot_request", {});
       await this.scheduleExpiry(metadata);
@@ -688,17 +690,31 @@ export class ServerRoom {
           if (a.role === "agent")
             await this.agentMessage(socket, a, message as string);
           else await this.dashboardMessage(socket, a, message as string);
-        } catch {
-          if (a.role === "agent")
-            socket.close(4008, "Protocol message rejected");
-          else
-            socket.send(
-              JSON.stringify({
+        } catch (error) {
+          if (a.role === "agent") {
+            const code = protocolRejectionCode(error, a.authenticated === true);
+            this.recordDiagnostic(
+              code ?? "INTERNAL_POST_AUTH_FAILURE",
+              a,
+              messageTypeHint(message),
+            );
+            if (code || !a.authenticated)
+              this.safeClose(
+                socket,
+                4008,
+                `Protocol message rejected: ${code ?? "INVALID_ENVELOPE"}`,
+              );
+          } else {
+            this.safeDashboardSend(
+              socket,
+              {
                 type: "relay.error",
                 code: "INVALID_REQUEST",
                 error: "The request was rejected.",
-              }),
+              },
+              a,
             );
+          }
         }
       })
       .finally(() => {
@@ -800,6 +816,7 @@ export class ServerRoom {
       else m.hostIdentity = a.candidate;
       await this.state.storage.put(METADATA_KEY, m);
       a.authenticated = true;
+      a.authenticatedAt = Date.now();
       delete a.challenge;
       delete a.candidate;
       socket.serializeAttachment(a);
@@ -811,18 +828,31 @@ export class ServerRoom {
           other.close(4002, "Agent reconnected");
         }
       }
-      await this.sendGateway(socket, a.serverId, "gateway.authenticated", {
-        protocolVersion: 3,
-        paired: m.paired,
-        authenticatedAt: new Date().toISOString(),
-      });
+      if (
+        !(await this.sendGatewaySafely(
+          socket,
+          a.serverId,
+          "gateway.authenticated",
+          {
+            protocolVersion: 3,
+            paired: m.paired,
+            authenticatedAt: new Date().toISOString(),
+          },
+          a,
+        ))
+      )
+        return;
       await this.broadcastReady(m);
       if (a.kind === "PAPER")
         await this.sendToAgent("HOST", "paper.connection", { connected: true });
       if (a.kind === "HOST")
-        await this.sendGateway(socket, a.serverId, "paper.connection", {
-          connected: this.agents("PAPER").length > 0,
-        });
+        await this.sendGatewaySafely(
+          socket,
+          a.serverId,
+          "paper.connection",
+          { connected: this.agents("PAPER").length > 0 },
+          a,
+        );
       return;
     }
     if (!a.authenticated) throw new Error("Agent authentication required");
@@ -874,13 +904,16 @@ export class ServerRoom {
       )
         throw new Error("Invalid access snapshot");
       // HOST reads the same local registry, but may only remove grants. New grants originate from PAPER.
+      // Safe Host divergence is a reconciliation conflict, not transport corruption.
       const next = body.devices as Device[];
       if (
         a.kind === "HOST" &&
         (Number(body.generation) !== m.generation ||
           next.some((d) => !m.devices.some((old) => sameDevice(old, d))))
-      )
-        throw new Error("Host cannot issue device grants");
+      ) {
+        this.recordDiagnostic("HOST_GRANT_CONFLICT", a, envelope.type);
+        return;
+      }
       if (Number(body.generation) < m.generation) return;
       if (
         Number(body.generation) === m.generation &&
@@ -939,15 +972,17 @@ export class ServerRoom {
           access.deviceId === pending.deviceId &&
           currentAccess(m, access.access)
         )
-          peer.send(
-            JSON.stringify({
+          this.safeDashboardSend(
+            peer,
+            {
               type: "server.event",
               serverId: a.serverId,
               agentKind: a.kind,
               eventType: "action.result",
               body,
               receivedAt: new Date().toISOString(),
-            }),
+            },
+            access,
           );
       }
       return;
@@ -972,8 +1007,9 @@ export class ServerRoom {
         identity?.capabilities ?? {},
       );
       if (filtered)
-        peer.send(
-          JSON.stringify({
+        this.safeDashboardSend(
+          peer,
+          {
             type: "server.event",
             serverId: a.serverId,
             agentKind: a.kind,
@@ -982,7 +1018,8 @@ export class ServerRoom {
             eventType: envelope.type,
             body: filtered,
             receivedAt: new Date().toISOString(),
-          }),
+          },
+          d,
         );
     }
   }
@@ -1199,19 +1236,83 @@ export class ServerRoom {
       ),
     );
   }
+  private async sendGatewaySafely(
+    socket: WebSocket,
+    serverId: string,
+    type: string,
+    body: Record<string, unknown>,
+    attachment?: SocketAttachment,
+  ): Promise<boolean> {
+    try {
+      await this.sendGateway(socket, serverId, type, body);
+      return true;
+    } catch {
+      const a =
+        attachment ?? (socket.deserializeAttachment() as SocketAttachment);
+      this.recordDiagnostic("PEER_DELIVERY_FAILED", a, type);
+      if (a.role === "agent") {
+        a.authenticated = false;
+        socket.serializeAttachment(a);
+      }
+      this.safeClose(socket, 1011, "Agent transport delivery failed");
+      return false;
+    }
+  }
   private async sendToAgent(
     kind: AgentKind,
     type: string,
     body: Record<string, unknown>,
-  ) {
+  ): Promise<boolean> {
     const s = this.agents(kind)[0];
-    if (s)
-      await this.sendGateway(
-        s,
-        (s.deserializeAttachment() as SocketAttachment).serverId,
-        type,
-        body,
+    if (!s) return false;
+    const a = s.deserializeAttachment() as SocketAttachment;
+    return this.sendGatewaySafely(s, a.serverId, type, body, a);
+  }
+  private safeDashboardSend(
+    socket: WebSocket,
+    payload: Record<string, unknown>,
+    attachment?: SocketAttachment,
+  ): boolean {
+    try {
+      socket.send(JSON.stringify(payload));
+      return true;
+    } catch {
+      const a =
+        attachment ?? (socket.deserializeAttachment() as SocketAttachment);
+      this.recordDiagnostic(
+        "DASHBOARD_DELIVERY_FAILED",
+        a,
+        String(payload.type ?? "unknown"),
       );
+      this.safeClose(socket, 1011, "Dashboard transport delivery failed");
+      return false;
+    }
+  }
+  private safeClose(socket: WebSocket, code: number, reason: string): void {
+    try {
+      socket.close(code, reason);
+    } catch {
+      // The destination is already unusable; never propagate close failures.
+    }
+  }
+  private recordDiagnostic(
+    code: string,
+    a: SocketAttachment,
+    messageType: string,
+  ): void {
+    console.warn(
+      JSON.stringify({
+        component: "PlexonPanelRelay",
+        code,
+        serverId: a.serverId,
+        agentKind: a.kind ?? null,
+        messageType,
+        sessionAgeMillis: a.authenticatedAt
+          ? Math.max(0, Date.now() - a.authenticatedAt)
+          : null,
+        sequence: a.sequence ?? null,
+      }),
+    );
   }
   private ready(m: RoomMetadata, a: SocketAttachment): Record<string, unknown> {
     const scopes = a.access?.scopes ?? [],
@@ -1225,7 +1326,7 @@ export class ServerRoom {
       type: "dashboard.ready",
       serverId: a.serverId,
       protocolVersion: 3,
-      version: "2.2.0",
+      version: "3.0.2",
       connectionStatus: this.agents("PAPER").length ? "online" : "offline",
       agents: {
         paper: this.agents("PAPER").length > 0,
@@ -1255,7 +1356,8 @@ export class ServerRoom {
   private async broadcastReady(m: RoomMetadata) {
     for (const s of this.state.getWebSockets("dashboard")) {
       const a = s.deserializeAttachment() as SocketAttachment;
-      if (currentAccess(m, a.access)) s.send(JSON.stringify(this.ready(m, a)));
+      if (currentAccess(m, a.access))
+        this.safeDashboardSend(s, this.ready(m, a), a);
     }
   }
   private closeInvalid(m: RoomMetadata) {
@@ -1266,14 +1368,14 @@ export class ServerRoom {
           (s.deserializeAttachment() as SocketAttachment).access,
         )
       )
-        s.close(4003, "Device revoked or expired");
+        this.safeClose(s, 4003, "Device revoked or expired");
     }
     for (const s of this.agents("HOST"))
       if (
         (s.deserializeAttachment() as SocketAttachment).publicKey !==
         m.identity?.hostPublicKey
       )
-        s.close(4003, "Host attachment revoked");
+        this.safeClose(s, 4003, "Host attachment revoked");
   }
   private async scheduleExpiry(m: RoomMetadata) {
     const expiries = m.devices
@@ -1294,6 +1396,55 @@ export class ServerRoom {
       await this.sendToAgent("HOST", "paper.connection", { connected: false });
   }
 }
+function messageTypeHint(message: ArrayBuffer | string): string {
+  if (typeof message !== "string") return "binary";
+  try {
+    const parsed: unknown = JSON.parse(message);
+    if (
+      isRecord(parsed) &&
+      typeof parsed.type === "string" &&
+      parsed.type.length <= 64
+    )
+      return parsed.type;
+  } catch {}
+  return "unknown";
+}
+
+function protocolRejectionCode(
+  error: unknown,
+  authenticated: boolean,
+): string | null {
+  if (error instanceof SyntaxError) return "INVALID_ENVELOPE";
+  const message = error instanceof Error ? error.message : String(error);
+  if (/wrong room/i.test(message)) return "WRONG_SERVER";
+  if (/protocol|agent kind/i.test(message)) return "PROTOCOL_MISMATCH";
+  if (/invalid signature/i.test(message)) return "INVALID_SIGNATURE";
+  if (/identity|room is already bound|host identity/i.test(message))
+    return "INVALID_IDENTITY";
+  if (/replay/i.test(message)) return "SESSION_REPLAY";
+  if (/initial sequence/i.test(message)) return "INVALID_INITIAL_SEQUENCE";
+  if (/challenge|candidate identity/i.test(message)) return "CHALLENGE_REJECTED";
+  if (/authentication required/i.test(message)) return "AUTH_REQUIRED";
+  if (/invalid access snapshot/i.test(message)) return "ACCESS_SYNC_INVALID";
+  if (/host authorization changed/i.test(message))
+    return "HOST_AUTHORIZATION_CHANGED";
+  if (
+    /event not allowed|presence|save lease|host backups disabled|only paper reports|invalid name|invalid eventId|invalid sessionId|invalid uuid|invalid observedAt|invalid sessionStartedAt|invalid sessionEndedAt|invalid persistence state/i.test(
+      message,
+    )
+  )
+    return "INVALID_EVENT";
+  if (/pairing|only paper issues|only paper approves/i.test(message))
+    return "INVALID_EVENT";
+  if (
+    /envelope|timestamp|message id|missing|required|expected|invalid .*field|too large/i.test(
+      message,
+    )
+  )
+    return "INVALID_ENVELOPE";
+  return authenticated ? null : "INVALID_ENVELOPE";
+}
+
 export function validDevice(value: unknown): value is Device {
   if (!isRecord(value)) return false;
   return (
