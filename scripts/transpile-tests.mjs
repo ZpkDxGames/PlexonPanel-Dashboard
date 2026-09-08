@@ -21,6 +21,8 @@ for (const file of [
   "app/management-views-legacy.tsx",
   "app/console-view-3-0.tsx",
   "app/players-view-2-3.tsx",
+  "app/activity-history-modal.tsx",
+  "app/players-view-3-0.tsx",
   "app/management-views-2-1.tsx",
   "app/advanced-views.tsx",
 ]) {
