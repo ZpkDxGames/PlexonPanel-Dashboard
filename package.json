@@ -1,6 +1,6 @@
 {
   "name": "plexonpanel-dashboard",
-  "version": "3.0.2",
+  "version": "3.1.0",
   "private": true,
   "engines": {
     "node": ">=22.13.0"
@@ -11,8 +11,13 @@
     "start": "next start",
     "relay:build": "tsc -p relay/tsconfig.json",
     "relay:keygen": "node relay/scripts/generate-secrets.mjs",
-    "relay:dev": "wrangler dev --config relay/wrangler.jsonc",
-    "relay:deploy": "wrangler deploy --config relay/wrangler.jsonc",
+    "relay:dev": "npm run relay:worker:dev",
+    "relay:deploy": "npm run relay:worker:deploy",
+    "relay:worker:dev": "wrangler dev --config relay/wrangler.jsonc",
+    "relay:worker:deploy": "wrangler deploy --config relay/wrangler.jsonc",
+    "relay:standalone:dev": "npm run relay:build && node --watch relay/dist/standalone/server.js",
+    "relay:standalone:start": "node relay/dist/standalone/server.js",
+    "relay:standalone:smoke": "npm run relay:build && node relay/tests/standalone-smoke.mjs",
     "relay:test": "npm run relay:build && node --test relay/tests/*.test.mjs",
     "env:vercel": "node scripts/create-vercel-env.mjs",
     "test": "node scripts/transpile-tests.mjs && node scripts/build-test.mjs && node --test --test-concurrency=1 tests/*.test.mjs",
