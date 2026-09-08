@@ -11,6 +11,7 @@ import {
   type ViewProps,
 } from "./control-views";
 import { str } from "../lib/control-state";
+import { DASHBOARD_VERSION } from "../lib/dashboard-version";
 import {
   lifecycleActionAllowed,
   normalizeServiceState,
@@ -255,7 +256,7 @@ export function ServerView21(props: ViewProps) {
             ["Minecraft", props.state.ready?.server.minecraftVersion],
             ["Paper agent", props.state.ready?.server.pluginVersion],
             ["Host agent", props.state.ready?.server.hostVersion],
-            ["Dashboard", "3.0.1"],
+            ["Dashboard", DASHBOARD_VERSION],
             ["Protocol", "3"],
           ].map(([label, value]) => (
             <div key={String(label)}>
