@@ -1,6 +1,21 @@
-<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M22 19.2727C22 20.779 20.779 22 19.2727 22H14.7273C13.221 22 12 20.779 12 19.2727V12H19.2727C20.779 12 22 13.221 22 14.7273V19.2727Z" fill="#68C4FF"/>
-<path d="M20 2C21.1046 2 22 2.89543 22 4V7C22 8.10457 21.1046 9 20 9H17C15.8954 9 15 8.10457 15 7V4C15 2.89543 15.8954 2 17 2H20Z" fill="#0C79D8"/>
-<path d="M7 15C8.10457 15 9 15.8954 9 17V20C9 21.1046 8.10457 22 7 22H4C2.89543 22 2 21.1046 2 20V17C2 15.8954 2.89543 15 4 15H7Z" fill="#0C79D8"/>
-<path d="M12 12H4.72727C3.22104 12 2 10.779 2 9.27273V4.72727C2 3.22104 3.22104 2 4.72727 2H9.27273C10.779 2 12 3.22104 12 4.72727V12Z" fill="#2E9EFF"/>
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="plexon-shell" x1="12" y1="8" x2="52" y2="56" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#36C9E8"/>
+      <stop offset="1" stop-color="#8B7CF6"/>
+    </linearGradient>
+    <linearGradient id="plexon-glow" x1="18" y1="24" x2="46" y2="44" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#79E7F5"/>
+      <stop offset="1" stop-color="#36C9E8"/>
+    </linearGradient>
+  </defs>
+  <rect x="4" y="4" width="56" height="56" rx="15" fill="#08111D"/>
+  <rect x="5" y="5" width="54" height="54" rx="14" stroke="url(#plexon-shell)" stroke-opacity="0.45" stroke-width="2"/>
+  <path d="M18 17H46C49.3137 17 52 19.6863 52 23V43C52 46.3137 49.3137 49 46 49H18C14.6863 49 12 46.3137 12 43V23C12 19.6863 14.6863 17 18 17Z" stroke="url(#plexon-shell)" stroke-width="3"/>
+  <path d="M12 26H52" stroke="#36C9E8" stroke-opacity="0.55" stroke-width="2"/>
+  <circle cx="18" cy="21.5" r="1.5" fill="#36C9E8"/>
+  <circle cx="23" cy="21.5" r="1.5" fill="#8B7CF6"/>
+  <path d="M19 32L25 37L19 42" stroke="url(#plexon-glow)" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M31 42H42" stroke="url(#plexon-glow)" stroke-width="3.2" stroke-linecap="round"/>
+  <path d="M16 53H48" stroke="#36C9E8" stroke-opacity="0.32" stroke-width="1.5" stroke-linecap="round"/>
 </svg>
