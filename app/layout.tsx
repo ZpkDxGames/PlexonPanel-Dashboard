@@ -12,6 +12,7 @@ import "./workspaces-3-0.css";
 import "./overview-3-0.css";
 import "./activity-history.css";
 import "./visual-responsive-refinement.css";
+import "./visual-responsive-authority.css";
 import { UiPreferencesProvider } from "../components/ui-preferences-provider";
 
 export const metadata: Metadata = {
