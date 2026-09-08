@@ -2,6 +2,7 @@
 
 import { Badge, Panel, type ViewProps } from "./control-views";
 import { diagnostics, number } from "../lib/control-state";
+import { DASHBOARD_LABEL } from "../lib/dashboard-version";
 import { displayRateLabel } from "../lib/display-cadence";
 import { useUiPreferences } from "../components/ui-preferences-provider";
 
@@ -366,7 +367,7 @@ export function SettingsView21(props: ViewProps & { reconnect: () => void }) {
 
         <Panel title="About">
           <dl className="cr-details cr-pad">
-            <div><dt>Dashboard</dt><dd>PlexonPanel Dashboard 3.0.1</dd></div>
+            <div><dt>Dashboard</dt><dd>{DASHBOARD_LABEL}</dd></div>
             <div><dt>Wire protocol</dt><dd>3</dd></div>
             <div><dt>Paper agent</dt><dd>{ready?.server.pluginVersion ?? "Unavailable"}</dd></div>
             <div><dt>Host companion</dt><dd>{ready?.server.hostVersion ?? "Unavailable"}</dd></div>

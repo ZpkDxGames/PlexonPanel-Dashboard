@@ -13,6 +13,8 @@ import "./overview-3-0.css";
 import "./activity-history.css";
 import "./visual-responsive-refinement.css";
 import "./visual-responsive-authority.css";
+import "./brand-console-icon.css";
+import "./backups-scaffold.css";
 import { UiPreferencesProvider } from "../components/ui-preferences-provider";
 
 export const metadata: Metadata = {

@@ -30,6 +30,7 @@ import {
   type ControlState,
   type JsonMap,
 } from "../lib/control-state";
+import { DASHBOARD_LABEL, DASHBOARD_VERSION } from "../lib/dashboard-version";
 import { isImmediateControlMessage } from "../lib/display-cadence";
 import { canAction, HIGH_RISK } from "../lib/scopes";
 import {
@@ -49,6 +50,7 @@ import { AccessView21, AuditView21 } from "./infrastructure-views-2-1";
 import { PerformanceView21 } from "./monitoring-views-2-1";
 import { OverviewView30 } from "./overview-view-3-0";
 import { ServerView21 } from "./server-view-2-1";
+import { BackupsView30 } from "./backups-view-3-0";
 
 const SettingsView = dynamic(() =>
   import("./settings-view-2-1").then((module) => module.SettingsView21),
@@ -62,6 +64,7 @@ const sections = [
   "Chat",
   "Plugins",
   "Server",
+  "Backups",
   "Audit",
   "Access",
   "Settings",
@@ -82,6 +85,7 @@ type IconName =
   | "chat"
   | "plugins"
   | "server"
+  | "backup"
   | "audit"
   | "access"
   | "settings"
@@ -95,7 +99,7 @@ type IconName =
 const navGroups: { label: string; sections: Section[] }[] = [
   { label: "MONITOR", sections: ["Overview", "Performance", "Players"] },
   { label: "COMMUNICATION", sections: ["Console", "Chat"] },
-  { label: "MANAGE", sections: ["Plugins", "Server"] },
+  { label: "MANAGE", sections: ["Plugins", "Server", "Backups"] },
   { label: "CONTROL", sections: ["Audit", "Access", "Settings"] },
 ];
 const iconBySection: Record<Section, IconName> = {
@@ -106,6 +110,7 @@ const iconBySection: Record<Section, IconName> = {
   Chat: "chat",
   Plugins: "plugins",
   Server: "server",
+  Backups: "backup",
   Audit: "audit",
   Access: "access",
   Settings: "settings",
@@ -120,6 +125,7 @@ const iconPaths: Record<IconName, string> = {
   plugins: "M8 3v5H3v8h5v5h8v-5h5V8h-5V3z",
   server:
     "M3 4h18v6H3zM3 14h18v6H3zM7 7h.01M7 17h.01M11 7h6M11 17h6",
+  backup: "M5 5h14v4H5zM6 9v10h12V9M9 13h6M10 16h4",
   audit: "M6 3h12v18H6zM9 8h6M9 12h6M9 16h4",
   access: "M12 3l8 4v5c0 5-3 8-8 9-5-1-8-4-8-9V7zM9 12l2 2 4-4",
   settings:
@@ -130,7 +136,8 @@ const iconPaths: Record<IconName, string> = {
   search: "M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14Zm5-2 5 5",
   chevron: "m8 10 4 4 4-4",
   menu: "M4 7h16M4 12h16M4 17h16",
-  panel: "M4 4h16v16H4zM8 8h8v8H8z",
+  panel:
+    "M5 4.5h14a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-11a2 2 0 0 1 2-2ZM3 8h18M6 6.25h.01M8.5 6.25h.01M7 12l2.5 2L7 16M12.5 16h4.5",
 };
 
 function Icon({ name, size = 18 }: { name: IconName; size?: number }) {
@@ -162,7 +169,7 @@ function Brand({ compact = false }: { compact?: boolean }) {
           <strong>
             Plexon<span>Panel</span>
           </strong>
-          <small>Control Room · 3.0.1</small>
+          <small>Control Room · {DASHBOARD_VERSION}</small>
         </div>
       )}
     </div>
@@ -673,7 +680,7 @@ export default function Dashboard21() {
               message.protocolVersion !== 3
             ) {
               setError(
-                "Protocol mismatch. PlexonPanel Dashboard 3.0.1 requires protocol 3 agents and relay.",
+                `${DASHBOARD_LABEL} requires protocol 3 agents and relay.`,
               );
               socket?.close(4008, "Protocol mismatch");
               return;
@@ -941,6 +948,9 @@ export default function Dashboard21() {
     case "Server":
       view = <ServerView21 {...props} />;
       break;
+    case "Backups":
+      view = <BackupsView30 {...props} />;
+      break;
     case "Audit":
       view = <AuditView21 {...props} />;
       break;
@@ -1199,7 +1209,7 @@ export default function Dashboard21() {
         </main>
         <footer className="cr21-footer">
           <span>Local authority · Signed protocol 3</span>
-          <span>PlexonPanel Dashboard 3.0.1</span>
+          <span>{DASHBOARD_LABEL}</span>
         </footer>
       </div>
 
