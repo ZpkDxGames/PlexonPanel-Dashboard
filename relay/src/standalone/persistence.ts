@@ -63,7 +63,7 @@ interface PairingRow {
 
 const SCHEMA_VERSION = 1;
 
-export class CoordinationStore implements AutoCloseable {
+export class CoordinationStore {
   private readonly db: DatabaseSync;
 
   constructor(path: string) {
@@ -265,10 +265,6 @@ export class CoordinationStore implements AutoCloseable {
 
   close(): void {
     this.db.close();
-  }
-
-  [Symbol.dispose](): void {
-    this.close();
   }
 
   private transaction<T>(work: () => T): T {
