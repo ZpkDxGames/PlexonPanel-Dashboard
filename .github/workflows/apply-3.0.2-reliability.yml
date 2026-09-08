@@ -1,0 +1,197 @@
+name: Apply PlexonPanel 3.0.2 reliability patch
+on:
+  push:
+    branches: ["agent/3.0.2-reliability"]
+permissions:
+  contents: write
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]' && !contains(github.event.head_commit.message, '[3.0.2 apply]')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: agent/3.0.2-reliability
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          cache: npm
+      - name: Apply relay and dashboard reliability changes
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          def replace(text, old, new, label, count=1):
+              if old not in text:
+                  raise SystemExit(f"missing patch anchor: {label}")
+              return text.replace(old, new, count)
+
+          p = Path("relay/src/index.ts")
+          text = p.read_text()
+
+          text = replace(text,
+          '''  authenticated?: boolean;\n  publicKey?: string;''',
+          '''  authenticated?: boolean;\n  authenticatedAt?: number;\n  publicKey?: string;''',
+          "attachment authenticatedAt")
+
+          old = '''        } catch {\n          if (a.role === "agent")\n            socket.close(4008, "Protocol message rejected");\n          else\n            socket.send(\n              JSON.stringify({\n                type: "relay.error",\n                code: "INVALID_REQUEST",\n                error: "The request was rejected.",\n              }),\n            );\n        }'''
+          new = '''        } catch (error) {\n          if (a.role === "agent") {\n            const code = protocolRejectionCode(error, a.authenticated === true);\n            this.recordDiagnostic(\n              code ?? "INTERNAL_POST_AUTH_FAILURE",\n              a,\n              messageTypeHint(message),\n            );\n            if (code || !a.authenticated)\n              this.safeClose(\n                socket,\n                4008,\n                `Protocol message rejected: ${code ?? "INVALID_ENVELOPE"}`,\n              );\n          } else {\n            this.safeDashboardSend(\n              socket,\n              {\n                type: "relay.error",\n                code: "INVALID_REQUEST",\n                error: "The request was rejected.",\n              },\n              a,\n            );\n          }\n        }'''
+          text = replace(text, old, new, "websocket error isolation")
+
+          text = replace(text,
+          '''      a.authenticated = true;\n      delete a.challenge;''',
+          '''      a.authenticated = true;\n      a.authenticatedAt = Date.now();\n      delete a.challenge;''',
+          "authenticated timestamp")
+
+          old = '''      await this.sendGateway(socket, a.serverId, "gateway.authenticated", {\n        protocolVersion: 3,\n        paired: m.paired,\n        authenticatedAt: new Date().toISOString(),\n      });\n      await this.broadcastReady(m);\n      if (a.kind === "PAPER")\n        await this.sendToAgent("HOST", "paper.connection", { connected: true });\n      if (a.kind === "HOST")\n        await this.sendGateway(socket, a.serverId, "paper.connection", {\n          connected: this.agents("PAPER").length > 0,\n        });'''
+          new = '''      if (\n        !(await this.sendGatewaySafely(\n          socket,\n          a.serverId,\n          "gateway.authenticated",\n          {\n            protocolVersion: 3,\n            paired: m.paired,\n            authenticatedAt: new Date().toISOString(),\n          },\n          a,\n        ))\n      )\n        return;\n      await this.broadcastReady(m);\n      if (a.kind === "PAPER")\n        await this.sendToAgent("HOST", "paper.connection", { connected: true });\n      if (a.kind === "HOST")\n        await this.sendGatewaySafely(\n          socket,\n          a.serverId,\n          "paper.connection",\n          { connected: this.agents("PAPER").length > 0 },\n          a,\n        );'''
+          text = replace(text, old, new, "post-auth delivery isolation")
+
+          old = '''      // HOST reads the same local registry, but may only remove grants. New grants originate from PAPER.\n      const next = body.devices as Device[];\n      if (\n        a.kind === "HOST" &&\n        (Number(body.generation) !== m.generation ||\n          next.some((d) => !m.devices.some((old) => sameDevice(old, d))))\n      )\n        throw new Error("Host cannot issue device grants");'''
+          new = '''      // HOST reads the same local registry, but may only remove grants. New grants originate from PAPER.\n      // A stale/divergent Host snapshot is a reconciliation conflict, not transport corruption.\n      const next = body.devices as Device[];\n      if (\n        a.kind === "HOST" &&\n        (Number(body.generation) !== m.generation ||\n          next.some((d) => !m.devices.some((old) => sameDevice(old, d))))\n      ) {\n        this.recordDiagnostic("HOST_GRANT_CONFLICT", a, envelope.type);\n        return;\n      }'''
+          text = replace(text, old, new, "host access reconciliation")
+
+          text = replace(text,
+          '''        if (\n          access.deviceId === pending.deviceId &&\n          currentAccess(m, access.access)\n        )\n          peer.send(\n            JSON.stringify({\n              type: "server.event",\n              serverId: a.serverId,\n              agentKind: a.kind,\n              eventType: "action.result",\n              body,\n              receivedAt: new Date().toISOString(),\n            }),\n          );''',
+          '''        if (\n          access.deviceId === pending.deviceId &&\n          currentAccess(m, access.access)\n        )\n          this.safeDashboardSend(\n            peer,\n            {\n              type: "server.event",\n              serverId: a.serverId,\n              agentKind: a.kind,\n              eventType: "action.result",\n              body,\n              receivedAt: new Date().toISOString(),\n            },\n            access,\n          );''',
+          "action result dashboard fanout")
+
+          text = replace(text,
+          '''      if (filtered)\n        peer.send(\n          JSON.stringify({\n            type: "server.event",\n            serverId: a.serverId,\n            agentKind: a.kind,\n            agentSession: a.sessionNonce,\n            agentSequence: a.sequence,\n            eventType: envelope.type,\n            body: filtered,\n            receivedAt: new Date().toISOString(),\n          }),\n        );''',
+          '''      if (filtered)\n        this.safeDashboardSend(\n          peer,\n          {\n            type: "server.event",\n            serverId: a.serverId,\n            agentKind: a.kind,\n            agentSession: a.sessionNonce,\n            agentSequence: a.sequence,\n            eventType: envelope.type,\n            body: filtered,\n            receivedAt: new Date().toISOString(),\n          },\n          d,\n        );''',
+          "event dashboard fanout")
+
+          text = replace(text,
+          '''      socket.send(JSON.stringify(this.ready(metadata, attachment)));\n      await this.sendToAgent("PAPER", "gateway.snapshot_request", {});''',
+          '''      this.safeDashboardSend(socket, this.ready(metadata, attachment), attachment);\n      await this.sendToAgent("PAPER", "gateway.snapshot_request", {});''',
+          "initial dashboard ready")
+
+          old = '''  private async sendToAgent(\n    kind: AgentKind,\n    type: string,\n    body: Record<string, unknown>,\n  ) {\n    const s = this.agents(kind)[0];\n    if (s)\n      await this.sendGateway(\n        s,\n        (s.deserializeAttachment() as SocketAttachment).serverId,\n        type,\n        body,\n      );\n  }'''
+          new = '''  private async sendGatewaySafely(\n    socket: WebSocket,\n    serverId: string,\n    type: string,\n    body: Record<string, unknown>,\n    attachment?: SocketAttachment,\n  ): Promise<boolean> {\n    try {\n      await this.sendGateway(socket, serverId, type, body);\n      return true;\n    } catch {\n      const a =\n        attachment ?? (socket.deserializeAttachment() as SocketAttachment);\n      this.recordDiagnostic("PEER_DELIVERY_FAILED", a, type);\n      if (a.role === "agent") {\n        a.authenticated = false;\n        socket.serializeAttachment(a);\n      }\n      this.safeClose(socket, 1011, "Agent transport delivery failed");\n      return false;\n    }\n  }\n  private async sendToAgent(\n    kind: AgentKind,\n    type: string,\n    body: Record<string, unknown>,\n  ): Promise<boolean> {\n    const s = this.agents(kind)[0];\n    if (!s) return false;\n    const a = s.deserializeAttachment() as SocketAttachment;\n    return this.sendGatewaySafely(s, a.serverId, type, body, a);\n  }\n  private safeDashboardSend(\n    socket: WebSocket,\n    payload: Record<string, unknown>,\n    attachment?: SocketAttachment,\n  ): boolean {\n    try {\n      socket.send(JSON.stringify(payload));\n      return true;\n    } catch {\n      const a =\n        attachment ?? (socket.deserializeAttachment() as SocketAttachment);\n      this.recordDiagnostic("DASHBOARD_DELIVERY_FAILED", a, String(payload.type ?? "unknown"));\n      this.safeClose(socket, 1011, "Dashboard transport delivery failed");\n      return false;\n    }\n  }\n  private safeClose(socket: WebSocket, code: number, reason: string): void {\n    try {\n      socket.close(code, reason);\n    } catch {\n      // A failed close is already a dead destination; never propagate it to a healthy sender.\n    }\n  }\n  private recordDiagnostic(\n    code: string,\n    a: SocketAttachment,\n    messageType: string,\n  ): void {\n    console.warn(\n      JSON.stringify({\n        component: "PlexonPanelRelay",\n        code,\n        serverId: a.serverId,\n        agentKind: a.kind ?? null,\n        messageType,\n        sessionAgeMillis: a.authenticatedAt\n          ? Math.max(0, Date.now() - a.authenticatedAt)\n          : null,\n        sequence: a.sequence ?? null,\n      }),\n    );\n  }'''
+          text = replace(text, old, new, "safe send helpers")
+
+          text = replace(text,
+          '''      if (currentAccess(m, a.access)) s.send(JSON.stringify(this.ready(m, a)));''',
+          '''      if (currentAccess(m, a.access))\n        this.safeDashboardSend(s, this.ready(m, a), a);''',
+          "ready fanout")
+
+          text = replace(text,
+          '''        s.close(4003, "Device revoked or expired");''',
+          '''        this.safeClose(s, 4003, "Device revoked or expired");''',
+          "safe revoked browser close")
+          text = replace(text,
+          '''        s.close(4003, "Host attachment revoked");''',
+          '''        this.safeClose(s, 4003, "Host attachment revoked");''',
+          "safe revoked host close")
+
+          # Keep public protocol v3 while versioning the coordinated release.
+          text = text.replace('version: "2.2.0"', 'version: "3.0.2"')
+          p.write_text(text)
+
+          # Add conservative rejection classification outside the class. Unknown post-auth failures are
+          # diagnostics only; known malformed/replay/security failures still fail closed.
+          p = Path("relay/src/index.ts")
+          text = p.read_text()
+          anchor = '''export function validDevice(value: unknown): value is Device {'''
+          helper = '''function messageTypeHint(message: ArrayBuffer | string): string {\n  if (typeof message !== "string") return "binary";\n  try {\n    const parsed: unknown = JSON.parse(message);\n    if (isRecord(parsed) && typeof parsed.type === "string" && parsed.type.length <= 64)\n      return parsed.type;\n  } catch {}\n  return "unknown";\n}\n\nfunction protocolRejectionCode(\n  error: unknown,\n  authenticated: boolean,\n): string | null {\n  if (error instanceof SyntaxError) return "INVALID_ENVELOPE";\n  const message = error instanceof Error ? error.message : String(error);\n  if (/wrong room/i.test(message)) return "WRONG_SERVER";\n  if (/protocol|agent kind/i.test(message)) return "PROTOCOL_MISMATCH";\n  if (/invalid signature/i.test(message)) return "INVALID_SIGNATURE";\n  if (/identity|room is already bound|host identity/i.test(message))\n    return "INVALID_IDENTITY";\n  if (/replay/i.test(message)) return "SESSION_REPLAY";\n  if (/initial sequence/i.test(message)) return "INVALID_INITIAL_SEQUENCE";\n  if (/challenge|candidate identity/i.test(message)) return "CHALLENGE_REJECTED";\n  if (/authentication required/i.test(message)) return "AUTH_REQUIRED";\n  if (/invalid access snapshot/i.test(message)) return "ACCESS_SYNC_INVALID";\n  if (/host authorization changed/i.test(message))\n    return "HOST_AUTHORIZATION_CHANGED";\n  if (\n    /event not allowed|presence|save lease|host backups disabled|only paper reports/i.test(\n      message,\n    )\n  )\n    return "INVALID_EVENT";\n  if (/pairing|only paper issues|only paper approves/i.test(message))\n    return "INVALID_EVENT";\n  if (/envelope|timestamp|message id|missing|required|expected|invalid .*field/i.test(message))\n    return "INVALID_ENVELOPE";\n  return authenticated ? null : "INVALID_ENVELOPE";\n}\n\n'''
+          if anchor not in text:
+              raise SystemExit("missing helper anchor")
+          text = text.replace(anchor, helper + anchor, 1)
+          p.write_text(text)
+
+          # Version surfaces.
+          p = Path("package.json")
+          package = p.read_text().replace('"version": "3.0.1"', '"version": "3.0.2"', 1)
+          p.write_text(package)
+
+          p = Path("lib/control-state.ts")
+          state = p.read_text().replace("PlexonPanel Dashboard 3.0.1 / Protocol 3", "PlexonPanel Dashboard 3.0.2 / Protocol 3")
+          p.write_text(state)
+
+          # Regression harness: a failed Dashboard send must be throwable on demand.
+          p = Path("relay/tests/room.test.mjs")
+          tests = p.read_text()
+          tests = replace(tests,
+          '''class Socket {\n  sent = [];\n  closed = null;''',
+          '''class Socket {\n  sent = [];\n  closed = null;\n  failSend = false;''',
+          "fake socket failure flag")
+          tests = replace(tests,
+          '''  send(text) {\n    this.sent.push(JSON.parse(text));''',
+          '''  send(text) {\n    if (this.failSend) throw new Error("simulated send failure");\n    this.sent.push(JSON.parse(text));''',
+          "fake socket send failure")
+          tests = replace(tests,
+          '''  assert.equal(host.socket.closed.code, 4008);\n  const m = await f.st.storage.get("room-metadata");''',
+          '''  assert.equal(host.socket.closed, null);\n  assert.deepEqual(\n    (await f.st.storage.get("room-metadata")).devices.map((d) => d.deviceId),\n    [f.d.deviceId],\n  );\n  const m = await f.st.storage.get("room-metadata");''',
+          "host divergence stays connected")
+
+          marker = '''test("client cannot exceed command, transfer, parameter or in-flight request limits", async () => {'''
+          added = r'''test("broken Dashboard fan-out cannot disconnect an authenticated Paper agent", async () => {
+  const f = await fixture();
+  const paper = await attach(f);
+  f.browser.failSend = true;
+  await paper.send("telemetry.system", { hostCpuPercent: 1 });
+  assert.equal(paper.socket.closed, null);
+  assert.equal(paper.socket.attachment.authenticated, true);
+  assert.equal(f.browser.closed.code, 1011);
+});
+
+test("broken Host peer delivery cannot retroactively reject healthy Paper", async () => {
+  const f = await fixture();
+  const host = await attach(f, "HOST");
+  host.socket.failSend = true;
+  const paper = await attach(f);
+  assert.equal(paper.socket.closed, null);
+  assert.equal(paper.socket.attachment.authenticated, true);
+  assert.equal(host.socket.closed.code, 1011);
+});
+
+test("broken Paper peer delivery cannot retroactively reject healthy Host", async () => {
+  const f = await fixture();
+  const paper = await attach(f);
+  paper.socket.failSend = true;
+  const host = await attach(f, "HOST");
+  await host.send("backup.coordination", {
+    requestId: randomUUID(),
+    leaseId: randomUUID(),
+    operation: "prepare",
+  });
+  assert.equal(host.socket.closed, null);
+  assert.equal(host.socket.attachment.authenticated, true);
+  assert.equal(paper.socket.closed.code, 1011);
+});
+
+'''
+          if marker not in tests:
+              raise SystemExit("missing regression test insertion anchor")
+          tests = tests.replace(marker, added + marker, 1)
+          p.write_text(tests)
+
+          # Protocol documentation: keep wire v3, explicitly separate acceptance from side effects.
+          p = Path("docs/PROTOCOL.md")
+          docs = p.read_text().replace("Product/bundle version 3.0.1, wire version 3.", "Product/bundle version 3.0.2, wire version 3.", 1)
+          note = '''\n## 3.0.2 post-authentication reliability\n\nAfter envelope, server, signature, session/replay, type and body validation succeeds, the agent packet is accepted. Dashboard fan-out, peer-agent delivery, Durable Object notifications and other post-authentication side effects are failure-isolated. A stale/broken destination may be discarded, but that failure cannot retroactively turn a valid sender packet into protocol corruption.\n\nHost `access.sync` remains removal-only. Safe stale/divergent Host snapshots are ignored and diagnosed without disconnecting the authenticated Host; malformed/replay/tampered traffic still fails closed with 4008 and a sanitized rejection code.\n'''
+          if "## 3.0.2 post-authentication reliability" not in docs:
+              docs += note
+          p.write_text(docs)
+
+          p = Path("CHANGELOG.md")
+          changelog = p.read_text()
+          entry = '''## 3.0.2 — reliability candidate, live lifecycle acceptance pending\n\n- Isolate broken Dashboard and peer-agent WebSocket destinations from healthy authenticated senders.\n- Stop translating unknown post-authentication side-effect failures into generic protocol corruption.\n- Keep real malformed, replayed, wrong-server, invalid-signature and invalid-event packets fail-closed.\n- Reconcile safe Host access divergence without disconnect loops or grant escalation.\n- Add sanitized relay rejection diagnostics and dedicated regression coverage for broken Dashboard/Host/Paper destinations.\n- Preserve protocol v3 and existing device credentials/scopes.\n\n'''
+          if not changelog.startswith("## 3.0.2"):
+              changelog = entry + changelog
+          p.write_text(changelog)
+          PY
+          npm install --package-lock-only --ignore-scripts
+          npm ci
+          npm run check
+          npm run build
+      - name: Commit applied source changes
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add relay/src/index.ts relay/tests/room.test.mjs package.json package-lock.json lib/control-state.ts docs/PROTOCOL.md CHANGELOG.md
+          git commit -m "Harden 3.0.2 relay lifecycle [3.0.2 apply]"
+          git push origin HEAD:agent/3.0.2-reliability
