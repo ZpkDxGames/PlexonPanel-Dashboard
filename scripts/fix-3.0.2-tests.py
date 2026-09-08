@@ -13,3 +13,17 @@ text = p.read_text()
 if "version: \"2.2.0\"" not in text:
     raise SystemExit("missing old relay health version expectation")
 p.write_text(text.replace('version: "2.2.0"', 'version: "3.0.2"', 1))
+
+p = Path("tests/dashboard-2-1.test.mjs")
+text = p.read_text()
+text = text.replace(
+    'safe diagnostics identify Dashboard 3.0.1 without changing protocol 3',
+    'safe diagnostics identify Dashboard 3.0.2 without changing protocol 3',
+    1,
+)
+text = text.replace(
+    r'/PlexonPanel Dashboard 3\.0\.1 \/ Protocol 3/',
+    r'/PlexonPanel Dashboard 3\.0\.2 \/ Protocol 3/',
+    1,
+)
+p.write_text(text)
