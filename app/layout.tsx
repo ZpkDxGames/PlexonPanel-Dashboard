@@ -11,6 +11,7 @@ import "./control-room-3-0.css";
 import "./workspaces-3-0.css";
 import "./overview-3-0.css";
 import "./activity-history.css";
+import "./player-activity-3-0.css";
 import "./visual-responsive-refinement.css";
 import "./visual-responsive-authority.css";
 import "./brand-console-icon.css";
