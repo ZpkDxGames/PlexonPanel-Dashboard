@@ -280,5 +280,19 @@ export function websocketProtocols(request: IncomingMessage): string[] {
 }
 
 function validCloseCode(code: number): boolean {
-  return code === 1000 || (code >= 3000 && code <= 4999);
+  return (
+    code === 1000 ||
+    code === 1001 ||
+    code === 1002 ||
+    code === 1003 ||
+    code === 1007 ||
+    code === 1008 ||
+    code === 1009 ||
+    code === 1010 ||
+    code === 1011 ||
+    code === 1012 ||
+    code === 1013 ||
+    code === 1014 ||
+    (code >= 3000 && code <= 4999)
+  );
 }
