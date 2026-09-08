@@ -163,13 +163,14 @@ async function attachHost(f) {
     await f.room.webSocketMessage(socket, text);
   };
   await send("agent.hello", {
+    agentName: "PlexonPanel Host",
     agentKind: "HOST",
     protocolVersion: 3,
     publicKey: f.host.publicKey,
     publicKeyFingerprint: await publicKeyFingerprint(f.host.publicKey),
     pluginVersion: "3.0.2",
-    paperVersion: "",
-    minecraftVersion: "",
+    paperVersion: "host companion",
+    minecraftVersion: "26.2",
     javaVersion: "25",
     operatingSystem: "Linux aarch64",
     capabilities: f.metadata.identity.capabilities,
