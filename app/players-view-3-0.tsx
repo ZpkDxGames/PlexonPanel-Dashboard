@@ -159,15 +159,16 @@ function PlayerActivityPanel({
 
 export function PlayersView30(props: ViewProps) {
   const [activityOpen, setActivityOpen] = useState(false);
-  const [events, setEvents] = useState<PresenceHistoryEvent[]>([]);
+  const [activity, setActivity] = useState<{
+    serverId: string;
+    events: PresenceHistoryEvent[];
+  }>({ serverId: "", events: [] });
   const serverId = props.state.serverId;
 
   useEffect(() => {
-    if (!serverId) {
-      setEvents([]);
-      return;
-    }
-    const refresh = () => setEvents(loadActivityHistory(serverId));
+    if (!serverId) return;
+    const refresh = () =>
+      setActivity({ serverId, events: loadActivityHistory(serverId) });
     const timer = window.setTimeout(refresh, 0);
     const unsubscribe = subscribeActivityHistory(serverId, refresh);
     return () => {
@@ -177,8 +178,13 @@ export function PlayersView30(props: ViewProps) {
   }, [serverId]);
 
   const stableEvents = useMemo(
-    () => [...events].sort((a, b) => Date.parse(a.observedAt) - Date.parse(b.observedAt)),
-    [events],
+    () =>
+      activity.serverId === serverId
+        ? [...activity.events].sort(
+            (a, b) => Date.parse(a.observedAt) - Date.parse(b.observedAt),
+          )
+        : [],
+    [activity, serverId],
   );
 
   return (
