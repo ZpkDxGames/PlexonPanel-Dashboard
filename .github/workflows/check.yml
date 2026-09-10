@@ -26,7 +26,7 @@ jobs:
       - run: npm run phase2:verify
       - uses: actions/upload-artifact@v7
         with:
-          name: PlexonPanel-Dashboard-3.2.0-rc.1
+          name: PlexonPanel-Dashboard-phase2-3.2.0-rc.2
           path: artifacts/plexonpanel-relay/
           if-no-files-found: error
           retention-days: 14
