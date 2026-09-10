@@ -1,6 +1,6 @@
 {
   "name": "plexonpanel-dashboard",
-  "version": "3.2.0-rc.1",
+  "version": "3.0.2",
   "private": true,
   "engines": {
     "node": ">=22.13.0"
@@ -26,7 +26,7 @@
     "check": "npm run lint && npm run typecheck && npm run relay:test && npm test",
     "typecheck": "tsc --noEmit && npm run relay:build",
     "relay:smoke": "npm run relay:build && node scripts/relay-smoke.mjs",
-    "phase2:verify": "npm run check && npm run relay:smoke && npm run relay:standalone:smoke && npm run relay:standalone:package && npm run build"
+    "phase2:verify": "npm audit --omit=dev --audit-level=high && npm run check && npm run relay:smoke && npm run relay:standalone:smoke && npm run relay:standalone:package && npm run build"
   },
   "dependencies": {
     "next": "16.3.1",
