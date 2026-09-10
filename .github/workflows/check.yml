@@ -1,7 +1,7 @@
 name: Dashboard and relay checks
 on:
   push:
-    branches: [main, "agent/**"]
+    branches: [main, "agent/**", "phase2/**"]
   pull_request:
   workflow_dispatch:
 permissions:
@@ -12,7 +12,7 @@ concurrency:
 jobs:
   verify:
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 25
     env:
       NEXT_TELEMETRY_DISABLED: "1"
       WRANGLER_SEND_METRICS: "false"
@@ -23,6 +23,10 @@ jobs:
           node-version: "24"
           cache: npm
       - run: npm ci
-      - run: npm run check
-      - run: npm run relay:smoke
-      - run: npm run build
+      - run: npm run phase2:verify
+      - uses: actions/upload-artifact@v7
+        with:
+          name: PlexonPanel-Dashboard-phase2-3.2.0-rc.2
+          path: artifacts/plexonpanel-relay/
+          if-no-files-found: error
+          retention-days: 14

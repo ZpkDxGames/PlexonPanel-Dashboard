@@ -13,6 +13,13 @@ relay/dist/
 .dev.vars.*
 .relay-public.json
 .relay-secrets.json
+relay/.standalone.env
+relay/*.private.json
+
+# Standalone relay coordination database
+*.db
+*.db-wal
+*.db-shm
 
 # Firebase credentials and local Web App configuration
 *firebase-adminsdk*.json
@@ -33,7 +40,6 @@ coverage/
 Thumbs.db
 .idea/
 .vscode/
-
 
 .test-dist/
 
