@@ -43,7 +43,7 @@
     "miniflare": "5.20260910.0-alpha",
     "tailwindcss": "4.2.1",
     "typescript": "5.9.3",
-    "wrangler": "4.15.0"
+    "wrangler": "4.131.0"
   },
   "type": "module",
   "displayName": "PlexonPanel Dashboard"
