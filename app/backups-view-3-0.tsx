@@ -244,12 +244,17 @@ export function BackupsView30(props: ViewProps) {
     } | null>(null),
     [typed, setTyped] = useState(""),
     [download, setDownload] = useState<number | null>(null);
-  const controller = useRef<AbortController | null>(null);
+  const controller = useRef<AbortController | null>(null),
+    persistedDraft = useMemo(
+      () =>
+        settingsQuery.data.settings
+          ? parseSettings(settingsQuery.data.settings)
+          : null,
+      [settingsQuery.data.settings],
+    ),
+    activeDraft = draft ?? persistedDraft,
+    setUnsaved = props.setUnsaved;
 
-  useEffect(() => {
-    if (!dirty && settingsQuery.data.settings)
-      setDraft(parseSettings(settingsQuery.data.settings));
-  }, [settingsQuery.data.settings, dirty]);
   useEffect(() => {
     if (!canViewMaintenance || !hostConnected) return;
     const timer = window.setInterval(status.refresh, 2000);
@@ -257,9 +262,9 @@ export function BackupsView30(props: ViewProps) {
   }, [canViewMaintenance, hostConnected, status.refresh]);
   useEffect(() => () => controller.current?.abort(), []);
   useEffect(() => {
-    props.setUnsaved?.(dirty);
-    return () => props.setUnsaved?.(false);
-  }, [dirty, props.setUnsaved]);
+    setUnsaved?.(dirty);
+    return () => setUnsaved?.(false);
+  }, [dirty, setUnsaved]);
 
   const fullBackups = records(fullQuery.data.backups, 1000),
     liveBackups = records(liveQuery.data.backups, 1000),
@@ -504,7 +509,8 @@ export function BackupsView30(props: ViewProps) {
                           <ActionButton danger onClick={async () => {
                             if (!window.confirm("Delete this local backup metadata and archive?")) return;
                             await props.run(full ? "backup.full.delete" : "backup.delete", { backupId: id }, "HOST");
-                            full ? fullQuery.refresh() : liveQuery.refresh();
+                            if (full) fullQuery.refresh();
+                            else liveQuery.refresh();
                           }}>Delete</ActionButton>
                         )}
                       </div></td>
@@ -523,30 +529,30 @@ export function BackupsView30(props: ViewProps) {
         <p className="cr-hint cr30-backup-preview-note">Browser downloads remain capped at 64 MiB. Large full restore points stay on the Host and/or Google Drive.</p>
       </Panel>
 
-      {draft && props.can("maintenance.settings.get", "HOST") && (
+      {activeDraft && props.can("maintenance.settings.get", "HOST") && (
         <Panel title="Maintenance settings" aside={dirty ? <Badge tone="amber">Unsaved</Badge> : <Badge>Host persisted</Badge>}>
           <div className="cr30-settings-grid">
             <section>
               <h3>Restart</h3>
-              <ScheduleEditor value={draft.restart.schedule} onChange={(schedule) => mutate({ ...draft, restart: { ...draft.restart, schedule } })} />
-              <label>Timezone<input value={draft.timezone} onChange={(event) => mutate({ ...draft, timezone: event.target.value })} placeholder="America/Sao_Paulo" /></label>
-              <label>Warnings · seconds<input value={draft.restart.warningSeconds.join(", ")} onChange={(event) => mutate({ ...draft, restart: { ...draft.restart, warningSeconds: event.target.value.split(",").map((value) => Number(value.trim())).filter((value) => Number.isFinite(value) && value >= 0) } })} /></label>
-              <label>Startup timeout · seconds<input type="number" min={30} max={1800} value={draft.restart.startupTimeoutSeconds} onChange={(event) => mutate({ ...draft, restart: { ...draft.restart, startupTimeoutSeconds: Number(event.target.value) } })} /></label>
+              <ScheduleEditor value={activeDraft.restart.schedule} onChange={(schedule) => mutate({ ...activeDraft, restart: { ...activeDraft.restart, schedule } })} />
+              <label>Timezone<input value={activeDraft.timezone} onChange={(event) => mutate({ ...activeDraft, timezone: event.target.value })} placeholder="America/Sao_Paulo" /></label>
+              <label>Warnings · seconds<input value={activeDraft.restart.warningSeconds.join(", ")} onChange={(event) => mutate({ ...activeDraft, restart: { ...activeDraft.restart, warningSeconds: event.target.value.split(",").map((value) => Number(value.trim())).filter((value) => Number.isFinite(value) && value >= 0) } })} /></label>
+              <label>Startup timeout · seconds<input type="number" min={30} max={1800} value={activeDraft.restart.startupTimeoutSeconds} onChange={(event) => mutate({ ...activeDraft, restart: { ...activeDraft.restart, startupTimeoutSeconds: Number(event.target.value) } })} /></label>
             </section>
             <section>
               <h3>Full restore point</h3>
-              <ScheduleEditor value={draft.fullRestorePoint.schedule} onChange={(schedule) => mutate({ ...draft, fullRestorePoint: { ...draft.fullRestorePoint, schedule } })} />
-              <label>Retention<select value={draft.fullRestorePoint.retentionMode} onChange={(event) => mutate({ ...draft, fullRestorePoint: { ...draft.fullRestorePoint, retentionMode: event.target.value as "SINGLE_CURRENT" | "ROTATING" } })}><option value="SINGLE_CURRENT">Single current</option><option value="ROTATING">Rotating</option></select></label>
-              {draft.fullRestorePoint.retentionMode === "ROTATING" && <label>Keep<input type="number" min={1} max={52} value={draft.fullRestorePoint.retentionCount} onChange={(event) => mutate({ ...draft, fullRestorePoint: { ...draft.fullRestorePoint, retentionCount: Number(event.target.value) } })} /></label>}
-              <label>Canonical filename<input value={draft.fullRestorePoint.canonicalFilename} onChange={(event) => mutate({ ...draft, fullRestorePoint: { ...draft.fullRestorePoint, canonicalFilename: event.target.value } })} /></label>
-              <label className="cr30-toggle-row"><input type="checkbox" checked={draft.fullRestorePoint.restartAfter} onChange={(event) => mutate({ ...draft, fullRestorePoint: { ...draft.fullRestorePoint, restartAfter: event.target.checked } })} />Restart after backup</label>
+              <ScheduleEditor value={activeDraft.fullRestorePoint.schedule} onChange={(schedule) => mutate({ ...activeDraft, fullRestorePoint: { ...activeDraft.fullRestorePoint, schedule } })} />
+              <label>Retention<select value={activeDraft.fullRestorePoint.retentionMode} onChange={(event) => mutate({ ...activeDraft, fullRestorePoint: { ...activeDraft.fullRestorePoint, retentionMode: event.target.value as "SINGLE_CURRENT" | "ROTATING" } })}><option value="SINGLE_CURRENT">Single current</option><option value="ROTATING">Rotating</option></select></label>
+              {activeDraft.fullRestorePoint.retentionMode === "ROTATING" && <label>Keep<input type="number" min={1} max={52} value={activeDraft.fullRestorePoint.retentionCount} onChange={(event) => mutate({ ...activeDraft, fullRestorePoint: { ...activeDraft.fullRestorePoint, retentionCount: Number(event.target.value) } })} /></label>}
+              <label>Canonical filename<input value={activeDraft.fullRestorePoint.canonicalFilename} onChange={(event) => mutate({ ...activeDraft, fullRestorePoint: { ...activeDraft.fullRestorePoint, canonicalFilename: event.target.value } })} /></label>
+              <label className="cr30-toggle-row"><input type="checkbox" checked={activeDraft.fullRestorePoint.restartAfter} onChange={(event) => mutate({ ...activeDraft, fullRestorePoint: { ...activeDraft.fullRestorePoint, restartAfter: event.target.checked } })} />Restart after backup</label>
             </section>
           </div>
           <div className="cr-actions cr30-settings-actions">
             {props.can("maintenance.settings.update", "HOST") && (
-              <ActionButton disabled={!dirty} onClick={() => props.run("maintenance.settings.update", { settings: draft as unknown as JsonMap }, "HOST").then(() => { setDirty(false); settingsQuery.refresh(); status.refresh(); props.notice("Maintenance settings saved on the Host."); })}>Save settings</ActionButton>
+              <ActionButton disabled={!dirty} onClick={() => props.run("maintenance.settings.update", { settings: activeDraft as unknown as JsonMap }, "HOST").then(() => { setDirty(false); setDraft(null); settingsQuery.refresh(); status.refresh(); props.notice("Maintenance settings saved on the Host."); })}>Save settings</ActionButton>
             )}
-            <button className="cr-button" disabled={!dirty} onClick={() => { setDraft(parseSettings(settingsQuery.data.settings)); setDirty(false); }}>Discard</button>
+            <button className="cr-button" disabled={!dirty} onClick={() => { setDraft(null); setDirty(false); }}>Discard</button>
           </div>
         </Panel>
       )}
