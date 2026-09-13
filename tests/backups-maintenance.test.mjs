@@ -53,7 +53,6 @@ test("destructive maintenance actions are capability-gated and high-risk at brow
     assert.equal(relayScopes.includes(`\"${action}\"`), true, `relay HIGH_RISK missing ${action}`);
   }
   for (const action of [
-    "backup.full.delete",
     "maintenance.settings.update",
     "maintenance.restart.now",
     "maintenance.full-backup.create",
@@ -63,6 +62,11 @@ test("destructive maintenance actions are capability-gated and high-risk at brow
     view.includes('props.can(full ? "backup.full.restore.prepare" : "backup.restore.prepare", "HOST")'),
     true,
     "restore control must gate the exact selected restore-prepare action",
+  );
+  assert.equal(
+    view.includes('props.can(full ? "backup.full.delete" : "backup.delete", "HOST")'),
+    true,
+    "delete control must gate the exact selected delete action",
   );
 });
 
