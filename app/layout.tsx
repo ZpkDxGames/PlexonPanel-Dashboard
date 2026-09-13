@@ -9,6 +9,7 @@ import "./player-head.css";
 import "./player-workspace-2-3.css";
 import "./control-room-3-0.css";
 import "./workspaces-3-0.css";
+import "./console-3-4.css";
 import "./overview-3-0.css";
 import "./activity-history.css";
 import "./player-activity-3-0.css";
