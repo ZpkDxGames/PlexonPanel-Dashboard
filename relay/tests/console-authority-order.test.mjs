@@ -16,7 +16,7 @@ test("Worker and standalone tolerate valid Host replay before console.source aut
 
   for (const content of files) {
     assert.doesNotMatch(content, /Event not allowed while host console source is unavailable/);
-    assert.match(content, /consoleHealthy !== true\) return/);
+    assert.match(content, /consoleHealthy !== true\)\s*return/);
   }
 });
 
