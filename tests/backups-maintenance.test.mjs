@@ -53,13 +53,17 @@ test("destructive maintenance actions are capability-gated and high-risk at brow
     assert.equal(relayScopes.includes(`\"${action}\"`), true, `relay HIGH_RISK missing ${action}`);
   }
   for (const action of [
-    "backup.full.restore.prepare",
     "backup.full.delete",
     "maintenance.settings.update",
     "maintenance.restart.now",
     "maintenance.full-backup.create",
   ])
     assert.equal(view.includes(`props.can(\"${action}\"`), true, `workspace must gate concrete action ${action}`);
+  assert.equal(
+    view.includes('props.can(full ? "backup.full.restore.prepare" : "backup.restore.prepare", "HOST")'),
+    true,
+    "restore control must gate the exact selected restore-prepare action",
+  );
 });
 
 test("full restore remains Owner-enforced by the Host and browser never receives provider credentials", async () => {
