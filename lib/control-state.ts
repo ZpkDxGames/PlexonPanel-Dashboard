@@ -14,6 +14,9 @@ export interface Ready {
   protocolVersion: number;
   version: string;
   device: Device;
+  connectionStatus?: string;
+  consoleAuthority?: "HOST" | "PAPER_FALLBACK";
+  consoleSourceState?: string;
   agents: { paper: boolean; host: boolean; hostInstalled: boolean };
   server: {
     fingerprint: string;
@@ -67,6 +70,7 @@ export interface ControlState {
 
 export const CONTROL_HISTORY_RETENTION_MS = 35 * 60_000;
 export const CONTROL_HISTORY_MAX_POINTS = 8192;
+export const CONSOLE_HISTORY_MAX_LINES = 2500;
 
 export function emptyControlState(serverId: string): ControlState {
   return {
@@ -260,8 +264,9 @@ export function applyControlMessage(
       break;
     }
     case "console.lines":
-      next.console = [...state.console, ...records(body.lines, 100)].slice(
-        -600,
+      next.console = mergeConsoleLines(
+        state.console,
+        records(body.lines, 100),
       );
       break;
     case "chat.message":
@@ -315,7 +320,7 @@ export function safeCache(state: ControlState): ControlState {
     presenceEventIds: [],
     service: {},
     backupProgress: null,
-    console: records(state.console, 600).slice(-200),
+    console: records(state.console, CONSOLE_HISTORY_MAX_LINES).slice(-500),
     chat: records(state.chat, 200).slice(-100),
     history: Array.isArray(state.history)
       ? state.history.slice(-CONTROL_HISTORY_MAX_POINTS)
@@ -329,11 +334,13 @@ export function diagnostics(state: ControlState): string {
     hostCpu = number(host.hostCpuPercent),
     paperCpu = number(paper.processCpuPercent);
   return [
-    `PlexonPanel Dashboard 3.0.2 / Protocol 3`,
+    `PlexonPanel Dashboard 3.4.0 / Protocol 3`,
     `Paper agent: ${state.ready?.server.pluginVersion ?? "unknown"}`,
     `Host agent: ${state.ready?.server.hostVersion ?? "not installed"}`,
     `Paper connected: ${Boolean(state.ready?.agents.paper)}`,
     `Host connected: ${Boolean(state.ready?.agents.host)}`,
+    `Console authority: ${state.ready?.consoleAuthority ?? "PAPER_FALLBACK"}`,
+    `Console source state: ${state.ready?.consoleSourceState ?? "unknown"}`,
     `Java: ${str(paper.javaVersion)}`,
     `OS / architecture: ${str(host.operatingSystem, str(paper.operatingSystem))} / ${str(host.architecture, str(paper.architecture))}`,
     `TPS: ${Array.isArray(state.server.tps) ? state.server.tps.join(" / ") : "unavailable"}`,
@@ -342,6 +349,49 @@ export function diagnostics(state: ControlState): string {
     `Paper process CPU: ${paperCpu === null ? "unavailable" : `${paperCpu}%`}`,
     `JVM heap bytes: ${number(paper.jvmHeapUsedBytes) ?? "unavailable"}`,
   ].join("\n");
+}
+
+function consoleStrongId(line: JsonMap): string | null {
+  const cursor = typeof line.journalCursor === "string" ? line.journalCursor : "";
+  if (cursor) return `journal:${cursor}`;
+  const session = typeof line.streamSession === "string" ? line.streamSession : "";
+  const sequence = number(line.sourceSequence);
+  if (session && sequence !== null) return `stream:${session}:${sequence}`;
+  return null;
+}
+
+function mergeConsoleLines(current: JsonMap[], incoming: JsonMap[]): JsonMap[] {
+  const result: JsonMap[] = [];
+  const strongIds = new Set<string>();
+  const weakRecent = new Map<string, { at: number; source: string }>();
+  for (const line of [...current, ...incoming]) {
+    const strong = consoleStrongId(line);
+    if (strong) {
+      if (strongIds.has(strong)) continue;
+      strongIds.add(strong);
+    }
+    const content = str(line.content, ""),
+      level = str(line.level, ""),
+      source = str(line.source, ""),
+      at = capturedAtMillis(line.capturedAt) ?? -1,
+      weakKey = `${level}\u0000${content}`,
+      previous = weakRecent.get(weakKey);
+    // During a source transition the same Paper/Journald line can arrive with different transport
+    // identifiers and slightly different capture timestamps. Deduplicate only cross-source copies.
+    if (
+      !strong &&
+      previous &&
+      previous.source !== source &&
+      previous.source &&
+      source &&
+      at >= 0 &&
+      Math.abs(at - previous.at) <= 2500
+    )
+      continue;
+    if (at >= 0) weakRecent.set(weakKey, { at, source });
+    result.push(line);
+  }
+  return result.slice(-CONSOLE_HISTORY_MAX_LINES);
 }
 
 function appendHistory(history: Sample[], sample: Sample): Sample[] {
