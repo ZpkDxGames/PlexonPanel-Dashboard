@@ -23,6 +23,9 @@ jobs:
           node-version: "24"
           cache: npm
       - run: npm ci
+      - run: node relay/scripts/prepare-standalone-3.3.mjs
       - run: npm run check
+      - run: npm run relay:standalone:smoke
+      - run: npm run relay:standalone:package
       - run: npm run relay:smoke
       - run: npm run build
