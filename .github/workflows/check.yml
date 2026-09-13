@@ -1,7 +1,7 @@
 name: Dashboard and relay checks
 on:
   push:
-    branches: [main, "agent/**"]
+    branches: [main, "agent/**", "release/**"]
   pull_request:
   workflow_dispatch:
 permissions:
@@ -25,4 +25,6 @@ jobs:
       - run: npm ci
       - run: npm run check
       - run: npm run relay:smoke
+      - run: npm run relay:standalone:smoke
+      - run: npm run relay:standalone:package
       - run: npm run build

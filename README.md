@@ -1,120 +1,78 @@
-# PlexonPanel Dashboard 3.0.1 — Paper/Host Control Room
+# PlexonPanel Dashboard 3.4.0 — Paper/Host Control Room
 
-PlexonPanel Dashboard is a responsive Next.js/Vercel control room for signed protocol-3 PlexonPanel Paper and Host agents. Dashboard 3.0.1 is an integration and UX-correctness release: it keeps the existing wire protocol, relay authentication, immutable device grants, local Paper/Host policy authority, device identity pins, and confirmation model while making the browser accurately present the faster 3.0.1 agent data.
+PlexonPanel Dashboard is a responsive Next.js/Vercel control room for signed Protocol 3 PlexonPanel Paper and Host agents. Dashboard 3.4.0 preserves existing identity, pairing, immutable device grants, local Paper/Host policy authority, confirmation rules, and `/v1` transport while adding Host-authoritative Linux console viewing and consolidating the standalone relay release line.
 
-## Control Room 3.0.1
+## Control Room 3.4.0
 
-- Active pages remain Overview, Performance, Players, Console, Chat, Plugins, Server, Audit, Access, and Settings.
-- Files and Backups are intentionally not first-class dashboard pages in 3.0.1. Their backend compatibility remains available for future or operation-specific use.
-- Paper and Host are independent authority domains. Paper owns Paper/JVM/player/console/plugin state; Host owns Linux machine telemetry and systemd lifecycle state.
-- Host CPU is always machine-wide Host CPU. Paper process CPU is always the Paper process metric. The UI does not substitute one for the other.
-- Responsive composition uses Grid/Flexbox, intrinsic sizing, container queries, dynamic viewport units, safe-area insets, and local semantic overflow. The dashboard does not globally scale a desktop UI to fit smaller windows.
-- Dialogs and confirmation surfaces use viewport-centered top-layer geometry and remain independent of sidebar width and document scroll.
+Active pages include Overview, Performance, Players, Console, Chat, Plugins, Server, Backups, Audit, Access, and Settings. Files remain a dormant backend-compatible surface rather than a first-class page.
 
-## Fast telemetry and Display update rate
+Paper and Host remain independent authority domains. Paper owns Paper/JVM/player/plugin state, chat, pairing/device state, and remote console command execution. Host owns Linux machine telemetry, systemd lifecycle, Host files/backups/maintenance, and—when its configured journald source is healthy and locally enabled—the preferred read-only console stream.
 
-PlexonPanel 3.0.1 agents can publish different data families at different source cadences. A typical full-control deployment provides Paper health and Host machine telemetry at approximately 250 ms, Paper JVM/process data around 1 second, and Host service status at a slower bounded cadence.
+Host CPU is always machine-wide Host CPU. Paper process CPU remains a separate JVM/process metric. The UI does not substitute one for the other.
 
-Dashboard keeps two conceptual layers:
+## Host-authoritative console
 
-1. **Authoritative live state** receives and validates every accepted message immediately.
-2. **Displayed state** is committed to React at the browser-selected Display update rate.
+PlexonPanel 3.4.0 can publish the real `plexoncraft.service` journald stream from the Host Companion.
 
-The browser-local **Display update rate** options are:
+- Relay authority uses authenticated Host source health, not merely Host socket presence.
+- A healthy Host source is preferred when Host console capability is enabled.
+- Paper `latest.log` remains the fallback producer when Host authority is unavailable.
+- `console.execute` is Paper-only in both Worker and standalone relay runtimes.
+- Host output may remain visible while Paper is offline; command entry remains unavailable until Paper reconnects.
+- Existing device scopes continue to control full/error-only console visibility.
 
-- Realtime — commit each accepted presentation update (`0 ms`)
-- Fast — no faster than `250 ms`
-- Balanced — no faster than `500 ms` and the default
-- Relaxed — no faster than `1000 ms`
-- Low activity — no faster than `2000 ms`
+The browser keeps a bounded 2,500-line live history and a smaller bounded safe cache. Journal/session identifiers provide strong duplicate suppression when available, with a short transition deduplication window when authority changes between Host and Paper. Invocation changes are rendered as startup/session separators.
 
-The setting changes presentation only. It does not mutate Paper configuration, Host configuration, relay state, or server policy, and different paired browsers may use different rates simultaneously.
+Pause, copy, export, search, filtering and clear remain local browser operations. Clearing the view does not delete journald or Minecraft logs, and pausing does not stop relay delivery.
 
-Operational state that must remain immediate bypasses this presentation throttle, including connection/ready state, player presence deltas, console/chat stream batches, lifecycle/service state, backup progress when surfaced, and action results. Changing the display rate takes effect without reconnecting the WebSocket.
+## Worker and standalone relay
+
+The canonical repository now contains both relay runtimes.
+
+- Cloudflare Worker remains supported through `relay/wrangler.jsonc`.
+- Standalone Node relay includes loopback-first configuration, bounded coordination persistence, service/env examples, packaging and smoke validation.
+- The accepted pre-3.4 Worker and standalone relay cores are kept as explicit core source units; 3.4 authority adapters add Host console handling without rewriting unrelated pairing/access/backup behavior.
+- Both runtimes enforce the same console scopes, Host source validation, ready-state authority metadata, replay/signature protections, and Paper-only command routing.
+
+See [standalone relay migration](docs/STANDALONE_RELAY_MIGRATION.md) and [3.4.0 release notes](RELEASE_NOTES_3.4.0.md).
+
+## Fast telemetry and display update rate
+
+Authoritative accepted state and displayed React state remain separate. The browser-local Display update rate controls presentation cadence only:
+
+- Realtime — `0 ms`
+- Fast — `250 ms`
+- Balanced — `500 ms` and the default
+- Relaxed — `1000 ms`
+- Low activity — `2000 ms`
+
+Connection/ready state, player presence deltas, console/chat batches, service state, backup progress and action results remain operational state and bypass presentation throttling where required.
 
 ## Performance workspace
 
-Performance charts use trusted source `capturedAt` timestamps when supplied and retain bounded browser-local high-frequency history. Exact duplicate source timestamps replace the existing sample rather than growing history.
+Performance charts use trusted source `capturedAt` timestamps when supplied and retain bounded browser-local history. Exact duplicate timestamps replace existing samples rather than growing history.
 
-Primary charts are:
-
-- TPS — Paper
-- MSPT — Paper
-- Host CPU — Linux machine-wide Host telemetry
-- Paper process CPU — Paper JVM/process telemetry
-- Host memory used — Host
-- JVM heap used — Paper
-
-Each chart shows current, minimum, average, maximum and P95 values when available, plus source ownership, detected source interval when explicitly advertised, browser display cadence, sample age, and live/paused/disconnected state.
-
-Raw history is used for statistics and export. SVG rendering is separately thinned with an extrema-preserving bounded representation so a 250 ms source cadence does not create unbounded path/DOM work. Missing samples remain gaps; the UI does not interpolate fake telemetry.
-
-## Minecraft player heads
-
-Current online players use a built-in public HTTPS provider by default:
-
-```text
-https://mc-heads.net/avatar/{uuid}/{size}
-```
-
-A deployment may override it with:
-
-```dotenv
-NEXT_PUBLIC_PLEXON_PLAYER_HEAD_URL_TEMPLATE=https://approved-avatar.example/avatar/{uuid}/{size}
-```
-
-Set the value exactly to `disabled` to disable remote heads deployment-wide. Blank/unset uses the built-in provider.
-
-Templates are validated fail-closed. Production requires HTTPS, exactly one `{uuid}`, at most one optional `{size}`, no credentials, no fragments, no unknown placeholders, and one exact provider origin for CSP. Player-head requests use `referrerPolicy="no-referrer"`, lazy loading, async decoding, normal browser caching, and never proxy or persist avatar images through the relay.
-
-The roster always renders a deterministic local fallback immediately. Provider failure, invalid UUID, timeout/error, disabled deployment state, or CSP rejection never blocks or shifts the player row. Remote heads are used for current-player UI only; historical/offline history stays avatar-free.
+Primary charts remain TPS, MSPT, Host CPU, Paper process CPU, Host memory used, and JVM heap used. Missing data stays unavailable rather than being synthesized. SVG rendering is separately thinned with an extrema-preserving bounded representation so high-frequency telemetry does not create unbounded DOM/path work.
 
 ## Players
 
-The online roster can present the 3.0.1 Paper fields when supplied, including name/display name, UUID according to browser preference, world, game mode, ping, health/max health, food, experience level, operator state, whitelist state, online duration, session ID/start, first seen, and last login.
+Current-player data remains Paper-owned. Location/address are shown only when authorized and actually supplied. Join/quit deltas reconcile against later authoritative roster snapshots, and player history requires both immutable `players.history.view` scope and current Paper capability.
 
-Location and address are shown only when the agent actually supplies them under locally authorized policy. The dashboard omits those details rather than fabricating `unknown` values.
+Player actions remain the intersection of exact device scope, Paper connection, Paper capability, local policy, action requirements, confirmation requirements, and Owner-only rules where applicable. Disabled browser controls are convenience only; Paper remains the security authority.
 
-Join/quit presence deltas bypass the telemetry presentation throttle and reconcile against later authoritative roster snapshots. The Live row highlight preference applies only to recently changed current-player rows rather than every online player.
+## Backups and lifecycle
 
-History appears only when both the immutable device grant and current Paper capability contain `players.history.view`. Existing credentials never acquire newly introduced scopes automatically; where re-pairing is needed, the UI says so. Historical player drawers remain read-only and do not fetch remote avatars.
+The Server workspace is Host-authoritative for systemd status and lifecycle actions. Paper connectivity is reported separately and never fabricates an active service state.
 
-Player actions remain the intersection of exact device scope, Paper connection, Paper-advertised capability, local policy, action requirements, and Owner-only rules where applicable. Disabled controls are convenience only; Paper remains the security authority.
+Backups & Maintenance exposes the matched Host maintenance control plane: restart scheduling, live snapshots, cold full restore points, verification, provider state, retry upload, restore/delete controls, and explicit recovery/offline states. Google Drive/rclone credentials remain Host-local and are never exposed to the browser.
 
-## Overview and lifecycle
+## Access, audit and storage
 
-Overview independently reports browser/relay connection, Paper connection, Host connection, TPS/MSPT, Paper process CPU/JVM heap, Host CPU/memory when Host is connected, player count, and telemetry freshness. A Host disconnect does not erase valid Paper state, and a Paper disconnect does not make an authenticated Host appear offline.
+Effective permission is always the intersection of immutable device scope, connected agent kind, agent-advertised capability, local policy, action-specific rules, and confirmation requirements. The browser never invents capabilities to make a control available.
 
-The Server page is strictly Host-authoritative for systemd status and lifecycle actions. Start, stop, restart and status are unavailable when Host is absent even if Paper is connected. Paper connectivity is shown separately and is never used to fabricate an `active` service state.
+The relay stores only bounded coordination state required by the architecture. Player inventories, presence bodies, telemetry, file contents, console/chat contents and action results are not introduced as durable relay application data.
 
-Stop/restart remain confirmation-gated. Service/lifecycle messages bypass display throttling, and a returned button/request acknowledgement is not treated as synthetic telemetry.
-
-## Console, Chat, Plugins, Access and Audit
-
-Console and Chat remain operational streams rather than chart telemetry. Their authorized batches and action feedback remain near-live even when the browser display rate is Relaxed or Low activity.
-
-Plugin inventory remains Paper-owned. Reload controls must satisfy the device scope, Paper capability, and a verified local reload mapping; the dashboard does not implement generic Bukkit/Paper `/reload` behavior merely because console execution exists.
-
-Access keeps immutable device grants visible through grouped capability states. Audit remains a compact scan-first operational timeline and must not expose tokens, pairing codes, private keys or unredacted sensitive command data.
-
-## Settings
-
-Settings is a browser presentation control center. Browser-local groups include:
-
-- Appearance: theme, accent, contrast, density, text scale, motion, live pulse and page transitions
-- Charts: window, style, grid and layout
-- Players: skin heads, head size, UUID display, mobile roster layout and live row highlight
-- Browser data behavior: Display update rate
-
-Player-head provider status is shown as built-in, custom deployment provider, disabled by deployment, or invalid configuration without exposing unnecessary provider URL detail.
-
-## Authority and storage
-
-The effective action permission is always the intersection of the immutable device grant/scopes, connected agent kind, agent-advertised capability, local Paper/Host policy, action-specific rules, and confirmation requirements. The browser never invents capabilities to make a control appear available.
-
-The relay verifies protocol-3 identity and routing and stores only coordination data required by the existing architecture. Player inventories, presence bodies, history results, telemetry, file bodies, console/chat bodies and action results are not introduced as relay-persisted Dashboard 3.0.1 data.
-
-Browser preferences cannot grant a scope, change local policy, alter authoritative source cadence, or weaken agent-side authorization.
+Audit and diagnostics must not expose access tokens, pairing codes, private keys, provider credentials, or unredacted sensitive command/log content.
 
 ## Development and validation
 
@@ -124,10 +82,12 @@ Use Node 24 and the committed dependency lock:
 npm ci
 npm run check
 npm run relay:smoke
+npm run relay:standalone:smoke
+npm run relay:standalone:package
 npm run build
 ```
 
-`npm run check` runs ESLint, application and relay TypeScript checks, relay tests, browser/state/UI tests, and the production-oriented test build. `relay:smoke` exercises the relay with temporary local workerd state; it is not a substitute for live Paper/Host acceptance.
+`npm run check` runs ESLint, application and relay TypeScript checks, Worker/standalone relay tests, browser/state/UI tests, and the production-oriented test build. Smoke checks exercise local relay behavior; they are not substitutes for live Paper/Host acceptance.
 
 Configure the public relay origin in `.env.local`:
 
@@ -141,8 +101,8 @@ Never place access tokens, relay signing keys, Paper/Host private keys, pairing 
 
 ## Compatibility and deployment
 
-Dashboard 3.0.1 remains on signed wire protocol 3 and `/v1`. Older 3.0 agents may omit the new telemetry metadata, emit slower samples, lack player-history/session fields, or provide no fast Host cadence; parsing remains optional and fails safely rather than crashing the dashboard.
+Dashboard 3.4.0 remains on signed Protocol 3 and `/v1`. Existing credentials do not gain scopes automatically, and the release does not require a Protocol 4 migration, identity reset, or automatic re-pair.
 
-A passing CI build is necessary but not sufficient for production deployment. Live PlexonCraft acceptance still includes Realtime/250/500/1000/2000 ms cadence checks, lifecycle immediacy, real-player head/fallback checks, partial Paper/Host failure states, browser CPU observation, viewport checks at the documented desktop/tablet/mobile sizes, and browser zoom at 80/100/125/150%.
+A passing repository CI run and Vercel preview are required source/presentation evidence but are not live PlexonCraft certification. Runtime acceptance still includes real Host journald readability, startup/shutdown capture, restart/cursor recovery, Paper-only fallback behavior, partial Paper/Host failures, relay restart behavior, and browser responsiveness against the authorized deployment.
 
-Read [3.0.1 release notes](RELEASE_NOTES_3.0.1.md), [protocol](docs/PROTOCOL.md), [architecture](docs/ARCHITECTURE.md), [operations](docs/OPERATIONS.md), [security](docs/SECURITY.md), [deployment](docs/VERCEL_DEPLOYMENT.md), and [validation](docs/VALIDATION.md).
+Read [3.4.0 release notes](RELEASE_NOTES_3.4.0.md), [protocol](docs/PROTOCOL.md), [architecture](docs/ARCHITECTURE.md), [operations](docs/OPERATIONS.md), [security](docs/SECURITY.md), [deployment](docs/VERCEL_DEPLOYMENT.md), and [validation](docs/VALIDATION.md).
