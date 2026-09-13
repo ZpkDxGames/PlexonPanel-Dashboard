@@ -1,0 +1,9 @@
+# Named, locally managed Cloudflare Tunnel example.
+# Replace placeholders with values created by `cloudflared tunnel create` / `tunnel route dns`.
+tunnel: <TUNNEL_UUID>
+credentials-file: /etc/cloudflared/<TUNNEL_UUID>.json
+
+ingress:
+  - hostname: relay.<OWNER_DOMAIN>
+    service: http://127.0.0.1:8787
+  - service: http_status:404
