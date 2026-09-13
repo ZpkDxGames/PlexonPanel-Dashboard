@@ -20,6 +20,36 @@ function atConsoleTail(element: HTMLDivElement) {
   return element.scrollHeight - element.scrollTop - element.clientHeight < 48;
 }
 
+function lineKey(line: JsonMap, index: number): string {
+  if (typeof line.journalCursor === "string" && line.journalCursor)
+    return `journal:${line.journalCursor}`;
+  if (
+    typeof line.streamSession === "string" &&
+    typeof line.sourceSequence === "number"
+  )
+    return `stream:${line.streamSession}:${line.sourceSequence}`;
+  return `${str(line.capturedAt, "unknown")}:${str(line.fingerprint, "none")}:${index}`;
+}
+
+function consoleSourceLabel(props: ViewProps): string {
+  if (!props.connected) return "Reconnecting";
+  const ready = props.state.ready;
+  if (ready?.consoleAuthority === "HOST") {
+    if (ready.consoleSourceState === "RECOVERING") return "Host • History replay";
+    if (ready.consoleSourceState === "RESTARTING") return "Host • Reconnecting";
+    return "Host • Journal";
+  }
+  if (ready?.agents.paper) return "Paper fallback";
+  if (ready?.agents.host) {
+    if (ready.consoleSourceState === "JOURNAL_PERMISSION_DENIED")
+      return "Host • Permission required";
+    if (ready.consoleSourceState === "JOURNAL_UNAVAILABLE")
+      return "Host • Console unavailable";
+    return "Server offline";
+  }
+  return "Console offline";
+}
+
 export function ConsoleView30(props: ViewProps) {
   const [search, setSearch] = useState("");
   const [level, setLevel] = useState("ALL");
@@ -46,9 +76,14 @@ export function ConsoleView30(props: ViewProps) {
             (level === "ALL" || line.level === level) &&
             str(line.content).toLowerCase().includes(search.toLowerCase()),
         )
-        .slice(-600),
+        .slice(-1200),
     [source, clearAt, level, search],
   );
+  const paperOnline = Boolean(props.state.ready?.agents.paper);
+  const hostOnline = Boolean(props.state.ready?.agents.host);
+  const canExecute = props.can("console.execute");
+  const commandAvailable = canExecute && paperOnline;
+  const sourceLabel = consoleSourceLabel(props);
 
   useEffect(() => {
     const delta = Math.max(0, source.length - previousSourceLength.current);
@@ -57,7 +92,7 @@ export function ConsoleView30(props: ViewProps) {
       viewport.current.scrollTop = viewport.current.scrollHeight;
       setUnseenLines(0);
     } else if (!paused && delta > 0) {
-      setUnseenLines((current) => Math.min(600, current + delta));
+      setUnseenLines((current) => Math.min(2500, current + delta));
     }
   }, [entries.length, followTail, paused, source.length]);
 
@@ -164,12 +199,24 @@ export function ConsoleView30(props: ViewProps) {
           <div className="cr21-panel-badges">
             {paused && <Badge tone="amber">View paused</Badge>}
             {!followTail && !paused && <Badge tone="quiet">Reading history</Badge>}
-            <Badge tone={props.connected ? "green" : "amber"}>
-              {props.connected ? "Authorized stream" : "Reconnecting"}
+            <Badge
+              tone={
+                sourceLabel === "Host • Journal" || sourceLabel === "Paper fallback"
+                  ? "green"
+                  : "amber"
+              }
+            >
+              {sourceLabel}
             </Badge>
           </div>
         }
       >
+        {!paperOnline && hostOnline && (
+          <p className="cr-hint cr-pad cr30-console-offline-note">
+            Paper is offline. Console output remains available through the Host Companion when its
+            journal source is healthy. Command input will unlock after Paper is ready.
+          </p>
+        )}
         <div className="cr30-console-viewport-wrap">
           <div
             className={`cr-console cr21-console ${wrap ? "wrap" : "nowrap"}`}
@@ -188,54 +235,76 @@ export function ConsoleView30(props: ViewProps) {
             }}
           >
             {entries.length ? (
-              entries.map((line, index) => (
-                <div
-                  className={`cr-console-line ${str(line.level).toLowerCase()}`}
-                  key={`${line.fingerprint}-${index}`}
-                >
-                  {timestamps && <time>{time(line.capturedAt)}</time>}
-                  <span>{str(line.level)}</span>
-                  <code>
-                    {str(line.content).replace(
-                      new RegExp(
-                        String.fromCharCode(27) + "\\[[0-?]*[ -/]*[@-~]",
-                        "g",
-                      ),
-                      "",
+              entries.map((line, index) => {
+                const invocation = str(line.invocationId, ""),
+                  previousInvocation =
+                    index > 0 ? str(entries[index - 1].invocationId, "") : "",
+                  showSession = Boolean(invocation && invocation !== previousInvocation),
+                  content = str(line.content),
+                  dataGap = /console lines were dropped|bounded recent replay|cursor could not be resumed/i.test(
+                    content,
+                  );
+                return (
+                  <div className="cr30-console-entry" key={lineKey(line, index)}>
+                    {showSession && (
+                      <div className="cr30-console-session" role="separator">
+                        <strong>PlexonCraft startup</strong>
+                        <span>{time(line.capturedAt)}</span>
+                        <code>Session {invocation.slice(0, 8)}…</code>
+                      </div>
                     )}
-                  </code>
-                  <button
-                    title="Copy line"
-                    aria-label="Copy console line"
-                    onClick={() =>
-                      void navigator.clipboard
-                        .writeText(str(line.content))
-                        .then(() => props.notice("Line copied."))
-                    }
-                  >
-                    Copy
-                  </button>
-                </div>
-              ))
+                    <div
+                      className={`cr-console-line ${str(line.level).toLowerCase()} ${dataGap ? "gap" : ""}`}
+                    >
+                      {timestamps && <time>{time(line.capturedAt)}</time>}
+                      <span>{str(line.level)}</span>
+                      <code>
+                        {content.replace(
+                          new RegExp(
+                            String.fromCharCode(27) + "\\[[0-?]*[ -/]*[@-~]",
+                            "g",
+                          ),
+                          "",
+                        )}
+                      </code>
+                      <button
+                        title="Copy line"
+                        aria-label="Copy console line"
+                        onClick={() =>
+                          void navigator.clipboard
+                            .writeText(content)
+                            .then(() => props.notice("Line copied."))
+                        }
+                      >
+                        Copy
+                      </button>
+                    </div>
+                  </div>
+                );
+              })
             ) : (
               <Empty title="No console lines to display">
-                Console content depends on the locally enabled stream and this
-                device&apos;s scope. Missing data is not replaced with examples.
+                {hostOnline && !paperOnline
+                  ? "The Host Companion is online, but no allowed console history is available yet. Check the journal source status if this persists."
+                  : "Console content depends on the locally enabled stream and this device's scope. Missing data is not replaced with examples."}
               </Empty>
             )}
           </div>
           {!paused && !followTail && (
             <button className="cr30-console-new-lines" onClick={jumpToTail}>
-              {unseenLines > 0 ? `${unseenLines} new line${unseenLines === 1 ? "" : "s"}` : "Return to live tail"}
+              {unseenLines > 0
+                ? `${unseenLines} new line${unseenLines === 1 ? "" : "s"}`
+                : "Return to live tail"}
             </button>
           )}
         </div>
 
-        {props.can("console.execute") ? (
+        {canExecute ? (
           <form
             className="cr-command cr30-command-bar"
             onSubmit={(event) => {
               event.preventDefault();
+              if (!commandAvailable) return;
               const value = command.trim();
               if (!value) return;
               setCommand("");
@@ -263,6 +332,7 @@ export function ConsoleView30(props: ViewProps) {
             <span aria-hidden>›</span>
             <input
               value={command}
+              disabled={!commandAvailable}
               onChange={(event) => setCommand(event.target.value)}
               onKeyDown={(event) => {
                 if (event.key === "ArrowUp") {
@@ -281,17 +351,24 @@ export function ConsoleView30(props: ViewProps) {
               autoComplete="off"
               spellCheck={false}
               maxLength={512}
-              placeholder="Enter a locally allowlisted command"
+              placeholder={
+                paperOnline
+                  ? "Enter a locally allowlisted command"
+                  : "Paper is offline — commands unavailable"
+              }
               aria-label="Console command"
             />
-            <button className="cr-button primary" disabled={!command.trim()}>
+            <button
+              className="cr-button primary"
+              disabled={!commandAvailable || !command.trim()}
+            >
               Run
             </button>
           </form>
         ) : (
           <p className="cr-hint cr-pad">
-            Read-only console. Command execution requires a locally enabled
-            capability and device scope.
+            Read-only console. Command execution requires a locally enabled capability and device
+            scope.
           </p>
         )}
       </Panel>
@@ -302,8 +379,9 @@ export function ConsoleView30(props: ViewProps) {
         </Panel>
       )}
       <p className="cr-hint cr30-console-authority">
-        The console remains bounded to the browser session. Clearing the view
-        does not delete server logs, and pausing does not stop the WebSocket.
+        Output source: {sourceLabel}. Console output and command execution intentionally use separate
+        authorities: Host owns lifecycle output when healthy; Paper owns commands. Clearing the view
+        remains browser-local and never deletes server or journal logs.
       </p>
     </div>
   );
