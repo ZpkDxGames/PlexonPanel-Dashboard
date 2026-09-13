@@ -1,6 +1,8 @@
 name: Apply PlexonPanel 3.4 relay reconciliation
 
 on:
+  push:
+    branches: ["release/3.4.0-host-console"]
   workflow_dispatch:
 
 permissions:
