@@ -6,7 +6,7 @@ async function source(path) {
   return readFile(new URL(`../${path}`, import.meta.url), "utf8");
 }
 
-test("Dashboard 3.0.2 exposes the active control-room page set with a scaffolded Backups workspace", async () => {
+test("Dashboard 3.0.2 exposes the active control-room page set with a functional Backups workspace", async () => {
   const dashboard = await source("app/dashboard-2-1.tsx");
   const backups = await source("app/backups-view-3-0.tsx");
   const sections = dashboard.match(/const sections = \[([\s\S]*?)\] as const;/)?.[1] ?? "";
@@ -16,17 +16,59 @@ test("Dashboard 3.0.2 exposes the active control-room page set with a scaffolded
   assert.equal(sections.includes('"Files"'), false);
   assert.equal(dashboard.includes("BackupsView30"), true);
   assert.equal(dashboard.includes('case "Backups"'), true);
-  assert.equal(backups.includes("Create backup"), true);
-  assert.equal(backups.includes("disabled>Create backup"), true);
+  assert.equal(backups.includes("Backups & Maintenance"), true);
+  assert.equal(backups.includes("Create live snapshot"), true);
+  assert.equal(backups.includes("Create full restore point"), true);
+  assert.equal(backups.includes("Restart now"), true);
 });
 
-test("Dashboard 3.0.2 Backups scaffold stays presentation-only until Host logic is wired", async () => {
+test("Dashboard 3.0.2 Backups workspace is wired to Host maintenance actions", async () => {
   const backups = await source("app/backups-view-3-0.tsx");
-  assert.equal(backups.includes("props.run("), false);
-  assert.equal(backups.includes("useQuery("), false);
-  assert.equal(backups.includes("backup.list · backup.view"), true);
-  assert.equal(backups.includes("backup.restore · backup.delete"), true);
-  assert.equal(backups.includes("No backup action is sent from this page yet."), true);
+  for (const action of [
+    "maintenance.status",
+    "maintenance.settings.get",
+    "maintenance.settings.update",
+    "maintenance.restart.now",
+    "maintenance.full-backup.create",
+    "backup.full.list",
+    "backup.full.verify",
+    "backup.full.retry-upload",
+    "backup.full.restore.prepare",
+    "backup.full.restore",
+    "provider.status",
+    "provider.test",
+  ]) assert.equal(backups.includes(action), true, `missing ${action}`);
+  assert.equal(backups.includes("props.run("), true);
+  assert.equal(backups.includes("useQuery("), true);
+  assert.equal(backups.includes("No backup action is sent from this page yet."), false);
+  assert.equal(backups.includes("Scaffold only"), false);
+  assert.equal(backups.includes("64 * 1024 * 1024"), true);
+  assert.equal(backups.includes("Host-local only"), true);
+});
+
+test("Dashboard and relay expose identical maintenance/provider scopes", async () => {
+  const dashboardScopes = await source("lib/scopes.ts");
+  const relayScopes = await source("relay/src/scopes.ts");
+  for (const scope of [
+    "maintenance.view",
+    "maintenance.configure",
+    "maintenance.restart",
+    "maintenance.run",
+    "provider.view",
+    "provider.test",
+  ]) {
+    assert.equal(dashboardScopes.includes(`\"${scope}\"`), true);
+    assert.equal(relayScopes.includes(`\"${scope}\"`), true);
+  }
+  for (const action of [
+    "backup.full.retry-upload",
+    "maintenance.settings.update",
+    "maintenance.full-backup.create",
+    "provider.test",
+  ]) {
+    assert.equal(dashboardScopes.includes(`\"${action}\"`), true);
+    assert.equal(relayScopes.includes(`\"${action}\"`), true);
+  }
 });
 
 test("Dashboard 3.0.2 keeps protocol hooks compatible while Files remains dormant", async () => {
@@ -67,6 +109,18 @@ test("Dashboard 3.0.2 responsive architecture does not globally scale the interf
   assert.equal(css.includes("container-name: workspace"), true);
   assert.equal(css.includes("@container workspace"), true);
   assert.equal(css.includes("100dvh"), true);
+});
+
+test("Dashboard 3.0.2 Backups workspace has responsive production layout", async () => {
+  const css = await source("app/backups-scaffold.css");
+  for (const selector of [
+    ".cr30-backup-summary",
+    ".cr30-backup-columns",
+    ".cr30-backup-metrics",
+    ".cr30-operation",
+    ".cr30-settings-grid",
+  ]) assert.equal(css.includes(selector), true, `missing ${selector}`);
+  assert.equal(css.includes("@container workspace"), true);
 });
 
 test("Dashboard 3.0.2 display update rate exposes every supported browser cadence", async () => {

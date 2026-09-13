@@ -38,6 +38,12 @@ export const SCOPES = [
   "backup.download",
   "backup.delete",
   "backup.restore",
+  "maintenance.view",
+  "maintenance.configure",
+  "maintenance.restart",
+  "maintenance.run",
+  "provider.view",
+  "provider.test",
   "server.status",
   "server.start",
   "server.stop",
@@ -57,15 +63,17 @@ export const HIGH_RISK = new Set([
   "files.delete",
   "backup.delete",
   "backup.restore",
+  "backup.full.delete",
+  "backup.full.restore",
+  "maintenance.settings.update",
+  "maintenance.restart.now",
+  "maintenance.full-backup.create",
   "server.stop",
   "server.restart",
   "devices.revoke",
 ]);
 export const ACTION_SCOPES: Record<string, string> = Object.fromEntries(
-  SCOPES.filter((s) => /^(player|files|backup|server)\./.test(s)).map((s) => [
-    s,
-    s,
-  ]),
+  SCOPES.filter((s) => /^(player|files|backup|maintenance|provider|server)\./.test(s)).map((s) => [s, s]),
 );
 Object.assign(ACTION_SCOPES, {
   "console.execute": "console.execute.allowed",
@@ -80,6 +88,19 @@ Object.assign(ACTION_SCOPES, {
   "backup.download.cancel": "backup.download",
   "backup.list": "backup.view",
   "backup.restore.prepare": "backup.restore",
+  "backup.full.list": "backup.view",
+  "backup.full.verify": "backup.view",
+  "backup.full.retry-upload": "backup.create",
+  "backup.full.delete": "backup.delete",
+  "backup.full.restore.prepare": "backup.restore",
+  "backup.full.restore": "backup.restore",
+  "maintenance.status": "maintenance.view",
+  "maintenance.settings.get": "maintenance.view",
+  "maintenance.settings.update": "maintenance.configure",
+  "maintenance.restart.now": "maintenance.restart",
+  "maintenance.full-backup.create": "maintenance.run",
+  "provider.status": "provider.view",
+  "provider.test": "provider.test",
   "audit.list": "audit.view",
   "audit.self": "audit.view.self",
   "devices.list": "devices.view",
@@ -106,7 +127,5 @@ export function canAction(
   capabilities: Record<string, boolean>,
 ): boolean {
   const scope = ACTION_SCOPES[action];
-  return Boolean(
-    scope && scopes.includes(scope) && capabilities[scope] === true,
-  );
+  return Boolean(scope && scopes.includes(scope) && capabilities[scope] === true);
 }
