@@ -53,5 +53,9 @@ test("3.4 adapters preserve the certified 3.3 relay cores as explicit source uni
   const standaloneCore = await source("relay/src/standalone/room-manager-core.ts");
   assert.match(workerCore, /export class ServerRoom/);
   assert.match(standaloneCore, /export class Room/);
-  assert.match(standaloneCore, /maintenance\.coordination/);
+  for (const core of [workerCore, standaloneCore]) {
+    assert.match(core, /access\.sync/);
+    assert.match(core, /backup\.coordination/);
+    assert.match(core, /gateway\.snapshot_request/);
+  }
 });
