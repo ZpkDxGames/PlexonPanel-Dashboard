@@ -42,6 +42,7 @@ type SettingsDraft = {
   };
   liveSnapshot: { schedule: ScheduleDraft };
 };
+type BackupRow = JsonMap & { _kind: "full" | "live" };
 
 const DAYS = [
   "MONDAY",
@@ -268,11 +269,11 @@ export function BackupsView30(props: ViewProps) {
 
   const fullBackups = records(fullQuery.data.backups, 1000),
     liveBackups = records(liveQuery.data.backups, 1000),
-    allBackups = useMemo(
+    allBackups = useMemo<BackupRow[]>(
       () =>
         [
-          ...fullBackups.map((backup) => ({ ...backup, _kind: "full" })),
-          ...liveBackups.map((backup) => ({ ...backup, _kind: "live" })),
+          ...fullBackups.map((backup) => ({ ...backup, _kind: "full" as const })),
+          ...liveBackups.map((backup) => ({ ...backup, _kind: "live" as const })),
         ].sort(
           (a, b) =>
             Date.parse(str(b.timestamp, "1970-01-01")) -
