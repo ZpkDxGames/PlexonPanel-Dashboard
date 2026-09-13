@@ -1,0 +1,50 @@
+.cr30-console-offline-note {
+  margin: 0;
+  border-bottom: 1px solid var(--cr21-border-soft);
+  background: color-mix(in srgb, var(--cr21-warning) 7%, transparent);
+}
+
+.cr30-console-entry {
+  display: contents;
+}
+
+.cr30-console-session {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 10px;
+  align-items: center;
+  margin: 10px 5px 7px;
+  padding: 8px 10px;
+  border-block: 1px solid color-mix(in srgb, var(--cr21-accent) 20%, var(--cr21-border-soft));
+  color: var(--cr21-text-muted);
+  font-size: .7rem;
+}
+
+.cr30-console-session strong {
+  color: var(--cr21-text-secondary);
+  font-size: .72rem;
+}
+
+.cr30-console-session code {
+  color: var(--cr21-text-muted);
+}
+
+.cr30-console-panel .cr-console-line.gap {
+  border-inline-start: 2px solid var(--cr21-warning);
+  background: color-mix(in srgb, var(--cr21-warning) 7%, transparent);
+}
+
+.cr30-command-bar input:disabled {
+  cursor: not-allowed;
+  opacity: .62;
+}
+
+@media (max-width: 760px) {
+  .cr30-console-session {
+    grid-template-columns: 1fr auto;
+  }
+
+  .cr30-console-session code {
+    grid-column: 1 / -1;
+  }
+}
