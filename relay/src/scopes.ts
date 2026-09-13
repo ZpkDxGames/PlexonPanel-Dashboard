@@ -63,9 +63,11 @@ export const HIGH_RISK = new Set([
   "files.delete",
   "backup.delete",
   "backup.restore",
-  "maintenance.configure",
-  "maintenance.restart",
-  "maintenance.run",
+  "backup.full.delete",
+  "backup.full.restore",
+  "maintenance.settings.update",
+  "maintenance.restart.now",
+  "maintenance.full-backup.create",
   "server.stop",
   "server.restart",
   "devices.revoke",
@@ -113,7 +115,7 @@ export function validScopes(value: unknown): value is string[] {
   return (
     Array.isArray(value) &&
     value.length <= SCOPES.length &&
-    new Set(value).size === value.length &&
+    new Set(value).size === SCOPES.length &&
     value.every(
       (s) => typeof s === "string" && (SCOPES as readonly string[]).includes(s),
     )
