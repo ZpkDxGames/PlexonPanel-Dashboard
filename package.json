@@ -9,7 +9,7 @@
     "dev": "node scripts/dev.mjs",
     "build": "next build",
     "start": "next start",
-    "relay:prepare": "node relay/scripts/prepare-relay-3.4.1.mjs",
+    "relay:prepare": "node relay/scripts/prepare-relay-3.4.1.mjs && node relay/scripts/prepare-console-authority-race.mjs",
     "relay:build": "npm run relay:prepare && tsc -p relay/tsconfig.json",
     "relay:keygen": "node relay/scripts/generate-secrets.mjs",
     "relay:dev": "npm run relay:worker:dev",
