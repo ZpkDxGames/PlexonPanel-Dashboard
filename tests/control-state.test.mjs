@@ -8,6 +8,7 @@ import {
   diagnostics,
   capturedAtMillis,
   CONTROL_HISTORY_MAX_POINTS,
+  CONSOLE_HISTORY_MAX_LINES,
 } from "../.test-dist/lib/control-state.js";
 import { canAction } from "../.test-dist/lib/scopes.js";
 const id = "server-fixture";
@@ -310,14 +311,57 @@ test("console and cache remain bounded and exclude players, files and action res
     event("action.result", { data: { content: "private file content" } }),
   );
   const c = safeCache(s);
-  assert.equal(s.console.length, 600);
-  assert.equal(c.console.length, 200);
+  assert.equal(s.console.length, CONSOLE_HISTORY_MAX_LINES);
+  assert.equal(c.console.length, 500);
   assert.equal(c.players.length, 0);
   assert.equal(c.presenceDeltas.length, 0);
   assert.equal(c.presenceEventIds.length, 0);
   assert.ok(!JSON.stringify(c).includes("private file content"));
   assert.ok(!JSON.stringify(c).includes("192.0.2.1"));
   assert.equal(c.cached, true);
+});
+test("console journal identifiers and short cross-source transitions suppress duplicates", () => {
+  let s = emptyControlState(id);
+  const host = {
+    capturedAt: "2026-09-13T17:00:00.000Z",
+    level: "INFO",
+    content: "Done (1.2s)! For help, type help",
+    source: "HOST_JOURNAL",
+    journalCursor: "cursor-1",
+    streamSession: "host-session",
+    sourceSequence: 42,
+  };
+  s = applyControlMessage(s, event("console.lines", { lines: [host] }, "HOST"));
+  s = applyControlMessage(s, event("console.lines", { lines: [host] }, "HOST"));
+  assert.equal(s.console.length, 1, "journal cursor is a strong deduplication key");
+  s = applyControlMessage(
+    s,
+    event("console.lines", {
+      lines: [
+        {
+          capturedAt: "2026-09-13T17:00:01.000Z",
+          level: "INFO",
+          content: host.content,
+          source: "PAPER_LOG_FALLBACK",
+        },
+      ],
+    }),
+  );
+  assert.equal(s.console.length, 1, "short cross-source duplicate is suppressed");
+  s = applyControlMessage(
+    s,
+    event("console.lines", {
+      lines: [
+        {
+          capturedAt: "2026-09-13T17:00:10.000Z",
+          level: "INFO",
+          content: host.content,
+          source: "PAPER_LOG_FALLBACK",
+        },
+      ],
+    }),
+  );
+  assert.equal(s.console.length, 2, "later repeated server output remains visible");
 });
 test("UI actions require the intersection of exact scopes and local capabilities", () => {
   assert.equal(
