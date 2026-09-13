@@ -52,8 +52,14 @@ test("destructive maintenance actions are capability-gated and high-risk at brow
     assert.equal(browserScopes.includes(`\"${action}\"`), true, `browser HIGH_RISK missing ${action}`);
     assert.equal(relayScopes.includes(`\"${action}\"`), true, `relay HIGH_RISK missing ${action}`);
   }
-  for (const scope of ["backup.restore", "maintenance.configure", "maintenance.restart", "maintenance.run"])
-    assert.equal(view.includes(`props.can(\"${scope}`), false, `workspace should gate concrete actions, not raw scope ${scope}`);
+  for (const action of [
+    "backup.full.restore.prepare",
+    "backup.full.delete",
+    "maintenance.settings.update",
+    "maintenance.restart.now",
+    "maintenance.full-backup.create",
+  ])
+    assert.equal(view.includes(`props.can(\"${action}\"`), true, `workspace must gate concrete action ${action}`);
 });
 
 test("full restore remains Owner-enforced by the Host and browser never receives provider credentials", async () => {
@@ -68,7 +74,7 @@ test("full restore remains Owner-enforced by the Host and browser never receives
 test("responsive Backups layout has desktop and narrow-workspace rules without global scaling", async () => {
   const css = await source("app/backups-scaffold.css");
   assert.equal(css.includes("@container workspace (max-width: 820px)"), true);
-  assert.equal(css.includes("@container workspace (max-width: 560px)"), true);
+  assert.equal(css.includes("@container workspace (max-width: 480px)"), true);
   assert.equal(/\bzoom\s*:/.test(css), false);
   assert.equal(/transform\s*:\s*scale\s*\(/.test(css), false);
 });
