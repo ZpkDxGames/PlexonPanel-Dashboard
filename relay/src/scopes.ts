@@ -115,7 +115,7 @@ export function validScopes(value: unknown): value is string[] {
   return (
     Array.isArray(value) &&
     value.length <= SCOPES.length &&
-    new Set(value).size === SCOPES.length &&
+    new Set(value).size === value.length &&
     value.every(
       (s) => typeof s === "string" && (SCOPES as readonly string[]).includes(s),
     )
