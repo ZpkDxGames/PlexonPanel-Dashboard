@@ -20,6 +20,21 @@ test("Worker and standalone tolerate valid Host replay before console.source aut
   }
 });
 
+test("Worker and standalone accept Host 3.4.0 empty replay snapshots as no-ops", async () => {
+  const files = [
+    await source("relay/src/index.ts"),
+    await source("relay/src/standalone/room-manager.ts"),
+    await source("relay/dist/index.js"),
+    await source("relay/dist/standalone/room-manager.js"),
+  ];
+
+  for (const content of files) {
+    assert.doesNotMatch(content, /body\.lines\.length < 1/);
+    assert.match(content, /body\.lines\.length === 0\)\s*return/);
+    assert.match(content, /body\.lines\.length > 100/);
+  }
+});
+
 test("console ordering tolerance does not remove 3.3 maintenance parity", async () => {
   const compiled = [
     await source("relay/dist/index-core.js"),
