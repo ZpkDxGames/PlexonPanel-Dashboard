@@ -272,8 +272,8 @@ export function BackupsView30(props: ViewProps) {
     allBackups = useMemo<BackupRow[]>(
       () =>
         [
-          ...fullBackups.map((backup) => ({ ...backup, _kind: "full" as const })),
-          ...liveBackups.map((backup) => ({ ...backup, _kind: "live" as const })),
+          ...fullBackups.map((backup): BackupRow => ({ ...backup, _kind: "full" })),
+          ...liveBackups.map((backup): BackupRow => ({ ...backup, _kind: "live" })),
         ].sort(
           (a, b) =>
             Date.parse(str(b.timestamp, "1970-01-01")) -
