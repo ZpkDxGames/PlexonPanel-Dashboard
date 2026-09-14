@@ -2,6 +2,7 @@ import { readFile } from "node:fs/promises";
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { filterEvent } from "../dist/index.js";
+import { ACTION_SCOPES } from "../dist/scopes.js";
 
 const root = new URL("../../", import.meta.url);
 const source = async (path) => readFile(new URL(path, root), "utf8");
@@ -33,7 +34,12 @@ test("console error and full scopes retain existing event filtering semantics", 
   assert.equal(full.lines.length, 3);
 });
 
-test("Worker and standalone both implement Host console authority and Paper-only execution", async () => {
+test("history actions preserve existing console scopes without adding privilege", () => {
+  assert.equal(ACTION_SCOPES["console.history"], "console.view.full");
+  assert.equal(ACTION_SCOPES["console.history.errors"], "console.view.errors");
+});
+
+test("Worker and standalone declare Host as sole console authority and Paper-only execution", async () => {
   const worker = await source("relay/src/index.ts");
   const standalone = await source("relay/src/standalone/room-manager.ts");
   for (const runtime of [worker, standalone]) {
@@ -43,8 +49,9 @@ test("Worker and standalone both implement Host console authority and Paper-only
     assert.match(runtime, /console\.view\.full/);
     assert.match(runtime, /console\.execute/);
     assert.match(runtime, /agentKind === "HOST"/);
-    assert.match(runtime, /PAPER_FALLBACK/);
-    assert.match(runtime, /3\.4\.0/);
+    assert.match(runtime, /consoleAuthority: "HOST"/);
+    assert.doesNotMatch(runtime, /PAPER_FALLBACK/);
+    assert.match(runtime, /3\.4\.0|RELAY_VERSION/);
   }
 });
 
