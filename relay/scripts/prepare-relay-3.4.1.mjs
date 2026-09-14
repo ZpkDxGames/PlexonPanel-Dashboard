@@ -4,6 +4,7 @@ import { resolve } from "node:path";
 const root = resolve(import.meta.dirname, "../..");
 const workerCorePath = resolve(root, "relay/src/index-core.ts");
 const standaloneCorePath = resolve(root, "relay/src/standalone/room-manager-core.ts");
+const roomTestPath = resolve(root, "relay/tests/room.test.mjs");
 
 async function replaceExactly(path, before, after, label) {
   const source = await readFile(path, "utf8");
@@ -18,119 +19,95 @@ async function replaceExactly(path, before, after, label) {
   process.stdout.write(`${label}: applied\n`);
 }
 
-const standaloneMaintenanceBefore = `    if (envelope.type === "backup.coordination.result") {
-      if (session.kind !== "PAPER") throw new Error("Only Paper reports save leases");
-      await this.sendToAgent("HOST", "backup.coordination.result", body);
-      this.counters.messagesAccepted += 1;
-      return;
-    }
-    if (envelope.type === "action.result") {`;
+const retiredCoordinationGuard = `    if (
+      envelope.type === "backup.coordination" ||
+      envelope.type === "backup.coordination.result" ||
+      envelope.type === "maintenance.coordination" ||
+      envelope.type === "maintenance.coordination.result"
+    )
+      throw new Error("Retired Paper backup coordination message");
+`;
 
-const standaloneMaintenanceAfter = `    if (envelope.type === "backup.coordination.result") {
-      if (session.kind !== "PAPER") throw new Error("Only Paper reports save leases");
-      await this.sendToAgent("HOST", "backup.coordination.result", body);
-      this.counters.messagesAccepted += 1;
-      return;
-    }
-    if (envelope.type === "maintenance.coordination") {
-      if (session.kind !== "HOST") throw new Error("Only Host coordinates maintenance");
-      requiredUuid(body.requestId, "requestId");
-      const operation = requiredText(body.operation, "operation", 24);
-      if (operation !== "notice" && operation !== "flush")
-        throw new Error("Invalid maintenance operation");
-      if (typeof body.automatic !== "boolean") throw new Error("Invalid maintenance mode");
-      if (body.deviceId !== undefined) requiredUuid(body.deviceId, "deviceId");
-      if (
-        body.generation !== undefined &&
-        (!Number.isSafeInteger(body.generation) || Number(body.generation) < 1)
-      )
-        throw new Error("Invalid maintenance generation");
-      if (operation === "notice") {
-        const message = requiredText(body.message, "message", 512);
-        if (/[\\0\\r\\n]/.test(message)) throw new Error("Invalid maintenance message");
-        if (body.title !== undefined && body.title !== null) {
-          const title = requiredText(body.title, "title", 160);
-          if (/[\\0\\r\\n]/.test(title)) throw new Error("Invalid maintenance title");
-        }
-      }
-      await this.sendToAgent("PAPER", "maintenance.coordination", body);
-      this.counters.messagesAccepted += 1;
-      return;
-    }
-    if (envelope.type === "maintenance.coordination.result") {
-      if (session.kind !== "PAPER") throw new Error("Only Paper reports maintenance coordination");
-      requiredUuid(body.requestId, "requestId");
-      const operation = requiredText(body.operation, "operation", 24);
-      if (operation !== "notice" && operation !== "flush")
-        throw new Error("Invalid maintenance operation");
-      if (typeof body.success !== "boolean") throw new Error("Invalid maintenance result");
-      await this.sendToAgent("HOST", "maintenance.coordination.result", body);
-      this.counters.messagesAccepted += 1;
-      return;
-    }
-    if (envelope.type === "action.result") {`;
+async function retireCoordination(path, label) {
+  const source = await readFile(path, "utf8");
+  if (source.includes(retiredCoordinationGuard)) {
+    process.stdout.write(`${label}: already retired\n`);
+    return;
+  }
+  const startMarker = `    if (envelope.type === "backup.coordination") {`;
+  const endMarker = `    if (!AGENT_EVENTS.has(envelope.type)) return;`;
+  const start = source.indexOf(startMarker);
+  const end = start < 0 ? -1 : source.indexOf(endMarker, start);
+  if (start < 0 || end < 0)
+    throw new Error(`${label}: coordination block was not found exactly where expected`);
+  const retired = source.slice(0, start) + retiredCoordinationGuard + source.slice(end);
+  for (const forbidden of [
+    `sendToAgent("PAPER", "backup.coordination"`,
+    `sendToAgent("HOST", "backup.coordination.result"`,
+    `sendToAgent("PAPER", "maintenance.coordination"`,
+    `sendToAgent("HOST", "maintenance.coordination.result"`,
+    "PAPER_COORDINATION_UNAVAILABLE",
+    "COORDINATING_PAPER",
+  ]) {
+    if (retired.includes(forbidden))
+      throw new Error(`${label}: retired coordination forwarding remains: ${forbidden}`);
+  }
+  await writeFile(path, retired, "utf8");
+  process.stdout.write(`${label}: retired\n`);
+}
 
-const workerMaintenanceBefore = `    if (envelope.type === "backup.coordination.result") {
-      if (a.kind !== "PAPER") throw new Error("Only Paper reports save leases");
-      await this.sendToAgent("HOST", "backup.coordination.result", body);
-      return;
-    }
-    if (envelope.type === "action.result") {`;
+async function retireRoomCoordinationTest() {
+  const source = await readFile(roomTestPath, "utf8");
+  const replacementTitle = `test("retired Paper backup and maintenance coordination are rejected and never forwarded"`;
+  if (source.includes(replacementTitle)) {
+    process.stdout.write("relay room coordination test: already retired\n");
+    return;
+  }
+  const startMarker = `test("broken Paper peer delivery cannot retroactively reject healthy Host"`;
+  const nextMarker = `test("client cannot exceed command, transfer, parameter or in-flight request limits"`;
+  const start = source.indexOf(startMarker);
+  const next = start < 0 ? -1 : source.indexOf(nextMarker, start);
+  if (start < 0 || next < 0)
+    throw new Error("relay room coordination test: legacy test block not found");
+  const replacement = `test("retired Paper backup and maintenance coordination are rejected and never forwarded", async () => {
+  const backupFixture = await fixture();
+  const backupPaper = await attach(backupFixture, "PAPER");
+  const backupHost = await attach(backupFixture, "HOST");
+  backupPaper.socket.sent.length = 0;
+  await backupHost.send("backup.coordination", {
+    requestId: randomUUID(),
+    leaseId: randomUUID(),
+    operation: "prepare",
+  });
+  assert.equal(backupHost.socket.closed?.code, 4008);
+  assert.equal(
+    backupPaper.socket.sent.some((message) => message.type === "backup.coordination"),
+    false,
+  );
 
-const workerMaintenanceAfter = `    if (envelope.type === "backup.coordination.result") {
-      if (a.kind !== "PAPER") throw new Error("Only Paper reports save leases");
-      await this.sendToAgent("HOST", "backup.coordination.result", body);
-      return;
-    }
-    if (envelope.type === "maintenance.coordination") {
-      if (a.kind !== "HOST") throw new Error("Only Host coordinates maintenance");
-      requiredUuid(body.requestId, "requestId");
-      const operation = requiredText(body.operation, "operation", 24);
-      if (operation !== "notice" && operation !== "flush")
-        throw new Error("Invalid maintenance operation");
-      if (typeof body.automatic !== "boolean") throw new Error("Invalid maintenance mode");
-      if (body.deviceId !== undefined) requiredUuid(body.deviceId, "deviceId");
-      if (
-        body.generation !== undefined &&
-        (!Number.isSafeInteger(body.generation) || Number(body.generation) < 1)
-      )
-        throw new Error("Invalid maintenance generation");
-      if (operation === "notice") {
-        const message = requiredText(body.message, "message", 512);
-        if (/[\\0\\r\\n]/.test(message)) throw new Error("Invalid maintenance message");
-        if (body.title !== undefined && body.title !== null) {
-          const title = requiredText(body.title, "title", 160);
-          if (/[\\0\\r\\n]/.test(title)) throw new Error("Invalid maintenance title");
-        }
-      }
-      await this.sendToAgent("PAPER", "maintenance.coordination", body);
-      return;
-    }
-    if (envelope.type === "maintenance.coordination.result") {
-      if (a.kind !== "PAPER") throw new Error("Only Paper reports maintenance coordination");
-      requiredUuid(body.requestId, "requestId");
-      const operation = requiredText(body.operation, "operation", 24);
-      if (operation !== "notice" && operation !== "flush")
-        throw new Error("Invalid maintenance operation");
-      if (typeof body.success !== "boolean") throw new Error("Invalid maintenance result");
-      await this.sendToAgent("HOST", "maintenance.coordination.result", body);
-      return;
-    }
-    if (envelope.type === "action.result") {`;
+  const maintenanceFixture = await fixture();
+  const maintenancePaper = await attach(maintenanceFixture, "PAPER");
+  const maintenanceHost = await attach(maintenanceFixture, "HOST");
+  maintenancePaper.socket.sent.length = 0;
+  await maintenanceHost.send("maintenance.coordination", {
+    requestId: randomUUID(),
+    operation: "flush",
+    automatic: false,
+  });
+  assert.equal(maintenanceHost.socket.closed?.code, 4008);
+  assert.equal(
+    maintenancePaper.socket.sent.some((message) => message.type === "maintenance.coordination"),
+    false,
+  );
+});
+`;
+  await writeFile(roomTestPath, source.slice(0, start) + replacement + "\n" + source.slice(next), "utf8");
+  process.stdout.write("relay room coordination test: retired\n");
+}
 
-await replaceExactly(
-  standaloneCorePath,
-  standaloneMaintenanceBefore,
-  standaloneMaintenanceAfter,
-  "standalone maintenance coordination",
-);
-
-await replaceExactly(
-  workerCorePath,
-  workerMaintenanceBefore,
-  workerMaintenanceAfter,
-  "worker maintenance coordination",
-);
+await retireCoordination(standaloneCorePath, "standalone Paper backup coordination");
+await retireCoordination(workerCorePath, "worker Paper backup coordination");
+await retireRoomCoordinationTest();
 
 await replaceExactly(
   standaloneCorePath,
@@ -194,4 +171,6 @@ await replaceExactly(
   "standalone ready version",
 );
 
-process.stdout.write("Relay sources prepared with PlexonPanel 3.3 maintenance parity and 3.4 console support.\n");
+process.stdout.write(
+  "Relay sources prepared with Step 5 manual-backup authority and retired Paper backup coordination.\n",
+);
