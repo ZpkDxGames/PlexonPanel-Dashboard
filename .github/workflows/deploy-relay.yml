@@ -1,0 +1,63 @@
+name: Deploy production relay
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: plexonpanel-production-relay
+  cancel-in-progress: false
+
+jobs:
+  deploy-relay:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      NEXT_TELEMETRY_DISABLED: "1"
+      WRANGLER_SEND_METRICS: "false"
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      PRODUCTION_RELAY_URL: ${{ vars.PRODUCTION_RELAY_URL }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          cache: npm
+      - run: npm ci
+      - name: Verify accepted source
+        run: |
+          npm run check
+          npm run relay:smoke
+          npm run relay:standalone:smoke
+      - name: Require production deployment configuration
+        shell: bash
+        run: |
+          test -n "$CLOUDFLARE_API_TOKEN" || { echo "::error::CLOUDFLARE_API_TOKEN is not configured"; exit 1; }
+          test -n "$CLOUDFLARE_ACCOUNT_ID" || { echo "::error::CLOUDFLARE_ACCOUNT_ID is not configured"; exit 1; }
+          case "$PRODUCTION_RELAY_URL" in
+            https://*) ;;
+            *) echo "::error::PRODUCTION_RELAY_URL must be a configured HTTPS repository variable"; exit 1 ;;
+          esac
+      - name: Stamp accepted revision
+        env:
+          PLEXON_BUILD_TIMESTAMP: ${{ github.event.head_commit.timestamp }}
+        run: node scripts/stamp-relay-deployment.mjs
+      - name: Deploy Cloudflare relay
+        run: npx wrangler deploy --config relay/wrangler.production.jsonc
+      - name: Verify deployed relay identity
+        shell: bash
+        run: |
+          curl --fail --silent --show-error --retry 5 --retry-delay 2 \
+            "$PRODUCTION_RELAY_URL/healthz" > /tmp/plexonpanel-relay-health.json
+          jq -e --arg sha "$GITHUB_SHA" '
+            .ok == true and
+            .protocolVersion == 3 and
+            .runtimeKind == "cloudflare-worker" and
+            .gitCommit == $sha
+          ' /tmp/plexonpanel-relay-health.json >/dev/null
+          echo "Production relay reports accepted revision ${GITHUB_SHA:0:12}."
