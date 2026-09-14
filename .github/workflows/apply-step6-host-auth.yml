@@ -47,13 +47,13 @@ jobs:
         run: |
           python3 - <<'PY'
           from pathlib import Path
-          for path in [Path("relay/src/index-core.ts"), Path("relay/src/standalone/room-manager-core.ts")]:
-              text = path.read_text()
-              old = '/pairing|only paper issues|only paper approves/i.test(message)'
-              new = '/pairing|only paper issues|only paper approves|access authority|only relay emits host authorization/i.test(message)'
-              if old not in text:
-                  raise SystemExit(f"protocol rejection anchor not found in {path}")
-              path.write_text(text.replace(old, new, 1))
+          p = Path("relay/src/index-core.ts")
+          text = p.read_text()
+          old = '/pairing|only paper issues|only paper approves/i.test(message)'
+          new = '/pairing|only paper issues|only paper approves|access authority|only relay emits host authorization/i.test(message)'
+          if old not in text:
+              raise SystemExit("worker protocol rejection anchor not found")
+          p.write_text(text.replace(old, new, 1))
           PY
       - name: Update Protocol 3 authorization mirror contract
         shell: bash
