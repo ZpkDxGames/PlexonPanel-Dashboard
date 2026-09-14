@@ -41,3 +41,8 @@ The sanitized telemetry cache expires in one hour. Online players, detailed pres
 Audit reads bounded local JSONL with filters/50-entry pages, excluding command/message/file bodies and secrets. Last-seen means last successful authorized activity, throttled to one minute. A lost browser should be revoked locally.
 
 The relay sees transient routed data; TLS is not end-to-end encryption against it. Restrict full console/chat and use sanitized diagnostics. A disconnected/timed-out request has an unknown outcome and is never resent automatically; inspect audit/server state before retrying.
+
+
+## Host authorization while Paper is offline
+
+Pairing and revocation remain Paper-authoritative. The relay persists only bounded coordination metadata and forwards validated Paper access snapshots to the authenticated Host. Host stores its own restrictive local mirror, so an already paired browser can continue to use Host-backed backup, provider, console and systemd controls while Paper/Minecraft is stopped. New pairing and access mutation still require Paper. A Host refresh request is best-effort: if Paper is offline, the last valid Host mirror remains in force; stale or malformed snapshots never replace it.

@@ -36,7 +36,7 @@ Every agent→relay body contains signed `_session` (fresh random UUID per WebSo
 6. The HMAC bearer credential binds audience `plexonpanel-relay`, protocol, server/device IDs, immutable role/scopes, generation and issue/expiry times (maximum 30 days).
 7. Browser preflights `/v1/dashboard/session` with Authorization, then uses WebSocket subprotocols `plexonpanel-v3` and `auth.<credential>`. Tokens never enter URLs; origin must be allowlisted.
 
-`access.sync` carries authoritative local generation/revision/devices. Stale state cannot undo revocation; a host can remove existing grants, never invent one. Revoke-all increments generation, active revoked browsers close and agents independently check their local registry. Last-seen means successful authorized activity, throttled to one minute, not idle presence.
+`access.sync` carries Paper-authoritative local generation/revision/devices. Stale state cannot undo revocation. After validating and persisting a Paper snapshot, the relay best-effort forwards it to authenticated Host as relay-signed `access.authority.sync`. Host may send `access.authority.request`; the relay accepts it only from authenticated Host and asks authenticated Paper to republish `access.sync`. These internal messages cannot mint grants, change generation/revision, or expose credentials. Revoke-all increments generation, active revoked browsers close and agents independently check their local authorization state. Last-seen remains Paper-owned successful authorized activity, throttled to one minute, not idle presence.
 
 ## Actions and events
 
@@ -66,4 +66,4 @@ Transfers use start → ordered 16 KiB chunks → cancellation/expiry, with fina
 
 After envelope, server, signature, session/replay, type and body validation succeeds, the agent packet is accepted. Dashboard fan-out, peer-agent delivery, Durable Object notifications and other post-authentication side effects are failure-isolated. A stale or broken destination may be discarded, but that failure cannot retroactively turn a valid sender packet into protocol corruption.
 
-Host `access.sync` remains removal-only. Safe stale or divergent Host snapshots are ignored and diagnosed without disconnecting the authenticated Host; malformed, replayed or tampered traffic still fails closed.
+Legacy Host `access.sync` remains removal-only for compatibility, but Host-owned authorization now comes from relay-signed Paper snapshots and is not a second grant authority. Safe stale or divergent Host snapshots are ignored and diagnosed without disconnecting the authenticated Host; malformed, replayed or tampered traffic still fails closed.
