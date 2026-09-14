@@ -64,35 +64,12 @@ function asInternals(room: CoreServerRoom): RoomInternals {
   return room as unknown as RoomInternals;
 }
 
-function hostSession(room: RoomInternals): AgentAttachment | null {
-  const socket = room.agents("HOST")[0];
-  return socket ? (socket.deserializeAttachment() as AgentAttachment) : null;
-}
-
-function hostConsoleAuthoritative(room: RoomInternals, metadata: RoomMetadataLike): boolean {
-  const host = hostSession(room);
-  return Boolean(
-    host?.authenticated &&
-      host.consoleHealthy === true &&
-      metadata.hostIdentity?.capabilities["console.view.full"] === true,
-  );
-}
-
 function hostConsoleState(room: RoomInternals): string {
-  const host = hostSession(room);
-  if (!host?.authenticated) return "HOST_OFFLINE";
+  const socket = room.agents("HOST")[0];
+  if (!socket) return "HOST_OFFLINE";
+  const host = socket.deserializeAttachment() as AgentAttachment;
+  if (!host.authenticated) return "HOST_OFFLINE";
   return host.consoleSourceState ?? "STARTING";
-}
-
-async function announceConsoleAuthority(
-  room: RoomInternals,
-  metadata: RoomMetadataLike,
-): Promise<void> {
-  await room.sendToAgent("PAPER", "console.authority", {
-    hostAuthoritative: hostConsoleAuthoritative(room, metadata),
-    source: "HOST_JOURNAL",
-    state: hostConsoleState(room),
-  });
 }
 
 function boundedText(value: unknown, maximum: number): string | null {
@@ -170,7 +147,6 @@ async function processHostConsole(
     attachment.consoleSourceState = state;
     socket.serializeAttachment(attachment);
     await room.broadcastReady(metadata);
-    await announceConsoleAuthority(room, metadata);
     return;
   }
 
@@ -181,8 +157,6 @@ async function processHostConsole(
     metadata.hostIdentity?.capabilities["console.view.full"] === true ||
     metadata.hostIdentity?.capabilities["console.view.errors"] === true;
   if (!hostCanView) throw new Error("Event not allowed while host console capability is disabled");
-
-  if (room.agents("PAPER").length > 0 && !hostConsoleAuthoritative(room, metadata)) return;
 
   for (const peer of room.state.getWebSockets("dashboard")) {
     const dashboard = peer.deserializeAttachment() as AgentAttachment;
@@ -241,10 +215,6 @@ adapterPrototype.agentMessage = async function (
     return;
   }
   await coreAgentMessage.call(this, socket, attachment, text);
-  if (type === "agent.challenge_response" && attachment.kind === "PAPER" && attachment.authenticated) {
-    const room = asInternals(this);
-    await announceConsoleAuthority(room, await room.metadata());
-  }
 };
 
 adapterPrototype.dashboardMessage = async function (
@@ -287,7 +257,7 @@ adapterPrototype.ready = function (
   return {
     ...coreReady.call(this, metadata, attachment),
     version: RELAY_VERSION,
-    consoleAuthority: hostConsoleAuthoritative(room, metadata) ? "HOST" : "PAPER_FALLBACK",
+    consoleAuthority: "HOST",
     consoleSourceState: hostConsoleState(room),
   };
 };
@@ -296,12 +266,7 @@ adapterPrototype.disconnected = async function (
   this: CoreServerRoom,
   socket,
 ): Promise<void> {
-  const attachment = socket.deserializeAttachment() as AgentAttachment;
   await coreDisconnected.call(this, socket);
-  if (attachment.kind === "HOST") {
-    const room = asInternals(this);
-    await announceConsoleAuthority(room, await room.metadata());
-  }
 };
 
 type WorkerEnv = Parameters<typeof coreWorker.fetch>[1] & RelayBuildEnvironment;
