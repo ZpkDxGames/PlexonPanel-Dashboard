@@ -28,8 +28,37 @@ jobs:
           node-version: "24"
           cache: npm
       - run: npm ci
+      - name: Normalize current protocol documentation anchor
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path("scripts/apply-step6-host-auth.mjs")
+          text = p.read_text()
+          start = text.index('const protocol = "docs/PROTOCOL.md";')
+          end = text.index('\n\nconst ops =', start)
+          p.write_text(text[:start] + text[end + 2:])
+          PY
       - name: Apply Step 6 source transformation
         run: node scripts/apply-step6-host-auth.mjs
+      - name: Update Protocol 3 authorization mirror contract
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path("docs/PROTOCOL.md")
+          text = p.read_text()
+          old = '`access.sync` carries authoritative local generation/revision/devices. Stale state cannot undo revocation; a host can remove existing grants, never invent one. Revoke-all increments generation, active revoked browsers close and agents independently check their local registry. Last-seen means successful authorized activity, throttled to one minute, not idle presence.'
+          new = '`access.sync` carries Paper-authoritative local generation/revision/devices. Stale state cannot undo revocation. After validating and persisting a Paper snapshot, the relay best-effort forwards it to authenticated Host as relay-signed `access.authority.sync`. Host may send `access.authority.request`; the relay accepts it only from authenticated Host and asks authenticated Paper to republish `access.sync`. These internal messages cannot mint grants, change generation/revision, or expose credentials. Revoke-all increments generation, active revoked browsers close and agents independently check their local authorization state. Last-seen remains Paper-owned successful authorized activity, throttled to one minute, not idle presence.'
+          if old not in text:
+              raise SystemExit("Protocol access.sync paragraph not found")
+          text = text.replace(old, new, 1)
+          old_tail = 'Host `access.sync` remains removal-only. Safe stale or divergent Host snapshots are ignored and diagnosed without disconnecting the authenticated Host; malformed, replayed or tampered traffic still fails closed.'
+          new_tail = 'Legacy Host `access.sync` remains removal-only for compatibility, but Host-owned authorization now comes from relay-signed Paper snapshots and is not a second grant authority. Safe stale or divergent Host snapshots are ignored and diagnosed without disconnecting the authenticated Host; malformed, replayed or tampered traffic still fails closed.'
+          if old_tail not in text:
+              raise SystemExit("Protocol Host access.sync compatibility paragraph not found")
+          p.write_text(text.replace(old_tail, new_tail, 1))
+          PY
       - name: Validate dashboard and both relay runtimes
         run: |
           npm run check
