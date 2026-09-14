@@ -87,6 +87,7 @@ Object.assign(ACTION_SCOPES, {
   "backup.download.chunk": "backup.download",
   "backup.download.cancel": "backup.download",
   "backup.list": "backup.view",
+  "backup.preflight": "backup.view",
   "backup.restore.prepare": "backup.restore",
   "backup.full.list": "backup.view",
   "backup.full.verify": "backup.view",
