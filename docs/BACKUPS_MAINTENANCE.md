@@ -1,42 +1,56 @@
 # Backups & Maintenance
 
-The PlexonPanel Dashboard is the authenticated control surface for maintenance; it is not the backup executor. The Paper agent coordinates player-facing warnings and final save flushing, while the Linux Host Companion remains the sole authority for systemd, cold ZIP creation, local backup storage, SHA-256 verification, restore execution, and rclone/Google Drive access.
+The PlexonPanel Dashboard is the authenticated control surface for maintenance; it is not the backup executor. The Linux Host Companion owns backup orchestration, Minecraft maintenance warnings, final save flushing, systemd lifecycle, cold ZIP creation, local verification, Google Drive/rclone transfer, retry/recovery state, and restart verification. Paper is not part of the full-backup critical path.
 
-## Backup classes
+## Backup model
 
-**Live Snapshot** keeps Paper online. The existing Paper/Host save-lease path coordinates world saving before the Host reads the configured live-backup include set. This path keeps the established live-snapshot exclusions and is not a substitute for a cold database-consistent restore point.
+PlexonPanel now exposes one backup model: a **manual cold full restore point**.
 
-**Full Restore Point** is a cold full-server ZIP. PlexonCraft is stopped before mutable worlds and plugin database state are archived. The Host creates the archive outside the Minecraft server root, writes to staging first, promotes only a completed archive, records SHA-256 metadata, and can upload the verified result through its host-local rclone configuration.
+A full restore point archives the configured Minecraft server root only after the Host has completed the maintenance countdown, issued the Host-local final `save-all flush`, stopped the configured systemd unit, and proved the service is stopped. The Host writes the archive outside the Minecraft server root, stages and atomically promotes it, verifies the local ZIP/hash before any off-site promotion, then applies the configured Google Drive/rclone policy.
+
+The previous Paper-coordinated live snapshot path is retired. There is no dashboard action, interval scheduler, or calendar schedule for creating backups automatically.
 
 ## Backups workspace
 
 The **Backups** section exposes the Host-backed **Backups & Maintenance** workspace when the paired device and Host capabilities allow it. It shows:
 
 - current maintenance phase and backup progress;
-- next restart and next full restore-point occurrence;
+- the independent next restart occurrence;
+- explicit **Manual only** full-backup mode;
 - local/off-site provider state;
-- loaded live-snapshot and full-restore-point inventory;
+- verified full-restore-point inventory;
 - SHA-256/verification state where available;
 - recovery-required state;
-- host-offline state;
-- schedule settings owned by the Host.
+- Host-offline state;
+- Host-owned restart and full-backup policy settings.
 
-No backup schedule is stored in browser-local preferences. Saving maintenance settings writes the validated Host-owned maintenance configuration through the control plane.
+The workspace does not invent a next backup timestamp because recurring full backups do not exist.
 
 ## Scheduling
 
-Schedules support daily, weekly, and selected-weekday modes with an IANA timezone such as `America/Sao_Paulo`. The Host recomputes calendar occurrences and persists execution claims, so a Host restart around the scheduled minute does not intentionally execute the same occurrence twice.
+Only restart scheduling remains automatic. Restart schedules support daily, weekly, and selected-weekday modes with an IANA timezone such as `America/Sao_Paulo`.
 
-Migrated installations do not automatically enable destructive schedules. Enable restart and full restore-point schedules explicitly after checking the intended timezone, weekday, and local time.
+Full backups are manual-only. Legacy values such as `backups.intervalMinutes` or `fullRestorePoint.schedule` are migration residue and are not authoritative. The dashboard neither edits nor presents a recurring full-backup schedule.
 
-For PlexonCraft, the recommended operating pattern is a daily low-traffic restart and a weekly Sunday restore point. If both resolve to the same scheduled occurrence, the Host collapses them into one cold maintenance operation rather than stopping and starting the server twice.
+## Manual full-backup flow
+
+1. An authorized user explicitly starts **Create full restore point**.
+2. The Host performs local/provider preflight before the countdown.
+3. If Minecraft is running, the Host executes the fixed 30m / 15m / 1m / 30s / 15s / 5s warning sequence through its Host-local command channel.
+4. Immediately before shutdown, the Host requires a successful `save-all flush` response.
+5. The Host stops the configured systemd service and proves the process is no longer running.
+6. The Host creates the cold archive and locally verifies its ZIP structure, expected entry count, size bounds, and SHA-256.
+7. When Google Drive is configured, the Host uploads through staging, verifies the remote object, then promotes the canonical restore point without destroying the previous known-good copy first.
+8. On terminal off-site failure, the verified local backup remains available, the job becomes degraded/retryable, and Minecraft is recovered according to the Host safety policy instead of being stranded offline indefinitely.
+9. **Retry upload** reuses the existing verified local archive while Minecraft remains online; it does not stop the server or recreate the backup.
+
+Paper may be disabled or disconnected while the Host performs these phases.
 
 ## Manual actions
 
 Depending on granted scopes and Host capabilities, the workspace can expose:
 
-- **Restart now**;
-- **Create live snapshot**;
+- **Restart server**;
 - **Create full restore point**;
 - **Verify**;
 - **Retry upload**;
@@ -44,32 +58,25 @@ Depending on granted scopes and Host capabilities, the workspace can expose:
 - **Delete**;
 - **Test Google Drive**.
 
-Destructive actions pass through the Dashboard confirmation layer, relay authorization, and the Host capability/device checks. Full restore is additionally Owner-enforced by the Host and requires the server-name confirmation token flow.
+There is no **Create live snapshot** action.
+
+Destructive actions pass through the Dashboard confirmation layer, relay authorization, and Host capability/device checks. Full restore remains Owner-enforced by the Host and requires the server-name confirmation-token flow.
 
 ## Google Drive / rclone
 
-Google credentials never enter browser state. Configure rclone on the Linux host under the `plexonpanel-host` account and point the Host Companion at the protected rclone config. A typical target is:
+Google credentials never enter browser state. Configure rclone on the Linux host under the `plexonpanel-host` account and keep the rclone config readable only by the Host service account.
 
-```text
-gdrive:PlexonCraft
-```
+The remote destination is Host-local configuration. Browser requests cannot supply an rclone executable, config path, destination, or arbitrary flags.
 
-with a single-current canonical pair such as:
+The Host uploads a replacement to a unique staging object, verifies the staged object, preserves the previous canonical object during promotion, and promotes only after verification succeeds. A failed cloud transfer does not invalidate the completed local restore point. Use **Retry upload** to send that existing local archive again without recreating it.
 
-```text
-gdrive:PlexonCraft/PlexonCraft-Latest.zip
-gdrive:PlexonCraft/PlexonCraft-Latest.json
-```
-
-The Host uploads a replacement to staging, verifies the staged object, preserves the previous canonical object during promotion, and promotes only after verification succeeds. A failed cloud transfer does not invalidate the completed local restore point. Use **Retry upload** to send that existing local archive again without recreating it.
-
-**Test Google Drive** performs a bounded Host-side provider check. The browser sees health/status information, not rclone credentials or arbitrary remote command arguments.
+**Test Google Drive** performs a bounded Host-side provider check. The browser sees sanitized health/status fields, not rclone stdout/stderr, OAuth material, or arbitrary remote command arguments.
 
 ## Restore
 
 A full restore uses the Host's destructive-operation lock and confirmation flow. The normal sequence is:
 
-1. select a full restore point;
+1. select a verified full restore point;
 2. prepare the restore and receive the short-lived confirmation token;
 3. type the configured server name;
 4. stop PlexonCraft if it is running;
@@ -79,20 +86,20 @@ A full restore uses the Host's destructive-operation lock and confirmation flow.
 8. extract into staging with traversal/ZIP-slip/duplicate/size protections;
 9. replace targets;
 10. remove the rollback journal after successful replacement;
-11. optionally start the service and require a fresh authenticated Paper reconnect.
+11. optionally start the service and require Host-local Minecraft readiness.
 
 If verified metadata refers to an off-site restore point whose local ZIP is no longer present, the Host can download the canonical remote archive to Host staging and verify it before using the same restore pipeline.
 
 ## Browser download policy
 
-Browser archive downloads remain capped at 64 MiB. Large restore points stay on the Host and/or the configured off-site provider; retrieve those through host/provider operations rather than making the browser hold multi-gigabyte ZIPs.
+Browser archive downloads remain capped at 64 MiB. Large restore points stay on the Host and/or configured off-site provider; retrieve those through Host/provider operations rather than making the browser hold multi-gigabyte ZIPs.
 
 ## Failure and recovery states
 
-The workspace surfaces Host-reported errors and recovery-required state. During a Google Drive outage the expected behavior is local backup preservation, prior remote restore-point preservation, server recovery/restart according to policy, and a later retryable upload.
+The workspace surfaces Host-reported errors and recovery-required state. During a Google Drive outage the expected behavior is local backup preservation, previous remote restore-point preservation, bounded retry/timeout handling, server recovery according to policy, and later retryable upload.
 
-If a destructive restore journal remains after a crash, do not bypass it in the browser. Keep Paper stopped and follow the Host Companion recovery procedure documented in the PlexonPanel repository before attempting another destructive operation.
+If a destructive restore journal remains after a crash, do not bypass it in the browser. Keep Minecraft stopped and follow the Host Companion recovery procedure before attempting another destructive operation.
 
 ## Permissions
 
-The Dashboard only exposes actions for which both the device grant and the current agent capability agree. Host-only maintenance/provider scopes are not Paper capabilities. High-risk actions require the shared confirmation flow; restore remains Host Owner-only even if a custom role is accidentally granted the underlying backup restore scope.
+The Dashboard exposes actions only when both the immutable device grant and current Host capability allow them. Backup, maintenance, provider, and systemd lifecycle authority are Host-owned. Paper does not advertise or execute full-backup coordination. High-risk actions require the shared confirmation flow; restore remains Host Owner-only even if a custom role is accidentally granted the underlying backup restore scope.
