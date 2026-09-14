@@ -7,9 +7,11 @@
   },
   "scripts": {
     "dev": "node scripts/dev.mjs",
-    "build": "next build",
+    "scopes:generate": "node scripts/generate-scope-contract.mjs",
+    "scopes:check": "node scripts/generate-scope-contract.mjs --check",
+    "build": "npm run scopes:generate && next build",
     "start": "next start",
-    "relay:prepare": "node relay/scripts/prepare-relay-3.4.1.mjs && node relay/scripts/prepare-console-authority-race.mjs",
+    "relay:prepare": "npm run scopes:generate && node relay/scripts/prepare-relay-3.4.1.mjs && node relay/scripts/prepare-console-authority-race.mjs",
     "relay:build": "npm run relay:prepare && tsc -p relay/tsconfig.json",
     "relay:keygen": "node relay/scripts/generate-secrets.mjs",
     "relay:dev": "npm run relay:worker:dev",
@@ -24,7 +26,7 @@
     "env:vercel": "node scripts/create-vercel-env.mjs",
     "test": "node scripts/transpile-tests.mjs && node scripts/build-test.mjs && node --test --test-concurrency=1 tests/*.test.mjs",
     "lint": "eslint . --ignore-pattern .next --ignore-pattern node_modules",
-    "check": "npm run lint && npm run typecheck && npm run relay:test && npm test",
+    "check": "npm run scopes:check && npm run lint && npm run typecheck && npm run relay:test && npm test",
     "typecheck": "tsc --noEmit && npm run relay:build",
     "relay:smoke": "npm run relay:build && node scripts/relay-smoke.mjs"
   },
