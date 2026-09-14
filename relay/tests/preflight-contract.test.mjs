@@ -284,12 +284,13 @@ test("standalone relay satisfies the same backup.preflight Host contract", async
     }));
     assert.equal(f.browser.socket.sent.some((message) => message.code === "SCOPE_DENIED"), false);
     const queued = f.browser.socket.sent.find((message) => message.type === "dashboard.action_queued");
-    assert.equal(queued?.agentKind, "HOST");
+    assert.equal(queued?.requestId, requestId);
     const requestEnvelope = f.hostSocket.sent.find((message) => message.type === "action.request");
     assert.ok(requestEnvelope, "standalone Host must receive action.request");
     const request = decodeEnvelope(JSON.stringify(requestEnvelope)).body;
     assert.equal(request.requestId, requestId);
     assert.equal(request.action, "backup.preflight");
+    assert.equal(request.deviceId, f.device.deviceId);
 
     const result = await signEnvelope("action.result", f.serverId, {
       requestId,
@@ -306,6 +307,7 @@ test("standalone relay satisfies the same backup.preflight Host contract", async
     const success = f.browser.socket.sent.find((message) => message.eventType === "action.result");
     assert.equal(success?.body?.status, "SUCCESS");
     assert.equal(success?.body?.requestId, requestId);
+    assert.equal(success?.body?.data?.backupRootWritable, true);
     assert.equal(f.other.socket.sent.some((message) => message.eventType === "action.result"), false);
   } finally {
     clearTimeout(f.hostSession.authTimer);
