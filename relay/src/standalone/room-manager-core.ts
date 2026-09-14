@@ -393,6 +393,17 @@ export class Room {
     }
     if (envelope.type === "access.sync") {
       this.applyAccessSync(session, body);
+      if (session.kind === "PAPER")
+        await this.sendToAgent("HOST", "access.authority.sync", body);
+      this.counters.messagesAccepted += 1;
+      return;
+    }
+    if (envelope.type === "access.authority.sync")
+      throw new Error("Only relay emits Host authorization snapshots");
+    if (envelope.type === "access.authority.request") {
+      if (session.kind !== "HOST") throw new Error("Only Host requests access authority refresh");
+      if (Object.keys(body).length !== 0) throw new Error("Invalid access authority request");
+      await this.sendToAgent("PAPER", "access.authority.request", {});
       this.counters.messagesAccepted += 1;
       return;
     }

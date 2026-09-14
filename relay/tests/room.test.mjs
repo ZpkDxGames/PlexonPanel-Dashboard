@@ -686,3 +686,62 @@ test("malformed claims fail closed without throwing", () => {
     false,
   );
 });
+
+
+test("Paper access sync is mirrored to Host and Host can request a refresh", async () => {
+  const f = await fixture();
+  const paper = await attach(f, "PAPER");
+  const host = await attach(f, "HOST");
+  paper.socket.sent.length = 0;
+  host.socket.sent.length = 0;
+
+  const snapshot = {
+    protocolVersion: 3,
+    serverId: f.serverId,
+    generation: 7,
+    revision: 2,
+    devices: [f.d],
+  };
+  await paper.send("access.sync", snapshot);
+  const mirroredEnvelope = host.socket.sent.find((message) => message.type === "access.authority.sync");
+  assert.ok(mirroredEnvelope, "Host must receive the validated Paper access snapshot");
+  const mirrored = decodeEnvelope(JSON.stringify(mirroredEnvelope)).body;
+  assert.equal(mirrored.serverId, f.serverId);
+  assert.equal(mirrored.generation, 7);
+  assert.equal(mirrored.revision, 2);
+  assert.equal(mirrored.devices[0].deviceId, f.d.deviceId);
+
+  paper.socket.sent.length = 0;
+  await host.send("access.authority.request", {});
+  const refreshEnvelope = paper.socket.sent.find((message) => message.type === "access.authority.request");
+  assert.ok(refreshEnvelope, "Paper must receive Host's refresh request");
+  assert.deepEqual(decodeEnvelope(JSON.stringify(refreshEnvelope)).body, {});
+});
+
+test("Paper cannot forge Host authorization control messages and access sync tolerates Host offline", async () => {
+  const f = await fixture();
+  const paper = await attach(f, "PAPER");
+  await paper.send("access.sync", {
+    protocolVersion: 3,
+    serverId: f.serverId,
+    generation: 7,
+    revision: 2,
+    devices: [f.d],
+  });
+  assert.equal(paper.socket.closed, null);
+  assert.equal((await f.st.storage.get("room-metadata")).revision, 2);
+
+  await paper.send("access.authority.request", {});
+  assert.equal(paper.socket.closed?.code, 4008);
+
+  const other = await fixture();
+  const paper2 = await attach(other, "PAPER");
+  await paper2.send("access.authority.sync", {
+    protocolVersion: 3,
+    serverId: other.serverId,
+    generation: 7,
+    revision: 2,
+    devices: [other.d],
+  });
+  assert.equal(paper2.socket.closed?.code, 4008);
+});

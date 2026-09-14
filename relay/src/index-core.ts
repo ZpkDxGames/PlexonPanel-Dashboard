@@ -931,6 +931,16 @@ export class ServerRoom {
       this.closeInvalid(m);
       await this.scheduleExpiry(m);
       await this.broadcastReady(m);
+      if (a.kind === "PAPER")
+        await this.sendToAgent("HOST", "access.authority.sync", body);
+      return;
+    }
+    if (envelope.type === "access.authority.sync")
+      throw new Error("Only relay emits Host authorization snapshots");
+    if (envelope.type === "access.authority.request") {
+      if (a.kind !== "HOST") throw new Error("Only Host requests access authority refresh");
+      if (Object.keys(body).length !== 0) throw new Error("Invalid access authority request");
+      await this.sendToAgent("PAPER", "access.authority.request", {});
       return;
     }
     if (envelope.type === "backup.coordination") {
@@ -1479,7 +1489,7 @@ function protocolRejectionCode(
     )
   )
     return "INVALID_EVENT";
-  if (/pairing|only paper issues|only paper approves/i.test(message))
+  if (/pairing|only paper issues|only paper approves|access authority|only relay emits host authorization/i.test(message))
     return "INVALID_EVENT";
   if (
     /envelope|timestamp|message id|missing|required|expected|invalid .*field|too large/i.test(
