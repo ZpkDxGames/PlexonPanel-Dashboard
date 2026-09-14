@@ -1,24 +1,60 @@
-# PlexonPanel Dashboard — Backups & Maintenance
+# PlexonPanel Dashboard — Step 8 Backups & Maintenance
 
-This release completes the production Backups workspace for the matched PlexonPanel maintenance control plane while keeping protocol generation 3.
+This release finalizes the production manual full-backup control surface for the matched PlexonPanel Host control plane while retaining signed Protocol 3 compatibility.
 
-## Highlights
+## Final operator experience
 
-- Replaced the presentation-only Backups scaffold with the real **Backups & Maintenance** workspace.
-- Added persisted restart and full restore-point schedule editing backed by the Host Companion.
-- Added next-run visibility, current maintenance phase, backup progress, backup inventory, verification state, local/off-site copy state, provider health, and recovery-required presentation.
-- Added manual **Restart now**, **Create live snapshot**, **Create full restore point**, **Verify**, **Retry upload**, **Restore**, **Delete**, and **Test Google Drive** controls with capability gating.
-- Added Google Drive/rclone status without exposing Host credentials, config contents, or arbitrary remote command arguments to the browser.
-- Added typed server-name restore confirmation and retained the existing 64 MiB browser archive download ceiling.
-- Added responsive Backups-specific layout for desktop and narrow workspaces without global interface scaling.
-- Added synchronized browser/relay maintenance and provider scopes and high-risk confirmation coverage for derived destructive actions.
+The Backups workspace now has one primary backup action: **Fully Backup Now**.
 
-## Matched Host/Paper behavior
+Automatic backups are retired. Full backup creation is manually initiated through **Fully Backup Now** and executed by the always-on Host Companion. Live-snapshot creation and automatic full-backup scheduling are not exposed as supported product behavior.
 
-The Dashboard does not create archives or control systemd directly. The matched PlexonPanel Paper/Host release owns maintenance execution: Paper coordinates countdown/save flushing; Host owns calendar scheduling, cold full restore points, SHA-256 verification, local retention, rclone staging/promotion, retry upload, restore journals, emergency pre-restore backups, systemd lifecycle, and authenticated Paper reconnect checks.
+The Dashboard:
 
-Full restore remains Owner-enforced by the Host. Migrated installations keep destructive schedules disabled until explicitly configured.
+- automatically requests authoritative Host preflight state;
+- blocks **Fully Backup Now** when the Host/device/service/RCON/storage/recovery state is not safe;
+- requires an explicit destructive-maintenance confirmation;
+- explains the mandatory 30-minute warning period, final `save-all flush`, cold shutdown, local verification, Google Drive/rclone upload/verification and automatic restart;
+- reconstructs the current durable Host job after refresh/reconnect;
+- displays Host-owned countdown fields rather than creating a browser-authoritative timer;
+- matches live archive/upload progress to the current durable job ID before displaying it;
+- shows local and remote verification state, safe error data, degraded state and recovery-required state;
+- exposes **Retry Upload** for a verified local backup without another Minecraft shutdown;
+- keeps restore as a separate destructive workflow;
+- keeps restart-only scheduling as an independent maintenance feature.
+
+Paper connection is informative only. The Paper plugin is not a prerequisite for the full-backup critical path.
+
+## Supported restore-point actions
+
+Depending on the current device grant and Host capabilities, the workspace exposes:
+
+- **Verify**;
+- **Retry Upload**;
+- **Restore**;
+- **Delete**;
+- **Test Google Drive**.
+
+Google Drive/rclone credentials and configuration contents remain Host-local and are never exposed to browser state.
+
+## Matched Host behavior
+
+The matched Host release owns:
+
+- durable maintenance job state;
+- warning countdown and Host-local RCON/player notices;
+- affirmative final save requirement;
+- systemd stop proof independent of Paper websocket state;
+- cold `.partial` archive staging and local verification;
+- SHA-256/metadata persistence;
+- Google Drive/rclone staging, promotion and final verification;
+- degraded/retry policy that preserves the local backup and previous known-good remote copy;
+- mandatory Minecraft service recovery whenever the manual backup workflow stopped the service;
+- Host-owned authorization mirror and journald console history inherited from Steps 6–7.
+
+Legacy `restartAfter` may remain serialized for rolling-upgrade compatibility, but it is presented as **Required** and cannot disable automatic recovery after a manual full backup.
 
 ## Validation
 
-Canonical Dashboard CI runs lint, TypeScript validation, relay build/tests, application tests, relay smoke validation, and a production Next.js build. Production deployment must use the final merged `main` candidate and must not expose rclone/OAuth secrets.
+Canonical Dashboard CI runs scope-contract validation, lint, TypeScript validation, relay build/tests, application tests, relay smoke checks, standalone relay packaging and a production Next.js build.
+
+Repository CI is not production certification. Real VPS/systemd/RCON/rclone, browser reconnect and degraded-provider fault-injection gates must be recorded separately and must not be marked passed unless they were actually executed.

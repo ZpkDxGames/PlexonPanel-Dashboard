@@ -57,7 +57,9 @@ type FailureRecord = {
 
 type ReadinessState = "Ready" | "Warning" | "Failed" | "Unknown" | "Not configured";
 
-const FAILURE_KEY = "plexonpanel.backup.last-safe-failure.v1";
+type PhaseDefinition = { key: string; label: string };
+
+const FAILURE_KEY = "plexonpanel.backup.last-safe-failure.v2";
 const DAYS = [
   "MONDAY",
   "TUESDAY",
@@ -67,21 +69,22 @@ const DAYS = [
   "SATURDAY",
   "SUNDAY",
 ];
-const PHASES = [
-  "QUEUED",
-  "PREFLIGHT",
-  "COUNTDOWN",
-  "FINAL_SAVE",
-  "STOPPING_SERVER",
-  "WAITING_FOR_STOP",
-  "ARCHIVING",
-  "VERIFYING_LOCAL",
-  "UPLOADING_REMOTE",
-  "VERIFYING_REMOTE",
-  "STARTING_SERVER",
-  "VERIFYING_STARTUP",
-  "COMPLETED",
+const PHASES: PhaseDefinition[] = [
+  { key: "QUEUED", label: "Queued" },
+  { key: "PREFLIGHT", label: "Preflight" },
+  { key: "COUNTDOWN", label: "30-minute warning period" },
+  { key: "FINAL_SAVE", label: "Saving server" },
+  { key: "STOPPING_SERVER", label: "Stopping Minecraft" },
+  { key: "WAITING_FOR_STOP", label: "Confirming shutdown" },
+  { key: "ARCHIVING", label: "Creating backup" },
+  { key: "VERIFYING_LOCAL", label: "Verifying local backup" },
+  { key: "UPLOADING_REMOTE", label: "Uploading to Google Drive" },
+  { key: "VERIFYING_REMOTE", label: "Verifying Google Drive backup" },
+  { key: "STARTING_SERVER", label: "Starting Minecraft" },
+  { key: "VERIFYING_STARTUP", label: "Checking readiness" },
+  { key: "COMPLETED", label: "Complete" },
 ];
+const TERMINAL_PHASES = new Set(["COMPLETED", "DEGRADED", "FAILED"]);
 
 function parseSchedule(value: unknown, fallback: ScheduleDraft): ScheduleDraft {
   const raw = record(value);
@@ -119,8 +122,6 @@ function parseSettings(value: unknown): SettingsDraft {
         typeof restart.startupTimeoutSeconds === "number" ? restart.startupTimeoutSeconds : 180,
     },
     fullRestorePoint: {
-      // Step 5 is manual-full-only. The legacy field is retained only for wire compatibility and
-      // is forced disabled before every settings update.
       schedule: parseSchedule(full.schedule, {
         enabled: false,
         type: "WEEKLY",
@@ -129,7 +130,7 @@ function parseSettings(value: unknown): SettingsDraft {
       }),
       retentionMode: full.retentionMode === "ROTATING" ? "ROTATING" : "SINGLE_CURRENT",
       retentionCount: typeof full.retentionCount === "number" ? full.retentionCount : 1,
-      restartAfter: full.restartAfter !== false,
+      restartAfter: true,
       canonicalFilename: str(full.canonicalFilename, "PlexonCraft-Latest.zip"),
       uploadTimeoutSeconds:
         typeof full.uploadTimeoutSeconds === "number" ? full.uploadTimeoutSeconds : 1800,
@@ -259,10 +260,31 @@ function listStrings(value: unknown, limit = 16): string[] {
     : [];
 }
 
+function booleanState(value: unknown): ReadinessState {
+  return value === true ? "Ready" : value === false ? "Failed" : "Unknown";
+}
+
+function phaseLabel(phase: string): string {
+  if (phase === "DEGRADED") return "Degraded — retry upload available";
+  if (phase === "RECOVERY_REQUIRED") return "Recovery required";
+  if (phase === "FAILED") return "Failed";
+  return PHASES.find((entry) => entry.key === phase)?.label ?? phase.replaceAll("_", " ").toLowerCase();
+}
+
+function formatCountdown(value: number | null): string {
+  if (value === null) return "Host countdown unavailable";
+  const seconds = Math.max(0, Math.floor(value));
+  const minutes = Math.floor(seconds / 60);
+  return `${minutes}:${String(seconds % 60).padStart(2, "0")}`;
+}
+
 export function BackupsView30(props: ViewProps) {
   const hostConnected = Boolean(props.state.ready?.agents.host);
+  const paperConnected = Boolean(props.state.ready?.agents.paper);
   const canMaintenance = props.can("maintenance.status", "HOST");
   const canBackups = props.can("backup.full.list", "HOST");
+  const canPreflight = props.can("backup.preflight", "HOST");
+  const canRunFullBackup = props.can("maintenance.full-backup.create", "HOST");
 
   const status = useQuery(
     "maintenance.status",
@@ -288,11 +310,16 @@ export function BackupsView30(props: ViewProps) {
     hostConnected && props.can("provider.status", "HOST"),
     "HOST",
   );
+  const preflight = useQuery(
+    "backup.preflight",
+    {},
+    hostConnected && canPreflight,
+    "HOST",
+  );
 
-  const [diagnosticsData, setDiagnosticsData] = useState<JsonMap | null>(null);
-  const [diagnosticsAt, setDiagnosticsAt] = useState(0);
   const [draft, setDraft] = useState<SettingsDraft | null>(null);
   const [dirty, setDirty] = useState(false);
+  const [confirmBackup, setConfirmBackup] = useState(false);
   const [localError, setLocalError] = useState("");
   const [lastFailure, setLastFailure] = useState<FailureRecord | null>(null);
   const [restore, setRestore] = useState<{
@@ -343,10 +370,69 @@ export function BackupsView30(props: ViewProps) {
     [settingsQuery.hasSuccess, settingsQuery.data.settings],
   );
   const activeDraft = draft ?? persistedDraft;
-  const diagnostics = diagnosticsData ?? {};
   const provider = providerQuery.hasSuccess ? providerQuery.data : {};
   const operation = status.hasSuccess ? record(status.data.currentOperation) : {};
-  const progress = props.state.backupProgress;
+  const operationPhase = str(operation.phase, "");
+  const operationJobId = str(operation.jobId, "");
+  const operationTerminal = TERMINAL_PHASES.has(operationPhase);
+  const operationBlocking = Boolean(operationJobId) && (!operationTerminal || operationPhase === "RECOVERY_REQUIRED");
+  const rawProgress = props.state.backupProgress;
+  const progress =
+    rawProgress && operationJobId && str(rawProgress.jobId, "") === operationJobId
+      ? rawProgress
+      : null;
+  const displayedPhase = str(progress?.phase, operationPhase);
+  const currentIndex = PHASES.findIndex((entry) => entry.key === displayedPhase);
+  const service = props.state.service;
+  const serviceState = str(service.state, "unknown").toLowerCase();
+  const serviceKnown = ["active", "inactive", "failed"].includes(serviceState);
+  const minecraftOnline = serviceState === "active";
+  const commandConfigured = preflight.data.commandChannelConfigured === true;
+  const minecraftReady = service.minecraftReady === true;
+  const commandReady = !minecraftOnline || (commandConfigured && minecraftReady);
+  const providerState = str(provider.status, "UNKNOWN");
+  const providerConfigured = provider.configured === true;
+  const recoveryKnown = status.hasSuccess || fullQuery.hasSuccess || preflight.hasSuccess;
+  const recoveryRequired =
+    operationPhase === "RECOVERY_REQUIRED" ||
+    operation.restartRecoveryRequired === true ||
+    status.data.jobRecoveryRequired === true ||
+    status.data.restoreRecoveryRequired === true ||
+    fullQuery.data.recoveryRequired === true ||
+    preflight.data.recoveryRequired === true ||
+    service.recoveryRequired === true;
+  const preflightReady =
+    preflight.hasSuccess &&
+    preflight.data.hostAuthenticated === true &&
+    preflight.data.operationBusy !== true &&
+    preflight.data.recoveryRequired !== true &&
+    preflight.data.backupRootWritable === true &&
+    serviceKnown &&
+    commandReady;
+  const actionReady =
+    hostConnected &&
+    canRunFullBackup &&
+    preflightReady &&
+    !operationBlocking &&
+    !recoveryRequired;
+
+  const fullBackups = fullQuery.hasSuccess ? records(fullQuery.data.backups, 1000) : [];
+  const lastLocal = fullBackups.find((backup) => backup.local === true);
+  const lastRemote = fullBackups.find((backup) => backup.offsite === true);
+  const unreadable = number(preflight.data.unreadableDurableCount);
+  const missingIncludes = listStrings(preflight.data.missingIncludes);
+  const symlinkIssues = listStrings(preflight.data.symlinkIssues);
+  const countdownRemaining = number(status.data.countdownRemainingSeconds);
+  const localVerified = operation.localBackupVerified === true;
+  const remoteVerified = operation.remoteBackupVerified === true;
+  const warnings = listStrings(progress?.warnings ?? operation.warnings);
+  const progressRatio = number(progress?.progress);
+  const progressPercent =
+    progressRatio !== null
+      ? Math.min(100, Math.round(progressRatio * 100))
+      : number(operation.progressPercent);
+  const progressBytes = progress?.bytesUploaded ?? progress?.bytes;
+  const progressTotal = progress?.totalBytes;
 
   const captureFailure = (action: string, error: unknown) => {
     const data = error instanceof ActionError ? error.data : {};
@@ -356,13 +442,13 @@ export function BackupsView30(props: ViewProps) {
       status: error instanceof ActionError ? error.status : "FAILED",
       code: error instanceof ActionError ? error.code : "CLIENT_ERROR",
       phase: str(data.phase, "UNKNOWN"),
-      message:
-        error instanceof Error ? error.message : "The operation could not be completed.",
+      message: error instanceof Error ? error.message : "The operation could not be completed.",
       safeRelativePath: str(data.safeRelativePath, ""),
       retryable: data.retryable === true,
       timestamp: new Date().toISOString(),
     };
     setLastFailure(safe);
+    setLocalError(safe.message);
     try {
       window.sessionStorage.setItem(FAILURE_KEY, JSON.stringify(safe));
     } catch {
@@ -380,72 +466,13 @@ export function BackupsView30(props: ViewProps) {
     }
   };
 
-  const runDiagnostics = async () => {
-    const result = await runOperation("backup.preflight", {});
-    setDiagnosticsData(result.data);
-    setDiagnosticsAt(Date.now());
-  };
-
   const refreshAll = () => {
     status.refresh();
     settingsQuery.refresh();
     fullQuery.refresh();
     providerQuery.refresh();
+    preflight.refresh();
   };
-
-  if (!hostConnected)
-    return (
-      <Empty title="Backups & Maintenance needs the Host companion">
-        Manual full backups remain Host-authoritative and do not require the Paper plugin to stay online.
-      </Empty>
-    );
-
-  if (!canBackups && !canMaintenance)
-    return (
-      <Empty title="Backups & Maintenance is unavailable">
-        Your device or Host policy does not grant the required view capabilities.
-      </Empty>
-    );
-
-  const unreadable = number(diagnostics.unreadableDurableCount);
-  const missingIncludes = listStrings(diagnostics.missingIncludes);
-  const symlinkIssues = listStrings(diagnostics.symlinkIssues);
-  const providerState = str(provider.status, "UNKNOWN");
-  const providerConfigured = provider.configured === true;
-  const providerReadiness: ReadinessState = !providerQuery.hasSuccess
-    ? "Unknown"
-    : providerState === "LOCAL"
-      ? "Not configured"
-      : providerState === "CONNECTED"
-        ? "Ready"
-        : providerState === "DEGRADED" || providerState === "ERROR"
-          ? "Failed"
-          : providerState === "CONFIGURED_UNTESTED"
-            ? "Warning"
-            : "Unknown";
-  const readReadiness: ReadinessState = !diagnosticsData
-    ? "Unknown"
-    : (unreadable ?? 0) > 0 || symlinkIssues.length > 0
-      ? "Failed"
-      : missingIncludes.length > 0
-        ? "Warning"
-        : "Ready";
-  const storageReadiness: ReadinessState = !diagnosticsData
-    ? "Unknown"
-    : diagnostics.backupRootWritable === true
-      ? "Ready"
-      : "Failed";
-  const recoveryKnown = status.hasSuccess || fullQuery.hasSuccess;
-  const recoveryRequired =
-    status.data.jobRecoveryRequired === true ||
-    status.data.restoreRecoveryRequired === true ||
-    fullQuery.data.recoveryRequired === true ||
-    diagnostics.recoveryRequired === true;
-
-  const fullBackups = records(fullQuery.data.backups, 1000);
-  const currentPhase = str(progress?.phase, str(operation.phase, ""));
-  const currentIndex = PHASES.indexOf(currentPhase);
-  const warnings = listStrings(progress?.warnings ?? operation.warnings);
 
   const startRestore = async (backupId: string) => {
     const result = await runOperation("backup.full.restore.prepare", { backupId });
@@ -457,206 +484,258 @@ export function BackupsView30(props: ViewProps) {
     });
   };
 
+  const readinessReason = !hostConnected
+    ? "Host Companion is disconnected."
+    : !canRunFullBackup
+      ? "This device does not have maintenance.run."
+      : recoveryRequired
+        ? "Host recovery is required before another destructive operation."
+        : operationBlocking
+          ? "Another destructive Host operation is active."
+          : !preflight.hasSuccess
+            ? preflight.error || "Host preflight has not completed successfully."
+            : !serviceKnown
+              ? "Minecraft service state is not in a stable controllable state."
+              : !commandReady
+                ? "The Host command channel / RCON readiness check is not ready while Minecraft is online."
+                : !preflightReady
+                  ? "Host preflight is not ready."
+                  : "Host preflight passed. The 30-minute countdown will begin only after confirmation.";
+
+  if (!hostConnected)
+    return (
+      <Empty title="Backups & Maintenance needs the Host Companion">
+        Fully Backup Now is Host-authoritative. Paper is informative only and is not required for the backup critical path.
+      </Empty>
+    );
+
+  if (!canBackups && !canMaintenance)
+    return (
+      <Empty title="Backups & Maintenance is unavailable">
+        Your device or Host policy does not grant the required view capabilities.
+      </Empty>
+    );
+
+  const providerReadiness: ReadinessState = !providerQuery.hasSuccess
+    ? "Unknown"
+    : providerState === "CONNECTED"
+      ? "Ready"
+      : providerState === "CONFIGURED_UNTESTED"
+        ? "Warning"
+        : providerConfigured
+          ? "Failed"
+          : "Not configured";
+  const storageReadiness: ReadinessState = !preflight.hasSuccess
+    ? preflight.error
+      ? "Failed"
+      : "Unknown"
+    : preflight.data.backupRootWritable === true
+      ? "Ready"
+      : "Failed";
+  const filesystemReadiness: ReadinessState = !preflight.hasSuccess
+    ? preflight.error
+      ? "Failed"
+      : "Unknown"
+    : (unreadable ?? 0) > 0 || symlinkIssues.length > 0
+      ? "Failed"
+      : missingIncludes.length > 0
+        ? "Warning"
+        : "Ready";
+
   return (
     <div className="cr30-backups-stack">
       <div className="cr21-page-toolbar cr30-backup-toolbar">
         <div>
           <strong>Backups & Maintenance</strong>
-          <span>Manual full backups, Host-owned maintenance state and off-site verification.</span>
+          <span>Host-authoritative manual full backups, restore points and recovery.</span>
         </div>
         <div className="cr-actions">
           <Badge tone="green">Host connected</Badge>
+          <Badge tone={paperConnected ? "green" : "quiet"}>Paper {paperConnected ? "online" : "offline"}</Badge>
           <Badge tone="cyan">Manual full backup only</Badge>
           <button className="cr-button" onClick={refreshAll}>Refresh</button>
         </div>
       </div>
 
       {queryAlert("Maintenance status unavailable", status)}
+      {queryAlert("Host backup preflight failed", preflight)}
       {queryAlert("Full restore-point inventory unavailable", fullQuery)}
       {queryAlert("Provider status unavailable", providerQuery)}
       {localError && <p className="cr-alert" role="alert">{localError}</p>}
 
-      <Panel
-        title="Backup readiness"
-        aside={
-          props.can("backup.preflight", "HOST") ? (
-            <ActionButton onClick={runDiagnostics}>Run backup diagnostics</ActionButton>
-          ) : undefined
-        }
-      >
+      {recoveryRequired && (
+        <div className="cr-step8-recovery" role="alert">
+          <div>
+            <strong>Recovery required</strong>
+            <span>A previous destructive operation is unresolved. New backups are blocked until Host recovery is completed.</span>
+          </div>
+          <Badge tone="red">Blocked</Badge>
+        </div>
+      )}
+
+      <Panel title="Backup readiness" aside={<Badge tone={actionReady ? "green" : "amber"}>{actionReady ? "Ready" : "Not ready"}</Badge>}>
         <div className="cr341-readiness-grid">
           <ReadinessItem
-            label="Host companion"
+            label="Host Companion"
             state="Ready"
-            detail="Authenticated Host control plane is connected and owns the full workflow."
+            detail="Connected and authoritative for lifecycle, backup state, provider work and recovery."
           />
           <ReadinessItem
-            label="Paper dependency"
-            state="Ready"
-            detail="Paper is not required for backup countdown, save flush, stop/start, archive, upload or recovery."
+            label="maintenance.run"
+            state={canRunFullBackup ? "Ready" : "Failed"}
+            detail={canRunFullBackup ? "This device may start manual full maintenance." : "Required scope is not granted."}
+          />
+          <ReadinessItem
+            label="Minecraft / systemd"
+            state={serviceKnown ? "Ready" : serviceState === "unknown" ? "Unknown" : "Warning"}
+            detail={`Service state: ${serviceState}${service.pid ? ` · PID ${String(service.pid)}` : ""}`}
+          />
+          <ReadinessItem
+            label="Command channel / RCON"
+            state={!minecraftOnline ? "Ready" : booleanState(commandConfigured && minecraftReady)}
+            detail={!minecraftOnline ? "Not required while Minecraft is already stopped." : commandReady ? "Host command channel and readiness probe are healthy." : "Required before warning/save/shutdown while Minecraft is online."}
           />
           <ReadinessItem
             label="Backup storage"
             state={storageReadiness}
-            detail={
-              diagnosticsData
-                ? diagnostics.backupRootWritable === true
-                  ? `${bytes(diagnostics.backupRootUsableBytes)} usable`
-                  : "Configured backup root is not writable."
-                : "Run backup diagnostics to verify storage."
-            }
+            detail={preflight.hasSuccess ? `${bytes(preflight.data.usableBytes ?? preflight.data.backupRootUsableBytes)} usable · ${bytes(preflight.data.requiredBytes)} required` : "Host preflight must verify writable storage and free space."}
           />
           <ReadinessItem
             label="Filesystem read contract"
-            state={readReadiness}
-            detail={
-              diagnosticsData
-                ? `${unreadable ?? 0} unreadable durable · ${missingIncludes.length} missing includes · ${number(diagnostics.volatileExcludedCount) ?? 0} volatile excluded`
-                : "Run backup diagnostics to verify the cold-archive source tree."
-            }
+            state={filesystemReadiness}
+            detail={preflight.hasSuccess ? `${unreadable ?? 0} unreadable · ${missingIncludes.length} missing includes · ${symlinkIssues.length} symlink issues` : "Host preflight scans the durable source tree."}
           />
           <ReadinessItem
-            label="Systemd control"
-            state={
-              !diagnosticsData
-                ? "Unknown"
-                : str(diagnostics.serviceState, "unknown").toLowerCase() === "active"
-                  ? "Ready"
-                  : "Warning"
-            }
-            detail={
-              diagnosticsData
-                ? `Minecraft service: ${str(diagnostics.serviceState, "unknown")}`
-                : "No destructive service test is run automatically."
-            }
-          />
-          <ReadinessItem
-            label="Off-site provider"
+            label="Google Drive / rclone"
             state={providerReadiness}
-            detail={
-              providerQuery.hasSuccess
-                ? providerState === "LOCAL"
-                  ? "Running Host explicitly reports LOCAL."
-                  : `${str(provider.provider, "RCLONE")} · ${str(provider.remote, "remote label unavailable")}`
-                : "Provider truth is unavailable; LOCAL is not inferred."
-            }
+            detail={preflight.hasSuccess ? `${str(preflight.data.provider, str(provider.provider, "RCLONE"))} · ${str(preflight.data.providerStatus, providerState)} · ${str(preflight.data.remote, str(provider.remote, "remote unavailable"))}` : providerConfigured ? `Configured · ${providerState}` : "Provider is not confirmed ready."}
           />
           <ReadinessItem
-            label="Recovery"
-            state={!recoveryKnown && !diagnosticsData ? "Unknown" : recoveryRequired ? "Failed" : "Ready"}
-            detail={
-              recoveryRequired
-                ? "Host recovery must be resolved before destructive operations."
-                : recoveryKnown || diagnosticsData
-                  ? "No recovery requirement reported."
-                  : "Recovery state unavailable."
-            }
-          />
-          <ReadinessItem
-            label="Backup scheduling"
-            state="Ready"
-            detail="No automatic backup schedule is active. Full backups start only from an explicit operator action."
+            label="Recovery / conflicts"
+            state={!recoveryKnown ? "Unknown" : recoveryRequired ? "Failed" : operationBlocking ? "Warning" : "Ready"}
+            detail={recoveryRequired ? "Resolve Host recovery before continuing." : operationBlocking ? `Current operation: ${phaseLabel(operationPhase)}` : "No blocking destructive operation reported."}
           />
         </div>
-        {diagnosticsAt > 0 && (
-          <p className="cr-hint cr30-backup-preview-note">
-            Diagnostics last ran {new Date(diagnosticsAt).toLocaleString()}. Provider reachability is checked separately.
-          </p>
-        )}
-        {missingIncludes.length > 0 && (
-          <p className="cr-alert" role="alert">
-            Missing configured includes: {missingIncludes.join(", ")}
-          </p>
-        )}
+        <div className="cr-step8-readiness-footer">
+          <span>{readinessReason}</span>
+          {canPreflight && <ActionButton onClick={async () => preflight.refresh()}>Re-run Host preflight</ActionButton>}
+        </div>
       </Panel>
 
+      <Panel title="Fully Backup Now" className="cr-step8-primary-panel" aside={<Badge tone="cyan">Manual · Host-owned</Badge>}>
+        <div className="cr-step8-primary">
+          <div>
+            <strong>Create a verified cold full-server restore point.</strong>
+            <p>
+              The Host owns the 30-minute warning period, final save flush, systemd stop proof, local archive verification, Google Drive promotion and automatic Minecraft restart. Closing this browser does not cancel the job.
+            </p>
+            <small>{readinessReason}</small>
+          </div>
+          <button
+            className="cr-button danger cr-step8-primary-button"
+            disabled={!actionReady}
+            onClick={() => setConfirmBackup(true)}
+          >
+            Fully Backup Now
+          </button>
+        </div>
+      </Panel>
+
+      {operationJobId && (
+        <Panel
+          title={operationTerminal ? "Latest Host operation" : "Active Host operation"}
+          aside={
+            <Badge tone={operationPhase === "DEGRADED" ? "amber" : operationPhase === "FAILED" || operationPhase === "RECOVERY_REQUIRED" ? "red" : operationTerminal ? "green" : "cyan"}>
+              {phaseLabel(displayedPhase || operationPhase)}
+            </Badge>
+          }
+        >
+          <div className="cr341-phase-list" aria-label="Backup operation phases">
+            {PHASES.map((phase, index) => {
+              const effectiveIndex = currentIndex < 0 ? PHASES.findIndex((entry) => entry.key === operationPhase) : currentIndex;
+              const state = effectiveIndex < 0 ? "pending" : index < effectiveIndex ? "done" : index === effectiveIndex ? "active" : "pending";
+              return (
+                <div className={`cr341-phase ${state}`} key={phase.key}>
+                  <span aria-hidden>{state === "done" ? "✓" : state === "active" ? "●" : "○"}</span>
+                  <strong>{phase.label}</strong>
+                </div>
+              );
+            })}
+          </div>
+          <dl className="cr30-provider-list">
+            <div><dt>Job ID</dt><dd>{operationJobId}</dd></div>
+            <div><dt>Current phase</dt><dd>{phaseLabel(displayedPhase || operationPhase)}</dd></div>
+            <div><dt>Phase started</dt><dd>{time(operation.phaseTimestamp)}</dd></div>
+            <div><dt>Job started</dt><dd>{time(operation.startedAt)}</dd></div>
+            {operationPhase === "COUNTDOWN" && <div><dt>Host countdown remaining</dt><dd>{formatCountdown(countdownRemaining)}</dd></div>}
+            {operationPhase === "COUNTDOWN" && <div><dt>Host countdown deadline</dt><dd>{time(status.data.countdownDeadline)}</dd></div>}
+            <div><dt>Progress</dt><dd>{progressPercent === null ? "Host has not reported a percentage" : `${progressPercent}%`}</dd></div>
+            <div><dt>Transferred / archived</dt><dd>{progress ? `${bytes(progressBytes)} / ${bytes(progressTotal)}` : "No live byte counter reported for this phase"}</dd></div>
+            <div><dt>Local verification</dt><dd>{localVerified ? "Verified" : operationTerminal ? "Not verified" : "Pending"}</dd></div>
+            <div><dt>Remote verification</dt><dd>{remoteVerified ? "Verified" : operationPhase === "DEGRADED" ? "Not current — retryable" : operationTerminal ? "Not verified" : "Pending"}</dd></div>
+            <div><dt>Result</dt><dd>{str(operation.result, operationTerminal ? operationPhase : "In progress")}</dd></div>
+            <div><dt>Error code</dt><dd>{str(operation.errorCode, "—") || "—"}</dd></div>
+            <div><dt>Safe message</dt><dd>{str(operation.errorMessage, "—") || "—"}</dd></div>
+          </dl>
+          {warnings.length > 0 && <p className="cr-alert">Warnings: {warnings.join(" · ")}</p>}
+          {operationPhase === "DEGRADED" && (
+            <div className="cr-step8-degraded">
+              <div>
+                <strong>Local backup verified; off-site copy is not current.</strong>
+                <span>Minecraft availability has been restored. Retry Upload does not stop Minecraft again.</span>
+              </div>
+              {str(operation.backupId, "") && props.can("backup.full.retry-upload", "HOST") && (
+                <ActionButton
+                  onClick={async () => {
+                    await runOperation("backup.full.retry-upload", { backupId: str(operation.backupId) });
+                    refreshAll();
+                    props.notice("Google Drive upload retry completed.");
+                  }}
+                >Retry Upload</ActionButton>
+              )}
+            </div>
+          )}
+          <p className="cr-hint cr30-backup-preview-note">
+            This state is reconstructed from the durable Host job. Live byte progress is shown only when the event job ID matches this job; no ETA is invented.
+          </p>
+        </Panel>
+      )}
+
       <div className="cr30-backup-columns">
-        <Panel title="Non-disruptive actions" aside={<Badge>Server remains online</Badge>}>
-          <div className="cr30-backup-actions">
-            {props.can("backup.preflight", "HOST") && (
-              <ActionButton onClick={runDiagnostics}>Run backup diagnostics</ActionButton>
-            )}
+        <Panel title="Provider & diagnostics" aside={<Badge tone={readinessTone(providerReadiness)}>{providerReadiness}</Badge>}>
+          <dl className="cr30-provider-list">
+            <div><dt>Provider</dt><dd>{providerQuery.hasSuccess ? str(provider.provider, "Unknown") : "Unknown"}</dd></div>
+            <div><dt>Remote</dt><dd>{providerQuery.hasSuccess ? str(provider.remote, providerConfigured ? "Unavailable" : "Not configured") : "Unavailable"}</dd></div>
+            <div><dt>Runtime state</dt><dd>{providerQuery.hasSuccess ? providerState : "UNKNOWN"}</dd></div>
+            <div><dt>Last test</dt><dd>{providerQuery.hasSuccess ? time(provider.lastTestAt) : "—"}</dd></div>
+            <div><dt>Last remote verification</dt><dd>{providerQuery.hasSuccess ? time(provider.lastSuccessfulVerificationAt) : lastRemote ? time(lastRemote.timestamp) : "—"}</dd></div>
+            <div><dt>Credentials</dt><dd>Host-local only</dd></div>
+          </dl>
+          <div className="cr-actions cr-step8-inline-actions">
             {props.can("provider.test", "HOST") && (
               <ActionButton
                 onClick={async () => {
                   const result = await runOperation("provider.test", {});
                   props.notice(`Provider: ${str(result.data.status, "checked")}`);
                   providerQuery.refresh();
+                  preflight.refresh();
                 }}
               >Test Google Drive</ActionButton>
             )}
           </div>
         </Panel>
 
-        <Panel title="Disruptive maintenance" aside={<Badge tone="amber">Minecraft may stop</Badge>}>
-          <div className="cr30-backup-actions">
-            {props.can("maintenance.restart.now", "HOST") && (
-              <ActionButton
-                danger
-                onClick={async () => {
-                  if (!window.confirm("Restart PlexonCraft now? The Host will coordinate the restart and verify readiness.")) return;
-                  await runOperation("maintenance.restart.now", { skipCountdown: true });
-                  status.refresh();
-                }}
-              >Restart server</ActionButton>
-            )}
-            {props.can("maintenance.full-backup.create", "HOST") && (
-              <ActionButton
-                danger
-                onClick={async () => {
-                  if (!window.confirm("Create a full restore point now? The Host owns the mandatory warning countdown, final save flush, server stop, cold archive, Google Drive upload and restart.")) return;
-                  await runOperation("maintenance.full-backup.create", {});
-                  status.refresh();
-                  fullQuery.refresh();
-                }}
-              >Create full restore point</ActionButton>
-            )}
-          </div>
-          <p className="cr-hint cr30-backup-preview-note">
-            The browser never owns the backup timer. Closing or refreshing this page does not cancel the Host job.
-          </p>
+        <Panel title="Last full backup" aside={<Badge>{lastLocal ? "Available" : "None"}</Badge>}>
+          <dl className="cr30-provider-list">
+            <div><dt>Last verified local</dt><dd>{lastLocal ? time(lastLocal.timestamp) : "—"}</dd></div>
+            <div><dt>Size</dt><dd>{lastLocal ? bytes(lastLocal.archiveBytes) : "—"}</dd></div>
+            <div><dt>Local verification</dt><dd>{lastLocal ? str(lastLocal.verification, str(lastLocal.sha256, "") ? "SHA-256" : "Unknown") : "—"}</dd></div>
+            <div><dt>Off-site</dt><dd>{lastLocal ? (lastLocal.offsite === true ? "Verified" : "Not current") : "—"}</dd></div>
+            <div><dt>Automatic backups</dt><dd>Retired — manual only</dd></div>
+            <div><dt>Paper dependency</dt><dd>None for the backup critical path</dd></div>
+          </dl>
         </Panel>
       </div>
-
-      <Panel
-        title="Provider"
-        aside={<Badge tone={readinessTone(providerReadiness)}>{providerReadiness}</Badge>}
-      >
-        <dl className="cr30-provider-list">
-          <div><dt>Provider</dt><dd>{providerQuery.hasSuccess ? str(provider.provider, "Unknown") : "Unknown"}</dd></div>
-          <div><dt>Remote</dt><dd>{providerQuery.hasSuccess ? str(provider.remote, providerConfigured ? "Unavailable" : "Not configured") : "Unavailable"}</dd></div>
-          <div><dt>Runtime state</dt><dd>{providerQuery.hasSuccess ? providerState : "UNKNOWN"}</dd></div>
-          <div><dt>Last test</dt><dd>{providerQuery.hasSuccess ? time(provider.lastTestAt) : "—"}</dd></div>
-          <div><dt>Last successful verification</dt><dd>{providerQuery.hasSuccess ? time(provider.lastSuccessfulVerificationAt) : "—"}</dd></div>
-          <div><dt>Host config</dt><dd>{provider.hostConfigRestartRequired === true ? "Configuration changed on disk — restart Host to apply" : providerQuery.hasSuccess ? "Loaded configuration is current" : "Unknown"}</dd></div>
-          <div><dt>Credentials</dt><dd>Host-local only</dd></div>
-        </dl>
-      </Panel>
-
-      {(Object.keys(operation).length > 0 || progress) && (
-        <Panel title="Current operation" aside={<Badge tone="cyan">{currentPhase || "Active"}</Badge>}>
-          <div className="cr341-phase-list" aria-label="Backup operation phases">
-            {PHASES.map((phase, index) => {
-              const state = currentIndex < 0 ? "pending" : index < currentIndex ? "done" : index === currentIndex ? "active" : "pending";
-              return (
-                <div className={`cr341-phase ${state}`} key={phase}>
-                  <span aria-hidden>{state === "done" ? "✓" : state === "active" ? "●" : "○"}</span>
-                  <strong>{phase.replaceAll("_", " ").toLowerCase()}</strong>
-                </div>
-              );
-            })}
-          </div>
-          <dl className="cr30-provider-list">
-            <div><dt>Request / job</dt><dd>{str(progress?.requestId, str(progress?.jobId, str(operation.jobId, "—")))}</dd></div>
-            <div><dt>Started</dt><dd>{time(progress?.startedAt ?? operation.startedAt)}</dd></div>
-            <div><dt>Bytes</dt><dd>{bytes(progress?.bytes)}</dd></div>
-            <div><dt>Entries</dt><dd>{number(progress?.entries) ?? "—"}</dd></div>
-            <div><dt>Skipped transient</dt><dd>{number(progress?.skippedTransientCount ?? progress?.skipped) ?? "—"}</dd></div>
-          </dl>
-          {warnings.length > 0 && <p className="cr-alert">Warnings: {warnings.join(" · ")}</p>}
-          <p className="cr-hint cr30-backup-preview-note">No ETA is invented when the Host does not know one.</p>
-        </Panel>
-      )}
 
       {lastFailure && (
         <Panel title="Last operation failure" aside={<Badge tone="red">{lastFailure.code}</Badge>}>
@@ -670,7 +749,7 @@ export function BackupsView30(props: ViewProps) {
             <div><dt>Timestamp</dt><dd>{time(lastFailure.timestamp)}</dd></div>
             <div><dt>Retry</dt><dd>{lastFailure.retryable ? "Retryable after the underlying condition clears" : "Operator intervention may be required"}</dd></div>
           </dl>
-          <div className="cr-actions">
+          <div className="cr-actions cr-step8-inline-actions">
             <button
               className="cr-button"
               onClick={() => void navigator.clipboard.writeText(JSON.stringify(lastFailure, null, 2))}
@@ -686,34 +765,30 @@ export function BackupsView30(props: ViewProps) {
         </Panel>
       )}
 
-      <Panel title="Backup inventory" aside={<Badge>{fullBackups.length} loaded</Badge>}>
+      <Panel title="Restore points" aside={<Badge>{fullBackups.length} loaded</Badge>}>
         {fullBackups.length ? (
           <div className="cr-table-wrap cr30-backup-table">
             <table>
               <thead>
-                <tr><th>Created</th><th>Type</th><th>Size</th><th>Copies</th><th>Verification</th><th>Warnings</th><th>Actions</th></tr>
+                <tr><th>Created</th><th>Size</th><th>Copies</th><th>Verification</th><th>Result</th><th>Actions</th></tr>
               </thead>
               <tbody>
                 {fullBackups.slice(0, 100).map((backup) => {
                   const id = str(backup.backupId);
-                  const backupWarnings = listStrings(backup.warnings);
-                  const skipped = number(backup.skippedTransientCount) ?? 0;
-                  const missing = listStrings(backup.missingIncludeWarnings);
                   return (
                     <tr key={id}>
-                      <td>{time(backup.timestamp)}<small>{backup.automatic ? "Legacy scheduled" : backup.emergency ? "Emergency" : "Manual"}</small></td>
-                      <td><Badge tone="cyan">Full restore point</Badge></td>
-                      <td>{bytes(backup.archiveBytes)}<small>{typeof backup.durationMillis === "number" ? `${Math.round(backup.durationMillis / 1000)}s` : "—"}</small></td>
+                      <td>{time(backup.timestamp)}<small>{backup.emergency ? "Emergency" : backup.automatic ? "Legacy scheduled" : "Manual"}</small></td>
+                      <td>{bytes(backup.archiveBytes)}</td>
                       <td><Badge tone={backup.local ? "green" : "quiet"}>{backup.local ? "Local" : "No local"}</Badge> <Badge tone={backup.offsite ? "green" : "quiet"}>{backup.offsite ? "Off-site" : "No off-site"}</Badge></td>
                       <td>{str(backup.verification, str(backup.sha256, "") ? "SHA-256" : "—")}<small title={str(backup.sha256, "")}>{str(backup.sha256, "").slice(0, 12)}{str(backup.sha256, "") ? "…" : ""}</small></td>
-                      <td>{backupWarnings.length || skipped || missing.length ? <Badge tone="amber">{backupWarnings.length + missing.length} warnings · {skipped} skipped</Badge> : <Badge tone="green">Clear</Badge>}</td>
+                      <td><Badge tone={backup.result === "DEGRADED" ? "amber" : backup.errorCode ? "red" : "green"}>{str(backup.result, backup.offsite ? "Verified" : "Local")}</Badge></td>
                       <td>
                         <div className="cr-actions">
                           {props.can("backup.full.verify", "HOST") && (
                             <ActionButton onClick={async () => { await runOperation("backup.full.verify", { backupId: id }); props.notice("Restore point verified."); }}>Verify</ActionButton>
                           )}
-                          {!backup.offsite && providerConfigured && props.can("backup.full.retry-upload", "HOST") && (
-                            <ActionButton onClick={async () => { await runOperation("backup.full.retry-upload", { backupId: id }); fullQuery.refresh(); }}>Retry upload</ActionButton>
+                          {backup.offsite !== true && backup.local === true && providerConfigured && props.can("backup.full.retry-upload", "HOST") && (
+                            <ActionButton onClick={async () => { await runOperation("backup.full.retry-upload", { backupId: id }); fullQuery.refresh(); providerQuery.refresh(); }}>Retry Upload</ActionButton>
                           )}
                           {props.can("backup.full.restore.prepare", "HOST") && (
                             <ActionButton danger onClick={() => startRestore(id)}>Restore</ActionButton>
@@ -737,8 +812,8 @@ export function BackupsView30(props: ViewProps) {
             </table>
           </div>
         ) : (
-          <Empty title={fullQuery.busy ? "Loading backups…" : "No confirmed full restore points"}>
-            Inventory remains unknown if its query failed; an empty result is shown only from confirmed query data.
+          <Empty title={fullQuery.busy ? "Loading restore points…" : "No confirmed restore points"}>
+            Inventory is shown only from confirmed Host data.
           </Empty>
         )}
       </Panel>
@@ -746,18 +821,28 @@ export function BackupsView30(props: ViewProps) {
       <Panel title="Restart schedule" aside={<Badge>{status.hasSuccess ? str(status.data.timezone, "Host timezone") : "Unknown timezone"}</Badge>}>
         <div className="cr30-backup-metrics">
           <article className="cr30-backup-metric"><span>Next restart</span><strong>{status.hasSuccess ? time(status.data.nextRestart) : "Unknown"}</strong><small>Restart-only maintenance</small></article>
-          <article className="cr30-backup-metric"><span>Full backups</span><strong>Manual only</strong><small>No automatic backup schedule</small></article>
+          <article className="cr30-backup-metric"><span>Full backups</span><strong>Manual only</strong><small>No automatic full-backup schedule</small></article>
         </div>
-        <p className="cr-hint cr30-backup-preview-note">
-          Restart scheduling remains independent. It cannot trigger a backup. Full restore points are created only through an explicit manual action.
-        </p>
+        <div className="cr-actions cr-step8-inline-actions">
+          {props.can("maintenance.restart.now", "HOST") && (
+            <ActionButton
+              danger
+              disabled={operationBlocking || recoveryRequired}
+              onClick={async () => {
+                if (!window.confirm("Restart PlexonCraft using the Host-owned maintenance warning and readiness workflow?")) return;
+                await runOperation("maintenance.restart.now", {});
+                status.refresh();
+              }}
+            >Restart server</ActionButton>
+          )}
+        </div>
       </Panel>
 
       {activeDraft && props.can("maintenance.settings.get", "HOST") && (
-        <Panel title="Maintenance settings" aside={dirty ? <Badge tone="amber">Unsaved</Badge> : <Badge>Host persisted</Badge>}>
+        <Panel title="Supported maintenance settings" aside={dirty ? <Badge tone="amber">Unsaved</Badge> : <Badge>Host persisted</Badge>}>
           <div className="cr30-settings-grid">
             <section>
-              <h3>Restart</h3>
+              <h3>Restart-only schedule</h3>
               <ScheduleEditor
                 value={activeDraft.restart.schedule}
                 onChange={(schedule) => {
@@ -770,12 +855,16 @@ export function BackupsView30(props: ViewProps) {
               <label>Startup timeout · seconds<input type="number" min={30} max={1800} value={activeDraft.restart.startupTimeoutSeconds} onChange={(event) => { setDraft({ ...activeDraft, restart: { ...activeDraft.restart, startupTimeoutSeconds: Number(event.target.value) } }); setDirty(true); }} /></label>
             </section>
             <section>
-              <h3>Manual full restore point</h3>
-              <p className="cr-hint">Automatic full-backup scheduling was retired. These settings only control manually requested restore points.</p>
+              <h3>Manual full backup</h3>
+              <p className="cr-hint">Automatic backups are retired. Full backup creation is manually initiated through Fully Backup Now and executed by the always-on Host Companion.</p>
               <label>Retention<select value={activeDraft.fullRestorePoint.retentionMode} onChange={(event) => { setDraft({ ...activeDraft, fullRestorePoint: { ...activeDraft.fullRestorePoint, retentionMode: event.target.value as "SINGLE_CURRENT" | "ROTATING" } }); setDirty(true); }}><option value="SINGLE_CURRENT">Single current</option><option value="ROTATING">Rotating</option></select></label>
               {activeDraft.fullRestorePoint.retentionMode === "ROTATING" && <label>Keep<input type="number" min={1} max={52} value={activeDraft.fullRestorePoint.retentionCount} onChange={(event) => { setDraft({ ...activeDraft, fullRestorePoint: { ...activeDraft.fullRestorePoint, retentionCount: Number(event.target.value) } }); setDirty(true); }} /></label>}
               <label>Canonical filename<input value={activeDraft.fullRestorePoint.canonicalFilename} onChange={(event) => { setDraft({ ...activeDraft, fullRestorePoint: { ...activeDraft.fullRestorePoint, canonicalFilename: event.target.value } }); setDirty(true); }} /></label>
-              <label className="cr30-toggle-row"><input type="checkbox" checked={activeDraft.fullRestorePoint.restartAfter} onChange={(event) => { setDraft({ ...activeDraft, fullRestorePoint: { ...activeDraft.fullRestorePoint, restartAfter: event.target.checked } }); setDirty(true); }} />Restart after backup</label>
+              <div className="cr-step8-fixed-setting">
+                <span>Restart after backup</span>
+                <Badge tone="green">Required</Badge>
+                <small>Minecraft service recovery is mandatory after a manual full backup or safely degraded completion.</small>
+              </div>
             </section>
           </div>
           <div className="cr-actions cr30-settings-actions">
@@ -787,6 +876,7 @@ export function BackupsView30(props: ViewProps) {
                     ...activeDraft,
                     fullRestorePoint: {
                       ...activeDraft.fullRestorePoint,
+                      restartAfter: true,
                       schedule: { ...activeDraft.fullRestorePoint.schedule, enabled: false },
                     },
                   } as unknown as JsonMap;
@@ -795,6 +885,7 @@ export function BackupsView30(props: ViewProps) {
                   setDraft(null);
                   settingsQuery.refresh();
                   status.refresh();
+                  preflight.refresh();
                   props.notice("Maintenance settings saved on the Host.");
                 }}
               >Save settings</ActionButton>
@@ -804,11 +895,59 @@ export function BackupsView30(props: ViewProps) {
         </Panel>
       )}
 
+      {confirmBackup && (
+        <div className="cr-step8-modal-backdrop" role="presentation" onMouseDown={(event) => { if (event.currentTarget === event.target) setConfirmBackup(false); }}>
+          <section className="cr-step8-modal" role="dialog" aria-modal="true" aria-labelledby="fully-backup-confirm-title">
+            <div className="cr-step8-modal-head">
+              <div>
+                <span>Destructive maintenance confirmation</span>
+                <h2 id="fully-backup-confirm-title">Fully Backup Now</h2>
+              </div>
+              <button className="cr-button" onClick={() => setConfirmBackup(false)}>Cancel</button>
+            </div>
+            <div className="cr-step8-confirm-copy">
+              <p>This operation is durable and continues even if this browser closes or reconnects.</p>
+              <ol>
+                <li>The Host begins a mandatory 30-minute player warning period, with warnings at 30m, 15m, 1m, 30s, 15s and 5s.</li>
+                <li>The Host requires an affirmative <code>save-all flush</code> response, then stops Minecraft and independently proves shutdown.</li>
+                <li>A cold full-server archive is created and locally verified with durable metadata/hash.</li>
+                <li>The archive is uploaded to the configured Google Drive/rclone destination using safe staging/promotion and remotely verified.</li>
+                <li>Minecraft automatically restarts and the Host verifies readiness.</li>
+                <li>If off-site upload ultimately fails after a valid local backup exists, the server is restored online and the job may become degraded/retryable; Retry Upload does not require another shutdown.</li>
+              </ol>
+            </div>
+            <div className="cr-step8-confirm-grid">
+              <ReadinessItem label="Host" state="Ready" detail="Connected and authenticated." />
+              <ReadinessItem label="Minecraft service" state={serviceKnown ? "Ready" : "Unknown"} detail={serviceKnown ? serviceState : "State unavailable"} />
+              <ReadinessItem label="Google Drive" state={providerReadiness} detail={preflight.hasSuccess ? str(preflight.data.providerStatus, providerState) : providerState} />
+              <ReadinessItem label="Backup storage" state={storageReadiness} detail={preflight.hasSuccess ? `${bytes(preflight.data.usableBytes)} usable` : "Not confirmed"} />
+              <ReadinessItem label="Conflicting operation" state={operationBlocking ? "Failed" : "Ready"} detail={operationBlocking ? phaseLabel(operationPhase) : "None"} />
+              <ReadinessItem label="Recovery gate" state={recoveryRequired ? "Failed" : "Ready"} detail={recoveryRequired ? "Recovery required" : "Clear"} />
+            </div>
+            <div className="cr-step8-modal-actions">
+              <button className="cr-button" onClick={() => setConfirmBackup(false)}>Cancel</button>
+              <ActionButton
+                danger
+                disabled={!actionReady}
+                onClick={async () => {
+                  await runOperation("maintenance.full-backup.create", {});
+                  setConfirmBackup(false);
+                  status.refresh();
+                  fullQuery.refresh();
+                  preflight.refresh();
+                  props.notice("Fully Backup Now queued on the Host. You may close this page; the Host job will continue.");
+                }}
+              >Confirm Fully Backup Now</ActionButton>
+            </div>
+          </section>
+        </div>
+      )}
+
       {restore && (
         <Panel title="Confirm restore">
           <div className="cr-form cr-pad">
             <p>
-              This full restore point replaces the stopped server tree after an emergency pre-restore backup and hash verification. PlexonCraft will be unavailable during restore.
+              Restore is a separate destructive workflow. This restore point replaces the stopped server tree after an emergency pre-restore backup and hash verification.
             </p>
             <label>Type {restore.serverName} to continue<input value={typed} onChange={(event) => setTyped(event.target.value)} autoComplete="off" /></label>
             <div className="cr-actions">
