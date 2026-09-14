@@ -21,10 +21,13 @@ test("health describes coordination-only storage", async () => {
   assert.deepEqual(await response.json(), {
     ok: true,
     service: "plexonpanel-relay",
-    version: "3.4.0",
+    version: "3.4.1",
     protocolVersion: 3,
     storage: "coordination-only",
     gatewayPublicKey: "public-test-key",
+    gitCommit: "unavailable",
+    buildTimestamp: "unavailable",
+    runtimeKind: "cloudflare-worker",
   });
 });
 

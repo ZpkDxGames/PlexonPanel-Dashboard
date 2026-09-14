@@ -5,6 +5,7 @@ import { diagnostics, number } from "../lib/control-state";
 import { DASHBOARD_LABEL } from "../lib/dashboard-version";
 import { displayRateLabel } from "../lib/display-cadence";
 import { useUiPreferences } from "../components/ui-preferences-provider";
+import { ControlPlaneBuildPanel } from "./control-plane-build-panel";
 
 function SelectField<T extends string | number>({
   label,
@@ -317,6 +318,11 @@ export function SettingsView21(props: ViewProps & { reconnect: () => void }) {
       </Panel>
 
       <div className="cr21-settings-grid cr30-diagnostics-grid">
+        <ControlPlaneBuildPanel
+          paperVersion={ready?.server.pluginVersion}
+          hostVersion={ready?.server.hostVersion}
+        />
+
         <Panel title="Connection">
           <dl className="cr-details cr-pad">
             <div><dt>Protocol</dt><dd>3</dd></div>

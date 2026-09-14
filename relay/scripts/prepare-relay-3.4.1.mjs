@@ -4,7 +4,6 @@ import { resolve } from "node:path";
 const root = resolve(import.meta.dirname, "../..");
 const workerCorePath = resolve(root, "relay/src/index-core.ts");
 const standaloneCorePath = resolve(root, "relay/src/standalone/room-manager-core.ts");
-const standaloneServerPath = resolve(root, "relay/src/standalone/server.ts");
 
 async function replaceExactly(path, before, after, label) {
   const source = await readFile(path, "utf8");
@@ -186,13 +185,6 @@ await replaceExactly(
           ? "HOST"
           : "PAPER";`,
   "worker Host action routing",
-);
-
-await replaceExactly(
-  standaloneServerPath,
-  'const VERSION = "3.1.0";',
-  'const VERSION = "3.4.0";',
-  "standalone health version",
 );
 
 await replaceExactly(

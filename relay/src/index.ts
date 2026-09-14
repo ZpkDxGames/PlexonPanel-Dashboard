@@ -11,6 +11,7 @@ import {
   importAgentPublicKey,
   verifyEnvelope,
 } from "./protocol.js";
+import { RELAY_VERSION, relayBuildIdentity, type RelayBuildEnvironment } from "./build-identity.js";
 
 export { PairingDirectory, currentAccess, filterEvent, validDevice };
 
@@ -181,8 +182,6 @@ async function processHostConsole(
     metadata.hostIdentity?.capabilities["console.view.errors"] === true;
   if (!hostCanView) throw new Error("Event not allowed while host console capability is disabled");
 
-  // When Host local policy does not allow full-console authority, Paper remains the live producer
-  // while online. Host still serves its allowed output while Paper is offline.
   if (room.agents("PAPER").length > 0 && !hostConsoleAuthoritative(room, metadata)) return;
 
   for (const peer of room.state.getWebSockets("dashboard")) {
@@ -287,7 +286,7 @@ adapterPrototype.ready = function (
   const room = asInternals(this);
   return {
     ...coreReady.call(this, metadata, attachment),
-    version: "3.4.0",
+    version: RELAY_VERSION,
     consoleAuthority: hostConsoleAuthoritative(room, metadata) ? "HOST" : "PAPER_FALLBACK",
     consoleSourceState: hostConsoleState(room),
   };
@@ -305,19 +304,17 @@ adapterPrototype.disconnected = async function (
   }
 };
 
+type WorkerEnv = Parameters<typeof coreWorker.fetch>[1] & RelayBuildEnvironment;
 const worker = {
-  async fetch(
-    request: Request,
-    env: Parameters<typeof coreWorker.fetch>[1],
-  ): Promise<Response> {
+  async fetch(request: Request, env: WorkerEnv): Promise<Response> {
     const response = await coreWorker.fetch(request, env);
     const url = new URL(request.url);
     if (request.method !== "GET" || url.pathname !== "/healthz" || !response.ok) return response;
     const payload = (await response.json()) as Record<string, unknown>;
-    return new Response(JSON.stringify({ ...payload, version: "3.4.0" }), {
-      status: response.status,
-      headers: response.headers,
-    });
+    return new Response(
+      JSON.stringify({ ...payload, ...relayBuildIdentity("cloudflare-worker", env) }),
+      { status: response.status, headers: response.headers },
+    );
   },
 };
 

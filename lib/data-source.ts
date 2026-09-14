@@ -8,6 +8,7 @@ import {
   saveRelayCredential,
   type RelayCredential,
 } from "./browser-store";
+import { ACTION_SCOPES } from "./scopes";
 import type { DashboardWorkspace } from "./dashboard-types";
 
 export interface DashboardSessionResponse {
@@ -45,6 +46,8 @@ const pendingActions = new Map<
     resolve: (value: ActionCompletion) => void;
     reject: (reason: Error) => void;
     timer: ReturnType<typeof setTimeout>;
+    action: string;
+    agentKind?: "PAPER" | "HOST";
   }
 >();
 
@@ -199,6 +202,23 @@ export function bindLiveSocket(socket: WebSocket | null): void {
   activeSocket = socket;
 }
 
+function rejectionBoundary(
+  relayRejected: boolean,
+  code: string,
+  agentKind?: "PAPER" | "HOST",
+): string | undefined {
+  if (relayRejected) {
+    if (code === "SCOPE_DENIED") return "RELAY_SCOPE";
+    if (code === "CAPABILITY_DISABLED") return "RELAY_CAPABILITY";
+    if (code === "HOST_OFFLINE" || code === "PAPER_OFFLINE") return "RELAY_ROUTING";
+    return undefined;
+  }
+  if (code === "SCOPE_DENIED") return agentKind === "HOST" ? "HOST_SCOPE" : "PAPER_SCOPE";
+  if (code === "CAPABILITY_DISABLED" && agentKind === "HOST") return "HOST_CAPABILITY";
+  if (code === "OPERATION_FAILED" && agentKind === "HOST") return "HOST_EXECUTION";
+  return undefined;
+}
+
 export function handleRelayControlMessage(
   message: Record<string, unknown>,
 ): boolean {
@@ -217,7 +237,25 @@ export function handleRelayControlMessage(
   pendingActions.delete(requestId);
   if (result.status === "SUCCESS")
     pending.resolve(result as unknown as ActionCompletion);
-  else
+  else {
+    const code = String(result.code ?? "FAILED");
+    const action = typeof result.action === "string" ? result.action : pending.action;
+    const agentKind =
+      result.agentKind === "HOST" || result.agentKind === "PAPER"
+        ? result.agentKind
+        : message.agentKind === "HOST" || message.agentKind === "PAPER"
+          ? message.agentKind
+          : pending.agentKind;
+    const data =
+      result.data !== null && typeof result.data === "object" && !Array.isArray(result.data)
+        ? { ...(result.data as Record<string, unknown>) }
+        : {};
+    const boundary = rejectionBoundary(message.type === "dashboard.action_rejected", code, agentKind);
+    if (boundary) data.rejectionBoundary = boundary;
+    const requiredScope = ACTION_SCOPES[action];
+    if (requiredScope) data.requiredScope = requiredScope;
+    if (agentKind) data.agentKind = agentKind;
+    data.runtimeKind = message.type === "dashboard.action_rejected" ? "relay" : agentKind?.toLowerCase() ?? "agent";
     pending.reject(
       new ActionError(
         typeof result.message === "string"
@@ -225,17 +263,14 @@ export function handleRelayControlMessage(
           : typeof result.error === "string"
             ? result.error
             : "The operation was denied.",
-        String(result.code ?? "FAILED"),
+        code,
         String(result.status ?? "DENIED"),
         requestId,
-        typeof result.action === "string" ? result.action : "",
-        result.data !== null &&
-        typeof result.data === "object" &&
-        !Array.isArray(result.data)
-          ? (result.data as Record<string, unknown>)
-          : {},
+        action,
+        data,
       ),
     );
+  }
   return true;
 }
 export class ActionError extends Error {
@@ -275,7 +310,7 @@ export async function sendDashboardAction(
         ? 15 * 60000
         : 45000,
     );
-    pendingActions.set(requestId, { resolve, reject, timer });
+    pendingActions.set(requestId, { resolve, reject, timer, action, agentKind });
     try {
       socket.send(
         JSON.stringify({

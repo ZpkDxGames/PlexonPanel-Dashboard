@@ -86,8 +86,12 @@ test("coordination store persists only bounded room metadata and rate limits pai
   }
 });
 
-test("standalone health route is safe and advertises Protocol 3", async () => {
+test("standalone health route is safe and advertises Protocol 3 build identity", async () => {
   const { directory, config } = await fixture();
+  const previousCommit = process.env.PLEXON_BUILD_GIT_COMMIT;
+  const previousTimestamp = process.env.PLEXON_BUILD_TIMESTAMP;
+  process.env.PLEXON_BUILD_GIT_COMMIT = "8b68f32423efb56eda1c535b7c3e36ea5a30a5e7";
+  process.env.PLEXON_BUILD_TIMESTAMP = "2026-09-14T02:17:15Z";
   const relay = createStandaloneRelay({ ...config, port: 0 });
   try {
     await relay.start();
@@ -98,12 +102,19 @@ test("standalone health route is safe and advertises Protocol 3", async () => {
     const body = await response.json();
     assert.equal(body.ok, true);
     assert.equal(body.runtime, "standalone");
+    assert.equal(body.runtimeKind, "standalone");
+    assert.equal(body.version, "3.4.1");
     assert.equal(body.protocolVersion, 3);
+    assert.equal(body.gitCommit, "8b68f32423efb56eda1c535b7c3e36ea5a30a5e7");
     assert.equal(body.storage, "coordination-only");
     assert.equal(Object.hasOwn(body, "gatewayPublicKey"), false);
     assert.equal(Object.hasOwn(body, "accessTokenSecret"), false);
   } finally {
     await relay.close();
+    if (previousCommit === undefined) delete process.env.PLEXON_BUILD_GIT_COMMIT;
+    else process.env.PLEXON_BUILD_GIT_COMMIT = previousCommit;
+    if (previousTimestamp === undefined) delete process.env.PLEXON_BUILD_TIMESTAMP;
+    else process.env.PLEXON_BUILD_TIMESTAMP = previousTimestamp;
     await rm(directory, { recursive: true, force: true });
   }
 });

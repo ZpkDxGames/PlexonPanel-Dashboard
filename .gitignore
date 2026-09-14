@@ -13,6 +13,7 @@ relay/dist/
 .dev.vars.*
 .relay-public.json
 .relay-secrets.json
+relay/wrangler.production.jsonc
 
 # Firebase credentials and local Web App configuration
 *firebase-adminsdk*.json
