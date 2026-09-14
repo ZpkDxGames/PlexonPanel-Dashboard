@@ -202,7 +202,10 @@ test("Worker routes Owner backup.preflight to Host and returns only the private 
 class NodeSocketStub {
   sent = [];
   closed = null;
-  send(text) { this.sent.push(JSON.parse(text)); }
+  send(text) {
+    this.sent.push(JSON.parse(text));
+    return true;
+  }
   close(code, reason) { this.closed = { code, reason }; }
 }
 
