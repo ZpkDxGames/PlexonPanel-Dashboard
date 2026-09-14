@@ -18,7 +18,7 @@ test("Step 8 promotes Fully Backup Now and retires ambiguous backup creation UI"
     "save-all flush",
     "Google Drive/rclone destination",
     "Minecraft automatically restarts",
-    "closing this browser does not cancel the job",
+    "Closing this browser does not cancel the job",
   ]) assert.equal(view.includes(text), true, `missing Step 8 operator contract: ${text}`);
 
   for (const retired of [
