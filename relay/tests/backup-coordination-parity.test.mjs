@@ -14,11 +14,15 @@ for (const [label, sourcePath, distPath] of [
     "relay/dist/standalone/room-manager-core.js",
   ],
 ]) {
-  test(`${label} relay immediately reports failed Paper backup coordination`, async () => {
+  test(`${label} relay rejects retired Paper backup coordination without forwarding`, async () => {
     for (const candidate of [await text(sourcePath), await text(distPath)]) {
-      assert.match(candidate, /PAPER_COORDINATION_UNAVAILABLE/);
-      assert.match(candidate, /COORDINATING_PAPER/);
-      assert.match(candidate, /backup\.coordination\.result/);
+      assert.match(candidate, /Retired Paper backup coordination message/);
+      assert.doesNotMatch(candidate, /PAPER_COORDINATION_UNAVAILABLE/);
+      assert.doesNotMatch(candidate, /COORDINATING_PAPER/);
+      assert.doesNotMatch(candidate, /sendToAgent\("PAPER", "backup\.coordination"/);
+      assert.doesNotMatch(candidate, /sendToAgent\("HOST", "backup\.coordination\.result"/);
+      assert.doesNotMatch(candidate, /sendToAgent\("PAPER", "maintenance\.coordination"/);
+      assert.doesNotMatch(candidate, /sendToAgent\("HOST", "maintenance\.coordination\.result"/);
     }
   });
 }
