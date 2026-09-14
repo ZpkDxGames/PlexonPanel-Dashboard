@@ -385,7 +385,7 @@ export function BackupsView30(props: ViewProps) {
   const currentIndex = PHASES.findIndex((entry) => entry.key === displayedPhase);
   const service = props.state.service;
   const serviceState = str(service.state, "unknown").toLowerCase();
-  const serviceKnown = ["active", "inactive", "failed", "activating", "deactivating"].includes(serviceState);
+  const serviceKnown = ["active", "inactive", "failed"].includes(serviceState);
   const minecraftOnline = serviceState === "active";
   const commandConfigured = preflight.data.commandChannelConfigured === true;
   const minecraftReady = service.minecraftReady === true;
@@ -495,7 +495,7 @@ export function BackupsView30(props: ViewProps) {
           : !preflight.hasSuccess
             ? preflight.error || "Host preflight has not completed successfully."
             : !serviceKnown
-              ? "Minecraft service state is not currently authoritative."
+              ? "Minecraft service state is not in a stable controllable state."
               : !commandReady
                 ? "The Host command channel / RCON readiness check is not ready while Minecraft is online."
                 : !preflightReady
@@ -587,7 +587,7 @@ export function BackupsView30(props: ViewProps) {
           />
           <ReadinessItem
             label="Minecraft / systemd"
-            state={!serviceKnown ? "Unknown" : serviceState === "active" || serviceState === "inactive" || serviceState === "failed" ? "Ready" : "Warning"}
+            state={serviceKnown ? "Ready" : serviceState === "unknown" ? "Unknown" : "Warning"}
             detail={`Service state: ${serviceState}${service.pid ? ` · PID ${String(service.pid)}` : ""}`}
           />
           <ReadinessItem
@@ -787,7 +787,7 @@ export function BackupsView30(props: ViewProps) {
                           {props.can("backup.full.verify", "HOST") && (
                             <ActionButton onClick={async () => { await runOperation("backup.full.verify", { backupId: id }); props.notice("Restore point verified."); }}>Verify</ActionButton>
                           )}
-                          {!backup.offsite && backup.local && providerConfigured && props.can("backup.full.retry-upload", "HOST") && (
+                          {backup.offsite !== true && backup.local === true && providerConfigured && props.can("backup.full.retry-upload", "HOST") && (
                             <ActionButton onClick={async () => { await runOperation("backup.full.retry-upload", { backupId: id }); fullQuery.refresh(); providerQuery.refresh(); }}>Retry Upload</ActionButton>
                           )}
                           {props.can("backup.full.restore.prepare", "HOST") && (
