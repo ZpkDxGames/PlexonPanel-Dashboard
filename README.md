@@ -67,7 +67,9 @@ Player actions remain the intersection of exact device scope, Paper connection, 
 
 The Server workspace is Host-authoritative for systemd status and lifecycle actions. Paper connectivity is reported separately and never fabricates an active service state.
 
-Backups & Maintenance exposes the matched Host maintenance control plane: restart scheduling, live snapshots, cold full restore points, verification, provider state, retry upload, restore/delete controls, and explicit recovery/offline states. Google Drive/rclone credentials remain Host-local and are never exposed to the browser.
+Backups & Maintenance exposes the Host-owned manual cold full-backup control plane: explicit full restore-point creation, the mandatory maintenance countdown and final-save phases, local/remote verification, provider state, retry upload, restore/delete controls, and explicit recovery/offline states. Full backups are manual-only; only restart scheduling remains automatic. The retired Paper-coordinated live-snapshot path is not exposed by the active dashboard. Google Drive/rclone credentials remain Host-local and are never exposed to the browser.
+
+See [Backups & Maintenance](docs/BACKUPS_MAINTENANCE.md) for the manual backup flow and migration semantics.
 
 ## Access, audit and storage
 
