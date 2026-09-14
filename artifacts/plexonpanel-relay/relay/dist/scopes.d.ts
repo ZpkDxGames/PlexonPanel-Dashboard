@@ -1,0 +1,6 @@
+export declare const SCOPES: readonly ["overview.view", "telemetry.view", "players.view", "players.history.view", "players.location", "players.address", "console.view.errors", "console.view.full", "console.execute.allowed", "chat.view", "chat.send", "chat.send.minimessage", "player.message", "player.kick", "player.ban", "player.unban", "player.whitelist", "player.teleport", "player.gamemode", "player.heal", "player.feed", "player.kill", "player.op", "plugins.view", "plugins.config", "plugins.reload", "files.list", "files.read", "files.write", "files.create", "files.rename", "files.delete", "files.download", "files.upload", "backup.view", "backup.create", "backup.download", "backup.delete", "backup.restore", "maintenance.view", "maintenance.configure", "maintenance.restart", "maintenance.run", "provider.view", "provider.test", "server.status", "server.start", "server.stop", "server.restart", "audit.view.self", "audit.view", "devices.view", "devices.revoke", "settings.view"];
+export type Scope = (typeof SCOPES)[number];
+export declare const HIGH_RISK: Set<string>;
+export declare const ACTION_SCOPES: Readonly<Record<string, Scope>>;
+export declare function validScopes(value: unknown): value is string[];
+export declare function canAction(action: string, scopes: readonly string[], capabilities: Record<string, boolean>): boolean;

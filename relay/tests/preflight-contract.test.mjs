@@ -266,12 +266,22 @@ async function standaloneFixture() {
     authTimer: setTimeout(() => {}, 60_000),
   };
   room.host = hostSession;
-  room.paper = { ...hostSession, socket: paperSocket, kind: "PAPER", publicKey: paperKey.publicKey };
+  const paperSession = {
+    ...hostSession,
+    socket: paperSocket,
+    kind: "PAPER",
+    publicKey: paperKey.publicKey,
+    sessionNonce: randomUUID(),
+    sequence: 0,
+    recent: [],
+    chain: Promise.resolve(),
+  };
+  room.paper = paperSession;
   const browser = { socket: browserSocket, access: access(serverId, device), rate: [], transferRate: [], snapshotRate: 0, chain: Promise.resolve() };
   const other = { socket: otherSocket, access: access(serverId, observer), rate: [], transferRate: [], snapshotRate: 0, chain: Promise.resolve() };
   room.dashboards.set(device.deviceId, browser);
   room.dashboards.set(observer.deviceId, other);
-  return { directory, store, room, serverId, device, browser, other, hostSession, hostSocket, hostKey };
+  return { directory, store, room, serverId, device, browser, other, hostSession, hostSocket, hostKey, paperSession, paperSocket, paperKey };
 }
 
 test("standalone relay satisfies the same backup.preflight Host contract", async () => {
@@ -312,6 +322,54 @@ test("standalone relay satisfies the same backup.preflight Host contract", async
     assert.equal(success?.body?.requestId, requestId);
     assert.equal(success?.body?.data?.backupRootWritable, true);
     assert.equal(f.other.socket.sent.some((message) => message.eventType === "action.result"), false);
+  } finally {
+    clearTimeout(f.hostSession.authTimer);
+    f.store.close();
+    await rm(f.directory, { recursive: true, force: true });
+  }
+});
+
+test("standalone relay mirrors Paper authorization to Host and enforces refresh direction", async () => {
+  const f = await standaloneFixture();
+  try {
+    const snapshot = {
+      protocolVersion: 3,
+      serverId: f.serverId,
+      generation: 7,
+      revision: 3,
+      devices: [f.device],
+      _session: f.paperSession.sessionNonce,
+      _sequence: 1,
+    };
+    const sync = await signEnvelope("access.sync", f.serverId, snapshot, f.paperKey.privateKey);
+    await f.room.agentMessage(f.paperSession, sync);
+    const mirroredEnvelope = f.hostSocket.sent.find((message) => message.type === "access.authority.sync");
+    assert.ok(mirroredEnvelope, "standalone Host must receive Paper access authority");
+    const mirrored = decodeEnvelope(JSON.stringify(mirroredEnvelope)).body;
+    assert.equal(mirrored.revision, 3);
+    assert.equal(mirrored.devices[0].deviceId, f.device.deviceId);
+
+    f.paperSocket.sent.length = 0;
+    const request = await signEnvelope(
+      "access.authority.request",
+      f.serverId,
+      { _session: f.hostSession.sessionNonce, _sequence: 1 },
+      f.hostKey.privateKey,
+    );
+    await f.room.agentMessage(f.hostSession, request);
+    const refresh = f.paperSocket.sent.find((message) => message.type === "access.authority.request");
+    assert.ok(refresh, "standalone Paper must receive Host refresh request");
+
+    const forgedRequest = await signEnvelope(
+      "access.authority.request",
+      f.serverId,
+      { _session: f.paperSession.sessionNonce, _sequence: 2 },
+      f.paperKey.privateKey,
+    );
+    await assert.rejects(
+      f.room.agentMessage(f.paperSession, forgedRequest),
+      /Only Host requests access authority refresh/,
+    );
   } finally {
     clearTimeout(f.hostSession.authTimer);
     f.store.close();
