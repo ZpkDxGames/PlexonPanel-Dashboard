@@ -1,15 +1,22 @@
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import type { Duplex } from "node:stream";
 import { pathToFileURL } from "node:url";
+import { relayBuildIdentity } from "../build-identity.js";
 import { normalizePairingCode, opaqueClientKey, pairingLookupId, signDashboardAccess, verifyDashboardAccess, type DashboardAccess } from "../security.js";
 import { loadStandaloneConfig, type StandaloneConfig } from "./config.js";
 import { CoordinationStore } from "./persistence.js";
 import { RoomManager, type RelayCounters } from "./room-manager.js";
 import { NodeWebSocket, header, websocketProtocols } from "./websocket.js";
 
-const VERSION = "3.1.0";
 const UUID =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+function buildIdentity() {
+  return relayBuildIdentity("standalone", {
+    BUILD_GIT_COMMIT: process.env.PLEXON_BUILD_GIT_COMMIT ?? process.env.GITHUB_SHA,
+    BUILD_TIMESTAMP: process.env.PLEXON_BUILD_TIMESTAMP,
+  });
+}
 
 export interface StandaloneRelay {
   readonly config: StandaloneConfig;
@@ -93,8 +100,8 @@ export function createStandaloneRelay(config: StandaloneConfig): StandaloneRelay
           event: "started",
           host: config.host,
           port: config.port,
-          protocolVersion: 3,
           storage: "coordination-only",
+          ...buildIdentity(),
         }),
       );
     },
@@ -133,9 +140,8 @@ async function handleHttp(
       ok: true,
       service: "plexonpanel-relay",
       runtime: "standalone",
-      version: VERSION,
-      protocolVersion: 3,
       storage: "coordination-only",
+      ...buildIdentity(),
       uptimeSeconds: Math.max(0, Math.floor((Date.now() - counters.startedAt) / 1000)),
       rooms: rooms.roomCount(),
       connections: {
