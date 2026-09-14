@@ -50,7 +50,6 @@ type RoomInternals = {
   counters: RelayCounters;
   currentAccess(access: DashboardAccess): boolean;
   broadcastReady(): void;
-  sendToAgent(kind: AgentKind, type: string, body: Record<string, unknown>): Promise<boolean>;
   dashboardSend(session: DashboardSessionLike, body: Record<string, unknown>): void;
 };
 type RoomPrototype = {
@@ -64,25 +63,9 @@ function internals(room: CoreRoom): RoomInternals {
   return room as unknown as RoomInternals;
 }
 
-function authoritative(room: RoomInternals): boolean {
-  return Boolean(
-    room.host?.authenticated &&
-      room.host.consoleHealthy === true &&
-      room.metadata.hostIdentity?.capabilities["console.view.full"] === true,
-  );
-}
-
 function sourceState(room: RoomInternals): string {
   if (!room.host?.authenticated) return "HOST_OFFLINE";
   return room.host.consoleSourceState ?? "STARTING";
-}
-
-async function announceAuthority(room: RoomInternals): Promise<void> {
-  await room.sendToAgent("PAPER", "console.authority", {
-    hostAuthoritative: authoritative(room),
-    source: "HOST_JOURNAL",
-    state: sourceState(room),
-  });
 }
 
 function boundedText(value: unknown, maximum: number): string | null {
@@ -156,7 +139,6 @@ async function processHostConsole(
     session.consoleHealthy = body.available === true;
     session.consoleSourceState = state;
     room.broadcastReady();
-    await announceAuthority(room);
     room.counters.messagesAccepted += 1;
     return;
   }
@@ -168,10 +150,6 @@ async function processHostConsole(
     room.metadata.hostIdentity?.capabilities["console.view.full"] === true ||
     room.metadata.hostIdentity?.capabilities["console.view.errors"] === true;
   if (!hostCanView) throw new Error("Event not allowed while host console capability is disabled");
-  if (room.paper?.authenticated && !authoritative(room)) {
-    room.counters.messagesAccepted += 1;
-    return;
-  }
 
   for (const dashboard of room.dashboards.values()) {
     if (!room.currentAccess(dashboard.access)) continue;
@@ -222,8 +200,6 @@ prototype.agentMessage = async function (
     return;
   }
   await coreAgentMessage.call(this, session, text);
-  if (type === "agent.challenge_response" && session.kind === "PAPER" && session.authenticated)
-    await announceAuthority(internals(this));
 };
 
 prototype.dashboardMessage = async function (
@@ -262,7 +238,7 @@ prototype.ready = function (
   return {
     ...coreReady.call(this, session),
     version: "3.4.0",
-    consoleAuthority: authoritative(room) ? "HOST" : "PAPER_FALLBACK",
+    consoleAuthority: "HOST",
     consoleSourceState: sourceState(room),
   };
 };
@@ -273,9 +249,7 @@ prototype.agentDisconnected = function (
   code,
   reason,
 ): void {
-  const wasHost = session.kind === "HOST" && session.authenticated;
   coreAgentDisconnected.call(this, session, code, reason);
-  if (wasHost) void announceAuthority(internals(this));
 };
 
 export { CoreRoom as Room };

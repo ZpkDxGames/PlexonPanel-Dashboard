@@ -69,6 +69,8 @@ const IDENTITY_ACTION_PREFIXES = [
 ] as const;
 const ACTION_ALIASES: Readonly<Record<string, Scope>> = {
   "console.execute": "console.execute.allowed",
+  "console.history": "console.view.full",
+  "console.history.errors": "console.view.errors",
   "chat.global.send": "chat.send",
   "player.deop": "player.op",
   "player.whitelist.add": "player.whitelist",

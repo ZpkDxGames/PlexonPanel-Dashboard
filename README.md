@@ -6,24 +6,27 @@ PlexonPanel Dashboard is a responsive Next.js/Vercel control room for signed Pro
 
 Active pages include Overview, Performance, Players, Console, Chat, Plugins, Server, Backups, Audit, Access, and Settings. Files remain a dormant backend-compatible surface rather than a first-class page.
 
-Paper and Host remain independent authority domains. Paper owns Paper/JVM/player/plugin state, chat, pairing/device state, and remote console command execution. Host owns Linux machine telemetry, systemd lifecycle, Host files/backups/maintenance, and—when its configured journald source is healthy and locally enabled—the preferred read-only console stream.
+Paper and Host remain independent authority domains. Paper owns Paper/JVM/player/plugin state, chat, pairing/device state, and remote console command execution. Host owns Linux machine telemetry, systemd lifecycle, Host files/backups/maintenance, and the authoritative read-only server console stream/history through its locally configured journald source.
 
 Host CPU is always machine-wide Host CPU. Paper process CPU remains a separate JVM/process metric. The UI does not substitute one for the other.
 
 ## Host-authoritative console
 
-PlexonPanel 3.4.0 can publish the real `plexoncraft.service` journald stream from the Host Companion.
+PlexonPanel publishes the real configured Minecraft systemd-unit journald stream from the Host Companion.
 
-- Relay authority uses authenticated Host source health, not merely Host socket presence.
-- A healthy Host source is preferred when Host console capability is enabled.
-- Paper `latest.log` remains the fallback producer when Host authority is unavailable.
-- `console.execute` is Paper-only in both Worker and standalone relay runtimes.
-- Host output may remain visible while Paper is offline; command entry remains unavailable until Paper reconnects.
+- The Host Companion is the sole authority for live console capture, replay, invocation boundaries, and retained history.
+- Host source health is reported separately; an offline or degraded Host does not transfer console authority to Paper.
+- Paper no longer tails `latest.log` as a fallback console producer.
+- `console.execute` remains Paper-only in both Worker and standalone relay runtimes.
+- Host output and retained history can remain available while Paper is offline; command entry remains unavailable until Paper reconnects.
 - Existing device scopes continue to control full/error-only console visibility.
+- Historical pages are bounded to 100 lines and are limited by the VPS's actual `systemd-journald` retention.
 
-The browser keeps a bounded 2,500-line live history and a smaller bounded safe cache. Journal/session identifiers provide strong duplicate suppression when available, with a short transition deduplication window when authority changes between Host and Paper. Invocation changes are rendered as startup/session separators.
+The browser keeps a bounded 2,500-line live/history presentation buffer and a smaller bounded safe cache. Journal/session identifiers provide strong duplicate suppression when available. Invocation changes are rendered as startup/session separators. Loading older history explicitly queries the Host and does not create a second console authority.
 
 Pause, copy, export, search, filtering and clear remain local browser operations. Clearing the view does not delete journald or Minecraft logs, and pausing does not stop relay delivery.
+
+See [Host console history authority](docs/CONSOLE_HISTORY_AUTHORITY.md) for retention, security, and runtime-certification semantics.
 
 ## Worker and standalone relay
 
@@ -32,7 +35,7 @@ The canonical repository now contains both relay runtimes.
 - Cloudflare Worker remains supported through `relay/wrangler.jsonc`.
 - Standalone Node relay includes loopback-first configuration, bounded coordination persistence, service/env examples, packaging and smoke validation.
 - The accepted pre-3.4 Worker and standalone relay cores are kept as explicit core source units; 3.4 authority adapters add Host console handling without rewriting unrelated pairing/access/backup behavior.
-- Both runtimes enforce the same console scopes, Host source validation, ready-state authority metadata, replay/signature protections, and Paper-only command routing.
+- Both runtimes enforce the same console scopes, Host source validation, ready-state authority metadata, replay/signature protections, Host-only console viewing/history, and Paper-only command routing.
 
 See [standalone relay migration](docs/STANDALONE_RELAY_MIGRATION.md) and [3.4.0 release notes](RELEASE_NOTES_3.4.0.md).
 
@@ -103,6 +106,6 @@ Never place access tokens, relay signing keys, Paper/Host private keys, pairing 
 
 Dashboard 3.4.0 remains on signed Protocol 3 and `/v1`. Existing credentials do not gain scopes automatically, and the release does not require a Protocol 4 migration, identity reset, or automatic re-pair.
 
-A passing repository CI run and Vercel preview are required source/presentation evidence but are not live PlexonCraft certification. Runtime acceptance still includes real Host journald readability, startup/shutdown capture, restart/cursor recovery, Paper-only fallback behavior, partial Paper/Host failures, relay restart behavior, and browser responsiveness against the authorized deployment.
+A passing repository CI run and Vercel preview are required source/presentation evidence but are not live PlexonCraft certification. Runtime acceptance still includes real Host journald readability, Paper-stopped history browsing, startup/shutdown capture, Host restart/cursor recovery without duplicate floods, unrelated-unit isolation, relay restart behavior, and browser responsiveness against the authorized deployment.
 
 Read [3.4.0 release notes](RELEASE_NOTES_3.4.0.md), [protocol](docs/PROTOCOL.md), [architecture](docs/ARCHITECTURE.md), [operations](docs/OPERATIONS.md), [security](docs/SECURITY.md), [deployment](docs/VERCEL_DEPLOYMENT.md), and [validation](docs/VALIDATION.md).
