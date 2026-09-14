@@ -59,13 +59,29 @@ const OPERATION_MESSAGES: Record<string, OperationMessage> = {
   },
 };
 
+function safeDiagnostic(value: unknown, pattern: RegExp): string | null {
+  return typeof value === "string" && pattern.test(value) ? value : null;
+}
+
+function diagnosticSuffix(error: ActionError): string {
+  const parts: string[] = [];
+  const boundary = safeDiagnostic(error.data.rejectionBoundary, /^[A-Z][A-Z0-9_]{1,63}$/);
+  const scope = safeDiagnostic(error.data.requiredScope, /^[a-z][a-z0-9_.-]{1,63}$/);
+  const agent = safeDiagnostic(error.data.agentKind, /^(PAPER|HOST)$/);
+  if (boundary) parts.push(`Boundary: ${boundary}`);
+  if (scope) parts.push(`Scope: ${scope}`);
+  if (agent) parts.push(`Agent: ${agent}`);
+  if (/^[0-9a-f-]{36}$/i.test(error.requestId)) parts.push(`Request: ${error.requestId}`);
+  return parts.length ? ` Diagnostic: ${parts.join(" · ")}.` : "";
+}
+
 export function operationMessage(error: unknown): OperationMessage {
   if (error instanceof ActionError) {
     const mapped = OPERATION_MESSAGES[error.code];
-    if (mapped) return mapped;
+    if (mapped) return { ...mapped, detail: `${mapped.detail}${diagnosticSuffix(error)}` };
     return {
       title: error.status === "DENIED" ? "Operation denied" : "Operation failed",
-      detail: error.message || "The agent rejected the operation.",
+      detail: `${error.message || "The agent rejected the operation."}${diagnosticSuffix(error)}`,
       tone: error.status === "DENIED" ? "warning" : "danger",
     };
   }
