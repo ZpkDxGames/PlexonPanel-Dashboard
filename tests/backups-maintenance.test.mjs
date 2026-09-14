@@ -22,7 +22,7 @@ test("Step 8 promotes Fully Backup Now and retires ambiguous backup creation UI"
   ]) assert.equal(view.includes(text), true, `missing Step 8 operator contract: ${text}`);
 
   for (const retired of [
-    ">Create full restore point</,
+    "Create full restore point",
     "Create live snapshot",
     "Scheduled full backup",
     "Next full restore point",
@@ -128,7 +128,7 @@ test("automatic backups stay retired while restart-only scheduling remains suppo
   assert.equal(view.includes("schedule: { ...activeDraft.fullRestorePoint.schedule, enabled: false }"), true);
   assert.equal(view.includes("restartAfter: true"), true);
   assert.equal(view.includes("Restart after backup"), true);
-  assert.equal(view.includes(">Required</), true);
+  assert.equal(view.includes("Required"), true);
 });
 
 test("restore point controls preserve only supported Host-backed operations", async () => {
