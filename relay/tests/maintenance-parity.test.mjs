@@ -41,6 +41,9 @@ for (const [label, sourcePath, distPath] of [
 test("standalone runtime identity no longer reports the legacy 3.1.0 build", async () => {
   const server = await text("relay/src/standalone/server.ts");
   const room = await text("relay/src/standalone/room-manager-core.ts");
-  assert.match(server, /const VERSION = "3\.4\.0"/);
-  assert.match(room, /version: "3\.4\.0"/);
+  const identity = await text("relay/src/build-identity.ts");
+  assert.doesNotMatch(server, /3\.1\.0/);
+  assert.doesNotMatch(room, /version: "3\.1\.0"/);
+  assert.match(server, /relayBuildIdentity\("standalone"/);
+  assert.match(identity, /RELAY_VERSION = "3\.4\.1"/);
 });
