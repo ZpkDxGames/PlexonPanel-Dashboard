@@ -6,19 +6,14 @@ import test from "node:test";
 const root = resolve(import.meta.dirname, "../..");
 const text = (path) => readFile(resolve(root, path), "utf8");
 
-for (const [label, sourcePath, distPath] of [
-  ["Worker", "relay/src/index-core.ts", "relay/dist/index-core.js"],
-  [
-    "standalone",
-    "relay/src/standalone/room-manager-core.ts",
-    "relay/dist/standalone/room-manager-core.js",
-  ],
-]) {
-  test(`${label} relay immediately reports failed Paper backup coordination`, async () => {
-    for (const candidate of [await text(sourcePath), await text(distPath)]) {
-      assert.match(candidate, /PAPER_COORDINATION_UNAVAILABLE/);
-      assert.match(candidate, /COORDINATING_PAPER/);
-      assert.match(candidate, /backup\.coordination\.result/);
-    }
-  });
-}
+test("Step 5 retires Paper backup coordination in source and compiled protocol", async () => {
+  for (const candidate of [
+    await text("relay/src/protocol.ts"),
+    await text("relay/dist/protocol.js"),
+  ]) {
+    assert.match(candidate, /backup\.coordination/);
+    assert.match(candidate, /backup\.coordination\.result/);
+    assert.match(candidate, /RETIRED_PAPER_BACKUP_COORDINATION/);
+    assert.match(candidate, /Paper backup coordination is retired/);
+  }
+});
