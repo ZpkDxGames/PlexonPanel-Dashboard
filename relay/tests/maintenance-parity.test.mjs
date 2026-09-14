@@ -9,27 +9,23 @@ async function text(path) {
   return readFile(resolve(root, path), "utf8");
 }
 
-for (const [label, sourcePath, distPath] of [
-  ["Worker", "relay/src/index-core.ts", "relay/dist/index-core.js"],
-  [
-    "standalone",
-    "relay/src/standalone/room-manager-core.ts",
-    "relay/dist/standalone/room-manager-core.js",
-  ],
+test("Step 5 retires Paper maintenance coordination at the shared protocol boundary", async () => {
+  for (const candidate of [
+    await text("relay/src/protocol.ts"),
+    await text("relay/dist/protocol.js"),
+  ]) {
+    assert.match(candidate, /maintenance\.coordination/);
+    assert.match(candidate, /maintenance\.coordination\.result/);
+    assert.match(candidate, /RETIRED_PAPER_BACKUP_COORDINATION/);
+    assert.match(candidate, /Paper backup coordination is retired/);
+  }
+});
+
+for (const [label, sourcePath] of [
+  ["Worker", "relay/src/index-core.ts"],
+  ["standalone", "relay/src/standalone/room-manager-core.ts"],
 ]) {
-  test(`${label} relay preserves 3.3 maintenance coordination in the 3.4 console release`, async () => {
-    const source = await text(sourcePath);
-    const compiled = await text(distPath);
-
-    for (const candidate of [source, compiled]) {
-      assert.match(candidate, /maintenance\.coordination/);
-      assert.match(candidate, /maintenance\.coordination\.result/);
-      assert.match(candidate, /Only Host coordinates maintenance/);
-      assert.match(candidate, /Only Paper reports maintenance coordination/);
-    }
-  });
-
-  test(`${label} relay routes maintenance and provider actions to Host and keeps full restore Owner-only`, async () => {
+  test(`${label} relay routes active maintenance and provider actions to Host and keeps full restore Owner-only`, async () => {
     const source = await text(sourcePath);
 
     assert.match(source, /action\.startsWith\("maintenance\."\)/);
