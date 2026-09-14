@@ -2,13 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ActionError } from "../lib/data-source";
-import {
-  number,
-  record,
-  records,
-  str,
-  type JsonMap,
-} from "../lib/control-state";
+import { number, record, records, str, type JsonMap } from "../lib/control-state";
 import {
   ActionButton,
   Badge,
@@ -50,7 +44,6 @@ type SettingsDraft = {
   };
 };
 
-type BackupRow = JsonMap & { _kind: "full" | "live" };
 type FailureRecord = {
   action: string;
   requestId: string;
@@ -62,6 +55,7 @@ type FailureRecord = {
   retryable: boolean;
   timestamp: string;
 };
+
 type ReadinessState = "Ready" | "Warning" | "Failed" | "Unknown" | "Not configured";
 
 const FAILURE_KEY = "plexonpanel.backup.last-safe-failure.v1";
@@ -74,14 +68,25 @@ const DAYS = [
   "SATURDAY",
   "SUNDAY",
 ];
+const FULL_BACKUP_WARNINGS = "30m · 15m · 1m · 30s · 15s · 5s";
 const PHASES = [
-  "COORDINATING_PAPER",
+  "QUEUED",
   "PREFLIGHT",
+  "COUNTDOWN",
+  "FINAL_SAVE",
+  "STOPPING_SERVER",
+  "WAITING_FOR_STOP",
+  "PREPARING",
   "ARCHIVING",
   "HASHING",
+  "VERIFYING_LOCAL",
   "UPLOADING",
-  "FINALIZING",
-  "COMPLETE",
+  "VERIFYING_REMOTE",
+  "STARTING_SERVER",
+  "VERIFYING_STARTUP",
+  "COMPLETED",
+  "DEGRADED",
+  "FAILED",
 ];
 
 function parseSchedule(value: unknown, fallback: ScheduleDraft): ScheduleDraft {
@@ -89,8 +94,7 @@ function parseSchedule(value: unknown, fallback: ScheduleDraft): ScheduleDraft {
   const kind = str(raw.type, fallback.type);
   return {
     enabled: raw.enabled === true,
-    type:
-      kind === "WEEKLY" || kind === "SELECTED_WEEKDAYS" ? kind : "DAILY",
+    type: kind === "WEEKLY" || kind === "SELECTED_WEEKDAYS" ? kind : "DAILY",
     weekdays: Array.isArray(raw.weekdays)
       ? raw.weekdays.filter((day): day is string => typeof day === "string")
       : fallback.weekdays,
@@ -113,49 +117,45 @@ function parseSettings(value: unknown): SettingsDraft {
         time: "04:00",
       }),
       warningSeconds: Array.isArray(restart.warningSeconds)
-        ? restart.warningSeconds.filter(
-            (value): value is number => typeof value === "number",
-          )
+        ? restart.warningSeconds.filter((value): value is number => typeof value === "number")
         : [900, 300, 60, 30, 10],
       stopTimeoutSeconds:
-        typeof restart.stopTimeoutSeconds === "number"
-          ? restart.stopTimeoutSeconds
-          : 180,
+        typeof restart.stopTimeoutSeconds === "number" ? restart.stopTimeoutSeconds : 180,
       startupTimeoutSeconds:
-        typeof restart.startupTimeoutSeconds === "number"
-          ? restart.startupTimeoutSeconds
-          : 180,
+        typeof restart.startupTimeoutSeconds === "number" ? restart.startupTimeoutSeconds : 180,
     },
     fullRestorePoint: {
-      schedule: parseSchedule(full.schedule, {
+      schedule: {
+        ...parseSchedule(full.schedule, {
+          enabled: false,
+          type: "WEEKLY",
+          weekdays: ["SUNDAY"],
+          time: "04:00",
+        }),
         enabled: false,
-        type: "WEEKLY",
-        weekdays: ["SUNDAY"],
-        time: "04:00",
-      }),
-      retentionMode:
-        full.retentionMode === "ROTATING" ? "ROTATING" : "SINGLE_CURRENT",
-      retentionCount:
-        typeof full.retentionCount === "number" ? full.retentionCount : 1,
+      },
+      retentionMode: full.retentionMode === "ROTATING" ? "ROTATING" : "SINGLE_CURRENT",
+      retentionCount: typeof full.retentionCount === "number" ? full.retentionCount : 1,
       restartAfter: full.restartAfter !== false,
       canonicalFilename: str(full.canonicalFilename, "PlexonCraft-Latest.zip"),
       uploadTimeoutSeconds:
-        typeof full.uploadTimeoutSeconds === "number"
-          ? full.uploadTimeoutSeconds
-          : 1800,
-      verificationMode: str(
-        full.verificationMode,
-        "SIZE_AND_HASH_WHEN_AVAILABLE",
-      ),
+        typeof full.uploadTimeoutSeconds === "number" ? full.uploadTimeoutSeconds : 1800,
+      verificationMode: str(full.verificationMode, "SIZE_AND_HASH_WHEN_AVAILABLE"),
       maximumBytes:
-        typeof full.maximumBytes === "number"
-          ? full.maximumBytes
-          : 1_099_511_627_776,
+        typeof full.maximumBytes === "number" ? full.maximumBytes : 1_099_511_627_776,
       excludes: Array.isArray(full.excludes)
-        ? full.excludes.filter(
-            (value): value is string => typeof value === "string",
-          )
+        ? full.excludes.filter((value): value is string => typeof value === "string")
         : ["logs", "crash-reports", "cache", ".cache"],
+    },
+  };
+}
+
+function manualOnlySettings(value: SettingsDraft): SettingsDraft {
+  return {
+    ...value,
+    fullRestorePoint: {
+      ...value.fullRestorePoint,
+      schedule: { ...value.fullRestorePoint.schedule, enabled: false },
     },
   };
 }
@@ -174,9 +174,7 @@ function ScheduleEditor({
         <input
           type="checkbox"
           checked={value.enabled}
-          onChange={(event) =>
-            onChange({ ...value, enabled: event.target.checked })
-          }
+          onChange={(event) => onChange({ ...value, enabled: event.target.checked })}
         />
         Enabled
       </label>
@@ -208,9 +206,7 @@ function ScheduleEditor({
           Weekday
           <select
             value={weekday}
-            onChange={(event) =>
-              onChange({ ...value, weekdays: [event.target.value] })
-            }
+            onChange={(event) => onChange({ ...value, weekdays: [event.target.value] })}
           >
             {DAYS.map((day) => (
               <option key={day} value={day}>
@@ -274,17 +270,8 @@ function queryAlert(
   );
 }
 
-function listStrings(value: unknown, limit = 16): string[] {
-  return Array.isArray(value)
-    ? value
-        .filter((entry): entry is string => typeof entry === "string")
-        .slice(0, limit)
-    : [];
-}
-
 export function BackupsView30(props: ViewProps) {
   const hostConnected = Boolean(props.state.ready?.agents.host);
-  const paperConnected = Boolean(props.state.ready?.agents.paper);
   const canMaintenance = props.can("maintenance.status", "HOST");
   const canBackups =
     props.can("backup.full.list", "HOST") || props.can("backup.list", "HOST");
@@ -301,16 +288,10 @@ export function BackupsView30(props: ViewProps) {
     hostConnected && props.can("maintenance.settings.get", "HOST"),
     "HOST",
   );
-  const fullQuery = useQuery(
+  const backupsQuery = useQuery(
     "backup.full.list",
     { page: 0 },
     hostConnected && props.can("backup.full.list", "HOST"),
-    "HOST",
-  );
-  const liveQuery = useQuery(
-    "backup.list",
-    { page: 0 },
-    hostConnected && props.can("backup.list", "HOST"),
     "HOST",
   );
   const providerQuery = useQuery(
@@ -327,7 +308,6 @@ export function BackupsView30(props: ViewProps) {
   const [localError, setLocalError] = useState("");
   const [lastFailure, setLastFailure] = useState<FailureRecord | null>(null);
   const [restore, setRestore] = useState<{
-    type: "full" | "live";
     id: string;
     token: string;
     serverName: string;
@@ -378,9 +358,7 @@ export function BackupsView30(props: ViewProps) {
   const activeDraft = draft ?? persistedDraft;
   const diagnostics = diagnosticsData ?? {};
   const provider = providerQuery.hasSuccess ? providerQuery.data : {};
-  const operation = status.hasSuccess
-    ? record(status.data.currentOperation)
-    : {};
+  const operation = status.hasSuccess ? record(status.data.currentOperation) : {};
   const progress = props.state.backupProgress;
 
   const captureFailure = (action: string, error: unknown) => {
@@ -405,10 +383,7 @@ export function BackupsView30(props: ViewProps) {
     }
   };
 
-  const runOperation = async (
-    action: string,
-    parameters: JsonMap = {},
-  ) => {
+  const runOperation = async (action: string, parameters: JsonMap = {}) => {
     setLocalError("");
     try {
       return await props.run(action, parameters, "HOST");
@@ -427,15 +402,14 @@ export function BackupsView30(props: ViewProps) {
   const refreshAll = () => {
     status.refresh();
     settingsQuery.refresh();
-    fullQuery.refresh();
-    liveQuery.refresh();
+    backupsQuery.refresh();
     providerQuery.refresh();
   };
 
   if (!hostConnected)
     return (
       <Empty title="Backups & Maintenance needs the Host companion">
-        The browser and Paper plugin never receive systemd, rclone, or backup filesystem authority.
+        Backup, provider and systemd authority exists only in the Linux Host companion.
       </Empty>
     );
   if (!canBackups && !canMaintenance)
@@ -445,9 +419,6 @@ export function BackupsView30(props: ViewProps) {
       </Empty>
     );
 
-  const unreadable = number(diagnostics.unreadableDurableCount);
-  const missingIncludes = listStrings(diagnostics.missingIncludes);
-  const symlinkIssues = listStrings(diagnostics.symlinkIssues);
   const providerState = str(provider.status, "UNKNOWN");
   const providerConfigured = provider.configured === true;
   const providerReadiness: ReadinessState = !providerQuery.hasSuccess
@@ -461,57 +432,44 @@ export function BackupsView30(props: ViewProps) {
           : providerState === "CONFIGURED_UNTESTED"
             ? "Warning"
             : "Unknown";
-  const readReadiness: ReadinessState = !diagnosticsData
-    ? "Unknown"
-    : (unreadable ?? 0) > 0 || symlinkIssues.length > 0
-      ? "Failed"
-      : missingIncludes.length > 0
-        ? "Warning"
-        : "Ready";
   const storageReadiness: ReadinessState = !diagnosticsData
     ? "Unknown"
     : diagnostics.backupRootWritable === true
       ? "Ready"
       : "Failed";
-  const recoveryKnown = status.hasSuccess || fullQuery.hasSuccess || liveQuery.hasSuccess;
+  const commandReadiness: ReadinessState = !diagnosticsData
+    ? "Unknown"
+    : diagnostics.commandChannelConfigured === true
+      ? "Ready"
+      : "Warning";
+  const recoveryKnown = status.hasSuccess || backupsQuery.hasSuccess || diagnosticsData !== null;
   const recoveryRequired =
     status.data.jobRecoveryRequired === true ||
     status.data.restoreRecoveryRequired === true ||
-    fullQuery.data.recoveryRequired === true ||
-    liveQuery.data.recoveryRequired === true ||
+    backupsQuery.data.recoveryRequired === true ||
     diagnostics.recoveryRequired === true;
-
-  const fullBackups = records(fullQuery.data.backups, 1000);
-  const liveBackups = records(liveQuery.data.backups, 1000);
-  const allBackups: BackupRow[] = [
-    ...fullBackups.map(
-      (backup): BackupRow => ({ ...backup, _kind: "full" }),
-    ),
-    ...liveBackups.map(
-      (backup): BackupRow => ({ ...backup, _kind: "live" }),
-    ),
-  ].sort(
+  const backupMode = str(
+    status.data.fullBackupMode,
+    str(diagnostics.backupMode, "MANUAL_ONLY"),
+  );
+  const backups = records(backupsQuery.data.backups, 1000).sort(
     (a, b) =>
       Date.parse(str(b.timestamp, "1970-01-01")) -
       Date.parse(str(a.timestamp, "1970-01-01")),
   );
 
-  const startRestore = async (type: "full" | "live", backupId: string) => {
-    const action =
-      type === "full" ? "backup.full.restore.prepare" : "backup.restore.prepare";
-    const result = await runOperation(action, { backupId });
+  const startRestore = async (backupId: string) => {
+    const result = await runOperation("backup.full.restore.prepare", { backupId });
     setTyped("");
     setRestore({
-      type,
       id: backupId,
       token: str(result.data.confirmationToken, ""),
       serverName: str(result.data.serverName, ""),
     });
   };
 
-  const currentPhase = str(progress?.phase, str(operation.phase, ""));
+  const currentPhase = str(operation.phase, str(progress?.phase, ""));
   const currentIndex = PHASES.indexOf(currentPhase);
-  const warnings = listStrings(progress?.warnings ?? operation.warnings);
 
   return (
     <div className="cr30-backups-stack">
@@ -519,18 +477,18 @@ export function BackupsView30(props: ViewProps) {
         <div>
           <strong>Backups & Maintenance</strong>
           <span>
-            Host-authoritative backup readiness, recovery, scheduling and off-site verification.
+            Host-owned manual full backups, restart scheduling, recovery and off-site verification.
           </span>
         </div>
         <div className="cr-actions">
           <Badge tone="green">Host connected</Badge>
+          <Badge tone="cyan">Manual full backup</Badge>
           <button className="cr-button" onClick={refreshAll}>Refresh</button>
         </div>
       </div>
 
       {queryAlert("Maintenance status unavailable", status)}
-      {queryAlert("Full restore-point inventory unavailable", fullQuery)}
-      {queryAlert("Live snapshot inventory unavailable", liveQuery)}
+      {queryAlert("Full restore-point inventory unavailable", backupsQuery)}
       {queryAlert("Provider status unavailable", providerQuery)}
       {localError && <p className="cr-alert" role="alert">{localError}</p>}
 
@@ -544,14 +502,14 @@ export function BackupsView30(props: ViewProps) {
       >
         <div className="cr341-readiness-grid">
           <ReadinessItem
-            label="Paper coordination"
-            state={paperConnected ? "Ready" : "Failed"}
-            detail={paperConnected ? "Authenticated Paper agent is present." : "Paper is not currently authenticated."}
-          />
-          <ReadinessItem
             label="Host companion"
             state="Ready"
-            detail="Authenticated Host control plane is connected."
+            detail="Backup orchestration is independent of the Paper plugin connection."
+          />
+          <ReadinessItem
+            label="Backup mode"
+            state={backupMode.includes("MANUAL") ? "Ready" : "Warning"}
+            detail={`${backupMode} · recurring full backups are disabled.`}
           />
           <ReadinessItem
             label="Backup storage"
@@ -559,30 +517,21 @@ export function BackupsView30(props: ViewProps) {
             detail={
               diagnosticsData
                 ? diagnostics.backupRootWritable === true
-                  ? `${bytes(diagnostics.backupRootUsableBytes)} usable`
+                  ? "Configured backup root is writable."
                   : "Configured backup root is not writable."
-                : "Run backup diagnostics to verify storage."
+                : "Run diagnostics to verify the Host backup root."
             }
           />
           <ReadinessItem
-            label="Filesystem read contract"
-            state={readReadiness}
+            label="Maintenance command channel"
+            state={commandReadiness}
             detail={
               diagnosticsData
-                ? `${unreadable ?? 0} unreadable durable · ${missingIncludes.length} missing includes · ${number(diagnostics.volatileExcludedCount) ?? 0} volatile excluded`
-                : "Run backup diagnostics after Paper save flush."
+                ? diagnostics.commandChannelConfigured === true
+                  ? "Host-local maintenance command transport is configured."
+                  : "Required while Minecraft is online; a stopped server can still be archived."
+                : "Run diagnostics to verify the Host-local command channel."
             }
-          />
-          <ReadinessItem
-            label="Systemd control"
-            state={
-              !diagnosticsData
-                ? "Unknown"
-                : str(diagnostics.serviceState, "unknown").toLowerCase() === "active"
-                  ? "Ready"
-                  : "Warning"
-            }
-            detail={diagnosticsData ? `Paper service: ${str(diagnostics.serviceState, "unknown")}` : "No destructive service test is run automatically."}
           />
           <ReadinessItem
             label="Off-site provider"
@@ -590,47 +539,48 @@ export function BackupsView30(props: ViewProps) {
             detail={
               providerQuery.hasSuccess
                 ? providerState === "LOCAL"
-                  ? "Running Host explicitly reports LOCAL."
+                  ? "No off-site provider is configured."
                   : `${str(provider.provider, "RCLONE")} · ${str(provider.remote, "remote label unavailable")}`
                 : "Provider truth is unavailable; LOCAL is not inferred."
             }
           />
           <ReadinessItem
             label="Recovery"
-            state={!recoveryKnown && !diagnosticsData ? "Unknown" : recoveryRequired ? "Failed" : "Ready"}
-            detail={recoveryRequired ? "Host recovery must be resolved before destructive operations." : recoveryKnown || diagnosticsData ? "No recovery requirement reported." : "Recovery state unavailable."}
-          />
-          <ReadinessItem
-            label="Scheduler"
-            state={status.hasSuccess ? "Ready" : "Unknown"}
-            detail={status.hasSuccess ? `Host timezone: ${str(status.data.timezone, "unknown")}` : "Maintenance status has not been confirmed."}
+            state={!recoveryKnown ? "Unknown" : recoveryRequired ? "Failed" : "Ready"}
+            detail={
+              recoveryRequired
+                ? "Host recovery must be resolved before destructive operations."
+                : recoveryKnown
+                  ? "No recovery requirement reported."
+                  : "Recovery state unavailable."
+            }
           />
         </div>
         {diagnosticsAt > 0 && (
           <p className="cr-hint cr30-backup-preview-note">
-            Diagnostics last ran {new Date(diagnosticsAt).toLocaleString()}. Provider reachability is not tested by preflight.
-          </p>
-        )}
-        {missingIncludes.length > 0 && (
-          <p className="cr-alert" role="alert">
-            Missing configured includes: {missingIncludes.join(", ")}
+            Diagnostics last ran {new Date(diagnosticsAt).toLocaleString()}. Full-backup provider preflight is repeated by the Host before countdown.
           </p>
         )}
       </Panel>
 
       <div className="cr30-backup-columns">
-        <Panel title="Non-disruptive actions" aside={<Badge>Paper remains online</Badge>}>
+        <Panel title="Manual full backup" aside={<Badge tone="amber">Server stop required</Badge>}>
           <div className="cr30-backup-actions">
             {props.can("backup.preflight", "HOST") && (
               <ActionButton onClick={runDiagnostics}>Run backup diagnostics</ActionButton>
             )}
-            {props.can("backup.create", "HOST") && (
+            {props.can("maintenance.full-backup.create", "HOST") && (
               <ActionButton
+                danger
                 onClick={async () => {
-                  await runOperation("backup.create", {});
-                  liveQuery.refresh();
+                  if (!window.confirm(
+                    `Create a full restore point? The Host owns a mandatory ${FULL_BACKUP_WARNINGS} warning sequence, flushes saves, stops Minecraft, verifies the local archive, and then applies the off-site policy.`,
+                  )) return;
+                  await runOperation("maintenance.full-backup.create", {});
+                  status.refresh();
+                  backupsQuery.refresh();
                 }}
-              >Create live snapshot</ActionButton>
+              >Create full restore point</ActionButton>
             )}
             {props.can("provider.test", "HOST") && (
               <ActionButton
@@ -642,34 +592,26 @@ export function BackupsView30(props: ViewProps) {
               >Test Google Drive</ActionButton>
             )}
           </div>
+          <p className="cr-hint cr30-backup-preview-note">
+            Paper connectivity is not a backup prerequisite. Provider preflight occurs before the warning countdown, and final save uses the Host-local command channel.
+          </p>
         </Panel>
 
-        <Panel title="Disruptive maintenance" aside={<Badge tone="amber">Paper may stop</Badge>}>
+        <Panel title="Restart" aside={<Badge>Independent schedule</Badge>}>
           <div className="cr30-backup-actions">
             {props.can("maintenance.restart.now", "HOST") && (
               <ActionButton
                 danger
                 onClick={async () => {
-                  if (!window.confirm("Restart PlexonCraft now? Paper will flush saves and the Host will require a fresh authenticated reconnect before reporting success.")) return;
+                  if (!window.confirm("Restart PlexonCraft now? The Host will flush saves, stop the service, start it again, and verify Minecraft readiness.")) return;
                   await runOperation("maintenance.restart.now", { skipCountdown: true });
                   status.refresh();
                 }}
               >Restart server</ActionButton>
             )}
-            {props.can("maintenance.full-backup.create", "HOST") && (
-              <ActionButton
-                danger
-                onClick={async () => {
-                  if (!window.confirm("Create a full restore point now? Paper will be stopped while the cold full-server archive is created.")) return;
-                  await runOperation("maintenance.full-backup.create", { skipCountdown: true });
-                  status.refresh();
-                  fullQuery.refresh();
-                }}
-              >Create full restore point</ActionButton>
-            )}
           </div>
           <p className="cr-hint cr30-backup-preview-note">
-            Full restore points intentionally stop Paper before mutable worlds and plugin databases are copied.
+            Restart scheduling remains separate from backups. Disabling recurring backups does not disable scheduled restarts.
           </p>
         </Panel>
       </div>
@@ -693,7 +635,14 @@ export function BackupsView30(props: ViewProps) {
         <Panel title="Current operation" aside={<Badge tone="cyan">{currentPhase || "Active"}</Badge>}>
           <div className="cr341-phase-list" aria-label="Backup operation phases">
             {PHASES.map((phase, index) => {
-              const state = currentIndex < 0 ? "pending" : index < currentIndex ? "done" : index === currentIndex ? "active" : "pending";
+              const state =
+                currentIndex < 0
+                  ? "pending"
+                  : index < currentIndex
+                    ? "done"
+                    : index === currentIndex
+                      ? "active"
+                      : "pending";
               return (
                 <div className={`cr341-phase ${state}`} key={phase}>
                   <span aria-hidden>{state === "done" ? "✓" : state === "active" ? "●" : "○"}</span>
@@ -706,10 +655,13 @@ export function BackupsView30(props: ViewProps) {
             <div><dt>Request / job</dt><dd>{str(progress?.requestId, str(progress?.jobId, str(operation.jobId, "—")))}</dd></div>
             <div><dt>Started</dt><dd>{time(progress?.startedAt ?? operation.startedAt)}</dd></div>
             <div><dt>Bytes</dt><dd>{bytes(progress?.bytes)}</dd></div>
-            <div><dt>Entries</dt><dd>{number(progress?.entries) ?? "—"}</dd></div>
-            <div><dt>Skipped transient</dt><dd>{number(progress?.skippedTransientCount ?? progress?.skipped) ?? "—"}</dd></div>
+            <div><dt>Entries</dt><dd>{number(progress?.entryCount ?? progress?.entries) ?? "—"}</dd></div>
+            <div><dt>Local verified</dt><dd>{operation.localBackupVerified === true ? "Yes" : "—"}</dd></div>
+            <div><dt>Remote verified</dt><dd>{operation.remoteBackupVerified === true ? "Yes" : "—"}</dd></div>
           </dl>
-          {warnings.length > 0 && <p className="cr-alert">Warnings: {warnings.join(" · ")}</p>}
+          {currentPhase === "COUNTDOWN" && (
+            <p className="cr-hint cr30-backup-preview-note">Required warning boundaries: {FULL_BACKUP_WARNINGS}.</p>
+          )}
           <p className="cr-hint cr30-backup-preview-note">No ETA is invented when the Host does not know one.</p>
         </Panel>
       )}
@@ -742,45 +694,48 @@ export function BackupsView30(props: ViewProps) {
         </Panel>
       )}
 
-      <Panel title="Backup inventory" aside={<Badge>{allBackups.length} loaded</Badge>}>
-        {allBackups.length ? (
+      <Panel title="Full restore points" aside={<Badge>{backups.length} loaded</Badge>}>
+        {backups.length ? (
           <div className="cr-table-wrap cr30-backup-table">
             <table>
               <thead>
-                <tr><th>Created</th><th>Type</th><th>Size</th><th>Copies</th><th>Verification</th><th>Warnings</th><th>Actions</th></tr>
+                <tr><th>Created</th><th>Size</th><th>Copies</th><th>Verification</th><th>Result</th><th>Actions</th></tr>
               </thead>
               <tbody>
-                {allBackups.slice(0, 100).map((backup) => {
+                {backups.slice(0, 100).map((backup) => {
                   const id = str(backup.backupId);
-                  const full = backup._kind === "full";
-                  const size = full ? backup.archiveBytes : backup.bytes;
-                  const backupWarnings = listStrings(backup.warnings);
-                  const skipped = number(backup.skippedTransientCount) ?? 0;
-                  const missing = listStrings(backup.missingIncludeWarnings);
+                  const size = number(backup.archiveBytes) ?? 0;
+                  const result = str(backup.result, "UNKNOWN");
                   return (
-                    <tr key={`${backup._kind}-${id}`}>
-                      <td>{time(backup.timestamp)}<small>{backup.automatic ? "Scheduled" : backup.emergency ? "Emergency" : "Manual"}</small></td>
-                      <td><Badge tone={full ? "cyan" : "quiet"}>{full ? "Full restore point" : "Live snapshot"}</Badge></td>
+                    <tr key={id}>
+                      <td>{time(backup.timestamp)}<small>{backup.emergency ? "Emergency" : "Manual"}</small></td>
                       <td>{bytes(size)}<small>{typeof backup.durationMillis === "number" ? `${Math.round(backup.durationMillis / 1000)}s` : "—"}</small></td>
                       <td><Badge tone={backup.local ? "green" : "quiet"}>{backup.local ? "Local" : "No local"}</Badge> <Badge tone={backup.offsite ? "green" : "quiet"}>{backup.offsite ? "Off-site" : "No off-site"}</Badge></td>
                       <td>{str(backup.verification, str(backup.sha256, "") ? "SHA-256" : "—")}<small title={str(backup.sha256, "")}>{str(backup.sha256, "").slice(0, 12)}{str(backup.sha256, "") ? "…" : ""}</small></td>
-                      <td>{backupWarnings.length || skipped || missing.length ? <Badge tone="amber">{backupWarnings.length + missing.length} warnings · {skipped} skipped</Badge> : <Badge tone="green">Clear</Badge>}</td>
+                      <td><Badge tone={result === "SUCCESS" ? "green" : result.includes("LOCAL") ? "amber" : "quiet"}>{result}</Badge></td>
                       <td>
                         <div className="cr-actions">
-                          {full && props.can("backup.full.verify", "HOST") && (
+                          {props.can("backup.full.verify", "HOST") && (
                             <ActionButton onClick={async () => { await runOperation("backup.full.verify", { backupId: id }); props.notice("Restore point verified."); }}>Verify</ActionButton>
                           )}
-                          {full && !backup.offsite && providerConfigured && props.can("backup.full.retry-upload", "HOST") && (
-                            <ActionButton onClick={async () => { await runOperation("backup.full.retry-upload", { backupId: id }); fullQuery.refresh(); }}>Retry upload</ActionButton>
+                          {!backup.offsite && providerConfigured && props.can("backup.full.retry-upload", "HOST") && (
+                            <ActionButton onClick={async () => { await runOperation("backup.full.retry-upload", { backupId: id }); backupsQuery.refresh(); }}>Retry upload</ActionButton>
                           )}
-                          {!full && props.can("backup.download", "HOST") && (
+                          {props.can("backup.download", "HOST") && (
                             <ActionButton
-                              disabled={download !== null || Number(size) > 64 * 1024 * 1024}
+                              disabled={download !== null || size > 64 * 1024 * 1024}
                               onClick={async () => {
                                 controller.current = new AbortController();
                                 setDownload(0);
                                 try {
-                                  await downloadTransfer("backup.download", { backupId: id }, `PlexonPanel-${id}.zip`, "HOST", controller.current.signal, setDownload);
+                                  await downloadTransfer(
+                                    "backup.download",
+                                    { backupId: id },
+                                    `PlexonPanel-${id}.zip`,
+                                    "HOST",
+                                    controller.current.signal,
+                                    setDownload,
+                                  );
                                 } catch (failure) {
                                   setLocalError(failure instanceof Error ? failure.message : "Download failed");
                                 } finally {
@@ -789,16 +744,16 @@ export function BackupsView30(props: ViewProps) {
                               }}
                             >Download</ActionButton>
                           )}
-                          {props.can(full ? "backup.full.restore.prepare" : "backup.restore.prepare", "HOST") && (
-                            <ActionButton danger onClick={() => startRestore(full ? "full" : "live", id)}>Restore</ActionButton>
+                          {props.can("backup.full.restore.prepare", "HOST") && (
+                            <ActionButton danger onClick={() => startRestore(id)}>Restore</ActionButton>
                           )}
-                          {!backup.emergency && props.can(full ? "backup.full.delete" : "backup.delete", "HOST") && (
+                          {!backup.emergency && props.can("backup.full.delete", "HOST") && (
                             <ActionButton
                               danger
                               onClick={async () => {
-                                if (!window.confirm("Delete this local backup metadata and archive?")) return;
-                                await runOperation(full ? "backup.full.delete" : "backup.delete", { backupId: id });
-                                if (full) fullQuery.refresh(); else liveQuery.refresh();
+                                if (!window.confirm("Delete this local full restore point metadata and archive?")) return;
+                                await runOperation("backup.full.delete", { backupId: id });
+                                backupsQuery.refresh();
                               }}
                             >Delete</ActionButton>
                           )}
@@ -811,8 +766,8 @@ export function BackupsView30(props: ViewProps) {
             </table>
           </div>
         ) : (
-          <Empty title={fullQuery.busy || liveQuery.busy ? "Loading backups…" : "No confirmed backups"}>
-            Inventory remains unknown if its query failed; an empty result is shown only from confirmed query data.
+          <Empty title={backupsQuery.busy ? "Loading restore points…" : "No confirmed restore points"}>
+            Inventory remains unknown if its query failed; an empty result is shown only from confirmed Host data.
           </Empty>
         )}
         {download !== null && (
@@ -824,14 +779,14 @@ export function BackupsView30(props: ViewProps) {
         <p className="cr-hint cr30-backup-preview-note">Browser downloads remain capped at 64 MiB.</p>
       </Panel>
 
-      <Panel title="Schedules" aside={<Badge>{status.hasSuccess ? str(status.data.timezone, "Host timezone") : "Unknown timezone"}</Badge>}>
+      <Panel title="Scheduling" aside={<Badge>{status.hasSuccess ? str(status.data.timezone, "Host timezone") : "Unknown timezone"}</Badge>}>
         <div className="cr30-backup-metrics">
-          <article className="cr30-backup-metric"><span>Next restart</span><strong>{status.hasSuccess ? time(status.data.nextRestart) : "Unknown"}</strong><small>Calendar maintenance</small></article>
-          <article className="cr30-backup-metric"><span>Next full restore point</span><strong>{status.hasSuccess ? time(status.data.nextFullRestorePoint) : "Unknown"}</strong><small>Cold full-server archive</small></article>
-          <article className="cr30-backup-metric"><span>Live snapshot</span><strong>{diagnosticsData ? number(diagnostics.legacyIntervalMinutes) === 0 ? "Disabled" : `Every ${number(diagnostics.legacyIntervalMinutes)} min` : "Unknown"}</strong><small>Protocol 3 Host interval scheduler · no decorative calendar schedule</small></article>
+          <article className="cr30-backup-metric"><span>Next restart</span><strong>{status.hasSuccess ? time(status.data.nextRestart) : "Unknown"}</strong><small>Independent restart scheduler</small></article>
+          <article className="cr30-backup-metric"><span>Full backups</span><strong>Manual only</strong><small>No interval or calendar backup scheduler</small></article>
+          <article className="cr30-backup-metric"><span>Warning sequence</span><strong>{FULL_BACKUP_WARNINGS}</strong><small>Host-owned and not bypassable from the dashboard</small></article>
         </div>
         <p className="cr-hint cr30-backup-preview-note">
-          Same-time full restore point + restart collapses into one serialized maintenance operation. Live snapshots remain on the separate Protocol 3 Host interval scheduler and all backup/maintenance work shares the Host operation lock. Keep unattended destructive schedules disabled until the intended live validation gates have been exercised.
+          Backup scheduling has been retired. Only restart scheduling remains automatic, and all destructive operations remain serialized by the Host.
         </p>
       </Panel>
 
@@ -839,19 +794,26 @@ export function BackupsView30(props: ViewProps) {
         <Panel title="Maintenance settings" aside={dirty ? <Badge tone="amber">Unsaved</Badge> : <Badge>Host persisted</Badge>}>
           <div className="cr30-settings-grid">
             <section>
-              <h3>Restart</h3>
-              <ScheduleEditor value={activeDraft.restart.schedule} onChange={(schedule) => { setDraft({ ...activeDraft, restart: { ...activeDraft.restart, schedule } }); setDirty(true); }} />
+              <h3>Restart schedule</h3>
+              <ScheduleEditor
+                value={activeDraft.restart.schedule}
+                onChange={(schedule) => {
+                  setDraft({ ...activeDraft, restart: { ...activeDraft.restart, schedule } });
+                  setDirty(true);
+                }}
+              />
               <label>Timezone<input value={activeDraft.timezone} onChange={(event) => { setDraft({ ...activeDraft, timezone: event.target.value }); setDirty(true); }} placeholder="America/Sao_Paulo" /></label>
               <label>Warnings · seconds<input value={activeDraft.restart.warningSeconds.join(", ")} onChange={(event) => { setDraft({ ...activeDraft, restart: { ...activeDraft.restart, warningSeconds: event.target.value.split(",").map((value) => Number(value.trim())).filter((value) => Number.isFinite(value) && value >= 0) } }); setDirty(true); }} /></label>
+              <label>Stop timeout · seconds<input type="number" min={30} max={1800} value={activeDraft.restart.stopTimeoutSeconds} onChange={(event) => { setDraft({ ...activeDraft, restart: { ...activeDraft.restart, stopTimeoutSeconds: Number(event.target.value) } }); setDirty(true); }} /></label>
               <label>Startup timeout · seconds<input type="number" min={30} max={1800} value={activeDraft.restart.startupTimeoutSeconds} onChange={(event) => { setDraft({ ...activeDraft, restart: { ...activeDraft.restart, startupTimeoutSeconds: Number(event.target.value) } }); setDirty(true); }} /></label>
             </section>
             <section>
-              <h3>Full restore point</h3>
-              <ScheduleEditor value={activeDraft.fullRestorePoint.schedule} onChange={(schedule) => { setDraft({ ...activeDraft, fullRestorePoint: { ...activeDraft.fullRestorePoint, schedule } }); setDirty(true); }} />
+              <h3>Manual full restore point</h3>
+              <p className="cr-hint">There is no full-backup schedule. These settings apply only when a backup is explicitly started.</p>
               <label>Retention<select value={activeDraft.fullRestorePoint.retentionMode} onChange={(event) => { setDraft({ ...activeDraft, fullRestorePoint: { ...activeDraft.fullRestorePoint, retentionMode: event.target.value as "SINGLE_CURRENT" | "ROTATING" } }); setDirty(true); }}><option value="SINGLE_CURRENT">Single current</option><option value="ROTATING">Rotating</option></select></label>
               {activeDraft.fullRestorePoint.retentionMode === "ROTATING" && <label>Keep<input type="number" min={1} max={52} value={activeDraft.fullRestorePoint.retentionCount} onChange={(event) => { setDraft({ ...activeDraft, fullRestorePoint: { ...activeDraft.fullRestorePoint, retentionCount: Number(event.target.value) } }); setDirty(true); }} /></label>}
               <label>Canonical filename<input value={activeDraft.fullRestorePoint.canonicalFilename} onChange={(event) => { setDraft({ ...activeDraft, fullRestorePoint: { ...activeDraft.fullRestorePoint, canonicalFilename: event.target.value } }); setDirty(true); }} /></label>
-              <label className="cr30-toggle-row"><input type="checkbox" checked={activeDraft.fullRestorePoint.restartAfter} onChange={(event) => { setDraft({ ...activeDraft, fullRestorePoint: { ...activeDraft.fullRestorePoint, restartAfter: event.target.checked } }); setDirty(true); }} />Restart after backup</label>
+              <label className="cr30-toggle-row"><input type="checkbox" checked={activeDraft.fullRestorePoint.restartAfter} onChange={(event) => { setDraft({ ...activeDraft, fullRestorePoint: { ...activeDraft.fullRestorePoint, restartAfter: event.target.checked } }); setDirty(true); }} />Restart after successful backup</label>
             </section>
           </div>
           <div className="cr-actions cr30-settings-actions">
@@ -859,7 +821,8 @@ export function BackupsView30(props: ViewProps) {
               <ActionButton
                 disabled={!dirty}
                 onClick={async () => {
-                  await runOperation("maintenance.settings.update", { settings: activeDraft as unknown as JsonMap });
+                  const settings = manualOnlySettings(activeDraft);
+                  await runOperation("maintenance.settings.update", { settings: settings as unknown as JsonMap });
                   setDirty(false);
                   setDraft(null);
                   settingsQuery.refresh();
@@ -877,9 +840,7 @@ export function BackupsView30(props: ViewProps) {
         <Panel title="Confirm restore">
           <div className="cr-form cr-pad">
             <p>
-              {restore.type === "full"
-                ? "This full restore point replaces the stopped server tree after an emergency pre-restore backup and hash verification. PlexonCraft will be unavailable during restore."
-                : "Paper must remain stopped. The Host will create an emergency backup, verify the archive, and keep a rollback journal."}
+              This full restore point replaces the stopped server tree after an emergency pre-restore backup and local verification. PlexonCraft will be unavailable during restore.
             </p>
             <label>Type {restore.serverName} to continue<input value={typed} onChange={(event) => setTyped(event.target.value)} autoComplete="off" /></label>
             <div className="cr-actions">
@@ -888,7 +849,7 @@ export function BackupsView30(props: ViewProps) {
                 disabled={typed !== restore.serverName}
                 onClick={async () => {
                   await runOperation(
-                    restore.type === "full" ? "backup.full.restore" : "backup.restore",
+                    "backup.full.restore",
                     { backupId: restore.id, confirmationToken: restore.token, serverName: typed, startAfter: true },
                   );
                   setRestore(null);
