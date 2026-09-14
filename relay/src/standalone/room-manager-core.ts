@@ -403,13 +403,57 @@ export class Room {
       requiredUuid(body.leaseId, "leaseId");
       if (!["prepare", "renew", "resume"].includes(String(body.operation)))
         throw new Error("Invalid save lease operation");
-      await this.sendToAgent("PAPER", "backup.coordination", body);
+      if (!(await this.sendToAgent("PAPER", "backup.coordination", body))) {
+        await this.sendToAgent("HOST", "backup.coordination.result", {
+          requestId: body.requestId,
+          success: false,
+          code: "PAPER_COORDINATION_UNAVAILABLE",
+          phase: "COORDINATING_PAPER",
+          message: "The relay could not deliver save coordination to an authenticated Paper agent.",
+        });
+      }
       this.counters.messagesAccepted += 1;
       return;
     }
     if (envelope.type === "backup.coordination.result") {
       if (session.kind !== "PAPER") throw new Error("Only Paper reports save leases");
       await this.sendToAgent("HOST", "backup.coordination.result", body);
+      this.counters.messagesAccepted += 1;
+      return;
+    }
+    if (envelope.type === "maintenance.coordination") {
+      if (session.kind !== "HOST") throw new Error("Only Host coordinates maintenance");
+      requiredUuid(body.requestId, "requestId");
+      const operation = requiredText(body.operation, "operation", 24);
+      if (operation !== "notice" && operation !== "flush")
+        throw new Error("Invalid maintenance operation");
+      if (typeof body.automatic !== "boolean") throw new Error("Invalid maintenance mode");
+      if (body.deviceId !== undefined) requiredUuid(body.deviceId, "deviceId");
+      if (
+        body.generation !== undefined &&
+        (!Number.isSafeInteger(body.generation) || Number(body.generation) < 1)
+      )
+        throw new Error("Invalid maintenance generation");
+      if (operation === "notice") {
+        const message = requiredText(body.message, "message", 512);
+        if (/[\0\r\n]/.test(message)) throw new Error("Invalid maintenance message");
+        if (body.title !== undefined && body.title !== null) {
+          const title = requiredText(body.title, "title", 160);
+          if (/[\0\r\n]/.test(title)) throw new Error("Invalid maintenance title");
+        }
+      }
+      await this.sendToAgent("PAPER", "maintenance.coordination", body);
+      this.counters.messagesAccepted += 1;
+      return;
+    }
+    if (envelope.type === "maintenance.coordination.result") {
+      if (session.kind !== "PAPER") throw new Error("Only Paper reports maintenance coordination");
+      requiredUuid(body.requestId, "requestId");
+      const operation = requiredText(body.operation, "operation", 24);
+      if (operation !== "notice" && operation !== "flush")
+        throw new Error("Invalid maintenance operation");
+      if (typeof body.success !== "boolean") throw new Error("Invalid maintenance result");
+      await this.sendToAgent("HOST", "maintenance.coordination.result", body);
       this.counters.messagesAccepted += 1;
       return;
     }
@@ -484,12 +528,18 @@ export class Room {
       if (HIGH_RISK.has(action) && parameters.confirmed !== true)
         throw new Error("CONFIRMATION_REQUIRED");
       if (
-        (action === "player.op" || action === "player.deop" || action.startsWith("backup.restore")) &&
+        (action === "player.op" ||
+          action === "player.deop" ||
+          action.startsWith("backup.restore") ||
+          action.startsWith("backup.full.restore")) &&
         session.access.role !== "Owner"
       )
         throw new Error("OWNER_REQUIRED");
       let kind: AgentKind =
-        action.startsWith("backup.") || (action.startsWith("server.") && action !== "server.status")
+        action.startsWith("backup.") ||
+        action.startsWith("maintenance.") ||
+        action.startsWith("provider.") ||
+        (action.startsWith("server.") && action !== "server.status")
           ? "HOST"
           : "PAPER";
       if ((action.startsWith("files.") || action === "server.status") && this.host?.authenticated)
@@ -735,7 +785,7 @@ export class Room {
       type: "dashboard.ready",
       serverId: this.serverId,
       protocolVersion: 3,
-      version: "3.1.0",
+      version: "3.4.0",
       connectionStatus: this.paper?.authenticated ? "online" : "offline",
       agents: {
         paper: Boolean(this.paper?.authenticated),

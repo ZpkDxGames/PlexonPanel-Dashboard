@@ -943,12 +943,54 @@ export class ServerRoom {
       requiredUuid(body.leaseId, "leaseId");
       if (!["prepare", "renew", "resume"].includes(String(body.operation)))
         throw new Error("Invalid save lease operation");
-      await this.sendToAgent("PAPER", "backup.coordination", body);
+      if (!(await this.sendToAgent("PAPER", "backup.coordination", body))) {
+        await this.sendToAgent("HOST", "backup.coordination.result", {
+          requestId: body.requestId,
+          success: false,
+          code: "PAPER_COORDINATION_UNAVAILABLE",
+          phase: "COORDINATING_PAPER",
+          message: "The relay could not deliver save coordination to an authenticated Paper agent.",
+        });
+      }
       return;
     }
     if (envelope.type === "backup.coordination.result") {
       if (a.kind !== "PAPER") throw new Error("Only Paper reports save leases");
       await this.sendToAgent("HOST", "backup.coordination.result", body);
+      return;
+    }
+    if (envelope.type === "maintenance.coordination") {
+      if (a.kind !== "HOST") throw new Error("Only Host coordinates maintenance");
+      requiredUuid(body.requestId, "requestId");
+      const operation = requiredText(body.operation, "operation", 24);
+      if (operation !== "notice" && operation !== "flush")
+        throw new Error("Invalid maintenance operation");
+      if (typeof body.automatic !== "boolean") throw new Error("Invalid maintenance mode");
+      if (body.deviceId !== undefined) requiredUuid(body.deviceId, "deviceId");
+      if (
+        body.generation !== undefined &&
+        (!Number.isSafeInteger(body.generation) || Number(body.generation) < 1)
+      )
+        throw new Error("Invalid maintenance generation");
+      if (operation === "notice") {
+        const message = requiredText(body.message, "message", 512);
+        if (/[\0\r\n]/.test(message)) throw new Error("Invalid maintenance message");
+        if (body.title !== undefined && body.title !== null) {
+          const title = requiredText(body.title, "title", 160);
+          if (/[\0\r\n]/.test(title)) throw new Error("Invalid maintenance title");
+        }
+      }
+      await this.sendToAgent("PAPER", "maintenance.coordination", body);
+      return;
+    }
+    if (envelope.type === "maintenance.coordination.result") {
+      if (a.kind !== "PAPER") throw new Error("Only Paper reports maintenance coordination");
+      requiredUuid(body.requestId, "requestId");
+      const operation = requiredText(body.operation, "operation", 24);
+      if (operation !== "notice" && operation !== "flush")
+        throw new Error("Invalid maintenance operation");
+      if (typeof body.success !== "boolean") throw new Error("Invalid maintenance result");
+      await this.sendToAgent("HOST", "maintenance.coordination.result", body);
       return;
     }
     if (envelope.type === "action.result") {
@@ -1069,12 +1111,15 @@ export class ServerRoom {
       if (
         (action === "player.op" ||
           action === "player.deop" ||
-          action.startsWith("backup.restore")) &&
+          action.startsWith("backup.restore") ||
+          action.startsWith("backup.full.restore")) &&
         a.access!.role !== "Owner"
       )
         throw new Error("OWNER_REQUIRED");
       let kind: AgentKind =
         action.startsWith("backup.") ||
+        action.startsWith("maintenance.") ||
+        action.startsWith("provider.") ||
         (action.startsWith("server.") && action !== "server.status")
           ? "HOST"
           : "PAPER";

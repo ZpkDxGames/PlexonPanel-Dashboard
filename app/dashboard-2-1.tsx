@@ -50,7 +50,7 @@ import { AccessView21, AuditView21 } from "./infrastructure-views-2-1";
 import { PerformanceView21 } from "./monitoring-views-2-1";
 import { OverviewView30 } from "./overview-view-3-0";
 import { ServerView21 } from "./server-view-2-1";
-import { BackupsView30 } from "./backups-view-3-0";
+import { BackupsView30 } from "./backups-view-3-4-1";
 
 const SettingsView = dynamic(() =>
   import("./settings-view-2-1").then((module) => module.SettingsView21),
