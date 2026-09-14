@@ -6,9 +6,12 @@ async function source(path) {
   return readFile(new URL(`../${path}`, import.meta.url), "utf8");
 }
 
-test("Dashboard 3.4.0 exposes the active control-room page set with a functional Backups workspace", async () => {
+const ACTIVE_BACKUPS_VIEW = "app/backups-view-3-4-1.tsx";
+
+test("Dashboard 3.4.1 exposes the active control-room page set with a manual-only Backups workspace", async () => {
   const dashboard = await source("app/dashboard-2-1.tsx");
-  const backups = await source("app/backups-view-3-0.tsx");
+  const backups = await source(ACTIVE_BACKUPS_VIEW);
+  const legacyBackups = await source("app/backups-view-3-0.tsx");
   const sections = dashboard.match(/const sections = \[([\s\S]*?)\] as const;/)?.[1] ?? "";
   assert.ok(sections.includes('"Overview"'));
   assert.ok(sections.includes('"Backups"'));
@@ -17,13 +20,15 @@ test("Dashboard 3.4.0 exposes the active control-room page set with a functional
   assert.equal(dashboard.includes("BackupsView30"), true);
   assert.equal(dashboard.includes('case "Backups"'), true);
   assert.equal(backups.includes("Backups & Maintenance"), true);
-  assert.equal(backups.includes("Create live snapshot"), true);
   assert.equal(backups.includes("Create full restore point"), true);
-  assert.equal(backups.includes("Restart now"), true);
+  assert.equal(backups.includes("Restart server"), true);
+  assert.equal(backups.includes("Create live snapshot"), false);
+  assert.equal(backups.includes('runOperation("backup.create"'), false);
+  assert.equal(legacyBackups.trim(), 'export { BackupsView30 } from "./backups-view-3-4-1";');
 });
 
-test("Dashboard 3.4.0 Backups workspace is wired to Host maintenance actions", async () => {
-  const backups = await source("app/backups-view-3-0.tsx");
+test("Dashboard 3.4.1 Backups workspace is wired to Host manual maintenance actions", async () => {
+  const backups = await source(ACTIVE_BACKUPS_VIEW);
   for (const action of [
     "maintenance.status",
     "maintenance.settings.get",
@@ -42,8 +47,9 @@ test("Dashboard 3.4.0 Backups workspace is wired to Host maintenance actions", a
   assert.equal(backups.includes("useQuery("), true);
   assert.equal(backups.includes("No backup action is sent from this page yet."), false);
   assert.equal(backups.includes("Scaffold only"), false);
-  assert.equal(backups.includes("64 * 1024 * 1024"), true);
   assert.equal(backups.includes("Host-local only"), true);
+  assert.equal(backups.includes('runOperation("maintenance.full-backup.create", {})'), true);
+  assert.equal(backups.includes('runOperation("maintenance.full-backup.create", { skipCountdown: true })'), false);
 });
 
 test("Dashboard and relay expose identical maintenance/provider scopes", async () => {
@@ -71,7 +77,20 @@ test("Dashboard and relay expose identical maintenance/provider scopes", async (
   }
 });
 
-test("Dashboard 3.4.0 keeps protocol hooks compatible while Files remains dormant", async () => {
+test("legacy backup.create scope remains compatibility-only and is not an active dashboard action", async () => {
+  const backups = await source(ACTIVE_BACKUPS_VIEW);
+  const manifest = JSON.parse(await source("protocol/action-scopes.json"));
+  const dashboardScopes = await source("lib/scopes.ts");
+  const relayScopes = await source("relay/src/scopes.ts");
+
+  assert.equal(manifest.scopes.includes("backup.create"), true);
+  assert.equal(dashboardScopes.includes('"backup.full.retry-upload": "backup.create"'), true);
+  assert.equal(relayScopes.includes('"backup.full.retry-upload": "backup.create"'), true);
+  assert.equal(backups.includes('props.can("backup.create"'), false);
+  assert.equal(backups.includes('runOperation("backup.create"'), false);
+});
+
+test("Dashboard 3.4.1 keeps protocol hooks compatible while Files remains dormant", async () => {
   const dashboard = await source("app/dashboard-2-1.tsx");
   assert.equal(dashboard.includes('action.startsWith("backup.")'), true);
   assert.equal(dashboard.includes('action.startsWith("files.")'), true);
@@ -93,7 +112,7 @@ test("Dashboard visible version metadata matches package 3.4.1", async () => {
   assert.equal(dashboard.includes("Control Room · 3.0.1"), false);
 });
 
-test("Dashboard 3.4.0 uses one console-style mark for dashboard branding and favicon identity", async () => {
+test("Dashboard 3.4.1 uses one console-style mark for dashboard branding and favicon identity", async () => {
   const dashboard = await source("app/dashboard-2-1.tsx");
   const favicon = await source("public/favicon.svg");
   assert.equal(dashboard.includes('panel:'), true);
@@ -102,7 +121,7 @@ test("Dashboard 3.4.0 uses one console-style mark for dashboard branding and fav
   assert.equal(favicon.includes("M31 42H42"), true);
 });
 
-test("Dashboard 3.4.0 responsive architecture does not globally scale the interface", async () => {
+test("Dashboard 3.4.1 responsive architecture does not globally scale the interface", async () => {
   const css = await source("app/control-room-3-0.css");
   assert.equal(/\bzoom\s*:/.test(css), false);
   assert.equal(/transform\s*:\s*scale\s*\(/.test(css), false);
@@ -111,7 +130,7 @@ test("Dashboard 3.4.0 responsive architecture does not globally scale the interf
   assert.equal(css.includes("100dvh"), true);
 });
 
-test("Dashboard 3.4.0 Backups workspace has responsive production layout", async () => {
+test("Dashboard 3.4.1 Backups workspace has responsive production layout", async () => {
   const css = await source("app/backups-scaffold.css");
   for (const selector of [
     ".cr30-backup-summary",
@@ -123,7 +142,7 @@ test("Dashboard 3.4.0 Backups workspace has responsive production layout", async
   assert.equal(css.includes("@container workspace"), true);
 });
 
-test("Dashboard 3.4.0 display update rate exposes every supported browser cadence", async () => {
+test("Dashboard 3.4.1 display update rate exposes every supported browser cadence", async () => {
   const settings = await source("app/settings-view-2-1.tsx");
   const preferences = await source("lib/ui-preferences.ts");
   for (const value of [0, 250, 500, 1000, 2000]) {
@@ -134,7 +153,7 @@ test("Dashboard 3.4.0 display update rate exposes every supported browser cadenc
   assert.equal(settings.includes("critical connection, authorization, lifecycle and action state is always applied immediately"), true);
 });
 
-test("Dashboard 3.4.0 authoritative and feature style layers are loaded after legacy presentation layers", async () => {
+test("Dashboard 3.4.1 authoritative and feature style layers are loaded after legacy presentation layers", async () => {
   const layout = await source("app/layout.tsx");
   const legacy = layout.indexOf('import "./player-workspace-2-3.css"');
   const controlRoom30 = layout.indexOf('import "./control-room-3-0.css"');

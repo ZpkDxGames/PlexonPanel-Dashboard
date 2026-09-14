@@ -8,32 +8,42 @@ async function source(path) {
 
 const BACKUPS_VIEW = "app/backups-view-3-4-1.tsx";
 
-test("3.4.1 Backups workspace renders preflight, readiness, progress, provider and inventory state", async () => {
+test("Step 5 Backups workspace is manual-full-only and Host-authoritative", async () => {
   const view = await source(BACKUPS_VIEW);
+
   for (const text of [
+    "Backups & Maintenance",
+    "Manual full backup only",
     "Backup readiness",
     "Run backup diagnostics",
     'runOperation("backup.preflight", {})',
     "Current operation",
     "Backup inventory",
-    "Schedules",
-    "Provider",
+    "Restart schedule",
     "Test Google Drive",
     "Retry upload",
     "Create full restore point",
-    "Create live snapshot",
+    "No automatic backup schedule",
+    "Paper is not required for backup countdown, save flush, stop/start, archive, upload or recovery.",
     "unreadableDurableCount",
     "missingIncludes",
     "symlinkIssues",
     "backupRootWritable",
-  ]) assert.equal(view.includes(text), true, `missing 3.4.1 backup contract: ${text}`);
+  ]) assert.equal(view.includes(text), true, `missing Step 5 backup contract: ${text}`);
 
-  for (const state of ["Ready", "Warning", "Failed", "Unknown", "Not configured"])
-    assert.equal(view.includes(`\"${state}\"`), true, `missing readiness state ${state}`);
+  for (const retired of [
+    "Create live snapshot",
+    'useQuery(\n    "backup.list"',
+    'runOperation("backup.create"',
+    "Next full restore point",
+    "legacyIntervalMinutes",
+    "COORDINATING_PAPER",
+    'runOperation("maintenance.full-backup.create", { skipCountdown: true })',
+  ]) assert.equal(view.includes(retired), false, `retired backup behavior remains: ${retired}`);
 
+  assert.equal(view.includes('runOperation("maintenance.full-backup.create", {})'), true);
   assert.equal(view.includes("props.state.backupProgress"), true);
   assert.equal(view.includes("status.data.nextRestart"), true);
-  assert.equal(view.includes("status.data.nextFullRestorePoint"), true);
 });
 
 test("provider and maintenance query failures never invent LOCAL, Idle or Clear authority", async () => {
@@ -80,16 +90,22 @@ test("ActionError and the backup failure card preserve safe structured diagnosti
   assert.equal(dataSource.includes("result.data as Record<string, unknown>"), true);
 });
 
-test("operation phases and inventory warnings expose transient and degraded state", async () => {
+test("operation timeline matches durable Host maintenance phases", async () => {
   const view = await source(BACKUPS_VIEW);
   for (const phase of [
-    "COORDINATING_PAPER",
+    "QUEUED",
     "PREFLIGHT",
+    "COUNTDOWN",
+    "FINAL_SAVE",
+    "STOPPING_SERVER",
+    "WAITING_FOR_STOP",
     "ARCHIVING",
-    "HASHING",
-    "UPLOADING",
-    "FINALIZING",
-    "COMPLETE",
+    "VERIFYING_LOCAL",
+    "UPLOADING_REMOTE",
+    "VERIFYING_REMOTE",
+    "STARTING_SERVER",
+    "VERIFYING_STARTUP",
+    "COMPLETED",
   ]) assert.equal(view.includes(`\"${phase}\"`), true, `missing operation phase ${phase}`);
 
   for (const marker of [
@@ -101,15 +117,15 @@ test("operation phases and inventory warnings expose transient and degraded stat
   ]) assert.equal(view.includes(marker), true, `missing inventory/progress marker ${marker}`);
 });
 
-test("scheduling remains truthful and documents collision and unattended-maintenance behavior", async () => {
+test("automatic backups are retired while restart-only scheduling remains configurable", async () => {
   const view = await source(BACKUPS_VIEW);
   assert.equal(view.includes("Next restart"), true);
-  assert.equal(view.includes("Next full restore point"), true);
-  assert.equal(view.includes("legacyIntervalMinutes"), true);
-  assert.equal(view.includes("Protocol 3 Host interval scheduler · no decorative calendar schedule"), true);
-  assert.equal(view.includes("Same-time full restore point + restart collapses into one serialized maintenance operation."), true);
-  assert.equal(view.includes("Keep unattended destructive schedules disabled until the intended live validation gates have been exercised."), true);
-  assert.equal(view.includes("liveSnapshot"), false);
+  assert.equal(view.includes("Restart-only maintenance"), true);
+  assert.equal(view.includes("Full backups"), true);
+  assert.equal(view.includes("Manual only"), true);
+  assert.equal(view.includes("Restart scheduling remains independent. It cannot trigger a backup."), true);
+  assert.equal(view.includes("Automatic full-backup scheduling was retired."), true);
+  assert.equal(view.includes("schedule: { ...activeDraft.fullRestorePoint.schedule, enabled: false }"), true);
 });
 
 test("host-offline, recovery-required and restore confirmation states remain explicit", async () => {
@@ -144,23 +160,13 @@ test("destructive maintenance actions remain capability-gated and high-risk at b
     "maintenance.full-backup.create",
   ])
     assert.equal(view.includes(`props.can(\"${action}\"`), true, `workspace must gate concrete action ${action}`);
-  assert.equal(
-    view.includes('props.can(full ? "backup.full.restore.prepare" : "backup.restore.prepare", "HOST")'),
-    true,
-    "restore control must gate the exact selected restore-prepare action",
-  );
-  assert.equal(
-    view.includes('props.can(full ? "backup.full.delete" : "backup.delete", "HOST")'),
-    true,
-    "delete control must gate the exact selected delete action",
-  );
+  assert.equal(view.includes('props.can("backup.full.restore.prepare", "HOST")'), true);
+  assert.equal(view.includes('props.can("backup.full.delete", "HOST")'), true);
 });
 
-test("browser boundary retains provider secrecy and the 64 MiB download ceiling", async () => {
+test("browser boundary retains provider secrecy", async () => {
   const view = await source(BACKUPS_VIEW);
   assert.equal(view.includes("Host-local only"), true);
-  assert.equal(view.includes("Browser downloads remain capped at 64 MiB."), true);
-  assert.equal(view.includes("64 * 1024 * 1024"), true);
   assert.equal(view.includes("rcloneConfig"), false);
   assert.equal(view.includes("client_secret"), false);
   assert.equal(view.includes("refresh_token"), false);
