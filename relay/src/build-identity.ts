@@ -2,8 +2,8 @@ export const RELAY_VERSION = "3.4.1" as const;
 export const RELAY_PROTOCOL_VERSION = 3 as const;
 
 export interface RelayBuildEnvironment {
-  BUILD_GIT_COMMIT?: string;
-  BUILD_TIMESTAMP?: string;
+  BUILD_GIT_COMMIT?: string | undefined;
+  BUILD_TIMESTAMP?: string | undefined;
 }
 
 export interface RelayBuildIdentity {
