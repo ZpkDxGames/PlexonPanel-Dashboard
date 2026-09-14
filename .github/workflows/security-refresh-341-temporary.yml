@@ -1,0 +1,49 @@
+name: Temporary security refresh 341
+
+on:
+  push:
+    branches:
+      - agent/3.4.1-backup-recovery
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: agent/3.4.1-backup-recovery
+          fetch-depth: 0
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Refresh vulnerable direct dependencies
+        run: |
+          npm install --save-exact next@16.3.5 react@19.2.8 react-dom@19.2.8
+          npm install --save-dev --save-exact wrangler@4.131.1 miniflare@5.20260911.0-alpha
+          npm audit fix
+      - name: Require clean high/critical audit
+        run: npm audit --audit-level=high
+      - name: Verify dashboard and relay
+        run: |
+          npm run check
+          npm run relay:smoke
+          npm run relay:standalone:smoke
+          npm run relay:standalone:package
+          npm run build
+        env:
+          NEXT_TELEMETRY_DISABLED: '1'
+          WRANGLER_SEND_METRICS: 'false'
+      - name: Commit verified dependency refresh
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package.json package-lock.json
+          git diff --cached --quiet && exit 0
+          git commit -m "Harden 3.4.1 dashboard dependencies"
+          git push origin HEAD:agent/3.4.1-backup-recovery
