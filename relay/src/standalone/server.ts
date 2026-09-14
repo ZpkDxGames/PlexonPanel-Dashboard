@@ -7,7 +7,7 @@ import { CoordinationStore } from "./persistence.js";
 import { RoomManager, type RelayCounters } from "./room-manager.js";
 import { NodeWebSocket, header, websocketProtocols } from "./websocket.js";
 
-const VERSION = "3.1.0";
+const VERSION = "3.4.0";
 const UUID =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 

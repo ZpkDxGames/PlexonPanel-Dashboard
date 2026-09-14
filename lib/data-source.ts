@@ -227,6 +227,13 @@ export function handleRelayControlMessage(
             : "The operation was denied.",
         String(result.code ?? "FAILED"),
         String(result.status ?? "DENIED"),
+        requestId,
+        typeof result.action === "string" ? result.action : "",
+        result.data !== null &&
+        typeof result.data === "object" &&
+        !Array.isArray(result.data)
+          ? (result.data as Record<string, unknown>)
+          : {},
       ),
     );
   return true;
@@ -236,6 +243,9 @@ export class ActionError extends Error {
     message: string,
     readonly code: string,
     readonly status: string,
+    readonly requestId = "",
+    readonly action = "",
+    readonly data: Record<string, unknown> = {},
   ) {
     super(message);
   }

@@ -101,7 +101,7 @@ function boundedText(value: unknown, maximum: number): string | null {
 }
 
 function validateConsoleBatch(body: Record<string, unknown>): void {
-  if (!Array.isArray(body.lines) || body.lines.length < 1 || body.lines.length > 100)
+  if (!Array.isArray(body.lines) || body.lines.length > 100)
     throw new Error("Event not allowed for host console batch");
   for (const candidate of body.lines) {
     if (!candidate || typeof candidate !== "object" || Array.isArray(candidate))
@@ -174,8 +174,14 @@ async function processHostConsole(
   }
 
   validateConsoleBatch(body);
-  if (attachment.consoleHealthy !== true)
-    throw new Error("Event not allowed while host console source is unavailable");
+  // SnapshotBatches intentionally emits a terminal empty batch for an empty replay. Host 3.4.0
+  // can therefore send console.lines with zero lines while the Minecraft service is stopped.
+  // Accept that authenticated empty snapshot as a no-op instead of tearing down the Host session.
+  if (Array.isArray(body.lines) && body.lines.length === 0) return;
+  // A freshly authenticated Host 3.4.0 can replay buffered lines immediately before its
+  // console.source status reaches the relay. Treat that valid ordering race as a bounded drop,
+  // not a protocol violation that tears down the authenticated Host session.
+  if (attachment.consoleHealthy !== true) return;
   const hostCanView =
     metadata.hostIdentity?.capabilities["console.view.full"] === true ||
     metadata.hostIdentity?.capabilities["console.view.errors"] === true;

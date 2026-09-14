@@ -78,7 +78,7 @@ test("Dashboard 3.4.0 keeps protocol hooks compatible while Files remains dorman
   assert.equal(dashboard.includes("Open files"), false);
 });
 
-test("Dashboard visible version metadata matches package 3.4.0", async () => {
+test("Dashboard visible version metadata matches package 3.4.1", async () => {
   const dashboard = await source("app/dashboard-2-1.tsx");
   const settings = await source("app/settings-view-2-1.tsx");
   const server = await source("app/server-view-2-1.tsx");
@@ -86,7 +86,7 @@ test("Dashboard visible version metadata matches package 3.4.0", async () => {
   const packageJson = JSON.parse(await source("package.json"));
   const version = versionSource.match(/DASHBOARD_VERSION = "([^"]+)"/)?.[1];
   assert.equal(version, packageJson.version);
-  assert.equal(version, "3.4.0");
+  assert.equal(version, "3.4.1");
   assert.equal(dashboard.includes("DASHBOARD_VERSION"), true);
   assert.equal(settings.includes("DASHBOARD_LABEL"), true);
   assert.equal(server.includes("DASHBOARD_VERSION"), true);

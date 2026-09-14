@@ -130,6 +130,8 @@ export function useQuery(
   const [data, setData] = useState<JsonMap>({}),
     [error, setError] = useState(""),
     [busy, setBusy] = useState(false),
+    [hasSuccess, setHasSuccess] = useState(false),
+    [updatedAt, setUpdatedAt] = useState(0),
     [revision, setRevision] = useState(0);
   const key = JSON.stringify(parameters);
   useEffect(() => {
@@ -144,7 +146,11 @@ export function useQuery(
         return sendDashboardAction(action, JSON.parse(key) as JsonMap, kind);
       })
       .then((result) => {
-        if (current) setData(result.data);
+        if (current) {
+          setData(result.data);
+          setHasSuccess(true);
+          setUpdatedAt(Date.now());
+        }
       })
       .catch((e) => {
         if (current)
@@ -161,6 +167,8 @@ export function useQuery(
     data,
     error,
     busy,
+    hasSuccess,
+    updatedAt,
     refresh: useCallback(() => setRevision((r) => r + 1), []),
   };
 }

@@ -337,18 +337,31 @@ export function BackupsView30(props: ViewProps) {
   const controller = useRef<AbortController | null>(null);
 
   useEffect(() => {
+    let timer: number | undefined;
     try {
       const stored = window.sessionStorage.getItem(FAILURE_KEY);
-      if (stored) setLastFailure(JSON.parse(stored) as FailureRecord);
+      if (stored) {
+        timer = window.setTimeout(() => {
+          try {
+            setLastFailure(JSON.parse(stored) as FailureRecord);
+          } catch {
+            // Invalid persisted diagnostics are ignored.
+          }
+        }, 0);
+      }
     } catch {
       // A blocked session store must not block operational controls.
     }
+    return () => {
+      if (timer !== undefined) window.clearTimeout(timer);
+    };
   }, []);
   useEffect(() => () => controller.current?.abort(), []);
+  const setUnsaved = props.setUnsaved;
   useEffect(() => {
-    props.setUnsaved?.(dirty);
-    return () => props.setUnsaved?.(false);
-  }, [dirty, props.setUnsaved]);
+    setUnsaved?.(dirty);
+    return () => setUnsaved?.(false);
+  }, [dirty, setUnsaved]);
   useEffect(() => {
     if (!hostConnected || !canMaintenance) return;
     const timer = window.setInterval(status.refresh, 2000);
@@ -470,21 +483,17 @@ export function BackupsView30(props: ViewProps) {
 
   const fullBackups = records(fullQuery.data.backups, 1000);
   const liveBackups = records(liveQuery.data.backups, 1000);
-  const allBackups = useMemo<BackupRow[]>(
-    () =>
-      [
-        ...fullBackups.map(
-          (backup): BackupRow => ({ ...backup, _kind: "full" }),
-        ),
-        ...liveBackups.map(
-          (backup): BackupRow => ({ ...backup, _kind: "live" }),
-        ),
-      ].sort(
-        (a, b) =>
-          Date.parse(str(b.timestamp, "1970-01-01")) -
-          Date.parse(str(a.timestamp, "1970-01-01")),
-      ),
-    [fullBackups, liveBackups],
+  const allBackups: BackupRow[] = [
+    ...fullBackups.map(
+      (backup): BackupRow => ({ ...backup, _kind: "full" }),
+    ),
+    ...liveBackups.map(
+      (backup): BackupRow => ({ ...backup, _kind: "live" }),
+    ),
+  ].sort(
+    (a, b) =>
+      Date.parse(str(b.timestamp, "1970-01-01")) -
+      Date.parse(str(a.timestamp, "1970-01-01")),
   );
 
   const startRestore = async (type: "full" | "live", backupId: string) => {
