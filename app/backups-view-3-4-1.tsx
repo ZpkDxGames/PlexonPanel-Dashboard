@@ -683,6 +683,7 @@ export function BackupsView30(props: ViewProps) {
           <div><dt>Remote</dt><dd>{providerQuery.hasSuccess ? str(provider.remote, providerConfigured ? "Unavailable" : "Not configured") : "Unavailable"}</dd></div>
           <div><dt>Runtime state</dt><dd>{providerQuery.hasSuccess ? providerState : "UNKNOWN"}</dd></div>
           <div><dt>Last test</dt><dd>{providerQuery.hasSuccess ? time(provider.lastTestAt) : "—"}</dd></div>
+          <div><dt>Last successful verification</dt><dd>{providerQuery.hasSuccess ? time(provider.lastSuccessfulVerificationAt) : "—"}</dd></div>
           <div><dt>Host config</dt><dd>{provider.hostConfigRestartRequired === true ? "Configuration changed on disk — restart Host to apply" : providerQuery.hasSuccess ? "Loaded configuration is current" : "Unknown"}</dd></div>
           <div><dt>Credentials</dt><dd>Host-local only</dd></div>
         </dl>
@@ -829,6 +830,9 @@ export function BackupsView30(props: ViewProps) {
           <article className="cr30-backup-metric"><span>Next full restore point</span><strong>{status.hasSuccess ? time(status.data.nextFullRestorePoint) : "Unknown"}</strong><small>Cold full-server archive</small></article>
           <article className="cr30-backup-metric"><span>Live snapshot</span><strong>{diagnosticsData ? number(diagnostics.legacyIntervalMinutes) === 0 ? "Disabled" : `Every ${number(diagnostics.legacyIntervalMinutes)} min` : "Unknown"}</strong><small>Protocol 3 Host interval scheduler · no decorative calendar schedule</small></article>
         </div>
+        <p className="cr-hint cr30-backup-preview-note">
+          Same-time full restore point + restart collapses into one serialized maintenance operation. Live snapshots remain on the separate Protocol 3 Host interval scheduler and all backup/maintenance work shares the Host operation lock. Keep unattended destructive schedules disabled until the intended live validation gates have been exercised.
+        </p>
       </Panel>
 
       {activeDraft && props.can("maintenance.settings.get", "HOST") && (
