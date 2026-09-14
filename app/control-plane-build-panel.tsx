@@ -12,8 +12,8 @@ export function ControlPlaneBuildPanel({
   paperVersion,
   hostVersion,
 }: {
-  paperVersion?: string;
-  hostVersion?: string;
+  paperVersion?: string | null;
+  hostVersion?: string | null;
 }) {
   const [builds, setBuilds] = useState<ControlPlaneBuilds | null>(null);
 
