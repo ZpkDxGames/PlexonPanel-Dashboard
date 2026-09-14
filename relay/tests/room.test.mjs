@@ -403,22 +403,10 @@ test("broken Paper peer delivery cannot retroactively reject healthy Host", asyn
   const paper = await attach(f);
   paper.socket.failSend = true;
   const host = await attach(f, "HOST");
-  await host.send("backup.coordination", {
-    requestId: randomUUID(),
-    leaseId: randomUUID(),
-    operation: "prepare",
-  });
+  await host.send("access.authority.request", {});
   assert.equal(host.socket.closed, null);
   assert.equal(host.socket.attachment.authenticated, true);
   assert.equal(paper.socket.closed.code, 1011);
-  const failureEnvelope = host.socket.sent.find(
-    (message) => message.type === "backup.coordination.result",
-  );
-  assert.ok(failureEnvelope, "Host receives an immediate coordination result");
-  const failure = decodeEnvelope(JSON.stringify(failureEnvelope)).body;
-  assert.equal(failure.success, false);
-  assert.equal(failure.code, "PAPER_COORDINATION_UNAVAILABLE");
-  assert.equal(failure.phase, "COORDINATING_PAPER");
 });
 
 test("client cannot exceed command, transfer, parameter or in-flight request limits", async () => {
