@@ -1,0 +1,42 @@
+name: Apply 341 source patch
+
+on:
+  push:
+    branches:
+      - agent/3.4.1-backup-recovery
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: agent/3.4.1-backup-recovery
+          fetch-depth: 0
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          cache: npm
+      - name: Apply source patch
+        run: python3 scripts/apply-341-source.py
+      - name: Install dependencies
+        run: npm ci
+      - name: Verify dashboard and relay
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"
+          WRANGLER_SEND_METRICS: "false"
+        run: npm run check && npm run relay:smoke && npm run relay:standalone:smoke && npm run relay:standalone:package && npm run build
+      - name: Commit verified source
+        run: |
+          rm .github/workflows/apply-341-source.yml
+          rm scripts/apply-341-source.py
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git commit -m "Complete 3.4.1 backup recovery control plane"
+          git push origin HEAD:agent/3.4.1-backup-recovery
