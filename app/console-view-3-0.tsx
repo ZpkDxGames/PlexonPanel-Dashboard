@@ -4,6 +4,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Badge, Empty, Panel, time, type ViewProps } from "./control-views";
 import { str, type JsonMap } from "../lib/control-state";
 
+const RETENTION_NOTICE =
+  "Console history is limited to entries currently retained by systemd-journald on the Host.";
+
 function downloadText(filename: string, body: string) {
   const blob = new Blob([body], { type: "text/plain;charset=utf-8" });
   const url = URL.createObjectURL(blob);
@@ -20,7 +23,7 @@ function atConsoleTail(element: HTMLDivElement) {
   return element.scrollHeight - element.scrollTop - element.clientHeight < 48;
 }
 
-function lineKey(line: JsonMap, index: number): string {
+function stableLineId(line: JsonMap): string {
   if (typeof line.journalCursor === "string" && line.journalCursor)
     return `journal:${line.journalCursor}`;
   if (
@@ -28,31 +31,49 @@ function lineKey(line: JsonMap, index: number): string {
     typeof line.sourceSequence === "number"
   )
     return `stream:${line.streamSession}:${line.sourceSequence}`;
-  return `${str(line.capturedAt, "unknown")}:${str(line.fingerprint, "none")}:${index}`;
+  return `${str(line.capturedAt, "unknown")}:${str(line.fingerprint, "none")}:${str(line.content, "")}`;
+}
+
+function lineKey(line: JsonMap, index: number): string {
+  return `${stableLineId(line)}:${index}`;
+}
+
+function mergeConsoleLines(history: JsonMap[], live: JsonMap[]): JsonMap[] {
+  const unique = new Map<string, JsonMap>();
+  for (const line of [...history, ...live]) unique.set(stableLineId(line), line);
+  return [...unique.values()].sort((left, right) => {
+    const a = Date.parse(str(left.capturedAt, ""));
+    const b = Date.parse(str(right.capturedAt, ""));
+    if (!Number.isFinite(a) && !Number.isFinite(b)) return 0;
+    if (!Number.isFinite(a)) return 1;
+    if (!Number.isFinite(b)) return -1;
+    return a - b;
+  });
 }
 
 function consoleSourceLabel(props: ViewProps): string {
   if (!props.connected) return "Reconnecting";
   const ready = props.state.ready;
-  if (ready?.consoleAuthority === "HOST") {
-    if (ready.consoleSourceState === "RECOVERING") return "Host • History replay";
-    if (ready.consoleSourceState === "RESTARTING") return "Host • Reconnecting";
-    return "Host • Journal";
-  }
-  if (ready?.agents.paper) return "Paper fallback";
-  if (ready?.agents.host) {
-    if (ready.consoleSourceState === "JOURNAL_PERMISSION_DENIED")
-      return "Host • Permission required";
-    if (ready.consoleSourceState === "JOURNAL_UNAVAILABLE")
-      return "Host • Console unavailable";
-    return "Server offline";
-  }
-  return "Console offline";
+  if (!ready?.agents.host) return "Host offline";
+  if (ready.consoleSourceState === "RECOVERING") return "Host • History replay";
+  if (ready.consoleSourceState === "RESTARTING") return "Host • Reconnecting";
+  if (ready.consoleSourceState === "JOURNAL_PERMISSION_DENIED")
+    return "Host • Permission required";
+  if (ready.consoleSourceState === "JOURNAL_UNAVAILABLE") return "Host • Console unavailable";
+  if (ready.consoleSourceState === "STARTING") return "Host • Starting";
+  if (ready.consoleSourceState === "DISABLED") return "Host • Console disabled";
+  if (ready.consoleSourceState === "STOPPED") return "Host • Console stopped";
+  return "Host • Journal";
 }
 
 export function ConsoleView30(props: ViewProps) {
   const [search, setSearch] = useState("");
   const [level, setLevel] = useState("ALL");
+  const [historical, setHistorical] = useState<JsonMap[]>([]);
+  const [historyBusy, setHistoryBusy] = useState(false);
+  const [historyHasMore, setHistoryHasMore] = useState(true);
+  const [historyError, setHistoryError] = useState("");
+  const [historyNotice, setHistoryNotice] = useState(RETENTION_NOTICE);
   const [paused, setPaused] = useState<JsonMap[] | null>(null);
   const [followTail, setFollowTail] = useState(true);
   const [unseenLines, setUnseenLines] = useState(0);
@@ -66,7 +87,11 @@ export function ConsoleView30(props: ViewProps) {
   const viewport = useRef<HTMLDivElement>(null);
   const previousSourceLength = useRef(0);
 
-  const source = paused ?? props.state.console;
+  const combined = useMemo(
+    () => mergeConsoleLines(historical, props.state.console),
+    [historical, props.state.console],
+  );
+  const source = paused ?? combined;
   const entries = useMemo(
     () =>
       source
@@ -76,13 +101,20 @@ export function ConsoleView30(props: ViewProps) {
             (level === "ALL" || line.level === level) &&
             str(line.content).toLowerCase().includes(search.toLowerCase()),
         )
-        .slice(-1200),
+        .slice(-2500),
     [source, clearAt, level, search],
   );
   const paperOnline = Boolean(props.state.ready?.agents.paper);
   const hostOnline = Boolean(props.state.ready?.agents.host);
   const canExecute = props.can("console.execute");
   const commandAvailable = canExecute && paperOnline;
+  const canFullHistory = props.can("console.history", "HOST");
+  const canErrorHistory = props.can("console.history.errors", "HOST");
+  const historyAction = canFullHistory
+    ? "console.history"
+    : canErrorHistory
+      ? "console.history.errors"
+      : null;
   const sourceLabel = consoleSourceLabel(props);
 
   useEffect(() => {
@@ -98,8 +130,8 @@ export function ConsoleView30(props: ViewProps) {
 
   useEffect(() => {
     if (paused) return;
-    previousSourceLength.current = props.state.console.length;
-  }, [paused, props.state.console.length]);
+    previousSourceLength.current = combined.length;
+  }, [paused, combined.length]);
 
   const jumpToTail = () => {
     setFollowTail(true);
@@ -108,6 +140,45 @@ export function ConsoleView30(props: ViewProps) {
       if (viewport.current)
         viewport.current.scrollTop = viewport.current.scrollHeight;
     });
+  };
+
+  const loadOlder = async () => {
+    if (!historyAction || !hostOnline || historyBusy) return;
+    setHistoryBusy(true);
+    setHistoryError("");
+    try {
+      const parameters: JsonMap = { limit: 100 };
+      const oldest = combined
+        .map((line) => str(line.capturedAt, ""))
+        .filter((value) => Number.isFinite(Date.parse(value)))
+        .sort((left, right) => Date.parse(left) - Date.parse(right))[0];
+      if (oldest) parameters.before = oldest;
+      if (
+        level !== "ALL" &&
+        (historyAction === "console.history" || level === "WARN" || level === "ERROR")
+      )
+        parameters.levels = [level];
+      const result = await props.run(historyAction, parameters, "HOST");
+      const lines = Array.isArray(result.data.lines)
+        ? result.data.lines.filter(
+            (line): line is JsonMap =>
+              Boolean(line && typeof line === "object" && !Array.isArray(line)),
+          )
+        : [];
+      setHistorical((current) => mergeConsoleLines(lines, current));
+      setHistoryHasMore(Boolean(result.data.hasMore));
+      setHistoryNotice(str(result.data.retentionNotice, RETENTION_NOTICE));
+      if (!lines.length)
+        setHistoryError(
+          "No older matching entries are currently retained by systemd-journald.",
+        );
+    } catch (error) {
+      setHistoryError(
+        error instanceof Error ? error.message : "Unable to load Host journal history.",
+      );
+    } finally {
+      setHistoryBusy(false);
+    }
   };
 
   const visibleText = entries
@@ -143,11 +214,18 @@ export function ConsoleView30(props: ViewProps) {
         <button
           className="cr-button"
           onClick={() => {
-            setPaused(paused ? null : [...props.state.console]);
+            setPaused(paused ? null : [...combined]);
             setUnseenLines(0);
           }}
         >
           {paused ? "Resume" : "Pause"}
+        </button>
+        <button
+          className="cr-button"
+          disabled={!hostOnline || !historyAction || historyBusy || !historyHasMore}
+          onClick={() => void loadOlder()}
+        >
+          {historyBusy ? "Loading history…" : historyHasMore ? "Load older history" : "No older history"}
         </button>
         <details className="cr21-menu">
           <summary className="cr-button">Display</summary>
@@ -177,11 +255,13 @@ export function ConsoleView30(props: ViewProps) {
                 )
               }
             >
-              Export browser-session log
+              Export visible log
             </button>
             <button
               onClick={() => {
                 setClearAt(Date.now());
+                setHistorical([]);
+                setHistoryHasMore(true);
                 setUnseenLines(0);
               }}
             >
@@ -199,22 +279,31 @@ export function ConsoleView30(props: ViewProps) {
           <div className="cr21-panel-badges">
             {paused && <Badge tone="amber">View paused</Badge>}
             {!followTail && !paused && <Badge tone="quiet">Reading history</Badge>}
-            <Badge
-              tone={
-                sourceLabel === "Host • Journal" || sourceLabel === "Paper fallback"
-                  ? "green"
-                  : "amber"
-              }
-            >
+            <Badge tone={sourceLabel === "Host • Journal" ? "green" : "amber"}>
               {sourceLabel}
             </Badge>
           </div>
         }
       >
-        {!paperOnline && hostOnline && (
+        {!hostOnline && (
           <p className="cr-hint cr-pad cr30-console-offline-note">
-            Paper is offline. Console output remains available through the Host Companion when its
-            journal source is healthy. Command input will unlock after Paper is ready.
+            Host Companion is offline. PlexonPanel does not substitute stale Paper console data;
+            retained history becomes available again only after Host reconnects.
+          </p>
+        )}
+        {hostOnline && !paperOnline && (
+          <p className="cr-hint cr-pad cr30-console-offline-note">
+            Paper is offline. Host-owned live output and retained journald history remain available;
+            command input unlocks after Paper is ready.
+          </p>
+        )}
+        <p className="cr-hint cr-pad cr30-console-offline-note">
+          {historyNotice} Historical requests return at most 100 lines per page.
+          {!historyAction && " This device does not have a Host console-history scope."}
+        </p>
+        {historyError && (
+          <p className="cr-hint cr-pad cr30-console-offline-note" role="status">
+            {historyError}
           </p>
         )}
         <div className="cr30-console-viewport-wrap">
@@ -284,9 +373,9 @@ export function ConsoleView30(props: ViewProps) {
               })
             ) : (
               <Empty title="No console lines to display">
-                {hostOnline && !paperOnline
-                  ? "The Host Companion is online, but no allowed console history is available yet. Check the journal source status if this persists."
-                  : "Console content depends on the locally enabled stream and this device's scope. Missing data is not replaced with examples."}
+                {hostOnline
+                  ? "The Host Companion is online, but no allowed console history is available yet. Check its journal source status if this persists."
+                  : "Console continuity is intentionally unavailable while the Host Companion is offline."}
               </Empty>
             )}
           </div>
@@ -379,9 +468,9 @@ export function ConsoleView30(props: ViewProps) {
         </Panel>
       )}
       <p className="cr-hint cr30-console-authority">
-        Output source: {sourceLabel}. Console output and command execution intentionally use separate
-        authorities: Host owns lifecycle output when healthy; Paper owns commands. Clearing the view
-        remains browser-local and never deletes server or journal logs.
+        Output source: {sourceLabel}. Host owns console capture, replay, and retained history; Paper
+        owns command execution. Clearing the view remains browser-local and never deletes journal
+        entries.
       </p>
     </div>
   );
