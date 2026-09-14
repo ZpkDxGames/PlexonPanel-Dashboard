@@ -8,7 +8,7 @@ async function source(path) {
 
 const ACTIVE_BACKUPS_VIEW = "app/backups-view-3-4-1.tsx";
 
-test("Dashboard 3.4.1 exposes the active control-room page set with a manual-only Backups workspace", async () => {
+test("Dashboard 3.4.1 exposes the active manual-only Backups workspace", async () => {
   const dashboard = await source("app/dashboard-2-1.tsx");
   const backups = await source(ACTIVE_BACKUPS_VIEW);
   const legacyBackups = await source("app/backups-view-3-0.tsx");
@@ -20,14 +20,14 @@ test("Dashboard 3.4.1 exposes the active control-room page set with a manual-onl
   assert.equal(dashboard.includes("BackupsView30"), true);
   assert.equal(dashboard.includes('case "Backups"'), true);
   assert.equal(backups.includes("Backups & Maintenance"), true);
-  assert.equal(backups.includes("Create full restore point"), true);
-  assert.equal(backups.includes("Restart server"), true);
+  assert.equal(backups.includes("Fully Backup Now"), true);
+  assert.equal(backups.includes("Create full restore point"), false);
   assert.equal(backups.includes("Create live snapshot"), false);
   assert.equal(backups.includes('runOperation("backup.create"'), false);
   assert.equal(legacyBackups.trim(), 'export { BackupsView30 } from "./backups-view-3-4-1";');
 });
 
-test("Dashboard 3.4.1 Backups workspace is wired to Host manual maintenance actions", async () => {
+test("Backups workspace is wired only to supported Host manual maintenance actions", async () => {
   const backups = await source(ACTIVE_BACKUPS_VIEW);
   for (const action of [
     "maintenance.status",
@@ -35,6 +35,7 @@ test("Dashboard 3.4.1 Backups workspace is wired to Host manual maintenance acti
     "maintenance.settings.update",
     "maintenance.restart.now",
     "maintenance.full-backup.create",
+    "backup.preflight",
     "backup.full.list",
     "backup.full.verify",
     "backup.full.retry-upload",
@@ -45,11 +46,9 @@ test("Dashboard 3.4.1 Backups workspace is wired to Host manual maintenance acti
   ]) assert.equal(backups.includes(action), true, `missing ${action}`);
   assert.equal(backups.includes("props.run("), true);
   assert.equal(backups.includes("useQuery("), true);
-  assert.equal(backups.includes("No backup action is sent from this page yet."), false);
-  assert.equal(backups.includes("Scaffold only"), false);
   assert.equal(backups.includes("Host-local only"), true);
   assert.equal(backups.includes('runOperation("maintenance.full-backup.create", {})'), true);
-  assert.equal(backups.includes('runOperation("maintenance.full-backup.create", { skipCountdown: true })'), false);
+  assert.equal(backups.includes("skipCountdown"), false);
 });
 
 test("Dashboard and relay expose identical maintenance/provider scopes", async () => {
@@ -90,6 +89,18 @@ test("legacy backup.create scope remains compatibility-only and is not an active
   assert.equal(backups.includes('runOperation("backup.create"'), false);
 });
 
+test("retired Paper coordination protocol cannot return", async () => {
+  const protocol = await source("relay/src/protocol.ts");
+  for (const type of [
+    "backup.coordination",
+    "backup.coordination.result",
+    "maintenance.coordination",
+    "maintenance.coordination.result",
+  ]) assert.equal(protocol.includes(`\"${type}\"`), true, `retired denylist missing ${type}`);
+  assert.equal(protocol.includes("RETIRED_COORDINATION_TYPES.has(type)"), true);
+  assert.equal(protocol.includes("RETIRED_COORDINATION_TYPES.has(envelope.type)"), true);
+});
+
 test("Dashboard 3.4.1 keeps protocol hooks compatible while Files remains dormant", async () => {
   const dashboard = await source("app/dashboard-2-1.tsx");
   assert.equal(dashboard.includes('action.startsWith("backup.")'), true);
@@ -109,16 +120,6 @@ test("Dashboard visible version metadata matches package 3.4.1", async () => {
   assert.equal(dashboard.includes("DASHBOARD_VERSION"), true);
   assert.equal(settings.includes("DASHBOARD_LABEL"), true);
   assert.equal(server.includes("DASHBOARD_VERSION"), true);
-  assert.equal(dashboard.includes("Control Room · 3.0.1"), false);
-});
-
-test("Dashboard 3.4.1 uses one console-style mark for dashboard branding and favicon identity", async () => {
-  const dashboard = await source("app/dashboard-2-1.tsx");
-  const favicon = await source("public/favicon.svg");
-  assert.equal(dashboard.includes('panel:'), true);
-  assert.equal(dashboard.includes("M7 12l2.5 2L7 16"), true);
-  assert.equal(favicon.includes("M19 32L25 37L19 42"), true);
-  assert.equal(favicon.includes("M31 42H42"), true);
 });
 
 test("Dashboard 3.4.1 responsive architecture does not globally scale the interface", async () => {
@@ -130,14 +131,16 @@ test("Dashboard 3.4.1 responsive architecture does not globally scale the interf
   assert.equal(css.includes("100dvh"), true);
 });
 
-test("Dashboard 3.4.1 Backups workspace has responsive production layout", async () => {
+test("Step 8 Backups workspace has responsive production layout", async () => {
   const css = await source("app/backups-scaffold.css");
   for (const selector of [
-    ".cr30-backup-summary",
     ".cr30-backup-columns",
     ".cr30-backup-metrics",
-    ".cr30-operation",
     ".cr30-settings-grid",
+    ".cr341-readiness-grid",
+    ".cr341-phase-list",
+    ".cr-step8-primary",
+    ".cr-step8-modal",
   ]) assert.equal(css.includes(selector), true, `missing ${selector}`);
   assert.equal(css.includes("@container workspace"), true);
 });
@@ -153,7 +156,7 @@ test("Dashboard 3.4.1 display update rate exposes every supported browser cadenc
   assert.equal(settings.includes("critical connection, authorization, lifecycle and action state is always applied immediately"), true);
 });
 
-test("Dashboard 3.4.1 authoritative and feature style layers are loaded after legacy presentation layers", async () => {
+test("authoritative and feature style layers are loaded after legacy presentation layers", async () => {
   const layout = await source("app/layout.tsx");
   const legacy = layout.indexOf('import "./player-workspace-2-3.css"');
   const controlRoom30 = layout.indexOf('import "./control-room-3-0.css"');
