@@ -2,6 +2,12 @@ const VERSION = 3;
 export const MAX_ENVELOPE_BYTES = 131_072;
 const MAX_BODY_BYTES = 65_536;
 const MESSAGE_TYPE = /^[a-z][a-z0-9_.-]{0,95}$/;
+const RETIRED_PAPER_BACKUP_COORDINATION = new Set([
+  "backup.coordination",
+  "backup.coordination.result",
+  "maintenance.coordination",
+  "maintenance.coordination.result",
+]);
 const UUID =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const ENVELOPE_FIELDS = [
@@ -155,6 +161,7 @@ export async function signEnvelope(
 ): Promise<string> {
   if (!MESSAGE_TYPE.test(type) || !UUID.test(serverId))
     throw new Error("Invalid outbound protocol metadata");
+  assertActiveMessageType(type);
   const bodyBytes = new TextEncoder().encode(JSON.stringify(body));
   if (bodyBytes.byteLength > MAX_BODY_BYTES)
     throw new Error("Outbound protocol body is too large");
@@ -227,11 +234,17 @@ function signable(envelope: ProtocolEnvelope): string {
   ].join("\n");
 }
 
+function assertActiveMessageType(type: string): void {
+  if (RETIRED_PAPER_BACKUP_COORDINATION.has(type))
+    throw new Error("Paper backup coordination is retired");
+}
+
 function validateEnvelope(envelope: ProtocolEnvelope): void {
   if (envelope.protocolVersion !== VERSION)
     throw new Error("Unsupported protocol version");
   if (typeof envelope.type !== "string" || !MESSAGE_TYPE.test(envelope.type))
     throw new Error("Invalid message type");
+  assertActiveMessageType(envelope.type);
   if (typeof envelope.messageId !== "string" || !UUID.test(envelope.messageId))
     throw new Error("Invalid message ID");
   if (typeof envelope.serverId !== "string" || !UUID.test(envelope.serverId))
