@@ -1,0 +1,41 @@
+name: Apply 341 schedule copy
+
+on:
+  push:
+    branches:
+      - agent/3.4.1-backup-recovery
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: agent/3.4.1-backup-recovery
+          fetch-depth: 0
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          cache: npm
+      - name: Apply schedule copy
+        run: python3 scripts/apply-341-schedule-copy.py
+      - name: Install dependencies
+        run: npm ci
+      - name: Verify application contracts
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"
+        run: npm test
+      - name: Commit verified source
+        run: |
+          rm .github/workflows/apply-341-schedule-copy.yml
+          rm scripts/apply-341-schedule-copy.py
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git commit -m "Document 3.4.1 maintenance scheduling behavior"
+          git push origin HEAD:agent/3.4.1-backup-recovery
