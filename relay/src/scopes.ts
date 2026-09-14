@@ -1,3 +1,6 @@
+// GENERATED FILE — source: protocol/action-scopes.json
+// Run npm run scopes:generate after editing the canonical manifest.
+
 export const SCOPES = [
   "overview.view",
   "telemetry.view",
@@ -52,30 +55,19 @@ export const SCOPES = [
   "audit.view",
   "devices.view",
   "devices.revoke",
-  "settings.view",
+  "settings.view"
 ] as const;
 export type Scope = (typeof SCOPES)[number];
-export const HIGH_RISK = new Set([
-  "player.ban",
-  "player.kill",
-  "player.op",
-  "player.deop",
-  "files.delete",
-  "backup.delete",
-  "backup.restore",
-  "backup.full.delete",
-  "backup.full.restore",
-  "maintenance.settings.update",
-  "maintenance.restart.now",
-  "maintenance.full-backup.create",
-  "server.stop",
-  "server.restart",
-  "devices.revoke",
-]);
-export const ACTION_SCOPES: Record<string, string> = Object.fromEntries(
-  SCOPES.filter((s) => /^(player|files|backup|maintenance|provider|server)\./.test(s)).map((s) => [s, s]),
-);
-Object.assign(ACTION_SCOPES, {
+
+const IDENTITY_ACTION_PREFIXES = [
+  "player.",
+  "files.",
+  "backup.",
+  "maintenance.",
+  "provider.",
+  "server."
+] as const;
+const ACTION_ALIASES: Readonly<Record<string, Scope>> = {
   "console.execute": "console.execute.allowed",
   "chat.global.send": "chat.send",
   "player.deop": "player.op",
@@ -110,18 +102,47 @@ Object.assign(ACTION_SCOPES, {
   "files.download.chunk": "files.download",
   "files.transfer.cancel": "files.download",
   "players.history.list": "players.history.view",
-  "players.snapshot.request": "players.view",
-});
+  "players.snapshot.request": "players.view"
+};
+
+export const HIGH_RISK = new Set<string>([
+  "player.ban",
+  "player.kill",
+  "player.op",
+  "player.deop",
+  "files.delete",
+  "backup.delete",
+  "backup.restore",
+  "backup.full.delete",
+  "backup.full.restore",
+  "maintenance.settings.update",
+  "maintenance.restart.now",
+  "maintenance.full-backup.create",
+  "server.stop",
+  "server.restart",
+  "devices.revoke"
+]);
+
+export const ACTION_SCOPES: Readonly<Record<string, Scope>> = Object.freeze({
+  ...Object.fromEntries(
+    SCOPES.filter((scope) =>
+      IDENTITY_ACTION_PREFIXES.some((prefix) => scope.startsWith(prefix)),
+    ).map((scope) => [scope, scope]),
+  ),
+  ...ACTION_ALIASES,
+}) as Readonly<Record<string, Scope>>;
+
 export function validScopes(value: unknown): value is string[] {
   return (
     Array.isArray(value) &&
     value.length <= SCOPES.length &&
     new Set(value).size === value.length &&
     value.every(
-      (s) => typeof s === "string" && (SCOPES as readonly string[]).includes(s),
+      (scope) => typeof scope === "string" && (SCOPES as readonly string[]).includes(scope),
     )
   );
 }
+
 export function canAction(
   action: string,
   scopes: readonly string[],
