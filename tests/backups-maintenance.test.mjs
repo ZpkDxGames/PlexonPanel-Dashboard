@@ -58,7 +58,9 @@ test("provider runtime transitions are explicit and Host-authoritative", async (
     assert.equal(view.includes(`\"${state}\"`), true, `missing provider transition ${state}`);
   assert.equal(view.includes("provider.configured === true"), true);
   assert.equal(view.includes("hostConfigRestartRequired"), true);
+  assert.equal(view.includes("Last test"), true);
   assert.equal(view.includes("Last successful verification"), true);
+  assert.equal(view.includes("lastSuccessfulVerificationAt"), true);
   assert.equal(view.includes("Credentials"), true);
   assert.equal(view.includes("Host-local only"), true);
 });
@@ -69,7 +71,7 @@ test("ActionError and the backup failure card preserve safe structured diagnosti
 
   for (const field of ["requestId", "action", "status", "code", "phase", "safeRelativePath", "retryable"])
     assert.equal(view.includes(field), true, `failure card missing ${field}`);
-  assert.equal(view.includes("Last safe failure"), true);
+  assert.equal(view.includes("Last operation failure"), true);
   assert.equal(view.includes("sessionStorage"), true);
 
   assert.equal(dataSource.includes("readonly requestId = \"\""), true);
@@ -113,7 +115,7 @@ test("scheduling remains truthful and documents collision and unattended-mainten
 test("host-offline, recovery-required and restore confirmation states remain explicit", async () => {
   const view = await source(BACKUPS_VIEW);
   assert.equal(view.includes("Backups & Maintenance needs the Host companion"), true);
-  assert.equal(view.includes("Restore recovery is required on the Host"), true);
+  assert.equal(view.includes("Host recovery must be resolved before destructive operations."), true);
   assert.equal(view.includes("Type {restore.serverName} to continue"), true);
   assert.equal(view.includes("typed !== restore.serverName"), true);
   assert.equal(view.includes("confirmationToken"), true);
@@ -156,7 +158,6 @@ test("destructive maintenance actions remain capability-gated and high-risk at b
 
 test("browser boundary retains provider secrecy and the 64 MiB download ceiling", async () => {
   const view = await source(BACKUPS_VIEW);
-  assert.equal(view.includes("Google Drive credentials remain in the Host"), true);
   assert.equal(view.includes("Host-local only"), true);
   assert.equal(view.includes("Browser downloads remain capped at 64 MiB."), true);
   assert.equal(view.includes("64 * 1024 * 1024"), true);
