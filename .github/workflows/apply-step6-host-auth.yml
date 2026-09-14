@@ -14,6 +14,7 @@ concurrency:
 
 jobs:
   apply:
+    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     env:
@@ -60,43 +61,18 @@ jobs:
           p.write_text(text.replace(old_tail, new_tail, 1))
           PY
       - name: Validate dashboard and both relay runtimes
-        id: validate
-        shell: bash
         run: |
-          set +e
-          {
-            echo '===== npm run check ====='
-            npm run check
-            echo '===== npm run relay:smoke ====='
-            npm run relay:smoke
-            echo '===== npm run relay:standalone:smoke ====='
-            npm run relay:standalone:smoke
-            echo '===== npm run relay:standalone:package ====='
-            npm run relay:standalone:package
-            echo '===== npm run build ====='
-            npm run build
-          } > step6-relay-validation.log 2>&1
-          code=$?
-          echo "exit_code=${code}" >> "$GITHUB_OUTPUT"
-          tail -n 300 step6-relay-validation.log
-          exit 0
-      - name: Upload relay validation diagnostics
-        uses: actions/upload-artifact@v4
-        with:
-          name: step6-relay-validation
-          path: step6-relay-validation.log
-          if-no-files-found: error
-          retention-days: 2
-      - name: Enforce relay validation result
-        if: steps.validate.outputs.exit_code != '0'
-        run: exit 1
+          npm run check
+          npm run relay:smoke
+          npm run relay:standalone:smoke
+          npm run relay:standalone:package
+          npm run build
       - name: Commit validated transformation
-        if: steps.validate.outputs.exit_code == '0'
         shell: bash
         run: |
           set -euo pipefail
-          rm -f step6-relay-validation.log
-          git rm scripts/apply-step6-host-auth.mjs .github/workflows/apply-step6-host-auth.yml
+          git checkout -- scripts/apply-step6-host-auth.mjs
+          git diff --check
           git add -A
           git diff --cached --check
           git config user.name "github-actions[bot]"
