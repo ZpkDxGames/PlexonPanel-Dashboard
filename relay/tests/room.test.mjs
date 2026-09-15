@@ -700,8 +700,15 @@ test("Paper access sync is mirrored to Host and Host can request a refresh", asy
   assert.equal(mirrored.devices[0].deviceId, f.d.deviceId);
 
   paper.socket.sent.length = 0;
+  host.socket.sent.length = 0;
   await host.send("access.authority.request", {});
-  const refreshEnvelope = paper.socket.sent.find((message) => message.type === "access.authority.request");
+    const cachedEnvelope = host.socket.sent.find((message) => message.type === "access.authority.sync");
+    assert.ok(cachedEnvelope, "Host refresh must immediately replay current relay authority");
+    const cached = decodeEnvelope(JSON.stringify(cachedEnvelope)).body;
+    assert.equal(cached.generation, 7);
+    assert.equal(cached.revision, 2);
+    assert.equal(cached.devices[0].deviceId, f.d.deviceId);
+    const refreshEnvelope = paper.socket.sent.find((message) => message.type === "access.authority.request");
   assert.ok(refreshEnvelope, "Paper must receive Host's refresh request");
   assert.deepEqual(decodeEnvelope(JSON.stringify(refreshEnvelope)).body, {});
 });

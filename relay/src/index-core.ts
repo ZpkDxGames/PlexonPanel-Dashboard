@@ -938,8 +938,20 @@ export class ServerRoom {
     if (envelope.type === "access.authority.sync")
       throw new Error("Only relay emits Host authorization snapshots");
     if (envelope.type === "access.authority.request") {
-      if (a.kind !== "HOST") throw new Error("Only Host requests access authority refresh");
-      if (Object.keys(body).length !== 0) throw new Error("Invalid access authority request");
+      if (a.kind !== "HOST")
+        throw new Error("Only Host requests access authority refresh");
+      if (Object.keys(body).length !== 0)
+        throw new Error("Invalid access authority request");
+      // Reconcile Host immediately from the relay's already validated Paper-authoritative
+      // room state, then request a fresh Paper publication. Host-side generation/revision
+      // checks still reject stale or conflicting snapshots.
+      await this.sendToAgent("HOST", "access.authority.sync", {
+        protocolVersion: 3,
+        serverId: a.serverId,
+        generation: m.generation,
+        revision: m.revision,
+        devices: m.devices,
+      });
       await this.sendToAgent("PAPER", "access.authority.request", {});
       return;
     }
