@@ -1,0 +1,165 @@
+name: Agent Step 8 authority remediation
+
+on:
+  push:
+    branches:
+      - fix/step8-authority-reconciliation
+
+permissions:
+  contents: write
+
+jobs:
+  patch-and-verify:
+    if: ${{ !contains(github.event.head_commit.message, '[agent-patch]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Apply authority reconciliation fix and regression coverage
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          def replace_once(path: str, old: str, new: str) -> None:
+              p = Path(path)
+              text = p.read_text()
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f"{path}: expected one replacement target, found {count}")
+              p.write_text(text.replace(old, new, 1))
+
+          replace_once(
+              "relay/src/index-core.ts",
+              '''    if (envelope.type === "access.authority.request") {
+                if (a.kind !== "HOST") throw new Error("Only Host requests access authority refresh");
+                if (Object.keys(body).length !== 0) throw new Error("Invalid access authority request");
+                await this.sendToAgent("PAPER", "access.authority.request", {});
+                return;
+              }''',
+              '''    if (envelope.type === "access.authority.request") {
+                if (a.kind !== "HOST")
+                  throw new Error("Only Host requests access authority refresh");
+                if (Object.keys(body).length !== 0)
+                  throw new Error("Invalid access authority request");
+                // Reconcile Host immediately from the relay's already validated Paper-authoritative
+                // room state, then request a fresh Paper publication. Host-side generation/revision
+                // checks still reject stale or conflicting snapshots.
+                await this.sendToAgent("HOST", "access.authority.sync", {
+                  protocolVersion: 3,
+                  serverId: a.serverId,
+                  generation: m.generation,
+                  revision: m.revision,
+                  devices: m.devices,
+                });
+                await this.sendToAgent("PAPER", "access.authority.request", {});
+                return;
+              }''',
+          )
+
+          replace_once(
+              "relay/src/standalone/room-manager-core.ts",
+              '''    if (envelope.type === "access.authority.request") {
+                if (session.kind !== "HOST") throw new Error("Only Host requests access authority refresh");
+                if (Object.keys(body).length !== 0) throw new Error("Invalid access authority request");
+                await this.sendToAgent("PAPER", "access.authority.request", {});
+                this.counters.messagesAccepted += 1;
+                return;
+              }''',
+              '''    if (envelope.type === "access.authority.request") {
+                if (session.kind !== "HOST")
+                  throw new Error("Only Host requests access authority refresh");
+                if (Object.keys(body).length !== 0)
+                  throw new Error("Invalid access authority request");
+                // Reconcile Host immediately from the relay's already validated Paper-authoritative
+                // room state, then request a fresh Paper publication. Host-side generation/revision
+                // checks still reject stale or conflicting snapshots.
+                await this.sendToAgent("HOST", "access.authority.sync", {
+                  protocolVersion: 3,
+                  serverId: this.serverId,
+                  generation: this.metadata.generation,
+                  revision: this.metadata.revision,
+                  devices: this.metadata.devices,
+                });
+                await this.sendToAgent("PAPER", "access.authority.request", {});
+                this.counters.messagesAccepted += 1;
+                return;
+              }''',
+          )
+
+          replace_once(
+              "relay/tests/room.test.mjs",
+              '''  paper.socket.sent.length = 0;
+              await host.send("access.authority.request", {});
+              const refreshEnvelope = paper.socket.sent.find((message) => message.type === "access.authority.request");
+              assert.ok(refreshEnvelope, "Paper must receive Host's refresh request");
+              assert.deepEqual(decodeEnvelope(JSON.stringify(refreshEnvelope)).body, {});''',
+              '''  paper.socket.sent.length = 0;
+              host.socket.sent.length = 0;
+              await host.send("access.authority.request", {});
+              const cachedEnvelope = host.socket.sent.find((message) => message.type === "access.authority.sync");
+              assert.ok(cachedEnvelope, "Host refresh must immediately replay current relay authority");
+              const cached = decodeEnvelope(JSON.stringify(cachedEnvelope)).body;
+              assert.equal(cached.generation, 7);
+              assert.equal(cached.revision, 2);
+              assert.equal(cached.devices[0].deviceId, f.d.deviceId);
+              const refreshEnvelope = paper.socket.sent.find((message) => message.type === "access.authority.request");
+              assert.ok(refreshEnvelope, "Paper must receive Host's refresh request");
+              assert.deepEqual(decodeEnvelope(JSON.stringify(refreshEnvelope)).body, {});''',
+          )
+
+          replace_once(
+              "relay/tests/preflight-contract.test.mjs",
+              '''    f.paperSocket.sent.length = 0;
+                const request = await signEnvelope(
+                  "access.authority.request",
+                  f.serverId,
+                  { _session: f.hostSession.sessionNonce, _sequence: 1 },
+                  f.hostKey.privateKey,
+                );
+                await f.room.agentMessage(f.hostSession, request);
+                const refresh = f.paperSocket.sent.find((message) => message.type === "access.authority.request");
+                assert.ok(refresh, "standalone Paper must receive Host refresh request");''',
+              '''    f.paperSocket.sent.length = 0;
+                f.hostSocket.sent.length = 0;
+                const request = await signEnvelope(
+                  "access.authority.request",
+                  f.serverId,
+                  { _session: f.hostSession.sessionNonce, _sequence: 1 },
+                  f.hostKey.privateKey,
+                );
+                await f.room.agentMessage(f.hostSession, request);
+                const cachedEnvelope = f.hostSocket.sent.find((message) => message.type === "access.authority.sync");
+                assert.ok(cachedEnvelope, "standalone Host refresh must replay current relay authority");
+                const cached = decodeEnvelope(JSON.stringify(cachedEnvelope)).body;
+                assert.equal(cached.generation, 7);
+                assert.equal(cached.revision, 3);
+                assert.equal(cached.devices[0].deviceId, f.device.deviceId);
+                const refresh = f.paperSocket.sent.find((message) => message.type === "access.authority.request");
+                assert.ok(refresh, "standalone Paper must receive Host refresh request");''',
+          )
+
+          protocol = Path("docs/PROTOCOL.md")
+          text = protocol.read_text()
+          old = "Host may send `access.authority.request`; the relay accepts it only from authenticated Host and asks authenticated Paper to republish `access.sync`."
+          new = "Host may send `access.authority.request`; the relay accepts it only from authenticated Host, immediately replays the relay's current validated Paper-authoritative room snapshot as `access.authority.sync`, and then asks authenticated Paper to republish `access.sync`."
+          if old not in text:
+              raise SystemExit("docs/PROTOCOL.md: authority refresh sentence not found")
+          protocol.write_text(text.replace(old, new, 1))
+          PY
+      - run: npm ci
+      - run: npm run check
+      - name: Commit verified remediation
+        shell: bash
+        run: |
+          git config user.name "PlexonPanel Agent"
+          git config user.email "99552287+ZpkDxGames@users.noreply.github.com"
+          git add relay/src/index-core.ts relay/src/standalone/room-manager-core.ts relay/tests/room.test.mjs relay/tests/preflight-contract.test.mjs docs/PROTOCOL.md
+          git diff --cached --check
+          git commit -m "[agent-patch] Fix Host authority reconciliation"
+          git push origin HEAD:${GITHUB_REF_NAME}
