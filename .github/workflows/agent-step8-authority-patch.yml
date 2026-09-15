@@ -31,7 +31,7 @@ jobs:
               text = p.read_text()
               count = text.count(old)
               if count != 1:
-                  raise SystemExit(f"{path}: expected one replacement target, found {count}")
+                  raise SystemExit(f"{path}: expected one replacement target, found {count}: {old[:80]!r}")
               p.write_text(text.replace(old, new, 1))
 
           replace_once(
@@ -94,54 +94,38 @@ jobs:
 
           replace_once(
               "relay/tests/room.test.mjs",
-              '''  paper.socket.sent.length = 0;
-              await host.send("access.authority.request", {});
-              const refreshEnvelope = paper.socket.sent.find((message) => message.type === "access.authority.request");
-              assert.ok(refreshEnvelope, "Paper must receive Host's refresh request");
-              assert.deepEqual(decodeEnvelope(JSON.stringify(refreshEnvelope)).body, {});''',
-              '''  paper.socket.sent.length = 0;
-              host.socket.sent.length = 0;
-              await host.send("access.authority.request", {});
+              '  paper.socket.sent.length = 0;\n  await host.send("access.authority.request", {});',
+              '  paper.socket.sent.length = 0;\n  host.socket.sent.length = 0;\n  await host.send("access.authority.request", {});',
+          )
+          replace_once(
+              "relay/tests/room.test.mjs",
+              '  await host.send("access.authority.request", {});\n  const refreshEnvelope = paper.socket.sent.find((message) => message.type === "access.authority.request");',
+              '''  await host.send("access.authority.request", {});
               const cachedEnvelope = host.socket.sent.find((message) => message.type === "access.authority.sync");
               assert.ok(cachedEnvelope, "Host refresh must immediately replay current relay authority");
               const cached = decodeEnvelope(JSON.stringify(cachedEnvelope)).body;
               assert.equal(cached.generation, 7);
               assert.equal(cached.revision, 2);
               assert.equal(cached.devices[0].deviceId, f.d.deviceId);
-              const refreshEnvelope = paper.socket.sent.find((message) => message.type === "access.authority.request");
-              assert.ok(refreshEnvelope, "Paper must receive Host's refresh request");
-              assert.deepEqual(decodeEnvelope(JSON.stringify(refreshEnvelope)).body, {});''',
+              const refreshEnvelope = paper.socket.sent.find((message) => message.type === "access.authority.request");''',
           )
 
           replace_once(
               "relay/tests/preflight-contract.test.mjs",
-              '''    f.paperSocket.sent.length = 0;
-                const request = await signEnvelope(
-                  "access.authority.request",
-                  f.serverId,
-                  { _session: f.hostSession.sessionNonce, _sequence: 1 },
-                  f.hostKey.privateKey,
-                );
-                await f.room.agentMessage(f.hostSession, request);
-                const refresh = f.paperSocket.sent.find((message) => message.type === "access.authority.request");
-                assert.ok(refresh, "standalone Paper must receive Host refresh request");''',
-              '''    f.paperSocket.sent.length = 0;
-                f.hostSocket.sent.length = 0;
-                const request = await signEnvelope(
-                  "access.authority.request",
-                  f.serverId,
-                  { _session: f.hostSession.sessionNonce, _sequence: 1 },
-                  f.hostKey.privateKey,
-                );
-                await f.room.agentMessage(f.hostSession, request);
-                const cachedEnvelope = f.hostSocket.sent.find((message) => message.type === "access.authority.sync");
-                assert.ok(cachedEnvelope, "standalone Host refresh must replay current relay authority");
-                const cached = decodeEnvelope(JSON.stringify(cachedEnvelope)).body;
-                assert.equal(cached.generation, 7);
-                assert.equal(cached.revision, 3);
-                assert.equal(cached.devices[0].deviceId, f.device.deviceId);
-                const refresh = f.paperSocket.sent.find((message) => message.type === "access.authority.request");
-                assert.ok(refresh, "standalone Paper must receive Host refresh request");''',
+              '    f.paperSocket.sent.length = 0;\n    const request = await signEnvelope(',
+              '    f.paperSocket.sent.length = 0;\n    f.hostSocket.sent.length = 0;\n    const request = await signEnvelope(',
+          )
+          replace_once(
+              "relay/tests/preflight-contract.test.mjs",
+              '    await f.room.agentMessage(f.hostSession, request);\n    const refresh = f.paperSocket.sent.find((message) => message.type === "access.authority.request");',
+              '''    await f.room.agentMessage(f.hostSession, request);
+              const cachedEnvelope = f.hostSocket.sent.find((message) => message.type === "access.authority.sync");
+              assert.ok(cachedEnvelope, "standalone Host refresh must replay current relay authority");
+              const cached = decodeEnvelope(JSON.stringify(cachedEnvelope)).body;
+              assert.equal(cached.generation, 7);
+              assert.equal(cached.revision, 3);
+              assert.equal(cached.devices[0].deviceId, f.device.deviceId);
+              const refresh = f.paperSocket.sent.find((message) => message.type === "access.authority.request");''',
           )
 
           protocol = Path("docs/PROTOCOL.md")
