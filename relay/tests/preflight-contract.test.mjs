@@ -350,6 +350,7 @@ test("standalone relay mirrors Paper authorization to Host and enforces refresh 
     assert.equal(mirrored.devices[0].deviceId, f.device.deviceId);
 
     f.paperSocket.sent.length = 0;
+    f.hostSocket.sent.length = 0;
     const request = await signEnvelope(
       "access.authority.request",
       f.serverId,
@@ -357,6 +358,12 @@ test("standalone relay mirrors Paper authorization to Host and enforces refresh 
       f.hostKey.privateKey,
     );
     await f.room.agentMessage(f.hostSession, request);
+    const cachedEnvelope = f.hostSocket.sent.find((message) => message.type === "access.authority.sync");
+    assert.ok(cachedEnvelope, "standalone Host refresh must replay current relay authority");
+    const cached = decodeEnvelope(JSON.stringify(cachedEnvelope)).body;
+    assert.equal(cached.generation, 7);
+    assert.equal(cached.revision, 3);
+    assert.equal(cached.devices[0].deviceId, f.device.deviceId);
     const refresh = f.paperSocket.sent.find((message) => message.type === "access.authority.request");
     assert.ok(refresh, "standalone Paper must receive Host refresh request");
 
