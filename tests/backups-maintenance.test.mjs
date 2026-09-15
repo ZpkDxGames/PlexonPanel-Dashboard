@@ -113,7 +113,11 @@ test("degraded and recovery-required states block or recover safely", async () =
   assert.equal(view.includes("Local backup verified; off-site copy is not current."), true);
   assert.equal(view.includes("Retry Upload does not stop Minecraft again."), true);
   assert.equal(view.includes('runOperation("backup.full.retry-upload"'), true);
-  assert.equal(view.includes("New backups are blocked until Host recovery is completed."), true);
+  assert.equal(view.includes("Verify & resolve recovery"), true);
+  assert.equal(view.includes('props.can("maintenance.recovery.resolve", "HOST")'), true);
+  assert.equal(view.includes('runOperation("maintenance.recovery.resolve", {})'), true);
+  assert.equal(view.includes("This does not mark the backup successful."), true);
+  assert.equal(view.includes("recoveryResolveReady"), true);
   assert.equal(view.includes("!operationBlocking"), true);
   assert.equal(view.includes("!recoveryRequired"), true);
 });
@@ -168,6 +172,7 @@ test("destructive maintenance actions remain capability-gated at browser and rel
     "maintenance.settings.update",
     "maintenance.restart.now",
     "maintenance.full-backup.create",
+    "maintenance.recovery.resolve",
   ]) {
     assert.equal(view.includes(action), true, `workspace missing ${action}`);
     assert.equal(browserScopes.includes(`\"${action}\"`), true, `browser HIGH_RISK missing ${action}`);
