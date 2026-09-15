@@ -101,7 +101,8 @@
     "files.download.chunk": "files.download",
     "files.transfer.cancel": "files.download",
     "players.history.list": "players.history.view",
-    "players.snapshot.request": "players.view"
+    "players.snapshot.request": "players.view",
+    "maintenance.recovery.resolve": "maintenance.run"
   },
   "highRisk": [
     "player.ban",
@@ -116,6 +117,7 @@
     "maintenance.settings.update",
     "maintenance.restart.now",
     "maintenance.full-backup.create",
+    "maintenance.recovery.resolve",
     "server.stop",
     "server.restart",
     "devices.revoke"

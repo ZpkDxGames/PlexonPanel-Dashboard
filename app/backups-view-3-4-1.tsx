@@ -285,6 +285,7 @@ export function BackupsView30(props: ViewProps) {
   const canBackups = props.can("backup.full.list", "HOST");
   const canPreflight = props.can("backup.preflight", "HOST");
   const canRunFullBackup = props.can("maintenance.full-backup.create", "HOST");
+  const canResolveRecovery = props.can("maintenance.recovery.resolve", "HOST");
 
   const status = useQuery(
     "maintenance.status",
@@ -393,14 +394,23 @@ export function BackupsView30(props: ViewProps) {
   const providerState = str(provider.status, "UNKNOWN");
   const providerConfigured = provider.configured === true;
   const recoveryKnown = status.hasSuccess || fullQuery.hasSuccess || preflight.hasSuccess;
-  const recoveryRequired =
+  const jobRecoveryRequired =
     operationPhase === "RECOVERY_REQUIRED" ||
     operation.restartRecoveryRequired === true ||
-    status.data.jobRecoveryRequired === true ||
+    status.data.jobRecoveryRequired === true;
+  const restoreRecoveryRequired =
     status.data.restoreRecoveryRequired === true ||
     fullQuery.data.recoveryRequired === true ||
     preflight.data.recoveryRequired === true ||
     service.recoveryRequired === true;
+  const recoveryRequired = jobRecoveryRequired || restoreRecoveryRequired;
+  const recoveryResolveReady =
+    hostConnected &&
+    canResolveRecovery &&
+    jobRecoveryRequired &&
+    minecraftOnline &&
+    commandConfigured &&
+    minecraftReady;
   const preflightReady =
     preflight.hasSuccess &&
     preflight.data.hostAuthenticated === true &&
@@ -567,9 +577,27 @@ export function BackupsView30(props: ViewProps) {
         <div className="cr-step8-recovery" role="alert">
           <div>
             <strong>Recovery required</strong>
-            <span>A previous destructive operation is unresolved. New backups are blocked until Host recovery is completed.</span>
+            <span>
+              {jobRecoveryRequired
+                ? "The previous maintenance job failed after crossing the stop boundary. Verify Minecraft is running and Host-local RCON readiness is healthy, then acknowledge recovery. This does not mark the backup successful."
+                : "A restore recovery gate is unresolved. New backups remain blocked until Host recovery is completed."}
+            </span>
           </div>
-          <Badge tone="red">Blocked</Badge>
+          <div className="cr-actions">
+            <Badge tone="red">Blocked</Badge>
+            {jobRecoveryRequired && canResolveRecovery && (
+              <button
+                className="cr-button"
+                disabled={!recoveryResolveReady}
+                onClick={async () => {
+                  if (!window.confirm("Acknowledge this failed maintenance job after verifying Minecraft is online and Host-local RCON readiness is healthy? This will clear the recovery gate but will not mark the backup successful.")) return;
+                  await runOperation("maintenance.recovery.resolve", {});
+                  refreshAll();
+                  props.notice("Maintenance recovery acknowledged. The failed job remains recorded as failed.");
+                }}
+              >Verify & resolve recovery</button>
+            )}
+          </div>
         </div>
       )}
 

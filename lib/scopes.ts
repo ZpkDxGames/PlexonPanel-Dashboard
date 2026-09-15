@@ -104,7 +104,8 @@ const ACTION_ALIASES: Readonly<Record<string, Scope>> = {
   "files.download.chunk": "files.download",
   "files.transfer.cancel": "files.download",
   "players.history.list": "players.history.view",
-  "players.snapshot.request": "players.view"
+  "players.snapshot.request": "players.view",
+  "maintenance.recovery.resolve": "maintenance.run"
 };
 
 export const HIGH_RISK = new Set<string>([
@@ -120,6 +121,7 @@ export const HIGH_RISK = new Set<string>([
   "maintenance.settings.update",
   "maintenance.restart.now",
   "maintenance.full-backup.create",
+  "maintenance.recovery.resolve",
   "server.stop",
   "server.restart",
   "devices.revoke"
