@@ -499,6 +499,7 @@ export default function Dashboard() {
       action: string,
       parameters: JsonMap,
       kind?: "PAPER" | "HOST",
+      confirmationMode: "default" | "preconfirmed" = "default",
     ): Promise<ActionCompletion> => {
       if (!can(action, kind)) {
         const e = new Error(
@@ -508,9 +509,10 @@ export default function Dashboard() {
         throw e;
       }
       if (
-        HIGH_RISK.has(action) ||
-        action === "console.execute" ||
-        action === "plugin.command.reload"
+        confirmationMode !== "preconfirmed" &&
+        (HIGH_RISK.has(action) ||
+          action === "console.execute" ||
+          action === "plugin.command.reload")
       ) {
         const approved = await new Promise<boolean>((resolve) =>
           setConfirmation({
@@ -525,6 +527,8 @@ export default function Dashboard() {
         if (!approved) throw new Error("Cancelled");
         parameters = { ...parameters, confirmed: true };
       }
+      if (confirmationMode === "preconfirmed")
+        parameters = { ...parameters, confirmed: true };
       try {
         const result = await sendDashboardAction(action, parameters, kind);
         setNotice(str(result.data.message, result.message));
