@@ -31,7 +31,6 @@ type SettingsDraft = {
     startupTimeoutSeconds: number;
   };
   fullRestorePoint: {
-    schedule: ScheduleDraft;
     retentionMode: "SINGLE_CURRENT" | "ROTATING";
     retentionCount: number;
     restartAfter: boolean;
@@ -69,10 +68,18 @@ const DAYS = [
   "SATURDAY",
   "SUNDAY",
 ];
+const COUNTDOWN_OPTIONS = [
+  { seconds: 1800, label: "30 minutes", short: "30m", detail: "Recommended for busy hours" },
+  { seconds: 900, label: "15 minutes", short: "15m", detail: "Balanced notice window" },
+  { seconds: 600, label: "10 minutes", short: "10m", detail: "Short maintenance notice" },
+  { seconds: 300, label: "5 minutes", short: "5m", detail: "Minimum safe preset" },
+] as const;
+type CountdownSeconds = (typeof COUNTDOWN_OPTIONS)[number]["seconds"];
+const COUNTDOWN_BOUNDARIES = [1800, 900, 60, 30, 15, 5] as const;
 const PHASES: PhaseDefinition[] = [
   { key: "QUEUED", label: "Queued" },
   { key: "PREFLIGHT", label: "Preflight" },
-  { key: "COUNTDOWN", label: "30-minute warning period" },
+  { key: "COUNTDOWN", label: "Player warning countdown" },
   { key: "FINAL_SAVE", label: "Saving server" },
   { key: "STOPPING_SERVER", label: "Stopping Minecraft" },
   { key: "WAITING_FOR_STOP", label: "Confirming shutdown" },
@@ -122,12 +129,6 @@ function parseSettings(value: unknown): SettingsDraft {
         typeof restart.startupTimeoutSeconds === "number" ? restart.startupTimeoutSeconds : 180,
     },
     fullRestorePoint: {
-      schedule: parseSchedule(full.schedule, {
-        enabled: false,
-        type: "WEEKLY",
-        weekdays: ["SUNDAY"],
-        time: "04:00",
-      }),
       retentionMode: full.retentionMode === "ROTATING" ? "ROTATING" : "SINGLE_CURRENT",
       retentionCount: typeof full.retentionCount === "number" ? full.retentionCount : 1,
       restartAfter: true,
@@ -142,6 +143,31 @@ function parseSettings(value: unknown): SettingsDraft {
         : ["logs", "crash-reports", "cache", ".cache"],
     },
   };
+}
+
+function isCountdownSeconds(value: number): value is CountdownSeconds {
+  return COUNTDOWN_OPTIONS.some((option) => option.seconds === value);
+}
+
+function countdownLabel(seconds: number): string {
+  return COUNTDOWN_OPTIONS.find((option) => option.seconds === seconds)?.label ?? `${seconds}s`;
+}
+
+function countdownWarnings(seconds: CountdownSeconds): number[] {
+  return Array.from(
+    new Set([seconds, ...COUNTDOWN_BOUNDARIES.filter((boundary) => boundary <= seconds)]),
+  ).sort((left, right) => right - left);
+}
+
+function countdownWarningLabel(seconds: CountdownSeconds): string {
+  return countdownWarnings(seconds)
+    .map((value) => (value >= 60 ? `${value / 60}m` : `${value}s`))
+    .join(" / ");
+}
+
+function restartCountdown(value: number[]): CountdownSeconds {
+  const largest = Math.max(...value, 0);
+  return isCountdownSeconds(largest) ? largest : 900;
 }
 
 function ScheduleEditor({
@@ -185,7 +211,7 @@ function ScheduleEditor({
           <option value="SELECTED_WEEKDAYS">Selected weekdays</option>
         </select>
       </label>
-      {value.type !== "DAILY" && (
+      {value.type === "WEEKLY" && (
         <label>
           Weekday
           <select
@@ -199,6 +225,33 @@ function ScheduleEditor({
             ))}
           </select>
         </label>
+      )}
+      {value.type === "SELECTED_WEEKDAYS" && (
+        <fieldset className="cr35-weekday-picker">
+          <legend>Restart days</legend>
+          <div>
+            {DAYS.map((day) => {
+              const selected = value.weekdays.includes(day);
+              return (
+                <label key={day} className={selected ? "selected" : ""}>
+                  <input
+                    type="checkbox"
+                    checked={selected}
+                    onChange={(event) => {
+                      const weekdays = event.target.checked
+                        ? DAYS.filter((candidate) =>
+                            candidate === day || value.weekdays.includes(candidate),
+                          )
+                        : value.weekdays.filter((candidate) => candidate !== day);
+                      onChange({ ...value, weekdays });
+                    }}
+                  />
+                  {day.slice(0, 3)}
+                </label>
+              );
+            })}
+          </div>
+        </fieldset>
       )}
       <label>
         Local time
@@ -321,14 +374,13 @@ export function BackupsView30(props: ViewProps) {
   const [draft, setDraft] = useState<SettingsDraft | null>(null);
   const [dirty, setDirty] = useState(false);
   const [confirmBackup, setConfirmBackup] = useState(false);
+  const [backupCountdownSeconds, setBackupCountdownSeconds] =
+    useState<CountdownSeconds>(1800);
   const [localError, setLocalError] = useState("");
   const [lastFailure, setLastFailure] = useState<FailureRecord | null>(null);
-  const [restore, setRestore] = useState<{
-    id: string;
-    token: string;
-    serverName: string;
-  } | null>(null);
-  const [typed, setTyped] = useState("");
+
+
+  useEffect(() => {
 
   useEffect(() => {
     let timer: number | undefined;
@@ -433,6 +485,7 @@ export function BackupsView30(props: ViewProps) {
   const missingIncludes = listStrings(preflight.data.missingIncludes);
   const symlinkIssues = listStrings(preflight.data.symlinkIssues);
   const countdownRemaining = number(status.data.countdownRemainingSeconds);
+  const countdownInitial = number(status.data.countdownInitialSeconds);
   const localVerified = operation.localBackupVerified === true;
   const remoteVerified = operation.remoteBackupVerified === true;
   const warnings = listStrings(progress?.warnings ?? operation.warnings);
@@ -466,10 +519,14 @@ export function BackupsView30(props: ViewProps) {
     }
   };
 
-  const runOperation = async (action: string, parameters: JsonMap = {}) => {
+  const runOperation = async (
+    action: string,
+    parameters: JsonMap = {},
+    confirmationMode: "default" | "preconfirmed" = "default",
+  ) => {
     setLocalError("");
     try {
-      return await props.run(action, parameters, "HOST");
+      return await props.run(action, parameters, "HOST", confirmationMode);
     } catch (error) {
       captureFailure(action, error);
       throw error;
@@ -484,15 +541,9 @@ export function BackupsView30(props: ViewProps) {
     preflight.refresh();
   };
 
-  const startRestore = async (backupId: string) => {
-    const result = await runOperation("backup.full.restore.prepare", { backupId });
-    setTyped("");
-    setRestore({
-      id: backupId,
-      token: str(result.data.confirmationToken, ""),
-      serverName: str(result.data.serverName, ""),
-    });
-  };
+
+
+  const readinessReason
 
   const readinessReason = !hostConnected
     ? "Host Companion is disconnected."
@@ -510,7 +561,7 @@ export function BackupsView30(props: ViewProps) {
                 ? "The Host command channel / RCON readiness check is not ready while Minecraft is online."
                 : !preflightReady
                   ? "Host preflight is not ready."
-                  : "Host preflight passed. The 30-minute countdown will begin only after confirmation.";
+                  : `Host preflight passed. The ${countdownLabel(backupCountdownSeconds)} countdown will begin only after confirmation.`;
 
   if (!hostConnected)
     return (
@@ -557,7 +608,7 @@ export function BackupsView30(props: ViewProps) {
       <div className="cr21-page-toolbar cr30-backup-toolbar">
         <div>
           <strong>Backups & Maintenance</strong>
-          <span>Host-authoritative manual full backups, restore points and recovery.</span>
+          <span>Host-authoritative manual full backups, verified history and recovery.</span>
         </div>
         <div className="cr-actions">
           <Badge tone="green">Host connected</Badge>
@@ -591,7 +642,7 @@ export function BackupsView30(props: ViewProps) {
                 disabled={!recoveryResolveReady}
                 onClick={async () => {
                   if (!window.confirm("Acknowledge this failed maintenance job after verifying Minecraft is online and Host-local RCON readiness is healthy? This will clear the recovery gate but will not mark the backup successful.")) return;
-                  await runOperation("maintenance.recovery.resolve", {});
+                  await runOperation("maintenance.recovery.resolve", {}, "preconfirmed");
                   refreshAll();
                   props.notice("Maintenance recovery acknowledged. The failed job remains recorded as failed.");
                 }}
@@ -650,22 +701,62 @@ export function BackupsView30(props: ViewProps) {
         </div>
       </Panel>
 
-      <Panel title="Fully Backup Now" className="cr-step8-primary-panel" aside={<Badge tone="cyan">Manual · Host-owned</Badge>}>
-        <div className="cr-step8-primary">
-          <div>
-            <strong>Create a verified cold full-server restore point.</strong>
+      <Panel title="Fully Backup Now" className="cr-step8-primary-panel cr35-backup-launch" aside={<Badge tone="cyan">Manual · Host-owned</Badge>}>
+        <div className="cr35-backup-hero">
+          <div className="cr35-backup-intro">
+            <span className="cr35-eyebrow">Complete cold-backup workflow</span>
+            <strong>Save, stop, protect, upload and recover—under one durable Host job.</strong>
             <p>
-              The Host owns the 30-minute warning period, final save flush, systemd stop proof, local archive verification, Google Drive promotion and automatic Minecraft restart. Closing this browser does not cancel the job.
+              Choose how long players are warned. The Host then requires <code>save-all flush</code>, proves Minecraft stopped, verifies the local archive, promotes it to Google Drive and brings the server back online.
             </p>
+            <div className="cr35-flow-chips" aria-label="Backup workflow summary">
+              <span>1 · Player notice</span>
+              <span>2 · Save &amp; stop</span>
+              <span>3 · Verify locally</span>
+              <span>4 · Google Drive</span>
+              <span>5 · Auto-restart</span>
+            </div>
+          </div>
+          <div className="cr35-launch-action">
+            <span>Selected warning</span>
+            <strong>{countdownLabel(backupCountdownSeconds)}</strong>
+            <small>{countdownWarningLabel(backupCountdownSeconds)} notices</small>
+            <button
+              className="cr-button danger cr-step8-primary-button"
+              disabled={!actionReady}
+              onClick={() => setConfirmBackup(true)}
+            >
+              Review &amp; start backup
+            </button>
+          </div>
+        </div>
+        <div className="cr35-countdown-panel">
+          <div>
+            <strong>Initial player countdown</strong>
+            <small>The selection is persisted by the Host and survives a browser refresh or Host reconnect.</small>
+          </div>
+          <div className="cr35-countdown-grid" role="radiogroup" aria-label="Initial backup countdown">
+            {COUNTDOWN_OPTIONS.map((option) => {
+              const selected = backupCountdownSeconds === option.seconds;
+              return (
+                <button
+                  type="button"
+                  role="radio"
+                  aria-checked={selected}
+                  className={`cr35-countdown-option ${selected ? "selected" : ""}`}
+                  key={option.seconds}
+                  onClick={() => setBackupCountdownSeconds(option.seconds)}
+                >
+                  <strong>{option.short}</strong>
+                  <span>{option.detail}</span>
+                </button>
+              );
+            })}
+          </div>
+          <div className="cr35-readiness-line">
+            <span className={actionReady ? "ready" : "blocked"} aria-hidden />
             <small>{readinessReason}</small>
           </div>
-          <button
-            className="cr-button danger cr-step8-primary-button"
-            disabled={!actionReady}
-            onClick={() => setConfirmBackup(true)}
-          >
-            Fully Backup Now
-          </button>
         </div>
       </Panel>
 
@@ -685,7 +776,11 @@ export function BackupsView30(props: ViewProps) {
               return (
                 <div className={`cr341-phase ${state}`} key={phase.key}>
                   <span aria-hidden>{state === "done" ? "✓" : state === "active" ? "●" : "○"}</span>
-                  <strong>{phase.label}</strong>
+                  <strong>
+                    {phase.key === "COUNTDOWN"
+                      ? `${countdownLabel(countdownInitial ?? backupCountdownSeconds)} countdown`
+                      : phase.label}
+                  </strong>
                 </div>
               );
             })}
@@ -695,6 +790,7 @@ export function BackupsView30(props: ViewProps) {
             <div><dt>Current phase</dt><dd>{phaseLabel(displayedPhase || operationPhase)}</dd></div>
             <div><dt>Phase started</dt><dd>{time(operation.phaseTimestamp)}</dd></div>
             <div><dt>Job started</dt><dd>{time(operation.startedAt)}</dd></div>
+            {countdownInitial !== null && <div><dt>Initial countdown</dt><dd>{countdownLabel(countdownInitial)}</dd></div>}
             {operationPhase === "COUNTDOWN" && <div><dt>Host countdown remaining</dt><dd>{formatCountdown(countdownRemaining)}</dd></div>}
             {operationPhase === "COUNTDOWN" && <div><dt>Host countdown deadline</dt><dd>{time(status.data.countdownDeadline)}</dd></div>}
             <div><dt>Progress</dt><dd>{progressPercent === null ? "Host has not reported a percentage" : `${progressPercent}%`}</dd></div>
@@ -793,7 +889,10 @@ export function BackupsView30(props: ViewProps) {
         </Panel>
       )}
 
-      <Panel title="Restore points" aside={<Badge>{fullBackups.length} loaded</Badge>}>
+      <Panel title="Verified backup history" aside={<Badge>{fullBackups.length} loaded</Badge>}>
+        <p className="cr-hint cr35-history-note">
+          Verification, retry-upload and retention controls remain available here. Direct server-tree restore is intentionally excluded from the stable Host contract so the always-on Host can keep the Minecraft tree read-only.
+        </p>
         {fullBackups.length ? (
           <div className="cr-table-wrap cr30-backup-table">
             <table>
@@ -813,20 +912,17 @@ export function BackupsView30(props: ViewProps) {
                       <td>
                         <div className="cr-actions">
                           {props.can("backup.full.verify", "HOST") && (
-                            <ActionButton onClick={async () => { await runOperation("backup.full.verify", { backupId: id }); props.notice("Restore point verified."); }}>Verify</ActionButton>
+                            <ActionButton onClick={async () => { await runOperation("backup.full.verify", { backupId: id }); props.notice("Backup verified."); }}>Verify</ActionButton>
                           )}
                           {backup.offsite !== true && backup.local === true && providerConfigured && props.can("backup.full.retry-upload", "HOST") && (
                             <ActionButton onClick={async () => { await runOperation("backup.full.retry-upload", { backupId: id }); fullQuery.refresh(); providerQuery.refresh(); }}>Retry Upload</ActionButton>
-                          )}
-                          {props.can("backup.full.restore.prepare", "HOST") && (
-                            <ActionButton danger onClick={() => startRestore(id)}>Restore</ActionButton>
                           )}
                           {!backup.emergency && props.can("backup.full.delete", "HOST") && (
                             <ActionButton
                               danger
                               onClick={async () => {
                                 if (!window.confirm("Delete this local full restore-point metadata and archive?")) return;
-                                await runOperation("backup.full.delete", { backupId: id });
+                                await runOperation("backup.full.delete", { backupId: id }, "preconfirmed");
                                 fullQuery.refresh();
                               }}
                             >Delete</ActionButton>
@@ -840,13 +936,13 @@ export function BackupsView30(props: ViewProps) {
             </table>
           </div>
         ) : (
-          <Empty title={fullQuery.busy ? "Loading restore points…" : "No confirmed restore points"}>
+          <Empty title={fullQuery.busy ? "Loading backup history…" : "No confirmed backups"}>
             Inventory is shown only from confirmed Host data.
           </Empty>
         )}
       </Panel>
 
-      <Panel title="Restart schedule" aside={<Badge>{status.hasSuccess ? str(status.data.timezone, "Host timezone") : "Unknown timezone"}</Badge>}>
+      <Panel title="Automatic restart schedule" aside={<Badge>{status.hasSuccess ? str(status.data.timezone, "Host timezone") : "Unknown timezone"}</Badge>}>
         <div className="cr30-backup-metrics">
           <article className="cr30-backup-metric"><span>Next restart</span><strong>{status.hasSuccess ? time(status.data.nextRestart) : "Unknown"}</strong><small>Restart-only maintenance</small></article>
           <article className="cr30-backup-metric"><span>Full backups</span><strong>Manual only</strong><small>No automatic full-backup schedule</small></article>
@@ -858,7 +954,7 @@ export function BackupsView30(props: ViewProps) {
               disabled={operationBlocking || recoveryRequired}
               onClick={async () => {
                 if (!window.confirm("Restart PlexonCraft using the Host-owned maintenance warning and readiness workflow?")) return;
-                await runOperation("maintenance.restart.now", {});
+                await runOperation("maintenance.restart.now", {}, "preconfirmed");
                 status.refresh();
               }}
             >Restart server</ActionButton>
@@ -870,7 +966,7 @@ export function BackupsView30(props: ViewProps) {
         <Panel title="Supported maintenance settings" aside={dirty ? <Badge tone="amber">Unsaved</Badge> : <Badge>Host persisted</Badge>}>
           <div className="cr30-settings-grid">
             <section>
-              <h3>Restart-only schedule</h3>
+              <h3>Automatic restart schedule</h3>
               <ScheduleEditor
                 value={activeDraft.restart.schedule}
                 onChange={(schedule) => {
@@ -879,7 +975,31 @@ export function BackupsView30(props: ViewProps) {
                 }}
               />
               <label>Timezone<input value={activeDraft.timezone} onChange={(event) => { setDraft({ ...activeDraft, timezone: event.target.value }); setDirty(true); }} placeholder="America/Sao_Paulo" /></label>
-              <label>Warnings · seconds<input value={activeDraft.restart.warningSeconds.join(", ")} onChange={(event) => { setDraft({ ...activeDraft, restart: { ...activeDraft.restart, warningSeconds: event.target.value.split(",").map((value) => Number(value.trim())).filter((value) => Number.isFinite(value) && value >= 0) } }); setDirty(true); }} /></label>
+              <label>
+                Initial player countdown
+                <select
+                  value={restartCountdown(activeDraft.restart.warningSeconds)}
+                  onChange={(event) => {
+                    const seconds = Number(event.target.value);
+                    if (!isCountdownSeconds(seconds)) return;
+                    setDraft({
+                      ...activeDraft,
+                      restart: {
+                        ...activeDraft.restart,
+                        warningSeconds: countdownWarnings(seconds),
+                      },
+                    });
+                    setDirty(true);
+                  }}
+                >
+                  {COUNTDOWN_OPTIONS.map((option) => (
+                    <option key={option.seconds} value={option.seconds}>
+                      {option.label} · {countdownWarningLabel(option.seconds)} notices
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>Shutdown timeout · seconds<input type="number" min={30} max={1800} value={activeDraft.restart.stopTimeoutSeconds} onChange={(event) => { setDraft({ ...activeDraft, restart: { ...activeDraft.restart, stopTimeoutSeconds: Number(event.target.value) } }); setDirty(true); }} /></label>
               <label>Startup timeout · seconds<input type="number" min={30} max={1800} value={activeDraft.restart.startupTimeoutSeconds} onChange={(event) => { setDraft({ ...activeDraft, restart: { ...activeDraft.restart, startupTimeoutSeconds: Number(event.target.value) } }); setDirty(true); }} /></label>
             </section>
             <section>
@@ -905,7 +1025,6 @@ export function BackupsView30(props: ViewProps) {
                     fullRestorePoint: {
                       ...activeDraft.fullRestorePoint,
                       restartAfter: true,
-                      schedule: { ...activeDraft.fullRestorePoint.schedule, enabled: false },
                     },
                   } as unknown as JsonMap;
                   await runOperation("maintenance.settings.update", { settings });
@@ -936,7 +1055,7 @@ export function BackupsView30(props: ViewProps) {
             <div className="cr-step8-confirm-copy">
               <p>This operation is durable and continues even if this browser closes or reconnects.</p>
               <ol>
-                <li>The Host begins a mandatory 30-minute player warning period, with warnings at 30m, 15m, 1m, 30s, 15s and 5s.</li>
+                <li>The Host begins the selected <strong>{countdownLabel(backupCountdownSeconds)}</strong> player countdown, with notices at {countdownWarningLabel(backupCountdownSeconds)}.</li>
                 <li>The Host requires an affirmative <code>save-all flush</code> response, then stops Minecraft and independently proves shutdown.</li>
                 <li>A cold full-server archive is created and locally verified with durable metadata/hash.</li>
                 <li>The archive is uploaded to the configured Google Drive/rclone destination using safe staging/promotion and remotely verified.</li>
@@ -958,12 +1077,16 @@ export function BackupsView30(props: ViewProps) {
                 danger
                 disabled={!actionReady}
                 onClick={async () => {
-                  await runOperation("maintenance.full-backup.create", {});
+                  await runOperation(
+                    "maintenance.full-backup.create",
+                    { countdownSeconds: backupCountdownSeconds },
+                    "preconfirmed",
+                  );
                   setConfirmBackup(false);
                   status.refresh();
                   fullQuery.refresh();
                   preflight.refresh();
-                  props.notice("Fully Backup Now queued on the Host. You may close this page; the Host job will continue.");
+                  props.notice(`Fully Backup Now queued with a ${countdownLabel(backupCountdownSeconds)} player countdown. You may close this page; the Host job will continue.`);
                 }}
               >Confirm Fully Backup Now</ActionButton>
             </div>
@@ -971,33 +1094,7 @@ export function BackupsView30(props: ViewProps) {
         </div>
       )}
 
-      {restore && (
-        <Panel title="Confirm restore">
-          <div className="cr-form cr-pad">
-            <p>
-              Restore is a separate destructive workflow. This restore point replaces the stopped server tree after an emergency pre-restore backup and hash verification.
-            </p>
-            <label>Type {restore.serverName} to continue<input value={typed} onChange={(event) => setTyped(event.target.value)} autoComplete="off" /></label>
-            <div className="cr-actions">
-              <ActionButton
-                danger
-                disabled={typed !== restore.serverName}
-                onClick={async () => {
-                  await runOperation("backup.full.restore", {
-                    backupId: restore.id,
-                    confirmationToken: restore.token,
-                    serverName: typed,
-                    startAfter: true,
-                  });
-                  setRestore(null);
-                  refreshAll();
-                }}
-              >Execute restore</ActionButton>
-              <button className="cr-button" onClick={() => setRestore(null)}>Cancel</button>
-            </div>
-          </div>
-        </Panel>
-      )}
+
     </div>
   );
 }
