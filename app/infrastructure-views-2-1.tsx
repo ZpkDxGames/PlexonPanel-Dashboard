@@ -362,7 +362,10 @@ export function AccessView21(
   const ready = props.state.ready;
   const paperCapabilities = ready?.server.paperCapabilities ?? {};
   const hostCapabilities = ready?.server.hostCapabilities ?? {};
-  const currentScopes = new Set<string>(current?.scopes ?? []);
+  const currentGrant =
+    props.deviceGrant?.deviceId === current?.deviceId ? props.deviceGrant : null;
+  const currentScopes = new Set<string>(currentGrant?.scopes ?? []);
+  const currentRole = currentGrant?.role || "Unknown";
   const locallyEnabledButUngraded = SCOPES.filter(
     (scope) =>
       localCapability(scope, paperCapabilities, hostCapabilities) &&
@@ -388,7 +391,7 @@ export function AccessView21(
     <div className="cr30-access-stack">
       <Panel
         title="This device"
-        aside={<Badge tone="cyan">{current?.role ?? "Unknown role"}</Badge>}
+        aside={<Badge tone="cyan">{currentRole}</Badge>}
       >
         <div className="cr30-device-summary">
           <div className="cr30-device-identity">
@@ -401,7 +404,7 @@ export function AccessView21(
             </div>
           </div>
           <dl className="cr30-device-facts">
-            <div><dt>Role</dt><dd>{current?.role ?? "Unknown"}</dd></div>
+            <div><dt>Role</dt><dd>{currentRole}</dd></div>
             <div><dt>Connection</dt><dd>{props.connected ? "Live" : "Offline"}</dd></div>
             <div><dt>Credential expiry</dt><dd>{time(current?.expiresAt)}</dd></div>
             <div><dt>Issued</dt><dd>{time(current?.issuedAt)}</dd></div>
@@ -418,6 +421,17 @@ export function AccessView21(
       </Panel>
 
       <Panel title="Capability summary" aside={<Badge>Local policy + this grant</Badge>}>
+        {currentGrant && !currentGrant.metadataMatches && (
+          <div className="cr30-repair-guidance">
+            <Badge tone="amber">Re-pair required</Badge>
+            <p>
+              This browser&apos;s signed grant does not match the current device
+              metadata. PlexonPanel is using only the scopes present in both and
+              will not silently expand this credential. Re-pair with the intended
+              role to issue a current signed grant.
+            </p>
+          </div>
+        )}
         <div className="cr30-capability-grid">
           {CAPABILITY_GROUPS.map((group) => {
             const locallyEnabled = group.scopes.filter((scope) =>

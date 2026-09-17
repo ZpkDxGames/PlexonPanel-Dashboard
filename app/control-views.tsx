@@ -9,8 +9,10 @@ import {
   type JsonMap,
   type Sample,
 } from "../lib/control-state";
+import type { EffectiveDeviceGrant } from "../lib/device-grant";
 export interface ViewProps {
   state: ControlState;
+  deviceGrant?: EffectiveDeviceGrant;
   can: (action: string, kind?: "PAPER" | "HOST") => boolean;
   run: (
     action: string,

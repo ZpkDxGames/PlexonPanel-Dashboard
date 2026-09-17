@@ -7,6 +7,7 @@ for (const file of [
   "lib/control-state.ts",
   "lib/activity-history.ts",
   "lib/display-cadence.ts",
+  "lib/device-grant.ts",
   "lib/scopes.ts",
   "lib/data-source.ts",
   "lib/browser-store.ts",

@@ -22,6 +22,8 @@ Dashboard 3.5.0 is the matched control-plane release for PlexonPanel 3.5.0. It k
 
 The stable Host runs with the live Minecraft server tree read-only. Direct server-tree restore is therefore not advertised in the active Dashboard. Verified backup history retains verify, retry-upload, delete, retention, and diagnostic controls. Compatibility scope metadata remains fail-closed for rolling upgrades, but it does not make a retired Host mutation available.
 
+Browser actions now use the intersection of the immutable signed device grant and the live relay device record. If an older Owner credential predates `maintenance.run`, the Backups and Access pages report that re-pairing is required instead of advertising a control the relay will reject. Re-pairing issues the current Owner scope set; no existing signed grant is silently expanded.
+
 ## Confirmation and relay reliability
 
 Feature-specific destructive confirmations now satisfy the shared high-risk confirmation contract without prompting twice. Worker and standalone relay adapters also tolerate an authenticated empty Host console replay and the bounded console-source ordering race without tearing down the Host session.
