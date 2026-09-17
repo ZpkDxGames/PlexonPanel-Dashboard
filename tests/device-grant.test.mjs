@@ -85,9 +85,17 @@ test("active dashboard and access views consume the reconciled signed grant", as
     new URL("../app/backups-view-3-4-1.tsx", import.meta.url),
     "utf8",
   );
+  const dataSource = await readFile(
+    new URL("../lib/data-source.ts", import.meta.url),
+    "utf8",
+  );
 
-  assert.equal(dashboard.includes("reconcileDeviceGrant(credential, ready.device)"), true);
+  assert.equal(dashboard.includes("reconcileDeviceGrant(sessionGrant, ready.device)"), true);
+  assert.equal(dashboard.includes("reconcileDeviceGrant(credential, ready.device)"), false);
   assert.equal(dashboard.includes("canAction(\n          action,\n          grant.scopes,"), true);
+  assert.equal(dataSource.includes("const session = await readJson<LiveSessionResponse>"), true);
+  assert.equal(dataSource.includes("deviceId: session.deviceId"), true);
+  assert.equal(dataSource.includes("scopes: session.scopes"), true);
   assert.equal(access.includes("currentGrant?.scopes"), true);
   assert.equal(access.includes("Re-pair required"), true);
   assert.equal(backups.includes("Re-pair Owner to resolve"), true);

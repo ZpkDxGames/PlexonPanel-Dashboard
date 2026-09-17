@@ -8,7 +8,7 @@ import {
   saveRelayCredential,
   type RelayCredential,
 } from "./browser-store";
-import { ACTION_SCOPES } from "./scopes";
+import { ACTION_SCOPES, validScopes } from "./scopes";
 import type { DashboardWorkspace } from "./dashboard-types";
 
 export interface DashboardSessionResponse {
@@ -20,8 +20,21 @@ export interface DashboardSessionResponse {
 
 export interface LiveConnectionGrant {
   serverId: string;
+  deviceId: string;
+  role: string;
+  scopes: string[];
   token: string;
   websocketUrl: string;
+  expiresAt: string;
+}
+
+interface LiveSessionResponse {
+  ok: boolean;
+  protocolVersion: number;
+  serverId: string;
+  deviceId: string;
+  role: string;
+  scopes: string[];
   expiresAt: string;
 }
 
@@ -175,7 +188,7 @@ export async function requestLiveConnection(): Promise<LiveConnectionGrant> {
     );
   }
   const sessionUrl = new URL("v1/dashboard/session", relayHttpUrl());
-  await readJson<{ ok: boolean }>(
+  const session = await readJson<LiveSessionResponse>(
     await fetch(sessionUrl, {
       method: "GET",
       mode: "cors",
@@ -186,11 +199,31 @@ export async function requestLiveConnection(): Promise<LiveConnectionGrant> {
       },
     }),
   );
+  if (
+    session.ok !== true ||
+    session.protocolVersion !== 3 ||
+    session.serverId !== credential.serverId ||
+    typeof session.deviceId !== "string" ||
+    !session.deviceId ||
+    typeof session.role !== "string" ||
+    !session.role ||
+    !validScopes(session.scopes) ||
+    !Number.isFinite(Date.parse(session.expiresAt)) ||
+    Date.parse(session.expiresAt) <= Date.now()
+  ) {
+    throw new DashboardRequestError(
+      "The relay returned an invalid signed session grant; pair this browser again.",
+      401,
+    );
+  }
   return {
-    serverId: credential.serverId,
+    serverId: session.serverId,
+    deviceId: session.deviceId,
+    role: session.role,
+    scopes: session.scopes,
     token: credential.accessToken,
     websocketUrl: websocket.toString(),
-    expiresAt: credential.expiresAt,
+    expiresAt: session.expiresAt,
   };
 }
 

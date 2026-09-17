@@ -172,7 +172,11 @@ test("pairing issues a scoped credential only after the room consumes its challe
     pairedEnv,
   );
   assert.equal(session.status, 200);
-  assert.equal((await session.json()).serverId, serverId);
+  const sessionBody = await session.json();
+  assert.equal(sessionBody.serverId, serverId);
+  assert.equal(sessionBody.deviceId, body.deviceId);
+  assert.equal(sessionBody.role, body.role);
+  assert.deepEqual(sessionBody.scopes, body.scopes);
 
   const replay = await relayWorker.fetch(
     new Request("https://relay.example/v1/pairings/claim", {
