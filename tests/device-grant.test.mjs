@@ -94,7 +94,13 @@ test("active dashboard and access views consume the reconciled signed grant", as
   assert.equal(dashboard.includes("reconcileDeviceGrant(credential, ready.device)"), false);
   assert.equal(dashboard.includes("canAction(\n          action,\n          grant.scopes,"), true);
   assert.equal(dataSource.includes("const session = await readJson<LiveSessionResponse>"), true);
-  assert.equal(dataSource.includes("deviceId: session.deviceId"), true);
+  assert.equal(dataSource.includes("liveConnectionGrantFromSession(session"), true);
+  assert.equal(
+    dataSource.includes(
+      "session.deviceId === undefined ? credential.deviceId : session.deviceId",
+    ),
+    true,
+  );
   assert.equal(dataSource.includes("scopes: session.scopes"), true);
   assert.equal(access.includes("currentGrant?.scopes"), true);
   assert.equal(access.includes("Re-pair required"), true);
