@@ -1,5 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import {
   lifecycleActionAllowed,
   normalizeServiceState,
@@ -13,6 +14,9 @@ import {
   operationMessage,
   operationText,
 } from "../.test-dist/lib/operation-messages.js";
+
+const dashboardSource = () =>
+  readFile(new URL("../app/dashboard-2-1.tsx", import.meta.url), "utf8");
 
 test("active service disables Start and allows stop/restart", () => {
   const state = normalizeServiceState("active", true);
@@ -79,4 +83,39 @@ test("safe diagnostics identify Dashboard 3.5.0 without changing protocol 3", ()
   const output = diagnostics(emptyControlState("test-server"));
   assert.match(output, /PlexonPanel Dashboard 3\.5\.0 \/ Protocol 3/);
   assert.doesNotMatch(output, /Dashboard 2\.2\.0/);
+});
+
+test("live actions are bound to the exact signed socket grant", async () => {
+  const dashboard = await dashboardSource();
+  for (const contract of [
+    "requestLiveConnection(credential)",
+    "grant.deviceId !== credential.deviceId",
+    "const effective = reconcileDeviceGrant(grant, reportedGrant)",
+    "effective?.metadataMatches",
+    "bindLiveSocket(candidate)",
+    "unbindLiveSocket(candidate)",
+  ])
+    assert.equal(
+      dashboard.includes(contract),
+      true,
+      `missing live socket/grant contract: ${contract}`,
+    );
+});
+
+test("preconfirmed maintenance actions are sent once with confirmation", async () => {
+  const dashboard = await dashboardSource();
+  assert.equal(
+    dashboard.includes(
+      'confirmationMode: "default" | "preconfirmed" = "default"',
+    ),
+    true,
+  );
+  assert.equal(
+    dashboard.includes('confirmationMode !== "preconfirmed" &&'),
+    true,
+  );
+  assert.equal(
+    dashboard.includes('if (confirmationMode === "preconfirmed")'),
+    true,
+  );
 });

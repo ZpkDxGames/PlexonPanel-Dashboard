@@ -10,6 +10,7 @@ import {
   pairDashboardServer,
   requestLiveConnection,
   sendDashboardAction,
+  unbindLiveSocket,
   type ActionCompletion,
 } from "../lib/data-source";
 import {
@@ -623,40 +624,52 @@ export default function Dashboard21() {
     if (!credential) return;
     let stopped = false;
     let attempt = 0;
+    let connectionSequence = 0;
     let socket: WebSocket | null = null;
     let retry: ReturnType<typeof setTimeout> | undefined;
-    let heartbeat: ReturnType<typeof setInterval> | undefined;
     const schedule = () => {
       if (stopped) return;
       attempt += 1;
       setPhase("reconnecting");
+      if (retry) clearTimeout(retry);
       retry = setTimeout(
-        () => void connect(),
+        () => {
+          retry = undefined;
+          void connect();
+        },
         Math.min(30_000, 1000 * 2 ** Math.min(attempt, 5)) *
           (0.8 + Math.random() * 0.4),
       );
     };
     const connect = async () => {
       if (stopped) return;
+      const sequence = ++connectionSequence;
       setPhase(attempt ? "reconnecting" : "connecting");
       try {
-        const grant = await requestLiveConnection();
-        if (stopped || grant.serverId !== credential.serverId) return;
-        setSessionGrant({
-          deviceId: grant.deviceId,
-          role: grant.role,
-          scopes: grant.scopes,
-        });
-        socket = new WebSocket(grant.websocketUrl, [
+        const grant = await requestLiveConnection(credential);
+        if (
+          stopped ||
+          sequence !== connectionSequence ||
+          grant.serverId !== credential.serverId ||
+          grant.deviceId !== credential.deviceId ||
+          grant.token !== credential.accessToken
+        )
+          return;
+        const candidate = new WebSocket(grant.websocketUrl, [
           "plexonpanel-v3",
           `auth.${grant.token}`,
         ]);
-        socket.onopen = () => {
-          if (stopped) {
-            socket?.close();
+        socket = candidate;
+        let heartbeat: ReturnType<typeof setInterval> | undefined;
+        const isCurrent = () =>
+          !stopped &&
+          sequence === connectionSequence &&
+          socket === candidate;
+        candidate.onopen = () => {
+          if (!isCurrent()) {
+            candidate.close();
             return;
           }
-          bindLiveSocket(socket);
           attempt = 0;
           commitState(
             (current) => ({
@@ -671,13 +684,13 @@ export default function Dashboard21() {
           );
           setError("");
           heartbeat = setInterval(() => {
-            if (socket?.readyState === WebSocket.OPEN)
-              socket.send(JSON.stringify({ type: "dashboard.ping" }));
+            if (isCurrent() && candidate.readyState === WebSocket.OPEN)
+              candidate.send(JSON.stringify({ type: "dashboard.ping" }));
           }, 20_000);
         };
-        socket.onmessage = (event) => {
+        candidate.onmessage = (event) => {
           if (
-            stopped ||
+            !isCurrent() ||
             typeof event.data !== "string" ||
             event.data.length > 131_072
           )
@@ -693,14 +706,41 @@ export default function Dashboard21() {
               setError(
                 `${DASHBOARD_LABEL} requires protocol 3 agents and relay.`,
               );
-              socket?.close(4008, "Protocol mismatch");
+              candidate.close(4008, "Protocol mismatch");
               return;
             }
             if (
               message.type === "dashboard.ready" &&
               message.protocolVersion === 3
-            )
+            ) {
+              const reported = record(message.device);
+              const reportedGrant =
+                typeof reported.deviceId === "string" &&
+                typeof reported.role === "string" &&
+                Array.isArray(reported.scopes) &&
+                reported.scopes.every((scope) => typeof scope === "string")
+                  ? {
+                      deviceId: reported.deviceId,
+                      role: reported.role,
+                      scopes: reported.scopes as string[],
+                    }
+                  : null;
+              const effective = reconcileDeviceGrant(grant, reportedGrant);
+              if (!effective?.metadataMatches) {
+                setError(
+                  "The live relay connection does not match this browser's signed grant. Reconnecting safely…",
+                );
+                candidate.close(4008, "Signed grant mismatch");
+                return;
+              }
+              bindLiveSocket(candidate);
+              setSessionGrant({
+                deviceId: grant.deviceId,
+                role: grant.role,
+                scopes: grant.scopes,
+              });
               setPhase("live");
+            }
             if (handleRelayControlMessage(message)) return;
             if (message.type === "relay.error") {
               setError(str(message.error, "Relay rejected a message"));
@@ -714,10 +754,12 @@ export default function Dashboard21() {
             setError("The relay sent an invalid message.");
           }
         };
-        socket.onclose = (event) => {
+        candidate.onclose = (event) => {
           if (heartbeat) clearInterval(heartbeat);
-          if (stopped) return;
-          bindLiveSocket(null);
+          unbindLiveSocket(candidate);
+          if (!isCurrent()) return;
+          socket = null;
+          connectionSequence += 1;
           setSessionGrant(null);
           commitState(
             (current) => ({
@@ -746,8 +788,8 @@ export default function Dashboard21() {
           }
           schedule();
         };
-        socket.onerror = () => {
-          if (!stopped)
+        candidate.onerror = () => {
+          if (isCurrent())
             setError("Relay connection unavailable. Reconnecting automatically…");
         };
       } catch (reason) {
@@ -770,10 +812,14 @@ export default function Dashboard21() {
     void connect();
     return () => {
       stopped = true;
+      connectionSequence += 1;
       if (retry) clearTimeout(retry);
-      if (heartbeat) clearInterval(heartbeat);
-      bindLiveSocket(null);
-      socket?.close(1000, "Workspace changed");
+      const current = socket;
+      socket = null;
+      if (current) {
+        unbindLiveSocket(current);
+        current.close(1000, "Workspace changed");
+      }
     };
   }, [credential, reconnect, commitState]);
 
@@ -821,6 +867,7 @@ export default function Dashboard21() {
       action: string,
       parameters: JsonMap,
       kind?: "PAPER" | "HOST",
+      confirmationMode: "default" | "preconfirmed" = "default",
     ): Promise<ActionCompletion> => {
       if (!can(action, kind)) {
         const unavailable = new Error(
@@ -830,9 +877,10 @@ export default function Dashboard21() {
         throw unavailable;
       }
       if (
-        HIGH_RISK.has(action) ||
-        action === "console.execute" ||
-        action === "plugin.command.reload"
+        confirmationMode !== "preconfirmed" &&
+        (HIGH_RISK.has(action) ||
+          action === "console.execute" ||
+          action === "plugin.command.reload")
       ) {
         const approved = await new Promise<boolean>((resolve) =>
           setConfirmation({
@@ -846,6 +894,15 @@ export default function Dashboard21() {
         );
         if (!approved) throw new Error("Cancelled");
         parameters = { ...parameters, confirmed: true };
+      }
+      if (confirmationMode === "preconfirmed")
+        parameters = { ...parameters, confirmed: true };
+      if (!can(action, kind)) {
+        const unavailable = new Error(
+          "The live authorization changed before the action was sent. Review the current device grant and try again.",
+        );
+        setNotice(unavailable.message);
+        throw unavailable;
       }
       try {
         const result = await sendDashboardAction(action, parameters, kind);

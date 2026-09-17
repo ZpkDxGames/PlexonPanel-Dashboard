@@ -222,8 +222,10 @@ export async function pairDashboardServer(
   return { serverId: result.serverId };
 }
 
-export async function requestLiveConnection(): Promise<LiveConnectionGrant> {
-  const credential = await loadRelayCredential();
+export async function requestLiveConnection(
+  selectedCredential?: RelayCredential,
+): Promise<LiveConnectionGrant> {
+  const credential = selectedCredential ?? (await loadRelayCredential());
   if (!credential)
     throw new DashboardRequestError(
       "This browser is not paired with a server",
@@ -272,6 +274,15 @@ export function bindLiveSocket(socket: WebSocket | null): void {
       "The connection closed before completion was observed. Check the local audit; this request will not be resent.",
     );
   activeSocket = socket;
+}
+
+export function unbindLiveSocket(socket: WebSocket): boolean {
+  if (activeSocket !== socket) return false;
+  activeSocket = null;
+  rejectPendingActions(
+    "The connection closed before completion was observed. Check the local audit; this request will not be resent.",
+  );
+  return true;
 }
 
 function rejectionBoundary(
