@@ -8,7 +8,7 @@ async function source(path) {
 
 const ACTIVE_BACKUPS_VIEW = "app/backups-view-3-4-1.tsx";
 
-test("Dashboard 3.4.1 exposes the active manual-only Backups workspace", async () => {
+test("Dashboard 3.5.0 exposes the active manual-only Backups workspace", async () => {
   const dashboard = await source("app/dashboard-2-1.tsx");
   const backups = await source(ACTIVE_BACKUPS_VIEW);
   const legacyBackups = await source("app/backups-view-3-0.tsx");
@@ -39,15 +39,17 @@ test("Backups workspace is wired only to supported Host manual maintenance actio
     "backup.full.list",
     "backup.full.verify",
     "backup.full.retry-upload",
-    "backup.full.restore.prepare",
-    "backup.full.restore",
+    "backup.full.delete",
     "provider.status",
     "provider.test",
   ]) assert.equal(backups.includes(action), true, `missing ${action}`);
+  assert.equal(backups.includes('"backup.full.restore.prepare"'), false);
+  assert.equal(backups.includes('"backup.full.restore"'), false);
+  assert.equal(backups.includes("Direct server-tree restore is intentionally excluded"), true);
   assert.equal(backups.includes("props.run("), true);
   assert.equal(backups.includes("useQuery("), true);
   assert.equal(backups.includes("Host-local only"), true);
-  assert.equal(backups.includes('runOperation("maintenance.full-backup.create", {})'), true);
+  assert.equal(backups.includes("countdownSeconds: backupCountdownSeconds"), true);
   assert.equal(backups.includes("skipCountdown"), false);
 });
 
@@ -101,7 +103,7 @@ test("retired Paper coordination protocol cannot return", async () => {
   assert.equal(protocol.includes("RETIRED_COORDINATION_TYPES.has(envelope.type)"), true);
 });
 
-test("Dashboard 3.4.1 keeps protocol hooks compatible while Files remains dormant", async () => {
+test("Dashboard 3.5.0 keeps protocol hooks compatible while Files remains dormant", async () => {
   const dashboard = await source("app/dashboard-2-1.tsx");
   assert.equal(dashboard.includes('action.startsWith("backup.")'), true);
   assert.equal(dashboard.includes('action.startsWith("files.")'), true);
@@ -116,13 +118,13 @@ test("Dashboard visible version metadata matches package 3.4.1", async () => {
   const packageJson = JSON.parse(await source("package.json"));
   const version = versionSource.match(/DASHBOARD_VERSION = "([^"]+)"/)?.[1];
   assert.equal(version, packageJson.version);
-  assert.equal(version, "3.4.1");
+  assert.equal(version, "3.5.0");
   assert.equal(dashboard.includes("DASHBOARD_VERSION"), true);
   assert.equal(settings.includes("DASHBOARD_LABEL"), true);
   assert.equal(server.includes("DASHBOARD_VERSION"), true);
 });
 
-test("Dashboard 3.4.1 responsive architecture does not globally scale the interface", async () => {
+test("Dashboard 3.5.0 responsive architecture does not globally scale the interface", async () => {
   const css = await source("app/control-room-3-0.css");
   assert.equal(/\bzoom\s*:/.test(css), false);
   assert.equal(/transform\s*:\s*scale\s*\(/.test(css), false);
@@ -145,7 +147,7 @@ test("Step 8 Backups workspace has responsive production layout", async () => {
   assert.equal(css.includes("@container workspace"), true);
 });
 
-test("Dashboard 3.4.1 display update rate exposes every supported browser cadence", async () => {
+test("Dashboard 3.5.0 display update rate exposes every supported browser cadence", async () => {
   const settings = await source("app/settings-view-2-1.tsx");
   const preferences = await source("lib/ui-preferences.ts");
   for (const value of [0, 250, 500, 1000, 2000]) {

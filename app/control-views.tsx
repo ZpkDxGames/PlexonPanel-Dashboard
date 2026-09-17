@@ -16,6 +16,7 @@ export interface ViewProps {
     action: string,
     parameters: JsonMap,
     kind?: "PAPER" | "HOST",
+    confirmationMode?: "default" | "preconfirmed",
   ) => Promise<ActionCompletion>;
   notice: (message: string) => void;
   connected: boolean;

@@ -8,17 +8,21 @@ async function source(path) {
 
 const BACKUPS_VIEW = "app/backups-view-3-4-1.tsx";
 
-test("Step 8 promotes Fully Backup Now and retires ambiguous backup creation UI", async () => {
+test("3.5 promotes Fully Backup Now with selectable durable countdowns", async () => {
   const view = await source(BACKUPS_VIEW);
   for (const text of [
     "Fully Backup Now",
     "Confirm Fully Backup Now",
     "Destructive maintenance confirmation",
-    "mandatory 30-minute player warning period",
+    "Initial player countdown",
+    "30 minutes",
+    "15 minutes",
+    "10 minutes",
+    "5 minutes",
     "save-all flush",
     "Google Drive/rclone destination",
     "Minecraft automatically restarts",
-    "Closing this browser does not cancel the job",
+    "continues even if this browser closes or reconnects",
   ]) assert.equal(view.includes(text), true, `missing Step 8 operator contract: ${text}`);
 
   for (const retired of [
@@ -30,7 +34,9 @@ test("Step 8 promotes Fully Backup Now and retires ambiguous backup creation UI"
     "COORDINATING_PAPER",
   ]) assert.equal(view.includes(retired), false, `retired backup UI remains: ${retired}`);
 
-  assert.equal(view.includes('runOperation("maintenance.full-backup.create", {})'), true);
+  assert.equal(view.includes("countdownSeconds: backupCountdownSeconds"), true);
+  assert.equal(view.includes('"maintenance.full-backup.create"'), true);
+  assert.equal(view.includes('"preconfirmed"'), true);
 });
 
 test("Host preflight is authoritative and gates Fully Backup Now", async () => {
@@ -60,6 +66,7 @@ test("durable Host job reconstructs the active timeline after refresh", async ()
   assert.equal(view.includes('window.setInterval(status.refresh, 2000)'), true);
   assert.equal(view.includes("phaseTimestamp"), true);
   assert.equal(view.includes("countdownRemainingSeconds"), true);
+  assert.equal(view.includes("countdownInitialSeconds"), true);
   assert.equal(view.includes("countdownDeadline"), true);
   assert.equal(view.includes("operationJobId"), true);
   assert.equal(view.includes('str(rawProgress.jobId, "") === operationJobId'), true);
@@ -82,7 +89,7 @@ test("durable Host job reconstructs the active timeline after refresh", async ()
   ]) assert.equal(view.includes(`key: \"${phase}\"`), true, `missing Host phase ${phase}`);
 
   for (const label of [
-    "30-minute warning period",
+    "Player warning countdown",
     "Saving server",
     "Confirming shutdown",
     "Creating backup",
@@ -115,7 +122,7 @@ test("degraded and recovery-required states block or recover safely", async () =
   assert.equal(view.includes('runOperation("backup.full.retry-upload"'), true);
   assert.equal(view.includes("Verify & resolve recovery"), true);
   assert.equal(view.includes('props.can("maintenance.recovery.resolve", "HOST")'), true);
-  assert.equal(view.includes('runOperation("maintenance.recovery.resolve", {})'), true);
+  assert.equal(view.includes('runOperation("maintenance.recovery.resolve", {}, "preconfirmed")'), true);
   assert.equal(view.includes("This does not mark the backup successful."), true);
   assert.equal(view.includes("recoveryResolveReady"), true);
   assert.equal(view.includes("!operationBlocking"), true);
@@ -126,26 +133,31 @@ test("automatic backups stay retired while restart-only scheduling remains suppo
   const view = await source(BACKUPS_VIEW);
   assert.equal(view.includes("No automatic full-backup schedule"), true);
   assert.equal(view.includes("Automatic backups are retired."), true);
-  assert.equal(view.includes("Restart-only schedule"), true);
+  assert.equal(view.includes("Automatic restart schedule"), true);
   assert.equal(view.includes("Next restart"), true);
-  assert.equal(view.includes('runOperation("maintenance.restart.now", {})'), true);
-  assert.equal(view.includes("schedule: { ...activeDraft.fullRestorePoint.schedule, enabled: false }"), true);
+  assert.equal(view.includes('runOperation("maintenance.restart.now", {}, "preconfirmed")'), true);
+  assert.equal(view.includes("restartCountdown(activeDraft.restart.warningSeconds)"), true);
+  assert.equal(view.includes("warningSeconds: countdownWarnings(seconds)"), true);
+  assert.equal(view.includes("SELECTED_WEEKDAYS"), true);
+  assert.equal(view.includes("cr35-weekday-picker"), true);
+  assert.equal(view.includes("Shutdown timeout"), true);
   assert.equal(view.includes("restartAfter: true"), true);
   assert.equal(view.includes("Restart after backup"), true);
   assert.equal(view.includes("Required"), true);
 });
 
-test("restore point controls preserve only supported Host-backed operations", async () => {
+test("stable backup history exposes read-only-safe Host operations", async () => {
   const view = await source(BACKUPS_VIEW);
   for (const action of [
     "backup.full.verify",
     "backup.full.retry-upload",
-    "backup.full.restore.prepare",
-    "backup.full.restore",
     "backup.full.delete",
     "provider.test",
   ]) assert.equal(view.includes(action), true, `missing supported action ${action}`);
-  assert.equal(view.includes("Restore is a separate destructive workflow."), true);
+  assert.equal(view.includes('"backup.full.restore.prepare"'), false);
+  assert.equal(view.includes('"backup.full.restore"'), false);
+  assert.equal(view.includes("Direct server-tree restore is intentionally excluded"), true);
+  assert.equal(view.includes("Minecraft tree read-only"), true);
 });
 
 test("safe failures remain structured and browser boundary retains provider secrecy", async () => {
@@ -168,7 +180,6 @@ test("destructive maintenance actions remain capability-gated at browser and rel
   const relayScopes = await source("relay/src/scopes.ts");
   for (const action of [
     "backup.full.delete",
-    "backup.full.restore",
     "maintenance.settings.update",
     "maintenance.restart.now",
     "maintenance.full-backup.create",
@@ -177,6 +188,11 @@ test("destructive maintenance actions remain capability-gated at browser and rel
     assert.equal(view.includes(action), true, `workspace missing ${action}`);
     assert.equal(browserScopes.includes(`\"${action}\"`), true, `browser HIGH_RISK missing ${action}`);
     assert.equal(relayScopes.includes(`\"${action}\"`), true, `relay HIGH_RISK missing ${action}`);
+  }
+  for (const compatibilityAction of ["backup.full.restore", "backup.full.restore.prepare"]) {
+    assert.equal(view.includes(`"${compatibilityAction}"`), false, `stable view exposes ${compatibilityAction}`);
+    assert.equal(browserScopes.includes(`"${compatibilityAction}"`), true, `browser compatibility scope missing ${compatibilityAction}`);
+    assert.equal(relayScopes.includes(`"${compatibilityAction}"`), true, `relay compatibility scope missing ${compatibilityAction}`);
   }
 });
 
@@ -190,6 +206,10 @@ test("responsive Step 8 backup layout avoids global scaling and styles the confi
     ".cr-step8-confirm-grid",
     ".cr-step8-recovery",
     ".cr-step8-degraded",
+    ".cr35-backup-hero",
+    ".cr35-countdown-grid",
+    ".cr35-countdown-option",
+    ".cr35-weekday-picker",
   ]) assert.equal(css.includes(selector), true, `missing responsive selector ${selector}`);
   assert.equal(css.includes("@container workspace (max-width: 820px)"), true);
   assert.equal(css.includes("@container workspace (max-width: 480px)"), true);

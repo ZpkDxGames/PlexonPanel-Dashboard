@@ -80,7 +80,7 @@ function agentIdentity(publicKey, hostPublicKey = "") {
   return {
     publicKey,
     fingerprint: "test-fingerprint",
-    pluginVersion: "3.4.1",
+    pluginVersion: "3.5.0",
     paperVersion: "Paper 1.21.10",
     minecraftVersion: "1.21.10",
     javaVersion: "25",
