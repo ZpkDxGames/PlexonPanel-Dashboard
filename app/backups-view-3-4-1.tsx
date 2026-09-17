@@ -379,9 +379,6 @@ export function BackupsView30(props: ViewProps) {
   const [localError, setLocalError] = useState("");
   const [lastFailure, setLastFailure] = useState<FailureRecord | null>(null);
 
-
-  useEffect(() => {
-
   useEffect(() => {
     let timer: number | undefined;
     try {
@@ -540,10 +537,6 @@ export function BackupsView30(props: ViewProps) {
     providerQuery.refresh();
     preflight.refresh();
   };
-
-
-
-  const readinessReason
 
   const readinessReason = !hostConnected
     ? "Host Companion is disconnected."
@@ -1093,7 +1086,6 @@ export function BackupsView30(props: ViewProps) {
           </section>
         </div>
       )}
-
 
     </div>
   );
