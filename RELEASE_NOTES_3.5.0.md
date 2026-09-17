@@ -24,6 +24,8 @@ The stable Host runs with the live Minecraft server tree read-only. Direct serve
 
 Browser actions now use the intersection of the immutable signed device grant decoded by the relay session endpoint and the live relay device record. They do not trust the editable metadata stored beside the browser token. If an older Owner credential predates `maintenance.run`, the Backups and Access pages report that re-pairing is required instead of advertising a control the relay will reject. Re-pairing issues the current Owner scope set; no existing signed grant is silently expanded.
 
+The browser accepts the established Protocol 3 session response during a rolling Dashboard/relay deployment, where `deviceId` may be absent, while continuing to take role, scopes and expiry only from the relay-verified signed session. A response-contract mismatch is treated as an upstream deployment fault and no longer deletes a freshly issued credential or asks the operator to repeat pairing indefinitely.
+
 ## Confirmation and relay reliability
 
 Feature-specific destructive confirmations now satisfy the shared high-risk confirmation contract without prompting twice. Worker and standalone relay adapters also tolerate an authenticated empty Host console replay and the bounded console-source ordering race without tearing down the Host session.

@@ -32,7 +32,7 @@ interface LiveSessionResponse {
   ok: boolean;
   protocolVersion: number;
   serverId: string;
-  deviceId: string;
+  deviceId?: string;
   role: string;
   scopes: string[];
   expiresAt: string;
@@ -51,6 +51,11 @@ interface PairingResponse extends RelayCredential {
   ok: boolean;
   fingerprint: string;
 }
+
+type SessionCredential = Pick<
+  RelayCredential,
+  "serverId" | "deviceId" | "accessToken" | "websocketUrl"
+>;
 
 let activeSocket: WebSocket | null = null;
 const pendingActions = new Map<
@@ -80,6 +85,60 @@ async function readJson<T>(response: Response): Promise<T> {
       response.status,
     );
   return body;
+}
+
+export function liveConnectionGrantFromSession(
+  value: unknown,
+  credential: SessionCredential,
+  now = Date.now(),
+): LiveConnectionGrant {
+  const session =
+    value && typeof value === "object" && !Array.isArray(value)
+      ? (value as Record<string, unknown>)
+      : {};
+  const deviceId =
+    session.deviceId === undefined ? credential.deviceId : session.deviceId;
+  const expiresAt =
+    typeof session.expiresAt === "string"
+      ? Date.parse(session.expiresAt)
+      : Number.NaN;
+  const invalidField =
+    session.ok !== true
+      ? "ok"
+      : session.protocolVersion !== 3
+        ? "protocolVersion"
+        : session.serverId !== credential.serverId
+          ? "serverId"
+          : typeof deviceId !== "string" || !deviceId
+            ? "deviceId"
+            : session.deviceId !== undefined &&
+                session.deviceId !== credential.deviceId
+              ? "deviceId"
+              : typeof session.role !== "string" ||
+                  !/^[A-Za-z][A-Za-z0-9_-]{0,31}$/.test(session.role)
+                ? "role"
+                : !validScopes(session.scopes)
+                  ? "scopes"
+                  : !Number.isFinite(expiresAt) || expiresAt <= now
+                    ? "expiresAt"
+                    : "";
+
+  if (invalidField) {
+    throw new DashboardRequestError(
+      `The relay returned an invalid signed session grant (${invalidField}). Refresh after the relay deployment completes.`,
+      502,
+    );
+  }
+
+  return {
+    serverId: session.serverId as string,
+    deviceId: deviceId as string,
+    role: session.role as string,
+    scopes: session.scopes as string[],
+    token: credential.accessToken,
+    websocketUrl: credential.websocketUrl,
+    expiresAt: session.expiresAt as string,
+  };
 }
 
 function relayHttpUrl(): URL {
@@ -199,32 +258,12 @@ export async function requestLiveConnection(): Promise<LiveConnectionGrant> {
       },
     }),
   );
-  if (
-    session.ok !== true ||
-    session.protocolVersion !== 3 ||
-    session.serverId !== credential.serverId ||
-    typeof session.deviceId !== "string" ||
-    !session.deviceId ||
-    typeof session.role !== "string" ||
-    !session.role ||
-    !validScopes(session.scopes) ||
-    !Number.isFinite(Date.parse(session.expiresAt)) ||
-    Date.parse(session.expiresAt) <= Date.now()
-  ) {
-    throw new DashboardRequestError(
-      "The relay returned an invalid signed session grant; pair this browser again.",
-      401,
-    );
-  }
-  return {
-    serverId: session.serverId,
-    deviceId: session.deviceId,
-    role: session.role,
-    scopes: session.scopes,
-    token: credential.accessToken,
+  return liveConnectionGrantFromSession(session, {
+    serverId: credential.serverId,
+    deviceId: credential.deviceId,
+    accessToken: credential.accessToken,
     websocketUrl: websocket.toString(),
-    expiresAt: session.expiresAt,
-  };
+  });
 }
 
 export function bindLiveSocket(socket: WebSocket | null): void {
