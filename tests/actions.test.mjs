@@ -4,6 +4,7 @@ import {
   bindLiveSocket,
   sendDashboardAction,
   handleRelayControlMessage,
+  unbindLiveSocket,
 } from "../.test-dist/lib/data-source.js";
 class TestSocket {
   static OPEN = 1;
@@ -71,4 +72,26 @@ test("disconnect rejects uncertain completion and never replays the command", as
   bindLiveSocket(second);
   await assert.rejects(promise, /will not be resent/);
   assert.equal(second.sent.length, 0);
+});
+test("a stale socket cannot unbind the current authorized connection", async () => {
+  const stale = new TestSocket();
+  const current = new TestSocket();
+  bindLiveSocket(stale);
+  bindLiveSocket(current);
+  assert.equal(unbindLiveSocket(stale), false);
+  const promise = sendDashboardAction("files.write", { path: "config.yml" });
+  assert.equal(stale.sent.length, 0);
+  assert.equal(current.sent.length, 1);
+  const request = current.sent[0];
+  handleRelayControlMessage({
+    type: "server.event",
+    eventType: "action.result",
+    body: {
+      requestId: request.requestId,
+      action: "files.write",
+      status: "SUCCESS",
+      data: {},
+    },
+  });
+  await promise;
 });

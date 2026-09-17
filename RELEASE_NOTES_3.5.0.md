@@ -26,6 +26,8 @@ Browser actions now use the intersection of the immutable signed device grant de
 
 The browser accepts the established Protocol 3 session response during a rolling Dashboard/relay deployment, where `deviceId` may be absent, while continuing to take role, scopes and expiry only from the relay-verified signed session. A response-contract mismatch is treated as an upstream deployment fault and no longer deletes a freshly issued credential or asks the operator to repeat pairing indefinitely.
 
+The active action channel is now bound to the exact signed grant and WebSocket that produced the accepted `dashboard.ready` state. Stale connection callbacks cannot replace or clear a newer socket, and controls remain unavailable until the relay device record exactly matches the signed device ID, role, and scopes.
+
 ## Confirmation and relay reliability
 
 Feature-specific destructive confirmations now satisfy the shared high-risk confirmation contract without prompting twice. Worker and standalone relay adapters also tolerate an authenticated empty Host console replay and the bounded console-source ordering race without tearing down the Host session.
