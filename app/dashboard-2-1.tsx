@@ -32,7 +32,10 @@ import {
 } from "../lib/control-state";
 import { DASHBOARD_LABEL, DASHBOARD_VERSION } from "../lib/dashboard-version";
 import { isImmediateControlMessage } from "../lib/display-cadence";
-import { reconcileDeviceGrant } from "../lib/device-grant";
+import {
+  reconcileDeviceGrant,
+  type DeviceGrantLike,
+} from "../lib/device-grant";
 import { canAction, HIGH_RISK } from "../lib/scopes";
 import {
   lifecycleActionAllowed,
@@ -456,6 +459,7 @@ function CommandPalette({
 export default function Dashboard21() {
   const { preferences } = useUiPreferences();
   const [credential, setCredential] = useState<RelayCredential | null>(null);
+  const [sessionGrant, setSessionGrant] = useState<DeviceGrantLike | null>(null);
   const [credentials, setCredentials] = useState<RelayCredential[]>([]);
   const [state, setState] = useState<ControlState>(() => emptyControlState(""));
   const [phase, setPhase] = useState<Phase>("loading");
@@ -550,6 +554,7 @@ export default function Dashboard21() {
       const selected = await loadRelayCredential();
       setCredentials(await listRelayCredentials());
       setCredential(selected);
+      setSessionGrant(null);
       const restored = selected
         ? ((await loadControlCache(selected.serverId)) ??
             emptyControlState(selected.serverId))
@@ -637,6 +642,11 @@ export default function Dashboard21() {
       try {
         const grant = await requestLiveConnection();
         if (stopped || grant.serverId !== credential.serverId) return;
+        setSessionGrant({
+          deviceId: grant.deviceId,
+          role: grant.role,
+          scopes: grant.scopes,
+        });
         socket = new WebSocket(grant.websocketUrl, [
           "plexonpanel-v3",
           `auth.${grant.token}`,
@@ -708,6 +718,7 @@ export default function Dashboard21() {
           if (heartbeat) clearInterval(heartbeat);
           if (stopped) return;
           bindLiveSocket(null);
+          setSessionGrant(null);
           commitState(
             (current) => ({
               ...current,
@@ -725,6 +736,7 @@ export default function Dashboard21() {
             );
             void clearBrowserWorkspace().then(() => {
               setCredential(null);
+              setSessionGrant(null);
               const empty = emptyControlState("");
               authoritativeState.current = empty;
               setState(empty);
@@ -744,6 +756,7 @@ export default function Dashboard21() {
           setError(reason.message);
           await clearBrowserWorkspace();
           setCredential(null);
+          setSessionGrant(null);
           const empty = emptyControlState("");
           authoritativeState.current = empty;
           setState(empty);
@@ -768,7 +781,7 @@ export default function Dashboard21() {
     (action: string, requestedKind?: "PAPER" | "HOST") => {
       const ready = state.ready;
       if (!ready || phase !== "live") return false;
-      const grant = reconcileDeviceGrant(credential, ready.device);
+      const grant = reconcileDeviceGrant(sessionGrant, ready.device);
       if (!grant) return false;
       if (
         (action === "player.op" ||
@@ -800,7 +813,7 @@ export default function Dashboard21() {
         )
       );
     },
-    [credential, state.ready, phase],
+    [sessionGrant, state.ready, phase],
   );
 
   const run = useCallback(
@@ -852,6 +865,7 @@ export default function Dashboard21() {
     if (!leaveEditor()) return;
     await logoutDashboard();
     setCredential(null);
+    setSessionGrant(null);
     const empty = emptyControlState("");
     authoritativeState.current = empty;
     setState(empty);
@@ -920,7 +934,7 @@ export default function Dashboard21() {
       </main>
     );
 
-  const deviceGrant = reconcileDeviceGrant(credential, state.ready?.device);
+  const deviceGrant = reconcileDeviceGrant(sessionGrant, state.ready?.device);
   const props: ViewProps = {
     state,
     can,

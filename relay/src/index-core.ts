@@ -344,6 +344,7 @@ const relayWorker = {
           ok: true,
           protocolVersion: 3,
           serverId: access.serverId,
+          deviceId: access.deviceId,
           role: access.role,
           scopes: access.scopes,
           expiresAt: new Date(access.expiresAt * 1000).toISOString(),

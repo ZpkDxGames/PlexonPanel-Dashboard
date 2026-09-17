@@ -120,7 +120,7 @@ Never place access tokens, relay signing keys, Paper/Host private keys, pairing 
 
 ## Compatibility and deployment
 
-Dashboard 3.5.0 remains on signed Protocol 3 and `/v1`. Existing credentials do not gain scopes automatically, and the release does not require a Protocol 4 migration or identity reset. A browser paired before its role received a newly introduced scope, such as `maintenance.run`, must be re-paired with that role before it can use the new operation. The Dashboard intersects signed and relay-reported device scopes so stale metadata cannot make an unavailable control appear ready.
+Dashboard 3.5.0 remains on signed Protocol 3 and `/v1`. Existing credentials do not gain scopes automatically, and the release does not require a Protocol 4 migration or identity reset. A browser paired before its role received a newly introduced scope, such as `maintenance.run`, must be re-paired with that role before it can use the new operation. The Dashboard reads the verified token grant from `/v1/dashboard/session` and intersects it with relay-reported device scopes, so stale browser or device metadata cannot make an unavailable control appear ready.
 
 A passing repository CI run and Vercel preview are required source/presentation evidence but are not live PlexonCraft certification. Runtime acceptance still includes real Host journald readability, Paper-stopped history browsing, startup/shutdown capture, Host restart/cursor recovery, systemd/RCON/rclone readiness, a real **Fully Backup Now** operation, browser reconnect during that operation, and controlled degraded/retry behavior. A gate that was not actually executed must not be reported as passed.
 
