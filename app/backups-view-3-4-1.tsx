@@ -437,7 +437,10 @@ export function BackupsView30(props: ViewProps) {
   const serviceState = str(service.state, "unknown").toLowerCase();
   const serviceKnown = ["active", "inactive", "failed"].includes(serviceState);
   const minecraftOnline = serviceState === "active";
-  const commandConfigured = preflight.data.commandChannelConfigured === true;
+  const statusCommandChannel = record(status.data.commandChannel);
+  const commandConfigured =
+    statusCommandChannel.enabled === true ||
+    preflight.data.commandChannelConfigured === true;
   const minecraftReady = service.minecraftReady === true;
   const commandReady = !minecraftOnline || (commandConfigured && minecraftReady);
   const providerState = str(provider.status, "UNKNOWN");

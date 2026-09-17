@@ -125,6 +125,8 @@ test("degraded and recovery-required states block or recover safely", async () =
   assert.equal(view.includes('runOperation("maintenance.recovery.resolve", {}, "preconfirmed")'), true);
   assert.equal(view.includes("This does not mark the backup successful."), true);
   assert.equal(view.includes("recoveryResolveReady"), true);
+  assert.equal(view.includes("status.data.commandChannel"), true);
+  assert.equal(view.includes("statusCommandChannel.enabled === true"), true);
   assert.equal(view.includes("!operationBlocking"), true);
   assert.equal(view.includes("!recoveryRequired"), true);
 });

@@ -71,6 +71,8 @@ Backups & Maintenance is a Host-authoritative **manual full-backup** control sur
 
 The Dashboard automatically presents Host preflight and blocks the action when the authoritative Host/device/service/RCON/storage/recovery state is not safe. Before confirmation, the operator chooses a 30-, 15-, 10-, or 5-minute initial player countdown. The Host validates and persists that selection, then requires affirmative `save-all flush`, systemd stop proof, cold archive/local verification, Google Drive/rclone staging and verification, and automatic Minecraft restart.
 
+Recovery acknowledgement uses the independent Host maintenance-status command-channel signal. A failed provider, storage, or source preflight therefore cannot falsely mark RCON as unconfigured or prevent an otherwise verified recovery acknowledgement.
+
 The backup job is durable on the Host. Closing, refreshing or reconnecting the browser does not cancel it; the Backups workspace reconstructs the current operation through Host status and displays Host-owned countdown fields. Live archive/upload progress is accepted only when its job ID matches the current durable job.
 
 If a verified local backup survives a bounded Google Drive failure, Minecraft availability is restored and the operation can become degraded/retryable. **Retry Upload** reuses the local archive without another Minecraft shutdown. Provider connectivity-test time and successful remote-backup verification time remain visibly distinct.

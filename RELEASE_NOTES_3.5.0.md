@@ -9,6 +9,7 @@ Dashboard 3.5.0 is the matched control-plane release for PlexonPanel 3.5.0. It k
 - The active-job timeline reconstructs the Host-persisted initial countdown, deadline, remaining time, phases, local verification, remote verification, and safe failure state after a refresh or reconnect.
 - The primary surface explains the actual sequence: player notice, `save-all flush`, proven systemd stop, cold local archive verification, Google Drive promotion/verification, and automatic Minecraft recovery.
 - Google Drive connectivity-test time and successful remote-backup verification time remain visibly distinct.
+- Recovery acknowledgement now reads command-channel configuration from independent Host maintenance status, so a provider/storage/source preflight failure cannot falsely label RCON unconfigured or deadlock the recovery control.
 
 ## Automatic restart settings
 
