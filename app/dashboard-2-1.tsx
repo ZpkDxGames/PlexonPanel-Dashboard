@@ -32,6 +32,7 @@ import {
 } from "../lib/control-state";
 import { DASHBOARD_LABEL, DASHBOARD_VERSION } from "../lib/dashboard-version";
 import { isImmediateControlMessage } from "../lib/display-cadence";
+import { reconcileDeviceGrant } from "../lib/device-grant";
 import { canAction, HIGH_RISK } from "../lib/scopes";
 import {
   lifecycleActionAllowed,
@@ -767,11 +768,13 @@ export default function Dashboard21() {
     (action: string, requestedKind?: "PAPER" | "HOST") => {
       const ready = state.ready;
       if (!ready || phase !== "live") return false;
+      const grant = reconcileDeviceGrant(credential, ready.device);
+      if (!grant) return false;
       if (
         (action === "player.op" ||
           action === "player.deop" ||
           action.startsWith("backup.restore")) &&
-        ready.device.role !== "Owner"
+        grant.role !== "Owner"
       )
         return false;
       let kind =
@@ -790,14 +793,14 @@ export default function Dashboard21() {
         Boolean(kind === "HOST" ? ready.agents.host : ready.agents.paper) &&
         canAction(
           action,
-          ready.device.scopes,
+          grant.scopes,
           kind === "HOST"
             ? ready.server.hostCapabilities
             : ready.server.paperCapabilities,
         )
       );
     },
-    [state.ready, phase],
+    [credential, state.ready, phase],
   );
 
   const run = useCallback(
@@ -917,6 +920,7 @@ export default function Dashboard21() {
       </main>
     );
 
+  const deviceGrant = reconcileDeviceGrant(credential, state.ready?.device);
   const props: ViewProps = {
     state,
     can,
@@ -924,6 +928,7 @@ export default function Dashboard21() {
     notice: setNotice,
     connected: phase === "live",
     setUnsaved,
+    ...(deviceGrant ? { deviceGrant } : {}),
   };
   let view: React.ReactNode;
   switch (section) {

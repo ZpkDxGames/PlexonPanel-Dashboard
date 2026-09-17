@@ -644,6 +644,9 @@ export function BackupsView30(props: ViewProps) {
                 }}
               >Verify & resolve recovery</button>
             )}
+            {jobRecoveryRequired && !canResolveRecovery && (
+              <Badge tone="amber">Re-pair Owner to resolve</Badge>
+            )}
           </div>
         </div>
       )}
@@ -658,7 +661,7 @@ export function BackupsView30(props: ViewProps) {
           <ReadinessItem
             label="maintenance.run"
             state={canRunFullBackup ? "Ready" : "Failed"}
-            detail={canRunFullBackup ? "This device may start manual full maintenance." : "Required scope is not granted."}
+            detail={canRunFullBackup ? "This device may start manual full maintenance." : "This browser's signed grant does not include maintenance.run; re-pair as Owner."}
           />
           <ReadinessItem
             label="Minecraft / systemd"
