@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 
 import relayWorker from "../dist/index.js";
+import { ACTION_CONTRACT_ID } from "../dist/scopes.js";
 import { verifyDashboardAccess } from "../dist/security.js";
 
 const env = {
@@ -23,6 +24,7 @@ test("health describes coordination-only storage", async () => {
     service: "plexonpanel-relay",
     version: "3.5.0",
     protocolVersion: 3,
+    actionContract: ACTION_CONTRACT_ID,
     storage: "coordination-only",
     gatewayPublicKey: "public-test-key",
     gitCommit: "unavailable",
@@ -175,6 +177,7 @@ test("pairing issues a scoped credential only after the room consumes its challe
   const sessionBody = await session.json();
   assert.equal(sessionBody.serverId, serverId);
   assert.equal(sessionBody.deviceId, body.deviceId);
+  assert.equal(sessionBody.actionContract, ACTION_CONTRACT_ID);
   assert.equal(sessionBody.role, body.role);
   assert.deepEqual(sessionBody.scopes, body.scopes);
 

@@ -4,6 +4,7 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
+import { ACTION_CONTRACT_ID } from "../dist/scopes.js";
 import { loadStandaloneConfig } from "../dist/standalone/config.js";
 import { CoordinationStore } from "../dist/standalone/persistence.js";
 import { createStandaloneRelay } from "../dist/standalone/server.js";
@@ -105,6 +106,7 @@ test("standalone health route is safe and advertises Protocol 3 build identity",
     assert.equal(body.runtimeKind, "standalone");
     assert.equal(body.version, "3.5.0");
     assert.equal(body.protocolVersion, 3);
+    assert.equal(body.actionContract, ACTION_CONTRACT_ID);
     assert.equal(body.gitCommit, "8b68f32423efb56eda1c535b7c3e36ea5a30a5e7");
     assert.equal(body.storage, "coordination-only");
     assert.equal(Object.hasOwn(body, "gatewayPublicKey"), false);

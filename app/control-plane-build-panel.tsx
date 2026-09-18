@@ -8,6 +8,12 @@ function shortCommit(value: string | undefined): string {
   return value && /^[0-9a-f]{7,64}$/i.test(value) ? value.slice(0, 12) : "Unavailable";
 }
 
+function shortContract(value: string | undefined): string {
+  return value && /^sha256:[0-9a-f]{64}$/.test(value)
+    ? value.slice(7, 19)
+    : "Unavailable";
+}
+
 export function ControlPlaneBuildPanel({
   paperVersion,
   hostVersion,
@@ -35,6 +41,7 @@ export function ControlPlaneBuildPanel({
         <div><dt>Dashboard build</dt><dd>{shortCommit(builds?.dashboard?.gitCommit)}</dd></div>
         <div><dt>Relay build</dt><dd>{shortCommit(builds?.relay?.gitCommit)}</dd></div>
         <div><dt>Relay runtime</dt><dd>{builds?.relay?.runtimeKind ?? "Unavailable"}</dd></div>
+        <div><dt>Action contract</dt><dd>{shortContract(builds?.relay?.actionContract)}</dd></div>
         <div><dt>Paper build</dt><dd>{paperVersion ?? "Unavailable"}</dd></div>
         <div><dt>Host build</dt><dd>{hostVersion ?? "Unavailable"}</dd></div>
         <div><dt>Protocol</dt><dd>{builds?.relay?.protocolVersion ?? builds?.dashboard?.protocolVersion ?? 3}</dd></div>

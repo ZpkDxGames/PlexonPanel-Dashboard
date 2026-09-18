@@ -91,7 +91,7 @@ const mf = new Miniflare(
     scriptPath: resolve(out, "index.js"),
     compatibilityDate: "2026-08-15",
     durableObjects: {
-      SERVER_ROOMS: { className: "ServerRoom", useSQLite: true },
+      SERVER_ROOMS: { className: "ServerRoomV350", useSQLite: true },
       PAIRING_DIRECTORY: { className: "PairingDirectory", useSQLite: true },
     },
     bindings: {

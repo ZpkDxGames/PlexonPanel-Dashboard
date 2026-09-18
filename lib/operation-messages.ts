@@ -17,6 +17,11 @@ const OPERATION_MESSAGES: Record<string, OperationMessage> = {
     detail: "This device does not have the scope required for the requested operation.",
     tone: "warning",
   },
+  UNKNOWN_ACTION: {
+    title: "Relay action contract mismatch",
+    detail: "The connected relay room does not recognize this Dashboard action. Wait for the relay deployment to finish before retrying.",
+    tone: "danger",
+  },
   OWNER_REQUIRED: {
     title: "Owner role required",
     detail: "This operation is intentionally restricted to a locally paired Owner device.",
@@ -68,9 +73,13 @@ function diagnosticSuffix(error: ActionError): string {
   const boundary = safeDiagnostic(error.data.rejectionBoundary, /^[A-Z][A-Z0-9_]{1,63}$/);
   const scope = safeDiagnostic(error.data.requiredScope, /^[a-z][a-z0-9_.-]{1,63}$/);
   const agent = safeDiagnostic(error.data.agentKind, /^(PAPER|HOST)$/);
+  const contract = safeDiagnostic(error.data.actionContract, /^sha256:[0-9a-f]{64}$/);
   if (boundary) parts.push(`Boundary: ${boundary}`);
   if (scope) parts.push(`Scope: ${scope}`);
+  if (typeof error.data.scopeGranted === "boolean")
+    parts.push(`Grant: ${error.data.scopeGranted ? "present" : "missing"}`);
   if (agent) parts.push(`Agent: ${agent}`);
+  if (contract) parts.push(`Contract: ${contract.slice(7, 19)}`);
   if (/^[0-9a-f-]{36}$/i.test(error.requestId)) parts.push(`Request: ${error.requestId}`);
   return parts.length ? ` Diagnostic: ${parts.join(" · ")}.` : "";
 }

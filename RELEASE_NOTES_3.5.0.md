@@ -28,6 +28,8 @@ The browser accepts the established Protocol 3 session response during a rolling
 
 The active action channel is now bound to the exact signed grant and WebSocket that produced the accepted `dashboard.ready` state. Stale connection callbacks cannot replace or clear a newer socket, and controls remain unavailable until the relay device record exactly matches the signed device ID, role, and scopes.
 
+The canonical action manifest now carries a deterministic SHA-256 contract identity through the Dashboard session, relay health response, and each room's `dashboard.ready` message. Unknown actions and missing device scopes are reported as different failures. The Cloudflare room class is migrated in place to `ServerRoomV350`, preserving Durable Object storage while forcing existing rooms onto the accepted 3.5.0 action contract.
+
 ## Confirmation and relay reliability
 
 Feature-specific destructive confirmations now satisfy the shared high-risk confirmation contract without prompting twice. Worker and standalone relay adapters also tolerate an authenticated empty Host console replay and the bounded console-source ordering race without tearing down the Host session.

@@ -9,6 +9,7 @@ import {
   sendDashboardAction,
 } from "../.test-dist/lib/data-source.js";
 import { operationMessage } from "../.test-dist/lib/operation-messages.js";
+import { ACTION_CONTRACT_ID } from "../.test-dist/lib/scopes.js";
 
 class FakeSocket {
   readyState = 1;
@@ -29,6 +30,7 @@ test("verified legacy session payload keeps signed claims without requiring devi
     {
       ok: true,
       protocolVersion: 3,
+      actionContract: ACTION_CONTRACT_ID,
       serverId: credential.serverId,
       role: "Owner",
       scopes: ["maintenance.view", "maintenance.run"],
@@ -41,6 +43,7 @@ test("verified legacy session payload keeps signed claims without requiring devi
   assert.deepEqual(grant, {
     serverId: credential.serverId,
     deviceId: credential.deviceId,
+    actionContract: ACTION_CONTRACT_ID,
     role: "Owner",
     scopes: ["maintenance.view", "maintenance.run"],
     token: credential.accessToken,
@@ -56,6 +59,7 @@ test("invalid signed session contract reports the safe field without deleting cr
         {
           ok: true,
           protocolVersion: 3,
+          actionContract: ACTION_CONTRACT_ID,
           serverId: credential.serverId,
           deviceId: credential.deviceId,
           role: "Owner",
@@ -90,6 +94,11 @@ test("relay SCOPE_DENIED preserves boundary, action, scope, agent and request ID
         requestId: request.requestId,
         code: "SCOPE_DENIED",
         error: "Your device does not have this scope.",
+        data: {
+          actionContract: ACTION_CONTRACT_ID,
+          requiredScope: "backup.view",
+          scopeGranted: false,
+        },
       }),
       true,
     );
@@ -100,10 +109,47 @@ test("relay SCOPE_DENIED preserves boundary, action, scope, agent and request ID
       assert.equal(error.data.rejectionBoundary, "RELAY_SCOPE");
       assert.equal(error.data.requiredScope, "backup.view");
       assert.equal(error.data.agentKind, "HOST");
+      assert.equal(error.data.scopeGranted, false);
+      assert.equal(error.data.actionContract, ACTION_CONTRACT_ID);
       const rendered = operationMessage(error);
       assert.match(rendered.detail, /Boundary: RELAY_SCOPE/);
       assert.match(rendered.detail, /Scope: backup\.view/);
+      assert.match(rendered.detail, /Grant: missing/);
+      assert.match(rendered.detail, /Contract: [0-9a-f]{12}/);
       assert.match(rendered.detail, new RegExp(`Request: ${request.requestId}`));
+      return true;
+    });
+  } finally {
+    bindLiveSocket(null);
+    globalThis.WebSocket = previousWebSocket;
+  }
+});
+
+test("relay UNKNOWN_ACTION is distinct from a missing device scope", async () => {
+  const previousWebSocket = globalThis.WebSocket;
+  globalThis.WebSocket = { OPEN: 1, CLOSING: 2 };
+  const socket = new FakeSocket();
+  bindLiveSocket(socket);
+  try {
+    const completion = sendDashboardAction("maintenance.recovery.resolve", {}, "HOST");
+    const request = socket.sent.at(-1);
+    handleRelayControlMessage({
+      type: "dashboard.action_rejected",
+      requestId: request.requestId,
+      action: request.action,
+      agentKind: "HOST",
+      code: "UNKNOWN_ACTION",
+      error: "This relay runtime does not recognize the requested action.",
+      data: { actionContract: ACTION_CONTRACT_ID },
+    });
+
+    await assert.rejects(completion, (error) => {
+      assert.ok(error instanceof ActionError);
+      assert.equal(error.data.rejectionBoundary, "RELAY_ACTION_CONTRACT");
+      assert.equal(error.data.actionContract, ACTION_CONTRACT_ID);
+      const rendered = operationMessage(error);
+      assert.equal(rendered.title, "Relay action contract mismatch");
+      assert.match(rendered.detail, /Boundary: RELAY_ACTION_CONTRACT/);
       return true;
     });
   } finally {

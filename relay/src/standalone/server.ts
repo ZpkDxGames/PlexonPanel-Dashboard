@@ -3,6 +3,7 @@ import type { Duplex } from "node:stream";
 import { pathToFileURL } from "node:url";
 import { relayBuildIdentity } from "../build-identity.js";
 import { normalizePairingCode, opaqueClientKey, pairingLookupId, signDashboardAccess, verifyDashboardAccess, type DashboardAccess } from "../security.js";
+import { ACTION_CONTRACT_ID } from "../scopes.js";
 import { loadStandaloneConfig, type StandaloneConfig } from "./config.js";
 import { CoordinationStore } from "./persistence.js";
 import { RoomManager, type RelayCounters } from "./room-manager.js";
@@ -141,6 +142,7 @@ async function handleHttp(
       service: "plexonpanel-relay",
       runtime: "standalone",
       storage: "coordination-only",
+      actionContract: ACTION_CONTRACT_ID,
       ...buildIdentity(),
       uptimeSeconds: Math.max(0, Math.floor((Date.now() - counters.startedAt) / 1000)),
       rooms: rooms.roomCount(),
@@ -236,6 +238,7 @@ async function handleHttp(
     json(response, 200, {
       ok: true,
       protocolVersion: 3,
+      actionContract: ACTION_CONTRACT_ID,
       serverId: access.serverId,
       deviceId: access.deviceId,
       role: access.role,
@@ -273,6 +276,7 @@ async function handleHttp(
     json(response, 200, {
       ok: true,
       protocolVersion: 3,
+      actionContract: ACTION_CONTRACT_ID,
       serverId: access.serverId,
       deviceId: access.deviceId,
       role: access.role,

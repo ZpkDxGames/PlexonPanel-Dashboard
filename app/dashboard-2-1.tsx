@@ -37,7 +37,11 @@ import {
   reconcileDeviceGrant,
   type DeviceGrantLike,
 } from "../lib/device-grant";
-import { canAction, HIGH_RISK } from "../lib/scopes";
+import {
+  ACTION_CONTRACT_ID,
+  canAction,
+  HIGH_RISK,
+} from "../lib/scopes";
 import {
   lifecycleActionAllowed,
   normalizeServiceState,
@@ -713,6 +717,16 @@ export default function Dashboard21() {
               message.type === "dashboard.ready" &&
               message.protocolVersion === 3
             ) {
+              if (
+                message.actionContract !== ACTION_CONTRACT_ID ||
+                message.actionContract !== grant.actionContract
+              ) {
+                setError(
+                  "The live relay room is running a different action contract. Actions are blocked until the relay deployment finishes.",
+                );
+                candidate.close(4008, "Action contract mismatch");
+                return;
+              }
               const reported = record(message.device);
               const reportedGrant =
                 typeof reported.deviceId === "string" &&
@@ -826,7 +840,12 @@ export default function Dashboard21() {
   const can = useCallback(
     (action: string, requestedKind?: "PAPER" | "HOST") => {
       const ready = state.ready;
-      if (!ready || phase !== "live") return false;
+      if (
+        !ready ||
+        phase !== "live" ||
+        ready.actionContract !== ACTION_CONTRACT_ID
+      )
+        return false;
       const grant = reconcileDeviceGrant(sessionGrant, ready.device);
       if (!grant) return false;
       if (

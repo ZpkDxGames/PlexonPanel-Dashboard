@@ -5,7 +5,7 @@
   "compatibility_date": "2026-08-15",
   "durable_objects": {
     "bindings": [
-      { "name": "SERVER_ROOMS", "class_name": "ServerRoom" },
+      { "name": "SERVER_ROOMS", "class_name": "ServerRoomV350" },
       { "name": "PAIRING_DIRECTORY", "class_name": "PairingDirectory" }
     ]
   },
@@ -13,6 +13,12 @@
     {
       "tag": "v1",
       "new_sqlite_classes": ["ServerRoom", "PairingDirectory"]
+    },
+    {
+      "tag": "v2-room-v350",
+      "renamed_classes": [
+        { "from": "ServerRoom", "to": "ServerRoomV350" }
+      ]
     }
   ],
   "vars": {
