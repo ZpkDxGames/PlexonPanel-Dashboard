@@ -718,8 +718,10 @@ export default function Dashboard21() {
               message.protocolVersion === 3
             ) {
               if (
-                message.actionContract !== ACTION_CONTRACT_ID ||
-                message.actionContract !== grant.actionContract
+                (message.actionContract !== undefined &&
+                  message.actionContract !== ACTION_CONTRACT_ID) ||
+                (message.actionContract !== undefined &&
+                  message.actionContract !== grant.actionContract)
               ) {
                 setError(
                   "The live relay room is running a different action contract. Actions are blocked until the relay deployment finishes.",
@@ -843,7 +845,8 @@ export default function Dashboard21() {
       if (
         !ready ||
         phase !== "live" ||
-        ready.actionContract !== ACTION_CONTRACT_ID
+        (ready.actionContract !== undefined &&
+          ready.actionContract !== ACTION_CONTRACT_ID)
       )
         return false;
       const grant = reconcileDeviceGrant(sessionGrant, ready.device);

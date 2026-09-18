@@ -13,7 +13,7 @@ export interface Ready {
   serverId: string;
   protocolVersion: number;
   version: string;
-  actionContract: string;
+  actionContract?: string;
   device: Device;
   connectionStatus?: string;
   consoleAuthority?: "HOST" | "PAPER_FALLBACK";

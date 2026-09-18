@@ -30,7 +30,6 @@ test("verified legacy session payload keeps signed claims without requiring devi
     {
       ok: true,
       protocolVersion: 3,
-      actionContract: ACTION_CONTRACT_ID,
       serverId: credential.serverId,
       role: "Owner",
       scopes: ["maintenance.view", "maintenance.run"],
@@ -50,6 +49,32 @@ test("verified legacy session payload keeps signed claims without requiring devi
     websocketUrl: credential.websocketUrl,
     expiresAt: "2030-01-01T00:00:00.000Z",
   });
+});
+
+test("an explicit session action-contract mismatch still fails closed", () => {
+  assert.throws(
+    () =>
+      liveConnectionGrantFromSession(
+        {
+          ok: true,
+          protocolVersion: 3,
+          actionContract: `sha256:${"0".repeat(64)}`,
+          serverId: credential.serverId,
+          deviceId: credential.deviceId,
+          role: "Owner",
+          scopes: ["maintenance.view", "maintenance.run"],
+          expiresAt: "2030-01-01T00:00:00.000Z",
+        },
+        credential,
+        Date.parse("2029-01-01T00:00:00.000Z"),
+      ),
+    (error) => {
+      assert.ok(error instanceof DashboardRequestError);
+      assert.equal(error.status, 502);
+      assert.match(error.message, /\(actionContract\)/);
+      return true;
+    },
+  );
 });
 
 test("invalid signed session contract reports the safe field without deleting credentials", () => {
