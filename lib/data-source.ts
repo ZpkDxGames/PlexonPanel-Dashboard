@@ -104,12 +104,16 @@ export function liveConnectionGrantFromSession(
     typeof session.expiresAt === "string"
       ? Date.parse(session.expiresAt)
       : Number.NaN;
+  const actionContract =
+    session.actionContract === undefined
+      ? ACTION_CONTRACT_ID
+      : session.actionContract;
   const invalidField =
     session.ok !== true
       ? "ok"
       : session.protocolVersion !== 3
         ? "protocolVersion"
-        : session.actionContract !== ACTION_CONTRACT_ID
+        : actionContract !== ACTION_CONTRACT_ID
           ? "actionContract"
           : session.serverId !== credential.serverId
             ? "serverId"
@@ -137,7 +141,7 @@ export function liveConnectionGrantFromSession(
   return {
     serverId: session.serverId as string,
     deviceId: deviceId as string,
-    actionContract: session.actionContract as string,
+    actionContract: actionContract as string,
     role: session.role as string,
     scopes: session.scopes as string[],
     token: credential.accessToken,
