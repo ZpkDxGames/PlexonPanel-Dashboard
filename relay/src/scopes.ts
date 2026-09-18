@@ -1,6 +1,8 @@
 // GENERATED FILE — source: protocol/action-scopes.json
 // Run npm run scopes:generate after editing the canonical manifest.
 
+export const ACTION_CONTRACT_ID = "sha256:cd5e9edb0aecd8ba8f021a60f83ee1cbd90a599785c31a385c66c1c9f10c9a90" as const;
+
 export const SCOPES = [
   "overview.view",
   "telemetry.view",

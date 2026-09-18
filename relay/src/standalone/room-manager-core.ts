@@ -9,7 +9,14 @@ import {
   verifyEnvelope,
 } from "../protocol.js";
 import { pairingLookupId, type DashboardAccess } from "../security.js";
-import { ACTION_SCOPES, HIGH_RISK, SCOPES, validScopes } from "../scopes.js";
+import {
+  ACTION_CONTRACT_ID,
+  ACTION_SCOPES,
+  HIGH_RISK,
+  SCOPES,
+  validScopes,
+  type Scope,
+} from "../scopes.js";
 import { currentAccess, filterEvent, validDevice } from "../index.js";
 import type { StandaloneConfig } from "./config.js";
 import {
@@ -530,11 +537,15 @@ export class Room {
     }
     if (message.type !== "dashboard.action") throw new Error("Unknown request");
     const requestId = requiredUuid(message.requestId, "requestId");
+    let action = "";
+    let scope: Scope | undefined;
+    let kind: AgentKind | undefined;
     try {
-      const action = requiredText(message.action, "action", 64);
-      const scope = ACTION_SCOPES[action];
+      action = requiredText(message.action, "action", 64);
+      scope = ACTION_SCOPES[action];
       const parameters = message.parameters;
-      if (!scope || !session.access.scopes.includes(scope)) throw new Error("SCOPE_DENIED");
+      if (!scope) throw new Error("UNKNOWN_ACTION");
+      if (!session.access.scopes.includes(scope)) throw new Error("SCOPE_DENIED");
       if (
         !record(parameters) ||
         Object.keys(parameters).length > 16 ||
@@ -558,7 +569,7 @@ export class Room {
         session.access.role !== "Owner"
       )
         throw new Error("OWNER_REQUIRED");
-      let kind: AgentKind =
+      kind =
         action.startsWith("backup.") ||
         action.startsWith("maintenance.") ||
         action.startsWith("provider.") ||
@@ -608,11 +619,23 @@ export class Room {
       });
       this.counters.messagesAccepted += 1;
     } catch (error) {
+      const code = error instanceof Error ? error.message : "DENIED";
       this.dashboardSend(session, {
         type: "dashboard.action_rejected",
         requestId,
-        code: error instanceof Error ? error.message : "DENIED",
+        ...(action ? { action } : {}),
+        ...(kind ? { agentKind: kind } : {}),
+        code,
         error: actionError(error),
+        data: {
+          actionContract: ACTION_CONTRACT_ID,
+          ...(scope
+            ? {
+                requiredScope: scope,
+                scopeGranted: session.access.scopes.includes(scope),
+              }
+            : {}),
+        },
       });
       this.counters.messagesRejected += 1;
     }
@@ -809,6 +832,7 @@ export class Room {
       serverId: this.serverId,
       protocolVersion: 3,
       version: "3.4.0",
+      actionContract: ACTION_CONTRACT_ID,
       connectionStatus: this.paper?.authenticated ? "online" : "offline",
       agents: {
         paper: Boolean(this.paper?.authenticated),
@@ -1028,6 +1052,8 @@ function actionError(error: unknown): string {
   const code = error instanceof Error ? error.message : "DENIED";
   return (
     {
+      UNKNOWN_ACTION:
+        "This relay runtime does not recognize the requested action.",
       SCOPE_DENIED: "Your device does not have this scope.",
       CAPABILITY_DISABLED: "This feature is disabled in local policy.",
       HOST_OFFLINE: "The host companion is not connected.",

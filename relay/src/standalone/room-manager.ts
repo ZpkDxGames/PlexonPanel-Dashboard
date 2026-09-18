@@ -10,6 +10,7 @@ import {
   importAgentPublicKey,
   verifyEnvelope,
 } from "../protocol.js";
+import { RELAY_VERSION } from "../build-identity.js";
 import { currentAccess, filterEvent } from "../index.js";
 import type { DashboardAccess } from "../security.js";
 import type { StoredRoom } from "./persistence.js";
@@ -243,7 +244,7 @@ prototype.ready = function (
   const room = internals(this);
   return {
     ...coreReady.call(this, session),
-    version: "3.4.0",
+    version: RELAY_VERSION,
     consoleAuthority: "HOST",
     consoleSourceState: sourceState(room),
   };

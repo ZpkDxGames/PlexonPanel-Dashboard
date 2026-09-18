@@ -47,3 +47,16 @@ test("standalone runtime identity reports the matched 3.5.0 build", async () => 
   assert.match(server, /relayBuildIdentity\("standalone"/);
   assert.match(identity, /RELAY_VERSION = "3\.5\.0"/);
 });
+
+test("Cloudflare room migration preserves storage while forcing the 3.5.0 class", async () => {
+  const config = JSON.parse(await text("relay/wrangler.jsonc"));
+  const roomBinding = config.durable_objects.bindings.find(
+    (binding) => binding.name === "SERVER_ROOMS",
+  );
+  assert.equal(roomBinding?.class_name, "ServerRoomV350");
+  assert.deepEqual(config.migrations.at(-1), {
+    tag: "v2-room-v350",
+    renamed_classes: [{ from: "ServerRoom", to: "ServerRoomV350" }],
+  });
+  assert.match(await text("relay/src/index.ts"), /export class ServerRoomV350/);
+});

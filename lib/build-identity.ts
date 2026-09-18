@@ -4,6 +4,7 @@ export interface BuildIdentity {
   buildTimestamp: string;
   protocolVersion: number;
   runtimeKind: string;
+  actionContract?: string;
 }
 
 export interface ControlPlaneBuilds {
@@ -30,6 +31,10 @@ function buildIdentity(value: unknown): BuildIdentity | null {
     buildTimestamp: candidate.buildTimestamp,
     protocolVersion: candidate.protocolVersion,
     runtimeKind: candidate.runtimeKind,
+    ...(typeof candidate.actionContract === "string" &&
+    /^sha256:[0-9a-f]{64}$/.test(candidate.actionContract)
+      ? { actionContract: candidate.actionContract }
+      : {}),
   };
 }
 

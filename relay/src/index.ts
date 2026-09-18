@@ -198,6 +198,9 @@ const coreReady = corePrototype.ready;
 const coreDisconnected = corePrototype.disconnected;
 
 export class ServerRoom extends CoreServerRoom {}
+// The v2 Durable Object migration preserves each room's SQLite storage while
+// forcing active production rooms onto the accepted 3.5.0 action contract.
+export class ServerRoomV350 extends ServerRoom {}
 
 const adapterPrototype = ServerRoom.prototype as unknown as CorePrototype;
 adapterPrototype.agentMessage = async function (

@@ -6,6 +6,7 @@ import { join } from "node:path";
 import test from "node:test";
 import { ServerRoom } from "../dist/index.js";
 import { decodeEnvelope, publicKeyFingerprint, signEnvelope } from "../dist/protocol.js";
+import { ACTION_CONTRACT_ID } from "../dist/scopes.js";
 import { loadStandaloneConfig } from "../dist/standalone/config.js";
 import { CoordinationStore } from "../dist/standalone/persistence.js";
 import { RoomManager } from "../dist/standalone/room-manager.js";
@@ -18,13 +19,13 @@ function keys() {
   };
 }
 
-function ownerDevice() {
+function ownerDevice(scopes = ["backup.view"]) {
   const now = Math.floor(Date.now() / 1000);
   return {
     deviceId: randomUUID(),
     name: "Owner browser",
     role: "Owner",
-    scopes: ["backup.view"],
+    scopes,
     issuedAt: now,
     expiresAt: now + 3600,
     lastSeen: now,
@@ -76,7 +77,11 @@ function workerState() {
   };
 }
 
-function agentIdentity(publicKey, hostPublicKey = "") {
+function agentIdentity(
+  publicKey,
+  hostPublicKey = "",
+  capabilities = { "backup.view": true },
+) {
   return {
     publicKey,
     fingerprint: "test-fingerprint",
@@ -85,7 +90,7 @@ function agentIdentity(publicKey, hostPublicKey = "") {
     minecraftVersion: "1.21.10",
     javaVersion: "25",
     operatingSystem: "Linux",
-    capabilities: { "backup.view": true },
+    capabilities,
     hostPublicKey,
   };
 }
@@ -209,7 +214,7 @@ class NodeSocketStub {
   close(code, reason) { this.closed = { code, reason }; }
 }
 
-async function standaloneFixture() {
+async function standaloneFixture(scopes = ["backup.view"]) {
   const directory = await mkdtemp(join(tmpdir(), "plexonpanel-preflight-contract-"));
   const relayKey = keys();
   const paperKey = keys();
@@ -226,16 +231,19 @@ async function standaloneFixture() {
   });
   const store = new CoordinationStore(config.databasePath);
   const serverId = randomUUID();
-  const device = ownerDevice();
+  const device = ownerDevice(scopes);
   const observer = { ...ownerDevice(), deviceId: randomUUID() };
+  const capabilities = Object.fromEntries(
+    [...new Set(["backup.view", ...scopes])].map((scope) => [scope, true]),
+  );
   store.saveRoom(serverId, {
     protocolVersion: 3,
     paired: true,
     generation: 7,
     revision: 2,
     devices: [device, observer],
-    identity: agentIdentity(paperKey.publicKey, hostKey.publicKey),
-    hostIdentity: agentIdentity(hostKey.publicKey),
+    identity: agentIdentity(paperKey.publicKey, hostKey.publicKey, capabilities),
+    hostIdentity: agentIdentity(hostKey.publicKey, "", capabilities),
   });
   const counters = {
     startedAt: Date.now(), connectionsAccepted: 0, connectionsRejected: 0,
@@ -322,6 +330,43 @@ test("standalone relay satisfies the same backup.preflight Host contract", async
     assert.equal(success?.body?.requestId, requestId);
     assert.equal(success?.body?.data?.backupRootWritable, true);
     assert.equal(f.other.socket.sent.some((message) => message.eventType === "action.result"), false);
+  } finally {
+    clearTimeout(f.hostSession.authTimer);
+    f.store.close();
+    await rm(f.directory, { recursive: true, force: true });
+  }
+});
+
+test("standalone relay recognizes recovery and reports unknown actions separately", async () => {
+  const f = await standaloneFixture(["maintenance.run"]);
+  try {
+    const requestId = randomUUID();
+    await f.room.dashboardMessage(f.browser, JSON.stringify({
+      type: "dashboard.action",
+      requestId,
+      action: "maintenance.recovery.resolve",
+      agentKind: "HOST",
+      parameters: { confirmed: true },
+    }));
+    const queued = f.browser.socket.sent.find(
+      (message) => message.requestId === requestId,
+    );
+    assert.equal(queued?.type, "dashboard.action_queued");
+    assert.equal(queued?.agentKind, "HOST");
+
+    const unknownId = randomUUID();
+    await f.room.dashboardMessage(f.browser, JSON.stringify({
+      type: "dashboard.action",
+      requestId: unknownId,
+      action: "maintenance.contract.unknown",
+      parameters: {},
+    }));
+    const rejected = f.browser.socket.sent.find(
+      (message) => message.requestId === unknownId,
+    );
+    assert.equal(rejected?.code, "UNKNOWN_ACTION");
+    assert.equal(rejected?.data?.actionContract, ACTION_CONTRACT_ID);
+    assert.equal(Object.hasOwn(rejected?.data ?? {}, "requiredScope"), false);
   } finally {
     clearTimeout(f.hostSession.authTimer);
     f.store.close();

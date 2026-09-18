@@ -13,7 +13,7 @@ import {
   publicKeyFingerprint,
 } from "../dist/protocol.js";
 import { pairingLookupId } from "../dist/security.js";
-import { SCOPES } from "../dist/scopes.js";
+import { ACTION_CONTRACT_ID, SCOPES } from "../dist/scopes.js";
 
 export class Storage {
   values = new Map();
@@ -301,6 +301,9 @@ test("relay checks device scope, local capability and high-risk confirmation", a
   await attach(f);
   await action(f, "files.write", {});
   assert.equal(f.browser.sent.at(-1).code, "SCOPE_DENIED");
+  assert.equal(f.browser.sent.at(-1).data.requiredScope, "files.write");
+  assert.equal(f.browser.sent.at(-1).data.scopeGranted, false);
+  assert.equal(f.browser.sent.at(-1).data.actionContract, ACTION_CONTRACT_ID);
   const m = await f.st.storage.get("room-metadata");
   m.identity.capabilities["player.kick"] = false;
   await f.st.storage.put("room-metadata", m);
@@ -308,6 +311,19 @@ test("relay checks device scope, local capability and high-risk confirmation", a
   assert.equal(f.browser.sent.at(-1).code, "CAPABILITY_DISABLED");
   await action(f, "player.op", {});
   assert.equal(f.browser.sent.at(-1).code, "CONFIRMATION_REQUIRED");
+});
+test("recovery action is recognized, routed to Host and never conflated with scope denial", async () => {
+  const f = await fixture(["maintenance.run"], "Owner");
+  await attach(f, "HOST");
+  await action(f, "maintenance.recovery.resolve", { confirmed: true });
+  assert.equal(f.browser.sent.at(-1).type, "dashboard.action_queued");
+  assert.equal(f.browser.sent.at(-1).action, "maintenance.recovery.resolve");
+  assert.equal(f.browser.sent.at(-1).agentKind, "HOST");
+
+  await action(f, "maintenance.contract.unknown", {});
+  assert.equal(f.browser.sent.at(-1).code, "UNKNOWN_ACTION");
+  assert.equal(f.browser.sent.at(-1).data.actionContract, ACTION_CONTRACT_ID);
+  assert.equal(Object.hasOwn(f.browser.sent.at(-1).data, "requiredScope"), false);
 });
 test("queued is not completed; results are private to the requesting device and survive hibernation", async () => {
   const f = await fixture(["files.read"]);

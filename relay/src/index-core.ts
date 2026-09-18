@@ -16,7 +16,14 @@ import {
   verifyDashboardAccess,
   type DashboardAccess,
 } from "./security.js";
-import { ACTION_SCOPES, SCOPES, HIGH_RISK, validScopes } from "./scopes.js";
+import {
+  ACTION_CONTRACT_ID,
+  ACTION_SCOPES,
+  SCOPES,
+  HIGH_RISK,
+  validScopes,
+  type Scope,
+} from "./scopes.js";
 interface Env {
   SERVER_ROOMS: DurableObjectNamespace;
   PAIRING_DIRECTORY: DurableObjectNamespace;
@@ -157,6 +164,7 @@ const relayWorker = {
           service: "plexonpanel-relay",
           version: "3.0.2",
           protocolVersion: 3,
+          actionContract: ACTION_CONTRACT_ID,
           storage: "coordination-only",
           gatewayPublicKey: env.GATEWAY_ED25519_PUBLIC_KEY,
         },
@@ -280,6 +288,7 @@ const relayWorker = {
         {
           ok: true,
           protocolVersion: 3,
+          actionContract: ACTION_CONTRACT_ID,
           serverId: access.serverId,
           deviceId: access.deviceId,
           role: access.role,
@@ -343,6 +352,7 @@ const relayWorker = {
         {
           ok: true,
           protocolVersion: 3,
+          actionContract: ACTION_CONTRACT_ID,
           serverId: access.serverId,
           deviceId: access.deviceId,
           role: access.role,
@@ -1108,12 +1118,15 @@ export class ServerRoom {
     }
     if (message.type !== "dashboard.action") throw new Error("Unknown request");
     const id = requiredUuid(message.requestId, "requestId");
+    let action = "";
+    let scope: Scope | undefined;
+    let kind: AgentKind | undefined;
     try {
-      const action = requiredText(message.action, "action", 64),
-        scope = ACTION_SCOPES[action],
-        parameters = message.parameters;
-      if (!scope || !a.access!.scopes.includes(scope))
-        throw new Error("SCOPE_DENIED");
+      action = requiredText(message.action, "action", 64);
+      scope = ACTION_SCOPES[action];
+      const parameters = message.parameters;
+      if (!scope) throw new Error("UNKNOWN_ACTION");
+      if (!a.access!.scopes.includes(scope)) throw new Error("SCOPE_DENIED");
       if (
         !isRecord(parameters) ||
         Object.keys(parameters).length > 16 ||
@@ -1139,7 +1152,7 @@ export class ServerRoom {
         a.access!.role !== "Owner"
       )
         throw new Error("OWNER_REQUIRED");
-      let kind: AgentKind =
+      kind =
         action.startsWith("backup.") ||
         action.startsWith("maintenance.") ||
         action.startsWith("provider.") ||
@@ -1205,12 +1218,24 @@ export class ServerRoom {
         }),
       );
     } catch (error) {
+      const code = error instanceof Error ? error.message : "DENIED";
       socket.send(
         JSON.stringify({
           type: "dashboard.action_rejected",
           requestId: id,
-          code: error instanceof Error ? error.message : "DENIED",
+          ...(action ? { action } : {}),
+          ...(kind ? { agentKind: kind } : {}),
+          code,
           error: actionError(error),
+          data: {
+            actionContract: ACTION_CONTRACT_ID,
+            ...(scope
+              ? {
+                  requiredScope: scope,
+                  scopeGranted: a.access?.scopes.includes(scope) === true,
+                }
+              : {}),
+          },
         }),
       );
     }
@@ -1395,6 +1420,7 @@ export class ServerRoom {
       serverId: a.serverId,
       protocolVersion: 3,
       version: "3.0.2",
+      actionContract: ACTION_CONTRACT_ID,
       connectionStatus: this.agents("PAPER").length ? "online" : "offline",
       agents: {
         paper: this.agents("PAPER").length > 0,
@@ -1746,6 +1772,8 @@ function actionError(error: unknown): string {
   return (
     (
       {
+        UNKNOWN_ACTION:
+          "This relay runtime does not recognize the requested action.",
         SCOPE_DENIED: "Your device does not have this scope.",
         CAPABILITY_DISABLED: "This feature is disabled in local policy.",
         HOST_OFFLINE: "The host companion is not connected.",

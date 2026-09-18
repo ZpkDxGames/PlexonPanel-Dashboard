@@ -8,7 +8,7 @@ import {
   saveRelayCredential,
   type RelayCredential,
 } from "./browser-store";
-import { ACTION_SCOPES, validScopes } from "./scopes";
+import { ACTION_CONTRACT_ID, ACTION_SCOPES, validScopes } from "./scopes";
 import type { DashboardWorkspace } from "./dashboard-types";
 
 export interface DashboardSessionResponse {
@@ -21,6 +21,7 @@ export interface DashboardSessionResponse {
 export interface LiveConnectionGrant {
   serverId: string;
   deviceId: string;
+  actionContract: string;
   role: string;
   scopes: string[];
   token: string;
@@ -31,6 +32,7 @@ export interface LiveConnectionGrant {
 interface LiveSessionResponse {
   ok: boolean;
   protocolVersion: number;
+  actionContract?: string;
   serverId: string;
   deviceId?: string;
   role: string;
@@ -107,21 +109,23 @@ export function liveConnectionGrantFromSession(
       ? "ok"
       : session.protocolVersion !== 3
         ? "protocolVersion"
-        : session.serverId !== credential.serverId
-          ? "serverId"
-          : typeof deviceId !== "string" || !deviceId
-            ? "deviceId"
-            : session.deviceId !== undefined &&
-                session.deviceId !== credential.deviceId
+        : session.actionContract !== ACTION_CONTRACT_ID
+          ? "actionContract"
+          : session.serverId !== credential.serverId
+            ? "serverId"
+            : typeof deviceId !== "string" || !deviceId
               ? "deviceId"
-              : typeof session.role !== "string" ||
-                  !/^[A-Za-z][A-Za-z0-9_-]{0,31}$/.test(session.role)
-                ? "role"
-                : !validScopes(session.scopes)
-                  ? "scopes"
-                  : !Number.isFinite(expiresAt) || expiresAt <= now
-                    ? "expiresAt"
-                    : "";
+              : session.deviceId !== undefined &&
+                  session.deviceId !== credential.deviceId
+                ? "deviceId"
+                : typeof session.role !== "string" ||
+                    !/^[A-Za-z][A-Za-z0-9_-]{0,31}$/.test(session.role)
+                  ? "role"
+                  : !validScopes(session.scopes)
+                    ? "scopes"
+                    : !Number.isFinite(expiresAt) || expiresAt <= now
+                      ? "expiresAt"
+                      : "";
 
   if (invalidField) {
     throw new DashboardRequestError(
@@ -133,6 +137,7 @@ export function liveConnectionGrantFromSession(
   return {
     serverId: session.serverId as string,
     deviceId: deviceId as string,
+    actionContract: session.actionContract as string,
     role: session.role as string,
     scopes: session.scopes as string[],
     token: credential.accessToken,
@@ -291,6 +296,7 @@ function rejectionBoundary(
   agentKind?: "PAPER" | "HOST",
 ): string | undefined {
   if (relayRejected) {
+    if (code === "UNKNOWN_ACTION") return "RELAY_ACTION_CONTRACT";
     if (code === "SCOPE_DENIED") return "RELAY_SCOPE";
     if (code === "CAPABILITY_DISABLED") return "RELAY_CAPABILITY";
     if (code === "HOST_OFFLINE" || code === "PAPER_OFFLINE") return "RELAY_ROUTING";
@@ -336,7 +342,8 @@ export function handleRelayControlMessage(
     const boundary = rejectionBoundary(message.type === "dashboard.action_rejected", code, agentKind);
     if (boundary) data.rejectionBoundary = boundary;
     const requiredScope = ACTION_SCOPES[action];
-    if (requiredScope) data.requiredScope = requiredScope;
+    if (requiredScope && code !== "UNKNOWN_ACTION")
+      data.requiredScope = requiredScope;
     if (agentKind) data.agentKind = agentKind;
     data.runtimeKind = message.type === "dashboard.action_rejected" ? "relay" : agentKind?.toLowerCase() ?? "agent";
     pending.reject(

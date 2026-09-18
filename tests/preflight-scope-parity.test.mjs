@@ -1,7 +1,12 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
-import { ACTION_SCOPES, canAction } from "../.test-dist/lib/scopes.js";
+import {
+  ACTION_CONTRACT_ID,
+  ACTION_SCOPES,
+  canAction,
+} from "../.test-dist/lib/scopes.js";
 
 async function source(path) {
   return readFile(new URL(`../${path}`, import.meta.url), "utf8");
@@ -22,5 +27,14 @@ test("browser and relay scope modules are generated from one checked-in manifest
   ]);
   assert.equal(browserScopes, relayScopes, "generated scope artifacts diverged");
   assert.match(browserScopes, /^\/\/ GENERATED FILE — source: protocol\/action-scopes\.json/m);
-  assert.equal(JSON.parse(manifest).actionAliases["backup.preflight"], "backup.view");
+  const parsed = JSON.parse(manifest);
+  assert.equal(parsed.actionAliases["backup.preflight"], "backup.view");
+  assert.equal(
+    parsed.actionAliases["maintenance.recovery.resolve"],
+    "maintenance.run",
+  );
+  assert.equal(
+    ACTION_CONTRACT_ID,
+    `sha256:${createHash("sha256").update(JSON.stringify(parsed)).digest("hex")}`,
+  );
 });
