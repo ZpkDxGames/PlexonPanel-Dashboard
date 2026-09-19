@@ -10,7 +10,7 @@ test("relay build identity exposes only bounded non-secret metadata", () => {
       BUILD_TIMESTAMP: "2026-09-14T02:17:15Z",
     }),
     {
-      version: "3.5.0",
+      version: "3.5.1",
       gitCommit: "8b68f32423efb56eda1c535b7c3e36ea5a30a5e7",
       buildTimestamp: "2026-09-14T02:17:15.000Z",
       protocolVersion: 3,
@@ -34,7 +34,7 @@ test("Worker health advertises the deployed commit and runtime kind", async () =
   );
   assert.equal(response.status, 200);
   const body = await response.json();
-  assert.equal(body.version, "3.5.0");
+  assert.equal(body.version, "3.5.1");
   assert.equal(body.gitCommit, "8b68f32423efb56eda1c535b7c3e36ea5a30a5e7");
   assert.equal(body.runtimeKind, "cloudflare-worker");
   assert.equal(body.protocolVersion, 3);
