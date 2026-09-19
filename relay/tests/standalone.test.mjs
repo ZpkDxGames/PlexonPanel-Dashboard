@@ -104,7 +104,7 @@ test("standalone health route is safe and advertises Protocol 3 build identity",
     assert.equal(body.ok, true);
     assert.equal(body.runtime, "standalone");
     assert.equal(body.runtimeKind, "standalone");
-    assert.equal(body.version, "3.5.0");
+    assert.equal(body.version, "3.5.1");
     assert.equal(body.protocolVersion, 3);
     assert.equal(body.actionContract, ACTION_CONTRACT_ID);
     assert.equal(body.gitCommit, "8b68f32423efb56eda1c535b7c3e36ea5a30a5e7");

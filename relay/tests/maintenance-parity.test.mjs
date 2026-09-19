@@ -38,14 +38,14 @@ for (const [label, sourcePath, distPath] of [
   });
 }
 
-test("standalone runtime identity reports the matched 3.5.0 build", async () => {
+test("standalone runtime identity reports the matched 3.5.1 build", async () => {
   const server = await text("relay/src/standalone/server.ts");
   const room = await text("relay/src/standalone/room-manager-core.ts");
   const identity = await text("relay/src/build-identity.ts");
   assert.doesNotMatch(server, /3\.1\.0/);
   assert.doesNotMatch(room, /version: "3\.1\.0"/);
   assert.match(server, /relayBuildIdentity\("standalone"/);
-  assert.match(identity, /RELAY_VERSION = "3\.5\.0"/);
+  assert.match(identity, /RELAY_VERSION = "3\.5\.1"/);
 });
 
 test("Cloudflare room migration preserves storage while forcing the 3.5.0 class", async () => {
