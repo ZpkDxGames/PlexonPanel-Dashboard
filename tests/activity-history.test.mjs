@@ -1,41 +1,28 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import {
-  capturePresenceHistoryMessage,
-  clearActivityHistory,
-  listActivityHistoryServers,
-  loadActivityHistory,
+  clearActivityHistory, listActivityHistoryServers, loadActivityHistory,
 } from "../.test-dist/lib/activity-history.js";
+import {
+  activityPage, activityParameters, liveActivity, observation,
+} from "../.test-dist/lib/durable-activity.js";
 
 function fakeBrowser() {
   const values = new Map();
-  const localStorage = {
-    get length() {
-      return values.size;
-    },
-    getItem(key) {
-      return values.has(key) ? values.get(key) : null;
-    },
-    setItem(key, value) {
-      values.set(key, String(value));
-    },
-    removeItem(key) {
-      values.delete(key);
-    },
-    key(index) {
-      return [...values.keys()][index] ?? null;
-    },
-  };
   const previousWindow = globalThis.window;
   const previousCustomEvent = globalThis.CustomEvent;
   globalThis.CustomEvent = class {
-    constructor(type, init = {}) {
-      this.type = type;
-      this.detail = init.detail;
-    }
+    constructor(type, init = {}) { this.type = type; this.detail = init.detail; }
   };
   globalThis.window = {
-    localStorage,
+    localStorage: {
+      get length() { return values.size; },
+      getItem: (key) => values.get(key) ?? null,
+      setItem: (key, value) => values.set(key, String(value)),
+      removeItem: (key) => values.delete(key),
+      key: (index) => [...values.keys()][index] ?? null,
+    },
     dispatchEvent() {},
     addEventListener() {},
     removeEventListener() {},
@@ -48,107 +35,53 @@ function fakeBrowser() {
   };
 }
 
-function presence(overrides = {}) {
-  return {
-    type: "server.event",
-    serverId: "server-a",
-    agentKind: "PAPER",
-    eventType: "players.presence",
-    body: {
-      eventId: "event-1",
-      sessionId: "session-1",
-      uuid: "11111111-1111-1111-1111-111111111111",
-      name: "Alex",
-      state: "JOINED",
-      observedAt: "2026-09-07T20:00:00.000Z",
-    },
-    ...overrides,
-  };
-}
+const row = (id, state = "JOINED", observedAt = "2026-09-26T18:00:00Z") => ({
+  eventId: id, uuid: "11111111-1111-1111-1111-111111111111",
+  name: "Alex", state, observedAt, termination: "NORMAL",
+});
+const filters = { query: "", status: "ALL", from: "", to: "" };
 
-test("presence history is browser-local, server-scoped and deduplicated", () => {
+test("legacy browser archive remains read-only, isolated and unverified", () => {
   const restore = fakeBrowser();
   try {
-    capturePresenceHistoryMessage(presence());
-    capturePresenceHistoryMessage(presence());
-    capturePresenceHistoryMessage(
-      presence({
-        serverId: "server-b",
-        body: {
-          ...presence().body,
-          eventId: "event-2",
-          state: "LEFT",
-          observedAt: "2026-09-07T20:05:00.000Z",
-        },
-      }),
-    );
-
-    assert.equal(loadActivityHistory("server-a").length, 1);
-    assert.equal(loadActivityHistory("server-a")[0].state, "JOINED");
-    assert.equal(loadActivityHistory("server-b").length, 1);
-    assert.deepEqual(listActivityHistoryServers(), ["server-a", "server-b"]);
-
+    window.localStorage.setItem("plexonpanel.activity-history.v1:server-a",
+      JSON.stringify([{ ...row("a"), recordedAt: Date.now() }]));
+    assert.equal(loadActivityHistory("server-a")[0].eventId, "a");
+    assert.deepEqual(listActivityHistoryServers(), ["server-a"]);
+    assert.deepEqual(loadActivityHistory("server-b"), []);
     clearActivityHistory("server-a");
-    assert.equal(loadActivityHistory("server-a").length, 0);
-    assert.deepEqual(listActivityHistoryServers(), ["server-b"]);
-  } finally {
-    restore();
-  }
-});
-
-test("invalid or host presence messages are not persisted", () => {
-  const restore = fakeBrowser();
-  try {
-    capturePresenceHistoryMessage(presence({ agentKind: "HOST" }));
-    capturePresenceHistoryMessage(
-      presence({ body: { ...presence().body, observedAt: "not-a-date" } }),
-    );
-    capturePresenceHistoryMessage({ type: "server.event", eventType: "players.presence" });
     assert.deepEqual(listActivityHistoryServers(), []);
-  } finally {
-    restore();
-  }
+  } finally { restore(); }
 });
 
-test("presence history follows the active Paper agent session", () => {
-  const restore = fakeBrowser();
-  try {
-    capturePresenceHistoryMessage({
-      type: "dashboard.ready",
-      protocolVersion: 3,
-      serverId: "server-session-test",
-      server: { paperSession: "paper-session-current" },
-    });
+test("display cadence cannot persist live presence to the legacy archive", async () => {
+  const source = await readFile(new URL("../lib/display-cadence.ts", import.meta.url), "utf8");
+  assert.doesNotMatch(source, /activity-history|localStorage|capturePresence/);
+  const legacy = await readFile(new URL("../lib/activity-history.ts", import.meta.url), "utf8");
+  assert.doesNotMatch(legacy, /setItem\(|capturePresenceHistoryMessage/);
+});
 
-    capturePresenceHistoryMessage(
-      presence({
-        serverId: "server-session-test",
-        agentSession: "paper-session-stale",
-        body: {
-          ...presence().body,
-          eventId: "stale-event",
-        },
-      }),
-    );
-    assert.equal(loadActivityHistory("server-session-test").length, 0);
+test("server-side filters use bounded Paper parameters and opaque cursors", () => {
+  assert.deepEqual(activityParameters({ query: " alex ", status: "OFFLINE", from: "", to: "" }, "opaque"), {
+    query: "alex", status: "OFFLINE", limit: 50, cursor: "opaque",
+  });
+});
 
-    capturePresenceHistoryMessage(
-      presence({
-        serverId: "server-session-test",
-        agentSession: "paper-session-current",
-        body: {
-          ...presence().body,
-          eventId: "current-event",
-          observedAt: "2026-09-07T20:10:00.000Z",
-        },
-      }),
-    );
-    assert.equal(loadActivityHistory("server-session-test").length, 1);
-    assert.equal(
-      loadActivityHistory("server-session-test")[0].eventId,
-      "current-event",
-    );
-  } finally {
-    restore();
-  }
+test("a live duplicate is replaced by the journal record; pages never mix", () => {
+  const now = Date.parse("2026-09-26T18:01:00Z");
+  const live = liveActivity([row("a"), row("a"), row("b", "LEFT")], filters, now);
+  assert.equal(live.length, 2);
+  const durable = [observation(row("a"), true)].filter(Boolean);
+  const first = activityPage(durable, live, true);
+  assert.equal(first.length, 2);
+  assert.equal(first.find((entry) => entry.eventId === "a").durable, true);
+  assert.deepEqual(activityPage(durable, live, false).map((entry) => entry.eventId), ["a"]);
+  assert.equal(liveActivity([row("old", "JOINED", "2026-09-26T10:00:00Z")], filters, now).length, 0);
+});
+
+test("live filters reject malformed rows and do not invent a leave", () => {
+  const now = Date.parse("2026-09-26T18:01:00Z");
+  const result = liveActivity([row("a"), { ...row("bad"), observedAt: "invalid" }],
+    { ...filters, status: "OFFLINE" }, now);
+  assert.deepEqual(result, []);
 });

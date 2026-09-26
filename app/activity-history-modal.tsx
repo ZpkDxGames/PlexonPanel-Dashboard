@@ -1,255 +1,254 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { PlayerHead } from "../components/player-head";
+import { sendDashboardAction } from "../lib/data-source";
 import {
-  ACTIVITY_HISTORY_MAX_EVENTS,
-  clearActivityHistory,
-  loadActivityHistory,
-  subscribeActivityHistory,
-  type PresenceHistoryEvent,
-} from "../lib/activity-history";
+  ACTIVITY_PAGE_SIZE, activityPage, activityParameters, liveActivity,
+  observation, type ActivityFilters, type ActivityObservation,
+} from "../lib/durable-activity";
+import { duration, time, type ViewProps } from "./control-views";
 
-type StateFilter = "ALL" | "JOINED" | "LEFT";
-type SortOrder = "NEWEST" | "OLDEST";
-
-const PAGE_SIZE = 100;
-
-function dayLabel(iso: string): string {
-  const date = new Date(iso);
-  const now = new Date();
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-  const target = new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
-  const delta = Math.round((today - target) / 86_400_000);
-  if (delta === 0) return "Today";
-  if (delta === 1) return "Yesterday";
-  return date.toLocaleDateString(undefined, {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
+interface HistoryPage {
+  key: string;
+  entries: ActivityObservation[];
+  nextCursor: string;
+  bounded: boolean;
+  capturedAt: string;
+  index: number;
 }
 
-function eventTime(event: PresenceHistoryEvent): string {
-  return new Date(event.observedAt).toLocaleTimeString(undefined, {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-  });
-}
+const INITIAL_FILTERS: ActivityFilters = { query: "", status: "ALL", from: "", to: "" };
+const MAX_ACTIVITY_PAGES = 100;
 
 export function ActivityHistoryModal({
-  serverId,
-  open,
-  onClose,
+  props, open, onClose,
 }: {
-  serverId: string;
+  props: ViewProps;
   open: boolean;
   onClose: () => void;
 }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
-  const [events, setEvents] = useState<PresenceHistoryEvent[]>([]);
-  const [query, setQuery] = useState("");
-  const [stateFilter, setStateFilter] = useState<StateFilter>("ALL");
-  const [sortOrder, setSortOrder] = useState<SortOrder>("NEWEST");
-  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const generation = useRef(0);
+  const pending = useRef(false);
+  const [filters, setFilters] = useState<ActivityFilters>(INITIAL_FILTERS);
+  const [page, setPage] = useState<HistoryPage | null>(null);
+  const [cursors, setCursors] = useState<string[]>([""]);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+
+  const ready = props.state.ready;
+  const serverId = props.state.serverId;
+  const effectiveScopes = props.deviceGrant?.scopes ?? ready?.device.scopes;
+  const scope = Boolean(effectiveScopes?.includes("players.history.view"));
+  const capabilityKnown = Boolean(ready &&
+    Object.prototype.hasOwnProperty.call(ready.server.paperCapabilities, "players.history.view"));
+  const enabled = ready?.server.paperCapabilities["players.history.view"] === true;
+  const paperOnline = Boolean(ready?.agents.paper);
+  const available = open && props.connected && paperOnline && scope && enabled;
+  const sourceKey = `${serverId}:${props.deviceGrant?.deviceId ?? ready?.device.deviceId ?? ""}:${ready?.device.issuedAt ?? ""}:${ready?.server.paperSession ?? ""}:${scope}:${enabled}:${props.connected}:${paperOnline}`;
+  const filterKey = JSON.stringify([filters.query, filters.status, filters.from, filters.to]);
+  const key = `${sourceKey}:${filterKey}`;
+  const current = page?.key === key && available ? page : null;
+  const canLive = Boolean(effectiveScopes?.includes("players.view"));
+  const live = useMemo(
+    () => props.connected && paperOnline && canLive
+      ? liveActivity(props.state.presenceDeltas, filters) : [],
+    [props.connected, paperOnline, canLive, props.state.presenceDeltas, filters],
+  );
+  const entries = activityPage(current?.entries ?? [], live, Boolean(current && current.index === 0));
 
   useEffect(() => {
     const dialog = dialogRef.current;
     if (!dialog) return;
     if (open && !dialog.open) dialog.showModal();
     if (!open && dialog.open) dialog.close();
+    if (open) {
+      const timer = window.setTimeout(() => searchRef.current?.focus(), 0);
+      return () => window.clearTimeout(timer);
+    }
   }, [open]);
 
   useEffect(() => {
-    if (!open || !serverId) return;
-    const refresh = () => setEvents(loadActivityHistory(serverId));
-    const timer = window.setTimeout(refresh, 0);
-    const unsubscribe = subscribeActivityHistory(serverId, refresh);
-    const focusTimer = window.setTimeout(() => searchRef.current?.focus(), 0);
+    // A late private action result must never appear under another server,
+    // session, filter, capability or dialog lifetime.
+    const requests = generation;
+    const token = ++requests.current;
+    pending.current = false;
+    if (!available) return;
+    const timer = window.setTimeout(async () => {
+      pending.current = true;
+      setBusy(true);
+      setError("");
+      setCursors([""]);
+      try {
+        if (filters.from && filters.to && filters.from > filters.to)
+          throw new Error("From must be on or before To.");
+        const result = await sendDashboardAction(
+          "players.history.list", activityParameters(filters), "PAPER",
+        );
+        if (generation.current !== token) return;
+        if (result.data.historyEnabled !== true)
+          throw new Error("Paper reports that local history is disabled.");
+        setPage({
+          key,
+          entries: (Array.isArray(result.data.entries) ? result.data.entries : [])
+            .slice(0, ACTIVITY_PAGE_SIZE).map((row) => observation(row, true))
+            .filter((row): row is ActivityObservation => row !== null),
+          nextCursor: typeof result.data.nextCursor === "string" ? result.data.nextCursor : "",
+          bounded: result.data.boundedWindow === true,
+          capturedAt: typeof result.data.capturedAt === "string" ? result.data.capturedAt : "",
+          index: 0,
+        });
+      } catch (reason) {
+        if (generation.current === token) {
+          setPage(null);
+          setError(reason instanceof Error ? reason.message : "Paper history is unavailable.");
+        }
+      } finally {
+        if (generation.current === token) {
+          pending.current = false;
+          setBusy(false);
+        }
+      }
+    }, 300);
     return () => {
       window.clearTimeout(timer);
-      window.clearTimeout(focusTimer);
-      unsubscribe();
+      requests.current++;
+      pending.current = false;
     };
-  }, [open, serverId]);
+  }, [available, key, sourceKey, filterKey, filters]);
 
-  const filtered = useMemo(() => {
-    const needle = query.trim().toLowerCase();
-    const matching = events.filter((event) => {
-      if (stateFilter !== "ALL" && event.state !== stateFilter) return false;
-      return (
-        !needle ||
-        event.name.toLowerCase().includes(needle) ||
-        event.uuid.toLowerCase().includes(needle)
+  async function navigate(index: number, cursor: string) {
+    if (!available || pending.current || !current || index >= MAX_ACTIVITY_PAGES) return;
+    const token = ++generation.current;
+    pending.current = true;
+    setBusy(true);
+    setError("");
+    try {
+      const result = await sendDashboardAction(
+        "players.history.list", activityParameters(filters, cursor), "PAPER",
       );
-    });
-    return matching.sort((a, b) => {
-      const delta = Date.parse(a.observedAt) - Date.parse(b.observedAt);
-      return sortOrder === "NEWEST" ? -delta : delta;
-    });
-  }, [events, query, sortOrder, stateFilter]);
-
-  const visibleLength = Math.min(visibleCount, filtered.length);
-  const groups = useMemo(() => {
-    const result = new Map<string, PresenceHistoryEvent[]>();
-    for (const event of filtered.slice(0, visibleCount)) {
-      const label = dayLabel(event.observedAt);
-      const list = result.get(label) ?? [];
-      list.push(event);
-      result.set(label, list);
+      if (generation.current !== token) return;
+      if (result.data.historyEnabled !== true)
+        throw new Error("Paper reports that local history is disabled.");
+      setPage({
+        key, index,
+        entries: (Array.isArray(result.data.entries) ? result.data.entries : [])
+          .slice(0, ACTIVITY_PAGE_SIZE).map((row) => observation(row, true))
+          .filter((row): row is ActivityObservation => row !== null),
+        nextCursor: typeof result.data.nextCursor === "string" ? result.data.nextCursor : "",
+        bounded: result.data.boundedWindow === true,
+        capturedAt: typeof result.data.capturedAt === "string" ? result.data.capturedAt : "",
+      });
+      if (index >= cursors.length) setCursors((currentCursors) => [...currentCursors.slice(0, index), cursor]);
+    } catch (reason) {
+      if (generation.current === token)
+        setError(reason instanceof Error ? reason.message : "Paper history is unavailable.");
+    } finally {
+      if (generation.current === token) {
+        pending.current = false;
+        setBusy(false);
+      }
     }
-    return [...result.entries()];
-  }, [filtered, visibleCount]);
+  }
 
-  const joins = events.filter((event) => event.state === "JOINED").length;
-  const leaves = events.filter((event) => event.state === "LEFT").length;
-  const uniquePlayers = new Set(events.map((event) => event.uuid)).size;
+  const unavailable = !props.connected
+    ? "The signed relay session is disconnected. History cannot be queried."
+    : !scope
+    ? "This device lacks players.history.view. Ask the operator to re-pair an approved device; old grants do not gain new scopes."
+    : !paperOnline
+      ? "Paper is offline. Its local history will be available when it reconnects."
+    : !capabilityKnown
+      ? "This Paper agent does not advertise player history. Upgrade it to use the local journal."
+    : !enabled
+        ? "Paper history is off. An operator must enable player-history.enabled locally after reviewing retention and privacy."
+        : "";
 
   return (
     <dialog
       ref={dialogRef}
       className="cr30-activity-dialog"
       aria-labelledby="cr30-activity-dialog-title"
-      onCancel={(event) => {
-        event.preventDefault();
-        onClose();
-      }}
-      onClick={(event) => {
-        if (event.target === event.currentTarget) onClose();
-      }}
+      onCancel={(event) => { event.preventDefault(); onClose(); }}
+      onClick={(event) => { if (event.target === event.currentTarget) onClose(); }}
     >
       <div className="cr30-activity-modal-shell">
         <header className="cr30-activity-modal-head">
           <div>
-            <span>Control Room / Activity</span>
-            <h2 id="cr30-activity-dialog-title">Player activity history</h2>
-            <p>
-              Browser-local join and leave history. Opening this view does not navigate away from
-              the live dashboard or reconnect its telemetry session.
-            </p>
+            <span>Control Room / Players</span>
+            <h2 id="cr30-activity-dialog-title">Player activity</h2>
+            <p>Paper&apos;s local presence journal is the history source. Opening this view keeps the live dashboard session connected.</p>
           </div>
-          <button type="button" className="cr30-activity-close" onClick={onClose} aria-label="Close activity history">
-            ×
-          </button>
+          <button type="button" className="cr30-activity-close" onClick={onClose} aria-label="Close activity history">×</button>
         </header>
-
-        <section className="cr30-activity-modal-stats" aria-label="Activity history summary">
-          <article><small>Total events</small><strong>{events.length.toLocaleString()}</strong></article>
-          <article><small>Joins</small><strong>{joins.toLocaleString()}</strong></article>
-          <article><small>Leaves</small><strong>{leaves.toLocaleString()}</strong></article>
-          <article><small>Unique players</small><strong>{uniquePlayers.toLocaleString()}</strong></article>
-        </section>
-
         <section className="cr30-activity-modal-controls" aria-label="Activity history filters">
-          <input
-            ref={searchRef}
-            type="search"
-            placeholder="Search player name or UUID"
-            aria-label="Search player activity"
-            value={query}
-            onChange={(event) => {
-              setQuery(event.target.value);
-              setVisibleCount(PAGE_SIZE);
-            }}
-          />
-          <select
-            aria-label="Filter activity type"
-            value={stateFilter}
-            onChange={(event) => {
-              setStateFilter(event.target.value as StateFilter);
-              setVisibleCount(PAGE_SIZE);
-            }}
-          >
-            <option value="ALL">All activity</option>
-            <option value="JOINED">Joins only</option>
-            <option value="LEFT">Leaves only</option>
+          <input ref={searchRef} type="search" maxLength={64} placeholder="Player name or UUID"
+            aria-label="Search player activity" value={filters.query}
+            onChange={(event) => setFilters((value) => ({ ...value, query: event.target.value }))} />
+          <select aria-label="Filter activity type" value={filters.status}
+            onChange={(event) => setFilters((value) => ({ ...value, status: event.target.value as ActivityFilters["status"] }))}>
+            <option value="ALL">All activity</option><option value="ONLINE">Joins</option><option value="OFFLINE">Leaves</option>
           </select>
-          <select
-            aria-label="Sort activity"
-            value={sortOrder}
-            onChange={(event) => {
-              setSortOrder(event.target.value as SortOrder);
-              setVisibleCount(PAGE_SIZE);
-            }}
-          >
-            <option value="NEWEST">Newest first</option>
-            <option value="OLDEST">Oldest first</option>
-          </select>
-          <button
-            type="button"
-            className="cr30-activity-clear"
-            disabled={!events.length}
-            onClick={() => {
-              if (!events.length) return;
-              if (
-                window.confirm(
-                  `Clear ${events.length.toLocaleString()} stored activity events for this server from this browser?`,
-                )
-              )
-                clearActivityHistory(serverId);
-            }}
-          >
-            Clear history
-          </button>
+          <label>From <input type="date" value={filters.from}
+            onChange={(event) => setFilters((value) => ({ ...value, from: event.target.value }))} /></label>
+          <label>To <input type="date" value={filters.to}
+            onChange={(event) => setFilters((value) => ({ ...value, to: event.target.value }))} /></label>
         </section>
-
-        <div className="cr30-activity-modal-scroll">
-          {groups.length ? (
-            <section className="cr30-activity-modal-groups" aria-label="Stored player activity">
-              {groups.map(([label, group]) => (
-                <article className="cr30-activity-modal-group" key={label}>
-                  <header>
-                    <strong>{label}</strong>
-                    <span>{group.length.toLocaleString()} shown</span>
-                  </header>
-                  <div>
-                    {group.map((event) => (
-                      <div className="cr30-activity-modal-row" key={event.eventId}>
-                        <PlayerHead
-                          uuid={event.uuid}
-                          name={event.name}
-                          size={40}
-                          online={event.state === "JOINED"}
-                        />
-                        <div className="cr30-activity-modal-identity">
-                          <strong>{event.name}</strong>
-                          <small>{event.uuid}</small>
+        <div className="cr30-activity-modal-scroll" aria-live="polite">
+          {unavailable && <div className="cr30-activity-modal-empty">{unavailable}</div>}
+          {!unavailable && error && <p role="alert" className="cr21-bounded">{error}</p>}
+          {!unavailable && busy && !current && <div className="cr30-activity-modal-empty">Querying Paper history…</div>}
+          {!unavailable && !busy && !current && !error && <div className="cr30-activity-modal-empty">Waiting for Paper history…</div>}
+          {!unavailable && current && (
+            <>
+              <p className="cr21-bounded" role="status">
+                Page {current.index + 1} · {current.entries.length} journal records
+                {current.capturedAt ? ` · queried ${time(current.capturedAt)}` : ""}.
+                {current.bounded && " Scan or retention limits may omit older observations."}
+                {" "}Live rows are transient until they appear in the journal.
+              </p>
+              {entries.length ? (
+                <section className="cr30-activity-modal-groups" aria-label="Paper player activity">
+                  <article className="cr30-activity-modal-group">
+                    <header><strong>Newest first</strong><span>{entries.length} shown</span></header>
+                    <div>
+                      {entries.map((item) => (
+                        <div className="cr30-activity-modal-row" key={item.eventId}>
+                          <span className="cr30-activity-initial" aria-hidden>{item.name.slice(0, 1).toUpperCase()}</span>
+                          <div className="cr30-activity-modal-identity">
+                            <strong>{item.name}</strong><small>{item.uuid}</small>
+                            {item.termination === "UNKNOWN_DISCONNECT" && <small>Disconnect time unknown</small>}
+                            {item.state === "LEFT" && item.sessionDurationMillis !== null && <small>Session {duration(item.sessionDurationMillis)}</small>}
+                          </div>
+                          <div className="cr30-activity-modal-meta">
+                            <span data-state={item.state}>{item.state === "JOINED" ? "Joined" : "Left"}</span>
+                            <small>{item.durable ? "Paper journal" : "Live · pending"}</small>
+                            <time dateTime={item.observedAt} title={item.observedAt}>{time(item.observedAt)}</time>
+                          </div>
                         </div>
-                        <div className="cr30-activity-modal-meta">
-                          <span data-state={event.state}>{event.state}</span>
-                          <time dateTime={event.observedAt}>{eventTime(event)}</time>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </article>
-              ))}
-            </section>
-          ) : (
-            <div className="cr30-activity-modal-empty">
-              {events.length ? "No activity matches the current filters." : "No stored activity yet."}
-            </div>
+                      ))}
+                    </div>
+                  </article>
+                </section>
+              ) : <div className="cr30-activity-modal-empty">No matching journal observations are retained in this bounded page.</div>}
+              <div className="cr30-activity-load-more">
+                <button type="button" disabled={busy || current.index === 0}
+                  onClick={() => void navigate(current.index - 1, cursors[current.index - 1])}>Newer page</button>
+                <button type="button" disabled={busy || !current.nextCursor || current.index >= MAX_ACTIVITY_PAGES - 1}
+                  onClick={() => void navigate(current.index + 1, current.nextCursor)}>
+                  {busy ? "Loading…" : "Older page"}
+                </button>
+              </div>
+            </>
           )}
-
-          {visibleLength < filtered.length && (
-            <div className="cr30-activity-load-more">
-              <button type="button" onClick={() => setVisibleCount((count) => count + PAGE_SIZE)}>
-                Load {Math.min(PAGE_SIZE, filtered.length - visibleLength).toLocaleString()} more
-              </button>
-              <span>
-                Showing {visibleLength.toLocaleString()} of {filtered.length.toLocaleString()} matching events
-              </span>
-            </div>
+          {unavailable && live.length > 0 && (
+            <p className="cr21-bounded">There are {live.length} recent live presence events in this tab only. They are not a historical record.</p>
           )}
         </div>
-
         <footer className="cr30-activity-modal-foot">
-          <span>
-            Retention is capped at {ACTIVITY_HISTORY_MAX_EVENTS.toLocaleString()} events per server.
-          </span>
-          <span>Stored only in this browser&apos;s LocalStorage.</span>
+          <span>Times use your device time zone. Pages contain at most {ACTIVITY_PAGE_SIZE} journal records; this view caps navigation at {MAX_ACTIVITY_PAGES} pages.</span>
+          <span>Retention and scan limits are set locally on Paper.</span>
         </footer>
       </div>
     </dialog>

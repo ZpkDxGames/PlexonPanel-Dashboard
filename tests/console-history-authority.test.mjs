@@ -43,6 +43,10 @@ test("console UI queries Host explicitly and discloses journald retention", asyn
   assert.match(view, /at most 100 lines per page/);
   assert.match(view, /does not substitute stale Paper console data/);
   assert.doesNotMatch(view, /Paper fallback/);
+  assert.match(view, /const historyKey = JSON\.stringify/);
+  assert.match(view, /Search loaded lines/);
+  assert.match(view, /result\.data\.nextCursor/);
+  assert.match(view, /Search, copy and export cover loaded visible lines only/);
 });
 
 test("relay adapters never expose Paper as console authority", async () => {

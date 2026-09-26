@@ -69,9 +69,15 @@ function consoleSourceLabel(props: ViewProps): string {
 export function ConsoleView30(props: ViewProps) {
   const [search, setSearch] = useState("");
   const [level, setLevel] = useState("ALL");
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+  const [historyRefresh, setHistoryRefresh] = useState(0);
   const [historical, setHistorical] = useState<JsonMap[]>([]);
   const [historyBusy, setHistoryBusy] = useState(false);
   const [historyHasMore, setHistoryHasMore] = useState(true);
+  const [historyCursor, setHistoryCursor] = useState("");
+  const [historyBefore, setHistoryBefore] = useState("");
+  const [historyKeyLoaded, setHistoryKeyLoaded] = useState("");
   const [historyError, setHistoryError] = useState("");
   const [historyNotice, setHistoryNotice] = useState(RETENTION_NOTICE);
   const [paused, setPaused] = useState<JsonMap[] | null>(null);
@@ -86,10 +92,25 @@ export function ConsoleView30(props: ViewProps) {
   const [historyIndex, setHistoryIndex] = useState(-1);
   const viewport = useRef<HTMLDivElement>(null);
   const previousSourceLength = useRef(0);
+  const historyGeneration = useRef(0);
+  const historyPending = useRef(false);
 
+  const paperOnline = Boolean(props.state.ready?.agents.paper);
+  const hostOnline = Boolean(props.state.ready?.agents.host);
+  const canExecute = props.can("console.execute");
+  const commandAvailable = canExecute && paperOnline;
+  const canFullHistory = props.can("console.history", "HOST");
+  const canErrorHistory = props.can("console.history.errors", "HOST");
+  const historyAction = canFullHistory
+    ? "console.history"
+    : canErrorHistory
+      ? "console.history.errors"
+      : null;
+  const sourceLabel = consoleSourceLabel(props);
+  const historyKey = JSON.stringify([props.state.serverId, props.deviceGrant?.deviceId, props.state.ready?.device.issuedAt, props.connected, hostOnline, historyAction, level, fromDate, toDate, historyRefresh]);
   const combined = useMemo(
-    () => mergeConsoleLines(historical, props.state.console),
-    [historical, props.state.console],
+    () => mergeConsoleLines(historyKeyLoaded === historyKey ? historical : [], props.state.console),
+    [historyKeyLoaded, historyKey, historical, props.state.console],
   );
   const source = paused ?? combined;
   const entries = useMemo(
@@ -104,18 +125,69 @@ export function ConsoleView30(props: ViewProps) {
         .slice(-2500),
     [source, clearAt, level, search],
   );
-  const paperOnline = Boolean(props.state.ready?.agents.paper);
-  const hostOnline = Boolean(props.state.ready?.agents.host);
-  const canExecute = props.can("console.execute");
-  const commandAvailable = canExecute && paperOnline;
-  const canFullHistory = props.can("console.history", "HOST");
-  const canErrorHistory = props.can("console.history.errors", "HOST");
-  const historyAction = canFullHistory
-    ? "console.history"
-    : canErrorHistory
-      ? "console.history.errors"
-      : null;
-  const sourceLabel = consoleSourceLabel(props);
+
+  useEffect(() => {
+    const requests = historyGeneration;
+    const token = ++requests.current;
+    historyPending.current = false;
+    if (!hostOnline || !props.connected || !historyAction) return;
+    if (historyAction === "console.history.errors" && level === "INFO") {
+      const timer = window.setTimeout(() => {
+        setHistorical([]);
+        setHistoryHasMore(false);
+        setHistoryKeyLoaded(historyKey);
+      }, 0);
+      return () => window.clearTimeout(timer);
+    }
+    const timer = window.setTimeout(async () => {
+      historyPending.current = true;
+      setHistoryBusy(true);
+      setHistoryError("");
+      try {
+        if (fromDate && toDate && fromDate > toDate)
+          throw new Error("From must be on or before To.");
+        const parameters: JsonMap = { limit: 100 };
+        if (level !== "ALL") parameters.levels = [level];
+        if (fromDate) parameters.after = new Date(`${fromDate}T00:00:00`).toISOString();
+        if (toDate) parameters.before = new Date(`${toDate}T23:59:59.999`).toISOString();
+        const result = await props.run(historyAction, parameters, "HOST");
+        if (historyGeneration.current !== token) return;
+        const lines = Array.isArray(result.data.lines)
+          ? result.data.lines.filter((line): line is JsonMap => Boolean(line && typeof line === "object" && !Array.isArray(line))).slice(0, 100)
+          : [];
+        const nextCursor = str(result.data.nextCursor, "");
+        const oldest = lines.length ? str(lines[0].capturedAt, "") : "";
+        setHistorical(lines);
+        setHistoryKeyLoaded(historyKey);
+        setHistoryCursor(nextCursor);
+        setHistoryBefore(oldest);
+        setHistoryHasMore(Boolean(result.data.hasMore && (nextCursor || oldest)));
+        setHistoryNotice(str(result.data.retentionNotice, RETENTION_NOTICE));
+      } catch (reason) {
+        if (historyGeneration.current === token) {
+          setHistorical([]);
+          setHistoryKeyLoaded(historyKey);
+          setHistoryCursor("");
+          setHistoryBefore("");
+          setHistoryHasMore(false);
+          setHistoryError(reason instanceof Error ? reason.message : "Host journal history is unavailable.");
+        }
+      } finally {
+        if (historyGeneration.current === token) {
+          historyPending.current = false;
+          setHistoryBusy(false);
+        }
+      }
+    }, 0);
+    return () => {
+      window.clearTimeout(timer);
+      requests.current++;
+      historyPending.current = false;
+    };
+    // The source key captures the server, signed connection, permission and level.
+    // props.run is deliberately read at request time; a new render must not restart the query.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [historyKey, hostOnline, props.connected, historyAction, level, fromDate, toDate]);
 
   useEffect(() => {
     const delta = Math.max(0, source.length - previousSourceLength.current);
@@ -143,41 +215,48 @@ export function ConsoleView30(props: ViewProps) {
   };
 
   const loadOlder = async () => {
-    if (!historyAction || !hostOnline || historyBusy) return;
+    if (!historyAction || !hostOnline || historyPending.current || historyKeyLoaded !== historyKey || !historyHasMore) return;
+    const token = ++historyGeneration.current;
+    historyPending.current = true;
     setHistoryBusy(true);
     setHistoryError("");
     try {
       const parameters: JsonMap = { limit: 100 };
-      const oldest = combined
-        .map((line) => str(line.capturedAt, ""))
-        .filter((value) => Number.isFinite(Date.parse(value)))
-        .sort((left, right) => Date.parse(left) - Date.parse(right))[0];
-      if (oldest) parameters.before = oldest;
+      if (historyCursor) parameters.cursor = historyCursor;
+      else if (historyBefore) parameters.before = historyBefore;
+      if (fromDate) parameters.after = new Date(`${fromDate}T00:00:00`).toISOString();
       if (
         level !== "ALL" &&
         (historyAction === "console.history" || level === "WARN" || level === "ERROR")
       )
         parameters.levels = [level];
       const result = await props.run(historyAction, parameters, "HOST");
+      if (historyGeneration.current !== token) return;
       const lines = Array.isArray(result.data.lines)
         ? result.data.lines.filter(
             (line): line is JsonMap =>
               Boolean(line && typeof line === "object" && !Array.isArray(line)),
           )
         : [];
-      setHistorical((current) => mergeConsoleLines(lines, current));
-      setHistoryHasMore(Boolean(result.data.hasMore));
+      setHistorical((current) => mergeConsoleLines(lines, current).slice(-1800));
+      const nextCursor = str(result.data.nextCursor, "");
+      const oldest = lines.length ? str(lines[0].capturedAt, "") : "";
+      setHistoryCursor(nextCursor);
+      setHistoryBefore(oldest || historyBefore);
+      setHistoryHasMore(Boolean(result.data.hasMore && (nextCursor || oldest) && historical.length + lines.length < 1800));
       setHistoryNotice(str(result.data.retentionNotice, RETENTION_NOTICE));
-      if (!lines.length)
+      if (!lines.length && !nextCursor)
         setHistoryError(
           "No older matching entries are currently retained by systemd-journald.",
         );
     } catch (error) {
-      setHistoryError(
-        error instanceof Error ? error.message : "Unable to load Host journal history.",
-      );
+      if (historyGeneration.current === token)
+        setHistoryError(error instanceof Error ? error.message : "Unable to load Host journal history.");
     } finally {
-      setHistoryBusy(false);
+      if (historyGeneration.current === token) {
+        historyPending.current = false;
+        setHistoryBusy(false);
+      }
     }
   };
 
@@ -196,7 +275,7 @@ export function ConsoleView30(props: ViewProps) {
           <input
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder="Search console output"
+            placeholder="Search loaded lines"
           />
         </label>
         <div className="cr21-segmented" aria-label="Console severity filter">
@@ -211,6 +290,8 @@ export function ConsoleView30(props: ViewProps) {
             </button>
           ))}
         </div>
+        <label>History from <input type="date" value={fromDate} onChange={(event) => setFromDate(event.target.value)} /></label>
+        <label>History to <input type="date" value={toDate} onChange={(event) => setToDate(event.target.value)} /></label>
         <button
           className="cr-button"
           onClick={() => {
@@ -222,10 +303,14 @@ export function ConsoleView30(props: ViewProps) {
         </button>
         <button
           className="cr-button"
-          disabled={!hostOnline || !historyAction || historyBusy || !historyHasMore}
+          disabled={!hostOnline || !historyAction || historyBusy || historyKeyLoaded !== historyKey || !historyHasMore}
           onClick={() => void loadOlder()}
         >
           {historyBusy ? "Loading history…" : historyHasMore ? "Load older history" : "No older history"}
+        </button>
+        <button className="cr-button" disabled={!hostOnline || !historyAction || historyBusy}
+          onClick={() => { setClearAt(0); setHistoryRefresh((value) => value + 1); }}>
+          Reload retained history
         </button>
         <details className="cr21-menu">
           <summary className="cr-button">Display</summary>
@@ -261,7 +346,9 @@ export function ConsoleView30(props: ViewProps) {
               onClick={() => {
                 setClearAt(Date.now());
                 setHistorical([]);
-                setHistoryHasMore(true);
+                setHistoryHasMore(false);
+                setHistoryCursor("");
+                setHistoryBefore("");
                 setUnseenLines(0);
               }}
             >
@@ -298,7 +385,7 @@ export function ConsoleView30(props: ViewProps) {
           </p>
         )}
         <p className="cr-hint cr-pad cr30-console-offline-note">
-          {historyNotice} Historical requests return at most 100 lines per page.
+          {historyNotice} History date and severity filters run on Host; live lines remain visible. Historical requests return at most 100 lines per page; this view holds at most 1,800 loaded history lines. Search, copy and export cover loaded visible lines only.
           {!historyAction && " This device does not have a Host console-history scope."}
         </p>
         {historyError && (

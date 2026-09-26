@@ -11,9 +11,7 @@ export interface PresenceHistoryEvent {
 
 const STORAGE_PREFIX = "plexonpanel.activity-history.v1:";
 const MAX_EVENTS = 5000;
-const MAX_SESSION_TRACKING = 32;
 const CHANGE_EVENT = "plexonpanel:activity-history-changed";
-const paperSessions = new Map<string, string>();
 
 function storage(): Storage | null {
   if (typeof window === "undefined") return null;
@@ -38,18 +36,6 @@ function object(value: unknown): Record<string, unknown> | null {
   return value !== null && typeof value === "object" && !Array.isArray(value)
     ? (value as Record<string, unknown>)
     : null;
-}
-
-function rememberPaperSession(serverId: string, session: string | null): void {
-  if (!session) {
-    paperSessions.delete(serverId);
-    return;
-  }
-  if (!paperSessions.has(serverId) && paperSessions.size >= MAX_SESSION_TRACKING) {
-    const oldest = paperSessions.keys().next().value as string | undefined;
-    if (oldest) paperSessions.delete(oldest);
-  }
-  paperSessions.set(serverId, session);
 }
 
 function normalizeEvent(value: unknown): PresenceHistoryEvent | null {
@@ -106,22 +92,8 @@ function announce(serverId: string): void {
   );
 }
 
-function write(serverId: string, events: PresenceHistoryEvent[]): void {
-  const local = storage();
-  if (!local || !serverId) return;
-  let retained = events.slice(-MAX_EVENTS);
-  while (retained.length) {
-    try {
-      local.setItem(key(serverId), JSON.stringify(retained));
-      announce(serverId);
-      return;
-    } catch {
-      if (retained.length <= 250) return;
-      retained = retained.slice(Math.ceil(retained.length * 0.25));
-    }
-  }
-}
-
+// Read-only compatibility for the unverified archive created by older dashboards.
+// These records are never sent to Paper or treated as signed observations.
 export function loadActivityHistory(serverId: string): PresenceHistoryEvent[] {
   return read(serverId);
 }
@@ -153,54 +125,6 @@ export function listActivityHistoryServers(): string[] {
     return [];
   }
   return result.sort();
-}
-
-export function capturePresenceHistoryMessage(
-  message: Record<string, unknown>,
-): void {
-  const serverId = boundedString(message.serverId, 128);
-  if (!serverId) return;
-
-  if (message.type === "dashboard.ready") {
-    if (message.protocolVersion !== 3) return;
-    const server = object(message.server);
-    rememberPaperSession(
-      serverId,
-      server ? boundedString(server.paperSession, 160) : null,
-    );
-    return;
-  }
-
-  if (
-    message.type !== "server.event" ||
-    message.eventType !== "players.presence" ||
-    message.agentKind === "HOST"
-  )
-    return;
-
-  const expectedPaperSession = paperSessions.get(serverId);
-  if (
-    expectedPaperSession &&
-    boundedString(message.agentSession, 160) !== expectedPaperSession
-  )
-    return;
-
-  const body = object(message.body);
-  if (!body) return;
-
-  const event = normalizeEvent({
-    eventId: body.eventId,
-    uuid: body.uuid,
-    name: body.name,
-    state: body.state,
-    observedAt: body.observedAt,
-    recordedAt: Date.now(),
-  });
-  if (!event) return;
-
-  const current = read(serverId);
-  if (current.some((item) => item.eventId === event.eventId)) return;
-  write(serverId, [...current, event]);
 }
 
 export function subscribeActivityHistory(

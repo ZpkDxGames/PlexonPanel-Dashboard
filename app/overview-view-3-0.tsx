@@ -295,11 +295,11 @@ export function OverviewView30(props: ViewProps) {
         <span>Paper and Host metrics remain separate authority domains.</span>
       </div>
 
-      <ActivityHistoryModal
-        serverId={state.serverId}
-        open={historyOpen}
+      {historyOpen && <ActivityHistoryModal
+        props={props}
+        open
         onClose={() => setHistoryOpen(false)}
-      />
+      />}
     </div>
   );
 }

@@ -101,19 +101,19 @@ test("Players distinguishes missing scope, local policy and older agents", () =>
         state: { ...props.state, ready },
       }),
     );
-  assert.match(render(baseReady), /device grant does not include player history/i);
+  assert.match(render(baseReady), /new immutable grant/i);
   assert.match(
     render({
       ...baseReady,
       device: { ...baseReady.device, scopes: ["players.history.view"] },
     }),
-    /disabled by local Paper policy/i,
+    /enable player-history.enabled locally/i,
   );
   const old = structuredClone(baseReady);
   old.device.scopes = ["players.history.view"];
   old.server.paperCapabilities = {};
   old.server.pluginVersion = "2.0.0";
-  assert.match(render(old), /predates the player-history capability/i);
+  assert.match(render(old), /does not advertise player history/i);
 });
 test("offline history detail is read-only and exposes no player actions", () => {
   const entry = {
