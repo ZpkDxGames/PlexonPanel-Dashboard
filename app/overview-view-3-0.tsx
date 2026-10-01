@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Badge, Empty, Panel, bytes, duration, metric, time, type ViewProps } from "./control-views";
+import { Badge, Empty, Panel, bytes, duration, time, type ViewProps } from "./control-views";
 import { diagnostics, number, str, type Sample } from "../lib/control-state";
 import { ActivityHistoryModal } from "./activity-history-modal";
 

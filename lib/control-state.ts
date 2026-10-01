@@ -16,7 +16,7 @@ export interface Ready {
   actionContract?: string;
   device: Device;
   connectionStatus?: string;
-  consoleAuthority?: "HOST" | "PAPER_FALLBACK";
+  consoleAuthority?: "HOST" | "PAPER_FALLBACK" | "UNAVAILABLE";
   consoleSourceState?: string;
   agents: { paper: boolean; host: boolean; hostInstalled: boolean };
   server: {
@@ -335,12 +335,12 @@ export function diagnostics(state: ControlState): string {
     hostCpu = number(host.hostCpuPercent),
     paperCpu = number(paper.processCpuPercent);
   return [
-    `PlexonPanel Dashboard 3.5.1 / Protocol 3`,
+    `PlexonPanel Dashboard 4.0.0 / Protocol 3`,
     `Paper agent: ${state.ready?.server.pluginVersion ?? "unknown"}`,
     `Host agent: ${state.ready?.server.hostVersion ?? "not installed"}`,
     `Paper connected: ${Boolean(state.ready?.agents.paper)}`,
     `Host connected: ${Boolean(state.ready?.agents.host)}`,
-    `Console authority: ${state.ready?.consoleAuthority ?? "PAPER_FALLBACK"}`,
+    `Console authority: ${state.ready?.consoleAuthority ?? "UNAVAILABLE"}`,
     `Console source state: ${state.ready?.consoleSourceState ?? "unknown"}`,
     `Java: ${str(paper.javaVersion)}`,
     `OS / architecture: ${str(host.operatingSystem, str(paper.operatingSystem))} / ${str(host.architecture, str(paper.architecture))}`,

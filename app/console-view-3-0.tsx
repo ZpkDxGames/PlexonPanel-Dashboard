@@ -54,6 +54,8 @@ function mergeConsoleLines(history: JsonMap[], live: JsonMap[]): JsonMap[] {
 function consoleSourceLabel(props: ViewProps): string {
   if (!props.connected) return "Reconnecting";
   const ready = props.state.ready;
+  if (ready?.consoleAuthority === "PAPER_FALLBACK") return "Paper • Live fallback";
+  if (ready?.consoleAuthority === "UNAVAILABLE") return "Console unavailable";
   if (!ready?.agents.host) return "Host offline";
   if (ready.consoleSourceState === "RECOVERING") return "Host • History replay";
   if (ready.consoleSourceState === "RESTARTING") return "Host • Reconnecting";
@@ -374,8 +376,8 @@ export function ConsoleView30(props: ViewProps) {
       >
         {!hostOnline && (
           <p className="cr-hint cr-pad cr30-console-offline-note">
-            Host Companion is offline. PlexonPanel does not substitute stale Paper console data;
-            retained history becomes available again only after Host reconnects.
+            Host Companion is offline. Live output can continue through the bounded Paper fallback
+            when it is enabled; retained history becomes available again only after Host reconnects.
           </p>
         )}
         {hostOnline && !paperOnline && (
@@ -555,9 +557,9 @@ export function ConsoleView30(props: ViewProps) {
         </Panel>
       )}
       <p className="cr-hint cr30-console-authority">
-        Output source: {sourceLabel}. Host owns console capture, replay, and retained history; Paper
-        owns command execution. Clearing the view remains browser-local and never deletes journal
-        entries.
+        Output source: {sourceLabel}. Host owns retained history and is preferred for live capture;
+        Paper owns command execution and provides only bounded, non-persistent live fallback.
+        Clearing the view remains browser-local and never deletes journal entries.
       </p>
     </div>
   );
