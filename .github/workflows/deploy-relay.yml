@@ -52,12 +52,27 @@ jobs:
       - name: Verify deployed relay identity
         shell: bash
         run: |
-          curl --fail --silent --show-error --retry 5 --retry-delay 2 \
-            "$PRODUCTION_RELAY_URL/healthz" > /tmp/plexonpanel-relay-health.json
-          jq -e --arg sha "$GITHUB_SHA" '
-            .ok == true and
-            .protocolVersion == 3 and
-            .runtimeKind == "cloudflare-worker" and
-            .gitCommit == $sha
-          ' /tmp/plexonpanel-relay-health.json >/dev/null
-          echo "Production relay reports accepted revision ${GITHUB_SHA:0:12}."
+          health_file=/tmp/plexonpanel-relay-health.json
+          for attempt in $(seq 1 15); do
+            if curl --fail --silent --show-error --retry 2 --retry-delay 1 \
+              --header "Cache-Control: no-cache" \
+              "$PRODUCTION_RELAY_URL/healthz?revision=$GITHUB_SHA&attempt=$attempt" \
+              > "$health_file" &&
+              jq -e --arg sha "$GITHUB_SHA" '
+                .ok == true and
+                .protocolVersion == 3 and
+                .runtimeKind == "cloudflare-worker" and
+                .gitCommit == $sha
+              ' "$health_file" >/dev/null; then
+              echo "Production relay reports accepted revision ${GITHUB_SHA:0:12}."
+              exit 0
+            fi
+
+            echo "Relay identity has not converged (attempt $attempt/15)."
+            sleep 2
+          done
+
+          echo "::error::Production relay did not report accepted revision ${GITHUB_SHA:0:12}."
+          jq '{ok, protocolVersion, runtimeKind, gitCommit, buildTimestamp}' \
+            "$health_file" 2>/dev/null || echo "Relay health response was not valid JSON."
+          exit 1
