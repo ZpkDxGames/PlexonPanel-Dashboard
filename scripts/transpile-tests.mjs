@@ -6,6 +6,7 @@ await mkdir(".test-dist/components", { recursive: true });
 for (const file of [
   "lib/control-state.ts",
   "lib/activity-history.ts",
+  "lib/durable-activity.ts",
   "lib/display-cadence.ts",
   "lib/device-grant.ts",
   "lib/scopes.ts",

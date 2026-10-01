@@ -238,7 +238,7 @@ export class Room {
         });
       });
     });
-    socket.onClose((_code, _reason) => {
+    socket.onClose(() => {
       if (this.dashboards.get(access.deviceId) === session) this.dashboards.delete(access.deviceId);
     });
     this.dashboardSend(session, this.ready(session));

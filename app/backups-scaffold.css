@@ -328,7 +328,7 @@
 
 .cr341-phase-list {
   display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 8px;
   padding: 16px;
 }
@@ -356,6 +356,115 @@
 .cr341-phase.active {
   color: var(--cr21-text-primary);
   background: var(--cr31-surface-card, var(--cr21-surface-1));
+}
+
+.cr35-live-progress {
+  --cr35-live-color: var(--cr21-cyan, #47c8ef);
+  display: grid;
+  gap: 14px;
+  margin: 0 16px 16px;
+  padding: 16px;
+  border: 1px solid color-mix(in srgb, var(--cr35-live-color) 40%, var(--cr21-border-soft));
+  border-radius: 15px;
+  background:
+    linear-gradient(110deg, color-mix(in srgb, var(--cr35-live-color) 9%, transparent), transparent 48%),
+    var(--cr31-surface-card, var(--cr21-surface-1));
+}
+
+.cr35-live-progress.upload { --cr35-live-color: #51d7c7; }
+.cr35-live-progress.verify { --cr35-live-color: #8ca7ff; }
+.cr35-live-progress.cleanup { --cr35-live-color: #a9d56f; }
+
+.cr35-live-progress > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.cr35-live-progress > header > div {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.cr35-live-progress > header span {
+  color: var(--cr35-live-color);
+  font-size: .62rem;
+  font-weight: 800;
+  letter-spacing: .085em;
+  text-transform: uppercase;
+}
+
+.cr35-live-progress > header strong:not(.cr35-live-progress-percent) {
+  font-size: .92rem;
+}
+
+.cr35-live-progress > header small {
+  color: var(--cr21-text-muted);
+  font-size: .69rem;
+  line-height: 1.45;
+}
+
+.cr35-live-progress-percent {
+  flex: 0 0 auto;
+  color: var(--cr21-text-primary);
+  font-size: clamp(1.35rem, 3vw, 2rem);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -.04em;
+}
+
+.cr35-live-progress-percent small {
+  margin-left: 2px;
+  color: var(--cr35-live-color) !important;
+  font-size: .72rem !important;
+}
+
+.cr35-live-progress progress {
+  width: 100%;
+  max-width: none;
+  height: 13px;
+  overflow: hidden;
+  border: 0;
+  border-radius: 999px;
+  accent-color: var(--cr35-live-color);
+  background: color-mix(in srgb, var(--cr21-text-muted) 15%, transparent);
+}
+
+.cr35-live-progress progress::-webkit-progress-bar {
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--cr21-text-muted) 15%, transparent);
+}
+
+.cr35-live-progress progress::-webkit-progress-value {
+  border-radius: 999px;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--cr35-live-color) 72%, white), var(--cr35-live-color));
+}
+
+.cr35-live-progress progress::-moz-progress-bar {
+  border-radius: 999px;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--cr35-live-color) 72%, white), var(--cr35-live-color));
+}
+
+.cr35-live-progress-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 170px), 1fr));
+  gap: 8px;
+}
+
+.cr35-live-progress-meta > span {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+  color: var(--cr21-text-muted);
+  font-size: .63rem;
+}
+
+.cr35-live-progress-meta strong {
+  color: var(--cr21-text-secondary);
+  font-size: .72rem;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
 }
 
 /* Step 8 — final manual backup control surface. */
@@ -832,5 +941,9 @@
 
   .cr-step8-modal-backdrop {
     padding: 8px;
+  }
+
+  .cr35-live-progress > header {
+    align-items: flex-start;
   }
 }

@@ -83,10 +83,12 @@ const PHASES: PhaseDefinition[] = [
   { key: "FINAL_SAVE", label: "Saving server" },
   { key: "STOPPING_SERVER", label: "Stopping Minecraft" },
   { key: "WAITING_FOR_STOP", label: "Confirming shutdown" },
-  { key: "ARCHIVING", label: "Creating backup" },
+  { key: "ARCHIVING", label: "Creating ZIP" },
+  { key: "HASHING", label: "Verifying ZIP" },
   { key: "VERIFYING_LOCAL", label: "Verifying local backup" },
   { key: "UPLOADING_REMOTE", label: "Uploading to Google Drive" },
   { key: "VERIFYING_REMOTE", label: "Verifying Google Drive backup" },
+  { key: "CLEANING_LOCAL", label: "Removing VPS ZIP" },
   { key: "STARTING_SERVER", label: "Starting Minecraft" },
   { key: "VERIFYING_STARTUP", label: "Checking readiness" },
   { key: "COMPLETED", label: "Complete" },
@@ -431,7 +433,8 @@ export function BackupsView30(props: ViewProps) {
     rawProgress && operationJobId && str(rawProgress.jobId, "") === operationJobId
       ? rawProgress
       : null;
-  const displayedPhase = str(progress?.phase, operationPhase);
+  const liveBackupProgress = operationPhase === "ARCHIVING" ? progress : null;
+  const displayedPhase = str(liveBackupProgress?.phase, operationPhase);
   const currentIndex = PHASES.findIndex((entry) => entry.key === displayedPhase);
   const service = props.state.service;
   const serviceState = str(service.state, "unknown").toLowerCase();
@@ -479,8 +482,10 @@ export function BackupsView30(props: ViewProps) {
     !recoveryRequired;
 
   const fullBackups = fullQuery.hasSuccess ? records(fullQuery.data.backups, 1000) : [];
-  const lastLocal = fullBackups.find((backup) => backup.local === true);
   const lastRemote = fullBackups.find((backup) => backup.offsite === true);
+  const lastBackup = fullBackups.find(
+    (backup) => backup.local === true || backup.offsite === true,
+  );
   const unreadable = number(preflight.data.unreadableDurableCount);
   const missingIncludes = listStrings(preflight.data.missingIncludes);
   const symlinkIssues = listStrings(preflight.data.symlinkIssues);
@@ -488,14 +493,60 @@ export function BackupsView30(props: ViewProps) {
   const countdownInitial = number(status.data.countdownInitialSeconds);
   const localVerified = operation.localBackupVerified === true;
   const remoteVerified = operation.remoteBackupVerified === true;
-  const warnings = listStrings(progress?.warnings ?? operation.warnings);
-  const progressRatio = number(progress?.progress);
+  const warnings = listStrings(liveBackupProgress?.warnings ?? operation.warnings);
+  const progressRatio = number(liveBackupProgress?.progress);
   const progressPercent =
     progressRatio !== null
       ? Math.min(100, Math.round(progressRatio * 100))
       : number(operation.progressPercent);
-  const progressBytes = progress?.bytesUploaded ?? progress?.bytes;
-  const progressTotal = progress?.totalBytes;
+  const progressBytes = liveBackupProgress?.bytesUploaded ?? liveBackupProgress?.bytes;
+  const progressTotal = liveBackupProgress?.totalBytes;
+  const progressBytesValue = number(progressBytes);
+  const progressTotalValue = number(progressTotal);
+  const progressBytesPerSecond = number(liveBackupProgress?.bytesPerSecond);
+  const liveProgressRatio =
+    progressRatio !== null
+      ? Math.max(0, Math.min(1, progressRatio))
+      : progressBytesValue !== null && progressTotalValue !== null && progressTotalValue > 0
+        ? Math.max(0, Math.min(1, progressBytesValue / progressTotalValue))
+        : null;
+  const liveProgressPercent =
+    liveProgressRatio === null ? null : Math.min(100, Math.round(liveProgressRatio * 100));
+  const progressState = str(liveBackupProgress?.providerState, "");
+  const liveProgressKind =
+    displayedPhase === "ARCHIVING" || displayedPhase === "HASHING"
+      ? "archive"
+      : displayedPhase === "UPLOADING_REMOTE"
+        ? "upload"
+        : displayedPhase === "CLEANING_LOCAL"
+          ? "cleanup"
+          : "verify";
+  const liveProgressTitle =
+    displayedPhase === "ARCHIVING"
+      ? "Creating ZIP archive"
+      : displayedPhase === "HASHING"
+        ? "Finalizing and verifying ZIP"
+        : displayedPhase === "UPLOADING_REMOTE"
+          ? "Uploading ZIP to Google Drive"
+          : displayedPhase === "VERIFYING_REMOTE"
+            ? "Verifying Google Drive copy"
+            : displayedPhase === "CLEANING_LOCAL"
+              ? "Removing temporary VPS ZIP"
+              : "Processing backup";
+  const liveProgressDetail =
+    displayedPhase === "ARCHIVING"
+      ? "Source data read and compressed by the Host"
+      : displayedPhase === "HASHING"
+        ? "ZIP write complete; checking archive integrity and SHA-256"
+        : displayedPhase === "UPLOADING_REMOTE"
+          ? "Verified ZIP bytes transferred by rclone"
+          : displayedPhase === "VERIFYING_REMOTE"
+            ? "Checking the staged object before canonical promotion"
+            : progressState === "LOCAL_RELEASED"
+              ? "Remote copy verified; temporary VPS ZIP removed"
+              : progressState === "LOCAL_RETAINED"
+                ? "Remote copy verified; VPS ZIP retained with a cleanup warning"
+                : "Remote copy verified; releasing temporary disk space";
 
   const captureFailure = (action: string, error: unknown) => {
     const data = error instanceof ActionError ? error.data : {};
@@ -784,6 +835,44 @@ export function BackupsView30(props: ViewProps) {
               );
             })}
           </div>
+          {liveBackupProgress && (
+            <section
+              className={`cr35-live-progress ${liveProgressKind}`}
+              aria-live="polite"
+              aria-label={liveProgressTitle}
+            >
+              <header>
+                <div>
+                  <span>Live Host progress</span>
+                  <strong>{liveProgressTitle}</strong>
+                  <small>{liveProgressDetail}</small>
+                </div>
+                <strong className="cr35-live-progress-percent">
+                  {liveProgressPercent === null ? "—" : liveProgressPercent}
+                  {liveProgressPercent !== null && <small>%</small>}
+                </strong>
+              </header>
+              <progress
+                max={1}
+                value={liveProgressRatio ?? undefined}
+                aria-label={`${liveProgressTitle}${liveProgressPercent === null ? "" : `: ${liveProgressPercent}%`}`}
+              />
+              <div className="cr35-live-progress-meta">
+                <span>
+                  {displayedPhase === "ARCHIVING" || displayedPhase === "HASHING"
+                    ? "Source processed"
+                    : "ZIP transferred"}
+                  <strong>{bytes(progressBytesValue)} / {bytes(progressTotalValue)}</strong>
+                </span>
+                {progressBytesPerSecond !== null && progressBytesPerSecond > 0 && (
+                  <span>Current rate<strong>{bytes(progressBytesPerSecond)}/s</strong></span>
+                )}
+                {progressState && (
+                  <span>Host state<strong>{progressState.replaceAll("_", " ").toLowerCase()}</strong></span>
+                )}
+              </div>
+            </section>
+          )}
           <dl className="cr30-provider-list">
             <div><dt>Job ID</dt><dd>{operationJobId}</dd></div>
             <div><dt>Current phase</dt><dd>{phaseLabel(displayedPhase || operationPhase)}</dd></div>
@@ -793,7 +882,7 @@ export function BackupsView30(props: ViewProps) {
             {operationPhase === "COUNTDOWN" && <div><dt>Host countdown remaining</dt><dd>{formatCountdown(countdownRemaining)}</dd></div>}
             {operationPhase === "COUNTDOWN" && <div><dt>Host countdown deadline</dt><dd>{time(status.data.countdownDeadline)}</dd></div>}
             <div><dt>Progress</dt><dd>{progressPercent === null ? "Host has not reported a percentage" : `${progressPercent}%`}</dd></div>
-            <div><dt>Transferred / archived</dt><dd>{progress ? `${bytes(progressBytes)} / ${bytes(progressTotal)}` : "No live byte counter reported for this phase"}</dd></div>
+            <div><dt>Transferred / archived</dt><dd>{liveBackupProgress ? `${bytes(progressBytes)} / ${bytes(progressTotal)}` : "No live byte counter reported for this phase"}</dd></div>
             <div><dt>Local verification</dt><dd>{localVerified ? "Verified" : operationTerminal ? "Not verified" : "Pending"}</dd></div>
             <div><dt>Remote verification</dt><dd>{remoteVerified ? "Verified" : operationPhase === "DEGRADED" ? "Not current — retryable" : operationTerminal ? "Not verified" : "Pending"}</dd></div>
             <div><dt>Result</dt><dd>{str(operation.result, operationTerminal ? operationPhase : "In progress")}</dd></div>
@@ -819,7 +908,7 @@ export function BackupsView30(props: ViewProps) {
             </div>
           )}
           <p className="cr-hint cr30-backup-preview-note">
-            This state is reconstructed from the durable Host job. Live byte progress is shown only when the event job ID matches this job; no ETA is invented.
+            This state is reconstructed from the durable Host job. ZIP and upload byte counters are shown only when a live Host event matches this job; remote verification and VPS cleanup remain separate phases, and no ETA is invented.
           </p>
         </Panel>
       )}
@@ -848,12 +937,19 @@ export function BackupsView30(props: ViewProps) {
           </div>
         </Panel>
 
-        <Panel title="Last full backup" aside={<Badge>{lastLocal ? "Available" : "None"}</Badge>}>
+        <Panel
+          title="Last full backup"
+          aside={
+            <Badge tone={lastBackup ? "green" : "quiet"}>
+              {lastBackup ? (lastBackup.offsite ? (lastBackup.local ? "VPS + Drive" : "Google Drive") : "VPS only") : "None"}
+            </Badge>
+          }
+        >
           <dl className="cr30-provider-list">
-            <div><dt>Last verified local</dt><dd>{lastLocal ? time(lastLocal.timestamp) : "—"}</dd></div>
-            <div><dt>Size</dt><dd>{lastLocal ? bytes(lastLocal.archiveBytes) : "—"}</dd></div>
-            <div><dt>Local verification</dt><dd>{lastLocal ? str(lastLocal.verification, str(lastLocal.sha256, "") ? "SHA-256" : "Unknown") : "—"}</dd></div>
-            <div><dt>Off-site</dt><dd>{lastLocal ? (lastLocal.offsite === true ? "Verified" : "Not current") : "—"}</dd></div>
+            <div><dt>Last verified</dt><dd>{lastBackup ? time(lastBackup.timestamp) : "—"}</dd></div>
+            <div><dt>Size</dt><dd>{lastBackup ? bytes(lastBackup.archiveBytes) : "—"}</dd></div>
+            <div><dt>Verification</dt><dd>{lastBackup ? str(lastBackup.verification, str(lastBackup.sha256, "") ? "SHA-256" : "Unknown") : "—"}</dd></div>
+            <div><dt>Availability</dt><dd>{lastBackup ? (lastBackup.offsite === true ? (lastBackup.local === true ? "Google Drive + VPS" : "Google Drive · VPS temporary ZIP released") : "VPS only") : "—"}</dd></div>
             <div><dt>Automatic backups</dt><dd>Retired — manual only</dd></div>
             <div><dt>Paper dependency</dt><dd>None for the backup critical path</dd></div>
           </dl>
@@ -905,12 +1001,12 @@ export function BackupsView30(props: ViewProps) {
                     <tr key={id}>
                       <td>{time(backup.timestamp)}<small>{backup.emergency ? "Emergency" : backup.automatic ? "Legacy scheduled" : "Manual"}</small></td>
                       <td>{bytes(backup.archiveBytes)}</td>
-                      <td><Badge tone={backup.local ? "green" : "quiet"}>{backup.local ? "Local" : "No local"}</Badge> <Badge tone={backup.offsite ? "green" : "quiet"}>{backup.offsite ? "Off-site" : "No off-site"}</Badge></td>
+                      <td><Badge tone={backup.local ? "green" : "quiet"}>{backup.local ? "VPS retained" : "VPS temp released"}</Badge> <Badge tone={backup.offsite ? "green" : "quiet"}>{backup.offsite ? "Google Drive" : "No off-site"}</Badge></td>
                       <td>{str(backup.verification, str(backup.sha256, "") ? "SHA-256" : "—")}<small title={str(backup.sha256, "")}>{str(backup.sha256, "").slice(0, 12)}{str(backup.sha256, "") ? "…" : ""}</small></td>
-                      <td><Badge tone={backup.result === "DEGRADED" ? "amber" : backup.errorCode ? "red" : "green"}>{str(backup.result, backup.offsite ? "Verified" : "Local")}</Badge></td>
+                      <td><Badge tone={backup.result === "DEGRADED" || backup.result === "SUCCESS_WITH_WARNING" ? "amber" : backup.errorCode ? "red" : "green"}>{str(backup.result, backup.offsite ? "Verified" : "Local")}</Badge></td>
                       <td>
                         <div className="cr-actions">
-                          {props.can("backup.full.verify", "HOST") && (
+                          {backup.local === true && props.can("backup.full.verify", "HOST") && (
                             <ActionButton onClick={async () => { await runOperation("backup.full.verify", { backupId: id }); props.notice("Backup verified."); }}>Verify</ActionButton>
                           )}
                           {backup.offsite !== true && backup.local === true && providerConfigured && props.can("backup.full.retry-upload", "HOST") && (
@@ -920,7 +1016,7 @@ export function BackupsView30(props: ViewProps) {
                             <ActionButton
                               danger
                               onClick={async () => {
-                                if (!window.confirm("Delete this local full restore-point metadata and archive?")) return;
+                                if (!window.confirm("Delete this backup history record and any retained VPS archive? The canonical Google Drive backup is not deleted.")) return;
                                 await runOperation("backup.full.delete", { backupId: id }, "preconfirmed");
                                 fullQuery.refresh();
                               }}

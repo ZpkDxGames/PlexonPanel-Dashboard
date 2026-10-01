@@ -78,6 +78,9 @@ export function PlayerHead({
     >
       <span className="cr23-player-head-fallback">{initials(name)}</span>
       {showImage && (
+        // The operator supplies one validated HTTPS template at runtime, so a static next/image
+        // remotePatterns allowlist cannot represent this intentionally constrained provider.
+        // eslint-disable-next-line @next/next/no-img-element
         <img
           src={url ?? undefined}
           alt=""

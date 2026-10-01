@@ -64,7 +64,8 @@ function useMobileLayout() {
   return mobile;
 }
 
-export function PlayersView21(props: ViewProps) {
+export function PlayersView21(props: ViewProps & { showHistoryTab?: boolean }) {
+  const showHistoryTab = props.showHistoryTab !== false;
   const { preferences } = useUiPreferences();
   const mobile = useMobileLayout();
   const useCards = mobile && preferences.mobilePlayerRows === "cards";
@@ -97,7 +98,7 @@ export function PlayersView21(props: ViewProps) {
   );
   const historyCapability = ready?.server.paperCapabilities["players.history.view"] === true;
   const paperOnline = Boolean(ready?.agents.paper);
-  const historyTabAvailable = historyScope && historyCapability;
+  const historyTabAvailable = showHistoryTab && historyScope && historyCapability;
 
   useEffect(() => {
     const refreshTimer = window.setTimeout(() => setPresenceNow(Date.now()), 0);
@@ -190,7 +191,7 @@ export function PlayersView21(props: ViewProps) {
 
   return (
     <>
-      <div className="cr-tabs cr21-player-tabs" aria-label="Player views">
+      {showHistoryTab && <div className="cr-tabs cr21-player-tabs" aria-label="Player views">
         <button aria-pressed={tab === "online"} onClick={() => setTab("online")}>Online</button>
         {historyTabAvailable && (
           <button
@@ -203,7 +204,7 @@ export function PlayersView21(props: ViewProps) {
             History
           </button>
         )}
-      </div>
+      </div>}
 
       {tab === "online" || !historyTabAvailable ? (
         <>
@@ -290,7 +291,7 @@ export function PlayersView21(props: ViewProps) {
             )}
           </Panel>
 
-          {historyUnavailable && <Panel title="Player history"><p className="cr-hint cr-pad">{historyUnavailable}</p></Panel>}
+          {showHistoryTab && historyUnavailable && <Panel title="Player history"><p className="cr-hint cr-pad">{historyUnavailable}</p></Panel>}
         </>
       ) : (
         <>

@@ -41,19 +41,24 @@ test("console UI queries Host explicitly and discloses journald retention", asyn
   assert.match(view, /Load older history/);
   assert.match(view, /systemd-journald/);
   assert.match(view, /at most 100 lines per page/);
-  assert.match(view, /does not substitute stale Paper console data/);
-  assert.doesNotMatch(view, /Paper fallback/);
+  assert.match(view, /bounded Paper fallback/);
+  assert.match(view, /retained history becomes available again only after Host reconnects/);
+  assert.match(view, /const historyKey = JSON\.stringify/);
+  assert.match(view, /Search loaded lines/);
+  assert.match(view, /result\.data\.nextCursor/);
+  assert.match(view, /Search, copy and export cover loaded visible lines only/);
 });
 
-test("relay adapters never expose Paper as console authority", async () => {
+test("relay adapters expose explicit Host, Paper fallback, and unavailable authority states", async () => {
   for (const path of [
     "relay/src/index.ts",
     "relay/src/standalone/room-manager.ts",
   ]) {
     const runtime = await source(path);
-    assert.match(runtime, /consoleAuthority: "HOST"/);
+    assert.match(runtime, /hostAuthoritative/);
     assert.match(runtime, /HOST_OFFLINE/);
-    assert.doesNotMatch(runtime, /PAPER_FALLBACK/);
-    assert.doesNotMatch(runtime, /console\.authority/);
+    assert.match(runtime, /PAPER_FALLBACK/);
+    assert.match(runtime, /UNAVAILABLE/);
+    assert.match(runtime, /console\.authority/);
   }
 });

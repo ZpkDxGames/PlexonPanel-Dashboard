@@ -1,22 +1,22 @@
-# PlexonPanel Dashboard 3.5.0 — Backup Control Room
+# PlexonPanel Dashboard 4.0.0 — Live Backup Progress
 
-PlexonPanel Dashboard is a responsive Next.js/Vercel control room for signed Protocol 3 PlexonPanel Paper and Host agents. Dashboard 3.5.0 preserves existing identity, pairing, immutable device grants, local Paper/Host policy authority, confirmation rules, and `/v1` transport while improving the Host-owned backup and restart experience.
+PlexonPanel Dashboard is a responsive Next.js/Vercel control room for signed Protocol 3 PlexonPanel Paper and Host agents. Dashboard 4.0.0 preserves existing identity, pairing, immutable device grants, local Paper/Host policy authority, confirmation rules, and `/v1` transport while adding truthful live ZIP/upload progress and verified local cleanup.
 
-## Control Room 3.5.0
+## Control Room 4.0.0
 
 Active pages include Overview, Performance, Players, Console, Chat, Plugins, Server, Backups, Audit, Access, and Settings. Files remain a dormant backend-compatible surface rather than a first-class page.
 
-Paper and Host remain independent authority domains. Paper owns Paper/JVM/player/plugin state, chat, pairing/device synchronization, and remote console command execution. Host owns Linux machine telemetry, systemd lifecycle, Host files/manual backups/maintenance, the durable authorization mirror, and the authoritative read-only server console stream/history through its locally configured journald source.
+Paper and Host remain independent authority domains. Paper owns Paper/JVM/player/plugin state, chat, pairing/device synchronization, remote console command execution, and the optional live-only console fallback. Host owns Linux machine telemetry, systemd lifecycle, Host files/manual backups/maintenance, the durable authorization mirror, and retained server console history through its locally configured journald source.
 
 Host CPU is always machine-wide Host CPU. Paper process CPU remains a separate JVM/process metric. The UI does not substitute one for the other.
 
-## Host-authoritative console
+## Host-preferred console and Paper fallback
 
 PlexonPanel publishes the real configured Minecraft systemd-unit journald stream from the Host Companion.
 
-- The Host Companion is the sole authority for live console capture, replay, invocation boundaries, and retained history.
-- Host source health is reported separately; an offline or degraded Host does not transfer console authority to Paper.
-- Paper no longer tails `latest.log` as a fallback console producer.
+- The Host Companion is preferred for live capture and is the sole authority for replay, invocation boundaries, and retained history.
+- Host source health is reported separately. When it is offline or degraded, a locally enabled Paper agent can publish bounded, redacted, live-only `latest.log` lines.
+- Relay-signed `console.authority` transitions suppress Paper output while Host is healthy; the ready state is explicitly `HOST`, `PAPER_FALLBACK`, or `UNAVAILABLE`.
 - `console.execute` remains Paper-only in both Worker and standalone relay runtimes.
 - Host output and retained history can remain available while Paper is offline; command entry remains unavailable until Paper reconnects.
 - Existing device scopes continue to control full/error-only console visibility.
@@ -35,7 +35,7 @@ The canonical repository contains both relay runtimes.
 - Cloudflare Worker remains supported through `relay/wrangler.jsonc`.
 - Standalone Node relay includes loopback-first configuration, bounded coordination persistence, service/env examples, packaging and smoke validation.
 - The accepted pre-3.4 Worker and standalone relay cores are kept as explicit core source units; authority adapters add Host console and maintenance handling without rewriting unrelated pairing/access behavior.
-- Both runtimes enforce the same scopes, Host source validation, ready-state authority metadata, replay/signature protections, Host-only console viewing/history, and Paper-only command routing.
+- Both runtimes enforce the same scopes, Host source validation, explicit source transitions, replay/signature protections, Host-only retained history, and Paper-only command routing.
 
 See [standalone relay migration](docs/STANDALONE_RELAY_MIGRATION.md) and [3.4.0 console release notes](RELEASE_NOTES_3.4.0.md).
 
@@ -73,7 +73,7 @@ The Dashboard automatically presents Host preflight and blocks the action when t
 
 Recovery acknowledgement uses the independent Host maintenance-status command-channel signal. A failed provider, storage, or source preflight therefore cannot falsely mark RCON as unconfigured or prevent an otherwise verified recovery acknowledgement.
 
-The backup job is durable on the Host. Closing, refreshing or reconnecting the browser does not cancel it; the Backups workspace reconstructs the current operation through Host status and displays Host-owned countdown fields. Live archive/upload progress is accepted only when its job ID matches the current durable job.
+The backup job is durable on the Host. Closing, refreshing or reconnecting the browser does not cancel it; the Backups workspace reconstructs the current operation through Host status and displays Host-owned countdown fields. Live archive/upload progress is accepted only when its job ID matches the current durable job. The active-operation card shows full-width source-compression and rclone-transfer progress, exact byte counters, current upload rate, remote verification, and the separate VPS ZIP cleanup phase.
 
 If a verified local backup survives a bounded Google Drive failure, Minecraft availability is restored and the operation can become degraded/retryable. **Retry Upload** reuses the local archive without another Minecraft shutdown. Provider connectivity-test time and successful remote-backup verification time remain visibly distinct.
 
@@ -120,8 +120,8 @@ Never place access tokens, relay signing keys, Paper/Host private keys, pairing 
 
 ## Compatibility and deployment
 
-Dashboard 3.5.0 remains on signed Protocol 3 and `/v1`. Existing credentials do not gain scopes automatically, and the release does not require a Protocol 4 migration or identity reset. A browser paired before its role received a newly introduced scope, such as `maintenance.run`, must be re-paired with that role before it can use the new operation. The Dashboard reads the verified token grant from `/v1/dashboard/session` and intersects it with relay-reported device scopes, so stale browser or device metadata cannot make an unavailable control appear ready.
+Dashboard 4.0.0 remains on signed Protocol 3 and `/v1`. Existing credentials do not gain scopes automatically, and the release does not require a Protocol 4 migration or identity reset. A browser paired before its role received a newly introduced scope, such as `maintenance.run`, must be re-paired with that role before it can use the new operation. The Dashboard reads the verified token grant from `/v1/dashboard/session` and intersects it with relay-reported device scopes, so stale browser or device metadata cannot make an unavailable control appear ready.
 
 A passing repository CI run and Vercel preview are required source/presentation evidence but are not live PlexonCraft certification. Runtime acceptance still includes real Host journald readability, Paper-stopped history browsing, startup/shutdown capture, Host restart/cursor recovery, systemd/RCON/rclone readiness, a real **Fully Backup Now** operation, browser reconnect during that operation, and controlled degraded/retry behavior. A gate that was not actually executed must not be reported as passed.
 
-Read [3.5.0 release notes](RELEASE_NOTES_3.5.0.md), [Step 8 backup release notes](RELEASE_NOTES_BACKUPS_MAINTENANCE.md), [protocol](docs/PROTOCOL.md), [architecture](docs/ARCHITECTURE.md), [operations](docs/OPERATIONS.md), [security](docs/SECURITY.md), [deployment](docs/VERCEL_DEPLOYMENT.md), and [validation](docs/VALIDATION.md).
+Read [4.0.0 release notes](RELEASE_NOTES_4.0.0.md), [Step 8 backup release notes](RELEASE_NOTES_BACKUPS_MAINTENANCE.md), [protocol](docs/PROTOCOL.md), [architecture](docs/ARCHITECTURE.md), [operations](docs/OPERATIONS.md), [security](docs/SECURITY.md), [deployment](docs/VERCEL_DEPLOYMENT.md), and [validation](docs/VALIDATION.md).

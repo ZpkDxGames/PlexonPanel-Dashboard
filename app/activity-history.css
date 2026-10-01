@@ -173,6 +173,26 @@ dialog.cr30-activity-dialog::backdrop {
   padding: 0 11px;
 }
 
+.cr30-activity-modal-controls label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--cr21-muted, #8fa4b8);
+  font-size: .72rem;
+}
+
+.cr30-activity-initial {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  border-radius: 9px;
+  background: rgba(95, 219, 242, .09);
+  color: var(--cr21-accent, #72e5f5);
+  font-weight: 750;
+}
+
 .cr30-activity-modal-controls select option {
   background: var(--cr21-bg, #07101a);
   color: var(--cr21-text, #e8f6f7);
@@ -312,6 +332,20 @@ dialog.cr30-activity-dialog::backdrop {
   color: var(--cr21-muted, #8fa4b8);
   font-size: .68rem;
   font-variant-numeric: tabular-nums;
+}
+
+.cr30-activity-modal-meta small {
+  color: var(--cr21-muted, #8fa4b8);
+  font-size: .65rem;
+}
+
+@media (max-width: 640px) {
+  .cr30-activity-modal-controls { grid-template-columns: 1fr 1fr; }
+  .cr30-activity-modal-controls > input { grid-column: 1 / -1; }
+  .cr30-activity-modal-controls label { min-width: 0; }
+  .cr30-activity-modal-controls label input { min-width: 0; width: 100%; }
+  .cr30-activity-modal-row { grid-template-columns: auto minmax(0, 1fr); }
+  .cr30-activity-modal-meta { grid-column: 2; justify-content: flex-start; flex-wrap: wrap; }
 }
 
 .cr30-activity-modal-empty {

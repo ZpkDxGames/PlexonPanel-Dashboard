@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Badge, Empty, Panel, bytes, duration, metric, time, type ViewProps } from "./control-views";
+import { Badge, Empty, Panel, bytes, duration, time, type ViewProps } from "./control-views";
 import { diagnostics, number, str, type Sample } from "../lib/control-state";
 import { ActivityHistoryModal } from "./activity-history-modal";
 
@@ -295,11 +295,11 @@ export function OverviewView30(props: ViewProps) {
         <span>Paper and Host metrics remain separate authority domains.</span>
       </div>
 
-      <ActivityHistoryModal
-        serverId={state.serverId}
-        open={historyOpen}
+      {historyOpen && <ActivityHistoryModal
+        props={props}
+        open
         onClose={() => setHistoryOpen(false)}
-      />
+      />}
     </div>
   );
 }

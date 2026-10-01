@@ -123,10 +123,11 @@ export default function ActivityPage() {
         <header className={styles.header}>
           <div>
             <span className={styles.eyebrow}>Control Room / Activity</span>
-            <h1>Player activity history</h1>
+            <h1>Legacy browser activity archive</h1>
             <p>
-              Join and leave events are stored only in this browser&apos;s LocalStorage.
-              The dashboard does not request additional plugin telemetry for this page.
+              These older, browser-captured entries are partial and unverified. They are not
+              Paper&apos;s retained journal and are never uploaded or merged into trusted history.
+              Open Players in the dashboard to query Paper when its local journal is enabled.
             </p>
           </div>
           <Link className={styles.back} href="/">
@@ -209,14 +210,14 @@ export default function ActivityPage() {
                 clearActivityHistory(serverId);
             }}
           >
-            Clear history
+            Clear legacy archive
           </button>
         </section>
 
         {!serverId ? (
           <div className={styles.empty}>
-            No stored server activity was found in this browser yet. Open the dashboard and
-            receive a player join or leave event first.
+            This browser has no legacy activity archive. Use Players in the dashboard for
+            Paper-owned history.
           </div>
         ) : groups.length ? (
           <section className={styles.groups} aria-label="Stored player activity">
@@ -256,9 +257,9 @@ export default function ActivityPage() {
         )}
 
         <p className={styles.note}>
-          Retention is capped at {ACTIVITY_HISTORY_MAX_EVENTS.toLocaleString()} events per server
-          to keep browser storage bounded. Clearing site data, using a different browser profile,
-          or using another device will not carry this history over.
+          Older dashboards kept at most {ACTIVITY_HISTORY_MAX_EVENTS.toLocaleString()} events per server
+          here. This archive no longer receives new events. Clearing site data removes it;
+          other browsers do not share it.
         </p>
       </div>
     </main>

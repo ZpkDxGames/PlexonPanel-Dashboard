@@ -64,12 +64,47 @@ function asInternals(room: CoreServerRoom): RoomInternals {
   return room as unknown as RoomInternals;
 }
 
-function hostConsoleState(room: RoomInternals): string {
+function hostSession(room: RoomInternals): AgentAttachment | null {
   const socket = room.agents("HOST")[0];
-  if (!socket) return "HOST_OFFLINE";
-  const host = socket.deserializeAttachment() as AgentAttachment;
+  return socket ? (socket.deserializeAttachment() as AgentAttachment) : null;
+}
+
+function hostConsoleAuthoritative(room: RoomInternals, metadata: RoomMetadataLike): boolean {
+  const host = hostSession(room);
+  const capabilities = metadata.hostIdentity?.capabilities ?? {};
+  return Boolean(
+    host?.authenticated &&
+      host.consoleHealthy === true &&
+      (capabilities["console.view.full"] === true ||
+        capabilities["console.view.errors"] === true),
+  );
+}
+
+function paperFallbackAvailable(room: RoomInternals, metadata: RoomMetadataLike): boolean {
+  const capabilities = metadata.identity?.capabilities ?? {};
+  return Boolean(
+    room.agents("PAPER").length > 0 &&
+      (capabilities["console.view.full"] === true ||
+        capabilities["console.view.errors"] === true),
+  );
+}
+
+function hostConsoleState(room: RoomInternals): string {
+  const host = hostSession(room);
+  if (!host) return "HOST_OFFLINE";
   if (!host.authenticated) return "HOST_OFFLINE";
   return host.consoleSourceState ?? "STARTING";
+}
+
+async function announceConsoleAuthority(
+  room: RoomInternals,
+  metadata: RoomMetadataLike,
+): Promise<void> {
+  await room.sendToAgent("PAPER", "console.authority", {
+    hostAuthoritative: hostConsoleAuthoritative(room, metadata),
+    source: "HOST_JOURNAL",
+    state: hostConsoleState(room),
+  });
 }
 
 function boundedText(value: unknown, maximum: number): string | null {
@@ -147,6 +182,7 @@ async function processHostConsole(
     attachment.consoleSourceState = state;
     socket.serializeAttachment(attachment);
     await room.broadcastReady(metadata);
+    await announceConsoleAuthority(room, metadata);
     return;
   }
 
@@ -163,6 +199,7 @@ async function processHostConsole(
     metadata.hostIdentity?.capabilities["console.view.full"] === true ||
     metadata.hostIdentity?.capabilities["console.view.errors"] === true;
   if (!hostCanView) throw new Error("Event not allowed while host console capability is disabled");
+  if (!hostConsoleAuthoritative(room, metadata)) return;
 
   for (const peer of room.state.getWebSockets("dashboard")) {
     const dashboard = peer.deserializeAttachment() as AgentAttachment;
@@ -199,7 +236,7 @@ const coreDisconnected = corePrototype.disconnected;
 
 export class ServerRoom extends CoreServerRoom {}
 // The v2 Durable Object migration preserves each room's SQLite storage while
-// forcing active production rooms onto the accepted 3.5.0 action contract.
+// preserving the v3 Durable Object class while enforcing the accepted 4.0 action contract.
 export class ServerRoomV350 extends ServerRoom {}
 
 const adapterPrototype = ServerRoom.prototype as unknown as CorePrototype;
@@ -224,6 +261,10 @@ adapterPrototype.agentMessage = async function (
     return;
   }
   await coreAgentMessage.call(this, socket, attachment, text);
+  if (type === "agent.challenge_response" && attachment.kind === "PAPER" && attachment.authenticated) {
+    const room = asInternals(this);
+    await announceConsoleAuthority(room, await room.metadata());
+  }
 };
 
 adapterPrototype.dashboardMessage = async function (
@@ -263,11 +304,20 @@ adapterPrototype.ready = function (
   attachment,
 ): Record<string, unknown> {
   const room = asInternals(this);
+  const hostAuthoritative = hostConsoleAuthoritative(room, metadata);
   return {
     ...coreReady.call(this, metadata, attachment),
     version: RELAY_VERSION,
-    consoleAuthority: "HOST",
-    consoleSourceState: hostConsoleState(room),
+    consoleAuthority: hostAuthoritative
+      ? "HOST"
+      : paperFallbackAvailable(room, metadata)
+        ? "PAPER_FALLBACK"
+        : "UNAVAILABLE",
+    consoleSourceState: hostAuthoritative
+      ? hostConsoleState(room)
+      : paperFallbackAvailable(room, metadata)
+        ? "PAPER_FALLBACK_ACTIVE"
+        : hostConsoleState(room),
   };
 };
 
@@ -275,7 +325,12 @@ adapterPrototype.disconnected = async function (
   this: CoreServerRoom,
   socket,
 ): Promise<void> {
+  const attachment = socket.deserializeAttachment() as AgentAttachment;
   await coreDisconnected.call(this, socket);
+  if (attachment.kind === "HOST") {
+    const room = asInternals(this);
+    await announceConsoleAuthority(room, await room.metadata());
+  }
 };
 
 type WorkerEnv = Parameters<typeof coreWorker.fetch>[1] & RelayBuildEnvironment;

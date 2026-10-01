@@ -4,6 +4,12 @@ import { useEffect, useState } from "react";
 import { loadControlPlaneBuilds, type ControlPlaneBuilds } from "../lib/build-identity";
 import { Badge, Panel } from "./control-views";
 
+const BUILD_TIME_FORMAT = new Intl.DateTimeFormat("en-GB", {
+  dateStyle: "medium",
+  timeStyle: "short",
+  timeZone: "UTC",
+});
+
 function shortCommit(value: string | undefined): string {
   return value && /^[0-9a-f]{7,64}$/i.test(value) ? value.slice(0, 12) : "Unavailable";
 }
@@ -12,6 +18,11 @@ function shortContract(value: string | undefined): string {
   return value && /^sha256:[0-9a-f]{64}$/.test(value)
     ? value.slice(7, 19)
     : "Unavailable";
+}
+
+function buildTime(value: string | undefined): string {
+  if (!value || !Number.isFinite(Date.parse(value))) return "Unavailable";
+  return `${BUILD_TIME_FORMAT.format(new Date(value))} UTC`;
 }
 
 export function ControlPlaneBuildPanel({
@@ -38,8 +49,12 @@ export function ControlPlaneBuildPanel({
   return (
     <Panel title="Control plane builds" aside={<Badge tone={tone}>{label}</Badge>}>
       <dl className="cr-details cr-pad">
+        <div><dt>Dashboard version</dt><dd>{builds?.dashboard?.version ?? "Unavailable"}</dd></div>
         <div><dt>Dashboard build</dt><dd>{shortCommit(builds?.dashboard?.gitCommit)}</dd></div>
+        <div><dt>Dashboard built</dt><dd>{buildTime(builds?.dashboard?.buildTimestamp)}</dd></div>
+        <div><dt>Relay version</dt><dd>{builds?.relay?.version ?? "Unavailable"}</dd></div>
         <div><dt>Relay build</dt><dd>{shortCommit(builds?.relay?.gitCommit)}</dd></div>
+        <div><dt>Relay built</dt><dd>{buildTime(builds?.relay?.buildTimestamp)}</dd></div>
         <div><dt>Relay runtime</dt><dd>{builds?.relay?.runtimeKind ?? "Unavailable"}</dd></div>
         <div><dt>Action contract</dt><dd>{shortContract(builds?.relay?.actionContract)}</dd></div>
         <div><dt>Paper build</dt><dd>{paperVersion ?? "Unavailable"}</dd></div>

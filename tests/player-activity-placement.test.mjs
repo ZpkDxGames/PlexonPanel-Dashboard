@@ -14,8 +14,7 @@ test("recent player activity is presented by the Players workspace", async () =>
     true,
   );
   assert.equal(players.includes('title="Recent player activity"'), true);
-  assert.equal(players.includes("loadActivityHistory"), true);
-  assert.equal(players.includes("subscribeActivityHistory"), true);
+  assert.equal(players.includes("liveActivity"), true);
   assert.equal(players.includes("ActivityHistoryModal"), true);
   assert.equal(players.includes("Browse activity history"), true);
 });
@@ -27,11 +26,11 @@ test("Overview activity card is visually removed after the transfer", async () =
   assert.equal(css.includes(".cr31-player-activity-panel"), true);
 });
 
-test("browser-local activity does not replace Paper-owned persistent history", async () => {
+test("the 3.x Activity modal queries Paper and suppresses the duplicate History tab", async () => {
   const players30 = await source("app/players-view-3-0.tsx");
-  const players23 = await source("app/players-view-2-3.tsx");
-  assert.equal(players30.includes('players.history.list'), false);
-  assert.equal(players30.includes("Persistent Paper history"), true);
-  assert.equal(players23.includes('sendDashboardAction("players.history.list"'), true);
-  assert.equal(players23.includes('setTab("history")'), true);
+  const modal = await source("app/activity-history-modal.tsx");
+  assert.equal(players30.includes("showHistoryTab={false}"), true);
+  assert.equal(modal.includes('"players.history.list"'), true);
+  assert.equal(modal.includes('"PAPER"'), true);
+  assert.equal(modal.includes("loadActivityHistory"), false);
 });

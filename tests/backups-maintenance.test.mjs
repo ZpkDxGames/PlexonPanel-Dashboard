@@ -80,9 +80,11 @@ test("durable Host job reconstructs the active timeline after refresh", async ()
     "STOPPING_SERVER",
     "WAITING_FOR_STOP",
     "ARCHIVING",
+    "HASHING",
     "VERIFYING_LOCAL",
     "UPLOADING_REMOTE",
     "VERIFYING_REMOTE",
+    "CLEANING_LOCAL",
     "STARTING_SERVER",
     "VERIFYING_STARTUP",
     "COMPLETED",
@@ -92,8 +94,10 @@ test("durable Host job reconstructs the active timeline after refresh", async ()
     "Player warning countdown",
     "Saving server",
     "Confirming shutdown",
-    "Creating backup",
+    "Creating ZIP",
+    "Verifying ZIP",
     "Uploading to Google Drive",
+    "Removing VPS ZIP",
     "Checking readiness",
   ]) assert.equal(view.includes(label), true, `missing human phase label ${label}`);
 });
@@ -102,6 +106,7 @@ test("truthful progress and verification details do not invent an ETA", async ()
   const view = await source(BACKUPS_VIEW);
   for (const marker of [
     "bytesUploaded",
+    "bytesPerSecond",
     "totalBytes",
     "progressPercent",
     "localBackupVerified",
@@ -109,6 +114,10 @@ test("truthful progress and verification details do not invent an ETA", async ()
     "Error code",
     "Safe message",
     "No live byte counter reported for this phase",
+    "Creating ZIP archive",
+    "Uploading ZIP to Google Drive",
+    "Removing temporary VPS ZIP",
+    "<progress",
     "no ETA is invented",
   ]) assert.equal(view.includes(marker), true, `progress marker missing ${marker}`);
 });
@@ -160,6 +169,8 @@ test("stable backup history exposes read-only-safe Host operations", async () =>
   assert.equal(view.includes('"backup.full.restore"'), false);
   assert.equal(view.includes("Direct server-tree restore is intentionally excluded"), true);
   assert.equal(view.includes("Minecraft tree read-only"), true);
+  assert.equal(view.includes("VPS temp released"), true);
+  assert.equal(view.includes("Google Drive · VPS temporary ZIP released"), true);
 });
 
 test("safe failures remain structured and browser boundary retains provider secrecy", async () => {
@@ -211,6 +222,7 @@ test("responsive Step 8 backup layout avoids global scaling and styles the confi
     ".cr35-backup-hero",
     ".cr35-countdown-grid",
     ".cr35-countdown-option",
+    ".cr35-live-progress",
     ".cr35-weekday-picker",
   ]) assert.equal(css.includes(selector), true, `missing responsive selector ${selector}`);
   assert.equal(css.includes("@container workspace (max-width: 820px)"), true);

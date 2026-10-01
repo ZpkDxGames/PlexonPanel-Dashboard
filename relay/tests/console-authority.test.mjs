@@ -39,7 +39,7 @@ test("history actions preserve existing console scopes without adding privilege"
   assert.equal(ACTION_SCOPES["console.history.errors"], "console.view.errors");
 });
 
-test("Worker and standalone declare Host as sole console authority and Paper-only execution", async () => {
+test("Worker and standalone prefer Host with explicit Paper fallback and Paper-only execution", async () => {
   const worker = await source("relay/src/index.ts");
   const standalone = await source("relay/src/standalone/room-manager.ts");
   for (const runtime of [worker, standalone]) {
@@ -49,9 +49,11 @@ test("Worker and standalone declare Host as sole console authority and Paper-onl
     assert.match(runtime, /console\.view\.full/);
     assert.match(runtime, /console\.execute/);
     assert.match(runtime, /agentKind === "HOST"/);
-    assert.match(runtime, /consoleAuthority: "HOST"/);
-    assert.doesNotMatch(runtime, /PAPER_FALLBACK/);
-    assert.match(runtime, /3\.4\.0|RELAY_VERSION/);
+    assert.match(runtime, /PAPER_FALLBACK/);
+    assert.match(runtime, /UNAVAILABLE/);
+    assert.match(runtime, /console\.authority/);
+    assert.match(runtime, /hostAuthoritative/);
+    assert.match(runtime, /RELAY_VERSION/);
   }
 });
 
