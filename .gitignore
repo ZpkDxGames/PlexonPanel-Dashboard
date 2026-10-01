@@ -42,3 +42,4 @@ Thumbs.db
 .wrangler/
 relay/.wrangler/
 relay/.test-dist/
+artifacts/
