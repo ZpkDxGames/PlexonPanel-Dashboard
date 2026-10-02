@@ -9,9 +9,9 @@
     "dev": "node scripts/dev.mjs",
     "scopes:generate": "node scripts/generate-scope-contract.mjs",
     "scopes:check": "node scripts/generate-scope-contract.mjs --check",
-    "build": "npm run scopes:generate && next build",
+    "build": "npm run scopes:generate && npm run fleet:generate && next build",
     "start": "next start",
-    "relay:prepare": "npm run scopes:generate",
+    "relay:prepare": "npm run scopes:generate && npm run fleet:generate",
     "relay:build": "npm run relay:prepare && tsc -p relay/tsconfig.json",
     "relay:keygen": "node relay/scripts/generate-secrets.mjs",
     "relay:dev": "npm run relay:worker:dev",
@@ -27,9 +27,11 @@
     "env:vercel": "node scripts/create-vercel-env.mjs",
     "test": "node scripts/transpile-tests.mjs && node scripts/build-test.mjs && node --test --test-concurrency=1 tests/*.test.mjs",
     "lint": "eslint . --ignore-pattern .next --ignore-pattern node_modules --ignore-pattern artifacts",
-    "check": "npm run scopes:check && npm run lint && npm run typecheck && npm run relay:test && npm test",
+    "check": "npm run scopes:check && npm run fleet:check && npm run lint && npm run typecheck && npm run relay:test && npm test",
     "typecheck": "tsc --noEmit && npm run relay:build",
-    "relay:smoke": "npm run relay:build && node scripts/relay-smoke.mjs"
+    "relay:smoke": "npm run relay:build && node scripts/relay-smoke.mjs",
+    "fleet:generate": "node scripts/generate-fleet-contract.mjs",
+    "fleet:check": "node scripts/generate-fleet-contract.mjs --check"
   },
   "dependencies": {
     "next": "16.3.8",

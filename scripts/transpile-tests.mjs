@@ -10,6 +10,7 @@ for (const file of [
   "lib/display-cadence.ts",
   "lib/device-grant.ts",
   "lib/scopes.ts",
+  "lib/fleet-contract.ts",
   "lib/data-source.ts",
   "lib/browser-store.ts",
   "lib/lifecycle-state.ts",
