@@ -1,3 +1,5 @@
+import { fleetFromHello, assertFleetAssociation, fleetReadyFields, assertNodeTelemetry } from "./fleet-association.js";
+import type { FleetIdentity } from "./fleet-contract.js";
 import {
   MAX_ENVELOPE_BYTES,
   assertFreshEnvelope,
@@ -35,6 +37,7 @@ interface Env {
 }
 type AgentKind = "PAPER" | "HOST";
 interface AgentIdentity {
+  fleet?: FleetIdentity;
   publicKey: string;
   fingerprint: string;
   pluginVersion: string;
@@ -776,7 +779,9 @@ export class ServerRoom {
         throw new Error("Host identity is not locally attached");
       if (a.kind === "PAPER" && m.identity && m.identity.publicKey !== key)
         throw new Error("Room is already bound");
-      a.candidate = identityFromHello(body, key, fingerprint);
+      a.candidate = identityFromHello(body, key, fingerprint, a.serverId);
+      assertFleetAssociation(a.candidate, a.kind === "PAPER" ? m.identity : m.hostIdentity,
+          a.kind === "PAPER" ? m.hostIdentity : m.identity);
       a.publicKey = key;
       a.fingerprint = fingerprint;
       a.challenge = randomToken(32);
@@ -823,6 +828,10 @@ export class ServerRoom {
       )
         throw new Error("Challenge rejected");
       if (!a.candidate) throw new Error("Missing candidate identity");
+      assertFleetAssociation(a.candidate, a.kind === "PAPER" ? m.identity : m.hostIdentity,
+          a.kind === "PAPER" ? m.hostIdentity : m.identity);
+      if (a.candidate.fleet && this.agents(a.kind).some((other) => other !== socket))
+        throw new Error("Duplicate fleet agent session denied");
       if (a.kind === "PAPER") m.identity = a.candidate;
       else m.hostIdentity = a.candidate;
       await this.state.storage.put(METADATA_KEY, m);
@@ -867,6 +876,8 @@ export class ServerRoom {
       return;
     }
     if (!a.authenticated) throw new Error("Agent authentication required");
+    if (envelope.type === "telemetry.system")
+      assertNodeTelemetry(a.kind === "PAPER" ? m.identity : m.hostIdentity, body);
     if (a.kind === "HOST" && a.publicKey !== m.identity?.hostPublicKey)
       throw new Error("Host authorization changed");
     if (envelope.type === "agent.pairing_begin") {
@@ -1429,6 +1440,7 @@ export class ServerRoom {
       },
       device: m.devices.find((d) => d.deviceId === a.deviceId),
       server: {
+        ...fleetReadyFields(m.identity, m.hostIdentity),
         serverId: a.serverId,
         fingerprint: m.identity?.fingerprint ?? "",
         pluginVersion: m.identity?.pluginVersion ?? "",
@@ -1824,8 +1836,11 @@ function identityFromHello(
   body: Record<string, unknown>,
   publicKey: string,
   fingerprint: string,
+  serverId: string,
 ): AgentIdentity {
+  const fleet = fleetFromHello(serverId, body);
   return {
+    ...(fleet ? { fleet } : {}),
     publicKey,
     fingerprint,
     pluginVersion: requiredText(body.pluginVersion, "pluginVersion", 64),

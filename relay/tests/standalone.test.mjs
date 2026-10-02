@@ -120,3 +120,39 @@ test("standalone health route is safe and advertises Protocol 3 build identity",
     await rm(directory, { recursive: true, force: true });
   }
 });
+
+
+test("fleet coordination persistence keeps shared and separate nodes isolated and rejects substitution", async () => {
+  const { directory, config } = await fixture();
+  const store = new CoordinationStore(config.databasePath);
+  const sharedNode = randomUUID();
+  const ids = [randomUUID(), randomUUID(), randomUUID()];
+  try {
+    for (let i = 0; i < ids.length; i++) {
+      const room = store.loadRoom(ids[i]);
+      const fleet = { serverId: ids[i], nodeId: i < 2 ? sharedNode : randomUUID(),
+        instanceKey: `instance-${i}`, serverName: `Server ${i}` };
+      const identity = { ...keys(), fingerprint: "public-fixture", pluginVersion: "5.0.0",
+        paperVersion: "Paper", minecraftVersion: "26.2", javaVersion: "25", operatingSystem: "Linux",
+        capabilities: {}, hostPublicKey: "public-fixture", fleet };
+      delete identity.privateKey;
+      room.identity = identity;
+      room.hostIdentity = { ...identity, fleet: { ...fleet } };
+      store.saveRoom(ids[i], room);
+    }
+    assert.equal(store.loadRoom(ids[0]).identity.fleet.nodeId, sharedNode);
+    assert.equal(store.loadRoom(ids[1]).identity.fleet.nodeId, sharedNode);
+    assert.notEqual(store.loadRoom(ids[2]).identity.fleet.nodeId, sharedNode);
+    const changed = store.loadRoom(ids[0]);
+    changed.identity.fleet.serverName = "Renamed";
+    store.saveRoom(ids[0], changed);
+    assert.equal(store.loadRoom(ids[0]).identity.fleet.serverName, "Renamed");
+    assert.equal(store.loadRoom(ids[1]).identity.fleet.serverName, "Server 1");
+    changed.hostIdentity.fleet.nodeId = randomUUID();
+    assert.throws(() => store.saveRoom(ids[0], changed), /association mismatch/);
+    changed.hostIdentity.fleet.nodeId = sharedNode;
+    changed.hostIdentity.fleet.serverId = ids[1];
+    assert.throws(() => store.saveRoom(ids[0], changed), /invalid room/);
+    assert.equal(store.loadRoom(ids[0]).hostIdentity.fleet.serverId, ids[0]);
+  } finally { store.close(); await rm(directory, { recursive: true, force: true }); }
+});
