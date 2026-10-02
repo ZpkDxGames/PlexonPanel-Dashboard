@@ -4,6 +4,7 @@ import { pathToFileURL } from "node:url";
 import { relayBuildIdentity } from "../build-identity.js";
 import { normalizePairingCode, opaqueClientKey, pairingLookupId, signDashboardAccess, verifyDashboardAccess, type DashboardAccess } from "../security.js";
 import { ACTION_CONTRACT_ID } from "../scopes.js";
+import { FLEET_CONTRACT_ID } from "../fleet-contract.js";
 import { loadStandaloneConfig, type StandaloneConfig } from "./config.js";
 import { CoordinationStore } from "./persistence.js";
 import { RoomManager, type RelayCounters } from "./room-manager.js";
@@ -143,6 +144,8 @@ async function handleHttp(
       runtime: "standalone",
       storage: "coordination-only",
       actionContract: ACTION_CONTRACT_ID,
+      fleetContract: FLEET_CONTRACT_ID,
+      configurationSchemas: { paper: 5, host: 5 },
       ...buildIdentity(),
       uptimeSeconds: Math.max(0, Math.floor((Date.now() - counters.startedAt) / 1000)),
       rooms: rooms.roomCount(),

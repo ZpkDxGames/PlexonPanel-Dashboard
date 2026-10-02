@@ -22,7 +22,7 @@ test("health describes coordination-only storage", async () => {
   assert.deepEqual(await response.json(), {
     ok: true,
     service: "plexonpanel-relay",
-    version: "4.0.0",
+    version: "5.0.0",
     protocolVersion: 3,
     actionContract: ACTION_CONTRACT_ID,
     storage: "coordination-only",
@@ -30,6 +30,8 @@ test("health describes coordination-only storage", async () => {
     gitCommit: "unavailable",
     buildTimestamp: "unavailable",
     runtimeKind: "cloudflare-worker",
+    fleetContract: "sha256:c5c8a5d21dd6b108f63fa6ecf00683c56ddb34cfb6716a2166ae22d3d438f902",
+    configurationSchemas: { paper: 5, host: 5 },
   });
 });
 

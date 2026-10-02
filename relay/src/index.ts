@@ -12,6 +12,7 @@ import {
   verifyEnvelope,
 } from "./protocol.js";
 import { RELAY_VERSION, relayBuildIdentity, type RelayBuildEnvironment } from "./build-identity.js";
+import { FLEET_CONTRACT_ID } from "./fleet-contract.js";
 
 export { PairingDirectory, currentAccess, filterEvent, validDevice };
 
@@ -341,7 +342,8 @@ const worker = {
     if (request.method !== "GET" || url.pathname !== "/healthz" || !response.ok) return response;
     const payload = (await response.json()) as Record<string, unknown>;
     return new Response(
-      JSON.stringify({ ...payload, ...relayBuildIdentity("cloudflare-worker", env) }),
+      JSON.stringify({ ...payload, ...relayBuildIdentity("cloudflare-worker", env),
+        fleetContract: FLEET_CONTRACT_ID, configurationSchemas: { paper: 5, host: 5 } }),
       { status: response.status, headers: response.headers },
     );
   },

@@ -1,4 +1,4 @@
-export const RELAY_VERSION = "4.0.0" as const;
+export const RELAY_VERSION = "5.0.0" as const;
 export const RELAY_PROTOCOL_VERSION = 3 as const;
 
 export interface RelayBuildEnvironment {

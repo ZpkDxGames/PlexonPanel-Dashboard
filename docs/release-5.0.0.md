@@ -1,0 +1,7 @@
+# PlexonPanel Dashboard / Relay 5.0.0 — release preparation
+
+Source versions are synchronized to 5.0.0 for Dashboard, Worker and standalone relay. Protocol remains 3 with the signed fleet contract and Paper/Host configuration schemas 5. The additive legacy adapters preserve existing relay storage while 5.0 controls require their immutable paired association. Fleet overview, per-server selection, passive telemetry, confirmation/completion binding and per-server revocation are implemented.
+
+This file is release preparation, not a published stable release or runtime certificate. The coordinated deployment receipt remains HOLD. The functioning 4.0 control plane and deployed VPS relay 3.5 remain retained until current operational/off-VPS backups, rollback rehearsal and coordinated migration readiness are verified. No 5.0 preview, standalone replacement or stable tag/release is authorized by source-version activation alone.
+
+CI builds/tests internal exact-source artifacts. Production Dashboard/Worker/standalone identity must report the accepted coordinated revision, version 5.0.0, protocol 3, action/fleet contracts and schemas after deployment. Actual two-server Paper/Host operation, provider refresh/upload, browser interaction, migration, backup, security and rollback certification remain external gates. Browser interaction is currently BLOCKED_WORKSPACE_BROWSER_CAPABILITY; intended Vercel project access is blocked by the current connector scope.

@@ -31,13 +31,15 @@ jobs:
       - run: npm run relay:standalone:smoke
       - run: npm run relay:standalone:package
       - run: npm run build
+      - id: version
+        run: node -e 'const fs=require("node:fs");fs.appendFileSync(process.env.GITHUB_OUTPUT,"value="+require("./package.json").version+"\n")'
       - name: Package coordinated Dashboard and relay evidence
         env:
           PLEXON_SOURCE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
         run: npm run release:manifest
       - uses: actions/upload-artifact@v7
         with:
-          name: PlexonPanel-Dashboard-4.0.0
+          name: PlexonPanel-Dashboard-${{ steps.version.outputs.value }}
           path: artifacts/plexonpanel-relay/
           if-no-files-found: error
           retention-days: 14

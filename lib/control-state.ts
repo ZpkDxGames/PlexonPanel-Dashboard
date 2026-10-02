@@ -1,3 +1,4 @@
+import { DASHBOARD_LABEL } from "./dashboard-version";
 import type { Scope } from "./scopes";
 export type JsonMap = Record<string, unknown>;
 export interface Device {
@@ -355,7 +356,7 @@ export function diagnostics(state: ControlState): string {
     hostCpu = number(host.hostCpuPercent),
     paperCpu = number(paper.processCpuPercent);
   return [
-    `PlexonPanel Dashboard 4.0.0 / Protocol 3`,
+    `${DASHBOARD_LABEL} / Protocol 3`,
     `Paper agent: ${state.ready?.server.pluginVersion ?? "unknown"}`,
     `Host agent: ${state.ready?.server.hostVersion ?? "not installed"}`,
     `Paper connected: ${Boolean(state.ready?.agents.paper)}`,
