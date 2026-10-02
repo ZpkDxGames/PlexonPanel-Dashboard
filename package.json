@@ -17,7 +17,7 @@
     "relay:dev": "npm run relay:worker:dev",
     "relay:deploy": "npm run relay:worker:deploy",
     "relay:worker:dev": "npm run relay:prepare && wrangler dev --config relay/wrangler.jsonc",
-    "relay:worker:deploy": "npm run relay:prepare && wrangler deploy --config relay/wrangler.jsonc",
+    "relay:worker:deploy": "node scripts/coordinated-deployment.mjs --require && npm run relay:prepare && wrangler deploy --config relay/wrangler.jsonc",
     "relay:standalone:dev": "npm run relay:build && node --watch relay/dist/standalone/server.js",
     "relay:standalone:start": "node relay/dist/standalone/server.js",
     "relay:standalone:smoke": "npm run relay:build && node relay/tests/standalone-smoke.mjs",
