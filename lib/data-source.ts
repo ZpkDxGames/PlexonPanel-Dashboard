@@ -262,7 +262,7 @@ export async function requestLiveConnection(
     websocket.search ||
     websocket.hash
   ) {
-    await clearBrowserWorkspace();
+    await clearBrowserWorkspace(credential.serverId);
     throw new DashboardRequestError(
       "The stored relay credential is invalid",
       401,
@@ -460,8 +460,9 @@ export function cacheDashboardWorkspace(
   return saveCachedWorkspace(workspace);
 }
 
-export async function logoutDashboard(): Promise<void> {
+export async function logoutDashboard(serverId?: string): Promise<void> {
   const socket = activeSocket;
+  const targetId = serverId ?? activeBinding?.serverId;
   activeSocket = null;
   activeBinding = null;
   rejectPendingActions(
@@ -469,7 +470,7 @@ export async function logoutDashboard(): Promise<void> {
   );
   if (socket && socket.readyState < WebSocket.CLOSING)
     socket.close(1000, "Dashboard device signed out");
-  await clearBrowserWorkspace();
+  await clearBrowserWorkspace(targetId);
 }
 
 export class DashboardRequestError extends Error {

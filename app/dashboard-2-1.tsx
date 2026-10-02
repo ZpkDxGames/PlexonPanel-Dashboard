@@ -65,8 +65,10 @@ import { BackupsView30 } from "./backups-view-3-4-1";
 const SettingsView = dynamic(() =>
   import("./settings-view-2-1").then((module) => module.SettingsView21),
 );
+const FleetOverview = dynamic(() => import("./fleet-overview").then(module => module.FleetOverview));
 
 const sections = [
+  "Fleet",
   "Overview",
   "Performance",
   "Players",
@@ -109,12 +111,13 @@ type IconName =
   | "panel";
 
 const navGroups: { label: string; sections: Section[] }[] = [
-  { label: "MONITOR", sections: ["Overview", "Performance", "Players"] },
+  { label: "MONITOR", sections: ["Fleet", "Overview", "Performance", "Players"] },
   { label: "COMMUNICATION", sections: ["Console", "Chat"] },
   { label: "MANAGE", sections: ["Plugins", "Server", "Backups"] },
   { label: "CONTROL", sections: ["Audit", "Access", "Settings"] },
 ];
 const iconBySection: Record<Section, IconName> = {
+  Fleet: "server",
   Overview: "overview",
   Performance: "performance",
   Players: "players",
@@ -191,10 +194,14 @@ function Brand({ compact = false }: { compact?: boolean }) {
 function Pairing({
   done,
   cancel,
+  servers = [],
+  selectServer,
   error: initialError,
 }: {
   done: () => Promise<void>;
   cancel?: () => void;
+  servers?: readonly RelayCredential[];
+  selectServer?: (id: string) => void;
   error?: string;
 }) {
   const [code, setCode] = useState("");
@@ -303,6 +310,13 @@ function Pairing({
             Server identity is signed. Telemetry and file contents are not stored
             by the relay.
           </p>
+          {servers.length > 0 && selectServer && <label className="cr-form">
+            Open a paired server
+            <select value="" onChange={event => { if (event.target.value) selectServer(event.target.value); }}>
+              <option value="" disabled>Choose a server</option>
+              {servers.map(server => <option key={server.serverId} value={server.serverId}>{server.serverId.slice(0, 8)} · {server.role}</option>)}
+            </select>
+          </label>}
         </div>
       </section>
     </main>
@@ -562,8 +576,7 @@ export default function Dashboard21() {
 
   const restore = useCallback(async (expectedServerId?: string, revision = selectionRevision.current) => {
     try {
-      const selected = await loadRelayCredential();
-      const saved = await listRelayCredentials();
+      const [selected, saved] = await Promise.all([loadRelayCredential(), listRelayCredentials()]);
       const cached = selected ? await loadControlCache(selected.serverId) : null;
       if (revision !== selectionRevision.current || (expectedServerId && selected?.serverId !== expectedServerId)) return;
       setCredentials(saved);
@@ -635,6 +648,7 @@ export default function Dashboard21() {
 
   useEffect(() => {
     if (!credential) return;
+    const revision = selectionRevision.current;
     let stopped = false;
     let attempt = 0;
     let connectionSequence = 0;
@@ -808,13 +822,15 @@ export default function Dashboard21() {
             setError(
               "This device was revoked or expired. Generate a new local pairing code.",
             );
-            void clearBrowserWorkspace().then(() => {
+            void clearBrowserWorkspace(credential.serverId).then(() => {
+              if (stopped || selectionRevision.current !== revision || authoritativeState.current.serverId !== credential.serverId) return;
               setCredential(null);
               setSessionGrant(null);
               const empty = emptyControlState("");
               authoritativeState.current = empty;
               setState(empty);
               setPhase("unpaired");
+              void listRelayCredentials().then(setCredentials);
             });
             return;
           }
@@ -828,13 +844,15 @@ export default function Dashboard21() {
         if (stopped) return;
         if (reason instanceof DashboardRequestError && reason.status === 401) {
           setError(reason.message);
-          await clearBrowserWorkspace();
+          await clearBrowserWorkspace(credential.serverId);
+          if (stopped || selectionRevision.current !== revision || authoritativeState.current.serverId !== credential.serverId) return;
           setCredential(null);
           setSessionGrant(null);
           const empty = emptyControlState("");
           authoritativeState.current = empty;
           setState(empty);
           setPhase("unpaired");
+          setCredentials(await listRelayCredentials());
           return;
         }
         setError(reason instanceof Error ? reason.message : "Relay unavailable");
@@ -972,7 +990,7 @@ export default function Dashboard21() {
     if (!leaveEditor()) return;
     ++selectionRevision.current;
     cancelConfirmation();
-    await logoutDashboard();
+    await logoutDashboard(credential?.serverId);
     setCredential(null);
     setSessionGrant(null);
     const empty = emptyControlState("");
@@ -1027,10 +1045,24 @@ export default function Dashboard21() {
     commitState((current) => ({ ...current, history: [] }), true);
   }, [commitState]);
 
+  const switchServer = (nextId: string) => {
+    if (!leaveEditor()) return;
+    const revision = ++selectionRevision.current;
+    cancelConfirmation(); bindLiveSocket(null); setSessionGrant(null);
+    const empty = emptyControlState(nextId);
+    authoritativeState.current = empty; setState(empty); setPhase("connecting");
+    setSection("Overview");
+    void selectRelayCredential(nextId).then(() => restore(nextId, revision)).catch(() => {
+      if (revision === selectionRevision.current) setNotice("Unable to switch server. Pair it again if the saved grant has expired.");
+    });
+  };
+
   if (pairing || phase === "unpaired")
     return (
       <Pairing
         done={restore}
+        servers={credentials}
+        selectServer={switchServer}
         {...(credential ? { cancel: () => setPairing(false) } : {})}
         error={error}
       />
@@ -1055,6 +1087,10 @@ export default function Dashboard21() {
   };
   let view: React.ReactNode;
   switch (section) {
+    case "Fleet":
+      view = <FleetOverview credentials={credentials} selected={state} connected={phase === "live"}
+        openServer={switchServer} pair={() => { if (leaveEditor()) setPairing(true); }} />;
+      break;
     case "Overview":
       view = <OverviewView30 {...props} />;
       break;
@@ -1212,28 +1248,7 @@ export default function Dashboard21() {
                 <span className="sr-only">Selected server</span>
                 <select
                   value={state.serverId || credential?.serverId}
-                  onChange={(event) => {
-                    if (!leaveEditor()) return;
-                    const nextId = event.target.value;
-                    const revision = ++selectionRevision.current;
-                    cancelConfirmation();
-                    bindLiveSocket(null);
-                    setSessionGrant(null);
-                    const empty = emptyControlState(nextId);
-                    authoritativeState.current = empty;
-                    setState(empty);
-                    setPhase("connecting");
-                    setSection("Overview");
-                    void selectRelayCredential(nextId)
-                      .then(() => restore(nextId, revision))
-                      .catch((reason) =>
-                        setNotice(
-                          reason instanceof Error
-                            ? reason.message
-                            : "Unable to switch server",
-                        ),
-                      );
-                  }}
+                  onChange={(event) => switchServer(event.target.value)}
                 >
                   {credentials.map((item) => (
                     <option key={item.serverId} value={item.serverId}>

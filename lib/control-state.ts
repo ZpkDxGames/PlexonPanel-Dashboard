@@ -152,6 +152,10 @@ export function applyControlMessage(
     return {
       ...state,
       ready,
+      server: ready.agents.paper && samePaperSession ? state.server : {},
+      system: ready.agents.paper && samePaperSession ? state.system : {},
+      hostSystem: ready.agents.host && state.ready?.server.hostSession === ready.server.hostSession ? state.hostSystem : {},
+      service: ready.agents.host && state.ready?.server.hostSession === ready.server.hostSession ? state.service : {},
       players: preserveRoster ? state.players : [],
       inventoryIds: preserveRoster
         ? state.inventoryIds
@@ -167,6 +171,8 @@ export function applyControlMessage(
     kind = message.agentKind === "HOST" ? "HOST" : "PAPER";
   const agentSession =
     typeof message.agentSession === "string" ? message.agentSession : undefined;
+  if (kind === "HOST" && state.ready?.server.hostSession && agentSession !== state.ready.server.hostSession)
+    return state;
   if (
     kind === "PAPER" &&
     state.ready?.server.paperSession &&

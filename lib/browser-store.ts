@@ -15,6 +15,7 @@ export interface RelayCredential {
 }
 const DB = "plexonpanel-browser-v3",
   STORE = "workspace";
+let selectionRevision = 0;
 function openDatabase(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
     const request = indexedDB.open(DB, 1);
@@ -48,6 +49,19 @@ const read = <T>(key: string) =>
 const write = (key: string, value: unknown) =>
   transaction("readwrite", (s) => s.put(value, key));
 const remove = (key: string) => transaction("readwrite", (s) => s.delete(key));
+async function writeSelection(id: string, revision: number): Promise<void> {
+  const db = await openDatabase();
+  try {
+    if (revision !== selectionRevision) return;
+    await new Promise<void>((resolve, reject) => {
+      const tx = db.transaction(STORE, "readwrite");
+      tx.objectStore(STORE).put(id, "selected");
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+      tx.onabort = () => reject(tx.error ?? new Error("Browser storage transaction aborted"));
+    });
+  } finally { db.close(); }
+}
 function valid(c: RelayCredential | undefined): c is RelayCredential {
   return Boolean(
     c &&
@@ -70,21 +84,22 @@ export async function loadRelayCredential(): Promise<RelayCredential | null> {
   if (!selected) return null;
   const c = await read<RelayCredential>(`credential:${selected}`);
   if (valid(c)) return c;
-  await remove(`credential:${selected}`);
-  await remove(`cache:${selected}`);
-  await remove("selected");
+  await clearBrowserWorkspace(selected);
   return null;
 }
 export async function selectRelayCredential(id: string): Promise<void> {
+  const revision = ++selectionRevision;
   const c = await read<RelayCredential>(`credential:${id}`);
+  if (revision !== selectionRevision) return;
   if (!valid(c))
     throw new Error("This server credential has expired. Pair again.");
-  await write("selected", id);
+  await writeSelection(id, revision);
 }
 export async function saveRelayCredential(c: RelayCredential): Promise<void> {
+  const revision = ++selectionRevision;
   if (!valid(c)) throw new Error("Invalid protocol 3 credential");
   await write(`credential:${c.serverId}`, c);
-  await write("selected", c.serverId);
+  await writeSelection(c.serverId, revision);
   await remove(`cache:${c.serverId}`);
   indexedDB.deleteDatabase("plexonpanel-browser-v2");
 }
@@ -101,13 +116,25 @@ export async function loadControlCache(
 export async function saveControlCache(state: ControlState): Promise<void> {
   await write(`cache:${state.serverId}`, safeCache(state));
 }
-export async function clearBrowserWorkspace(): Promise<void> {
-  const id = await read<string>("selected");
-  if (id) {
-    await remove(`credential:${id}`);
-    await remove(`cache:${id}`);
-  }
-  await remove("selected");
+export async function clearBrowserWorkspace(serverId?: string): Promise<void> {
+  const db = await openDatabase();
+  try {
+    await new Promise<void>((resolve, reject) => {
+      const tx = db.transaction(STORE, "readwrite"), store = tx.objectStore(STORE);
+      const selected = store.get("selected");
+      selected.onsuccess = () => {
+        const id = serverId ?? selected.result;
+        if (typeof id === "string" && id) {
+          store.delete(`credential:${id}`);
+          store.delete(`cache:${id}`);
+          if (selected.result === id) store.delete("selected");
+        }
+      };
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+      tx.onabort = () => reject(tx.error ?? new Error("Browser storage transaction aborted"));
+    });
+  } finally { db.close(); }
   indexedDB.deleteDatabase("plexonpanel-browser-v2");
 }
 // Legacy transformation helpers remain available to isolated migration tests; live v3 uses server-specific state.
