@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "version": "5.0.0",
+  "state": "HOLD",
+  "acceptedDashboardSourceCommit": null,
+  "acceptedCoreSourceCommit": null,
+  "dashboardCiRun": null,
+  "coreCiRun": null,
+  "evidence": {
+    "currentOperationalBackup": "NOT_VERIFIED",
+    "offVpsIntegrity": "NOT_VERIFIED",
+    "rollbackRehearsal": "NOT_EXECUTED",
+    "operatorDeploymentReady": "NOT_VERIFIED",
+    "ociBackup": "SKIPPED_OPERATOR_DECISION"
+  }
+}

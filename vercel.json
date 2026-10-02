@@ -2,5 +2,6 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
   "installCommand": "npm ci",
-  "buildCommand": "npm run build"
+  "ignoreCommand": "node scripts/coordinated-deployment.mjs --vercel-ignore",
+  "buildCommand": "node scripts/coordinated-deployment.mjs --require && npm run build"
 }
