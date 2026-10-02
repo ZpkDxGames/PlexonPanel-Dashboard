@@ -5,6 +5,7 @@ import {
   sendDashboardAction,
   handleRelayControlMessage,
   unbindLiveSocket,
+  captureActionTarget,
 } from "../.test-dist/lib/data-source.js";
 class TestSocket {
   static OPEN = 1;
@@ -16,6 +17,65 @@ class TestSocket {
 }
 globalThis.WebSocket = TestSocket;
 afterEach(() => bindLiveSocket(null));
+
+test("confirmation captured for Server A cannot send on Server B after an asynchronous switch", async () => {
+  const a = new TestSocket();
+  const b = new TestSocket();
+  bindLiveSocket(a, "server-a", "paper-session-a");
+  const confirmation = captureActionTarget("server-a");
+  await Promise.resolve(); // Simulate the operator reviewing an open dialog.
+  bindLiveSocket(b, "server-b", "paper-session-b");
+  await assert.rejects(sendDashboardAction("server.stop", { confirmed: true }, "HOST", confirmation), /connection changed/);
+  assert.equal(a.sent.length, 0);
+  assert.equal(b.sent.length, 0);
+  assert.throws(() => captureActionTarget("server-a"), /selected server connection changed/);
+});
+
+test("a confirmation cannot survive agent or grant replacement on the same Dashboard socket", async () => {
+  const socket = new TestSocket();
+  bindLiveSocket(socket, "server-a", "host-session-one");
+  const confirmation = captureActionTarget("server-a");
+  bindLiveSocket(socket, "server-a", "host-session-two");
+  await assert.rejects(sendDashboardAction("server.restart", { confirmed: true }, "HOST", confirmation), /connection changed/);
+  assert.equal(socket.sent.length, 0);
+});
+
+test("action completion must match the original server, socket, action and source authority", async () => {
+  const a = new TestSocket();
+  const b = new TestSocket();
+  bindLiveSocket(a, "server-a", "live-a");
+  let completed = false;
+  const completion = sendDashboardAction("server.stop", {}, "HOST", captureActionTarget("server-a"))
+    .then((value) => { completed = true; return value; });
+  const result = { type: "server.event", serverId: "server-a", agentKind: "HOST", eventType: "action.result",
+    body: { requestId: a.sent[0].requestId, action: "server.stop", status: "SUCCESS", data: {} } };
+  for (const [message, socket] of [
+    [{ ...result, serverId: "server-b" }, a],
+    [result, b],
+    [{ ...result, agentKind: "PAPER" }, a],
+    [{ ...result, body: { ...result.body, action: "server.start" } }, a],
+  ]) {
+    handleRelayControlMessage(message, socket);
+    await Promise.resolve();
+    assert.equal(completed, false);
+  }
+  handleRelayControlMessage(result, a);
+  await completion;
+  assert.equal(completed, true);
+});
+
+test("legacy relay rejection without a server field is accepted only from its original bound socket", async () => {
+  const a = new TestSocket();
+  bindLiveSocket(a, "server-a", "legacy-a");
+  const completion = sendDashboardAction("server.stop", {}, "HOST");
+  const rejection = { type: "dashboard.action_rejected", requestId: a.sent[0].requestId,
+    action: "server.stop", code: "SCOPE_DENIED", error: "Denied" };
+  handleRelayControlMessage(rejection, new TestSocket());
+  handleRelayControlMessage(rejection); // Missing server and missing source cannot resolve it.
+  handleRelayControlMessage(rejection, a);
+  await assert.rejects(completion, (error) => error.code === "SCOPE_DENIED");
+});
+
 test("relay queue acknowledgement never reports an operation completed", async () => {
   const ws = new TestSocket();
   bindLiveSocket(ws);

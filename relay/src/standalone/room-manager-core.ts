@@ -625,6 +625,7 @@ export class Room {
       });
       this.dashboardSend(session, {
         type: "dashboard.action_queued",
+        serverId: this.serverId,
         requestId,
         action,
         agentKind: kind,
@@ -634,6 +635,7 @@ export class Room {
       const code = error instanceof Error ? error.message : "DENIED";
       this.dashboardSend(session, {
         type: "dashboard.action_rejected",
+        serverId: this.serverId,
         requestId,
         ...(action ? { action } : {}),
         ...(kind ? { agentKind: kind } : {}),
@@ -863,6 +865,7 @@ export class Room {
         hostCapabilities: this.metadata.hostIdentity?.capabilities ?? {},
         hostVersion: this.metadata.hostIdentity?.pluginVersion ?? null,
         paperSession: this.paper?.sessionNonce,
+        hostSession: this.host?.sessionNonce,
         paired: this.metadata.paired,
       },
       receivedAt: new Date().toISOString(),

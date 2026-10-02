@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   bindLiveSocket,
+  captureActionTarget,
   DashboardRequestError,
   handleRelayControlMessage,
   logoutDashboard,
@@ -83,6 +84,8 @@ type Phase = "loading" | "unpaired" | "connecting" | "live" | "reconnecting";
 type Confirmation = {
   action: string;
   parameters: JsonMap;
+  serverId: string;
+  serverName: string;
   resolve: (approved: boolean) => void;
 };
 type StateUpdater = ControlState | ((current: ControlState) => ControlState);
@@ -333,8 +336,8 @@ function Confirm({ value }: { value: Confirmation }) {
       <Badge tone="amber">Confirm operation</Badge>
       <h2 id="confirm-title">{value.action.replaceAll(".", " ")}</h2>
       <p>
-        This operation will run on your server using this device&apos;s local
-        permissions.
+        This operation will run on <strong>{value.serverName}</strong> using this device&apos;s local permissions.
+        <br /><code>{value.serverId.slice(0, 8)}</code>
       </p>
       {target !== undefined && (
         <code className="cr-confirm-target">{String(target)}</code>
@@ -474,6 +477,9 @@ export default function Dashboard21() {
   const [pairing, setPairing] = useState(false);
   const [reconnect, setReconnect] = useState(0);
   const [confirmation, setConfirmation] = useState<Confirmation | null>(null);
+  const confirmationRef = useRef<Confirmation | null>(null);
+  const selectionRevision = useRef(0);
+  const cancelConfirmation = useCallback(() => confirmationRef.current?.resolve(false), []);
   const [refreshRevision, setRefreshRevision] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -554,15 +560,17 @@ export default function Dashboard21() {
     setSidebarOpen(false);
   };
 
-  const restore = useCallback(async () => {
+  const restore = useCallback(async (expectedServerId?: string, revision = selectionRevision.current) => {
     try {
       const selected = await loadRelayCredential();
-      setCredentials(await listRelayCredentials());
+      const saved = await listRelayCredentials();
+      const cached = selected ? await loadControlCache(selected.serverId) : null;
+      if (revision !== selectionRevision.current || (expectedServerId && selected?.serverId !== expectedServerId)) return;
+      setCredentials(saved);
       setCredential(selected);
       setSessionGrant(null);
       const restored = selected
-        ? ((await loadControlCache(selected.serverId)) ??
-            emptyControlState(selected.serverId))
+        ? (cached?.serverId === selected.serverId ? cached : emptyControlState(selected.serverId))
         : emptyControlState("");
       authoritativeState.current = restored;
       setState(restored);
@@ -577,6 +585,7 @@ export default function Dashboard21() {
       setPairing(false);
       setPhase(selected ? "connecting" : "unpaired");
     } catch (reason) {
+      if (revision !== selectionRevision.current) return;
       setError(
         reason instanceof Error
           ? reason.message
@@ -668,7 +677,8 @@ export default function Dashboard21() {
         const isCurrent = () =>
           !stopped &&
           sequence === connectionSequence &&
-          socket === candidate;
+          socket === candidate &&
+          authoritativeState.current.serverId === credential.serverId;
         candidate.onopen = () => {
           if (!isCurrent()) {
             candidate.close();
@@ -749,7 +759,13 @@ export default function Dashboard21() {
                 candidate.close(4008, "Signed grant mismatch");
                 return;
               }
-              bindLiveSocket(candidate);
+              const readyContext = JSON.stringify({ paper: message.agents && record(message.agents).paper,
+                host: message.agents && record(message.agents).host,
+                paperSession: record(message.server).paperSession,
+                hostSession: record(message.server).hostSession,
+                role: reportedGrant?.role, scopes: reportedGrant?.scopes,
+                capabilities: record(message.server).capabilities });
+              if (bindLiveSocket(candidate, grant.serverId, readyContext)) cancelConfirmation();
               setSessionGrant({
                 deviceId: grant.deviceId,
                 role: grant.role,
@@ -757,7 +773,7 @@ export default function Dashboard21() {
               });
               setPhase("live");
             }
-            if (handleRelayControlMessage(message)) return;
+            if (handleRelayControlMessage(message, candidate)) return;
             if (message.type === "relay.error") {
               setError(str(message.error, "Relay rejected a message"));
               return;
@@ -772,7 +788,7 @@ export default function Dashboard21() {
         };
         candidate.onclose = (event) => {
           if (heartbeat) clearInterval(heartbeat);
-          unbindLiveSocket(candidate);
+          if (unbindLiveSocket(candidate)) cancelConfirmation();
           if (!isCurrent()) return;
           socket = null;
           connectionSequence += 1;
@@ -833,11 +849,11 @@ export default function Dashboard21() {
       const current = socket;
       socket = null;
       if (current) {
-        unbindLiveSocket(current);
+        if (unbindLiveSocket(current)) cancelConfirmation();
         current.close(1000, "Workspace changed");
       }
     };
-  }, [credential, reconnect, commitState]);
+  }, [credential, reconnect, commitState, cancelConfirmation]);
 
   const can = useCallback(
     (action: string, requestedKind?: "PAPER" | "HOST") => {
@@ -891,6 +907,9 @@ export default function Dashboard21() {
       kind?: "PAPER" | "HOST",
       confirmationMode: "default" | "preconfirmed" = "default",
     ): Promise<ActionCompletion> => {
+      const expectedServerId = credential?.serverId ?? "";
+      const targetConnection = captureActionTarget(expectedServerId);
+      parameters = structuredClone(parameters);
       if (!can(action, kind)) {
         const unavailable = new Error(
           "This action is unavailable for the current device or local policy.",
@@ -904,16 +923,23 @@ export default function Dashboard21() {
           action === "console.execute" ||
           action === "plugin.command.reload")
       ) {
-        const approved = await new Promise<boolean>((resolve) =>
-          setConfirmation({
-            action,
-            parameters,
+        const approved = await new Promise<boolean>((resolve) => {
+          cancelConfirmation();
+          const next: Confirmation = {
+            action, parameters, serverId: expectedServerId,
+            serverName: str(state.ready?.server.serverName ?? state.server.serverName,
+              `Server ${expectedServerId.slice(0, 8)}`),
             resolve: (ok) => {
-              setConfirmation(null);
+              if (confirmationRef.current === next) {
+                confirmationRef.current = null;
+                setConfirmation(null);
+              }
               resolve(ok);
             },
-          }),
-        );
+          };
+          confirmationRef.current = next;
+          setConfirmation(next);
+        });
         if (!approved) throw new Error("Cancelled");
         parameters = { ...parameters, confirmed: true };
       }
@@ -927,21 +953,25 @@ export default function Dashboard21() {
         throw unavailable;
       }
       try {
-        const result = await sendDashboardAction(action, parameters, kind);
+        const result = await sendDashboardAction(action, parameters, kind, targetConnection);
+        if (captureActionTarget(expectedServerId).generation !== targetConnection.generation)
+          throw new Error("The target connection changed before completion was displayed.");
         setNotice(
           str(result.data.message, result.message || "Operation completed."),
         );
         return result;
       } catch (reason) {
-        setNotice(operationText(reason));
+        if (authoritativeState.current.serverId === expectedServerId) setNotice(operationText(reason));
         throw reason;
       }
     },
-    [can],
+    [can, credential?.serverId, state.ready?.server.serverName, state.server.serverName, cancelConfirmation],
   );
 
   const forget = async () => {
     if (!leaveEditor()) return;
+    ++selectionRevision.current;
+    cancelConfirmation();
     await logoutDashboard();
     setCredential(null);
     setSessionGrant(null);
@@ -1068,7 +1098,7 @@ export default function Dashboard21() {
   }
 
   const serverName = str(
-    state.server.serverName,
+    state.ready?.server.serverName ?? state.server.serverName,
     credential?.serverId
       ? `Server ${credential.serverId.slice(0, 8)}`
       : "Server unavailable",
@@ -1177,16 +1207,25 @@ export default function Dashboard21() {
         <header className="cr21-topbar">
           <div className="cr21-topbar-server">
             <span className="cr21-kicker">CURRENT SERVER</span>
-            {credentials.length > 1 ? (
+            {credentials.length > 0 ? (
               <label className="cr21-server-select">
                 <span className="sr-only">Selected server</span>
                 <select
-                  value={credential?.serverId}
+                  value={state.serverId || credential?.serverId}
                   onChange={(event) => {
                     if (!leaveEditor()) return;
+                    const nextId = event.target.value;
+                    const revision = ++selectionRevision.current;
+                    cancelConfirmation();
+                    bindLiveSocket(null);
+                    setSessionGrant(null);
+                    const empty = emptyControlState(nextId);
+                    authoritativeState.current = empty;
+                    setState(empty);
+                    setPhase("connecting");
                     setSection("Overview");
-                    void selectRelayCredential(event.target.value)
-                      .then(restore)
+                    void selectRelayCredential(nextId)
+                      .then(() => restore(nextId, revision))
                       .catch((reason) =>
                         setNotice(
                           reason instanceof Error

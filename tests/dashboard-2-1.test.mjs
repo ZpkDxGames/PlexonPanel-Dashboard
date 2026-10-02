@@ -97,7 +97,7 @@ test("live actions are bound to the exact signed socket grant", async () => {
     "ready.actionContract !== ACTION_CONTRACT_ID",
     "const effective = reconcileDeviceGrant(grant, reportedGrant)",
     "effective?.metadataMatches",
-    "bindLiveSocket(candidate)",
+    "bindLiveSocket(candidate, grant.serverId, readyContext)",
     "unbindLiveSocket(candidate)",
   ])
     assert.equal(

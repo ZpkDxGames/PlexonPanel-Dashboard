@@ -1223,6 +1223,7 @@ export class ServerRoom {
       socket.send(
         JSON.stringify({
           type: "dashboard.action_queued",
+          serverId: a.serverId,
           requestId: id,
           action,
           agentKind: kind,
@@ -1233,6 +1234,7 @@ export class ServerRoom {
       socket.send(
         JSON.stringify({
           type: "dashboard.action_rejected",
+          serverId: a.serverId,
           requestId: id,
           ...(action ? { action } : {}),
           ...(kind ? { agentKind: kind } : {}),
@@ -1453,6 +1455,9 @@ export class ServerRoom {
           this.agents("PAPER")[0]?.deserializeAttachment() as
             | SocketAttachment
             | undefined
+        )?.sessionNonce,
+        hostSession: (
+          this.agents("HOST")[0]?.deserializeAttachment() as SocketAttachment | undefined
         )?.sessionNonce,
         paired: m.paired,
       },
