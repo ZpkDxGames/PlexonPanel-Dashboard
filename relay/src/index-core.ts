@@ -1,4 +1,4 @@
-import { fleetFromHello, assertFleetAssociation, fleetReadyFields, assertNodeTelemetry } from "./fleet-association.js";
+import { fleetFromHello, assertFleetAssociation, fleetReadyFields, assertNodeTelemetry, assertServiceTelemetry, FleetProtocolError, fleetTargetCompatible } from "./fleet-association.js";
 import type { FleetIdentity } from "./fleet-contract.js";
 import {
   MAX_ENVELOPE_BYTES,
@@ -877,7 +877,11 @@ export class ServerRoom {
     }
     if (!a.authenticated) throw new Error("Agent authentication required");
     if (envelope.type === "telemetry.system")
-      assertNodeTelemetry(a.kind === "PAPER" ? m.identity : m.hostIdentity, body);
+      assertNodeTelemetry(a.kind === "PAPER" ? m.identity : m.hostIdentity, body, a.kind);
+    if (envelope.type === "service.status") {
+      assertServiceTelemetry(m.hostIdentity, body, a.kind);
+      if (!fleetTargetCompatible("HOST", m.identity, m.hostIdentity)) return;
+    }
     if (a.kind === "HOST" && a.publicKey !== m.identity?.hostPublicKey)
       throw new Error("Host authorization changed");
     if (envelope.type === "agent.pairing_begin") {
@@ -1182,6 +1186,7 @@ export class ServerRoom {
       }
       if (action.startsWith("players.") && kind !== "PAPER")
         throw new Error("INVALID_PARAMETERS");
+      if (!fleetTargetCompatible(kind, m.identity, m.hostIdentity)) throw new Error("FLEET_TARGET_INCOMPATIBLE");
       const identity = kind === "HOST" ? m.hostIdentity : m.identity;
       if (identity?.capabilities[scope] !== true)
         throw new Error("CAPABILITY_DISABLED");
@@ -1526,6 +1531,7 @@ function protocolRejectionCode(
   authenticated: boolean,
 ): string | null {
   if (error instanceof SyntaxError) return "INVALID_ENVELOPE";
+  if (error instanceof FleetProtocolError) return "FLEET_CONTRACT_REJECTED";
   const message = error instanceof Error ? error.message : String(error);
   if (/wrong room/i.test(message)) return "WRONG_SERVER";
   if (/protocol|agent kind/i.test(message)) return "PROTOCOL_MISMATCH";
@@ -1794,6 +1800,7 @@ function actionError(error: unknown): string {
         SCOPE_DENIED: "Your device does not have this scope.",
         CAPABILITY_DISABLED: "This feature is disabled in local policy.",
         HOST_OFFLINE: "The host companion is not connected.",
+        FLEET_TARGET_INCOMPATIBLE: "Paper and Host must have a compatible fleet binding before this action.",
         PAPER_OFFLINE: "The Paper agent is offline.",
         CONFIRMATION_REQUIRED: "Confirm this action first.",
         RATE_LIMITED: "Too many requests. Wait a few seconds.",

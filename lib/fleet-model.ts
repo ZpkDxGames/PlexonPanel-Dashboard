@@ -19,7 +19,7 @@ export function fresh(value: unknown, now: number): boolean {
 }
 export function boundNode(state: ControlState): string | null {
   const server = state.ready?.server;
-  return server?.fleetState === "BOUND" && server.fleetContract === FLEET_CONTRACT_ID && validFleetUuid(server.nodeId)
+  return server?.hostTargetCompatible !== false && server?.fleetState === "BOUND" && server.fleetContract === FLEET_CONTRACT_ID && validFleetUuid(server.nodeId)
     ? server.nodeId.toLowerCase() : null;
 }
 export function fleetCard(state: ControlState, phase: FleetPhase, now: number): FleetCard {
@@ -27,15 +27,16 @@ export function fleetCard(state: ControlState, phase: FleetPhase, now: number): 
   const paper = live && Boolean(state.ready?.agents.paper), host = live && Boolean(state.ready?.agents.host);
   const serverFresh = paper && fresh(state.server.capturedAt, now);
   const resources = record(state.service.resources);
-  const serviceFresh = host && fresh(resources.capturedAt, now) && resources.scope === "MINECRAFT_SERVICE" && resources.source === "SYSTEMD_CGROUP";
+  const serviceFresh = host && state.ready?.server.hostTargetCompatible !== false && fresh(resources.capturedAt, now) && resources.scope === "MINECRAFT_SERVICE" && resources.source === "SYSTEMD_CGROUP";
   let status: FleetCard["status"] = "online", reason = "Paper and Host are connected";
   if (phase === "revoked") { status = "offline"; reason = "Browser grant expired or was revoked; pair this server again"; }
   else if (phase === "limited") { status = "stale"; reason = "Subscription limit reached; open this server to prioritize it"; }
   else if (!live) { status = "stale"; reason = "Waiting for an authenticated relay connection"; }
   else if (!paper && !host) { status = "offline"; reason = "Paper and Host are offline"; }
-  else if (!paper) { status = "offline"; reason = `Minecraft is ${str(state.service.activeState, "offline")}; Host is connected`; }
+  else if (!paper) { status = "offline"; reason = `Minecraft is ${str(state.service.state, "offline")}; Host is connected`; }
   else if (!serverFresh) { status = "stale"; reason = "Minecraft telemetry is missing or older than 30 seconds"; }
   else if (!host) { status = "degraded"; reason = "Host is offline; node and service metrics are unavailable"; }
+  else if (state.ready?.server.hostTargetCompatible === false) { status = "degraded"; reason = "Paper and Host versions or fleet bindings are incompatible; service actions are unavailable"; }
   else if ((Array.isArray(state.server.tps) && (number(state.server.tps[0]) ?? 20) < 18) ||
            (number(state.server.averageTickMillis) ?? 0) > 50) { status = "degraded"; reason = "Minecraft tick performance is degraded"; }
   const timestamps = [serverFresh ? capturedAtMillis(state.server.capturedAt) : null,
@@ -47,7 +48,7 @@ export function fleetCard(state: ControlState, phase: FleetPhase, now: number): 
     mspt: serverFresh ? number(state.server.averageTickMillis) : null,
     serviceCpu: serviceFresh && resources.cpuAvailable === true && resources.cpuUnit === "PERCENT_OF_ONE_CORE" ? number(resources.cpuPercent) : null,
     serviceMemory: serviceFresh && resources.memoryAvailable === true ? number(resources.memoryBytes) : null,
-    serviceState: host ? str(state.service.activeState, "unknown") : "unavailable",
+    serviceState: host && state.ready?.server.hostTargetCompatible !== false ? str(state.service.state, "unknown") : "unavailable",
     lastUpdate: timestamps.length ? Math.max(...timestamps) : null };
 }
 export function nodeSummaries(states: readonly ControlState[], now: number): NodeSummary[] {

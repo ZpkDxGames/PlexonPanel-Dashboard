@@ -1,4 +1,4 @@
-import { fleetFromHello, assertFleetAssociation, fleetReadyFields, assertNodeTelemetry } from "../fleet-association.js";
+import { fleetFromHello, assertFleetAssociation, fleetReadyFields, assertNodeTelemetry, assertServiceTelemetry, FleetProtocolError, fleetTargetCompatible } from "../fleet-association.js";
 import {
   MAX_ENVELOPE_BYTES,
   assertFreshEnvelope,
@@ -394,7 +394,11 @@ export class Room {
 
     if (!session.authenticated) throw new Error("Agent authentication required");
     if (envelope.type === "telemetry.system")
-      assertNodeTelemetry(session.kind === "PAPER" ? this.metadata.identity : this.metadata.hostIdentity, body);
+      assertNodeTelemetry(session.kind === "PAPER" ? this.metadata.identity : this.metadata.hostIdentity, body, session.kind);
+    if (envelope.type === "service.status") {
+      assertServiceTelemetry(this.metadata.hostIdentity, body, session.kind);
+      if (!fleetTargetCompatible("HOST", this.metadata.identity, this.metadata.hostIdentity)) return;
+    }
     if (session.kind === "HOST" && session.publicKey !== this.metadata.identity?.hostPublicKey)
       throw new Error("Host authorization changed");
 
@@ -596,6 +600,7 @@ export class Room {
         kind = message.agentKind;
       }
       if (action.startsWith("players.") && kind !== "PAPER") throw new Error("INVALID_PARAMETERS");
+      if (!fleetTargetCompatible(kind, this.metadata.identity, this.metadata.hostIdentity)) throw new Error("FLEET_TARGET_INCOMPATIBLE");
       const identity = kind === "HOST" ? this.metadata.hostIdentity : this.metadata.identity;
       if (identity?.capabilities[scope] !== true) throw new Error("CAPABILITY_DISABLED");
       const agent = kind === "HOST" ? this.host : this.paper;
@@ -1087,6 +1092,7 @@ function actionError(error: unknown): string {
 }
 
 function protocolRejectionCode(error: unknown): string {
+  if (error instanceof FleetProtocolError) return "FLEET_CONTRACT_REJECTED";
   const message = error instanceof Error ? error.message : String(error);
   if (/wrong room/i.test(message)) return "WRONG_SERVER";
   if (/protocol|agent kind/i.test(message)) return "PROTOCOL_MISMATCH";

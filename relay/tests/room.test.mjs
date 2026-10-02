@@ -787,6 +787,18 @@ test("signed fleet hello binds Paper and Host to the same node and exact instanc
   assert.equal(paper.socket.attachment.authenticated, true);
 });
 
+test("signed service status uses Host authority and Paper cannot impersonate its systemd source", async () => {
+  const f = await fixture(["telemetry.view", "server.status"]); const hello = fleetHello();
+  const paper = await attach(f, "PAPER", f.key, hello);
+  const host = await attach(f, "HOST", f.host, hello);
+  const body = { nodeId: hello.nodeId, state: "active", resources: { scope: "MINECRAFT_SERVICE", source: "SYSTEMD_CGROUP", cpuUnit: "PERCENT_OF_ONE_CORE" } };
+  await host.send("service.status", body);
+  const event = f.browser.sent.filter(message => message.type === "server.event" && message.eventType === "service.status").at(-1);
+  assert.equal(event.agentKind, "HOST"); assert.equal(event.body.state, "active");
+  await paper.send("service.status", body);
+  assert.equal(paper.socket.closed.code, 4008); assert.equal(host.socket.attachment.authenticated, true);
+});
+
 test("fleet identity cannot be downgraded or replaced by a simultaneous cloned session", async () => {
   const f = await fixture();
   const hello = fleetHello();
@@ -820,4 +832,34 @@ test("unsupported, incomplete or substituted fleet contracts fail before challen
     assert.equal(rejected.socket.sent.some((m) => m.type === "gateway.challenge"), false);
     assert.equal((await f.st.storage.get("room-metadata")).identity.fleet, undefined);
   }
+});
+
+test("5.0 Paper cannot route service actions to a previously authenticated legacy Host", async () => {
+  const f = await fixture(["server.start", "players.view", "server.status"]);
+  const host = await attach(f, "HOST", f.host, { pluginVersion: "3.5.0" });
+  const paper = await attach(f, "PAPER", f.key, fleetHello());
+  const ready = f.browser.sent.filter(m => m.type === "dashboard.ready").at(-1);
+  assert.equal(ready.server.hostTargetCompatible, false);
+  assert.equal(ready.server.paperTargetCompatible, true);
+  await action(f, "server.start");
+  assert.equal(f.browser.sent.at(-1).code, "FLEET_TARGET_INCOMPATIBLE");
+  assert.equal(host.socket.sent.some(m => m.type === "action.request"), false);
+  await action(f, "players.snapshot.request");
+  assert.equal(f.browser.sent.at(-1).type, "dashboard.action_queued");
+  assert.equal(paper.socket.sent.at(-1).type, "action.request");
+  const count = f.browser.sent.filter(m => m.eventType === "service.status").length;
+  await host.send("service.status", { state: "active" });
+  assert.equal(f.browser.sent.filter(m => m.eventType === "service.status").length, count);
+  const reconnect = await attach(f, "HOST", f.host, { pluginVersion: "3.5.0" });
+  assert.equal(reconnect.socket.closed.code, 4008);
+});
+test("bound 5.0 Host can start its service after Paper disconnects without losing its immutable association", async () => {
+  const f = await fixture(["server.start"]); const hello = fleetHello();
+  const paper = await attach(f, "PAPER", f.key, hello);
+  const host = await attach(f, "HOST", f.host, hello);
+  paper.socket.close(1000, "server stopped");
+  await f.room.webSocketClose(paper.socket);
+  await action(f, "server.start");
+  assert.equal(f.browser.sent.at(-1).type, "dashboard.action_queued");
+  assert.equal(host.socket.sent.at(-1).type, "action.request");
 });
