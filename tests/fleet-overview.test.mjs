@@ -6,7 +6,7 @@ import { FleetFeed } from "../.test-dist/lib/fleet-feed.js";
 import { boundNode, fleetCard, nodeSummaries } from "../.test-dist/lib/fleet-model.js";
 import { FLEET_CONTRACT_ID } from "../.test-dist/lib/fleet-contract.js";
 import { ACTION_CONTRACT_ID } from "../.test-dist/lib/scopes.js";
-import { applyControlMessage, emptyControlState } from "../.test-dist/lib/control-state.js";
+import { applyControlMessage, emptyControlState, compatibleActionTarget } from "../.test-dist/lib/control-state.js";
 import { DashboardRequestError } from "../.test-dist/lib/data-source.js";
 import { FleetOverview } from "../.test-dist/app/fleet-overview.js";
 const A = "10000000-0000-4000-8000-000000000001", B = "10000000-0000-4000-8000-000000000002";
@@ -24,7 +24,7 @@ function state(id, nodeId = NODE) {
   value.server = { capturedAt, onlinePlayers: 3, tps: [20], averageTickMillis: 12 };
   value.hostSystem = { nodeId, processRole: "HOST", metricScope: "NODE", capturedAt, hostCpuPercent: 35,
     physicalMemoryUsedBytes: 8e9, physicalMemoryTotalBytes: 24e9, diskUsedBytes: 39e9, diskTotalBytes: 145e9 };
-  value.service = { activeState: "active", resources: { capturedAt, scope: "MINECRAFT_SERVICE", source: "SYSTEMD_CGROUP",
+  value.service = { state: "active", resources: { capturedAt, scope: "MINECRAFT_SERVICE", source: "SYSTEMD_CGROUP",
     cpuUnit: "PERCENT_OF_ONE_CORE", cpuAvailable: true, cpuPercent: 150, memoryAvailable: true, memoryBytes: 4e9 } };
   return value;
 }
@@ -104,11 +104,14 @@ test("shared node totals use one fresh Host sample, separate nodes stay separate
 test("cards distinguish service one-core CPU from node CPU and do not fabricate stale or missing metrics", () => {
   const value = state(A), card = fleetCard(value, "live", Date.now());
   assert.equal(card.status, "online"); assert.equal(card.serviceCpu, 150); assert.equal(card.players, 3);
+  assert.equal(card.serviceState, "active");
   value.service.resources.cpuAvailable = false;
   assert.equal(fleetCard(value, "live", Date.now()).serviceCpu, null);
   value.server.capturedAt = new Date(Date.now() - 31_000).toISOString();
   assert.equal(fleetCard(value, "live", Date.now()).status, "stale"); assert.equal(fleetCard(value, "live", Date.now()).players, null);
-  value.ready.agents.paper = false; assert.equal(fleetCard(value, "live", Date.now()).status, "offline");
+  value.ready.agents.paper = false; value.service.state = "inactive";
+  assert.equal(fleetCard(value, "live", Date.now()).status, "offline");
+  assert.match(fleetCard(value, "live", Date.now()).reason, /Minecraft is inactive/);
   assert.equal(fleetCard(value, "revoked", Date.now()).serviceMemory, null);
 });
 
@@ -118,6 +121,8 @@ test("Host replacement clears old metrics and ignores delayed old-session events
   assert.deepEqual(value.hostSystem, {}); assert.deepEqual(value.service, {});
   const stale = applyControlMessage(value, { type: "server.event", serverId: A, agentKind: "HOST", agentSession: "host-1", eventType: "telemetry.system", body: { hostCpuPercent: 100 } });
   assert.equal(stale, value);
+  const forged = applyControlMessage(value, { type: "server.event", serverId: A, agentKind: "PAPER", agentSession: "paper-1", eventType: "service.status", body: { state: "active" } });
+  assert.equal(forged, value);
 });
 
 test("fleet rendering exposes selected-server navigation and unavailable metrics without credentials", () => {
@@ -125,4 +130,19 @@ test("fleet rendering exposes selected-server navigation and unavailable metrics
     selected: state(A), connected: true, openServer() {}, pair() {} }));
   assert.match(html, /Fleet overview/); assert.match(html, /Open Alpha 10000000/); assert.match(html, /100% = one CPU core/);
   assert.match(html, /Unavailable/); assert.doesNotMatch(html, /synthetic-private-grant/);
+});
+
+test("mixed-version fleet hides service/node totals and blocks Host controls", () => {
+  const a = state(A); a.ready.server.pluginVersion = "5.0.0"; a.ready.server.hostVersion = "3.5.0";
+  a.ready.server.hostTargetCompatible = false; a.ready.server.paperTargetCompatible = true;
+  assert.equal(compatibleActionTarget(a.ready, "HOST"), false);
+  assert.equal(compatibleActionTarget(a.ready, "PAPER"), true);
+  assert.equal(fleetCard(a, "live", Date.now()).status, "degraded");
+  assert.equal(fleetCard(a, "live", Date.now()).serviceMemory, null);
+  assert.equal(fleetCard(a, "live", Date.now()).serviceState, "unavailable");
+  assert.deepEqual(nodeSummaries([a], Date.now()), []);
+  delete a.ready.server.paperTargetCompatible;
+  assert.equal(compatibleActionTarget(a.ready, "PAPER"), false);
+  a.ready.server.pluginVersion = "4.0.0"; a.ready.server.hostVersion = "4.0.0";
+  assert.equal(compatibleActionTarget(a.ready, "PAPER"), true);
 });

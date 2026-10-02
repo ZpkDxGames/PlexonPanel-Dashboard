@@ -31,6 +31,7 @@ import {
   str,
   type ControlState,
   type JsonMap,
+  compatibleActionTarget,
 } from "../lib/control-state";
 import { DASHBOARD_LABEL, DASHBOARD_VERSION } from "../lib/dashboard-version";
 import { isImmediateControlMessage } from "../lib/display-cadence";
@@ -777,6 +778,8 @@ export default function Dashboard21() {
                 host: message.agents && record(message.agents).host,
                 paperSession: record(message.server).paperSession,
                 hostSession: record(message.server).hostSession,
+                paperTargetCompatible: record(message.server).paperTargetCompatible,
+                hostTargetCompatible: record(message.server).hostTargetCompatible,
                 role: reportedGrant?.role, scopes: reportedGrant?.scopes,
                 capabilities: record(message.server).capabilities });
               if (bindLiveSocket(candidate, grant.serverId, readyContext)) cancelConfirmation();
@@ -905,6 +908,7 @@ export default function Dashboard21() {
       )
         kind = "HOST";
       return (
+        compatibleActionTarget(ready, kind) &&
         Boolean(kind === "HOST" ? ready.agents.host : ready.agents.paper) &&
         canAction(
           action,

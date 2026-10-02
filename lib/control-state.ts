@@ -34,6 +34,8 @@ export interface Ready {
     instanceKey?: string | null;
     fleetContract?: string | null;
     fleetState?: "BOUND" | "INCOMPLETE" | "LEGACY";
+    paperTargetCompatible?: boolean;
+    hostTargetCompatible?: boolean;
   };
 }
 export interface Sample {
@@ -46,6 +48,11 @@ export interface Sample {
   memory: number | null;
   players: number | null;
   gc: number | null;
+}
+export function compatibleActionTarget(ready: Ready, kind: "PAPER" | "HOST"): boolean {
+  const declared = kind === "HOST" ? ready.server.hostTargetCompatible : ready.server.paperTargetCompatible;
+  const fleetRelease = ready.server.pluginVersion === "5.0.0" || ready.server.hostVersion === "5.0.0";
+  return fleetRelease ? declared === true : declared !== false;
 }
 export interface ControlState {
   serverId: string;
@@ -286,6 +293,7 @@ export function applyControlMessage(
       next.chat = [...state.chat, body].slice(-200);
       break;
     case "service.status":
+      if (kind !== "HOST") return state;
       next.service = body;
       break;
     case "backup.progress":
