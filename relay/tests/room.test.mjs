@@ -181,6 +181,7 @@ async function attach(
   f,
   kind = "PAPER",
   key = kind === "HOST" ? f.host : f.key,
+  hello = {},
 ) {
   const socket = new Socket();
   socket.serializeAttachment({
@@ -217,6 +218,7 @@ async function attach(
     operatingSystem: "Linux aarch64",
     capabilities: f.metadata.identity.capabilities,
     hostPublicKey: kind === "PAPER" ? f.host.publicKey : "",
+    ...hello,
   });
   if (socket.closed) return { socket, send, encode };
   const challenge = decodeEnvelope(
@@ -755,4 +757,67 @@ test("Paper cannot forge Host authorization control messages and access sync tol
     devices: [other.d],
   });
   assert.equal(paper2.socket.closed?.code, 4008);
+});
+
+
+function fleetHello(nodeId = randomUUID(), instanceKey = "instance-a", serverName = "Instance A") {
+  return { pluginVersion: "5.0.0", fleetContract: "sha256:c5c8a5d21dd6b108f63fa6ecf00683c56ddb34cfb6716a2166ae22d3d438f902", nodeId, instanceKey, serverName };
+}
+
+test("signed fleet hello binds Paper and Host to the same node and exact instance", async () => {
+  const f = await fixture();
+  const hello = fleetHello();
+  const paper = await attach(f, "PAPER", f.key, hello);
+  assert.equal(paper.socket.attachment.authenticated, true);
+  const wrongNode = await attach(f, "HOST", f.host, { ...hello, nodeId: randomUUID() });
+  assert.equal(wrongNode.socket.closed.code, 4008);
+  const wrongInstance = await attach(f, "HOST", f.host, { ...hello, instanceKey: "instance-b" });
+  assert.equal(wrongInstance.socket.closed.code, 4008);
+  const host = await attach(f, "HOST", f.host, hello);
+  assert.equal(host.socket.attachment.authenticated, true);
+  const ready = f.browser.sent.filter((m) => m.type === "dashboard.ready").at(-1);
+  assert.equal(ready.server.fleetState, "BOUND");
+  assert.equal(ready.server.nodeId, hello.nodeId);
+  assert.equal(ready.server.serverName, "Instance A");
+  const stored = await f.st.storage.get("room-metadata");
+  assert.equal(stored.identity.fleet.serverId, f.serverId);
+  assert.equal(stored.hostIdentity.fleet.nodeId, hello.nodeId);
+  await host.send("telemetry.system", { nodeId: randomUUID(), capturedAt: new Date().toISOString() });
+  assert.equal(host.socket.closed.code, 4008);
+  assert.equal(paper.socket.attachment.authenticated, true);
+});
+
+test("fleet identity cannot be downgraded or replaced by a simultaneous cloned session", async () => {
+  const f = await fixture();
+  const hello = fleetHello();
+  const original = await attach(f, "PAPER", f.key, hello);
+  const duplicate = await attach(f, "PAPER", f.key, hello);
+  assert.equal(duplicate.socket.closed.code, 4008);
+  assert.equal(original.socket.attachment.authenticated, true);
+  const downgrade = await attach(f, "PAPER", f.key);
+  assert.equal(downgrade.socket.closed.code, 4008);
+  assert.equal((await f.st.storage.get("room-metadata")).identity.fleet.nodeId, hello.nodeId);
+  await f.room.webSocketClose(original.socket);
+  const renamed = await attach(f, "PAPER", f.key, { ...hello, serverName: "Renamed A" });
+  assert.equal(renamed.socket.attachment.authenticated, true);
+  const stored = await f.st.storage.get("room-metadata");
+  assert.equal(stored.identity.fleet.serverId, f.serverId);
+  assert.equal(stored.identity.fleet.nodeId, hello.nodeId);
+  assert.equal(stored.identity.fleet.serverName, "Renamed A");
+});
+
+test("unsupported, incomplete or substituted fleet contracts fail before challenge", async () => {
+  for (const hello of [
+    { pluginVersion: "5.0.0" },
+    { ...fleetHello(), fleetContract: "unsupported" },
+    { ...fleetHello(), pluginVersion: "6.0.0" },
+    { ...fleetHello(), instanceKey: "instance-a.service;stop-b" },
+    { ...fleetHello(), serverId: randomUUID() },
+  ]) {
+    const f = await fixture();
+    const rejected = await attach(f, "PAPER", f.key, hello);
+    assert.equal(rejected.socket.closed.code, 4008);
+    assert.equal(rejected.socket.sent.some((m) => m.type === "gateway.challenge"), false);
+    assert.equal((await f.st.storage.get("room-metadata")).identity.fleet, undefined);
+  }
 });

@@ -1,3 +1,5 @@
+import { assertFleetAssociation } from "../fleet-association.js";
+import { parseFleetIdentity, type FleetIdentity } from "../fleet-contract.js";
 import { DatabaseSync } from "node:sqlite";
 
 export interface StoredRoom {
@@ -11,6 +13,7 @@ export interface StoredRoom {
   currentPairing?: PairingRegistration;
 }
 export interface StoredAgentIdentity {
+  fleet?: FleetIdentity;
   publicKey: string;
   fingerprint: string;
   pluginVersion: string;
@@ -101,12 +104,18 @@ export class CoordinationStore {
     if (!row) return emptyRoom();
     let parsed: unknown;
     try { parsed = JSON.parse(row.value); } catch { throw new Error(`Stored coordination state for ${serverId} is corrupt`); }
-    if (!validStoredRoom(parsed)) throw new Error(`Stored coordination state for ${serverId} is incompatible`);
+    if (!validStoredRoom(parsed)
+        || (parsed.identity?.fleet && parsed.identity.fleet.serverId !== serverId)
+        || (parsed.hostIdentity?.fleet && parsed.hostIdentity.fleet.serverId !== serverId)) throw new Error(`Stored coordination state for ${serverId} is incompatible`);
+    if (parsed.identity) assertFleetAssociation(parsed.identity, undefined, parsed.hostIdentity);
     return parsed;
   }
 
   saveRoom(serverId: string, room: StoredRoom): void {
-    if (!validStoredRoom(room)) throw new Error("Refused to persist invalid room state");
+    if (!validStoredRoom(room)
+        || (room.identity?.fleet && room.identity.fleet.serverId !== serverId)
+        || (room.hostIdentity?.fleet && room.hostIdentity.fleet.serverId !== serverId)) throw new Error("Refused to persist invalid room state");
+    if (room.identity) assertFleetAssociation(room.identity, undefined, room.hostIdentity);
     this.db.prepare(`
       INSERT INTO server_rooms(server_id,state_json,updated_at) VALUES(?,?,?)
       ON CONFLICT(server_id) DO UPDATE SET state_json=excluded.state_json,updated_at=excluded.updated_at
@@ -225,7 +234,8 @@ function validIdentity(value: unknown): value is StoredAgentIdentity {
     typeof value.operatingSystem === "string" && record(value.capabilities) &&
     Object.keys(value.capabilities).length <= 256 &&
     Object.values(value.capabilities).every((entry) => typeof entry === "boolean") &&
-    typeof value.hostPublicKey === "string" && value.hostPublicKey.length <= 512;
+    typeof value.hostPublicKey === "string" && value.hostPublicKey.length <= 512 &&
+    (value.fleet === undefined || parseFleetIdentity(value.fleet) !== null);
 }
 function validDevice(value: unknown): value is StoredDevice {
   if (!record(value)) return false;

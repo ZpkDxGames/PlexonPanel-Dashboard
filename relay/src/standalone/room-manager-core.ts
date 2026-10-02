@@ -1,3 +1,4 @@
+import { fleetFromHello, assertFleetAssociation, fleetReadyFields, assertNodeTelemetry } from "../fleet-association.js";
 import {
   MAX_ENVELOPE_BYTES,
   assertFreshEnvelope,
@@ -313,7 +314,10 @@ export class Room {
         throw new Error("Host identity is not locally attached");
       if (session.kind === "PAPER" && this.metadata.identity && this.metadata.identity.publicKey !== key)
         throw new Error("Room is already bound");
-      session.candidate = identityFromHello(body, key, fingerprint);
+      session.candidate = identityFromHello(body, key, fingerprint, this.serverId);
+      assertFleetAssociation(session.candidate,
+          session.kind === "PAPER" ? this.metadata.identity : this.metadata.hostIdentity,
+          session.kind === "PAPER" ? this.metadata.hostIdentity : this.metadata.identity);
       session.publicKey = key;
       session.fingerprint = fingerprint;
       session.challenge = randomToken();
@@ -357,6 +361,12 @@ export class Room {
         this.counters.authenticationFailures += 1;
         throw new Error("Challenge rejected");
       }
+      assertFleetAssociation(session.candidate,
+          session.kind === "PAPER" ? this.metadata.identity : this.metadata.hostIdentity,
+          session.kind === "PAPER" ? this.metadata.hostIdentity : this.metadata.identity);
+      const previous = session.kind === "PAPER" ? this.paper : this.host;
+      if (session.candidate.fleet && previous?.authenticated)
+        throw new Error("Duplicate fleet agent session denied");
       if (session.kind === "PAPER") this.metadata.identity = session.candidate;
       else this.metadata.hostIdentity = session.candidate;
       session.authenticated = true;
@@ -383,6 +393,8 @@ export class Room {
     }
 
     if (!session.authenticated) throw new Error("Agent authentication required");
+    if (envelope.type === "telemetry.system")
+      assertNodeTelemetry(session.kind === "PAPER" ? this.metadata.identity : this.metadata.hostIdentity, body);
     if (session.kind === "HOST" && session.publicKey !== this.metadata.identity?.hostPublicKey)
       throw new Error("Host authorization changed");
 
@@ -841,6 +853,7 @@ export class Room {
       },
       device: this.metadata.devices.find((device) => device.deviceId === session.access.deviceId),
       server: {
+        ...fleetReadyFields(this.metadata.identity, this.metadata.hostIdentity),
         serverId: this.serverId,
         fingerprint: this.metadata.identity?.fingerprint ?? "",
         pluginVersion: this.metadata.identity?.pluginVersion ?? "",
@@ -927,14 +940,17 @@ function identityFromHello(
   body: Record<string, unknown>,
   publicKey: string,
   fingerprint: string,
+  serverId: string,
 ): StoredAgentIdentity {
   const capabilities = record(body.capabilities) ? body.capabilities : {};
   if (Object.keys(capabilities).length > 256 || !Object.values(capabilities).every((value) => typeof value === "boolean"))
     throw new Error("Invalid capabilities");
+  const fleet = fleetFromHello(serverId, body);
   return {
     publicKey,
     fingerprint,
-    pluginVersion: requiredText(body.pluginVersion, "pluginVersion", 128),
+    pluginVersion: requiredText(body.pluginVersion, "pluginVersion", 64),
+    ...(fleet ? { fleet } : {}),
     paperVersion: requiredText(body.paperVersion, "paperVersion", 256),
     minecraftVersion: requiredText(body.minecraftVersion, "minecraftVersion", 64),
     javaVersion: requiredText(body.javaVersion, "javaVersion", 128),
