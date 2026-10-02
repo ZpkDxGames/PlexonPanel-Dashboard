@@ -60,6 +60,14 @@ type SessionCredential = Pick<
 >;
 
 let activeSocket: WebSocket | null = null;
+let activeBinding: { serverId: string; generation: string; context: string } | null = null;
+export interface ActionTarget { readonly serverId: string; readonly generation: string }
+
+export function captureActionTarget(expectedServerId: string): ActionTarget {
+  if (!activeSocket || !activeBinding || activeBinding.serverId !== expectedServerId)
+    throw new Error("The selected server connection changed. Review the target and try again.");
+  return Object.freeze({ serverId: activeBinding.serverId, generation: activeBinding.generation });
+}
 const pendingActions = new Map<
   string,
   {
@@ -67,6 +75,9 @@ const pendingActions = new Map<
     reject: (reason: Error) => void;
     timer: ReturnType<typeof setTimeout>;
     action: string;
+    socket: WebSocket;
+    serverId: string;
+    generation: string;
     agentKind?: "PAPER" | "HOST";
   }
 >();
@@ -277,17 +288,22 @@ export async function requestLiveConnection(
   });
 }
 
-export function bindLiveSocket(socket: WebSocket | null): void {
-  if (activeSocket && activeSocket !== socket)
+export function bindLiveSocket(socket: WebSocket | null, serverId = "", context = ""): boolean {
+  const changed = activeSocket !== socket || activeBinding?.serverId !== serverId || activeBinding?.context !== context;
+  if (activeSocket && changed)
     rejectPendingActions(
-      "The connection closed before completion was observed. Check the local audit; this request will not be resent.",
+      "The connection changed before completion was observed. Check the local audit; this request will not be resent.",
     );
   activeSocket = socket;
+  if (!socket) activeBinding = null;
+  else if (changed || !activeBinding) activeBinding = { serverId, context, generation: crypto.randomUUID() };
+  return changed;
 }
 
 export function unbindLiveSocket(socket: WebSocket): boolean {
   if (activeSocket !== socket) return false;
   activeSocket = null;
+  activeBinding = null;
   rejectPendingActions(
     "The connection closed before completion was observed. Check the local audit; this request will not be resent.",
   );
@@ -314,6 +330,7 @@ function rejectionBoundary(
 
 export function handleRelayControlMessage(
   message: Record<string, unknown>,
+  sourceSocket?: WebSocket,
 ): boolean {
   if (message.type === "dashboard.action_queued") return true;
   const result =
@@ -326,6 +343,14 @@ export function handleRelayControlMessage(
     typeof result.requestId === "string" ? result.requestId : "";
   const pending = pendingActions.get(requestId);
   if (!pending) return true;
+  if ((sourceSocket && sourceSocket !== pending.socket)
+      || pending.generation !== activeBinding?.generation
+      || pending.socket !== activeSocket
+      || (message.serverId !== undefined && message.serverId !== pending.serverId)
+      || (pending.serverId && message.serverId === undefined && sourceSocket !== pending.socket)
+      || (result.action !== undefined && result.action !== pending.action)
+      || (pending.agentKind && message.agentKind !== undefined && message.agentKind !== pending.agentKind))
+    return true;
   clearTimeout(pending.timer);
   pendingActions.delete(requestId);
   if (result.status === "SUCCESS")
@@ -383,9 +408,14 @@ export async function sendDashboardAction(
   action: string,
   parameters: Record<string, unknown>,
   agentKind?: "PAPER" | "HOST",
+  expectedTarget?: ActionTarget,
 ): Promise<ActionCompletion> {
   const socket = activeSocket;
-  if (!socket || socket.readyState !== WebSocket.OPEN)
+  const binding = activeBinding;
+  if (expectedTarget && (!binding || expectedTarget.serverId !== binding.serverId
+      || expectedTarget.generation !== binding.generation))
+    throw new Error("The confirmed server connection changed. Review the target and confirm again.");
+  if (!socket || !binding || socket.readyState !== WebSocket.OPEN)
     throw new Error("The relay is not connected.");
   if (!/^[a-z][a-z0-9_.-]{0,63}$/.test(action) || pendingActions.size >= 32)
     throw new Error("Request limit reached.");
@@ -404,7 +434,8 @@ export async function sendDashboardAction(
         ? 15 * 60000
         : 45000,
     );
-    pendingActions.set(requestId, { resolve, reject, timer, action, agentKind });
+    pendingActions.set(requestId, { resolve, reject, timer, action, agentKind,
+      socket, serverId: binding.serverId, generation: binding.generation });
     try {
       socket.send(
         JSON.stringify({
@@ -432,6 +463,7 @@ export function cacheDashboardWorkspace(
 export async function logoutDashboard(): Promise<void> {
   const socket = activeSocket;
   activeSocket = null;
+  activeBinding = null;
   rejectPendingActions(
     "This browser credential was removed before the action completed.",
   );

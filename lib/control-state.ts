@@ -28,6 +28,12 @@ export interface Ready {
     paperCapabilities: Record<string, boolean>;
     hostCapabilities: Record<string, boolean>;
     paperSession?: string;
+    hostSession?: string;
+    serverName?: string;
+    nodeId?: string | null;
+    instanceKey?: string | null;
+    fleetContract?: string | null;
+    fleetState?: "BOUND" | "INCOMPLETE" | "LEGACY";
   };
 }
 export interface Sample {
