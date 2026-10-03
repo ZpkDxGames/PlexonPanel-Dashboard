@@ -1,6 +1,7 @@
 import { execFileSync } from "node:child_process";
-import { appendFileSync, readFileSync } from "node:fs";
+import { appendFileSync, lstatSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { isDeepStrictEqual } from "node:util";
 import { deploymentDecision, RECEIPT_PATH } from "./coordinated-deployment-policy.mjs";
 
 const root = resolve(import.meta.dirname, "..");
@@ -17,7 +18,25 @@ try {
       parent = git(["rev-parse", "HEAD^"]);
       changedPaths = git(["diff", "--name-only", "HEAD^", "HEAD", "--"]).split("\n").filter(Boolean);
       // Local unstaged changes cannot ride an accepted activation commit.
-      if (git(["status", "--porcelain", "--untracked-files=all"])) {
+      const status = git(["status", "--porcelain", "--untracked-files=all"]);
+      let equivalentVercelConfig = false;
+      if (status === "M vercel.json" && process.env.VERCEL === "1"
+          && process.env.VERCEL_ENV === "production" && process.env.VERCEL_GIT_COMMIT_REF === "main") {
+        const info = lstatSync(resolve(root, "vercel.json"));
+        if (info.isFile() && !info.isSymbolicLink() && !(info.mode & 0o111)) {
+          const original = JSON.parse(git(["show", "HEAD:vercel.json"]));
+          const current = JSON.parse(readFileSync(resolve(root, "vercel.json"), "utf8"));
+          equivalentVercelConfig = isDeepStrictEqual(original, current);
+          if (!equivalentVercelConfig) {
+            const keys = [...new Set([...Object.keys(original), ...Object.keys(current)])]
+              .filter(key => !isDeepStrictEqual(original[key], current[key]));
+            process.stdout.write(`ACTIVATION_VERCEL_CONFIG_CHANGED_KEYS=${JSON.stringify(keys)}\n`);
+          }
+        }
+      }
+      // Vercel rewrites this JSON while building. Only identical parsed values are accepted.
+      // Local formatting edits, other files, and actual configuration changes still fail closed.
+      if (status && !equivalentVercelConfig) {
         changedPaths.push("WORKTREE_CHANGED");
         // File names only: never print a diff, environment values, or file contents.
         const paths = [git(["diff", "--name-only", "HEAD", "--"]),

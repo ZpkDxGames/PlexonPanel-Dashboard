@@ -89,6 +89,8 @@ test("actual activation ancestry, dirty source, preview hold and Vercel exit cod
     for (const file of ["coordinated-deployment.mjs", "coordinated-deployment-policy.mjs"])
       copyFileSync(join("scripts", file), join(directory, "scripts", file));
     writeFileSync(join(directory, "package.json"), JSON.stringify({ type: "module", version: "5.0.0" }));
+    const vercelConfig = { framework: "nextjs", buildCommand: "npm run build", installCommand: "npm ci" };
+    writeFileSync(join(directory, "vercel.json"), JSON.stringify(vercelConfig, null, 2) + "\n");
     writeFileSync(join(directory, RECEIPT_PATH), JSON.stringify({ ...fixtureReceipt, state: "HOLD" }));
     const git = args => execFileSync("git", args, { cwd: directory, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();
     git(["init", "-q"]); git(["config", "user.name", "Coordination fixture"]); git(["config", "user.email", "fixture@example.invalid"]);
@@ -105,7 +107,16 @@ test("actual activation ancestry, dirty source, preview hold and Vercel exit cod
     const preview = { VERCEL: "1", VERCEL_ENV: "preview", VERCEL_GIT_COMMIT_REF: "feature" };
     assert.equal(run("--vercel-ignore", preview).status, 0);
     assert.equal(run("--require", preview).status, 1);
-    assert.equal(run("--require", { VERCEL: "1", VERCEL_ENV: "production", VERCEL_GIT_COMMIT_REF: "main" }).status, 0);
+    const production = { VERCEL: "1", VERCEL_ENV: "production", VERCEL_GIT_COMMIT_REF: "main" };
+    assert.equal(run("--require", production).status, 0);
+    writeFileSync(join(directory, "vercel.json"), JSON.stringify(vercelConfig));
+    assert.equal(run("--require").status, 1);
+    assert.equal(run("--require", production).status, 0);
+    assert.equal(run("--require", preview).status, 1);
+    writeFileSync(join(directory, "vercel.json"), JSON.stringify({ ...vercelConfig, buildCommand: "echo unexpected" }));
+    assert.equal(run("--require", production).status, 1);
+    assert.match(run("--require", production).stdout, /ACTIVATION_VERCEL_CONFIG_CHANGED_KEYS=\["buildCommand"\]/);
+    writeFileSync(join(directory, "vercel.json"), JSON.stringify(vercelConfig, null, 2) + "\n");
     assert.equal(run("--github-output", { GITHUB_OUTPUT: output }).status, 0);
     assert.equal(readFileSync(output, "utf8"), `allowed=true\nworker_allowed=${fixtureReceipt.schemaVersion === 1}\n`);
     writeFileSync(output, "");
