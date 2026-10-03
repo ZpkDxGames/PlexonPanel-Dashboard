@@ -5,6 +5,7 @@ import { deploymentDecision, RECEIPT_PATH } from "./coordinated-deployment-polic
 
 const root = resolve(import.meta.dirname, "..");
 let result = { allowed: false, code: "COORDINATION_CHECK_UNAVAILABLE" };
+let workerAllowed = false;
 try {
   const version = JSON.parse(readFileSync(resolve(root, "package.json"), "utf8")).version;
   let receipt = null, parent = null, changedPaths = null;
@@ -23,12 +24,14 @@ try {
   if (version === "5.0.0" && process.env.VERCEL === "1"
       && (process.env.VERCEL_ENV !== "production" || process.env.VERCEL_GIT_COMMIT_REF !== "main"))
     result = { allowed: false, code: "FIVE_PREVIEW_DEPLOYMENT_HELD" };
+  // Schema 2 authorizes a staged VPS migration; Worker publication is a separate target.
+  workerAllowed = result.allowed && (version === "4.0.0" || receipt?.schemaVersion === 1);
 } catch { /* Fail closed without printing parser input or command output. */ }
 
 process.stdout.write(`${result.code}\n`);
 if (process.argv.includes("--github-output")) {
   if (!process.env.GITHUB_OUTPUT) process.exit(1);
-  appendFileSync(process.env.GITHUB_OUTPUT, `allowed=${result.allowed}\n`);
+  appendFileSync(process.env.GITHUB_OUTPUT, `allowed=${result.allowed}\nworker_allowed=${workerAllowed}\n`);
 } else if (process.argv.includes("--vercel-ignore")) {
   process.exit(result.allowed ? 1 : 0);
 } else {
