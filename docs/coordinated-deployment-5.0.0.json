@@ -1,16 +1,60 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "version": "5.0.0",
-  "state": "HOLD",
-  "acceptedDashboardSourceCommit": null,
-  "acceptedCoreSourceCommit": null,
-  "dashboardCiRun": null,
-  "coreCiRun": null,
+  "state": "READY",
+  "acceptedDashboardSourceCommit": "89ce9e914177bcfdd9e7cab8dba40652b45ea8cc",
+  "acceptedCoreSourceCommit": "fb3c5444715179425183aec6d1f1fbe140211753",
+  "dashboardCiRun": 37151932186,
+  "coreCiRun": 37080636071,
+  "legacyInstallationsRetained": true,
+  "runtimeCertification": "NOT_EXECUTED",
   "evidence": {
-    "currentOperationalBackup": "NOT_VERIFIED",
-    "offVpsIntegrity": "NOT_VERIFIED",
-    "rollbackRehearsal": "NOT_EXECUTED",
-    "operatorDeploymentReady": "NOT_VERIFIED",
+    "currentOperationalBackup": "SKIPPED_OPERATOR_DECISION",
+    "offVpsIntegrity": "SKIPPED_OPERATOR_DECISION",
+    "rollbackRehearsal": "PASS",
+    "operatorDeploymentReady": "PASS",
     "ociBackup": "SKIPPED_OPERATOR_DECISION"
+  },
+  "operatorDecision": {
+    "approved": true,
+    "intent": "STAGED_VPS_MIGRATION",
+    "confirmedAt": "2026-10-03T20:20:24Z",
+    "reason": "Continue the staged VPS migration under the operator's existing decision to skip a new backup and off-VPS verification. Retain the remaining legacy installations. Executed relay and production Dashboard alias recovery checks cover control-plane recovery; world-data recovery and full 5.0 runtime certification remain unexecuted.",
+    "acceptedDashboardSourceCommit": "89ce9e914177bcfdd9e7cab8dba40652b45ea8cc",
+    "acceptedCoreSourceCommit": "fb3c5444715179425183aec6d1f1fbe140211753",
+    "scope": {
+      "nodeId": "e8a25ee9-8645-4728-87c9-ed7565244ed7",
+      "serverId": "37f9fc3a-cb34-4b24-add5-091f4df4b522",
+      "instanceKey": "plexoncraft"
+    },
+    "exceptions": [
+      "currentOperationalBackup",
+      "offVpsIntegrity"
+    ]
+  },
+  "deploymentTarget": "vercel-dashboard-and-vps-standalone-relay",
+  "recoveryEvidence": {
+    "scope": "control-plane-runtime-state-switch-and-production-alias-recovery",
+    "relayReceipt": "/etc/plexonpanel/migration-permissions/relay-rollback.0b8nmmj6/receipt.json",
+    "relayCompletedAt": "2026-10-03T20:09:00Z",
+    "dashboardRollbackCommit": "8f05f115a8e92e87eaa6097da532e49db795cf6c",
+    "dashboardRestoredCommit": "398dc57aec72e7afae71ce577981577f69d1ec62",
+    "dashboardRollbackVerifiedAt": "2026-10-03T20:26:34Z",
+    "dashboardRestoreVerifiedAt": "2026-10-03T20:28:09Z",
+    "worldDataRecoveryTested": false,
+    "fiveDashboardRuntimeRecoveryTested": false
+  },
+  "readinessEvidence": {
+    "reportedAt": "2026-10-03T21:18:31Z",
+    "marker": "VPS_READY_FOR_DASHBOARD_ACTIVATION_SERVICES_STOPPED",
+    "instanceStateUnchanged": true,
+    "nativeNodeValidation": true,
+    "nativeInstanceAccountValidation": true,
+    "instanceServicesStopped": true,
+    "relayAndHelpersActive": true
+  },
+  "legacyRetention": {
+    "remainingInstallationsRetained": true,
+    "hostFourJarPreviouslyRemovedByOperator": true
   }
 }
