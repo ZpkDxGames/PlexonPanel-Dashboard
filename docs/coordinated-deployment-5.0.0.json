@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "version": "5.0.0",
-  "state": "READY",
+  "state": "HOLD",
   "acceptedDashboardSourceCommit": "8f6bc2ff0a8dec17f0e18a6e15c3830e22a7c6ef",
   "acceptedCoreSourceCommit": "fb3c5444715179425183aec6d1f1fbe140211753",
   "dashboardCiRun": 37155442876,
@@ -56,5 +56,6 @@
   "legacyRetention": {
     "remainingInstallationsRetained": true,
     "hostFourJarPreviouslyRemovedByOperator": true
-  }
+  },
+  "activationBlocker": "Vercel rewrites vercel.json in its build worktree. Equivalent JSON values are accepted only in production/main; changed values and all other source edits remain blocked pending fresh source CI."
 }
