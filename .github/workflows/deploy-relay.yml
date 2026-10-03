@@ -16,7 +16,7 @@ jobs:
   coordination:
     runs-on: ubuntu-24.04
     outputs:
-      allowed: ${{ steps.gate.outputs.allowed }}
+      worker_allowed: ${{ steps.gate.outputs.worker_allowed }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -29,7 +29,7 @@ jobs:
 
   deploy-relay:
     needs: coordination
-    if: github.ref == 'refs/heads/main' && needs.coordination.outputs.allowed == 'true'
+    if: github.ref == 'refs/heads/main' && needs.coordination.outputs.worker_allowed == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     env:

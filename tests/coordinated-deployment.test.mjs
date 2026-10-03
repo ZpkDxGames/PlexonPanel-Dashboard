@@ -81,6 +81,7 @@ test("Vercel exit convention and explicit deployment requirement agree with actu
 test("actual activation ancestry, dirty source, preview hold and Vercel exit codes", () => {
   for (const fixtureReceipt of [receipt, exceptionReceipt]) {
   const directory = mkdtempSync(join(tmpdir(), "plexon-coordination-"));
+  const output = `${directory}-github-output`;
   try {
     mkdirSync(join(directory, "scripts")); mkdirSync(join(directory, "docs"));
     for (const file of ["coordinated-deployment.mjs", "coordinated-deployment-policy.mjs"])
@@ -103,11 +104,26 @@ test("actual activation ancestry, dirty source, preview hold and Vercel exit cod
     assert.equal(run("--vercel-ignore", preview).status, 0);
     assert.equal(run("--require", preview).status, 1);
     assert.equal(run("--require", { VERCEL: "1", VERCEL_ENV: "production", VERCEL_GIT_COMMIT_REF: "main" }).status, 0);
+    assert.equal(run("--github-output", { GITHUB_OUTPUT: output }).status, 0);
+    assert.equal(readFileSync(output, "utf8"), `allowed=true\nworker_allowed=${fixtureReceipt.schemaVersion === 1}\n`);
+    writeFileSync(output, "");
+    assert.equal(run("--github-output", { ...preview, GITHUB_OUTPUT: output }).status, 0);
+    assert.equal(readFileSync(output, "utf8"), "allowed=false\nworker_allowed=false\n");
     writeFileSync(join(directory, "unaccepted-source.mjs"), "export const changed = true;");
     assert.equal(run("--require").status, 1);
+    writeFileSync(output, "");
+    assert.equal(run("--github-output", { GITHUB_OUTPUT: output }).status, 0);
+    assert.equal(readFileSync(output, "utf8"), "allowed=false\nworker_allowed=false\n");
     rmSync(join(directory, "unaccepted-source.mjs"));
     writeFileSync(join(directory, "package.json"), JSON.stringify({ type: "module", version: "5.0.0", changed: true }));
     assert.equal(run("--require").status, 1);
-  } finally { rmSync(directory, { recursive: true, force: true }); }
+  } finally { rmSync(output, { force: true }); rmSync(directory, { recursive: true, force: true }); }
   }
+});
+
+test("Cloudflare deployment consumes the Worker-specific authorization", () => {
+  const workflow = readFileSync(".github/workflows/deploy-relay.yml", "utf8");
+  assert.match(workflow, /worker_allowed: \$\{\{ steps\.gate\.outputs\.worker_allowed \}\}/);
+  assert.match(workflow, /needs\.coordination\.outputs\.worker_allowed == 'true'/);
+  assert.doesNotMatch(workflow, /needs\.coordination\.outputs\.allowed == 'true'/);
 });
