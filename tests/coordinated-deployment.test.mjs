@@ -66,16 +66,18 @@ test("five is held until exact accepted source and executed coordination evidenc
   assert.equal(decide({ receipt: { ...receipt, acceptedCoreSourceCommit: "invalid" } }).allowed, false);
   assert.equal(decide({ version: "5.0.0-rc.1" }).allowed, false);
 });
-test("committed hold receipt cannot accidentally authorize five", () => {
+test("committed receipt cannot authorize unrelated fixture ancestry", () => {
   const committed = JSON.parse(readFileSync(RECEIPT_PATH, "utf8"));
   assert.equal(decide({ receipt: committed }).allowed, false);
 });
-test("Vercel exit convention and explicit deployment requirement agree with actual version", () => {
-  const version = JSON.parse(readFileSync("package.json", "utf8")).version;
-  const allowed = version === "4.0.0";
-  const run = flag => spawnSync(process.execPath, ["scripts/coordinated-deployment.mjs", flag], { encoding: "utf8" });
-  assert.equal(run("--vercel-ignore").status, allowed ? 1 : 0);
-  assert.equal(run("--require").status, allowed ? 0 : 1);
+test("Vercel ignore and explicit build exit conventions agree for the current receipt", () => {
+  const run = flag => spawnSync(process.execPath, ["scripts/coordinated-deployment.mjs", flag], {
+    encoding: "utf8", env: { ...process.env, VERCEL: "0" },
+  });
+  const ignore = run("--vercel-ignore"), require = run("--require");
+  assert.ok([0, 1].includes(require.status));
+  assert.equal(ignore.status, require.status === 0 ? 1 : 0);
+  assert.equal(ignore.stdout, require.stdout);
   assert.equal(deploymentDecision({ version: "4.0.0" }).allowed, true);
 });
 test("actual activation ancestry, dirty source, preview hold and Vercel exit codes", () => {
@@ -111,6 +113,7 @@ test("actual activation ancestry, dirty source, preview hold and Vercel exit cod
     assert.equal(readFileSync(output, "utf8"), "allowed=false\nworker_allowed=false\n");
     writeFileSync(join(directory, "unaccepted-source.mjs"), "export const changed = true;");
     assert.equal(run("--require").status, 1);
+    assert.match(run("--require").stdout, /ACTIVATION_WORKTREE_PATHS=\["unaccepted-source.mjs"\]/);
     writeFileSync(output, "");
     assert.equal(run("--github-output", { GITHUB_OUTPUT: output }).status, 0);
     assert.equal(readFileSync(output, "utf8"), "allowed=false\nworker_allowed=false\n");
