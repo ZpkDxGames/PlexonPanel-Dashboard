@@ -17,7 +17,13 @@ try {
       parent = git(["rev-parse", "HEAD^"]);
       changedPaths = git(["diff", "--name-only", "HEAD^", "HEAD", "--"]).split("\n").filter(Boolean);
       // Local unstaged changes cannot ride an accepted activation commit.
-      if (git(["status", "--porcelain", "--untracked-files=all"])) changedPaths.push("WORKTREE_CHANGED");
+      if (git(["status", "--porcelain", "--untracked-files=all"])) {
+        changedPaths.push("WORKTREE_CHANGED");
+        // File names only: never print a diff, environment values, or file contents.
+        const paths = [git(["diff", "--name-only", "HEAD", "--"]),
+          git(["ls-files", "--others", "--exclude-standard"])].join("\n").split("\n").filter(Boolean);
+        process.stdout.write(`ACTIVATION_WORKTREE_PATHS=${JSON.stringify(paths.slice(0, 30))}\n`);
+      }
     }
   }
   result = deploymentDecision({ version, receipt, parent, changedPaths });

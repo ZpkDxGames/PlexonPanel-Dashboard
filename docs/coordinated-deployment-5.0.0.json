@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "version": "5.0.0",
-  "state": "READY",
+  "state": "HOLD",
   "acceptedDashboardSourceCommit": "89ce9e914177bcfdd9e7cab8dba40652b45ea8cc",
   "acceptedCoreSourceCommit": "fb3c5444715179425183aec6d1f1fbe140211753",
   "dashboardCiRun": 37151932186,
@@ -56,5 +56,6 @@
   "legacyRetention": {
     "remainingInstallationsRetained": true,
     "hostFourJarPreviouslyRemovedByOperator": true
-  }
+  },
+  "activationBlocker": "Failed activation 6b7f90b: CI expected HOLD after READY, and Vercel reported changed build worktree. Source checks are being corrected and diagnosed before reactivation."
 }
