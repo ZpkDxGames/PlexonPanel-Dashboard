@@ -1,10 +1,10 @@
 {
   "schemaVersion": 2,
   "version": "5.0.0",
-  "state": "HOLD",
-  "acceptedDashboardSourceCommit": "89ce9e914177bcfdd9e7cab8dba40652b45ea8cc",
+  "state": "READY",
+  "acceptedDashboardSourceCommit": "8f6bc2ff0a8dec17f0e18a6e15c3830e22a7c6ef",
   "acceptedCoreSourceCommit": "fb3c5444715179425183aec6d1f1fbe140211753",
-  "dashboardCiRun": 37151932186,
+  "dashboardCiRun": 37155442876,
   "coreCiRun": 37080636071,
   "legacyInstallationsRetained": true,
   "runtimeCertification": "NOT_EXECUTED",
@@ -20,7 +20,7 @@
     "intent": "STAGED_VPS_MIGRATION",
     "confirmedAt": "2026-10-03T20:20:24Z",
     "reason": "Continue the staged VPS migration under the operator's existing decision to skip a new backup and off-VPS verification. Retain the remaining legacy installations. Executed relay and production Dashboard alias recovery checks cover control-plane recovery; world-data recovery and full 5.0 runtime certification remain unexecuted.",
-    "acceptedDashboardSourceCommit": "89ce9e914177bcfdd9e7cab8dba40652b45ea8cc",
+    "acceptedDashboardSourceCommit": "8f6bc2ff0a8dec17f0e18a6e15c3830e22a7c6ef",
     "acceptedCoreSourceCommit": "fb3c5444715179425183aec6d1f1fbe140211753",
     "scope": {
       "nodeId": "e8a25ee9-8645-4728-87c9-ed7565244ed7",
@@ -56,6 +56,5 @@
   "legacyRetention": {
     "remainingInstallationsRetained": true,
     "hostFourJarPreviouslyRemovedByOperator": true
-  },
-  "activationBlocker": "Failed activation 6b7f90b: CI expected HOLD after READY, and Vercel reported changed build worktree. Source checks are being corrected and diagnosed before reactivation."
+  }
 }
