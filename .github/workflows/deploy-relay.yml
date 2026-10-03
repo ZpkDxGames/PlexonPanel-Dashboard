@@ -74,11 +74,17 @@ jobs:
               --header "Cache-Control: no-cache" \
               "$PRODUCTION_RELAY_URL/healthz?revision=$GITHUB_SHA&attempt=$attempt" \
               > "$health_file" &&
-              jq -e --arg sha "$GITHUB_SHA" '
+              jq -e --arg sha "$GITHUB_SHA" --arg version "$(node -p 'require("./package.json").version')" '
                 .ok == true and
+                .version == $version and
                 .protocolVersion == 3 and
                 .runtimeKind == "cloudflare-worker" and
-                .gitCommit == $sha
+                .gitCommit == $sha and
+                (if $version == "5.0.0" then
+                  .fleetContract == "sha256:c5c8a5d21dd6b108f63fa6ecf00683c56ddb34cfb6716a2166ae22d3d438f902" and
+                  .actionContract == "sha256:cd5e9edb0aecd8ba8f021a60f83ee1cbd90a599785c31a385c66c1c9f10c9a90" and
+                  .configurationSchemas == {paper:5,host:5}
+                 else true end)
               ' "$health_file" >/dev/null; then
               echo "Production relay reports accepted revision ${GITHUB_SHA:0:12}."
               exit 0

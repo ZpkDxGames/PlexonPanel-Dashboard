@@ -2,6 +2,8 @@ import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
 import { copyFile, readdir, readFile, stat, writeFile } from "node:fs/promises";
 import { resolve, relative } from "node:path";
+import { FLEET_CONTRACT_ID } from "../relay/dist/fleet-contract.js";
+import { ACTION_CONTRACT_ID } from "../relay/dist/scopes.js";
 
 const root = resolve(import.meta.dirname, "..");
 const output = resolve(root, "artifacts/plexonpanel-relay");
@@ -45,6 +47,9 @@ const timestamp = execFileSync("git", ["show", "-s", "--format=%cI", sourceCommi
 const manifest = {
   version: sourcePackage.version,
   protocolVersion: 3,
+  fleetContract: FLEET_CONTRACT_ID,
+  actionContract: ACTION_CONTRACT_ID,
+  configurationSchemas: { paper: 5, host: 5 },
   dashboardSourceCommit: sourceCommit,
   relaySourceCommit: sourceCommit,
   dashboardCiRun: /^\d+$/.test(process.env.GITHUB_RUN_ID ?? "")
@@ -58,6 +63,10 @@ const manifest = {
     ci: process.env.GITHUB_RUN_ID ? "CI_RUNNING" : "LOCAL_VERIFIED",
     deployment: "NOT_EXECUTED",
     runtime: "NOT_EXECUTED",
+    migration: "NOT_EXECUTED",
+    security: "SOURCE_TESTED_RUNTIME_NOT_EXECUTED",
+    backup: "NOT_EXECUTED",
+    browser: "BLOCKED_WORKSPACE_BROWSER_CAPABILITY",
   },
   artifacts,
 };

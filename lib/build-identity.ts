@@ -1,3 +1,6 @@
+import { ACTION_CONTRACT_ID } from "./scopes";
+import { FLEET_CONTRACT_ID } from "./fleet-contract";
+
 export interface BuildIdentity {
   version: string;
   gitCommit: string;
@@ -5,6 +8,7 @@ export interface BuildIdentity {
   protocolVersion: number;
   runtimeKind: string;
   actionContract?: string;
+  fleetContract?: string;
 }
 
 export interface ControlPlaneBuilds {
@@ -35,6 +39,8 @@ function buildIdentity(value: unknown): BuildIdentity | null {
     /^sha256:[0-9a-f]{64}$/.test(candidate.actionContract)
       ? { actionContract: candidate.actionContract }
       : {}),
+    ...(typeof candidate.fleetContract === "string" && /^sha256:[0-9a-f]{64}$/.test(candidate.fleetContract)
+      ? { fleetContract: candidate.fleetContract } : {}),
   };
 }
 
@@ -83,12 +89,16 @@ export async function loadControlPlaneBuilds(): Promise<ControlPlaneBuilds> {
       message: "Control-plane build identity is unavailable. Do not treat this deployment as fully verified.",
     };
   }
-  if (dashboardCommit !== relayCommit) {
+  const five = dashboardBuild?.version.startsWith("5.") || relayBuild?.version.startsWith("5.");
+  const contractMatches = !five || [dashboardBuild, relayBuild].every(build =>
+    build?.version === "5.0.0" && build.protocolVersion === 3
+    && build.actionContract === ACTION_CONTRACT_ID && build.fleetContract === FLEET_CONTRACT_ID);
+  if (dashboardCommit !== relayCommit || !contractMatches) {
     return {
       dashboard: dashboardBuild,
       relay: relayBuild,
       status: "MISMATCH",
-      message: "Control-plane deployment mismatch: Dashboard and relay were not built from the same accepted revision.",
+      message: "Control-plane deployment mismatch: Dashboard and relay do not report the same accepted revision and compatible component contracts.",
     };
   }
   return {

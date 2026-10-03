@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { DASHBOARD_VERSION } from "../../../lib/dashboard-version";
+import { ACTION_CONTRACT_ID } from "../../../lib/scopes";
+import { FLEET_CONTRACT_ID } from "../../../lib/fleet-contract";
 
 export const dynamic = "force-dynamic";
 
@@ -27,6 +29,9 @@ export function GET() {
         process.env.PLEXON_BUILD_TIMESTAMP ?? process.env.VERCEL_BUILD_TIMESTAMP,
       ),
       protocolVersion: 3,
+      actionContract: ACTION_CONTRACT_ID,
+      fleetContract: FLEET_CONTRACT_ID,
+      configurationSchemas: { paper: 5, host: 5 },
       runtimeKind: "vercel-nextjs",
     },
     {
