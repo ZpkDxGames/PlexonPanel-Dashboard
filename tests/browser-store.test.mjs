@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { clearBrowserWorkspace, loadRelayCredential, listRelayCredentials, selectRelayCredential } from "../.test-dist/lib/browser-store.js";
+import { clearBrowserWorkspace, loadRelayCredential, listRelayCredentials, selectRelayCredential, loadServerLabels, saveServerLabel } from "../.test-dist/lib/browser-store.js";
 function storage(values, delays = []) {
   const data = new Map(Object.entries(values));
   const database = { close() {}, transaction() {
@@ -33,5 +33,19 @@ test("a slow earlier selection cannot overwrite a newer selection in browser sto
   try {
     await Promise.all([selectRelayCredential("A"), selectRelayCredential("B")]);
     assert.equal(data.get("selected"), "B");
+  } finally { delete globalThis.indexedDB; }
+});
+
+test("server labels are presentation metadata, persist independently and are removed only with their server", async () => {
+  const data = storage({ selected: "B", "credential:A": c("A"), "credential:B": c("B") });
+  try {
+    await saveServerLabel("A", "PlexonCraft"); await saveServerLabel("B", "TonimSMP");
+    await saveServerLabel("A", "unsafe\nlabel");
+    assert.deepEqual(await loadServerLabels(), { A: "PlexonCraft", B: "TonimSMP" });
+    assert.deepEqual((await listRelayCredentials()).map(c => c.serverId), ["A", "B"]);
+    assert.equal(data.get("selected"), "B");
+    await clearBrowserWorkspace("A");
+    assert.deepEqual(await loadServerLabels(), { B: "TonimSMP" });
+    assert.equal(data.get("credential:B").accessToken, "synthetic-private-grant");
   } finally { delete globalThis.indexedDB; }
 });

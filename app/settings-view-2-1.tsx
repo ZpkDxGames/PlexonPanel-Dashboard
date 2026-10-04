@@ -114,6 +114,7 @@ export function SettingsView21(props: ViewProps & { reconnect: () => void }) {
               label="Accent"
               value={preferences.accent}
               options={[
+                { value: "monochrome", label: "Monochrome" },
                 { value: "cyan", label: "Plexon cyan" },
                 { value: "violet", label: "Violet" },
                 { value: "emerald", label: "Emerald" },

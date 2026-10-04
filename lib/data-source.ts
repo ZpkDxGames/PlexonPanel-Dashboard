@@ -242,6 +242,8 @@ export async function pairDashboardServer(
   return { serverId: result.serverId };
 }
 
+export const LIVE_CONNECTION_TIMEOUT_MS = 10_000;
+
 export async function requestLiveConnection(
   selectedCredential?: RelayCredential,
 ): Promise<LiveConnectionGrant> {
@@ -274,6 +276,7 @@ export async function requestLiveConnection(
       method: "GET",
       mode: "cors",
       cache: "no-store",
+      signal: AbortSignal.timeout(LIVE_CONNECTION_TIMEOUT_MS),
       headers: {
         Authorization: `Bearer ${credential.accessToken}`,
         Accept: "application/json",

@@ -18,6 +18,7 @@ import "./visual-responsive-authority.css";
 import "./brand-console-icon.css";
 import "./backups-scaffold.css";
 import "./fleet-overview.css";
+import "./workspace-5.css";
 import { UiPreferencesProvider } from "../components/ui-preferences-provider";
 
 export const metadata: Metadata = {

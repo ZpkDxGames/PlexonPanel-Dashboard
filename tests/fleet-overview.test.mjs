@@ -128,7 +128,7 @@ test("Host replacement clears old metrics and ignores delayed old-session events
 test("fleet rendering exposes selected-server navigation and unavailable metrics without credentials", () => {
   const html = renderToStaticMarkup(React.createElement(FleetOverview, { credentials: [credential(A), credential(B)],
     selected: state(A), connected: true, openServer() {}, pair() {} }));
-  assert.match(html, /Fleet overview/); assert.match(html, /Open Alpha 10000000/); assert.match(html, /100% = one CPU core/);
+  assert.match(html, /Your servers/); assert.match(html, /Open Alpha 10000000/); assert.match(html, /100% = one CPU core/);
   assert.match(html, /Unavailable/); assert.doesNotMatch(html, /synthetic-private-grant/);
 });
 
@@ -145,4 +145,25 @@ test("mixed-version fleet hides service/node totals and blocks Host controls", (
   assert.equal(compatibleActionTarget(a.ready, "PAPER"), false);
   a.ready.server.pluginVersion = "4.0.0"; a.ready.server.hostVersion = "4.0.0";
   assert.equal(compatibleActionTarget(a.ready, "PAPER"), true);
+});
+
+test("selector remembers labels while connections are unavailable and distinguishes them from browser device names", () => {
+  const html = renderToStaticMarkup(React.createElement(FleetOverview, { credentials: [credential(A), credential(B)],
+    selected: emptyControlState(A), connected: false, phase: "reconnecting", labels: { [A]: "PlexonCraft", [B]: "TonimSMP" }, openServer() {}, pair() {} }));
+  assert.match(html, /PlexonCraft/); assert.match(html, /TonimSMP/);
+  assert.match(html, /Last selected/); assert.match(html, /Continue to workspace/);
+  assert.match(html, /Relay unavailable/); assert.match(html, /Connecting/);
+  assert.doesNotMatch(html, /Browser device|synthetic-private-grant/);
+});
+
+test("a relay socket that never supplies an authenticated ready cannot remain connecting indefinitely", async t => {
+  t.mock.timers.enable({ apis: ["setTimeout"] });
+  const sockets = [];
+  const feed = new FleetFeed(() => {}, { grant: async c => grant(c), socket: () => { const socket = new Socket(); sockets.push(socket); return socket; } });
+  try {
+    feed.updateRoster([credential(A)], ""); await flush();
+    sockets[0].onopen();
+    t.mock.timers.tick(10_000);
+    assert.equal(sockets[0].closed, true);
+  } finally { feed.close(); t.mock.timers.reset(); }
 });

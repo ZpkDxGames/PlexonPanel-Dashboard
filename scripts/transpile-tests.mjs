@@ -15,6 +15,7 @@ for (const file of [
   "lib/fleet-contract.ts",
   "lib/fleet-feed.ts",
   "lib/fleet-model.ts",
+  "lib/connection-state.ts",
   "lib/data-source.ts",
   "lib/browser-store.ts",
   "lib/lifecycle-state.ts",
@@ -26,6 +27,7 @@ for (const file of [
   "components/player-head.tsx",
   "app/control-views.tsx",
   "app/fleet-overview.tsx",
+  "app/connection-summary.tsx",
   "app/management-views-legacy.tsx",
   "app/console-view-3-0.tsx",
   "app/players-view-2-3.tsx",
@@ -33,8 +35,22 @@ for (const file of [
   "app/players-view-3-0.tsx",
   "app/management-views-2-1.tsx",
   "app/advanced-views.tsx",
+  "app/dashboard-2-1.tsx",
+  "app/overview-view-3-0.tsx",
+  "app/infrastructure-views-2-1.tsx",
+  "app/monitoring-views-2-1.tsx",
+  "app/server-view-2-1.tsx",
+  "app/backups-view-3-4-1.tsx",
+  "app/settings-view-2-1.tsx",
+  "app/control-plane-build-panel.tsx",
+  "lib/management-data.ts",
+
 ]) {
-  const source = await readFile(file, "utf8");
+  let source = await readFile(file, "utf8");
+  // Render the real lazy workspace components in the DOM harness without the Next chunk loader.
+  if (file === "app/dashboard-2-1.tsx") source = source.replace('"next/dynamic"', '"../../tests/support/dynamic.mjs"');
+  source = source.replace(/import\((["'])(\.{1,2}\/[^"']+)\1\)/g,
+    (all, q, p) => `import(${q}${/\.\w+$/.test(p) ? p : p + ".js"}${q})`);
   const output = ts
     .transpileModule(source, {
       compilerOptions: {

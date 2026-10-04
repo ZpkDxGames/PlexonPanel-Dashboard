@@ -22,7 +22,9 @@ function storage(seed = {}) {
 test("UI preferences use provider-aware safe defaults", () => {
   assert.equal(createDefaultUiPreferences(false).playerHeads, false);
   assert.equal(createDefaultUiPreferences(true).playerHeads, true);
-  assert.equal(createDefaultUiPreferences().theme, "system");
+  assert.equal(createDefaultUiPreferences().theme, "light");
+  assert.equal(createDefaultUiPreferences().accent, "monochrome");
+  assert.equal(createDefaultUiPreferences().density, "compact");
   assert.equal(createDefaultUiPreferences().motion, "system");
   assert.equal(createDefaultUiPreferences().displayUpdateRateMs, 500);
 });
@@ -40,7 +42,7 @@ test("strict parsing drops unknown and corrupt preference values", () => {
     unknown: "do-not-keep",
   });
   assert.equal(parsed.schemaVersion, 1);
-  assert.equal(parsed.theme, "system");
+  assert.equal(parsed.theme, "light");
   assert.equal(parsed.accent, "emerald");
   assert.equal(parsed.density, "compact");
   assert.equal(parsed.textScale, 100);

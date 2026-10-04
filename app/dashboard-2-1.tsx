@@ -6,6 +6,7 @@ import {
   bindLiveSocket,
   captureActionTarget,
   DashboardRequestError,
+  LIVE_CONNECTION_TIMEOUT_MS,
   handleRelayControlMessage,
   logoutDashboard,
   pairDashboardServer,
@@ -19,6 +20,8 @@ import {
   listRelayCredentials,
   loadControlCache,
   loadRelayCredential,
+  loadServerLabels,
+  saveServerLabel,
   saveControlCache,
   selectRelayCredential,
   type RelayCredential,
@@ -61,6 +64,7 @@ import { AccessView21, AuditView21 } from "./infrastructure-views-2-1";
 import { PerformanceView21 } from "./monitoring-views-2-1";
 import { OverviewView30 } from "./overview-view-3-0";
 import { ServerView21 } from "./server-view-2-1";
+import { ConnectionPills, ConnectionSummary } from "./connection-summary";
 import { BackupsView30 } from "./backups-view-3-4-1";
 
 const SettingsView = dynamic(() =>
@@ -432,7 +436,7 @@ function CommandPalette({
     {
       label: "Restart server",
       visible: restartAvailable,
-      action: () => void run("server.restart", {}, "HOST"),
+      action: () => void run("server.restart", {}, "HOST").catch(() => {}),
     },
     { label: "Copy diagnostics", action: copyDiagnostics },
   ];
@@ -486,7 +490,15 @@ export default function Dashboard21() {
   const [credentials, setCredentials] = useState<RelayCredential[]>([]);
   const [state, setState] = useState<ControlState>(() => emptyControlState(""));
   const [phase, setPhase] = useState<Phase>("loading");
-  const [section, setSection] = useState<Section>("Overview");
+  const [section, setSection] = useState<Section>("Fleet");
+  const [serverLabels, setServerLabels] = useState<Record<string, string>>({});
+  const knownLabels = useRef<Record<string, string>>({});
+  const rememberServerName = useCallback((id: string, name: string) => {
+    if (knownLabels.current[id] === name) return;
+    knownLabels.current = { ...knownLabels.current, [id]: name };
+    setServerLabels(knownLabels.current);
+    void saveServerLabel(id, name).catch(() => {});
+  }, []);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [pairing, setPairing] = useState(false);
@@ -566,20 +578,26 @@ export default function Dashboard21() {
   const setUnsaved = useCallback((dirty: boolean) => {
     unsaved.current = dirty;
   }, []);
-  const leaveEditor = () =>
-    !unsaved.current || window.confirm("Discard unsaved changes?");
+  const leaveEditor = useCallback(() =>
+    !unsaved.current || window.confirm("Discard unsaved changes?"), []);
   const navigate = (next: Section) => {
     if (next !== section && !leaveEditor()) return;
     setSection(next);
-    localStorage.setItem("plexonpanel-last-section", next);
+    if (next !== "Fleet" && credential) {
+      try { localStorage.setItem(`plexonpanel-section:${credential.serverId}`, next); } catch {}
+    }
+    cancelConfirmation();
+    setPaletteOpen(false);
     setSidebarOpen(false);
   };
 
   const restore = useCallback(async (expectedServerId?: string, revision = selectionRevision.current) => {
     try {
-      const [selected, saved] = await Promise.all([loadRelayCredential(), listRelayCredentials()]);
+      const [selected, saved, labels] = await Promise.all([loadRelayCredential(), listRelayCredentials(), loadServerLabels()]);
       const cached = selected ? await loadControlCache(selected.serverId) : null;
       if (revision !== selectionRevision.current || (expectedServerId && selected?.serverId !== expectedServerId)) return;
+      knownLabels.current = labels;
+      setServerLabels(labels);
       setCredentials(saved);
       setCredential(selected);
       setSessionGrant(null);
@@ -588,16 +606,10 @@ export default function Dashboard21() {
         : emptyControlState("");
       authoritativeState.current = restored;
       setState(restored);
-      const storedSection = localStorage.getItem("plexonpanel-last-section");
-      if (storedSection && sections.includes(storedSection as Section))
-        setSection(storedSection as Section);
-      else if (storedSection)
-        localStorage.setItem("plexonpanel-last-section", "Overview");
-      setSidebarCollapsed(
-        localStorage.getItem("plexonpanel-sidebar-collapsed") === "true",
-      );
+      setSection("Fleet");
+      try { setSidebarCollapsed(localStorage.getItem("plexonpanel-sidebar-collapsed") === "true"); } catch {}
       setPairing(false);
-      setPhase(selected ? "connecting" : "unpaired");
+      setPhase(selected ? "connecting" : saved.length ? "connecting" : "unpaired");
     } catch (reason) {
       if (revision !== selectionRevision.current) return;
       setError(
@@ -618,6 +630,10 @@ export default function Dashboard21() {
     const timer = window.setTimeout(() => setNotice(""), 6500);
     return () => window.clearTimeout(timer);
   }, [notice]);
+  useEffect(() => {
+    const name = state.ready?.server.serverName;
+    if (phase === "live" && name) rememberServerName(state.serverId, name);
+  }, [phase, state.serverId, state.ready?.server.serverName, rememberServerName]);
   useEffect(() => {
     if (!credential || !state.updatedAt) return;
     const timer = window.setTimeout(() => {
@@ -655,8 +671,9 @@ export default function Dashboard21() {
     let connectionSequence = 0;
     let socket: WebSocket | null = null;
     let retry: ReturnType<typeof setTimeout> | undefined;
+    let handshake: ReturnType<typeof setTimeout> | undefined;
     const schedule = () => {
-      if (stopped) return;
+      if (stopped || revision !== selectionRevision.current) return;
       attempt += 1;
       setPhase("reconnecting");
       if (retry) clearTimeout(retry);
@@ -670,13 +687,13 @@ export default function Dashboard21() {
       );
     };
     const connect = async () => {
-      if (stopped) return;
+      if (stopped || revision !== selectionRevision.current) return;
       const sequence = ++connectionSequence;
       setPhase(attempt ? "reconnecting" : "connecting");
       try {
         const grant = await requestLiveConnection(credential);
         if (
-          stopped ||
+          stopped || revision !== selectionRevision.current ||
           sequence !== connectionSequence ||
           grant.serverId !== credential.serverId ||
           grant.deviceId !== credential.deviceId ||
@@ -689,17 +706,20 @@ export default function Dashboard21() {
         ]);
         socket = candidate;
         let heartbeat: ReturnType<typeof setInterval> | undefined;
+        let authenticatedReady = false;
         const isCurrent = () =>
-          !stopped &&
+          !stopped && revision === selectionRevision.current &&
           sequence === connectionSequence &&
           socket === candidate &&
           authoritativeState.current.serverId === credential.serverId;
+        handshake = setTimeout(() => {
+          if (isCurrent() && !authenticatedReady) candidate.close(4008, "Relay handshake timed out");
+        }, LIVE_CONNECTION_TIMEOUT_MS);
         candidate.onopen = () => {
           if (!isCurrent()) {
             candidate.close();
             return;
           }
-          attempt = 0;
           commitState(
             (current) => ({
               ...current,
@@ -788,6 +808,10 @@ export default function Dashboard21() {
                 role: grant.role,
                 scopes: grant.scopes,
               });
+              authenticatedReady = true;
+              if (handshake) clearTimeout(handshake);
+              handshake = undefined;
+              attempt = 0;
               setPhase("live");
             }
             if (handleRelayControlMessage(message, candidate)) return;
@@ -804,6 +828,8 @@ export default function Dashboard21() {
           }
         };
         candidate.onclose = (event) => {
+          if (handshake) clearTimeout(handshake);
+          handshake = undefined;
           if (heartbeat) clearInterval(heartbeat);
           if (unbindLiveSocket(candidate)) cancelConfirmation();
           if (!isCurrent()) return;
@@ -844,8 +870,8 @@ export default function Dashboard21() {
             setError("Relay connection unavailable. Reconnecting automatically…");
         };
       } catch (reason) {
-        if (stopped) return;
-        if (reason instanceof DashboardRequestError && reason.status === 401) {
+        if (stopped || revision !== selectionRevision.current) return;
+        if (reason instanceof DashboardRequestError && (reason.status === 401 || reason.status === 403)) {
           setError(reason.message);
           await clearBrowserWorkspace(credential.serverId);
           if (stopped || selectionRevision.current !== revision || authoritativeState.current.serverId !== credential.serverId) return;
@@ -867,6 +893,7 @@ export default function Dashboard21() {
       stopped = true;
       connectionSequence += 1;
       if (retry) clearTimeout(retry);
+      if (handshake) clearTimeout(handshake);
       const current = socket;
       socket = null;
       if (current) {
@@ -929,6 +956,7 @@ export default function Dashboard21() {
       kind?: "PAPER" | "HOST",
       confirmationMode: "default" | "preconfirmed" = "default",
     ): Promise<ActionCompletion> => {
+      const revision = selectionRevision.current;
       const expectedServerId = credential?.serverId ?? "";
       const targetConnection = captureActionTarget(expectedServerId);
       parameters = structuredClone(parameters);
@@ -983,7 +1011,7 @@ export default function Dashboard21() {
         );
         return result;
       } catch (reason) {
-        if (authoritativeState.current.serverId === expectedServerId) setNotice(operationText(reason));
+        if (revision === selectionRevision.current && authoritativeState.current.serverId === expectedServerId) setNotice(operationText(reason));
         throw reason;
       }
     },
@@ -992,16 +1020,19 @@ export default function Dashboard21() {
 
   const forget = async () => {
     if (!leaveEditor()) return;
-    ++selectionRevision.current;
+    const revision = ++selectionRevision.current;
     cancelConfirmation();
+    setCredential(null); setNotice(""); setError("");
     await logoutDashboard(credential?.serverId);
+    if (revision !== selectionRevision.current) return;
     setCredential(null);
     setSessionGrant(null);
     const empty = emptyControlState("");
     authoritativeState.current = empty;
     setState(empty);
     setPhase("unpaired");
-    setCredentials(await listRelayCredentials());
+    const remaining = await listRelayCredentials();
+    if (revision === selectionRevision.current) setCredentials(remaining);
   };
   const refreshCurrent = useCallback(() => {
     if (section === "Players") {
@@ -1049,17 +1080,34 @@ export default function Dashboard21() {
     commitState((current) => ({ ...current, history: [] }), true);
   }, [commitState]);
 
-  const switchServer = (nextId: string) => {
+  const switchServer = useCallback((nextId: string) => {
     if (!leaveEditor()) return;
+    const next = credentials.find(item => item.serverId === nextId);
+    if (!next || Date.parse(next.expiresAt) <= Date.now()) {
+      setNotice("This server's saved grant expired. Pair it again to restore access.");
+      return;
+    }
+    cancelConfirmation();
+    setPaletteOpen(false); setSidebarOpen(false); setPairing(false);
+    unsaved.current = false;
+    setNotice(""); setError("");
+    let nextSection: Section = "Overview";
+    try {
+      const savedSection = localStorage.getItem(`plexonpanel-section:${nextId}`);
+      if (savedSection && savedSection !== "Fleet" && sections.includes(savedSection as Section)) nextSection = savedSection as Section;
+    } catch {}
+    setSection(nextSection);
+    if (credential?.serverId === nextId && authoritativeState.current.serverId === nextId) return;
     const revision = ++selectionRevision.current;
-    cancelConfirmation(); bindLiveSocket(null); setSessionGrant(null);
-    const empty = emptyControlState(nextId);
-    authoritativeState.current = empty; setState(empty); setPhase("connecting");
-    setSection("Overview");
-    void selectRelayCredential(nextId).then(() => restore(nextId, revision)).catch(() => {
-      if (revision === selectionRevision.current) setNotice("Unable to switch server. Pair it again if the saved grant has expired.");
+    // Retire the old command channel synchronously, before browser storage can yield.
+    bindLiveSocket(null); setSessionGrant(null);
+    commitState(emptyControlState(nextId), true);
+    setPhase("connecting"); setCredential(next);
+    setReconnect(value => value + 1);
+    void selectRelayCredential(nextId).catch(() => {
+      if (revision === selectionRevision.current) setNotice("The workspace opened, but the selection could not be saved in browser storage.");
     });
-  };
+  }, [credentials, credential?.serverId, cancelConfirmation, commitState, leaveEditor]);
 
   if (pairing || phase === "unpaired")
     return (
@@ -1067,7 +1115,7 @@ export default function Dashboard21() {
         done={restore}
         servers={credentials}
         selectServer={switchServer}
-        {...(credential ? { cancel: () => setPairing(false) } : {})}
+        {...(credential || credentials.length ? { cancel: () => { setPairing(false); setSection("Fleet"); if (!credential) setPhase("connecting"); } } : {})}
         error={error}
       />
     );
@@ -1078,6 +1126,15 @@ export default function Dashboard21() {
         <p>Opening your browser workspace…</p>
       </main>
     );
+
+  if (section === "Fleet") return <main className="paired-server-home">
+    <header className="paired-server-brand"><Brand /><span>Server control, kept simple.</span></header>
+    {error && <p className="cr-alert" role="alert">{error}</p>}
+    <FleetOverview credentials={credentials} selected={state} connected={phase === "live"} phase={phase}
+      labels={serverLabels} rememberName={rememberServerName} openServer={switchServer} pair={() => setPairing(true)} />
+    {notice && <p className="cr-alert" role="status">{notice}</p>}
+    <footer className="paired-server-footer">Your selection is remembered in this browser. Access is granted separately by each server.</footer>
+  </main>;
 
   const deviceGrant = reconcileDeviceGrant(sessionGrant, state.ready?.device);
   const props: ViewProps = {
@@ -1091,10 +1148,6 @@ export default function Dashboard21() {
   };
   let view: React.ReactNode;
   switch (section) {
-    case "Fleet":
-      view = <FleetOverview credentials={credentials} selected={state} connected={phase === "live"}
-        openServer={switchServer} pair={() => { if (leaveEditor()) setPairing(true); }} />;
-      break;
     case "Overview":
       view = <OverviewView30 {...props} />;
       break;
@@ -1140,12 +1193,11 @@ export default function Dashboard21() {
   const serverName = str(
     state.ready?.server.serverName ?? state.server.serverName,
     credential?.serverId
-      ? `Server ${credential.serverId.slice(0, 8)}`
+      ? serverLabels[credential.serverId] || `Server ${credential.serverId.slice(0, 8)}`
       : "Server unavailable",
   );
   const role = state.ready?.device.role ?? credential?.role ?? "Paired";
-  const paper = Boolean(state.ready?.agents.paper);
-  const host = Boolean(state.ready?.agents.host);
+  const paper = phase === "live" && !state.cached && Boolean(state.ready?.agents.paper);
   const telemetryUpdatedAt = state.telemetryUpdatedAt || state.updatedAt;
   const restartAvailable =
     can("server.restart", "HOST") &&
@@ -1220,7 +1272,7 @@ export default function Dashboard21() {
                   onClick={() => navigate(name)}
                 >
                   <Icon name={iconBySection[name]} />
-                  {!sidebarCollapsed && <span>{name}</span>}
+                  {!sidebarCollapsed && <span>{name === "Fleet" ? "All servers" : name}</span>}
                   {name === "Console" &&
                     state.console.some((line) => line.level === "ERROR") && (
                       <i className="cr-nav-alert" />
@@ -1256,7 +1308,7 @@ export default function Dashboard21() {
                 >
                   {credentials.map((item) => (
                     <option key={item.serverId} value={item.serverId}>
-                      {item.serverId.slice(0, 8)} · {item.role}
+                      {serverLabels[item.serverId] || `Server ${item.serverId.slice(0, 8)}`} · {item.role}
                     </option>
                   ))}
                 </select>
@@ -1266,19 +1318,7 @@ export default function Dashboard21() {
               <strong>{serverName}</strong>
             )}
           </div>
-          <div className="cr21-agent-pills">
-            <span data-online={paper}>
-              <i /> {paper ? "Paper" : "Paper offline"}
-            </span>
-            <span data-online={host}>
-              <i />{" "}
-              {host
-                ? "Host"
-                : state.ready?.agents.hostInstalled
-                  ? "Host offline"
-                  : "Host not installed"}
-            </span>
-          </div>
+          <ConnectionPills state={state} phase={phase} />
           <Freshness phase={phase} updatedAt={telemetryUpdatedAt} />
           <div className="cr21-topbar-actions">
             <button
@@ -1295,7 +1335,7 @@ export default function Dashboard21() {
               </summary>
               <div>
                 {restartAvailable && (
-                  <button onClick={() => void run("server.restart", {}, "HOST")}>
+                  <button onClick={() => void run("server.restart", {}, "HOST").catch(() => {})}>
                     Restart server
                   </button>
                 )}
@@ -1333,24 +1373,7 @@ export default function Dashboard21() {
           </div>
         </div>
 
-        {phase !== "live" ? (
-          <div className="cr-banner amber">
-            {error || "Connecting to the relay…"}
-            {state.cached &&
-              " Showing a bounded browser cache; actions are disabled."}
-            <button onClick={() => setReconnect((value) => value + 1)}>
-              Retry now
-            </button>
-          </div>
-        ) : (
-          !paper && (
-            <div className="cr-banner">
-              {host
-                ? "Paper is offline. The authenticated Host companion remains connected."
-                : "The relay is reachable. Waiting for an authenticated Paper or Host agent."}
-            </div>
-          )
-        )}
+        <ConnectionSummary state={state} phase={phase} retry={() => setReconnect(value => value + 1)} />
         {error && phase === "live" && (
           <p className="cr-alert" role="alert">
             {error}

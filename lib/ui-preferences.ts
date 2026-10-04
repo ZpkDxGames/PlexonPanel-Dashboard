@@ -6,7 +6,7 @@ export type DisplayUpdateRateMs = 0 | 250 | 500 | 1000 | 2000;
 export type UiPreferencesV1 = {
   schemaVersion: 1;
   theme: "system" | "dark" | "light";
-  accent: "cyan" | "violet" | "emerald" | "amber";
+  accent: "monochrome" | "cyan" | "violet" | "emerald" | "amber";
   contrast: "system" | "standard" | "high";
   density: "compact" | "comfortable" | "spacious";
   textScale: 100 | 112.5 | 125;
@@ -43,10 +43,10 @@ export function createDefaultUiPreferences(
 ): UiPreferencesV1 {
   return {
     schemaVersion: 1,
-    theme: "system",
-    accent: "cyan",
+    theme: "light",
+    accent: "monochrome",
     contrast: "system",
-    density: "comfortable",
+    density: "compact",
     textScale: 100,
     mobilePlayerRows: "cards",
     playerHeads: playerHeadsAvailable,
@@ -81,7 +81,7 @@ export function parseUiPreferences(
     theme: oneOf(source.theme, ["system", "dark", "light"] as const, defaults.theme),
     accent: oneOf(
       source.accent,
-      ["cyan", "violet", "emerald", "amber"] as const,
+      ["monochrome", "cyan", "violet", "emerald", "amber"] as const,
       defaults.accent,
     ),
     contrast: oneOf(
