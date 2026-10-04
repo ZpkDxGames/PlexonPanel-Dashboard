@@ -1,5 +1,7 @@
 "use client";
 
+import { Select } from "../components/select";
+
 import { useEffect, useMemo, useRef, useState } from "react";
 import { sendDashboardAction } from "../lib/data-source";
 import {
@@ -186,10 +188,10 @@ export function ActivityHistoryModal({
           <input ref={searchRef} type="search" maxLength={64} placeholder="Player name or UUID"
             aria-label="Search player activity" value={filters.query}
             onChange={(event) => setFilters((value) => ({ ...value, query: event.target.value }))} />
-          <select aria-label="Filter activity type" value={filters.status}
-            onChange={(event) => setFilters((value) => ({ ...value, status: event.target.value as ActivityFilters["status"] }))}>
+          <Select aria-label="Filter activity type" value={filters.status}
+            onValueChange={(selectedValue) => setFilters((value) => ({ ...value, status: selectedValue as ActivityFilters["status"] }))}>
             <option value="ALL">All activity</option><option value="ONLINE">Joins</option><option value="OFFLINE">Leaves</option>
-          </select>
+          </Select>
           <label>From <input type="date" value={filters.from}
             onChange={(event) => setFilters((value) => ({ ...value, from: event.target.value }))} /></label>
           <label>To <input type="date" value={filters.to}

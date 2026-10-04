@@ -1,105 +1,39 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import {
-  buildPlayerHeadUrl,
-  createAvatarProvider,
-  normalizePlayerUuid,
-  resolveAvatarProviderTemplate,
-  type PlayerHeadSize,
-} from "../lib/avatar-provider";
+import { useState } from "react";
+import { buildPlayerHeadUrl, createAvatarProvider, resolveAvatarProviderTemplate, type PlayerHeadSize } from "../lib/avatar-provider";
 import { useUiPreferences } from "./ui-preferences-provider";
 
-const MAX_ROSTER = 512;
-const urlMemo = new Map<string, string | null>();
-const failed = new Set<string>();
-const provider = createAvatarProvider(
-  resolveAvatarProviderTemplate(process.env.NEXT_PUBLIC_PLEXON_PLAYER_HEAD_URL_TEMPLATE),
-  { production: process.env.NODE_ENV === "production" },
-);
-
-function boundedSet<T>(map: Map<string, T>, key: string, value: T) {
-  if (!map.has(key) && map.size >= MAX_ROSTER) {
-    const oldest = map.keys().next().value as string | undefined;
-    if (oldest) map.delete(oldest);
-  }
-  map.set(key, value);
+const provider = createAvatarProvider(resolveAvatarProviderTemplate(process.env.NEXT_PUBLIC_PLEXON_PLAYER_HEAD_URL_TEMPLATE),
+  { production: process.env.NODE_ENV === "production" });
+const failed = new Map<string, number>();
+const MAX_FAILURES = 512;
+export function clearPlayerHeadSessionCache() { failed.clear(); }
+function AvatarImage({ url, size, motion }: { url: string; size: PlayerHeadSize; motion: boolean }) {
+  const [status, setStatus] = useState(() => (failed.get(url) ?? 0) > Date.now() ? "failed" : "loading");
+  if (status === "failed") return null;
+  // The validated template fixes one CSP origin. Avatar requests never use a browser-selected URL.
+  // eslint-disable-next-line @next/next/no-img-element
+  return <img src={url} alt="" width={size} height={size} loading="lazy" decoding="async" referrerPolicy="no-referrer"
+    className={status === "loaded" ? "loaded" : ""}
+    onLoad={() => { failed.delete(url); setStatus("loaded"); }}
+    onError={() => {
+      if (failed.size >= MAX_FAILURES) failed.delete(failed.keys().next().value!);
+      failed.set(url, Date.now() + 60_000); setStatus("failed");
+    }} style={{ transitionDuration: motion ? "150ms" : "0ms" }} />;
 }
 
-function initials(name: string): string {
-  const glyphs = Array.from(name.trim());
-  return (glyphs.length ? glyphs.slice(0, 2).join("") : "?").toUpperCase();
-}
-
-function palette(name: string): number {
-  let hash = 0;
-  for (const char of Array.from(name)) hash = (hash * 31 + (char.codePointAt(0) ?? 0)) | 0;
-  return Math.abs(hash) % 6;
-}
-
-export function clearPlayerHeadSessionCache() {
-  urlMemo.clear();
-  failed.clear();
-}
-
-export function PlayerHead({
-  uuid,
-  name,
-  size,
-  online = true,
-}: {
-  uuid: string;
-  name: string;
-  size: PlayerHeadSize;
-  online?: boolean;
+export function PlayerHead({ uuid, name, skinTextureId, size, online = true }: {
+  uuid: string; name: string; skinTextureId?: string; size: PlayerHeadSize; online?: boolean;
 }) {
   const { preferences, resolved, avatarProviderAvailable } = useUiPreferences();
-  const [loadFailed, setLoadFailed] = useState(false);
-  const [loaded, setLoaded] = useState(false);
-  const canonical = normalizePlayerUuid(uuid);
-  const failureKey = canonical ? `${provider?.origin ?? "none"}:${canonical}:${size}` : "invalid";
-  const url = useMemo(() => {
-    if (!preferences.playerHeads || !avatarProviderAvailable || !provider || !canonical) {
-      return null;
-    }
-    const cacheKey = `${provider.template}:${canonical}:${size}`;
-    if (!urlMemo.has(cacheKey)) {
-      boundedSet(urlMemo, cacheKey, buildPlayerHeadUrl(provider, canonical, size));
-    }
-    return urlMemo.get(cacheKey) ?? null;
-  }, [avatarProviderAvailable, canonical, preferences.playerHeads, size]);
-  const showImage = Boolean(url && !loadFailed && !failed.has(failureKey));
-
-  return (
-    <span
-      className={`cr23-player-head cr23-player-head-${palette(name)}${online ? " online" : ""}`}
-      style={{ width: size, height: size }}
-      aria-hidden="true"
-    >
-      <span className="cr23-player-head-fallback">{initials(name)}</span>
-      {showImage && (
-        // The operator supplies one validated HTTPS template at runtime, so a static next/image
-        // remotePatterns allowlist cannot represent this intentionally constrained provider.
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={url ?? undefined}
-          alt=""
-          width={size}
-          height={size}
-          loading="lazy"
-          decoding="async"
-          referrerPolicy="no-referrer"
-          className={loaded ? "loaded" : ""}
-          onLoad={() => setLoaded(true)}
-          onError={() => {
-            failed.add(failureKey);
-            setLoadFailed(true);
-          }}
-          style={{
-            transitionDuration: resolved.motion === "full" ? "150ms" : "0ms",
-          }}
-        />
-      )}
-    </span>
-  );
+  const url = preferences.playerHeads && avatarProviderAvailable ? buildPlayerHeadUrl(provider, uuid, size, name, skinTextureId) : null;
+  let hash = 0;
+  for (const char of name) hash = (hash * 31 + (char.codePointAt(0) ?? 0)) | 0;
+  const initials = Array.from(name.trim()).slice(0, 2).join("").toUpperCase() || "?";
+  return <span className={`cr23-player-head cr23-player-head-${Math.abs(hash) % 6}${online ? " online" : ""}`}
+    style={{ width: size, height: size }} aria-hidden="true">
+    <span className="cr23-player-head-fallback">{initials}</span>
+    {url && <AvatarImage key={url} url={url} size={size} motion={resolved.motion === "full"} />}
+  </span>;
 }

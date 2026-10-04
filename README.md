@@ -118,6 +118,8 @@ NEXT_PUBLIC_PLEXON_PLAYER_HEAD_URL_TEMPLATE=
 
 Never place access tokens, relay signing keys, Paper/Host private keys, pairing secrets, server credentials, or reusable provider secrets in `NEXT_PUBLIC_*` variables.
 
+For applied/offline skins, custom dropdowns and instance Drive backup setup, see [player controls and backup remaster](docs/PLAYER_CONTROLS_BACKUPS_5.0.md).
+
 ## Compatibility and deployment
 
 Dashboard 4.0.0 remains on signed Protocol 3 and `/v1`. Existing credentials do not gain scopes automatically, and the release does not require a Protocol 4 migration or identity reset. A browser paired before its role received a newly introduced scope, such as `maintenance.run`, must be re-paired with that role before it can use the new operation. The Dashboard reads the verified token grant from `/v1/dashboard/session` and intersects it with relay-reported device scopes, so stale browser or device metadata cannot make an unavailable control appear ready.

@@ -1,5 +1,7 @@
 "use client";
 
+import { Select } from "../../components/select";
+
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { PlayerHead } from "../../components/player-head";
@@ -138,17 +140,17 @@ export default function ActivityPage() {
         {servers.length > 1 && (
           <label>
             <span className={styles.eyebrow}>Stored server</span>
-            <select
+            <Select aria-label="Stored server"
               className={styles.serverSelect}
               value={serverId}
-              onChange={(event) => updateServer(event.target.value)}
+              onValueChange={(selectedValue) => updateServer(selectedValue)}
             >
               {servers.map((id) => (
                 <option key={id} value={id}>
                   {id}
                 </option>
               ))}
-            </select>
+            </Select>
           </label>
         )}
 
@@ -179,23 +181,23 @@ export default function ActivityPage() {
             value={query}
             onChange={(event) => setQuery(event.target.value)}
           />
-          <select
+          <Select
             aria-label="Filter activity type"
             value={stateFilter}
-            onChange={(event) => setStateFilter(event.target.value as StateFilter)}
+            onValueChange={(selectedValue) => setStateFilter(selectedValue as StateFilter)}
           >
             <option value="ALL">All activity</option>
             <option value="JOINED">Joins only</option>
             <option value="LEFT">Leaves only</option>
-          </select>
-          <select
+          </Select>
+          <Select
             aria-label="Sort activity"
             value={sortOrder}
-            onChange={(event) => setSortOrder(event.target.value as SortOrder)}
+            onValueChange={(selectedValue) => setSortOrder(selectedValue as SortOrder)}
           >
             <option value="NEWEST">Newest first</option>
             <option value="OLDEST">Oldest first</option>
-          </select>
+          </Select>
           <button
             type="button"
             className={styles.danger}

@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
 const view = () =>
-  readFile(new URL("../app/backups-view-3-4-1.tsx", import.meta.url), "utf8");
+  readFile(new URL("../app/backups-view.tsx", import.meta.url), "utf8");
 
 test("provider view keeps latest test and last remote verification as distinct Host-authoritative fields", async () => {
   const source = await view();

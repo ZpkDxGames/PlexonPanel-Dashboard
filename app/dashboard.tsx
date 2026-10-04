@@ -1,5 +1,7 @@
 "use client";
 
+import { Select } from "../components/select";
+
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -66,7 +68,7 @@ import { PerformanceView21 } from "./monitoring-views-2-1";
 import { OverviewView30 } from "./overview-view-3-0";
 import { ServerView21 } from "./server-view-2-1";
 import { ConnectionPills, ConnectionSummary } from "./connection-summary";
-import { BackupsView30 } from "./backups-view-3-4-1";
+import { BackupsView } from "./backups-view";
 
 const SettingsView = dynamic(() =>
   import("./settings-view-2-1").then((module) => module.SettingsView21),
@@ -344,10 +346,10 @@ function Pairing({
           </p>
           {servers.length > 0 && selectServer && <label className="cr-form">
             Open a paired server
-            <select value="" onChange={event => { if (event.target.value) selectServer(event.target.value); }}>
+            <Select aria-label="Open a paired server" value="" onValueChange={selectedValue => { if (selectedValue) selectServer(selectedValue); }}>
               <option value="" disabled>Choose a server</option>
               {servers.map(server => <option key={server.serverId} value={server.serverId}>{server.serverId.slice(0, 8)} · {server.role}</option>)}
-            </select>
+            </Select>
           </label>}
         </div>
       </section>
@@ -391,6 +393,9 @@ function Confirm({ value }: { value: Confirmation }) {
       {value.action === "console.execute" && (
         <pre className="cr-output">{str(value.parameters.command)}</pre>
       )}
+      {value.action === "backup.full.delete" && <p>This deletes the history record and any retained VPS archive. The canonical Google Drive backup remains stored.</p>}
+      {value.action === "maintenance.recovery.resolve" && <p>Verify Minecraft is online and Host-local RCON readiness is healthy before clearing the recovery gate. The failed backup remains recorded as failed.</p>}
+      {value.action === "maintenance.restart.now" && <p>The Host will run its maintenance warning and readiness workflow before restarting this server.</p>}
       <div className="cr-actions">
         <button className="cr-button" onClick={() => value.resolve(false)}>
           Cancel
@@ -1192,7 +1197,7 @@ export default function Dashboard21() {
       view = <ServerView21 {...props} />;
       break;
     case "Backups":
-      view = <BackupsView30 {...props} />;
+      view = <BackupsView {...props} />;
       break;
     case "Audit":
       view = <AuditView21 {...props} />;
@@ -1328,17 +1333,16 @@ export default function Dashboard21() {
             {credentials.length > 0 ? (
               <label className="cr21-server-select">
                 <span className="sr-only">Selected server</span>
-                <select
+                <Select aria-label="Selected server"
                   value={state.serverId || credential?.serverId}
-                  onChange={(event) => switchServer(event.target.value)}
+                  onValueChange={(selectedValue) => switchServer(selectedValue)}
                 >
                   {credentials.map((item) => (
                     <option key={item.serverId} value={item.serverId}>
                       {serverLabels[item.serverId] || `Server ${item.serverId.slice(0, 8)}`} · {item.role}
                     </option>
                   ))}
-                </select>
-                <Icon name="chevron" size={15} />
+                </Select>
               </label>
             ) : (
               <strong>{serverName}</strong>

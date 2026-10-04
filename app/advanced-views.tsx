@@ -1,4 +1,6 @@
 "use client";
+
+import { Select } from "../components/select";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ActionError, captureActionTarget, sendDashboardAction } from "../lib/data-source";
 import { number, records, str, type JsonMap } from "../lib/control-state";
@@ -246,11 +248,11 @@ export function FilesView(props: ViewProps) {
       <div className="cr-toolbar">
         <label>
           Root
-          <select
+          <Select aria-label="Root"
             value={root}
-            onChange={(e) => {
+            onValueChange={(selectedValue) => {
               if (dirty && !window.confirm("Discard unsaved edits?")) return;
-              setRoot(e.target.value);
+              setRoot(selectedValue);
               setSelected(null);
               setPath("");
               setPage(0);
@@ -262,7 +264,7 @@ export function FilesView(props: ViewProps) {
             ).map((r) => (
               <option key={String(r)}>{String(r)}</option>
             ))}
-          </select>
+          </Select>
         </label>
         <nav className="cr-breadcrumbs" aria-label="File path">
           <button onClick={() => changeDirectory("")}>{root}</button>

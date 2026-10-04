@@ -22,9 +22,11 @@ for (const file of [
   "lib/operation-messages.ts",
   "lib/ui-preferences.ts",
   "lib/avatar-provider.ts",
+  "lib/backup-readiness.ts",
   "lib/chart-geometry.ts",
   "components/ui-preferences-provider.tsx",
   "components/player-head.tsx",
+  "components/select.tsx",
   "app/control-views.tsx",
   "app/fleet-overview.tsx",
   "app/connection-summary.tsx",
@@ -40,7 +42,8 @@ for (const file of [
   "app/infrastructure-views-2-1.tsx",
   "app/monitoring-views-2-1.tsx",
   "app/server-view-2-1.tsx",
-  "app/backups-view-3-4-1.tsx",
+  "app/backups-view.tsx",
+  "app/backup-destination.tsx",
   "app/settings-view-2-1.tsx",
   "app/client-preferences.tsx",
   "app/preferences-dialog.tsx",
@@ -52,6 +55,7 @@ for (const file of [
   let source = await readFile(file, "utf8");
   // Render the real lazy workspace components in the DOM harness without the Next chunk loader.
   if (file === "app/dashboard.tsx") source = source.replace('"next/dynamic"', '"../../tests/support/dynamic.mjs"');
+  if (file === "components/select.tsx") source = source.replace('import styles from "./select.module.css";', 'const styles = { trigger: "cr-select", menu: "cr-select-menu", option: "cr-select-option" };');
   source = source.replace(/import\((["'])(\.{1,2}\/[^"']+)\1\)/g,
     (all, q, p) => `import(${q}${/\.\w+$/.test(p) ? p : p + ".js"}${q})`);
   const output = ts
