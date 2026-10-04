@@ -1,5 +1,7 @@
 "use client";
 
+import { Select } from "../components/select";
+
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ActionButton,
@@ -210,8 +212,8 @@ export function PlayersView21(props: ViewProps & { showHistoryTab?: boolean }) {
         <>
           <div className="cr21-filter-toolbar">
             <label className="cr-search">Search players<input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Name, display name or UUID" /></label>
-            <label>World<select value={worldFilter} onChange={(event) => setWorldFilter(event.target.value)}><option value="ALL">All worlds</option>{worlds.map((world) => <option key={world}>{world}</option>)}</select></label>
-            <label>Sort<select value={sort} onChange={(event) => setSort(event.target.value as PlayerSort)}><option value="name">Name</option><option value="ping">Ping</option><option value="session">Session time</option><option value="world">World</option></select></label>
+            <label>World<Select aria-label="World" value={worldFilter} onValueChange={(selectedValue) => setWorldFilter(selectedValue)}><option value="ALL">All worlds</option>{worlds.map((world) => <option key={world}>{world}</option>)}</Select></label>
+            <label>Sort<Select aria-label="Sort" value={sort} onValueChange={(selectedValue) => setSort(selectedValue as PlayerSort)}><option value="name">Name</option><option value="ping">Ping</option><option value="session">Session time</option><option value="world">World</option></Select></label>
             <Badge>{props.state.players.length} online</Badge>
             <button
               className="cr-button"
@@ -240,7 +242,7 @@ export function PlayersView21(props: ViewProps & { showHistoryTab?: boolean }) {
                     return (
                       <article className={`cr23-player-card${highlighted ? " live" : ""}`} key={uuid}>
                         <div className="cr23-player-card-identity">
-                          <PlayerHead uuid={uuid} name={names.name} size={rowHeadSize} online />
+                          <PlayerHead uuid={uuid} name={names.name} skinTextureId={str(item.skinTextureId, "")} size={rowHeadSize} online />
                           <div>
                             <strong>{names.primary}</strong>
                             {names.displayName && <small>{names.name}</small>}
@@ -270,7 +272,7 @@ export function PlayersView21(props: ViewProps & { showHistoryTab?: boolean }) {
                         const highlighted = preferences.liveRowHighlight && recentlyChanged.has(uuid);
                         return (
                           <tr key={uuid} className={highlighted ? "cr23-live-player-row" : undefined}>
-                            <td><div className="cr-person"><PlayerHead uuid={uuid} name={names.name} size={rowHeadSize} online /><div><strong>{names.primary}</strong>{names.displayName && <small>{names.name}</small>}{shownUuid && <small>{shownUuid}</small>}</div></div></td>
+                            <td><div className="cr-person"><PlayerHead uuid={uuid} name={names.name} skinTextureId={str(item.skinTextureId, "")} size={rowHeadSize} online /><div><strong>{names.primary}</strong>{names.displayName && <small>{names.name}</small>}{shownUuid && <small>{shownUuid}</small>}</div></div></td>
                             <td>{str(item.world)}</td><td>{metric(item.pingMillis, " ms", 0)}</td><td>{str(item.gameMode).toLowerCase()}</td><td>{duration(item.onlineDurationMillis)}</td>
                             <td><button className="cr-button" onClick={() => setSelected(uuid)}>Manage</button></td>
                           </tr>
@@ -297,7 +299,7 @@ export function PlayersView21(props: ViewProps & { showHistoryTab?: boolean }) {
         <>
           <div className="cr21-filter-toolbar">
             <label className="cr-search">Search history<input value={historyQuery} maxLength={64} onChange={(event) => setHistoryQuery(event.target.value)} placeholder="Username or UUID" /></label>
-            <label>Status<select value={historyStatus} onChange={(event) => setHistoryStatus(event.target.value)}><option value="ALL">All observations</option><option value="ONLINE">Joined</option><option value="OFFLINE">Left</option></select></label>
+            <label>Status<Select aria-label="Status" value={historyStatus} onValueChange={(selectedValue) => setHistoryStatus(selectedValue)}><option value="ALL">All observations</option><option value="ONLINE">Joined</option><option value="OFFLINE">Left</option></Select></label>
             <label>From<input type="date" value={historyFrom} onChange={(event) => setHistoryFrom(event.target.value)} /></label>
             <label>To<input type="date" value={historyTo} onChange={(event) => setHistoryTo(event.target.value)} /></label>
             <button className="cr-button" disabled={historyBusy || !props.connected || !paperOnline} onClick={() => void loadHistory(false)}>{historyBusy ? "Loading…" : "Search"}</button>
@@ -402,7 +404,7 @@ function PlayerDrawer23({ player, previousSessions, historyAvailable, close, ...
     <dialog className="cr-drawer cr21-player-drawer" ref={ref} onCancel={close} aria-labelledby="player-title">
       <div className="cr-panel-head cr23-player-drawer-head">
         <div className="cr23-player-drawer-identity">
-          <PlayerHead uuid={uuid} name={names.name} size={64} online />
+          <PlayerHead uuid={uuid} name={names.name} skinTextureId={str(player.skinTextureId, "")} size={64} online />
           <div><small>Player management · online now</small><h2 id="player-title">{names.primary}</h2><span>{names.displayName ? `${names.name} · ${uuid}` : uuid}</span></div>
         </div>
         <button className="cr-button" onClick={close} aria-label="Close player details">×</button>
@@ -431,7 +433,7 @@ function PlayerDrawer23({ player, previousSessions, historyAvailable, close, ...
         <div className="cr-form cr21-drawer-section">
           {props.can("player.message") && <form onSubmit={(event) => { event.preventDefault(); void props.run("player.message", { ...base, message }).then(() => setMessage("")).catch(() => {}); }}><label>Private message<input value={message} onChange={(event) => setMessage(event.target.value)} maxLength={2000} required /></label><button className="cr-button primary">Send message</button></form>}
           <div className="cr-actions">{["heal", "feed"].filter((action) => props.can(`player.${action}`)).map((action) => <ActionButton key={action} onClick={() => props.run(`player.${action}`, base)}>{action === "heal" ? "Heal" : "Feed"}</ActionButton>)}</div>
-          {props.can("player.gamemode") && <div className="cr-form"><label>Game mode<select value={gameMode} onChange={(event) => setGameMode(event.target.value)}>{["SURVIVAL", "CREATIVE", "ADVENTURE", "SPECTATOR"].map((value) => <option key={value}>{value}</option>)}</select></label><ActionButton onClick={() => props.run("player.gamemode", { ...base, gameMode })}>Set game mode</ActionButton></div>}
+          {props.can("player.gamemode") && <div className="cr-form"><label>Game mode<Select aria-label="Game mode" value={gameMode} onValueChange={(selectedValue) => setGameMode(selectedValue)}>{["SURVIVAL", "CREATIVE", "ADVENTURE", "SPECTATOR"].map((value) => <option key={value}>{value}</option>)}</Select></label><ActionButton onClick={() => props.run("player.gamemode", { ...base, gameMode })}>Set game mode</ActionButton></div>}
           {props.can("player.teleport") && <div className="cr-form"><label>Destination world<input value={world} onChange={(event) => setWorld(event.target.value)} /></label><div className="cr-three">{(["x", "y", "z"] as const).map((key) => <label key={key}>{key.toUpperCase()}<input type="number" value={coordinates[key]} onChange={(event) => setCoordinates({ ...coordinates, [key]: event.target.value })} /></label>)}</div><ActionButton disabled={Object.values(coordinates).some((value) => value === "")} onClick={() => props.run("player.teleport", { ...base, world, x: Number(coordinates.x), y: Number(coordinates.y), z: Number(coordinates.z) })}>Teleport</ActionButton></div>}
           {!permittedActions.some((action) => ["message", "heal", "feed", "gamemode", "teleport"].includes(action)) && <Empty title="Player actions unavailable">The current device scope or local Paper policy does not allow direct player actions.</Empty>}
         </div>

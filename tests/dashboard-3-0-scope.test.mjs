@@ -6,7 +6,7 @@ async function source(path) {
   return readFile(new URL(`../${path}`, import.meta.url), "utf8");
 }
 
-const ACTIVE_BACKUPS_VIEW = "app/backups-view-3-4-1.tsx";
+const ACTIVE_BACKUPS_VIEW = "app/backups-view.tsx";
 
 test("Dashboard 5.0.0 exposes the active manual-only Backups workspace", async () => {
   const dashboard = await source("app/dashboard.tsx");
@@ -17,7 +17,7 @@ test("Dashboard 5.0.0 exposes the active manual-only Backups workspace", async (
   assert.ok(sections.includes('"Backups"'));
   assert.ok(sections.includes('"Settings"'));
   assert.equal(sections.includes('"Files"'), false);
-  assert.equal(dashboard.includes("BackupsView30"), true);
+  assert.equal(dashboard.includes("BackupsView"), true);
   assert.equal(dashboard.includes('case "Backups"'), true);
   assert.equal(backups.includes("Backups & Maintenance"), true);
   assert.equal(backups.includes("Fully Backup Now"), true);

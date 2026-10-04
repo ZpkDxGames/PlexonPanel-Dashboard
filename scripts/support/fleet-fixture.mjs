@@ -96,7 +96,7 @@ export async function createFleetFixture({ port = 0, origin = "http://127.0.0.1:
         tps: [20, 20, 20], averageTickMillis: room === rooms[0] ? 12 : 18 });
       await room.host.send("telemetry.system", { capturedAt, nodeId: room.nodeId, metricScope: "NODE", processRole: "HOST",
         hostCpuPercent: 35, physicalMemoryUsedBytes: 8e9, physicalMemoryTotalBytes: 24e9, diskUsedBytes: 39e9, diskTotalBytes: 145e9 });
-      await room.host.send("service.status", { nodeId: room.nodeId, state: room.serviceState, mainPid: 100,
+      await room.host.send("service.status", { nodeId: room.nodeId, state: room.serviceState, minecraftReady: room.serviceState === "active", mainPid: 100,
         resources: { capturedAt, scope: "MINECRAFT_SERVICE", source: "SYSTEMD_CGROUP", cpuUnit: "PERCENT_OF_ONE_CORE",
           cpuAvailable: true, cpuPercent: room === rooms[0] ? 150 : 80, memoryAvailable: true, memoryBytes: room === rooms[0] ? 4e9 : 2e9 } });
     }

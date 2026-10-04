@@ -1,5 +1,7 @@
 "use client";
 
+import { Select } from "../components/select";
+
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ActionButton,
@@ -97,16 +99,16 @@ export function AuditView21(props: ViewProps) {
         </label>
         <label>
           <span className="sr-only">Audit source</span>
-          <select
+          <Select aria-label="Audit source"
             value={kind}
-            onChange={(event) => {
-              setKind(event.target.value as "PAPER" | "HOST");
+            onValueChange={(selectedValue) => {
+              setKind(selectedValue as "PAPER" | "HOST");
               setPage(0);
             }}
           >
             <option value="PAPER">Paper audit</option>
             {props.state.ready?.agents.host && <option value="HOST">Host audit</option>}
-          </select>
+          </Select>
         </label>
         <button
           className="cr-button"
@@ -534,10 +536,10 @@ export function AccessView21(
             </label>
             <label>
               <span className="sr-only">Filter devices by role</span>
-              <select value={role} onChange={(event) => setRole(event.target.value)}>
+              <Select aria-label="Filter devices by role" value={role} onValueChange={(selectedValue) => setRole(selectedValue)}>
                 <option value="ALL">All roles</option>
                 {roles.map((value) => <option key={value}>{value}</option>)}
-              </select>
+              </Select>
             </label>
             <button className="cr-button" disabled={query.busy} onClick={query.refresh}>
               {query.busy ? "Refreshing…" : "Refresh"}

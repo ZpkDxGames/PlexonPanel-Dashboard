@@ -1,4 +1,6 @@
 "use client";
+
+import { Select } from "../components/select";
 import { Badge, Panel } from "./control-views";
 import { useUiPreferences } from "../components/ui-preferences-provider";
 import { displayRateLabel } from "../lib/display-cadence";
@@ -19,11 +21,11 @@ function SelectField<T extends string | number>({
   return (
     <label className="cr23-field">
       <span>{label}</span>
-      <select
+      <Select aria-label=""
         value={String(value)}
-        onChange={(event) => {
+        onValueChange={(selectedValue) => {
           const next = options.find(
-            (option) => String(option.value) === event.target.value,
+            (option) => String(option.value) === selectedValue,
           );
           if (next) onChange(next.value);
         }}
@@ -33,7 +35,7 @@ function SelectField<T extends string | number>({
             {option.label}
           </option>
         ))}
-      </select>
+      </Select>
       {hint && <small>{hint}</small>}
     </label>
   );

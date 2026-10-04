@@ -11,7 +11,7 @@ import {
 
 } from "../.test-dist/app/management-views-2-1.js";
 import { FilesView } from "../.test-dist/app/advanced-views.js";
-import { BackupsView30 as BackupsView } from "../.test-dist/app/backups-view-3-4-1.js";
+import { BackupsView } from "../.test-dist/app/backups-view.js";
 import { ServerView21 as ServerView } from "../.test-dist/app/server-view-2-1.js";
 import { OverviewView30 as OverviewView } from "../.test-dist/app/overview-view-3-0.js";
 import {

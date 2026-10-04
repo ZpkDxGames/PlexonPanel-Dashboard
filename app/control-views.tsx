@@ -1,8 +1,9 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
-import { sendDashboardAction, type ActionCompletion } from "../lib/data-source";
+import { ActionError, sendDashboardAction, type ActionCompletion } from "../lib/data-source";
 import {
   number,
+  record,
   str,
   type ControlState,
   type JsonMap,
@@ -130,6 +131,7 @@ export function useQuery(
 ) {
   const [data, setData] = useState<JsonMap>({}),
     [error, setError] = useState(""),
+    [failure, setFailure] = useState<{ code: string; stage: string; requestId: string } | null>(null),
     [busy, setBusy] = useState(false),
     [hasSuccess, setHasSuccess] = useState(false),
     [updatedAt, setUpdatedAt] = useState(0),
@@ -140,22 +142,24 @@ export function useQuery(
     let current = true;
     void Promise.resolve()
       .then(() => {
-        if (current) {
-          setBusy(true);
-          setError("");
-        }
+        if (!current) return null;
+        setBusy(true);
+        setError("");
+        setFailure(null);
         return sendDashboardAction(action, JSON.parse(key) as JsonMap, kind);
       })
       .then((result) => {
-        if (current) {
+        if (current && result) {
           setData(result.data);
           setHasSuccess(true);
           setUpdatedAt(Date.now());
         }
       })
       .catch((e) => {
-        if (current)
+        if (current) {
           setError(e instanceof Error ? e.message : "Request failed");
+          setFailure(e instanceof ActionError ? { code: e.code, stage: str(e.data.stage, str(record(e.data.safeDetails).stage, "")), requestId: e.requestId } : null);
+        }
       })
       .finally(() => {
         if (current) setBusy(false);
@@ -167,6 +171,7 @@ export function useQuery(
   return {
     data,
     error,
+    failure,
     busy,
     hasSuccess,
     updatedAt,

@@ -4,10 +4,11 @@ export type AvatarProvider = {
   template: string;
   origin: string;
   hasSizePlaceholder: boolean;
+  identityPlaceholder: "{uuid}" | "{player}";
 };
 
 export const DEFAULT_PLAYER_HEAD_URL_TEMPLATE =
-  "https://mc-heads.net/avatar/{uuid}/{size}";
+  "https://mc-heads.net/avatar/{player}/{size}";
 
 const UUID_DASHED = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const UUID_PLAIN = /^[0-9a-f]{32}$/i;
@@ -47,13 +48,14 @@ export function createAvatarProvider(
   const template = value.trim();
   if (!template || template.length > 2048 || CONTROL.test(template)) return null;
   if (template.startsWith("//")) return null;
-  if (count(template, "{uuid}") !== 1 || count(template, "{size}") > 1) return null;
+  if (count(template, "{uuid}") + count(template, "{player}") !== 1 || count(template, "{size}") > 1) return null;
 
   const placeholders = template.match(/\{[^{}]*\}/g) ?? [];
-  if (placeholders.some((token) => token !== "{uuid}" && token !== "{size}")) {
+  if (placeholders.some((token) => token !== "{uuid}" && token !== "{player}" && token !== "{size}")) {
     return null;
   }
-  const stripped = template.replace("{uuid}", "0".repeat(32)).replace("{size}", "40");
+  const identityPlaceholder = template.includes("{player}") ? "{player}" : "{uuid}";
+  const stripped = template.replace(identityPlaceholder, "0".repeat(32)).replace("{size}", "40");
   if (stripped.includes("{") || stripped.includes("}")) return null;
 
   try {
@@ -67,6 +69,7 @@ export function createAvatarProvider(
       template,
       origin: url.origin,
       hasSizePlaceholder: template.includes("{size}"),
+      identityPlaceholder,
     };
   } catch {
     return null;
@@ -77,13 +80,20 @@ export function buildPlayerHeadUrl(
   provider: AvatarProvider | null,
   uuid: unknown,
   size: PlayerHeadSize,
+  name?: unknown,
+  skinTextureId?: unknown,
 ): string | null {
   if (!provider || !ALLOWED_SIZES.has(size)) return null;
   const canonical = normalizePlayerUuid(uuid);
   if (!canonical) return null;
+  // Applied profile textures take precedence. Offline UUIDs are not Mojang account IDs.
+  const texture = typeof skinTextureId === "string" && /^[0-9a-f]{64}$/i.test(skinTextureId) ? skinTextureId.toLowerCase() : null;
+  const accountName = typeof name === "string" && /^[A-Za-z0-9_]{1,16}$/.test(name) ? name : null;
+  const player = texture ?? (canonical[12] === "3" ? accountName : canonical);
+  if (provider.identityPlaceholder === "{player}" && !player) return null;
   try {
     const rendered = provider.template
-      .replace("{uuid}", canonical)
+      .replace(provider.identityPlaceholder, provider.identityPlaceholder === "{uuid}" ? canonical : player!)
       .replace("{size}", String(size));
     const url = new URL(rendered);
     if (url.origin !== provider.origin || url.username || url.password || url.hash) {

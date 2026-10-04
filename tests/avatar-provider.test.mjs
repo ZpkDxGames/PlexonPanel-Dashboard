@@ -77,7 +77,9 @@ test("rejects malformed, repeated, secret-bearing, fragment, and unsafe template
     "https://avatars.example.test/head/static",
     "https://avatars.example.test/{uuid}/{uuid}",
     "https://avatars.example.test/{uuid}/{size}/{size}",
-    "https://avatars.example.test/{player}",
+    "https://avatars.example.test/{unknown}",
+    "https://avatars.example.test/{uuid}/{player}",
+    "https://avatars.example.test/{player}/{player}",
     "https://user:pass@avatars.example.test/{uuid}",
     "https://avatars.example.test/{uuid}#fragment",
     "//avatars.example.test/{uuid}",
@@ -99,4 +101,16 @@ test("rejects unsupported sizes and malformed UUIDs without producing a request 
   assert.equal(buildPlayerHeadUrl(provider, "bad", 40), null);
   assert.equal(buildPlayerHeadUrl(provider, UUID_PLAIN, 48), null);
   assert.equal(buildPlayerHeadUrl(null, UUID_PLAIN, 40), null);
+});
+
+test("applied texture wins, offline UUID uses the real account name, online UUID remains stable", () => {
+  const provider = createAvatarProvider(DEFAULT_PLAYER_HEAD_URL_TEMPLATE, { production: true });
+  const offline = "c35b35bf-9d8e-39a9-b599-f03dfc68512d";
+  assert.equal(buildPlayerHeadUrl(provider, offline, 40, "ZpkDxGames"), "https://mc-heads.net/avatar/ZpkDxGames/40");
+  assert.equal(buildPlayerHeadUrl(provider, offline, 40, "ZpkDxGames", "ab".repeat(32)), `https://mc-heads.net/avatar/${"ab".repeat(32)}/40`);
+  assert.equal(buildPlayerHeadUrl(provider, UUID_DASHED, 40, "RenamedAccount"), `https://mc-heads.net/avatar/${UUID_PLAIN}/40`);
+  for (const name of ["<span>Nickname", "../escape", "bad/name", "a".repeat(17), ""]) assert.equal(buildPlayerHeadUrl(provider, offline, 40, name), null);
+  assert.equal(buildPlayerHeadUrl(provider, offline, 40, "ZpkDxGames", "https://evil.test/texture"), "https://mc-heads.net/avatar/ZpkDxGames/40");
+  const legacy = createAvatarProvider("https://avatars.example.test/{uuid}/{size}", { production: true });
+  assert.equal(buildPlayerHeadUrl(legacy, offline, 40, "ZpkDxGames", "ab".repeat(32)), "https://avatars.example.test/c35b35bf9d8e39a9b599f03dfc68512d/40");
 });

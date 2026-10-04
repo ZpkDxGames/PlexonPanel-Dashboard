@@ -15,11 +15,22 @@ import { UI_PREFERENCES_KEY } from "../.test-dist/lib/ui-preferences.js";
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-test("mounted Dashboard selects and operates independent signed instances without stale transitions", { timeout: 40_000 }, async t => {
+test("mounted Dashboard selects and operates independent signed instances without stale transitions", { timeout: 60_000 }, async t => {
   let simulateLifecycle = false;
+  let backupMode = "missing", backupJob = null;
   let fileContent = "settings:\n  sample: true\n", fileHash = "a".repeat(64), simulateConflict = false;
   const fixture = await createFleetFixture({ names: ["PlexonCraft", "TonimSMP"], instanceKeys: ["plexoncraft", "tonimsmp"],
     async beforeActionResult({ room, kind, body, attach, sync, telemetry }) {
+      if (body.action === "provider.status") return { data: { configured: backupMode !== "missing", status: backupMode === "missing" ? "LOCAL" : "CONNECTED", remote: `gdrive:plexonpanel/${room.serverId}` } };
+      if (body.action === "provider.test") return { status: "FAILED", code: "RCLONE_TEST_FAILED", message: "Fixture provider test failed", data: { phase: "PROVIDER_TEST", retryable: true } };
+      if (body.action === "maintenance.status") return { data: { commandChannel: { enabled: true }, currentOperation: backupJob ?? {} } };
+      if (body.action === "maintenance.settings.get") return { data: { settings: { schemaVersion: 3, timezone: "UTC", restart: {}, fullRestorePoint: { canonicalFilename: `${room.name}-Latest.zip` } } } };
+      if (body.action === "backup.full.list") return { data: { backups: [], recoveryRequired: false } };
+      if (body.action === "backup.preflight") {
+        if (backupMode === "missing") return { status: "FAILED", code: "RCLONE_UNAVAILABLE", message: "No off-site rclone provider is configured on the running Host.", data: { stage: "provider", phase: "PREFLIGHT" } };
+        if (backupMode === "source-failed") return { status: "FAILED", code: "BACKUP_SOURCE_UNREADABLE", message: "Fixture source unreadable", data: { stage: "source", phase: "PREFLIGHT" } };
+        return { data: { hostAuthenticated: true, backupRootWritable: true, commandChannelConfigured: true, usableBytes: 10000000, requiredBytes: 1000 } };
+      }
       if (body.action === "files.list") return { data: { roots: ["server"], entries: [{ name: "bukkit.yml", directory: false, editable: true }], hasMore: false } };
       if (body.action === "files.read") return { data: { content: fileContent, sha256: fileHash, editable: kind === "PAPER" } };
       if (body.action === "files.write") {
@@ -78,10 +89,13 @@ test("mounted Dashboard selects and operates independent signed instances withou
   const text = () => rootElement.textContent;
   const button = name => [...rootElement.querySelectorAll("button")].find(node => node.textContent.trim() === name);
   const click = async node => { assert.ok(node, "Required button missing"); await act(async () => node.dispatchEvent(new window.MouseEvent("click", { bubbles: true }))); };
-  const select = async id => {
-    const node = rootElement.querySelector('select'); assert.ok(node);
-    await act(async () => { node.value = id; node.dispatchEvent(new window.Event("change", { bubbles: true })); });
+  const choose = async (node, value) => {
+    assert.ok(node, "Required dropdown missing");
+    await click(node);
+    const option = [...window.document.querySelectorAll('[role="option"]')].find(item => item.dataset.value === value);
+    await click(option);
   };
+  const select = async id => choose(rootElement.querySelector('[role="combobox"]'), id);
   const currentName = () => rootElement.querySelector(".cr21-server-identity strong")?.textContent;
   const health = () => rootElement.querySelector(".workspace-health")?.dataset.state;
   const first = fixture.rooms[0], second = fixture.rooms[1];
@@ -94,8 +108,8 @@ test("mounted Dashboard selects and operates independent signed instances withou
       await click(button("Client settings"));
       await wait(() => rootElement.querySelector(".client-preferences-dialog[open]"), "client settings dialog");
       for (const [label, value, attribute] of [["Accent", "violet", "plexonAccent"], ["Density", "spacious", "plexonDensity"], ["Chart style", "line", "plexonChartStyle"]]) {
-        const field = [...rootElement.querySelectorAll('.client-preferences-dialog label')].find(node => node.querySelector('span')?.textContent === label).querySelector('select');
-        await act(async () => { field.value = value; field.dispatchEvent(new window.Event("change", { bubbles: true })); });
+        const field = [...rootElement.querySelectorAll('.client-preferences-dialog label')].find(node => node.querySelector('span')?.textContent === label).querySelector('[role="combobox"]');
+        await choose(field, value);
         assert.equal(window.document.documentElement.dataset[attribute], value);
       }
       await click(button("Done"));
@@ -124,13 +138,8 @@ test("mounted Dashboard selects and operates independent signed instances withou
       await wait(() => fixture.requests.some(request => request.action === "server.restart"), "room-bound completion");
       assert.deepEqual(fixture.requests.filter(request => request.action === "server.restart").map(request => [request.serverId, request.kind]), [[second.serverId, "HOST"]]);
     });
-    await t.test("same-tick A to B to A switches establish a fresh live command channel", async () => {
-      await act(async () => {
-        const node = rootElement.querySelector("select");
-        for (const id of [first.serverId, second.serverId, first.serverId]) {
-          node.value = id; node.dispatchEvent(new window.Event("change", { bubbles: true }));
-        }
-      });
+    await t.test("rapid A to B to A dropdown switches establish a fresh live command channel", async () => {
+      for (const id of [first.serverId, second.serverId, first.serverId]) await select(id);
       await wait(() => currentName() === "PlexonCraft" && health() === "online", "rapid switches");
       assert.equal(captureActionTarget(first.serverId).serverId, first.serverId);
       await wait(() => currentName() === "PlexonCraft", "settled selection");
@@ -209,6 +218,74 @@ test("mounted Dashboard selects and operates independent signed instances withou
       await click(button("Overview"));
       assert.equal(JSON.parse(window.localStorage.getItem(UI_PREFERENCES_KEY)).density, "spacious");
     });
+    await t.test("backup setup is instance-specific, unverified checks stay unknown and cached preflight cannot authorize a new job", async () => {
+      // Start backup interaction with a fresh authenticated session, like switching instances.
+      await select(first.serverId); await wait(() => health() === "online", "first server connected");
+      await select(second.serverId); await wait(() => health() === "online", "selected server connected");
+      await click([...rootElement.querySelectorAll('.cr21-nav button')].find(node => node.textContent.trim() === "Backups"));
+      await wait(() => text().includes("No off-site rclone provider"), "missing provider preflight");
+      assert.match(text(), /TonimSMP backup destination/);
+      assert.match(text(), /\/var\/backups\/plexonpanel\/instances\/tonimsmp/);
+      const check = label => [...rootElement.querySelectorAll('.cr341-readiness-item')].find(node => node.querySelector('strong').textContent === label).querySelector('.cr-badge').textContent;
+      assert.equal(check("Backup storage"), "Unknown"); assert.equal(check("Filesystem read contract"), "Unknown");
+      assert.equal(button("Review & start backup").disabled, true);
+      backupMode = "ready";
+      await wait(() => !rootElement.querySelector('.cr30-backup-toolbar button').disabled, "refresh available");
+      await click(rootElement.querySelector('.cr30-backup-toolbar button'));
+      await wait(() => !button("Review & start backup").disabled, "fresh authoritative preflight");
+      assert.equal(check("Backup storage"), "Ready");
+      backupMode = "source-failed";
+      await wait(() => !rootElement.querySelector('.cr30-backup-toolbar button').disabled, "refresh available");
+      await click(rootElement.querySelector('.cr30-backup-toolbar button'));
+      assert.equal(button("Review & start backup").disabled, true);
+      await wait(() => text().includes("Fixture source unreadable"), "source failure replaces readiness");
+      assert.equal(check("Filesystem read contract"), "Failed"); assert.equal(check("Backup storage"), "Unknown");
+      assert.equal(button("Review & start backup").disabled, true);
+      assert.equal(fixture.requests.some(request => request.action === "maintenance.full-backup.create"), false);
+      await click(button("Test Google Drive"));
+      await wait(() => text().includes("Last operation failure"), "server-bound safe diagnostic");
+      assert.ok(window.sessionStorage.getItem(`plexonpanel.backup.last-safe-failure.v3:${second.serverId}`));
+      await select(first.serverId);
+      await wait(() => health() === "online", "first backup server connected");
+      await click([...rootElement.querySelectorAll('.cr21-nav button')].find(node => node.textContent.trim() === "Backups"));
+      await wait(() => text().includes("PlexonCraft backup destination"), "first instance backup view");
+      assert.equal(text().includes("Last operation failure"), false);
+      await select(second.serverId);
+      await wait(() => text().includes("TonimSMP backup destination") && text().includes("Last operation failure"), "matching instance diagnostic restored");
+      backupMode = "ready";
+    });
+    await t.test("signed upload progress is shown for the active Host job and ignored for other jobs", async () => {
+      backupJob = { jobId: "11111111-1111-4111-8111-111111111111", phase: "UPLOADING_REMOTE", localBackupVerified: true };
+      await wait(() => !rootElement.querySelector('.cr30-backup-toolbar button').disabled, "refresh available");
+      await click(rootElement.querySelector('.cr30-backup-toolbar button'));
+      await wait(() => text().includes("Uploading to Google Drive"), "durable upload job");
+      await act(async () => second.host.send("backup.progress", { jobId: backupJob.jobId, phase: "UPLOADING_REMOTE", bytesUploaded: 512, totalBytes: 1024, progress: 0.5, bytesPerSecond: 256 }));
+      await wait(() => text().includes("50%"), "live verified job transfer progress");
+      await act(async () => second.host.send("backup.progress", { jobId: "22222222-2222-4222-8222-222222222222", phase: "UPLOADING_REMOTE", bytesUploaded: 999999, totalBytes: 999999, progress: 1 }));
+      await act(async () => { await sleep(600); });
+      assert.equal(text().includes("976.6 KiB"), false);
+      backupJob = null;
+      await click([...rootElement.querySelectorAll('.cr21-nav button')].find(node => node.textContent.trim() === "Server"));
+    });
+    await t.test("cold backup review cancels without a command and confirms only the selected Host", async () => {
+      await select(first.serverId); await wait(() => health() === "online", "first backup session");
+      await select(second.serverId); await wait(() => health() === "online", "second backup session");
+      await click([...rootElement.querySelectorAll('.cr21-nav button')].find(node => node.textContent.trim() === "Backups"));
+      await wait(() => button("Review & start backup") && !button("Review & start backup").disabled, "backup ready for review");
+      const requests = () => fixture.requests.filter(request => request.action === "maintenance.full-backup.create");
+      await click(button("Review & start backup"));
+      await wait(() => rootElement.querySelector('dialog[open].cr-step8-modal'), "custom backup confirmation");
+      assert.match(rootElement.querySelector('.cr-step8-modal').textContent, /TonimSMP/);
+      assert.equal(requests().length, 0);
+      await click([...rootElement.querySelectorAll('.cr-step8-modal button')].find(node => node.textContent === "Cancel"));
+      assert.equal(requests().length, 0);
+      await click(button("Review & start backup")); await click(button("Confirm Fully Backup Now"));
+      await wait(() => requests().length === 1 && !rootElement.querySelector('.cr-step8-modal'), "confirmed backup queued");
+      const request = requests()[0];
+      assert.equal(request.serverId, second.serverId); assert.equal(request.kind, "HOST");
+      assert.equal(request.parameters.confirmed, true); assert.equal(request.parameters.countdownSeconds, 1800);
+      await click([...rootElement.querySelectorAll('.cr21-nav button')].find(node => node.textContent.trim() === "Server"));
+    });
     await t.test("Host-confirmed stop, agent disconnect and relay disconnect are different UI states", async () => {
       second.serviceState = "inactive";
       await act(async () => { second.paper.socket.close(); await sleep(60); await fixture.telemetry(); });
@@ -230,7 +307,9 @@ test("mounted Dashboard selects and operates independent signed instances withou
       await select(first.serverId);
       await wait(() => currentName() === "PlexonCraft" && health() === "online", "remaining paired instance");
       assert.equal(captureActionTarget(first.serverId).serverId, first.serverId);
-      assert.equal(rootElement.querySelector("select").options.length, 1);
+      await click(rootElement.querySelector('[role="combobox"]'));
+      assert.equal(window.document.querySelectorAll('[role="option"]').length, 1);
+      await click(rootElement.querySelector('[role="combobox"]'));
       await act(async () => { await fixture.close(); await sleep(50); });
       await wait(() => health() === "relay-unavailable", "relay outage");
       assert.match(text(), /Relay unavailable/);

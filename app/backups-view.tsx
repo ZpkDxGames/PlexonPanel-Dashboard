@@ -1,6 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Select } from "../components/select";
+import { BackupDestination } from "./backup-destination";
+import { backupCheckState, type BackupReadiness } from "../lib/backup-readiness";
+
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ActionError } from "../lib/data-source";
 import { number, record, records, str, type JsonMap } from "../lib/control-state";
 import {
@@ -43,6 +47,7 @@ type SettingsDraft = {
 };
 
 type FailureRecord = {
+  serverId: string;
   action: string;
   requestId: string;
   status: string;
@@ -54,11 +59,11 @@ type FailureRecord = {
   timestamp: string;
 };
 
-type ReadinessState = "Ready" | "Warning" | "Failed" | "Unknown" | "Not configured";
+type ReadinessState = BackupReadiness;
 
 type PhaseDefinition = { key: string; label: string };
 
-const FAILURE_KEY = "plexonpanel.backup.last-safe-failure.v2";
+const FAILURE_KEY = "plexonpanel.backup.last-safe-failure.v3";
 const DAYS = [
   "MONDAY",
   "TUESDAY",
@@ -192,10 +197,10 @@ function ScheduleEditor({
       </label>
       <label>
         Frequency
-        <select
+        <Select aria-label="Frequency"
           value={value.type}
-          onChange={(event) => {
-            const type = event.target.value as ScheduleDraft["type"];
+          onValueChange={(selectedValue) => {
+            const type = selectedValue as ScheduleDraft["type"];
             onChange({
               ...value,
               type,
@@ -211,21 +216,21 @@ function ScheduleEditor({
           <option value="DAILY">Daily</option>
           <option value="WEEKLY">Weekly</option>
           <option value="SELECTED_WEEKDAYS">Selected weekdays</option>
-        </select>
+        </Select>
       </label>
       {value.type === "WEEKLY" && (
         <label>
           Weekday
-          <select
+          <Select aria-label="Weekday"
             value={weekday}
-            onChange={(event) => onChange({ ...value, weekdays: [event.target.value] })}
+            onValueChange={(selectedValue) => onChange({ ...value, weekdays: [selectedValue] })}
           >
             {DAYS.map((day) => (
               <option key={day} value={day}>
                 {day.charAt(0) + day.slice(1).toLowerCase()}
               </option>
             ))}
-          </select>
+          </Select>
         </label>
       )}
       {value.type === "SELECTED_WEEKDAYS" && (
@@ -333,7 +338,8 @@ function formatCountdown(value: number | null): string {
   return `${minutes}:${String(seconds % 60).padStart(2, "0")}`;
 }
 
-export function BackupsView30(props: ViewProps) {
+export function BackupsView(props: ViewProps) {
+  const failureKey = `${FAILURE_KEY}:${props.state.serverId}`;
   const hostConnected = Boolean(props.state.ready?.agents.host);
   const paperConnected = Boolean(props.state.ready?.agents.paper);
   const canMaintenance = props.can("maintenance.status", "HOST");
@@ -376,19 +382,33 @@ export function BackupsView30(props: ViewProps) {
   const [draft, setDraft] = useState<SettingsDraft | null>(null);
   const [dirty, setDirty] = useState(false);
   const [confirmBackup, setConfirmBackup] = useState(false);
+  const backupDialog = useRef<HTMLDialogElement>(null);
+  useEffect(() => {
+    if (!confirmBackup) return;
+    const dialog = backupDialog.current;
+    if (dialog && !dialog.open) dialog.showModal();
+    return () => { if (dialog?.open) dialog.close(); };
+  }, [confirmBackup]);
   const [backupCountdownSeconds, setBackupCountdownSeconds] =
     useState<CountdownSeconds>(1800);
   const [localError, setLocalError] = useState("");
   const [lastFailure, setLastFailure] = useState<FailureRecord | null>(null);
+  const [refreshCooldown, setRefreshCooldown] = useState(false);
+  useEffect(() => {
+    if (!refreshCooldown) return;
+    const timer = window.setTimeout(() => setRefreshCooldown(false), 5000);
+    return () => window.clearTimeout(timer);
+  }, [refreshCooldown]);
 
   useEffect(() => {
     let timer: number | undefined;
     try {
-      const stored = window.sessionStorage.getItem(FAILURE_KEY);
+      const stored = window.sessionStorage.getItem(failureKey);
       if (stored) {
         timer = window.setTimeout(() => {
           try {
-            setLastFailure(JSON.parse(stored) as FailureRecord);
+            const failure = JSON.parse(stored) as FailureRecord;
+            if (failure.serverId === props.state.serverId) setLastFailure(failure);
           } catch {
             // Invalid persisted diagnostics are ignored.
           }
@@ -400,19 +420,13 @@ export function BackupsView30(props: ViewProps) {
     return () => {
       if (timer !== undefined) window.clearTimeout(timer);
     };
-  }, []);
+  }, [failureKey, props.state.serverId]);
 
   const setUnsaved = props.setUnsaved;
   useEffect(() => {
     setUnsaved?.(dirty);
     return () => setUnsaved?.(false);
   }, [dirty, setUnsaved]);
-
-  useEffect(() => {
-    if (!hostConnected || !canMaintenance) return;
-    const timer = window.setInterval(status.refresh, 2000);
-    return () => window.clearInterval(timer);
-  }, [hostConnected, canMaintenance, status.refresh]);
 
   const persistedDraft = useMemo(
     () =>
@@ -428,12 +442,21 @@ export function BackupsView30(props: ViewProps) {
   const operationJobId = str(operation.jobId, "");
   const operationTerminal = TERMINAL_PHASES.has(operationPhase);
   const operationBlocking = Boolean(operationJobId) && (!operationTerminal || operationPhase === "RECOVERY_REQUIRED");
+  useEffect(() => {
+    if (!hostConnected || !canMaintenance || status.busy) return;
+    const timer = window.setInterval(() => {
+      if (document.visibilityState !== "hidden") status.refresh();
+    }, operationBlocking ? 2000 : 15000);
+    return () => window.clearInterval(timer);
+  }, [hostConnected, canMaintenance, operationBlocking, status.busy, status.refresh]);
   const rawProgress = props.state.backupProgress;
   const progress =
     rawProgress && operationJobId && str(rawProgress.jobId, "") === operationJobId
       ? rawProgress
       : null;
-  const liveBackupProgress = operationPhase === "ARCHIVING" ? progress : null;
+  const livePhaseIndex = PHASES.findIndex(entry => entry.key === str(progress?.phase, ""));
+  const durablePhaseIndex = PHASES.findIndex(entry => entry.key === operationPhase);
+  const liveBackupProgress = progress && !operationTerminal && livePhaseIndex >= 0 && livePhaseIndex >= durablePhaseIndex ? progress : null;
   const displayedPhase = str(liveBackupProgress?.phase, operationPhase);
   const currentIndex = PHASES.findIndex((entry) => entry.key === displayedPhase);
   const service = props.state.service;
@@ -468,6 +491,7 @@ export function BackupsView30(props: ViewProps) {
     minecraftReady;
   const preflightReady =
     preflight.hasSuccess &&
+    !preflight.error && !preflight.busy &&
     preflight.data.hostAuthenticated === true &&
     preflight.data.operationBusy !== true &&
     preflight.data.recoveryRequired !== true &&
@@ -551,6 +575,7 @@ export function BackupsView30(props: ViewProps) {
   const captureFailure = (action: string, error: unknown) => {
     const data = error instanceof ActionError ? error.data : {};
     const safe: FailureRecord = {
+      serverId: props.state.serverId,
       action: error instanceof ActionError && error.action ? error.action : action,
       requestId: error instanceof ActionError ? error.requestId : "",
       status: error instanceof ActionError ? error.status : "FAILED",
@@ -564,7 +589,7 @@ export function BackupsView30(props: ViewProps) {
     setLastFailure(safe);
     setLocalError(safe.message);
     try {
-      window.sessionStorage.setItem(FAILURE_KEY, JSON.stringify(safe));
+      window.sessionStorage.setItem(failureKey, JSON.stringify(safe));
     } catch {
       // The visible failure card remains available for this render session.
     }
@@ -579,12 +604,13 @@ export function BackupsView30(props: ViewProps) {
     try {
       return await props.run(action, parameters, "HOST", confirmationMode);
     } catch (error) {
-      captureFailure(action, error);
+      if (!(error instanceof Error && error.message === "Cancelled")) captureFailure(action, error);
       throw error;
     }
   };
 
   const refreshAll = () => {
+    setRefreshCooldown(true);
     status.refresh();
     settingsQuery.refresh();
     fullQuery.refresh();
@@ -633,22 +659,8 @@ export function BackupsView30(props: ViewProps) {
         : providerConfigured
           ? "Failed"
           : "Not configured";
-  const storageReadiness: ReadinessState = !preflight.hasSuccess
-    ? preflight.error
-      ? "Failed"
-      : "Unknown"
-    : preflight.data.backupRootWritable === true
-      ? "Ready"
-      : "Failed";
-  const filesystemReadiness: ReadinessState = !preflight.hasSuccess
-    ? preflight.error
-      ? "Failed"
-      : "Unknown"
-    : (unreadable ?? 0) > 0 || symlinkIssues.length > 0
-      ? "Failed"
-      : missingIncludes.length > 0
-        ? "Warning"
-        : "Ready";
+  const storageReadiness = backupCheckState(preflight, "storage");
+  const filesystemReadiness = backupCheckState(preflight, "source");
 
   return (
     <div className="cr30-backups-stack">
@@ -661,7 +673,7 @@ export function BackupsView30(props: ViewProps) {
           <Badge tone="green">Host connected</Badge>
           <Badge tone={paperConnected ? "green" : "quiet"}>Paper {paperConnected ? "online" : "offline"}</Badge>
           <Badge tone="cyan">Manual full backup only</Badge>
-          <button className="cr-button" onClick={refreshAll}>Refresh</button>
+          <button className="cr-button" disabled={refreshCooldown || status.busy || settingsQuery.busy || fullQuery.busy || providerQuery.busy || preflight.busy} onClick={refreshAll}>Refresh</button>
         </div>
       </div>
 
@@ -670,6 +682,10 @@ export function BackupsView30(props: ViewProps) {
       {queryAlert("Full restore-point inventory unavailable", fullQuery)}
       {queryAlert("Provider status unavailable", providerQuery)}
       {localError && <p className="cr-alert" role="alert">{localError}</p>}
+
+      <BackupDestination state={props.state} configured={providerConfigured}
+        remote={str(provider.remote, "")}
+        restartRequired={provider.hostConfigRestartRequired === true} />
 
       {recoveryRequired && (
         <div className="cr-step8-recovery" role="alert">
@@ -684,16 +700,14 @@ export function BackupsView30(props: ViewProps) {
           <div className="cr-actions">
             <Badge tone="red">Blocked</Badge>
             {jobRecoveryRequired && canResolveRecovery && (
-              <button
-                className="cr-button"
+              <ActionButton
                 disabled={!recoveryResolveReady}
                 onClick={async () => {
-                  if (!window.confirm("Acknowledge this failed maintenance job after verifying Minecraft is online and Host-local RCON readiness is healthy? This will clear the recovery gate but will not mark the backup successful.")) return;
-                  await runOperation("maintenance.recovery.resolve", {}, "preconfirmed");
+                  await runOperation("maintenance.recovery.resolve");
                   refreshAll();
                   props.notice("Maintenance recovery acknowledged. The failed job remains recorded as failed.");
                 }}
-              >Verify & resolve recovery</button>
+              >Verify & resolve recovery</ActionButton>
             )}
             {jobRecoveryRequired && !canResolveRecovery && (
               <Badge tone="amber">Re-pair Owner to resolve</Badge>
@@ -727,12 +741,12 @@ export function BackupsView30(props: ViewProps) {
           <ReadinessItem
             label="Backup storage"
             state={storageReadiness}
-            detail={preflight.hasSuccess ? `${bytes(preflight.data.usableBytes ?? preflight.data.backupRootUsableBytes)} usable · ${bytes(preflight.data.requiredBytes)} required` : "Host preflight must verify writable storage and free space."}
+            detail={storageReadiness === "Unknown" ? "Not verified. Complete the earlier preflight gate, then refresh." : preflight.hasSuccess ? `${bytes(preflight.data.usableBytes ?? preflight.data.backupRootUsableBytes)} usable · ${bytes(preflight.data.requiredBytes)} required` : "Host preflight reported a storage failure."}
           />
           <ReadinessItem
             label="Filesystem read contract"
             state={filesystemReadiness}
-            detail={preflight.hasSuccess ? `${unreadable ?? 0} unreadable · ${missingIncludes.length} missing includes · ${symlinkIssues.length} symlink issues` : "Host preflight scans the durable source tree."}
+            detail={filesystemReadiness === "Unknown" ? "Not verified. Provider setup must pass before the Host scans the source tree." : preflight.hasSuccess ? `${unreadable ?? 0} unreadable · ${missingIncludes.length} missing includes · ${symlinkIssues.length} symlink issues` : "Host preflight reported a source-read failure."}
           />
           <ReadinessItem
             label="Google Drive / rclone"
@@ -977,7 +991,7 @@ export function BackupsView30(props: ViewProps) {
               className="cr-button"
               onClick={() => {
                 setLastFailure(null);
-                try { window.sessionStorage.removeItem(FAILURE_KEY); } catch {}
+                try { window.sessionStorage.removeItem(failureKey); } catch {}
               }}
             >Clear card</button>
           </div>
@@ -1016,8 +1030,7 @@ export function BackupsView30(props: ViewProps) {
                             <ActionButton
                               danger
                               onClick={async () => {
-                                if (!window.confirm("Delete this backup history record and any retained VPS archive? The canonical Google Drive backup is not deleted.")) return;
-                                await runOperation("backup.full.delete", { backupId: id }, "preconfirmed");
+                                await runOperation("backup.full.delete", { backupId: id });
                                 fullQuery.refresh();
                               }}
                             >Delete</ActionButton>
@@ -1048,8 +1061,7 @@ export function BackupsView30(props: ViewProps) {
               danger
               disabled={operationBlocking || recoveryRequired}
               onClick={async () => {
-                if (!window.confirm("Restart PlexonCraft using the Host-owned maintenance warning and readiness workflow?")) return;
-                await runOperation("maintenance.restart.now", {}, "preconfirmed");
+                await runOperation("maintenance.restart.now");
                 status.refresh();
               }}
             >Restart server</ActionButton>
@@ -1072,10 +1084,10 @@ export function BackupsView30(props: ViewProps) {
               <label>Timezone<input value={activeDraft.timezone} onChange={(event) => { setDraft({ ...activeDraft, timezone: event.target.value }); setDirty(true); }} placeholder="America/Sao_Paulo" /></label>
               <label>
                 Initial player countdown
-                <select
+                <Select aria-label="Initial player countdown"
                   value={restartCountdown(activeDraft.restart.warningSeconds)}
-                  onChange={(event) => {
-                    const seconds = Number(event.target.value);
+                  onValueChange={(selectedValue) => {
+                    const seconds = Number(selectedValue);
                     if (!isCountdownSeconds(seconds)) return;
                     setDraft({
                       ...activeDraft,
@@ -1092,7 +1104,7 @@ export function BackupsView30(props: ViewProps) {
                       {option.label} · {countdownWarningLabel(option.seconds)} notices
                     </option>
                   ))}
-                </select>
+                </Select>
               </label>
               <label>Shutdown timeout · seconds<input type="number" min={30} max={1800} value={activeDraft.restart.stopTimeoutSeconds} onChange={(event) => { setDraft({ ...activeDraft, restart: { ...activeDraft.restart, stopTimeoutSeconds: Number(event.target.value) } }); setDirty(true); }} /></label>
               <label>Startup timeout · seconds<input type="number" min={30} max={1800} value={activeDraft.restart.startupTimeoutSeconds} onChange={(event) => { setDraft({ ...activeDraft, restart: { ...activeDraft.restart, startupTimeoutSeconds: Number(event.target.value) } }); setDirty(true); }} /></label>
@@ -1100,7 +1112,7 @@ export function BackupsView30(props: ViewProps) {
             <section>
               <h3>Manual full backup</h3>
               <p className="cr-hint">Automatic backups are retired. Full backup creation is manually initiated through Fully Backup Now and executed by the always-on Host Companion.</p>
-              <label>Retention<select value={activeDraft.fullRestorePoint.retentionMode} onChange={(event) => { setDraft({ ...activeDraft, fullRestorePoint: { ...activeDraft.fullRestorePoint, retentionMode: event.target.value as "SINGLE_CURRENT" | "ROTATING" } }); setDirty(true); }}><option value="SINGLE_CURRENT">Single current</option><option value="ROTATING">Rotating</option></select></label>
+              <label>Retention<Select aria-label="Retention" value={activeDraft.fullRestorePoint.retentionMode} onValueChange={(selectedValue) => { setDraft({ ...activeDraft, fullRestorePoint: { ...activeDraft.fullRestorePoint, retentionMode: selectedValue as "SINGLE_CURRENT" | "ROTATING" } }); setDirty(true); }}><option value="SINGLE_CURRENT">Single current</option><option value="ROTATING">Rotating</option></Select></label>
               {activeDraft.fullRestorePoint.retentionMode === "ROTATING" && <label>Keep<input type="number" min={1} max={52} value={activeDraft.fullRestorePoint.retentionCount} onChange={(event) => { setDraft({ ...activeDraft, fullRestorePoint: { ...activeDraft.fullRestorePoint, retentionCount: Number(event.target.value) } }); setDirty(true); }} /></label>}
               <label>Canonical filename<input value={activeDraft.fullRestorePoint.canonicalFilename} onChange={(event) => { setDraft({ ...activeDraft, fullRestorePoint: { ...activeDraft.fullRestorePoint, canonicalFilename: event.target.value } }); setDirty(true); }} /></label>
               <div className="cr-step8-fixed-setting">
@@ -1138,8 +1150,8 @@ export function BackupsView30(props: ViewProps) {
       )}
 
       {confirmBackup && (
-        <div className="cr-step8-modal-backdrop" role="presentation" onMouseDown={(event) => { if (event.currentTarget === event.target) setConfirmBackup(false); }}>
-          <section className="cr-step8-modal" role="dialog" aria-modal="true" aria-labelledby="fully-backup-confirm-title">
+          <dialog ref={backupDialog} className="cr-step8-modal" aria-labelledby="fully-backup-confirm-title"
+            onCancel={event => { event.preventDefault(); setConfirmBackup(false); }}>
             <div className="cr-step8-modal-head">
               <div>
                 <span>Destructive maintenance confirmation</span>
@@ -1148,7 +1160,7 @@ export function BackupsView30(props: ViewProps) {
               <button className="cr-button" onClick={() => setConfirmBackup(false)}>Cancel</button>
             </div>
             <div className="cr-step8-confirm-copy">
-              <p>This operation is durable and continues even if this browser closes or reconnects.</p>
+              <p>This cold backup runs on <strong>{props.state.ready?.server.serverName ?? "this server"}</strong> (<code>{props.state.serverId.slice(0, 8)}</code>). It continues even if this browser closes or reconnects.</p>
               <ol>
                 <li>The Host begins the selected <strong>{countdownLabel(backupCountdownSeconds)}</strong> player countdown, with notices at {countdownWarningLabel(backupCountdownSeconds)}.</li>
                 <li>The Host requires an affirmative <code>save-all flush</code> response, then stops Minecraft and independently proves shutdown.</li>
@@ -1185,8 +1197,7 @@ export function BackupsView30(props: ViewProps) {
                 }}
               >Confirm Fully Backup Now</ActionButton>
             </div>
-          </section>
-        </div>
+          </dialog>
       )}
 
     </div>

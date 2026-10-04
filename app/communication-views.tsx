@@ -1,5 +1,7 @@
 "use client";
 
+import { Select } from "../components/select";
+
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ActionButton,
@@ -318,24 +320,24 @@ export function PluginsView21(props: ViewProps) {
         </label>
         <label>
           State
-          <select
+          <Select aria-label="State"
             value={status}
-            onChange={(event) => setStatus(event.target.value)}
+            onValueChange={(selectedValue) => setStatus(selectedValue)}
           >
             <option value="ALL">All states</option>
             <option value="ENABLED">Enabled</option>
             <option value="DISABLED">Disabled</option>
-          </select>
+          </Select>
         </label>
         <label>
           Sort
-          <select
+          <Select aria-label="Sort"
             value={sort}
-            onChange={(event) => setSort(event.target.value as PluginSort)}
+            onValueChange={(selectedValue) => setSort(selectedValue as PluginSort)}
           >
             <option value="name">Name</option>
             <option value="version">Version</option>
-          </select>
+          </Select>
         </label>
         <Badge>{props.state.plugins.length} installed</Badge>
         <button
