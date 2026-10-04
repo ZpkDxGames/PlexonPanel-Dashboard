@@ -33,7 +33,7 @@ export function inbox(socket, signed = false) {
     });
   };
 }
-export async function createFleetFixture({ port = 0, origin = "http://127.0.0.1:3000", separateNodes = false } = {}) {
+export async function createFleetFixture({ port = 0, origin = "http://127.0.0.1:3000", separateNodes = false, names, instanceKeys } = {}) {
   const directory = await mkdtemp(join(tmpdir(), "plexonpanel-fleet-tcp-"));
   const relayKeys = keys(); const nodeId = randomUUID();
   const config = await loadStandaloneConfig({ PLEXON_RELAY_HOST: "127.0.0.1", PLEXON_RELAY_PORT: "8787",
@@ -42,7 +42,7 @@ export async function createFleetFixture({ port = 0, origin = "http://127.0.0.1:
     GATEWAY_ED25519_PRIVATE_KEY: relayKeys.privateKey, GATEWAY_ED25519_PUBLIC_KEY: relayKeys.publicKey });
   const relay = createStandaloneRelay({ ...config, port }); const sockets = new Set(), requests = [];
   const rooms = ["alpha", "bravo"].map((key, i) => ({ serverId: randomUUID(), nodeId: separateNodes && i ? randomUUID() : nodeId,
-    key, name: `Simulated ${i ? "Bravo" : "Alpha"}`, players: i ? 7 : 3, paperKeys: keys(), hostKeys: keys(),
+    key: instanceKeys?.[i] ?? key, name: names?.[i] ?? `Simulated ${i ? "Bravo" : "Alpha"}`, players: i ? 7 : 3, paperKeys: keys(), hostKeys: keys(),
     deviceId: randomUUID(), revision: 1, serviceState: "active" }));
   let interval, closed = false;
   const gatewayKey = await importAgentPublicKey(relayKeys.publicKey);
@@ -91,12 +91,12 @@ export async function createFleetFixture({ port = 0, origin = "http://127.0.0.1:
     const capturedAt = new Date().toISOString();
     for (const room of rooms) {
       await room.paper?.send("telemetry.server", { capturedAt, serverName: room.name, onlinePlayers: room.players, maximumPlayers: 20,
-        tps: [20, 20, 20], averageTickMillis: room.key === "alpha" ? 12 : 18 });
+        tps: [20, 20, 20], averageTickMillis: room === rooms[0] ? 12 : 18 });
       await room.host.send("telemetry.system", { capturedAt, nodeId: room.nodeId, metricScope: "NODE", processRole: "HOST",
         hostCpuPercent: 35, physicalMemoryUsedBytes: 8e9, physicalMemoryTotalBytes: 24e9, diskUsedBytes: 39e9, diskTotalBytes: 145e9 });
       await room.host.send("service.status", { nodeId: room.nodeId, state: room.serviceState, mainPid: 100,
         resources: { capturedAt, scope: "MINECRAFT_SERVICE", source: "SYSTEMD_CGROUP", cpuUnit: "PERCENT_OF_ONE_CORE",
-          cpuAvailable: true, cpuPercent: room.key === "alpha" ? 150 : 80, memoryAvailable: true, memoryBytes: room.key === "alpha" ? 4e9 : 2e9 } });
+          cpuAvailable: true, cpuPercent: room === rooms[0] ? 150 : 80, memoryAvailable: true, memoryBytes: room === rooms[0] ? 4e9 : 2e9 } });
     }
   }
   async function close() {

@@ -42,7 +42,7 @@ type UiPreferencesContextValue = {
 
 const fallbackPreferences = createDefaultUiPreferences(false);
 const fallbackResolved: ResolvedUiPresentation = {
-  theme: "dark",
+  theme: "light",
   contrast: "standard",
   motion: "reduced",
 };

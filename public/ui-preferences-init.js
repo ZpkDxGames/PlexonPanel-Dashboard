@@ -9,16 +9,17 @@
     saved = {};
   }
 
-  const theme = allowed(saved.theme, ["system", "dark", "light"], "system");
+  const theme = allowed(saved.theme, ["system", "dark", "light"], "light");
   const contrast = allowed(saved.contrast, ["system", "standard", "high"], "system");
   const motion = allowed(saved.motion, ["system", "full", "reduced", "off"], "system");
-  const legacyDensity = localStorage.getItem("plexonpanel-density");
+  let legacyDensity;
+  try { legacyDensity = localStorage.getItem("plexonpanel-density"); } catch {}
   const density = allowed(
     saved.density ?? legacyDensity,
     ["compact", "comfortable", "spacious"],
-    "comfortable",
+    "compact",
   );
-  const accent = allowed(saved.accent, ["cyan", "violet", "emerald", "amber"], "cyan");
+  const accent = allowed(saved.accent, ["monochrome", "cyan", "violet", "emerald", "amber"], "monochrome");
   const textScale = [100, 112.5, 125].includes(saved.textScale) ? saved.textScale : 100;
 
   const dark = window.matchMedia?.("(prefers-color-scheme: dark)").matches ?? true;

@@ -49,6 +49,24 @@ const read = <T>(key: string) =>
 const write = (key: string, value: unknown) =>
   transaction("readwrite", (s) => s.put(value, key));
 const remove = (key: string) => transaction("readwrite", (s) => s.delete(key));
+export async function loadServerLabels(): Promise<Record<string, string>> {
+  const entries = await transaction<unknown[]>("readonly", s => s.getAll());
+  const labels: Record<string, string> = {};
+  for (const entry of entries) {
+    if (!entry || typeof entry !== "object") continue;
+    const value = entry as { kind?: string; serverId?: string; label?: string };
+    if (value.kind === "server-label" && typeof value.serverId === "string" && validLabel(value.label))
+      labels[value.serverId] = value.label;
+  }
+  return labels;
+}
+function validLabel(label: unknown): label is string {
+  return typeof label === "string" && label.trim().length > 0 && label.length <= 80 && !/[\u0000-\u001f\u007f]/.test(label);
+}
+export async function saveServerLabel(serverId: string, label: string): Promise<void> {
+  if (!serverId || !validLabel(label)) return;
+  await write(`label:${serverId}`, { kind: "server-label", serverId, label });
+}
 async function writeSelection(id: string, revision: number): Promise<void> {
   const db = await openDatabase();
   try {
@@ -127,6 +145,7 @@ export async function clearBrowserWorkspace(serverId?: string): Promise<void> {
         if (typeof id === "string" && id) {
           store.delete(`credential:${id}`);
           store.delete(`cache:${id}`);
+          store.delete(`label:${id}`);
           if (selected.result === id) store.delete("selected");
         }
       };

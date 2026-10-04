@@ -2,7 +2,7 @@
 
 import type { RelayCredential } from "./browser-store";
 import { applyControlMessage, emptyControlState, record, type ControlState } from "./control-state";
-import { DashboardRequestError, requestLiveConnection, type LiveConnectionGrant } from "./data-source";
+import { DashboardRequestError, LIVE_CONNECTION_TIMEOUT_MS, requestLiveConnection, type LiveConnectionGrant } from "./data-source";
 import { reconcileDeviceGrant } from "./device-grant";
 import { MAXIMUM_FLEET_CONNECTIONS } from "./fleet-contract";
 import { ACTION_CONTRACT_ID } from "./scopes";
@@ -12,7 +12,7 @@ export interface FleetSnapshot { serverId: string; phase: FleetPhase; state: Con
 interface Entry {
   credential: RelayCredential; snapshot: FleetSnapshot; socket: WebSocket | null;
   retry?: ReturnType<typeof setTimeout>; heartbeat?: ReturnType<typeof setInterval>;
-  expiry?: ReturnType<typeof setTimeout>; attempt: number; stopped: boolean;
+  handshake?: ReturnType<typeof setTimeout>; expiry?: ReturnType<typeof setTimeout>; attempt: number; stopped: boolean;
 }
 interface Dependencies {
   grant: (credential: RelayCredential) => Promise<LiveConnectionGrant>;
@@ -78,7 +78,8 @@ export class FleetFeed {
   private clearConnection(entry: Entry): void {
     if (entry.heartbeat) clearInterval(entry.heartbeat);
     if (entry.expiry) clearTimeout(entry.expiry);
-    entry.heartbeat = undefined; entry.expiry = undefined;
+    if (entry.handshake) clearTimeout(entry.handshake);
+    entry.heartbeat = undefined; entry.expiry = undefined; entry.handshake = undefined;
   }
   private revoke(entry: Entry): void {
     if (entry.stopped) return;
@@ -109,6 +110,9 @@ export class FleetFeed {
       const socket = this.dependencies.socket(grant.websocketUrl, ["plexonpanel-v3", `auth.${grant.token}`]);
       entry.socket = socket;
       const current = () => !entry.stopped && !this.closed && entry.socket === socket;
+      entry.handshake = setTimeout(() => {
+        if (current() && entry.snapshot.phase !== "live") socket.close(4008, "Relay handshake timed out");
+      }, LIVE_CONNECTION_TIMEOUT_MS);
       const checkExpiry = () => {
         const remaining = Date.parse(grant.expiresAt) - Date.now();
         if (!current()) return;
@@ -136,6 +140,8 @@ export class FleetFeed {
             if (message.protocolVersion !== 3 || (message.actionContract !== undefined && message.actionContract !== ACTION_CONTRACT_ID) ||
                 !effective?.metadataMatches || typeof record(message.agents).paper !== "boolean" ||
                 typeof record(message.agents).host !== "boolean") { this.revoke(entry); return; }
+            if (entry.handshake) clearTimeout(entry.handshake);
+            entry.handshake = undefined;
             entry.attempt = 0;
             entry.snapshot = { ...entry.snapshot, phase: "live", state: applyControlMessage(entry.snapshot.state, message) };
             this.emit(true);

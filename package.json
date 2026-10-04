@@ -45,6 +45,8 @@
     "@types/react-dom": "19.2.3",
     "eslint": "9.39.4",
     "eslint-config-next": "16.3.8",
+    "fake-indexeddb": "6.2.5",
+    "jsdom": "29.1.1",
     "miniflare": "5.20260911.0-alpha",
     "tailwindcss": "4.2.1",
     "typescript": "5.9.3",
