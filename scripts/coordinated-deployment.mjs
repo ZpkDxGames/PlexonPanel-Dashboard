@@ -5,6 +5,7 @@ import { isDeepStrictEqual } from "node:util";
 import { deploymentDecision, RECEIPT_PATH } from "./coordinated-deployment-policy.mjs";
 
 const root = resolve(import.meta.dirname, "..");
+const requireWorker = process.argv.includes("--require-worker");
 let result = { allowed: false, code: "COORDINATION_CHECK_UNAVAILABLE" };
 let workerAllowed = false;
 try {
@@ -12,8 +13,11 @@ try {
   let receipt = null, parent = null, changedPaths = null;
   if (version === "5.0.0") {
     receipt = JSON.parse(readFileSync(resolve(root, RECEIPT_PATH), "utf8"));
+    // A VPS staging receipt never authorizes Worker publication, even in a shallow checkout.
+    // Reject that target before reading activation ancestry; Dashboard checks still require it.
+    const workerTargetHeld = requireWorker && receipt.schemaVersion === 2;
     // No private data or provider credentials are read by this gate.
-    if (receipt.state === "READY") {
+    if (receipt.state === "READY" && !workerTargetHeld) {
       const git = args => execFileSync("git", args, { cwd: root, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();
       parent = git(["rev-parse", "HEAD^"]);
       changedPaths = git(["diff", "--name-only", "HEAD^", "HEAD", "--"]).split("\n").filter(Boolean);
@@ -45,7 +49,9 @@ try {
       }
     }
   }
-  result = deploymentDecision({ version, receipt, parent, changedPaths });
+  result = requireWorker && version === "5.0.0" && receipt?.schemaVersion === 2
+    ? { allowed: false, code: "WORKER_PUBLICATION_NOT_AUTHORIZED_FOR_VPS_TARGET" }
+    : deploymentDecision({ version, receipt, parent, changedPaths });
   if (version === "5.0.0" && process.env.VERCEL === "1"
       && (process.env.VERCEL_ENV !== "production" || process.env.VERCEL_GIT_COMMIT_REF !== "main"))
     result = { allowed: false, code: "FIVE_PREVIEW_DEPLOYMENT_HELD" };
@@ -59,6 +65,8 @@ if (process.argv.includes("--github-output")) {
   appendFileSync(process.env.GITHUB_OUTPUT, `allowed=${result.allowed}\nworker_allowed=${workerAllowed}\n`);
 } else if (process.argv.includes("--vercel-ignore")) {
   process.exit(result.allowed ? 1 : 0);
+} else if (requireWorker) {
+  process.exit(workerAllowed ? 0 : 1);
 } else {
   process.exit(result.allowed ? 0 : 1);
 }
