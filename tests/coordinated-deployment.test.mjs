@@ -3,6 +3,7 @@ import { execFileSync, spawnSync } from "node:child_process";
 import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { pathToFileURL } from "node:url";
 import test from "node:test";
 import { deploymentDecision, RECEIPT_PATH } from "../scripts/coordinated-deployment-policy.mjs";
 
@@ -84,6 +85,7 @@ test("actual activation ancestry, dirty source, preview hold and Vercel exit cod
   for (const fixtureReceipt of [receipt, exceptionReceipt]) {
   const directory = mkdtempSync(join(tmpdir(), "plexon-coordination-"));
   const output = `${directory}-github-output`;
+  const shallow = `${directory}-shallow`;
   try {
     mkdirSync(join(directory, "scripts")); mkdirSync(join(directory, "docs"));
     for (const file of ["coordinated-deployment.mjs", "coordinated-deployment-policy.mjs"])
@@ -103,6 +105,20 @@ test("actual activation ancestry, dirty source, preview hold and Vercel exit cod
       cwd: directory, encoding: "utf8", env: { ...process.env, VERCEL: "0", ...extra },
     });
     assert.equal(run("--require").status, 0);
+    const worker = run("--require-worker");
+    assert.equal(worker.status, fixtureReceipt.schemaVersion === 1 ? 0 : 1);
+    if (fixtureReceipt.schemaVersion === 2)
+      assert.match(worker.stdout, /WORKER_PUBLICATION_NOT_AUTHORIZED_FOR_VPS_TARGET/);
+    // Reproduce a provider checkout without HEAD^; no command fetches history or bypasses the gate.
+    execFileSync("git", ["clone", "--quiet", "--depth", "1", pathToFileURL(directory).href, shallow], { stdio: "ignore" });
+    const shallowRun = flag => spawnSync(process.execPath, ["scripts/coordinated-deployment.mjs", flag], {
+      cwd: shallow, encoding: "utf8", env: { ...process.env, VERCEL: "0" },
+    });
+    assert.equal(shallowRun("--require").status, 1);
+    assert.match(shallowRun("--require").stdout, /COORDINATION_CHECK_UNAVAILABLE/);
+    assert.equal(shallowRun("--require-worker").status, 1);
+    if (fixtureReceipt.schemaVersion === 2)
+      assert.match(shallowRun("--require-worker").stdout, /WORKER_PUBLICATION_NOT_AUTHORIZED_FOR_VPS_TARGET/);
     assert.equal(run("--vercel-ignore").status, 1);
     const preview = { VERCEL: "1", VERCEL_ENV: "preview", VERCEL_GIT_COMMIT_REF: "feature" };
     assert.equal(run("--vercel-ignore", preview).status, 0);
@@ -131,11 +147,14 @@ test("actual activation ancestry, dirty source, preview hold and Vercel exit cod
     rmSync(join(directory, "unaccepted-source.mjs"));
     writeFileSync(join(directory, "package.json"), JSON.stringify({ type: "module", version: "5.0.0", changed: true }));
     assert.equal(run("--require").status, 1);
-  } finally { rmSync(output, { force: true }); rmSync(directory, { recursive: true, force: true }); }
+  } finally { rmSync(output, { force: true }); rmSync(shallow, { recursive: true, force: true }); rmSync(directory, { recursive: true, force: true }); }
   }
 });
 
 test("Cloudflare deployment consumes the Worker-specific authorization", () => {
+  const scripts = JSON.parse(readFileSync("package.json", "utf8")).scripts;
+  assert.equal(scripts["relay:deploy"], "npm run relay:worker:deploy");
+  assert.match(scripts["relay:worker:deploy"], /coordinated-deployment\.mjs --require-worker &&/);
   const workflow = readFileSync(".github/workflows/deploy-relay.yml", "utf8");
   assert.match(workflow, /worker_allowed: \$\{\{ steps\.gate\.outputs\.worker_allowed \}\}/);
   assert.match(workflow, /needs\.coordination\.outputs\.worker_allowed == 'true'/);
