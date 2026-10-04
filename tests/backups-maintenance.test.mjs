@@ -210,7 +210,7 @@ test("destructive maintenance actions remain capability-gated at browser and rel
 });
 
 test("responsive Step 8 backup layout avoids global scaling and styles the confirmation surface", async () => {
-  const css = await source("app/backups-scaffold.css");
+  const css = await source("app/dashboard.css");
   for (const selector of [
     ".cr341-readiness-grid",
     ".cr341-phase-list",

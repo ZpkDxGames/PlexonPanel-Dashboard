@@ -16,7 +16,7 @@ import {
 } from "../.test-dist/lib/operation-messages.js";
 
 const dashboardSource = () =>
-  readFile(new URL("../app/dashboard-2-1.tsx", import.meta.url), "utf8");
+  readFile(new URL("../app/dashboard.tsx", import.meta.url), "utf8");
 
 test("active service disables Start and allows stop/restart", () => {
   const state = normalizeServiceState("active", true);

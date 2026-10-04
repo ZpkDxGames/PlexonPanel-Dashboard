@@ -1,24 +1,6 @@
 import type { Metadata } from "next";
 import Script from "next/script";
-import "./globals.css";
-import "./control-room.css";
-import "./control-room-2-1.css";
-import "./management-2-1.css";
-import "./visual-motion.css";
-import "./player-head.css";
-import "./player-workspace-2-3.css";
-import "./control-room-3-0.css";
-import "./workspaces-3-0.css";
-import "./console-3-4.css";
-import "./overview-3-0.css";
-import "./activity-history.css";
-import "./player-activity-3-0.css";
-import "./visual-responsive-refinement.css";
-import "./visual-responsive-authority.css";
-import "./brand-console-icon.css";
-import "./backups-scaffold.css";
-import "./fleet-overview.css";
-import "./workspace-5.css";
+import "./dashboard.css";
 import { UiPreferencesProvider } from "../components/ui-preferences-provider";
 
 export const metadata: Metadata = {

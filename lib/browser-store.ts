@@ -1,5 +1,4 @@
 "use client";
-import type { DashboardWorkspace } from "./dashboard-types";
 import { safeCache, type ControlState } from "./control-state";
 import { validScopes } from "./scopes";
 export interface RelayCredential {
@@ -155,13 +154,4 @@ export async function clearBrowserWorkspace(serverId?: string): Promise<void> {
     });
   } finally { db.close(); }
   indexedDB.deleteDatabase("plexonpanel-browser-v2");
-}
-// Legacy transformation helpers remain available to isolated migration tests; live v3 uses server-specific state.
-export async function loadCachedWorkspace(): Promise<DashboardWorkspace | null> {
-  return null;
-}
-export async function saveCachedWorkspace(
-  _workspace: DashboardWorkspace,
-): Promise<void> {
-  void _workspace;
 }

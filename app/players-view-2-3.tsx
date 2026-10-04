@@ -15,7 +15,7 @@ import { number, records, str, type JsonMap } from "../lib/control-state";
 import { sendDashboardAction } from "../lib/data-source";
 import { PlayerHead } from "../components/player-head";
 import { useUiPreferences } from "../components/ui-preferences-provider";
-import { HistoryPlayerDrawer21 } from "./management-views-legacy";
+import { HistoryPlayerDrawer21 } from "./communication-views";
 
 type PlayerSort = "name" | "ping" | "session" | "world";
 

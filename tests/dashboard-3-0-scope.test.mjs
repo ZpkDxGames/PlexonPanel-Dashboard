@@ -9,9 +9,9 @@ async function source(path) {
 const ACTIVE_BACKUPS_VIEW = "app/backups-view-3-4-1.tsx";
 
 test("Dashboard 5.0.0 exposes the active manual-only Backups workspace", async () => {
-  const dashboard = await source("app/dashboard-2-1.tsx");
+  const dashboard = await source("app/dashboard.tsx");
   const backups = await source(ACTIVE_BACKUPS_VIEW);
-  const legacyBackups = await source("app/backups-view-3-0.tsx");
+
   const sections = dashboard.match(/const sections = \[([\s\S]*?)\] as const;/)?.[1] ?? "";
   assert.ok(sections.includes('"Overview"'));
   assert.ok(sections.includes('"Backups"'));
@@ -24,7 +24,7 @@ test("Dashboard 5.0.0 exposes the active manual-only Backups workspace", async (
   assert.equal(backups.includes("Create full restore point"), false);
   assert.equal(backups.includes("Create live snapshot"), false);
   assert.equal(backups.includes('runOperation("backup.create"'), false);
-  assert.equal(legacyBackups.trim(), 'export { BackupsView30 } from "./backups-view-3-4-1";');
+
 });
 
 test("Backups workspace is wired only to supported Host manual maintenance actions", async () => {
@@ -103,15 +103,15 @@ test("retired Paper coordination protocol cannot return", async () => {
   assert.equal(protocol.includes("RETIRED_COORDINATION_TYPES.has(envelope.type)"), true);
 });
 
-test("Dashboard 5.0.0 keeps protocol hooks compatible while Files remains dormant", async () => {
-  const dashboard = await source("app/dashboard-2-1.tsx");
+test("Dashboard 5.0.0 keeps protocol hooks compatible with a selected-server Configuration workspace", async () => {
+  const dashboard = await source("app/dashboard.tsx");
   assert.equal(dashboard.includes('action.startsWith("backup.")'), true);
   assert.equal(dashboard.includes('action.startsWith("files.")'), true);
-  assert.equal(dashboard.includes("Open files"), false);
+  assert.ok(dashboard.includes('case "Configuration"'));
 });
 
 test("Dashboard visible version metadata matches package 5.0.0", async () => {
-  const dashboard = await source("app/dashboard-2-1.tsx");
+  const dashboard = await source("app/dashboard.tsx");
   const settings = await source("app/settings-view-2-1.tsx");
   const server = await source("app/server-view-2-1.tsx");
   const versionSource = await source("lib/dashboard-version.ts");
@@ -125,16 +125,16 @@ test("Dashboard visible version metadata matches package 5.0.0", async () => {
 });
 
 test("Dashboard 5.0.0 responsive architecture does not globally scale the interface", async () => {
-  const css = await source("app/control-room-3-0.css");
+  const css = await source("app/dashboard.css");
   assert.equal(/\bzoom\s*:/.test(css), false);
-  assert.equal(/transform\s*:\s*scale\s*\(/.test(css), false);
+  assert.doesNotMatch(css, /\.cr21-shell\s*\{[^}]*transform\s*:\s*scale\s*\(/);
   assert.equal(css.includes("container-name: workspace"), true);
   assert.equal(css.includes("@container workspace"), true);
   assert.equal(css.includes("100dvh"), true);
 });
 
 test("Step 8 Backups workspace has responsive production layout", async () => {
-  const css = await source("app/backups-scaffold.css");
+  const css = await source("app/dashboard.css");
   for (const selector of [
     ".cr30-backup-columns",
     ".cr30-backup-metrics",
@@ -148,7 +148,7 @@ test("Step 8 Backups workspace has responsive production layout", async () => {
 });
 
 test("Dashboard 5.0.0 display update rate exposes every supported browser cadence", async () => {
-  const settings = await source("app/settings-view-2-1.tsx");
+  const settings = await source("app/client-preferences.tsx");
   const preferences = await source("lib/ui-preferences.ts");
   for (const value of [0, 250, 500, 1000, 2000]) {
     assert.equal(settings.includes(`value: ${value}`), true);
@@ -158,20 +158,11 @@ test("Dashboard 5.0.0 display update rate exposes every supported browser cadenc
   assert.equal(settings.includes("critical connection, authorization, lifecycle and action state is always applied immediately"), true);
 });
 
-test("authoritative and feature style layers are loaded after legacy presentation layers", async () => {
+test("production loads one canonical global stylesheet without legacy overlap", async () => {
   const layout = await source("app/layout.tsx");
-  const legacy = layout.indexOf('import "./player-workspace-2-3.css"');
-  const controlRoom30 = layout.indexOf('import "./control-room-3-0.css"');
-  const workspaces30 = layout.indexOf('import "./workspaces-3-0.css"');
-  const overview30 = layout.indexOf('import "./overview-3-0.css"');
-  const refinement = layout.indexOf('import "./visual-responsive-refinement.css"');
-  const brand = layout.indexOf('import "./brand-console-icon.css"');
-  const backups = layout.indexOf('import "./backups-scaffold.css"');
-  assert.ok(legacy >= 0);
-  assert.ok(controlRoom30 > legacy);
-  assert.ok(workspaces30 > controlRoom30);
-  assert.ok(overview30 > workspaces30);
-  assert.ok(refinement > overview30);
-  assert.ok(brand > refinement);
-  assert.ok(backups > brand);
+  assert.deepEqual([...layout.matchAll(/import "(\.\/[^"\n]+\.css)"/g)].map(m => m[1]), ["./dashboard.css"]);
+  const css = await source("app/dashboard.css");
+  assert.doesNotMatch(css, /backdrop-filter:\s*blur/);
+  assert.ok(css.includes(".client-preferences-dialog"));
+  assert.ok(css.includes(".configuration-workspace"));
 });

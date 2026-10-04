@@ -18,6 +18,41 @@ class TestSocket {
 globalThis.WebSocket = TestSocket;
 afterEach(() => bindLiveSocket(null));
 
+test("Host lifecycle completion survives Paper presence and session changes without replay", async () => {
+  const socket = new TestSocket();
+  const context = { authorization: "owner-grant", PAPER: "online-session-1", HOST: "online-host-1" };
+  bindLiveSocket(socket, "server-a", context);
+  const hostTarget = captureActionTarget("server-a", "HOST");
+  const paperTarget = captureActionTarget("server-a", "PAPER");
+  const host = sendDashboardAction("server.restart", {}, "HOST", hostTarget);
+  const paper = sendDashboardAction("files.read", {}, "PAPER", paperTarget);
+  const rejectedPaper = assert.rejects(paper, /will not be resent/);
+  bindLiveSocket(socket, "server-a", { ...context, PAPER: "offline" });
+  await rejectedPaper;
+  bindLiveSocket(socket, "server-a", { ...context, PAPER: "online-session-2" });
+  assert.equal(captureActionTarget("server-a", "HOST").generation, hostTarget.generation);
+  handleRelayControlMessage({ type: "server.event", serverId: "server-a", agentKind: "HOST", eventType: "action.result",
+    body: { requestId: socket.sent[0].requestId, action: "server.restart", status: "SUCCESS", data: {} } }, socket);
+  await host;
+  assert.equal(socket.sent.length, 2);
+  await assert.rejects(sendDashboardAction("files.write", {}, "PAPER", paperTarget), /connection changed/);
+});
+
+test("Host session or signed grant replacement rejects its pending lifecycle command", async () => {
+  for (const change of [{ HOST: "replacement-host" }, { authorization: "replacement-grant" }]) {
+    const socket = new TestSocket();
+    const context = { authorization: "grant", PAPER: "paper", HOST: "host" };
+    bindLiveSocket(socket, "server-a", context);
+    const target = captureActionTarget("server-a", "HOST");
+    const result = sendDashboardAction("server.stop", {}, "HOST", target);
+    const rejection = assert.rejects(result, /will not be resent/);
+    bindLiveSocket(socket, "server-a", { ...context, ...change });
+    await rejection;
+    await assert.rejects(sendDashboardAction("server.stop", {}, "HOST", target), /connection changed/);
+    assert.equal(socket.sent.length, 1);
+  }
+});
+
 test("confirmation captured for Server A cannot send on Server B after an asynchronous switch", async () => {
   const a = new TestSocket();
   const b = new TestSocket();

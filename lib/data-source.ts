@@ -2,21 +2,11 @@
 
 import {
   clearBrowserWorkspace,
-  loadCachedWorkspace,
   loadRelayCredential,
-  saveCachedWorkspace,
   saveRelayCredential,
   type RelayCredential,
 } from "./browser-store";
 import { ACTION_CONTRACT_ID, ACTION_SCOPES, validScopes } from "./scopes";
-import type { DashboardWorkspace } from "./dashboard-types";
-
-export interface DashboardSessionResponse {
-  authenticated: boolean;
-  serverId?: string;
-  workspace?: DashboardWorkspace;
-  error?: string;
-}
 
 export interface LiveConnectionGrant {
   serverId: string;
@@ -60,13 +50,20 @@ type SessionCredential = Pick<
 >;
 
 let activeSocket: WebSocket | null = null;
-let activeBinding: { serverId: string; generation: string; context: string } | null = null;
-export interface ActionTarget { readonly serverId: string; readonly generation: string }
+type AgentKind = "PAPER" | "HOST";
+export interface ActionBindingContext { authorization: string; PAPER: string; HOST: string }
+let activeBinding: { serverId: string; generation: string; context: string | ActionBindingContext;
+  authorities: Record<AgentKind, string> } | null = null;
+export interface ActionTarget { readonly serverId: string; readonly generation: string; readonly agentKind?: AgentKind }
 
-export function captureActionTarget(expectedServerId: string): ActionTarget {
+function bindingGeneration(kind?: AgentKind): string | undefined {
+  return kind ? activeBinding?.authorities[kind] : activeBinding?.generation;
+}
+
+export function captureActionTarget(expectedServerId: string, agentKind?: AgentKind): ActionTarget {
   if (!activeSocket || !activeBinding || activeBinding.serverId !== expectedServerId)
     throw new Error("The selected server connection changed. Review the target and try again.");
-  return Object.freeze({ serverId: activeBinding.serverId, generation: activeBinding.generation });
+  return Object.freeze({ serverId: activeBinding.serverId, generation: bindingGeneration(agentKind)!, agentKind });
 }
 const pendingActions = new Map<
   string,
@@ -184,19 +181,6 @@ function relayHttpUrl(): URL {
   return url;
 }
 
-export async function loadDashboardSession(): Promise<DashboardSessionResponse> {
-  const [credential, workspace] = await Promise.all([
-    loadRelayCredential(),
-    loadCachedWorkspace(),
-  ]);
-  if (!credential) return { authenticated: false };
-  return {
-    authenticated: true,
-    serverId: credential.serverId,
-    ...(workspace ? { workspace } : {}),
-  };
-}
-
 export async function pairDashboardServer(
   code: string,
   name = "Browser device",
@@ -291,16 +275,31 @@ export async function requestLiveConnection(
   });
 }
 
-export function bindLiveSocket(socket: WebSocket | null, serverId = "", context = ""): boolean {
-  const changed = activeSocket !== socket || activeBinding?.serverId !== serverId || activeBinding?.context !== context;
-  if (activeSocket && changed)
-    rejectPendingActions(
-      "The connection changed before completion was observed. Check the local audit; this request will not be resent.",
-    );
+export function bindLiveSocket(socket: WebSocket | null, serverId = "", context: string | ActionBindingContext = ""): boolean {
+  const previous = activeBinding;
+  const authorization = (value: string | ActionBindingContext | undefined) => typeof value === "string" ? value : value?.authorization;
+  const changed = activeSocket !== socket || previous?.serverId !== serverId
+    || typeof previous?.context !== typeof context
+    || authorization(previous?.context) !== authorization(context);
+  const changedAuthorities = new Set<AgentKind>();
+  for (const kind of ["PAPER", "HOST"] as const)
+    if (changed || (typeof previous?.context === "object" && typeof context === "object"
+        && previous.context[kind] !== context[kind])) changedAuthorities.add(kind);
+  // Lifecycle operations deliberately change Paper presence. Only the authority executing
+  // the request (or the browser's signed authorization) can invalidate its completion.
+  if (activeSocket) rejectPendingActions(
+    "The connection changed before completion was observed. Check the local audit; this request will not be resent.",
+    (pending) => changed || (pending.agentKind ? changedAuthorities.has(pending.agentKind) : changedAuthorities.size > 0),
+  );
   activeSocket = socket;
   if (!socket) activeBinding = null;
-  else if (changed || !activeBinding) activeBinding = { serverId, context, generation: crypto.randomUUID() };
-  return changed;
+  else activeBinding = { serverId, context,
+    generation: changed || changedAuthorities.size ? crypto.randomUUID() : previous!.generation,
+    authorities: {
+      PAPER: changedAuthorities.has("PAPER") ? crypto.randomUUID() : previous!.authorities.PAPER,
+      HOST: changedAuthorities.has("HOST") ? crypto.randomUUID() : previous!.authorities.HOST,
+    } };
+  return changed || changedAuthorities.size > 0;
 }
 
 export function unbindLiveSocket(socket: WebSocket): boolean {
@@ -347,7 +346,7 @@ export function handleRelayControlMessage(
   const pending = pendingActions.get(requestId);
   if (!pending) return true;
   if ((sourceSocket && sourceSocket !== pending.socket)
-      || pending.generation !== activeBinding?.generation
+      || pending.generation !== bindingGeneration(pending.agentKind)
       || pending.socket !== activeSocket
       || (message.serverId !== undefined && message.serverId !== pending.serverId)
       || (pending.serverId && message.serverId === undefined && sourceSocket !== pending.socket)
@@ -416,7 +415,8 @@ export async function sendDashboardAction(
   const socket = activeSocket;
   const binding = activeBinding;
   if (expectedTarget && (!binding || expectedTarget.serverId !== binding.serverId
-      || expectedTarget.generation !== binding.generation))
+      || expectedTarget.generation !== bindingGeneration(expectedTarget.agentKind)
+      || (expectedTarget.agentKind && expectedTarget.agentKind !== agentKind)))
     throw new Error("The confirmed server connection changed. Review the target and confirm again.");
   if (!socket || !binding || socket.readyState !== WebSocket.OPEN)
     throw new Error("The relay is not connected.");
@@ -438,7 +438,7 @@ export async function sendDashboardAction(
         : 45000,
     );
     pendingActions.set(requestId, { resolve, reject, timer, action, agentKind,
-      socket, serverId: binding.serverId, generation: binding.generation });
+      socket, serverId: binding.serverId, generation: bindingGeneration(agentKind)! });
     try {
       socket.send(
         JSON.stringify({
@@ -455,12 +455,6 @@ export async function sendDashboardAction(
       reject(error);
     }
   });
-}
-
-export function cacheDashboardWorkspace(
-  workspace: DashboardWorkspace,
-): Promise<void> {
-  return saveCachedWorkspace(workspace);
 }
 
 export async function logoutDashboard(serverId?: string): Promise<void> {
@@ -485,12 +479,11 @@ export class DashboardRequestError extends Error {
   }
 }
 
-function rejectPendingActions(message: string): void {
-  for (const pending of pendingActions.values()) {
+function rejectPendingActions(message: string, matches: (pending: { agentKind?: AgentKind }) => boolean = () => true): void {
+  for (const [id, pending] of pendingActions) {
+    if (!matches(pending)) continue;
     clearTimeout(pending.timer);
     pending.reject(new Error(message));
+    pendingActions.delete(id);
   }
-  pendingActions.clear();
 }
-
-export type DashboardDataSource = () => Promise<DashboardWorkspace>;

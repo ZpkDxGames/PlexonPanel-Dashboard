@@ -119,7 +119,7 @@ export function ServerView21(props: ViewProps) {
         <div>
           <strong>Server lifecycle</strong>
           <span>
-            systemd state and lifecycle actions are Host-authoritative and locally policy-gated.
+            Control this Minecraft instance and follow its connection progress.
           </span>
         </div>
         <button
@@ -131,7 +131,8 @@ export function ServerView21(props: ViewProps) {
         </button>
       </div>
 
-      <Panel title="Infrastructure" className="cr21-status-panel">
+      <div className="server-workspace-grid">
+      <Panel title="Connections" className="cr21-status-panel">
         <div className="cr21-status-strip">
           <Agent
             name="Paper agent"
@@ -228,11 +229,7 @@ export function ServerView21(props: ViewProps) {
               Restart
             </ActionButton>
           </div>
-          <dl className="cr21-lifecycle-rules">
-            <div><dt>Active</dt><dd>Start disabled · Stop enabled · Restart enabled</dd></div>
-            <div><dt>Inactive</dt><dd>Start enabled · Stop disabled · Restart disabled</dd></div>
-            <div><dt>Transitioning</dt><dd>Conflicting lifecycle actions disabled</dd></div>
-          </dl>
+          <p className="cr-hint">Graceful stop saves the world before shutting down. Start and restart can finish on the Host while Paper is still connecting.</p>
           {effectivePending && <OperationTimeline pending={effectivePending} />}
           {query.error && (
             <p className="cr-alert" role="alert">
@@ -241,7 +238,9 @@ export function ServerView21(props: ViewProps) {
           )}
         </div>
       </Panel>
+      </div>
 
+      <details className="workspace-disclosure runtime-disclosure"><summary>Runtime and version details</summary>
       <Panel title="Runtime details">
         <dl className="cr-details cr-pad">
           {[
@@ -266,6 +265,7 @@ export function ServerView21(props: ViewProps) {
           ))}
         </dl>
       </Panel>
+      </details>
     </>
   );
 }
