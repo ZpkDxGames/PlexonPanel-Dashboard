@@ -4,4 +4,4 @@ export {
   ChatView21,
   HistoryPlayerDrawer21,
   PluginsView21,
-} from "./management-views-legacy";
+} from "./communication-views";

@@ -7,14 +7,31 @@ import { JSDOM } from "jsdom";
 import { IDBFactory } from "fake-indexeddb";
 import WebSocket from "ws";
 import { createFleetFixture } from "../scripts/support/fleet-fixture.mjs";
-import Dashboard from "../.test-dist/app/dashboard-2-1.js";
+import Dashboard from "../.test-dist/app/dashboard.js";
 import { saveRelayCredential, selectRelayCredential, loadRelayCredential } from "../.test-dist/lib/browser-store.js";
 import { captureActionTarget, bindLiveSocket } from "../.test-dist/lib/data-source.js";
+import { UiPreferencesProvider } from "../.test-dist/components/ui-preferences-provider.js";
+import { UI_PREFERENCES_KEY } from "../.test-dist/lib/ui-preferences.js";
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 test("mounted Dashboard selects and operates independent signed instances without stale transitions", { timeout: 40_000 }, async t => {
-  const fixture = await createFleetFixture({ names: ["PlexonCraft", "TonimSMP"], instanceKeys: ["plexoncraft", "tonimsmp"] });
+  let simulateLifecycle = false;
+  let fileContent = "settings:\n  sample: true\n", fileHash = "a".repeat(64), simulateConflict = false;
+  const fixture = await createFleetFixture({ names: ["PlexonCraft", "TonimSMP"], instanceKeys: ["plexoncraft", "tonimsmp"],
+    async beforeActionResult({ room, kind, body, attach, sync, telemetry }) {
+      if (body.action === "files.list") return { data: { roots: ["server"], entries: [{ name: "bukkit.yml", directory: false, editable: true }], hasMore: false } };
+      if (body.action === "files.read") return { data: { content: fileContent, sha256: fileHash, editable: kind === "PAPER" } };
+      if (body.action === "files.write") {
+        if (simulateConflict || body.parameters.sha256 !== fileHash) return { status: "CONFLICT", code: "STALE_FILE", message: "Fixture file changed", data: {} };
+        fileContent = body.parameters.content; fileHash = "b".repeat(64); return { data: { sha256: fileHash } };
+      }
+      if (!simulateLifecycle || kind !== "HOST" || !["server.stop", "server.start", "server.restart"].includes(body.action)) return;
+      if (body.action !== "server.start") { room.paper.socket.close(); await sleep(120); }
+      room.serviceState = body.action === "server.stop" ? "inactive" : "active";
+      await telemetry(); await sleep(120);
+      if (body.action !== "server.stop") { await attach(room, "PAPER"); await sync(room); await telemetry(); await sleep(120); }
+    } });
   const dom = new JSDOM('<div id="root"></div>', { url: fixture.origin, pretendToBeVisual: true });
   const { window } = dom;
   window.scrollTo = () => {};
@@ -50,11 +67,11 @@ test("mounted Dashboard selects and operates independent signed instances withou
   const { createRoot } = await import("react-dom/client");
   const rootElement = window.document.getElementById("root");
   let root;
-  const mount = async () => { root = createRoot(rootElement); await act(async () => root.render(React.createElement(Dashboard))); };
+  const mount = async () => { root = createRoot(rootElement); await act(async () => root.render(React.createElement(UiPreferencesProvider, null, React.createElement(Dashboard)))); };
   const wait = async (condition, label) => {
     const until = Date.now() + 7000;
     while (!condition()) {
-      assert.ok(Date.now() < until, `Timed out: ${label}`);
+      assert.ok(Date.now() < until, `Timed out: ${label}; page: ${rootElement.textContent.slice(-3500)}`);
       await act(async () => { await sleep(25); });
     }
   };
@@ -74,6 +91,15 @@ test("mounted Dashboard selects and operates independent signed instances withou
     await t.test("opening selector shows live named cards and remembers the selected server", async () => {
       await wait(() => text().includes("PlexonCraft") && text().includes("TonimSMP") && text().includes("Continue to workspace"), "paired server selector");
       assert.ok(rootElement.querySelector(".paired-server-home"));
+      await click(button("Client settings"));
+      await wait(() => rootElement.querySelector(".client-preferences-dialog[open]"), "client settings dialog");
+      for (const [label, value, attribute] of [["Accent", "violet", "plexonAccent"], ["Density", "spacious", "plexonDensity"], ["Chart style", "line", "plexonChartStyle"]]) {
+        const field = [...rootElement.querySelectorAll('.client-preferences-dialog label')].find(node => node.querySelector('span')?.textContent === label).querySelector('select');
+        await act(async () => { field.value = value; field.dispatchEvent(new window.Event("change", { bubbles: true })); });
+        assert.equal(window.document.documentElement.dataset[attribute], value);
+      }
+      await click(button("Done"));
+      assert.equal(JSON.parse(window.localStorage.getItem(UI_PREFERENCES_KEY)).accent, "violet");
       assert.equal(rootElement.querySelector('.fleet-card[data-selected="true"] h2').textContent, "PlexonCraft");
       await click(button("Continue to workspace"));
       await wait(() => currentName() === "PlexonCraft" && health() === "online", "PlexonCraft workspace");
@@ -133,6 +159,55 @@ test("mounted Dashboard selects and operates independent signed instances withou
       await select(second.serverId);
       await wait(() => currentName() === "TonimSMP" && health() === "online", "second page scope");
       assert.equal(rootElement.querySelector(".cr21-page-head h1").textContent, "Overview");
+    });
+    await t.test("lifecycle commands complete across real signed Paper disconnect and reconnect events", async () => {
+      simulateLifecycle = true;
+      await click(button("Server"));
+      for (const [label, action, expected] of [["Graceful stop", "server.stop", "stopped"], ["Start", "server.start", "online"], ["Restart", "server.restart", "online"]]) {
+        await wait(() => button(label) && !button(label).disabled, `${label} available`);
+        await click(button(label));
+        if (action !== "server.start") { await wait(() => rootElement.querySelector("dialog[open]"), "lifecycle confirmation"); await click(button("Confirm operation")); }
+        await wait(() => rootElement.querySelector(".cr-toast")?.textContent.includes("Simulated fixture response"), `${action} successful completion`);
+        assert.doesNotMatch(rootElement.querySelector(".cr-toast").textContent, /connection changed|could not be completed/);
+        await wait(() => rootElement.querySelector('.cr21-operation [data-state="current"]')?.textContent.includes("Complete"), `${action} observed success`);
+        assert.equal(fixture.requests.filter(r => r.action === action && r.serverId === second.serverId).length, action === "server.restart" ? 2 : 1);
+        await wait(() => health() === expected, `${action} connection state`);
+        await click(rootElement.querySelector('.cr-toast button'));
+      }
+      simulateLifecycle = false;
+      await click(button("Overview"));
+    });
+    await t.test("Owner configuration uses Paper editing, reviews changes and preserves conflicts and unsaved work", async () => {
+      await click(button("Configuration"));
+      const fileButton = () => [...rootElement.querySelectorAll('.cr-file-list button')].find(node => node.textContent.includes("bukkit.yml"));
+      await wait(() => fileButton(), "configuration files");
+      await click(fileButton());
+      await wait(() => rootElement.querySelector('.cr-file-split textarea'), "configuration editor");
+      const edit = async content => {
+        const field = rootElement.querySelector('.cr-file-split textarea');
+        await act(async () => { Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, "value").set.call(field, content); field.dispatchEvent(new window.Event("input", { bubbles: true })); });
+      };
+      const changed = "settings:\n  sample: false\n";
+      await edit(changed);
+      const saveButton = () => button("Review changes") || button("Save reviewed changes");
+      await wait(() => saveButton(), "dirty editor");
+      const before = fixture.requests.filter(r => r.action === "files.write").length;
+      await click(saveButton());
+      assert.equal(fixture.requests.filter(r => r.action === "files.write").length, before);
+      await click(saveButton());
+      await wait(() => fileContent === changed, "reviewed configuration save");
+      const request = fixture.requests.find(r => r.action === "files.write");
+      assert.equal(request.kind, "PAPER"); assert.equal(request.serverId, second.serverId);
+      simulateConflict = true;
+      await edit("settings:\n  sample: pending\n");
+      await click(saveButton()); await click(saveButton());
+      await wait(() => text().includes("Conflict: the server file changed"), "conflict keeps edits");
+      assert.match(rootElement.querySelector('.cr-file-split textarea').value, /pending/);
+      await select(first.serverId);
+      assert.equal(currentName(), "TonimSMP");
+      await edit(changed); simulateConflict = false;
+      await click(button("Overview"));
+      assert.equal(JSON.parse(window.localStorage.getItem(UI_PREFERENCES_KEY)).density, "spacious");
     });
     await t.test("Host-confirmed stop, agent disconnect and relay disconnect are different UI states", async () => {
       second.serviceState = "inactive";

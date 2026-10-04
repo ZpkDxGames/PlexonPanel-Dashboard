@@ -28,27 +28,30 @@ for (const file of [
   "app/control-views.tsx",
   "app/fleet-overview.tsx",
   "app/connection-summary.tsx",
-  "app/management-views-legacy.tsx",
+  "app/communication-views.tsx",
   "app/console-view-3-0.tsx",
   "app/players-view-2-3.tsx",
   "app/activity-history-modal.tsx",
   "app/players-view-3-0.tsx",
   "app/management-views-2-1.tsx",
   "app/advanced-views.tsx",
-  "app/dashboard-2-1.tsx",
+  "app/dashboard.tsx",
   "app/overview-view-3-0.tsx",
   "app/infrastructure-views-2-1.tsx",
   "app/monitoring-views-2-1.tsx",
   "app/server-view-2-1.tsx",
   "app/backups-view-3-4-1.tsx",
   "app/settings-view-2-1.tsx",
+  "app/client-preferences.tsx",
+  "app/preferences-dialog.tsx",
+  "app/configuration-view.tsx",
   "app/control-plane-build-panel.tsx",
   "lib/management-data.ts",
 
 ]) {
   let source = await readFile(file, "utf8");
   // Render the real lazy workspace components in the DOM harness without the Next chunk loader.
-  if (file === "app/dashboard-2-1.tsx") source = source.replace('"next/dynamic"', '"../../tests/support/dynamic.mjs"');
+  if (file === "app/dashboard.tsx") source = source.replace('"next/dynamic"', '"../../tests/support/dynamic.mjs"');
   source = source.replace(/import\((["'])(\.{1,2}\/[^"']+)\1\)/g,
     (all, q, p) => `import(${q}${/\.\w+$/.test(p) ? p : p + ".js"}${q})`);
   const output = ts

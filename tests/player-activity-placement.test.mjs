@@ -20,7 +20,7 @@ test("recent player activity is presented by the Players workspace", async () =>
 });
 
 test("Overview activity card is visually removed after the transfer", async () => {
-  const css = await source("app/player-activity-3-0.css");
+  const css = await source("app/dashboard.css");
   assert.equal(css.includes(".cr30-overview-columns > .cr-panel:has(.cr30-activity-actions)"), true);
   assert.equal(css.includes("display: none"), true);
   assert.equal(css.includes(".cr31-player-activity-panel"), true);

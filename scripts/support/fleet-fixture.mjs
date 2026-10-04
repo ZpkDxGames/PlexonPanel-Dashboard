@@ -33,7 +33,7 @@ export function inbox(socket, signed = false) {
     });
   };
 }
-export async function createFleetFixture({ port = 0, origin = "http://127.0.0.1:3000", separateNodes = false, names, instanceKeys } = {}) {
+export async function createFleetFixture({ port = 0, origin = "http://127.0.0.1:3000", separateNodes = false, names, instanceKeys, beforeActionResult } = {}) {
   const directory = await mkdtemp(join(tmpdir(), "plexonpanel-fleet-tcp-"));
   const relayKeys = keys(); const nodeId = randomUUID();
   const config = await loadStandaloneConfig({ PLEXON_RELAY_HOST: "127.0.0.1", PLEXON_RELAY_PORT: "8787",
@@ -71,12 +71,14 @@ export async function createFleetFixture({ port = 0, origin = "http://127.0.0.1:
       const message = decodeEnvelope(data.toString());
       assert.equal(await verifyEnvelope(message.envelope, gatewayKey), true);
       if (message.envelope.type === "action.request") {
-        const body = message.body; requests.push({ serverId: room.serverId, kind, action: body.action, requestId: body.requestId });
+        const body = message.body; requests.push({ serverId: room.serverId, kind, action: body.action, requestId: body.requestId, parameters: body.parameters });
         let result = {};
         if (body.action === "players.snapshot.request") result = { snapshotId: randomUUID(), capturedAt: new Date().toISOString(), players: [] };
         if (body.action.startsWith("console.history")) result = { lines: [], hasMore: false };
+        if (body.action === "server.status") result = { state: room.serviceState };
+        const response = await beforeActionResult?.({ room, kind, body, attach, sync, telemetry });
         await agent.send("action.result", { requestId: body.requestId, deviceId: body.deviceId, action: body.action,
-          status: "succeeded", code: "OK", message: "Simulated fixture response", data: result });
+          status: "SUCCESS", code: "OK", message: "Simulated fixture response", data: result, ...response });
       }
     })().catch(() => socket.close(4008, "FIXTURE_GATEWAY_FAILURE")); });
     room[kind.toLowerCase()] = agent; return agent;
