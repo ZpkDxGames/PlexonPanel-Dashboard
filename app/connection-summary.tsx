@@ -1,14 +1,10 @@
 "use client";
-import { useEffect, useState } from "react";
 import type { ControlState } from "../lib/control-state";
 import { connectionState, type ConnectionPhase, type ConnectionState } from "../lib/connection-state";
+import { useTelemetryNow } from "../lib/telemetry-clock";
 
 export function useConnectionState(state: ControlState, phase: ConnectionPhase): ConnectionState {
-  const [now, setNow] = useState(() => Date.now());
-  useEffect(() => {
-    const timer = setInterval(() => setNow(Date.now()), 5000);
-    return () => clearInterval(timer);
-  }, []);
+  const now = useTelemetryNow(state.updatedAt);
   return connectionState(state, phase, now);
 }
 export function ConnectionPills({ state, phase }: { state: ControlState; phase: ConnectionPhase }) {

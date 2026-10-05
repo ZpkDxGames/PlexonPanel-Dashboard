@@ -5,6 +5,7 @@ import { emptyControlState, type ControlState } from "../lib/control-state";
 import { FleetFeed, type FleetSnapshot } from "../lib/fleet-feed";
 import { connectionState, type ConnectionPhase } from "../lib/connection-state";
 import { fleetCard, nodeSummaries } from "../lib/fleet-model";
+import { useTelemetryNow } from "../lib/telemetry-clock";
 
 function bytes(value: number | null): string {
   return value === null ? "Unavailable" : `${(value / 1024 ** 3).toFixed(2)} GiB`;
@@ -19,12 +20,11 @@ export function FleetOverview({ credentials, selected, connected, openServer, pa
 }) {
   const feed = useRef<FleetFeed | null>(null);
   const [snapshots, setSnapshots] = useState<FleetSnapshot[]>([]);
-  const [now, setNow] = useState(() => Date.now());
+  const now = useTelemetryNow(Math.max(selected.updatedAt, ...snapshots.map(snapshot => snapshot.state.updatedAt)));
   useEffect(() => {
     const manager = new FleetFeed(setSnapshots);
     feed.current = manager;
-    const clock = setInterval(() => setNow(Date.now()), 5000);
-    return () => { clearInterval(clock); manager.close(); feed.current = null; };
+    return () => { manager.close(); feed.current = null; };
   }, []);
   useEffect(() => { feed.current?.updateRoster(credentials, selected.serverId); }, [credentials, selected.serverId]);
   useEffect(() => {
