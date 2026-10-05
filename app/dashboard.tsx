@@ -68,6 +68,7 @@ import { PerformanceView21 } from "./monitoring-views-2-1";
 import { OverviewView30 } from "./overview-view-3-0";
 import { ServerView21 } from "./server-view-2-1";
 import { ConnectionPills, ConnectionSummary } from "./connection-summary";
+import { TelemetryFreshness } from "./telemetry-freshness";
 import { BackupsView } from "./backups-view";
 
 const SettingsView = dynamic(() =>
@@ -406,29 +407,6 @@ function Confirm({ value }: { value: Confirmation }) {
       </div>
     </dialog>
   );
-}
-
-function Freshness({ phase, updatedAt }: { phase: Phase; updatedAt: number }) {
-  const [now, setNow] = useState(updatedAt);
-  useEffect(() => {
-    const timer = window.setInterval(() => setNow(Date.now()), 1000);
-    return () => window.clearInterval(timer);
-  }, []);
-  if (phase !== "live")
-    return <span className="cr21-freshness stale">Disconnected</span>;
-  if (!updatedAt)
-    return <span className="cr21-freshness waiting">Waiting for telemetry</span>;
-  const seconds = Math.max(
-    0,
-    Math.floor((Math.max(now, updatedAt) - updatedAt) / 1000),
-  );
-  if (seconds <= 3)
-    return (
-      <span className="cr21-freshness live">Live · sample {seconds}s ago</span>
-    );
-  if (seconds <= 10)
-    return <span className="cr21-freshness">Delayed · {seconds}s</span>;
-  return <span className="cr21-freshness stale">Telemetry stale · {seconds}s</span>;
 }
 
 function CommandPalette({
@@ -1228,7 +1206,6 @@ export default function Dashboard21() {
   );
   const role = state.ready?.device.role ?? credential?.role ?? "Paired";
   const paper = phase === "live" && !state.cached && Boolean(state.ready?.agents.paper);
-  const telemetryUpdatedAt = state.telemetryUpdatedAt || state.updatedAt;
   const restartAvailable =
     can("server.restart", "HOST") &&
     lifecycleActionAllowed(
@@ -1349,7 +1326,6 @@ export default function Dashboard21() {
             )}
           </div>
           <ConnectionPills state={state} phase={phase} />
-          <Freshness phase={phase} updatedAt={telemetryUpdatedAt} />
           <div className="cr21-topbar-actions">
             <button className="cr-button workspace-appearance" onClick={() => setPreferencesOpen(true)} title="Client settings"><Icon name="settings" size={16} /><span>Appearance</span></button>
             <button
@@ -1398,7 +1374,7 @@ export default function Dashboard21() {
             <p className="workspace-page-description">{pageDescriptions[section]}</p>
           </div>
           <div className="cr21-page-meta">
-            <Freshness phase={phase} updatedAt={telemetryUpdatedAt} />
+            <TelemetryFreshness phase={phase} state={state} />
             <button className="cr-button" onClick={refreshCurrent}>
               <Icon name="refresh" size={15} /> Refresh
             </button>

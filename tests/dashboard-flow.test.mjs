@@ -21,7 +21,7 @@ test("mounted Dashboard selects and operates independent signed instances withou
   let fileContent = "settings:\n  sample: true\n", fileHash = "a".repeat(64), simulateConflict = false;
   const fixture = await createFleetFixture({ names: ["PlexonCraft", "TonimSMP"], instanceKeys: ["plexoncraft", "tonimsmp"],
     async beforeActionResult({ room, kind, body, attach, sync, telemetry }) {
-      if (body.action === "provider.status") return { data: { configured: backupMode !== "missing", status: backupMode === "missing" ? "LOCAL" : "CONNECTED", remote: `gdrive:plexonpanel/${room.serverId}` } };
+      if (body.action === "provider.status") return { data: { configured: backupMode !== "missing", status: backupMode === "missing" ? "LOCAL" : backupMode === "ready-old-provider" ? "DEGRADED" : "CONNECTED", remote: `gdrive:plexonpanel/${room.serverId}` } };
       if (body.action === "provider.test") return { status: "FAILED", code: "RCLONE_TEST_FAILED", message: "Fixture provider test failed", data: { phase: "PROVIDER_TEST", retryable: true } };
       if (body.action === "maintenance.status") return { data: { commandChannel: { enabled: true }, currentOperation: backupJob ?? {} } };
       if (body.action === "maintenance.settings.get") return { data: { settings: { schemaVersion: 3, timezone: "UTC", restart: {}, fullRestorePoint: { canonicalFilename: `${room.name}-Latest.zip` } } } };
@@ -29,7 +29,7 @@ test("mounted Dashboard selects and operates independent signed instances withou
       if (body.action === "backup.preflight") {
         if (backupMode === "missing") return { status: "FAILED", code: "RCLONE_UNAVAILABLE", message: "No off-site rclone provider is configured on the running Host.", data: { stage: "provider", phase: "PREFLIGHT" } };
         if (backupMode === "source-failed") return { status: "FAILED", code: "BACKUP_SOURCE_UNREADABLE", message: "Fixture source unreadable", data: { stage: "source", phase: "PREFLIGHT" } };
-        return { data: { hostAuthenticated: true, backupRootWritable: true, commandChannelConfigured: true, usableBytes: 10000000, requiredBytes: 1000 } };
+        return { data: { hostAuthenticated: true, backupRootWritable: true, commandChannelConfigured: true, usableBytes: 10000000, requiredBytes: 1000, provider: "RCLONE", providerStatus: "CONNECTED", remote: `gdrive:plexonpanel/${room.serverId}` } };
       }
       if (body.action === "files.list") return { data: { roots: ["server"], entries: [{ name: "bukkit.yml", directory: false, editable: true }], hasMore: false } };
       if (body.action === "files.read") return { data: { content: fileContent, sha256: fileHash, editable: kind === "PAPER" } };
@@ -229,11 +229,13 @@ test("mounted Dashboard selects and operates independent signed instances withou
       const check = label => [...rootElement.querySelectorAll('.cr341-readiness-item')].find(node => node.querySelector('strong').textContent === label).querySelector('.cr-badge').textContent;
       assert.equal(check("Backup storage"), "Unknown"); assert.equal(check("Filesystem read contract"), "Unknown");
       assert.equal(button("Review & start backup").disabled, true);
-      backupMode = "ready";
+      backupMode = "ready-old-provider";
       await wait(() => !rootElement.querySelector('.cr30-backup-toolbar button').disabled, "refresh available");
       await click(rootElement.querySelector('.cr30-backup-toolbar button'));
       await wait(() => !button("Review & start backup").disabled, "fresh authoritative preflight");
       assert.equal(check("Backup storage"), "Ready");
+      await click(button("Re-run Host preflight"));
+      await wait(() => check("Google Drive / rclone") === "Ready", "new preflight supersedes stale provider status");
       backupMode = "source-failed";
       await wait(() => !rootElement.querySelector('.cr30-backup-toolbar button').disabled, "refresh available");
       await click(rootElement.querySelector('.cr30-backup-toolbar button'));

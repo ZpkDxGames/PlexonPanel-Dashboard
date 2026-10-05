@@ -2,7 +2,7 @@
 
 import { Select } from "../components/select";
 import { BackupDestination } from "./backup-destination";
-import { backupCheckState, type BackupReadiness } from "../lib/backup-readiness";
+import { backupCheckState, backupProviderReadiness, backupProviderSnapshot, type BackupReadiness } from "../lib/backup-readiness";
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ActionError } from "../lib/data-source";
@@ -436,19 +436,20 @@ export function BackupsView(props: ViewProps) {
     [settingsQuery.hasSuccess, settingsQuery.data.settings],
   );
   const activeDraft = draft ?? persistedDraft;
-  const provider = providerQuery.hasSuccess ? providerQuery.data : {};
+  const { data: provider, fromPreflight: providerFromPreflight, known: providerKnown } = backupProviderSnapshot(providerQuery, preflight);
   const operation = status.hasSuccess ? record(status.data.currentOperation) : {};
   const operationPhase = str(operation.phase, "");
   const operationJobId = str(operation.jobId, "");
   const operationTerminal = TERMINAL_PHASES.has(operationPhase);
   const operationBlocking = Boolean(operationJobId) && (!operationTerminal || operationPhase === "RECOVERY_REQUIRED");
+  const { busy: statusBusy, refresh: refreshStatus } = status;
   useEffect(() => {
-    if (!hostConnected || !canMaintenance || status.busy) return;
+    if (!hostConnected || !canMaintenance || statusBusy) return;
     const timer = window.setInterval(() => {
-      if (document.visibilityState !== "hidden") status.refresh();
+      if (document.visibilityState !== "hidden") refreshStatus();
     }, operationBlocking ? 2000 : 15000);
     return () => window.clearInterval(timer);
-  }, [hostConnected, canMaintenance, operationBlocking, status.busy, status.refresh]);
+  }, [hostConnected, canMaintenance, operationBlocking, statusBusy, refreshStatus]);
   const rawProgress = props.state.backupProgress;
   const progress =
     rawProgress && operationJobId && str(rawProgress.jobId, "") === operationJobId
@@ -650,15 +651,7 @@ export function BackupsView(props: ViewProps) {
       </Empty>
     );
 
-  const providerReadiness: ReadinessState = !providerQuery.hasSuccess
-    ? "Unknown"
-    : providerState === "CONNECTED"
-      ? "Ready"
-      : providerState === "CONFIGURED_UNTESTED"
-        ? "Warning"
-        : providerConfigured
-          ? "Failed"
-          : "Not configured";
+  const providerReadiness = backupProviderReadiness(providerQuery, preflight);
   const storageReadiness = backupCheckState(preflight, "storage");
   const filesystemReadiness = backupCheckState(preflight, "source");
 
@@ -930,10 +923,10 @@ export function BackupsView(props: ViewProps) {
       <div className="cr30-backup-columns">
         <Panel title="Provider & diagnostics" aside={<Badge tone={readinessTone(providerReadiness)}>{providerReadiness}</Badge>}>
           <dl className="cr30-provider-list">
-            <div><dt>Provider</dt><dd>{providerQuery.hasSuccess ? str(provider.provider, "Unknown") : "Unknown"}</dd></div>
-            <div><dt>Remote</dt><dd>{providerQuery.hasSuccess ? str(provider.remote, providerConfigured ? "Unavailable" : "Not configured") : "Unavailable"}</dd></div>
-            <div><dt>Runtime state</dt><dd>{providerQuery.hasSuccess ? providerState : "UNKNOWN"}</dd></div>
-            <div><dt>Last test</dt><dd>{providerQuery.hasSuccess ? time(provider.lastTestAt) : "—"}</dd></div>
+            <div><dt>Provider</dt><dd>{providerKnown ? str(provider.provider, "Unknown") : "Unknown"}</dd></div>
+            <div><dt>Remote</dt><dd>{providerKnown ? str(provider.remote, providerConfigured ? "Unavailable" : "Not configured") : "Unavailable"}</dd></div>
+            <div><dt>Runtime state</dt><dd>{providerKnown ? providerState : "UNKNOWN"}</dd></div>
+            <div><dt>Last test</dt><dd>{providerFromPreflight ? "Passed during latest preflight" : providerQuery.hasSuccess ? time(provider.lastTestAt) : "—"}</dd></div>
             <div><dt>Last remote verification</dt><dd>{providerQuery.hasSuccess ? time(provider.lastSuccessfulVerificationAt) : lastRemote ? time(lastRemote.timestamp) : "—"}</dd></div>
             <div><dt>Credentials</dt><dd>Host-local only</dd></div>
           </dl>
