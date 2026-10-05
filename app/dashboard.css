@@ -6783,6 +6783,8 @@ html dialog.cr21-player-drawer::backdrop { backdrop-filter: none; background: #0
 html .cr21-mobile-menu { background: var(--cr21-surface-1); color: var(--cr21-text-primary); border-color: var(--cr21-border-soft); }
 
 .cr21-topbar > .cr21-freshness { display: none; }
+.workspace-freshness { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 4px 12px; }
+@media (max-width: 640px) { .workspace-freshness { justify-content: flex-start; gap: 3px 10px; } }
 
 .cr21-brand-mark { background: linear-gradient(145deg, var(--cr21-surface-1), var(--cr21-surface-3)); border-color: var(--cr21-border-soft); color: var(--cr21-text-primary); box-shadow: 0 2px 4px #00000006; }
 

@@ -45,7 +45,7 @@ export function connectionState(state: ControlState, phase: ConnectionPhase, now
   if (!paper) return { ...result, kind: "paper-disconnected", label: "Minecraft connection unavailable",
     minecraft: service === "active" ? "Running · plugin disconnected" : "Unknown",
     detail: service === "active" ? "Host reports a running service, but the Paper agent is disconnected." : "Host is connected. Waiting for a fresh service sample or Paper connection." };
-  if (!fresh(state.server.capturedAt, now)) return { ...result, kind: "stale", label: "Telemetry stale",
-    detail: "Agents are connected, but Minecraft telemetry is missing or older than 30 seconds." };
+  if (!fresh(state.server.capturedAt, now)) return { ...result, kind: "stale", label: "Minecraft telemetry unavailable",
+    detail: "Agents are connected, but Minecraft telemetry is missing, older than 30 seconds, or has an inconsistent clock. Host telemetry and backups are independent." };
   return { ...result, kind: "online", label: "Online", detail: "Minecraft, Host, and relay are connected." };
 }

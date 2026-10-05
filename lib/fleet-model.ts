@@ -1,7 +1,8 @@
 import { capturedAtMillis, number, record, str, type ControlState } from "./control-state";
 import { FLEET_CONTRACT_ID, validFleetUuid } from "./fleet-contract";
 import type { FleetPhase } from "./fleet-feed";
-export const FLEET_STALE_MS = 30_000;
+import { TELEMETRY_STALE_MS } from "./telemetry-freshness";
+export const FLEET_STALE_MS = TELEMETRY_STALE_MS;
 export interface FleetCard {
   serverId: string; name: string; nodeId: string | null;
   status: "online" | "degraded" | "offline" | "stale"; reason: string;

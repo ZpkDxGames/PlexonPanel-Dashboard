@@ -135,6 +135,7 @@ export function useQuery(
     [busy, setBusy] = useState(false),
     [hasSuccess, setHasSuccess] = useState(false),
     [updatedAt, setUpdatedAt] = useState(0),
+    [completedAt, setCompletedAt] = useState(0),
     [revision, setRevision] = useState(0);
   const key = JSON.stringify(parameters);
   useEffect(() => {
@@ -162,7 +163,10 @@ export function useQuery(
         }
       })
       .finally(() => {
-        if (current) setBusy(false);
+        if (current) {
+          setCompletedAt(Date.now());
+          setBusy(false);
+        }
       });
     return () => {
       current = false;
@@ -175,6 +179,7 @@ export function useQuery(
     busy,
     hasSuccess,
     updatedAt,
+    completedAt,
     refresh: useCallback(() => setRevision((r) => r + 1), []),
   };
 }

@@ -1,5 +1,7 @@
 import { DASHBOARD_LABEL } from "./dashboard-version";
 import type { Scope } from "./scopes";
+import { capturedAtMillis, telemetryFreshness } from "./telemetry-freshness";
+export { capturedAtMillis } from "./telemetry-freshness";
 export type JsonMap = Record<string, unknown>;
 export interface Device {
   deviceId: string;
@@ -131,12 +133,6 @@ export function number(value: unknown): number | null {
 export function str(value: unknown, fallback = "—"): string {
   return typeof value === "string" ? value : fallback;
 }
-export function capturedAtMillis(value: unknown): number | null {
-  if (typeof value !== "string" || !value) return null;
-  const parsed = Date.parse(value);
-  return Number.isFinite(parsed) && parsed >= 0 ? parsed : null;
-}
-
 export function applyControlMessage(
   state: ControlState,
   message: JsonMap,
@@ -354,13 +350,22 @@ export function diagnostics(state: ControlState): string {
   const host = state.ready?.agents.host ? state.hostSystem : {},
     paper = state.ready?.agents.paper ? state.system : {},
     hostCpu = number(host.hostCpuPercent),
-    paperCpu = number(paper.processCpuPercent);
+    paperCpu = number(paper.processCpuPercent),
+    now = Date.now(),
+    live = !state.cached,
+    timestamp = (value: unknown) => {
+      const at = capturedAtMillis(value);
+      return at === null ? "unavailable" : new Date(at).toISOString();
+    };
   return [
     `${DASHBOARD_LABEL} / Protocol 3`,
     `Paper agent: ${state.ready?.server.pluginVersion ?? "unknown"}`,
     `Host agent: ${state.ready?.server.hostVersion ?? "not installed"}`,
     `Paper connected: ${Boolean(state.ready?.agents.paper)}`,
     `Host connected: ${Boolean(state.ready?.agents.host)}`,
+    `Browser time: ${new Date(now).toISOString()}`,
+    `Minecraft sample: ${timestamp(state.server.capturedAt)} / ${telemetryFreshness(state.server.capturedAt, live && Boolean(state.ready?.agents.paper), now).label}`,
+    `Host sample: ${timestamp(host.capturedAt)} / ${telemetryFreshness(host.capturedAt, live && Boolean(state.ready?.agents.host), now).label}`,
     `Console authority: ${state.ready?.consoleAuthority ?? "UNAVAILABLE"}`,
     `Console source state: ${state.ready?.consoleSourceState ?? "unknown"}`,
     `Java: ${str(paper.javaVersion)}`,

@@ -2,7 +2,36 @@ import type { JsonMap } from "./control-state";
 
 export type BackupReadiness = "Ready" | "Warning" | "Failed" | "Unknown" | "Not configured";
 type Preflight = { hasSuccess: boolean; busy: boolean; error: string; data: JsonMap;
-  failure: { code: string; stage: string } | null };
+  failure: { code: string; stage: string } | null; completedAt?: number; updatedAt?: number };
+
+function newerPreflight(provider: Preflight, preflight: Preflight) {
+  return (preflight.completedAt ?? preflight.updatedAt ?? 0) >= (provider.completedAt ?? provider.updatedAt ?? 0);
+}
+export function backupProviderSnapshot(provider: Preflight, preflight: Preflight) {
+  const fromPreflight = !provider.busy && !preflight.busy && !preflight.error &&
+    preflight.hasSuccess && newerPreflight(provider, preflight) && preflight.data.providerStatus === "CONNECTED";
+  const data: JsonMap = fromPreflight ? {
+    ...provider.data, configured: true, status: "CONNECTED",
+    provider: preflight.data.provider ?? "RCLONE",
+    remote: preflight.data.remote ?? provider.data.remote,
+  } : provider.hasSuccess ? provider.data : {};
+  return { data, fromPreflight, known: fromPreflight || provider.hasSuccess };
+}
+
+/** A newer successful preflight supersedes an older provider-status response. */
+export function backupProviderReadiness(provider: Preflight, preflight: Preflight): BackupReadiness {
+  if (provider.busy || preflight.busy) return "Unknown";
+  if (newerPreflight(provider, preflight) && preflight.error) {
+    const code = preflight.failure?.code ?? "";
+    if (code === "RCLONE_UNAVAILABLE") return "Not configured";
+    if (preflight.failure?.stage === "provider" || code.startsWith("RCLONE_")) return "Failed";
+  }
+  if (backupProviderSnapshot(provider, preflight).fromPreflight) return "Ready";
+  if (provider.error || !provider.hasSuccess) return "Unknown";
+  if (provider.data.status === "CONNECTED") return "Ready";
+  if (provider.data.status === "CONFIGURED_UNTESTED") return "Warning";
+  return provider.data.configured === true ? "Failed" : "Not configured";
+}
 /** A failed early gate does not assert the outcome of later checks. Old success is not fresh readiness. */
 export function backupCheckState(query: Preflight, check: "storage" | "source"): BackupReadiness {
   if (query.busy) return "Unknown";
