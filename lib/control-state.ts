@@ -82,6 +82,7 @@ export interface ControlState {
   backupProgress: JsonMap | null;
   updatedAt: number;
   telemetryUpdatedAt: number;
+  paperConnectedAt?: number;
   cached: boolean;
 }
 
@@ -156,10 +157,16 @@ export function applyControlMessage(
     return {
       ...state,
       ready,
-      server: ready.agents.paper && samePaperSession ? state.server : {},
-      system: ready.agents.paper && samePaperSession ? state.system : {},
-      hostSystem: ready.agents.host && state.ready?.server.hostSession === ready.server.hostSession ? state.hostSystem : {},
-      service: ready.agents.host && state.ready?.server.hostSession === ready.server.hostSession ? state.service : {},
+      updatedAt: Date.now(),
+      paperConnectedAt: ready.agents.paper
+        ? samePaperSession && state.ready?.agents.paper && !state.cached
+          ? state.paperConnectedAt
+          : Date.now()
+        : undefined,
+      server: ready.agents.paper && samePaperSession && !state.cached ? state.server : {},
+      system: ready.agents.paper && samePaperSession && !state.cached ? state.system : {},
+      hostSystem: ready.agents.host && !state.cached && state.ready?.server.hostSession === ready.server.hostSession ? state.hostSystem : {},
+      service: ready.agents.host && !state.cached && state.ready?.server.hostSession === ready.server.hostSession ? state.service : {},
       players: preserveRoster ? state.players : [],
       inventoryIds: preserveRoster
         ? state.inventoryIds
@@ -187,9 +194,11 @@ export function applyControlMessage(
   let next = { ...state, updatedAt: receivedAt, cached: false };
   switch (message.eventType) {
     case "telemetry.server":
+      if (kind !== "PAPER" || supersededCapture(state.server, body)) return state;
       next.server = body;
       break;
     case "telemetry.system":
+      if (supersededCapture(kind === "HOST" ? state.hostSystem : state.system, body)) return state;
       if (kind === "HOST") next.hostSystem = body;
       else next.system = body;
       break;
@@ -291,6 +300,7 @@ export function applyControlMessage(
       break;
     case "service.status":
       if (kind !== "HOST") return state;
+      if (supersededCapture(record(state.service.resources), record(body.resources))) return state;
       next.service = body;
       break;
     case "backup.progress":
@@ -327,6 +337,11 @@ export function applyControlMessage(
   }
   return next;
 }
+function supersededCapture(previous: JsonMap, incoming: JsonMap): boolean {
+  const before = capturedAtMillis(previous.capturedAt);
+  const after = capturedAtMillis(incoming.capturedAt);
+  return before !== null && (after === null || after < before);
+}
 export function safeCache(state: ControlState): ControlState {
   // Player addresses/locations, files, action parameters and action outputs never enter this cache.
   return {
@@ -344,6 +359,7 @@ export function safeCache(state: ControlState): ControlState {
       ? state.history.slice(-CONTROL_HISTORY_MAX_POINTS)
       : [],
     cached: true,
+    paperConnectedAt: undefined,
   };
 }
 export function diagnostics(state: ControlState): string {

@@ -17,6 +17,7 @@ for (const file of [
   "lib/fleet-model.ts",
   "lib/connection-state.ts",
   "lib/telemetry-freshness.ts",
+  "lib/telemetry-clock.ts",
   "lib/data-source.ts",
   "lib/browser-store.ts",
   "lib/lifecycle-state.ts",

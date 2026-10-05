@@ -1,6 +1,7 @@
 import { record, type ControlState } from "./control-state";
 import { fresh } from "./fleet-model";
 import { normalizeServiceState } from "./lifecycle-state";
+import { capturedAtMillis, TELEMETRY_STALE_MS } from "./telemetry-freshness";
 
 export type ConnectionPhase = "loading" | "unpaired" | "connecting" | "live" | "reconnecting" | "revoked" | "limited";
 export interface ConnectionState {
@@ -45,6 +46,10 @@ export function connectionState(state: ControlState, phase: ConnectionPhase, now
   if (!paper) return { ...result, kind: "paper-disconnected", label: "Minecraft connection unavailable",
     minecraft: service === "active" ? "Running · plugin disconnected" : "Unknown",
     detail: service === "active" ? "Host reports a running service, but the Paper agent is disconnected." : "Host is connected. Waiting for a fresh service sample or Paper connection." };
+  if (capturedAtMillis(state.server.capturedAt) === null && state.paperConnectedAt !== undefined &&
+      now >= state.paperConnectedAt && now - state.paperConnectedAt <= TELEMETRY_STALE_MS)
+    return { ...result, label: "Waiting for Minecraft telemetry",
+      detail: "The Paper agent is connected. Waiting for its first sample from this session." };
   if (!fresh(state.server.capturedAt, now)) return { ...result, kind: "stale", label: "Minecraft telemetry unavailable",
     detail: "Agents are connected, but Minecraft telemetry is missing, older than 30 seconds, or has an inconsistent clock. Host telemetry and backups are independent." };
   return { ...result, kind: "online", label: "Online", detail: "Minecraft, Host, and relay are connected." };
