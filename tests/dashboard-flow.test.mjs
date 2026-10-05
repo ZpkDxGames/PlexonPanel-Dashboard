@@ -17,10 +17,13 @@ const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 test("mounted Dashboard selects and operates independent signed instances without stale transitions", { timeout: 60_000 }, async t => {
   let simulateLifecycle = false;
+  let lifecycleBusy = false;
   let backupMode = "missing", backupJob = null;
   let fileContent = "settings:\n  sample: true\n", fileHash = "a".repeat(64), simulateConflict = false;
   const fixture = await createFleetFixture({ names: ["PlexonCraft", "TonimSMP"], instanceKeys: ["plexoncraft", "tonimsmp"],
     async beforeActionResult({ room, kind, body, attach, sync, telemetry }) {
+      if (lifecycleBusy && kind === "HOST" && body.action === "server.stop")
+        return { status: "DENIED", code: "BUSY", message: "A backup operation is running. This request was not queued.", data: {} };
       if (body.action === "provider.status") return { data: { configured: backupMode !== "missing", status: backupMode === "missing" ? "LOCAL" : backupMode === "ready-old-provider" ? "DEGRADED" : "CONNECTED", remote: `gdrive:plexonpanel/${room.serverId}` } };
       if (body.action === "provider.test") return { status: "FAILED", code: "RCLONE_TEST_FAILED", message: "Fixture provider test failed", data: { phase: "PROVIDER_TEST", retryable: true } };
       if (body.action === "maintenance.status") return { data: { commandChannel: { enabled: true }, currentOperation: backupJob ?? {} } };
@@ -184,6 +187,25 @@ test("mounted Dashboard selects and operates independent signed instances withou
         await click(rootElement.querySelector('.cr-toast button'));
       }
       simulateLifecycle = false;
+      await click(button("Overview"));
+    });
+    await t.test("a busy stop stays visible in lifecycle controls without delayed or automatic replay", async () => {
+      lifecycleBusy = true;
+      await click(button("Server"));
+      await wait(() => button("Graceful stop") && !button("Graceful stop").disabled, "stop control ready");
+      const before = fixture.requests.filter(r => r.action === "server.stop" && r.serverId === second.serverId).length;
+      await click(button("Graceful stop"));
+      await wait(() => rootElement.querySelector("dialog[open]"), "busy stop confirmation");
+      await click(button("Confirm operation"));
+      await wait(() => rootElement.querySelector('.cr21-lifecycle-card [role="alert"]')?.textContent.includes("Server control is busy"), "persistent lifecycle rejection");
+      assert.match(rootElement.querySelector('.cr21-lifecycle-card [role="alert"]').textContent, /will not run later/);
+      await wait(() => button("Graceful stop") && !button("Graceful stop").disabled, "rejected stop releases controls");
+      if (rootElement.querySelector('.cr-toast button')) await click(rootElement.querySelector('.cr-toast button'));
+      assert.ok(rootElement.querySelector('.cr21-lifecycle-card [role="alert"]'));
+      assert.equal(rootElement.querySelector(".cr21-operation"), null);
+      assert.equal(health(), "online");
+      assert.equal(fixture.requests.filter(r => r.action === "server.stop" && r.serverId === second.serverId).length, before + 1);
+      lifecycleBusy = false;
       await click(button("Overview"));
     });
     await t.test("Owner configuration uses Paper editing, reviews changes and preserves conflicts and unsaved work", async () => {
