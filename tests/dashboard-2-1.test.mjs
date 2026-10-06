@@ -79,6 +79,15 @@ test("unknown action codes retain the sanitized agent message", () => {
   assert.equal(mapped.detail, "Operation was rejected safely");
 });
 
+test("lifecycle busy explains rejection without suggesting a deferred stop", () => {
+  const busy = operationMessage(new ActionError("raw details", "BUSY", "DENIED", "", "server.stop"));
+  assert.equal(busy.title, "Server control is busy");
+  assert.match(busy.detail, /rejected and will not run later/);
+  assert.doesNotMatch(busy.detail, /raw details/);
+  assert.equal(operationMessage(new ActionError("raw", "BUSY", "DENIED", "", "backup.full.retry-upload")).title,
+    "Another operation is running");
+});
+
 test("safe diagnostics identify Dashboard 5.0.0 without changing protocol 3", () => {
   const output = diagnostics(emptyControlState("test-server"));
   assert.match(output, /PlexonPanel Dashboard 5\.0\.0 \/ Protocol 3/);

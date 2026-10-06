@@ -12,6 +12,7 @@ import {
 } from "./control-views";
 import { str } from "../lib/control-state";
 import { DASHBOARD_VERSION } from "../lib/dashboard-version";
+import { operationText } from "../lib/operation-messages";
 import {
   lifecycleActionAllowed,
   normalizeServiceState,
@@ -34,7 +35,7 @@ function stateTone(state: ServiceState) {
 function OperationTimeline({ pending }: { pending: PendingOperation }) {
   const steps = [
     { id: "requested", label: "Requested" },
-    { id: "executing", label: "Executing on host" },
+    { id: "executing", label: "Waiting for Host result" },
     ...(pending.action === "start" || pending.action === "restart"
       ? [
           {
@@ -83,6 +84,7 @@ export function ServerView21(props: ViewProps) {
   // separately and must never be used to fabricate an active service state.
   const state = normalizeServiceState(service.state, false);
   const [pending, setPending] = useState<PendingOperation | null>(null);
+  const [operationError, setOperationError] = useState("");
 
   const effectivePending =
     pending?.phase === "waiting-paper" && paperOnline
@@ -96,6 +98,7 @@ export function ServerView21(props: ViewProps) {
   }, [effectivePending?.phase, effectivePending?.action]);
 
   const runLifecycle = async (action: LifecycleAction) => {
+    setOperationError("");
     setPending({ action, phase: "requested" });
     await Promise.resolve();
     setPending({ action, phase: "executing" });
@@ -109,6 +112,10 @@ export function ServerView21(props: ViewProps) {
       }
     } catch (error) {
       setPending(null);
+      if (!(error instanceof Error && error.message === "Cancelled")) {
+        setOperationError(operationText(error));
+        query.refresh();
+      }
       throw error;
     }
   };
@@ -231,6 +238,9 @@ export function ServerView21(props: ViewProps) {
           </div>
           <p className="cr-hint">Graceful stop saves the world before shutting down. Start and restart can finish on the Host while Paper is still connecting.</p>
           {effectivePending && <OperationTimeline pending={effectivePending} />}
+          {operationError && (
+            <p className="cr-alert" role="alert">{operationError}</p>
+          )}
           {query.error && (
             <p className="cr-alert" role="alert">
               {query.error}

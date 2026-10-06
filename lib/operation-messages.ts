@@ -86,6 +86,13 @@ function diagnosticSuffix(error: ActionError): string {
 
 export function operationMessage(error: unknown): OperationMessage {
   if (error instanceof ActionError) {
+    if (error.code === "BUSY" && ["server.start", "server.stop", "server.restart"].includes(error.action)) {
+      return {
+        title: "Server control is busy",
+        detail: "Another backup, restore or lifecycle operation is running. This request was rejected and will not run later. Check Backups and refresh the server state before trying again." + diagnosticSuffix(error),
+        tone: "warning",
+      };
+    }
     const mapped = OPERATION_MESSAGES[error.code];
     if (mapped) return { ...mapped, detail: `${mapped.detail}${diagnosticSuffix(error)}` };
     return {
