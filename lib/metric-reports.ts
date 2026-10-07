@@ -16,15 +16,18 @@ export const METRICS: Record<MetricField, { label: string; unit: string; source:
   serviceMemory: { label: "Minecraft service RAM", unit: "bytes", source: "service", origin: "Host · systemd cgroup", intervalMs: 5000 },
 };
 
+export type MetricPoint = TimedValue & { provenance: "source capture" | "legacy packet timestamp" };
+
 /** A host packet cannot create a new Paper observation. Unknown captures stay unknown. */
-export function metricSeries(history: readonly Sample[], field: MetricField, minutes: number, now: number): TimedValue[] {
+export function metricSeries(history: readonly Sample[], field: MetricField, minutes: number, now: number): MetricPoint[] {
   const source = METRICS[field].source;
-  const points = new Map<number, TimedValue>();
+  const points = new Map<number, MetricPoint>();
   for (const sample of history) {
     // Pre-revamp cache records had packet timestamps only; provenance is unavailable.
     const at = sample.sources ? sample.sources[source] : sample.at;
     if (at === null || at === undefined || !Number.isFinite(at) || at < 0 || at > now + 5000) continue;
-    points.set(at, { at, value: number(sample[field]) });
+    if (sample.sources || points.get(at)?.provenance !== "source capture")
+      points.set(at, { at, value: number(sample[field]), provenance: sample.sources ? "source capture" : "legacy packet timestamp" });
   }
   return windowedPoints([...points.values()].sort((a, b) => a.at - b.at), minutes, now);
 }
@@ -42,14 +45,10 @@ export function metricReport(points: readonly TimedValue[], minutes: number, now
 
 export function exportMetrics(history: readonly Sample[], serverId: string, minutes: number, now: number, format: "csv" | "json") {
   const fields = Object.keys(METRICS) as MetricField[];
-  const captures = new Map<MetricSource, Set<number>>();
-  for (const sample of history) if (sample.sources) for (const source of Object.keys(sample.sources) as MetricSource[]) {
-    const at = sample.sources[source]; if (at !== null) { if (!captures.has(source)) captures.set(source, new Set()); captures.get(source)!.add(at); }
-  }
   const observations = fields.flatMap(field => metricSeries(history, field, minutes, now).map(point => ({
     serverId, metric: field, capturedAt: new Date(point.at).toISOString(), value: point.value,
     unit: METRICS[field].unit, source: METRICS[field].origin,
-    provenance: captures.get(METRICS[field].source)?.has(point.at) ? "source capture" : "legacy packet timestamp",
+    provenance: point.provenance,
   })));
   if (format === "json") return JSON.stringify({ schemaVersion: 1, serverId, windowMinutes: minutes,
     generatedAt: new Date(now).toISOString(), retention: "browser observed history", observations }, null, 2);

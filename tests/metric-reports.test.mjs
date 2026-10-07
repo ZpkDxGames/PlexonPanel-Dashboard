@@ -7,7 +7,7 @@ const now=Date.parse('2026-10-07T12:00:00Z');
 const sample=(at,values={})=>({at,tps:20,mspt:4,hostCpu:0,processCpu:1,heap:100,memory:1000,players:0,gc:0,...values});
 test('250ms Host updates cannot manufacture Paper samples or inflate observed p95',()=>{
  const history=Array.from({length:9},(_,i)=>sample(now-2000+i*250,{sources:{paperHealth:now-2000,paperSystem:now-2000,hostSystem:now-2000+i*250,service:null}}));
- assert.equal(metricSeries(history,'tps',5,now).length,1);
+ assert.equal(metricSeries(history,'tps',5,now).length,1);assert.equal(metricSeries(history,'tps',5,now)[0].provenance,"source capture");
  assert.equal(metricSeries(history,'hostCpu',5,now).length,9);
  const report=metricReport(metricSeries(history,'tps',5,now),5,now,2000);
  assert.equal(report.count,1);assert.equal(report.coverage,0);assert.equal(report.p95,20);
@@ -15,7 +15,7 @@ test('250ms Host updates cannot manufacture Paper samples or inflate observed p9
 test('actual source gaps break paths, future clocks are rejected and null is never a zero',()=>{
  const history=[sample(now-290000),sample(now-2000,{tps:null}),sample(now,{tps:0}),sample(now+6000)];
  const points=metricSeries(history,'tps',5,now);
- assert.equal(points.length,3);assert.equal(points[1].value,null);assert.equal(points[2].value,0);
+ assert.equal(points.length,3);assert.equal(points[0].provenance,"legacy packet timestamp");assert.equal(points[1].value,null);assert.equal(points[2].value,0);
  assert.equal(gapSegments(points,6000).length,2);
  assert.equal(metricSeries(history,'tps',1,now).length,2);
 });

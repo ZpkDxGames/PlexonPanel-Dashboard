@@ -77,6 +77,7 @@ export function TelemetryChart({
   const now = useTelemetryNow(history.at(-1)?.at ?? 0);
   const series = useMemo(() => metricSeries(history, spec.field, windowMinutes, now), [history, spec.field, windowMinutes, now]);
   const points = series;
+  const legacyCount = series.filter(point => point.provenance === "legacy packet timestamp" && point.value !== null).length;
   const values = series.map((point) => point.value).filter((value): value is number => value !== null);
   const stats = metricReport(series, windowMinutes, now, sourceIntervalMs ?? METRICS[spec.field].intervalMs);
   const [lower, upper] = resolveDomain(values, { fixed: spec.domain, percentage: spec.percentage, capacity, reference: spec.reference?.value });
@@ -155,7 +156,7 @@ export function TelemetryChart({
       {stats.count ? (
         <div className="workspace-chart-stage" ref={viewportRef}>
           <p id={descriptionId} className="sr-only">
-            {spec.label} over the last {windowMinutes} minutes is {trendText(series)}. Latest value {stats.current === null ? "unavailable" : spec.format(stats.current)}. {stats.count} available source samples; missing samples are rendered as gaps. Focus the chart and use the left and right arrow keys to inspect samples.
+            {spec.label} over the last {windowMinutes} minutes is {trendText(series)}. Latest value {stats.current === null ? "unavailable" : spec.format(stats.current)}. {stats.count} observed values{legacyCount ? `, including ${legacyCount} legacy packet-time cached observations` : " from independent source captures"}; missing samples are rendered as gaps. Focus the chart and use the left and right arrow keys to inspect samples.
           </p>
           <svg
             ref={svgRef}
@@ -221,7 +222,7 @@ export function TelemetryChart({
               <span>{spec.shortLabel}</span>
               <b>{spec.format(inspectedValue)}</b>
               <small>{sampleFreshnessText(inspected.at, end)}</small>
-              <small>{METRICS[spec.field].origin} · {METRICS[spec.field].unit}</small>
+              <small>{METRICS[spec.field].origin} · {METRICS[spec.field].unit} · {inspected.provenance}</small>
             </div>
           )}
         </div>
@@ -234,7 +235,8 @@ export function TelemetryChart({
               : "Keep this browser open to build bounded browser-local history."}
         </Empty>
       )}
-      <div className="workspace-chart-caption"><span>Browser-local rolling history · source timestamps</span><span>{stats.count} source values · {stats.coverage.toFixed(0)}% observed time coverage</span></div>
+      <div className="workspace-chart-caption"><span>Browser-local rolling history · {legacyCount ? "includes legacy packet timestamps" : "source timestamps"}</span><span>{stats.count} observed values · {stats.coverage.toFixed(0)}% observed time coverage</span></div>
+      {legacyCount > 0 && <p className="ui-hint">{legacyCount} cached observations predate source-capture metadata. These use packet times and can repeat a source value; statistics include these observations until they age out of this window.</p>}
     </Panel>
   );
 }
