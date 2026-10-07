@@ -1,14 +1,22 @@
-# PlexonPanel Dashboard 4.0.0 — Live Backup Progress
+# PlexonPanel Dashboard 5.0.0
 
-PlexonPanel Dashboard is a responsive Next.js/Vercel control room for signed Protocol 3 PlexonPanel Paper and Host agents. Dashboard 4.0.0 preserves existing identity, pairing, immutable device grants, local Paper/Host policy authority, confirmation rules, and `/v1` transport while adding truthful live ZIP/upload progress and verified local cleanup.
+PlexonPanel Dashboard is a responsive Next.js/Vercel control room for signed Protocol 3 PlexonPanel Paper and Host agents. Dashboard 5.0.0 preserves existing identity, pairing, immutable device grants, local Paper/Host policy authority, confirmation rules, and `/v1` transport while adding truthful live ZIP/upload progress and verified local cleanup.
 
-## Control Room 4.0.0
+## Control Room 5.0.0
 
-Active pages include Overview, Performance, Players, Console, Chat, Plugins, Server, Backups, Audit, Access, and Settings. Files remain a dormant backend-compatible surface rather than a first-class page.
+Fleet is the global paired-instance view. Selected-server workspaces are Overview, Performance, Players, Console, Chat, Plugins, Server, Backups, Configuration, Audit, Access and Settings. Configuration exposes the existing permission-gated file workflow.
 
 Paper and Host remain independent authority domains. Paper owns Paper/JVM/player/plugin state, chat, pairing/device synchronization, remote console command execution, and the optional live-only console fallback. Host owns Linux machine telemetry, systemd lifecycle, Host files/manual backups/maintenance, the durable authorization mirror, and retained server console history through its locally configured journald source.
 
 Host CPU is always machine-wide Host CPU. Paper process CPU remains a separate JVM/process metric. The UI does not substitute one for the other.
+
+## UI and reporting revamp
+
+One minimalist light/dark design system now owns the shell, mobile drawer and all active pages. Semantic modules replace historical page filenames; the old global stylesheet and unmounted Overview are removed. Heavy workspaces load on demand. One preferences store controls density, text, accents, motion and charts.
+
+Overview prioritizes six instance metrics, including systemd service CPU/RAM. Fleet shows shared-node totals once. Reports deduplicate actual source captures, show sample-based p95 and observed coverage, preserve gaps, provide a bounded data table and source/unit/timestamp-aware CSV/JSON. No invented long-horizon history or new backend collector.
+
+Source evidence: [baseline](docs/UI_REVAMP_BASELINE.md), [architecture](docs/UI_REVAMP_ARCHITECTURE.md), [migration matrix](docs/UI_REVAMP_MIGRATION_MATRIX.md), [metrics](docs/UI_REVAMP_METRICS.md), [validation](docs/UI_REVAMP_VALIDATION.md), [rollout/rollback](docs/UI_REVAMP_ROLLOUT.md). This frontend update needs no Paper/Host JAR or VPS restart; exact-main activation and production certification remain separately gated.
 
 ## Host-preferred console and Paper fallback
 

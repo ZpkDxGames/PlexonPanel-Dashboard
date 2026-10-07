@@ -1,0 +1,1294 @@
+{
+  "environment": "Chromium / local Next development server / signed standalone relay / simulated agents",
+  "widths": [
+    360,
+    390,
+    768,
+    1024,
+    1440,
+    1920
+  ],
+  "views": [
+    {
+      "name": "Fleet",
+      "width": 360,
+      "theme": "light",
+      "scroll": 360,
+      "nodes": 143
+    },
+    {
+      "name": "Fleet",
+      "width": 390,
+      "theme": "light",
+      "scroll": 390,
+      "nodes": 143
+    },
+    {
+      "name": "Fleet",
+      "width": 768,
+      "theme": "light",
+      "scroll": 768,
+      "nodes": 143
+    },
+    {
+      "name": "Fleet",
+      "width": 1024,
+      "theme": "light",
+      "scroll": 1024,
+      "nodes": 143
+    },
+    {
+      "name": "Fleet",
+      "width": 1440,
+      "theme": "light",
+      "scroll": 1440,
+      "nodes": 143
+    },
+    {
+      "name": "Fleet",
+      "width": 1920,
+      "theme": "light",
+      "scroll": 1920,
+      "nodes": 143
+    },
+    {
+      "name": "Overview",
+      "width": 360,
+      "theme": "light",
+      "scroll": 360,
+      "nodes": 424
+    },
+    {
+      "name": "Overview",
+      "width": 390,
+      "theme": "light",
+      "scroll": 390,
+      "nodes": 424
+    },
+    {
+      "name": "Overview",
+      "width": 768,
+      "theme": "light",
+      "scroll": 768,
+      "nodes": 424
+    },
+    {
+      "name": "Overview",
+      "width": 1024,
+      "theme": "light",
+      "scroll": 1024,
+      "nodes": 424
+    },
+    {
+      "name": "Overview",
+      "width": 1440,
+      "theme": "light",
+      "scroll": 1440,
+      "nodes": 424
+    },
+    {
+      "name": "Overview",
+      "width": 1920,
+      "theme": "light",
+      "scroll": 1920,
+      "nodes": 424
+    },
+    {
+      "name": "Performance",
+      "width": 360,
+      "theme": "light",
+      "scroll": 360,
+      "nodes": 752
+    },
+    {
+      "name": "Performance",
+      "width": 390,
+      "theme": "light",
+      "scroll": 390,
+      "nodes": 752
+    },
+    {
+      "name": "Performance",
+      "width": 768,
+      "theme": "light",
+      "scroll": 768,
+      "nodes": 752
+    },
+    {
+      "name": "Performance",
+      "width": 1024,
+      "theme": "light",
+      "scroll": 1024,
+      "nodes": 752
+    },
+    {
+      "name": "Performance",
+      "width": 1440,
+      "theme": "light",
+      "scroll": 1440,
+      "nodes": 752
+    },
+    {
+      "name": "Performance",
+      "width": 1920,
+      "theme": "light",
+      "scroll": 1920,
+      "nodes": 752
+    },
+    {
+      "name": "Players",
+      "width": 360,
+      "theme": "light",
+      "scroll": 360,
+      "nodes": 267
+    },
+    {
+      "name": "Players",
+      "width": 390,
+      "theme": "light",
+      "scroll": 390,
+      "nodes": 267
+    },
+    {
+      "name": "Players",
+      "width": 768,
+      "theme": "light",
+      "scroll": 768,
+      "nodes": 267
+    },
+    {
+      "name": "Players",
+      "width": 1024,
+      "theme": "light",
+      "scroll": 1024,
+      "nodes": 267
+    },
+    {
+      "name": "Players",
+      "width": 1440,
+      "theme": "light",
+      "scroll": 1440,
+      "nodes": 267
+    },
+    {
+      "name": "Players",
+      "width": 1920,
+      "theme": "light",
+      "scroll": 1920,
+      "nodes": 267
+    },
+    {
+      "name": "Console",
+      "width": 360,
+      "theme": "light",
+      "scroll": 360,
+      "nodes": 267
+    },
+    {
+      "name": "Console",
+      "width": 390,
+      "theme": "light",
+      "scroll": 390,
+      "nodes": 267
+    },
+    {
+      "name": "Console",
+      "width": 768,
+      "theme": "light",
+      "scroll": 768,
+      "nodes": 267
+    },
+    {
+      "name": "Console",
+      "width": 1024,
+      "theme": "light",
+      "scroll": 1024,
+      "nodes": 267
+    },
+    {
+      "name": "Console",
+      "width": 1440,
+      "theme": "light",
+      "scroll": 1440,
+      "nodes": 267
+    },
+    {
+      "name": "Console",
+      "width": 1920,
+      "theme": "light",
+      "scroll": 1920,
+      "nodes": 267
+    },
+    {
+      "name": "Chat",
+      "width": 360,
+      "theme": "light",
+      "scroll": 360,
+      "nodes": 247
+    },
+    {
+      "name": "Chat",
+      "width": 390,
+      "theme": "light",
+      "scroll": 390,
+      "nodes": 247
+    },
+    {
+      "name": "Chat",
+      "width": 768,
+      "theme": "light",
+      "scroll": 768,
+      "nodes": 247
+    },
+    {
+      "name": "Chat",
+      "width": 1024,
+      "theme": "light",
+      "scroll": 1024,
+      "nodes": 247
+    },
+    {
+      "name": "Chat",
+      "width": 1440,
+      "theme": "light",
+      "scroll": 1440,
+      "nodes": 247
+    },
+    {
+      "name": "Chat",
+      "width": 1920,
+      "theme": "light",
+      "scroll": 1920,
+      "nodes": 247
+    },
+    {
+      "name": "Plugins",
+      "width": 360,
+      "theme": "light",
+      "scroll": 360,
+      "nodes": 244
+    },
+    {
+      "name": "Plugins",
+      "width": 390,
+      "theme": "light",
+      "scroll": 390,
+      "nodes": 244
+    },
+    {
+      "name": "Plugins",
+      "width": 768,
+      "theme": "light",
+      "scroll": 768,
+      "nodes": 244
+    },
+    {
+      "name": "Plugins",
+      "width": 1024,
+      "theme": "light",
+      "scroll": 1024,
+      "nodes": 244
+    },
+    {
+      "name": "Plugins",
+      "width": 1440,
+      "theme": "light",
+      "scroll": 1440,
+      "nodes": 244
+    },
+    {
+      "name": "Plugins",
+      "width": 1920,
+      "theme": "light",
+      "scroll": 1920,
+      "nodes": 244
+    },
+    {
+      "name": "Server",
+      "width": 360,
+      "theme": "light",
+      "scroll": 360,
+      "nodes": 305
+    },
+    {
+      "name": "Server",
+      "width": 390,
+      "theme": "light",
+      "scroll": 390,
+      "nodes": 305
+    },
+    {
+      "name": "Server",
+      "width": 768,
+      "theme": "light",
+      "scroll": 768,
+      "nodes": 305
+    },
+    {
+      "name": "Server",
+      "width": 1024,
+      "theme": "light",
+      "scroll": 1024,
+      "nodes": 305
+    },
+    {
+      "name": "Server",
+      "width": 1440,
+      "theme": "light",
+      "scroll": 1440,
+      "nodes": 305
+    },
+    {
+      "name": "Server",
+      "width": 1920,
+      "theme": "light",
+      "scroll": 1920,
+      "nodes": 305
+    },
+    {
+      "name": "Backups",
+      "width": 360,
+      "theme": "light",
+      "scroll": 360,
+      "nodes": 467
+    },
+    {
+      "name": "Backups",
+      "width": 390,
+      "theme": "light",
+      "scroll": 390,
+      "nodes": 467
+    },
+    {
+      "name": "Backups",
+      "width": 768,
+      "theme": "light",
+      "scroll": 768,
+      "nodes": 467
+    },
+    {
+      "name": "Backups",
+      "width": 1024,
+      "theme": "light",
+      "scroll": 1024,
+      "nodes": 467
+    },
+    {
+      "name": "Backups",
+      "width": 1440,
+      "theme": "light",
+      "scroll": 1440,
+      "nodes": 467
+    },
+    {
+      "name": "Backups",
+      "width": 1920,
+      "theme": "light",
+      "scroll": 1920,
+      "nodes": 467
+    },
+    {
+      "name": "Configuration",
+      "width": 360,
+      "theme": "light",
+      "scroll": 360,
+      "nodes": 296
+    },
+    {
+      "name": "Configuration",
+      "width": 390,
+      "theme": "light",
+      "scroll": 390,
+      "nodes": 296
+    },
+    {
+      "name": "Configuration",
+      "width": 768,
+      "theme": "light",
+      "scroll": 768,
+      "nodes": 296
+    },
+    {
+      "name": "Configuration",
+      "width": 1024,
+      "theme": "light",
+      "scroll": 1024,
+      "nodes": 296
+    },
+    {
+      "name": "Configuration",
+      "width": 1440,
+      "theme": "light",
+      "scroll": 1440,
+      "nodes": 296
+    },
+    {
+      "name": "Configuration",
+      "width": 1920,
+      "theme": "light",
+      "scroll": 1920,
+      "nodes": 296
+    },
+    {
+      "name": "Audit",
+      "width": 360,
+      "theme": "light",
+      "scroll": 360,
+      "nodes": 263
+    },
+    {
+      "name": "Audit",
+      "width": 390,
+      "theme": "light",
+      "scroll": 390,
+      "nodes": 263
+    },
+    {
+      "name": "Audit",
+      "width": 768,
+      "theme": "light",
+      "scroll": 768,
+      "nodes": 263
+    },
+    {
+      "name": "Audit",
+      "width": 1024,
+      "theme": "light",
+      "scroll": 1024,
+      "nodes": 263
+    },
+    {
+      "name": "Audit",
+      "width": 1440,
+      "theme": "light",
+      "scroll": 1440,
+      "nodes": 263
+    },
+    {
+      "name": "Audit",
+      "width": 1920,
+      "theme": "light",
+      "scroll": 1920,
+      "nodes": 263
+    },
+    {
+      "name": "Access",
+      "width": 360,
+      "theme": "light",
+      "scroll": 360,
+      "nodes": 720
+    },
+    {
+      "name": "Access",
+      "width": 390,
+      "theme": "light",
+      "scroll": 390,
+      "nodes": 720
+    },
+    {
+      "name": "Access",
+      "width": 768,
+      "theme": "light",
+      "scroll": 768,
+      "nodes": 720
+    },
+    {
+      "name": "Access",
+      "width": 1024,
+      "theme": "light",
+      "scroll": 1024,
+      "nodes": 720
+    },
+    {
+      "name": "Access",
+      "width": 1440,
+      "theme": "light",
+      "scroll": 1440,
+      "nodes": 720
+    },
+    {
+      "name": "Access",
+      "width": 1920,
+      "theme": "light",
+      "scroll": 1920,
+      "nodes": 720
+    },
+    {
+      "name": "Settings",
+      "width": 360,
+      "theme": "light",
+      "scroll": 360,
+      "nodes": 458
+    },
+    {
+      "name": "Settings",
+      "width": 390,
+      "theme": "light",
+      "scroll": 390,
+      "nodes": 458
+    },
+    {
+      "name": "Settings",
+      "width": 768,
+      "theme": "light",
+      "scroll": 768,
+      "nodes": 458
+    },
+    {
+      "name": "Settings",
+      "width": 1024,
+      "theme": "light",
+      "scroll": 1024,
+      "nodes": 458
+    },
+    {
+      "name": "Settings",
+      "width": 1440,
+      "theme": "light",
+      "scroll": 1440,
+      "nodes": 458
+    },
+    {
+      "name": "Settings",
+      "width": 1920,
+      "theme": "light",
+      "scroll": 1920,
+      "nodes": 458
+    },
+    {
+      "name": "Overview",
+      "width": 360,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 360,
+      "nodes": 424
+    },
+    {
+      "name": "Overview",
+      "width": 390,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 390,
+      "nodes": 424
+    },
+    {
+      "name": "Overview",
+      "width": 768,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 768,
+      "nodes": 424
+    },
+    {
+      "name": "Overview",
+      "width": 1024,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 1024,
+      "nodes": 424
+    },
+    {
+      "name": "Overview",
+      "width": 1440,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 1440,
+      "nodes": 424
+    },
+    {
+      "name": "Overview",
+      "width": 1920,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 1920,
+      "nodes": 424
+    },
+    {
+      "name": "Performance",
+      "width": 360,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 360,
+      "nodes": 752
+    },
+    {
+      "name": "Performance",
+      "width": 390,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 390,
+      "nodes": 752
+    },
+    {
+      "name": "Performance",
+      "width": 768,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 768,
+      "nodes": 752
+    },
+    {
+      "name": "Performance",
+      "width": 1024,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 1024,
+      "nodes": 752
+    },
+    {
+      "name": "Performance",
+      "width": 1440,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 1440,
+      "nodes": 752
+    },
+    {
+      "name": "Performance",
+      "width": 1920,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 1920,
+      "nodes": 752
+    },
+    {
+      "name": "Players",
+      "width": 360,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 360,
+      "nodes": 267
+    },
+    {
+      "name": "Players",
+      "width": 390,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 390,
+      "nodes": 267
+    },
+    {
+      "name": "Players",
+      "width": 768,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 768,
+      "nodes": 267
+    },
+    {
+      "name": "Players",
+      "width": 1024,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 1024,
+      "nodes": 267
+    },
+    {
+      "name": "Players",
+      "width": 1440,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 1440,
+      "nodes": 267
+    },
+    {
+      "name": "Players",
+      "width": 1920,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 1920,
+      "nodes": 267
+    },
+    {
+      "name": "Console",
+      "width": 360,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 360,
+      "nodes": 267
+    },
+    {
+      "name": "Console",
+      "width": 390,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 390,
+      "nodes": 267
+    },
+    {
+      "name": "Console",
+      "width": 768,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 768,
+      "nodes": 267
+    },
+    {
+      "name": "Console",
+      "width": 1024,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 1024,
+      "nodes": 267
+    },
+    {
+      "name": "Console",
+      "width": 1440,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 1440,
+      "nodes": 267
+    },
+    {
+      "name": "Console",
+      "width": 1920,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 1920,
+      "nodes": 267
+    },
+    {
+      "name": "Chat",
+      "width": 360,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 360,
+      "nodes": 247
+    },
+    {
+      "name": "Chat",
+      "width": 390,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 390,
+      "nodes": 247
+    },
+    {
+      "name": "Chat",
+      "width": 768,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 768,
+      "nodes": 247
+    },
+    {
+      "name": "Chat",
+      "width": 1024,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 1024,
+      "nodes": 247
+    },
+    {
+      "name": "Chat",
+      "width": 1440,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 1440,
+      "nodes": 247
+    },
+    {
+      "name": "Chat",
+      "width": 1920,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 1920,
+      "nodes": 247
+    },
+    {
+      "name": "Plugins",
+      "width": 360,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 360,
+      "nodes": 244
+    },
+    {
+      "name": "Plugins",
+      "width": 390,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 390,
+      "nodes": 244
+    },
+    {
+      "name": "Plugins",
+      "width": 768,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 768,
+      "nodes": 244
+    },
+    {
+      "name": "Plugins",
+      "width": 1024,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 1024,
+      "nodes": 244
+    },
+    {
+      "name": "Plugins",
+      "width": 1440,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 1440,
+      "nodes": 244
+    },
+    {
+      "name": "Plugins",
+      "width": 1920,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 1920,
+      "nodes": 244
+    },
+    {
+      "name": "Server",
+      "width": 360,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 360,
+      "nodes": 305
+    },
+    {
+      "name": "Server",
+      "width": 390,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 390,
+      "nodes": 305
+    },
+    {
+      "name": "Server",
+      "width": 768,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 768,
+      "nodes": 305
+    },
+    {
+      "name": "Server",
+      "width": 1024,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 1024,
+      "nodes": 305
+    },
+    {
+      "name": "Server",
+      "width": 1440,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 1440,
+      "nodes": 305
+    },
+    {
+      "name": "Server",
+      "width": 1920,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 1920,
+      "nodes": 305
+    },
+    {
+      "name": "Backups",
+      "width": 360,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 360,
+      "nodes": 467
+    },
+    {
+      "name": "Backups",
+      "width": 390,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 390,
+      "nodes": 467
+    },
+    {
+      "name": "Backups",
+      "width": 768,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 768,
+      "nodes": 467
+    },
+    {
+      "name": "Backups",
+      "width": 1024,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 1024,
+      "nodes": 467
+    },
+    {
+      "name": "Backups",
+      "width": 1440,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 1440,
+      "nodes": 467
+    },
+    {
+      "name": "Backups",
+      "width": 1920,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 1920,
+      "nodes": 467
+    },
+    {
+      "name": "Configuration",
+      "width": 360,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 360,
+      "nodes": 296
+    },
+    {
+      "name": "Configuration",
+      "width": 390,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 390,
+      "nodes": 296
+    },
+    {
+      "name": "Configuration",
+      "width": 768,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 768,
+      "nodes": 296
+    },
+    {
+      "name": "Configuration",
+      "width": 1024,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 1024,
+      "nodes": 296
+    },
+    {
+      "name": "Configuration",
+      "width": 1440,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 1440,
+      "nodes": 296
+    },
+    {
+      "name": "Configuration",
+      "width": 1920,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 1920,
+      "nodes": 296
+    },
+    {
+      "name": "Audit",
+      "width": 360,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 360,
+      "nodes": 263
+    },
+    {
+      "name": "Audit",
+      "width": 390,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 390,
+      "nodes": 263
+    },
+    {
+      "name": "Audit",
+      "width": 768,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 768,
+      "nodes": 263
+    },
+    {
+      "name": "Audit",
+      "width": 1024,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 1024,
+      "nodes": 263
+    },
+    {
+      "name": "Audit",
+      "width": 1440,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 1440,
+      "nodes": 263
+    },
+    {
+      "name": "Audit",
+      "width": 1920,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 1920,
+      "nodes": 263
+    },
+    {
+      "name": "Access",
+      "width": 360,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 360,
+      "nodes": 720
+    },
+    {
+      "name": "Access",
+      "width": 390,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 390,
+      "nodes": 720
+    },
+    {
+      "name": "Access",
+      "width": 768,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 768,
+      "nodes": 720
+    },
+    {
+      "name": "Access",
+      "width": 1024,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 1024,
+      "nodes": 720
+    },
+    {
+      "name": "Access",
+      "width": 1440,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 1440,
+      "nodes": 720
+    },
+    {
+      "name": "Access",
+      "width": 1920,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 1920,
+      "nodes": 720
+    },
+    {
+      "name": "Settings",
+      "width": 360,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 360,
+      "nodes": 458
+    },
+    {
+      "name": "Settings",
+      "width": 390,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 390,
+      "nodes": 458
+    },
+    {
+      "name": "Settings",
+      "width": 768,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 768,
+      "nodes": 458
+    },
+    {
+      "name": "Settings",
+      "width": 1024,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 1024,
+      "nodes": 458
+    },
+    {
+      "name": "Settings",
+      "width": 1440,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 1440,
+      "nodes": 458
+    },
+    {
+      "name": "Settings",
+      "width": 1920,
+      "theme": "dark/high contrast/125%/motion off",
+      "scroll": 1920,
+      "nodes": 458
+    }
+  ],
+  "errors": [],
+  "accessibility": [
+    {
+      "name": "Overview",
+      "violations": []
+    },
+    {
+      "name": "Performance",
+      "violations": []
+    },
+    {
+      "name": "Players",
+      "violations": []
+    },
+    {
+      "name": "Console",
+      "violations": []
+    },
+    {
+      "name": "Chat",
+      "violations": []
+    },
+    {
+      "name": "Plugins",
+      "violations": []
+    },
+    {
+      "name": "Server",
+      "violations": []
+    },
+    {
+      "name": "Backups",
+      "violations": []
+    },
+    {
+      "name": "Configuration",
+      "violations": []
+    },
+    {
+      "name": "Audit",
+      "violations": []
+    },
+    {
+      "name": "Access",
+      "violations": []
+    },
+    {
+      "name": "Settings",
+      "violations": []
+    },
+    {
+      "name": "Overview dark/125%",
+      "violations": []
+    },
+    {
+      "name": "Performance dark/125%",
+      "violations": []
+    },
+    {
+      "name": "Players dark/125%",
+      "violations": []
+    },
+    {
+      "name": "Console dark/125%",
+      "violations": []
+    },
+    {
+      "name": "Chat dark/125%",
+      "violations": []
+    },
+    {
+      "name": "Plugins dark/125%",
+      "violations": []
+    },
+    {
+      "name": "Server dark/125%",
+      "violations": []
+    },
+    {
+      "name": "Backups dark/125%",
+      "violations": []
+    },
+    {
+      "name": "Configuration dark/125%",
+      "violations": []
+    },
+    {
+      "name": "Audit dark/125%",
+      "violations": []
+    },
+    {
+      "name": "Access dark/125%",
+      "violations": []
+    },
+    {
+      "name": "Settings dark/125%",
+      "violations": []
+    }
+  ],
+  "interactions": [
+    {
+      "action": "navigate Overview",
+      "milliseconds": 243.0694029999995
+    },
+    {
+      "action": "navigate Performance",
+      "milliseconds": 350.92380799999955
+    },
+    {
+      "action": "navigate Players",
+      "milliseconds": 312.8598489999986
+    },
+    {
+      "action": "navigate Console",
+      "milliseconds": 279.14242899999954
+    },
+    {
+      "action": "navigate Chat",
+      "milliseconds": 284.42034200000126
+    },
+    {
+      "action": "navigate Plugins",
+      "milliseconds": 283.1717270000008
+    },
+    {
+      "action": "navigate Server",
+      "milliseconds": 298.90873099999953
+    },
+    {
+      "action": "navigate Backups",
+      "milliseconds": 314.87434399999984
+    },
+    {
+      "action": "navigate Configuration",
+      "milliseconds": 299.8351399999956
+    },
+    {
+      "action": "navigate Audit",
+      "milliseconds": 330.89014000000316
+    },
+    {
+      "action": "navigate Access",
+      "milliseconds": 343.98650700000144
+    },
+    {
+      "action": "navigate Settings",
+      "milliseconds": 351.8959889999969
+    },
+    {
+      "action": "navigate Overview",
+      "milliseconds": 273.1604129999978
+    },
+    {
+      "action": "navigate Overview",
+      "milliseconds": 271.88758699999744
+    },
+    {
+      "action": "navigate Performance",
+      "milliseconds": 339.4965420000008
+    },
+    {
+      "action": "navigate Players",
+      "milliseconds": 361.74607199999446
+    },
+    {
+      "action": "navigate Console",
+      "milliseconds": 317.2596459999986
+    },
+    {
+      "action": "navigate Chat",
+      "milliseconds": 288.4647849999965
+    },
+    {
+      "action": "navigate Plugins",
+      "milliseconds": 286.24760499999684
+    },
+    {
+      "action": "navigate Server",
+      "milliseconds": 308.2300399999949
+    },
+    {
+      "action": "navigate Backups",
+      "milliseconds": 320.5679600000003
+    },
+    {
+      "action": "navigate Configuration",
+      "milliseconds": 282.24019000001135
+    },
+    {
+      "action": "navigate Audit",
+      "milliseconds": 297.0677169999981
+    },
+    {
+      "action": "navigate Access",
+      "milliseconds": 369.36226599999645
+    },
+    {
+      "action": "navigate Settings",
+      "milliseconds": 329.7815469999914
+    },
+    {
+      "action": "navigate Overview",
+      "milliseconds": 351.2751309999876
+    },
+    {
+      "action": "navigate Backups",
+      "milliseconds": 386.72263800000655
+    },
+    {
+      "action": "navigate Performance",
+      "milliseconds": 337.69854299999133
+    }
+  ],
+  "soak": {
+    "durationMs": 10004,
+    "telemetryIntervalMs": 250,
+    "snapshots": [
+      {
+        "at": 10004,
+        "metrics": {
+          "Nodes": 5185,
+          "LayoutCount": 50,
+          "RecalcStyleCount": 50,
+          "ScriptDuration": 2.412547,
+          "TaskDuration": 2.653274,
+          "JSHeapUsedSize": 62707452
+        }
+      }
+    ]
+  },
+  "status": "PASS"
+}
