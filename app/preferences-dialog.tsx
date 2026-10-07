@@ -10,7 +10,7 @@ export function PreferencesDialog({ close }: { close: () => void }) {
     return () => { if (dialog?.open) dialog.close(); };
   }, []);
   return <dialog ref={ref} className="client-preferences-dialog" aria-labelledby="client-preferences-title" onCancel={event => { event.preventDefault(); close(); }}>
-    <header><div><span className="cr21-kicker">YOUR BROWSER</span><h2 id="client-preferences-title">Make it yours</h2><p>Saved automatically for every workspace on this browser.</p></div><button className="cr-button" aria-label="Close client settings" onClick={close}>Done</button></header>
+    <header><div><span className="workspace-kicker">YOUR BROWSER</span><h2 id="client-preferences-title">Make it yours</h2><p>Saved automatically for every workspace on this browser.</p></div><button className="ui-button" aria-label="Close client settings" onClick={close}>Done</button></header>
     <ClientPreferences />
   </dialog>;
 }

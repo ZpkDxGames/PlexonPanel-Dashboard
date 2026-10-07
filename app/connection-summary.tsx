@@ -19,6 +19,6 @@ export function ConnectionSummary({ state, phase, retry }: { state: ControlState
   const status = useConnectionState(state, phase);
   return <section className="workspace-health" data-state={status.kind} aria-label="Selected server status" role="status">
     <div><strong>{status.label}</strong><p>{status.detail}{state.cached && " Showing this server's saved history; commands are disabled."}</p></div>
-    {phase === "reconnecting" && <button className="cr-button" onClick={retry}>Retry connection</button>}
+    {phase === "reconnecting" && <button className="ui-button" onClick={retry}>Retry connection</button>}
   </section>;
 }

@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { liveActivity } from "../lib/durable-activity";
 import { Badge, Empty, Panel, time, type ViewProps } from "./control-views";
 import { ActivityHistoryModal } from "./activity-history-modal";
-import { PlayersView21 as PlayersView23 } from "./players-view-2-3";
+import { PlayerRoster } from "./player-roster";
 
 function journalStatus(props: ViewProps) {
   const ready = props.state.ready;
@@ -21,7 +21,7 @@ function journalStatus(props: ViewProps) {
   return { label: "Available", tone: "green", detail: "Open Activity to query retained, paginated observations directly from Paper." };
 }
 
-export function PlayersView30(props: ViewProps) {
+export function PlayersView(props: ViewProps) {
   const [activityOpen, setActivityOpen] = useState(false);
   const journal = journalStatus(props);
   const live = useMemo(
@@ -34,24 +34,24 @@ export function PlayersView30(props: ViewProps) {
 
   return (
     <>
-      <PlayersView23 {...props} showHistoryTab={false} />
+      <PlayerRoster {...props} showHistoryTab={false} />
       <Panel
         title="Recent player activity"
-        className="cr31-player-activity-panel"
-        aside={<div className="cr31-player-activity-badges">
+        className="player-activity-panel"
+        aside={<div className="player-activity-badges">
           <Badge tone={props.connected && props.state.ready?.agents.paper ? "green" : "amber"}>
             {props.connected && props.state.ready?.agents.paper ? "Live" : "Source offline"}
           </Badge>
           <Badge>{live.length} recent in this session</Badge>
         </div>}
       >
-        <p className="cr-hint cr-pad">Live updates are transient. The Paper journal supplies retained activity when locally enabled.</p>
-        <div className="cr31-player-activity-body">
-          <section className="cr31-player-activity-feed" aria-label="Recent live join and leave activity">
+        <p className="ui-hint ui-pad">Live updates are transient. The Paper journal supplies retained activity when locally enabled.</p>
+        <div className="player-activity-body">
+          <section className="player-activity-feed" aria-label="Recent live join and leave activity">
             {live.length ? live.slice(0, 8).map((event) => (
               <article key={event.eventId}>
-                <span className="cr30-activity-initial" aria-hidden>{event.name.slice(0, 1).toUpperCase()}</span>
-                <div className="cr31-player-activity-identity">
+                <span className="view-activity-initial" aria-hidden>{event.name.slice(0, 1).toUpperCase()}</span>
+                <div className="player-activity-identity">
                   <strong>{event.name}</strong><small>{event.uuid.slice(0, 8)}</small>
                 </div>
                 <span data-state={event.state}>{event.state === "JOINED" ? "Joined" : "Left"}</span>
@@ -59,16 +59,16 @@ export function PlayersView30(props: ViewProps) {
               </article>
             )) : <Empty title="No recent live activity">Paper joins and leaves appear here during this signed session.</Empty>}
           </section>
-          <aside className="cr31-player-history-context">
+          <aside className="player-history-context">
             <div>
-              <span className="cr31-player-history-kicker">Paper journal</span>
-              <div className="cr31-player-history-status">
+              <span className="player-history-kicker">Paper journal</span>
+              <div className="player-history-status">
                 <strong>Retained history</strong><Badge tone={journal.tone}>{journal.label}</Badge>
               </div>
               <p>{journal.detail}</p>
             </div>
-            <div className="cr31-player-history-actions">
-              <button type="button" className="cr-button primary"
+            <div className="player-history-actions">
+              <button type="button" className="ui-button primary"
                 disabled={!props.state.serverId} onClick={() => setActivityOpen(true)}>
                 Browse activity history
               </button>

@@ -36,7 +36,7 @@ test("console history actions reuse the existing least-privilege view scopes", (
 });
 
 test("console UI queries Host explicitly and discloses journald retention", async () => {
-  const view = await source("app/console-view-3-0.tsx");
+  const view = await source("app/console-view.tsx");
   assert.match(view, /props\.run\(historyAction, parameters, "HOST"\)/);
   assert.match(view, /Load older history/);
   assert.match(view, /systemd-journald/);

@@ -31,7 +31,7 @@ function Timestamp({ value }: { value: unknown }) {
   );
 }
 
-export function HistoryPlayerDrawer21({
+export function HistoryPlayerDrawer({
   entry,
   entries,
   close,
@@ -50,21 +50,21 @@ export function HistoryPlayerDrawer21({
   }, []);
   return (
     <dialog
-      className="cr-drawer cr21-player-drawer"
+      className="ui-drawer workspace-player-drawer"
       ref={ref}
       onCancel={close}
       aria-labelledby="history-player-title"
     >
-      <div className="cr-panel-head">
+      <div className="ui-panel-head">
         <div>
           <small>Presence observation · read only</small>
           <h2 id="history-player-title">{str(entry.name)}</h2>
         </div>
-        <button className="cr-button" onClick={close} aria-label="Close history details">
+        <button className="ui-button" onClick={close} aria-label="Close history details">
           ×
         </button>
       </div>
-      <dl className="cr-details cr21-drawer-section">
+      <dl className="ui-details workspace-drawer-section">
         {[
           ["UUID", str(entry.uuid, "Unknown")],
           ["State", str(entry.state, "Unknown")],
@@ -91,9 +91,9 @@ export function HistoryPlayerDrawer21({
           </div>
         ))}
       </dl>
-      <div className="cr21-drawer-section">
+      <div className="workspace-drawer-section">
         <h3>Loaded observations for this player</h3>
-        <ul className="cr21-session-list">
+        <ul className="workspace-session-list">
           {entries.slice(0, 12).map((item) => (
             <li key={str(item.eventId)}>
               <strong>{item.state === "JOINED" ? "Joined" : "Left"}</strong>
@@ -104,7 +104,7 @@ export function HistoryPlayerDrawer21({
             </li>
           ))}
         </ul>
-        <p className="cr-hint">
+        <p className="ui-hint">
           Offline history rows expose no player actions. Only observations in
           the currently loaded bounded result are shown here.
         </p>
@@ -113,7 +113,7 @@ export function HistoryPlayerDrawer21({
   );
 }
 
-export function ChatView21(props: ViewProps) {
+export function ChatView(props: ViewProps) {
   const [message, setMessage] = useState("");
   const [search, setSearch] = useState("");
   const [paused, setPaused] = useState<JsonMap[] | null>(null);
@@ -146,8 +146,8 @@ export function ChatView21(props: ViewProps) {
 
   return (
     <>
-      <div className="cr21-filter-toolbar">
-        <label className="cr-search">
+      <div className="workspace-filter-toolbar">
+        <label className="ui-search">
           Search chat
           <input
             value={search}
@@ -156,19 +156,19 @@ export function ChatView21(props: ViewProps) {
           />
         </label>
         <button
-          className="cr-button"
+          className="ui-button"
           onClick={() => setPaused(paused ? null : [...props.state.chat])}
         >
           {paused ? "Resume view" : "Pause view"}
         </button>
         <button
-          className="cr-button"
+          className="ui-button"
           aria-pressed={followTail}
           onClick={() => setFollowTail(!followTail)}
         >
           Follow tail {followTail ? "on" : "off"}
         </button>
-        <button className="cr-button" onClick={() => setClearAt(Date.now())}>
+        <button className="ui-button" onClick={() => setClearAt(Date.now())}>
           Clear local view
         </button>
         <Badge>{messages.length} messages</Badge>
@@ -187,14 +187,14 @@ export function ChatView21(props: ViewProps) {
           )
         }
       >
-        <div className="cr-chat cr21-chat" ref={viewport}>
+        <div className="ui-chat workspace-chat" ref={viewport}>
           {messages.length ? (
             messages.map((item, index) => (
               <div
-                className="cr-chat-message"
+                className="ui-chat-message"
                 key={`${item.messageId}-${index}`}
               >
-                <span className="cr-avatar" aria-hidden>
+                <span className="ui-avatar" aria-hidden>
                   {str(item.playerName).slice(0, 2).toUpperCase()}
                 </span>
                 <div>
@@ -205,7 +205,7 @@ export function ChatView21(props: ViewProps) {
                   <p>{str(item.content)}</p>
                 </div>
                 <button
-                  className="cr21-copy-message"
+                  className="workspace-copy-message"
                   aria-label="Copy chat message"
                   onClick={() =>
                     void navigator.clipboard
@@ -227,7 +227,7 @@ export function ChatView21(props: ViewProps) {
 
         {props.can("chat.global.send") ? (
           <form
-            className="cr-form cr-pad"
+            className="ui-form ui-pad"
             onSubmit={(event) => {
               event.preventDefault();
               void props
@@ -246,14 +246,14 @@ export function ChatView21(props: ViewProps) {
                 required
               />
             </label>
-            <div className="cr-actions">
+            <div className="ui-actions">
               {props.state.ready?.device.scopes.includes(
                 "chat.send.minimessage",
               ) &&
                 props.state.ready.server.capabilities[
                   "chat.send.minimessage"
                 ] && (
-                  <label className="cr-check">
+                  <label className="ui-check">
                     <input
                       type="checkbox"
                       checked={mini}
@@ -263,7 +263,7 @@ export function ChatView21(props: ViewProps) {
                   </label>
                 )}
               <button
-                className="cr-button primary"
+                className="ui-button primary"
                 disabled={!message.trim()}
               >
                 Send to global chat
@@ -271,7 +271,7 @@ export function ChatView21(props: ViewProps) {
             </div>
           </form>
         ) : (
-          <p className="cr-hint cr-pad">
+          <p className="ui-hint ui-pad">
             Sending is disabled for this device or by local policy.
           </p>
         )}
@@ -280,7 +280,7 @@ export function ChatView21(props: ViewProps) {
   );
 }
 
-export function PluginsView21(props: ViewProps) {
+export function PluginsView(props: ViewProps) {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("ALL");
   const [sort, setSort] = useState<PluginSort>("name");
@@ -309,8 +309,8 @@ export function PluginsView21(props: ViewProps) {
 
   return (
     <>
-      <div className="cr21-filter-toolbar">
-        <label className="cr-search">
+      <div className="workspace-filter-toolbar">
+        <label className="ui-search">
           Search plugins
           <input
             value={search}
@@ -341,7 +341,7 @@ export function PluginsView21(props: ViewProps) {
         </label>
         <Badge>{props.state.plugins.length} installed</Badge>
         <button
-          className="cr-button"
+          className="ui-button"
           onClick={() =>
             props.notice(
               "Plugin inventory is pushed by the Paper agent; the latest received snapshot is displayed.",
@@ -354,7 +354,7 @@ export function PluginsView21(props: ViewProps) {
 
       <Panel title="Plugin inventory" aside={<Badge>{plugins.length} shown</Badge>}>
         {plugins.length ? (
-          <div className="cr-table-wrap">
+          <div className="ui-table-wrap">
             <table>
               <thead>
                 <tr>
@@ -371,7 +371,7 @@ export function PluginsView21(props: ViewProps) {
                     <td>
                       <strong>{str(item.name)}</strong>
                       {typeof item.description === "string" && (
-                        <small className="cr21-table-description">
+                        <small className="workspace-table-description">
                           {item.description}
                         </small>
                       )}
@@ -389,7 +389,7 @@ export function PluginsView21(props: ViewProps) {
                     </td>
                     <td>
                       <button
-                        className="cr-button"
+                        className="ui-button"
                         onClick={() => setSelected(str(item.name))}
                       >
                         Details
@@ -418,7 +418,7 @@ export function PluginsView21(props: ViewProps) {
           close={() => setSelected(null)}
         />
       )}
-      <p className="cr-hint">
+      <p className="ui-hint">
         Generic Bukkit/Paper reload is intentionally unsupported. Dedicated
         reload commands remain controlled by local plugin policy.
       </p>
@@ -441,29 +441,29 @@ function PluginDialog21({
   }, []);
   return (
     <dialog
-      className="cr-drawer cr21-player-drawer"
+      className="ui-drawer workspace-player-drawer"
       ref={ref}
       onCancel={close}
       aria-labelledby="plugin-title"
     >
-      <div className="cr-panel-head">
+      <div className="ui-panel-head">
         <div>
           <small>Plugin details</small>
           <h2 id="plugin-title">{str(plugin.name)}</h2>
         </div>
-        <button className="cr-button" onClick={close} aria-label="Close plugin details">
+        <button className="ui-button" onClick={close} aria-label="Close plugin details">
           ×
         </button>
       </div>
-      <div className="cr21-drawer-section">
-        <div className="cr-actions">
+      <div className="workspace-drawer-section">
+        <div className="ui-actions">
           <Badge tone={plugin.enabled ? "green" : "quiet"}>
             {plugin.enabled ? "Enabled" : "Disabled"}
           </Badge>
           <Badge>{str(plugin.version)}</Badge>
         </div>
         <p>{str(plugin.description, "No description provided by this plugin.")}</p>
-        <dl className="cr-details">
+        <dl className="ui-details">
           <div>
             <dt>Authors</dt>
             <dd>
@@ -494,7 +494,7 @@ function PluginDialog21({
             <dd>plugins/{str(plugin.name)}</dd>
           </div>
         </dl>
-        <div className="cr-actions">
+        <div className="ui-actions">
           {props.can("plugin.command.reload") && (
             <ActionButton
               onClick={() =>
@@ -510,7 +510,7 @@ function PluginDialog21({
           {typeof plugin.website === "string" &&
             /^https:\/\//.test(plugin.website) && (
               <a
-                className="cr-button"
+                className="ui-button"
                 href={plugin.website}
                 target="_blank"
                 rel="noreferrer"
@@ -519,7 +519,7 @@ function PluginDialog21({
               </a>
             )}
         </div>
-        <p className="cr-hint">
+        <p className="ui-hint">
           Use the Files workspace for configuration access when its root and
           current device scope permit it.
         </p>

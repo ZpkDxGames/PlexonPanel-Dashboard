@@ -186,8 +186,8 @@ function ScheduleEditor({
 }) {
   const weekday = value.weekdays[0] ?? "SUNDAY";
   return (
-    <div className="cr30-schedule-grid">
-      <label className="cr30-toggle-row">
+    <div className="view-schedule-grid">
+      <label className="view-toggle-row">
         <input
           type="checkbox"
           checked={value.enabled}
@@ -234,7 +234,7 @@ function ScheduleEditor({
         </label>
       )}
       {value.type === "SELECTED_WEEKDAYS" && (
-        <fieldset className="cr35-weekday-picker">
+        <fieldset className="backup-weekday-picker">
           <legend>Restart days</legend>
           <div>
             {DAYS.map((day) => {
@@ -289,7 +289,7 @@ function ReadinessItem({
   detail: string;
 }) {
   return (
-    <div className="cr341-readiness-item">
+    <div className="backup-readiness-item">
       <div>
         <strong>{label}</strong>
         <small>{detail}</small>
@@ -305,7 +305,7 @@ function queryAlert(
 ) {
   if (!query.error) return null;
   return (
-    <p className="cr-alert" role="alert">
+    <p className="ui-alert" role="alert">
       <strong>{title}</strong> — {query.error}
       {query.hasSuccess && query.updatedAt > 0
         ? ` Showing last confirmed data from ${new Date(query.updatedAt).toLocaleString()}.`
@@ -656,17 +656,17 @@ export function BackupsView(props: ViewProps) {
   const filesystemReadiness = backupCheckState(preflight, "source");
 
   return (
-    <div className="cr30-backups-stack">
-      <div className="cr21-page-toolbar cr30-backup-toolbar">
+    <div className="view-backups-stack">
+      <div className="workspace-page-toolbar view-backup-toolbar">
         <div>
           <strong>Backups & Maintenance</strong>
           <span>Host-authoritative manual full backups, verified history and recovery.</span>
         </div>
-        <div className="cr-actions">
+        <div className="ui-actions">
           <Badge tone="green">Host connected</Badge>
           <Badge tone={paperConnected ? "green" : "quiet"}>Paper {paperConnected ? "online" : "offline"}</Badge>
           <Badge tone="cyan">Manual full backup only</Badge>
-          <button className="cr-button" disabled={refreshCooldown || status.busy || settingsQuery.busy || fullQuery.busy || providerQuery.busy || preflight.busy} onClick={refreshAll}>Refresh</button>
+          <button className="ui-button" disabled={refreshCooldown || status.busy || settingsQuery.busy || fullQuery.busy || providerQuery.busy || preflight.busy} onClick={refreshAll}>Refresh</button>
         </div>
       </div>
 
@@ -674,14 +674,14 @@ export function BackupsView(props: ViewProps) {
       {queryAlert("Host backup preflight failed", preflight)}
       {queryAlert("Full restore-point inventory unavailable", fullQuery)}
       {queryAlert("Provider status unavailable", providerQuery)}
-      {localError && <p className="cr-alert" role="alert">{localError}</p>}
+      {localError && <p className="ui-alert" role="alert">{localError}</p>}
 
       <BackupDestination state={props.state} configured={providerConfigured}
         remote={str(provider.remote, "")}
         restartRequired={provider.hostConfigRestartRequired === true} />
 
       {recoveryRequired && (
-        <div className="cr-step8-recovery" role="alert">
+        <div className="backup-ui-recovery" role="alert">
           <div>
             <strong>Recovery required</strong>
             <span>
@@ -690,7 +690,7 @@ export function BackupsView(props: ViewProps) {
                 : "A restore recovery gate is unresolved. New backups remain blocked until Host recovery is completed."}
             </span>
           </div>
-          <div className="cr-actions">
+          <div className="ui-actions">
             <Badge tone="red">Blocked</Badge>
             {jobRecoveryRequired && canResolveRecovery && (
               <ActionButton
@@ -710,7 +710,7 @@ export function BackupsView(props: ViewProps) {
       )}
 
       <Panel title="Backup readiness" aside={<Badge tone={actionReady ? "green" : "amber"}>{actionReady ? "Ready" : "Not ready"}</Badge>}>
-        <div className="cr341-readiness-grid">
+        <div className="backup-readiness-grid">
           <ReadinessItem
             label="Host Companion"
             state="Ready"
@@ -752,21 +752,21 @@ export function BackupsView(props: ViewProps) {
             detail={recoveryRequired ? "Resolve Host recovery before continuing." : operationBlocking ? `Current operation: ${phaseLabel(operationPhase)}` : "No blocking destructive operation reported."}
           />
         </div>
-        <div className="cr-step8-readiness-footer">
+        <div className="backup-ui-readiness-footer">
           <span>{readinessReason}</span>
           {canPreflight && <ActionButton onClick={async () => preflight.refresh()}>Re-run Host preflight</ActionButton>}
         </div>
       </Panel>
 
-      <Panel title="Fully Backup Now" className="cr-step8-primary-panel cr35-backup-launch" aside={<Badge tone="cyan">Manual · Host-owned</Badge>}>
-        <div className="cr35-backup-hero">
-          <div className="cr35-backup-intro">
-            <span className="cr35-eyebrow">Complete cold-backup workflow</span>
+      <Panel title="Fully Backup Now" className="backup-ui-primary-panel backup-backup-launch" aside={<Badge tone="cyan">Manual · Host-owned</Badge>}>
+        <div className="backup-hero">
+          <div className="backup-intro">
+            <span className="backup-eyebrow">Complete cold-backup workflow</span>
             <strong>Save, stop, protect, upload and recover—under one durable Host job.</strong>
             <p>
               Choose how long players are warned. The Host then requires <code>save-all flush</code>, proves Minecraft stopped, verifies the local archive, promotes it to Google Drive and brings the server back online.
             </p>
-            <div className="cr35-flow-chips" aria-label="Backup workflow summary">
+            <div className="backup-flow-chips" aria-label="Backup workflow summary">
               <span>1 · Player notice</span>
               <span>2 · Save &amp; stop</span>
               <span>3 · Verify locally</span>
@@ -774,12 +774,12 @@ export function BackupsView(props: ViewProps) {
               <span>5 · Auto-restart</span>
             </div>
           </div>
-          <div className="cr35-launch-action">
+          <div className="backup-launch-action">
             <span>Selected warning</span>
             <strong>{countdownLabel(backupCountdownSeconds)}</strong>
             <small>{countdownWarningLabel(backupCountdownSeconds)} notices</small>
             <button
-              className="cr-button danger cr-step8-primary-button"
+              className="ui-button danger backup-ui-primary-button"
               disabled={!actionReady}
               onClick={() => setConfirmBackup(true)}
             >
@@ -787,12 +787,12 @@ export function BackupsView(props: ViewProps) {
             </button>
           </div>
         </div>
-        <div className="cr35-countdown-panel">
+        <div className="backup-countdown-panel">
           <div>
             <strong>Initial player countdown</strong>
             <small>The selection is persisted by the Host and survives a browser refresh or Host reconnect.</small>
           </div>
-          <div className="cr35-countdown-grid" role="radiogroup" aria-label="Initial backup countdown">
+          <div className="backup-countdown-grid" role="radiogroup" aria-label="Initial backup countdown">
             {COUNTDOWN_OPTIONS.map((option) => {
               const selected = backupCountdownSeconds === option.seconds;
               return (
@@ -800,7 +800,7 @@ export function BackupsView(props: ViewProps) {
                   type="button"
                   role="radio"
                   aria-checked={selected}
-                  className={`cr35-countdown-option ${selected ? "selected" : ""}`}
+                  className={`backup-countdown-option ${selected ? "selected" : ""}`}
                   key={option.seconds}
                   onClick={() => setBackupCountdownSeconds(option.seconds)}
                 >
@@ -810,7 +810,7 @@ export function BackupsView(props: ViewProps) {
               );
             })}
           </div>
-          <div className="cr35-readiness-line">
+          <div className="backup-readiness-line">
             <span className={actionReady ? "ready" : "blocked"} aria-hidden />
             <small>{readinessReason}</small>
           </div>
@@ -826,12 +826,12 @@ export function BackupsView(props: ViewProps) {
             </Badge>
           }
         >
-          <div className="cr341-phase-list" aria-label="Backup operation phases">
+          <div className="backup-phase-list" aria-label="Backup operation phases">
             {PHASES.map((phase, index) => {
               const effectiveIndex = currentIndex < 0 ? PHASES.findIndex((entry) => entry.key === operationPhase) : currentIndex;
               const state = effectiveIndex < 0 ? "pending" : index < effectiveIndex ? "done" : index === effectiveIndex ? "active" : "pending";
               return (
-                <div className={`cr341-phase ${state}`} key={phase.key}>
+                <div className={`backup-phase ${state}`} key={phase.key}>
                   <span aria-hidden>{state === "done" ? "✓" : state === "active" ? "●" : "○"}</span>
                   <strong>
                     {phase.key === "COUNTDOWN"
@@ -844,7 +844,7 @@ export function BackupsView(props: ViewProps) {
           </div>
           {liveBackupProgress && (
             <section
-              className={`cr35-live-progress ${liveProgressKind}`}
+              className={`backup-live-progress ${liveProgressKind}`}
               aria-live="polite"
               aria-label={liveProgressTitle}
             >
@@ -854,7 +854,7 @@ export function BackupsView(props: ViewProps) {
                   <strong>{liveProgressTitle}</strong>
                   <small>{liveProgressDetail}</small>
                 </div>
-                <strong className="cr35-live-progress-percent">
+                <strong className="backup-live-progress-percent">
                   {liveProgressPercent === null ? "—" : liveProgressPercent}
                   {liveProgressPercent !== null && <small>%</small>}
                 </strong>
@@ -864,7 +864,7 @@ export function BackupsView(props: ViewProps) {
                 value={liveProgressRatio ?? undefined}
                 aria-label={`${liveProgressTitle}${liveProgressPercent === null ? "" : `: ${liveProgressPercent}%`}`}
               />
-              <div className="cr35-live-progress-meta">
+              <div className="backup-live-progress-meta">
                 <span>
                   {displayedPhase === "ARCHIVING" || displayedPhase === "HASHING"
                     ? "Source processed"
@@ -880,7 +880,7 @@ export function BackupsView(props: ViewProps) {
               </div>
             </section>
           )}
-          <dl className="cr30-provider-list">
+          <dl className="view-provider-list">
             <div><dt>Job ID</dt><dd>{operationJobId}</dd></div>
             <div><dt>Current phase</dt><dd>{phaseLabel(displayedPhase || operationPhase)}</dd></div>
             <div><dt>Phase started</dt><dd>{time(operation.phaseTimestamp)}</dd></div>
@@ -896,9 +896,9 @@ export function BackupsView(props: ViewProps) {
             <div><dt>Error code</dt><dd>{str(operation.errorCode, "—") || "—"}</dd></div>
             <div><dt>Safe message</dt><dd>{str(operation.errorMessage, "—") || "—"}</dd></div>
           </dl>
-          {warnings.length > 0 && <p className="cr-alert">Warnings: {warnings.join(" · ")}</p>}
+          {warnings.length > 0 && <p className="ui-alert">Warnings: {warnings.join(" · ")}</p>}
           {operationPhase === "DEGRADED" && (
-            <div className="cr-step8-degraded">
+            <div className="backup-ui-degraded">
               <div>
                 <strong>Local backup verified; off-site copy is not current.</strong>
                 <span>Minecraft availability has been restored. Retry Upload does not stop Minecraft again.</span>
@@ -914,15 +914,15 @@ export function BackupsView(props: ViewProps) {
               )}
             </div>
           )}
-          <p className="cr-hint cr30-backup-preview-note">
+          <p className="ui-hint view-backup-preview-note">
             This state is reconstructed from the durable Host job. ZIP and upload byte counters are shown only when a live Host event matches this job; remote verification and VPS cleanup remain separate phases, and no ETA is invented.
           </p>
         </Panel>
       )}
 
-      <div className="cr30-backup-columns">
+      <div className="view-backup-columns">
         <Panel title="Provider & diagnostics" aside={<Badge tone={readinessTone(providerReadiness)}>{providerReadiness}</Badge>}>
-          <dl className="cr30-provider-list">
+          <dl className="view-provider-list">
             <div><dt>Provider</dt><dd>{providerKnown ? str(provider.provider, "Unknown") : "Unknown"}</dd></div>
             <div><dt>Remote</dt><dd>{providerKnown ? str(provider.remote, providerConfigured ? "Unavailable" : "Not configured") : "Unavailable"}</dd></div>
             <div><dt>Runtime state</dt><dd>{providerKnown ? providerState : "UNKNOWN"}</dd></div>
@@ -930,7 +930,7 @@ export function BackupsView(props: ViewProps) {
             <div><dt>Last remote verification</dt><dd>{providerQuery.hasSuccess ? time(provider.lastSuccessfulVerificationAt) : lastRemote ? time(lastRemote.timestamp) : "—"}</dd></div>
             <div><dt>Credentials</dt><dd>Host-local only</dd></div>
           </dl>
-          <div className="cr-actions cr-step8-inline-actions">
+          <div className="ui-actions backup-ui-inline-actions">
             {props.can("provider.test", "HOST") && (
               <ActionButton
                 onClick={async () => {
@@ -952,7 +952,7 @@ export function BackupsView(props: ViewProps) {
             </Badge>
           }
         >
-          <dl className="cr30-provider-list">
+          <dl className="view-provider-list">
             <div><dt>Last verified</dt><dd>{lastBackup ? time(lastBackup.timestamp) : "—"}</dd></div>
             <div><dt>Size</dt><dd>{lastBackup ? bytes(lastBackup.archiveBytes) : "—"}</dd></div>
             <div><dt>Verification</dt><dd>{lastBackup ? str(lastBackup.verification, str(lastBackup.sha256, "") ? "SHA-256" : "Unknown") : "—"}</dd></div>
@@ -965,7 +965,7 @@ export function BackupsView(props: ViewProps) {
 
       {lastFailure && (
         <Panel title="Last operation failure" aside={<Badge tone="red">{lastFailure.code}</Badge>}>
-          <dl className="cr30-provider-list">
+          <dl className="view-provider-list">
             <div><dt>Action</dt><dd>{lastFailure.action}</dd></div>
             <div><dt>Request ID</dt><dd>{lastFailure.requestId || "Unavailable"}</dd></div>
             <div><dt>Status</dt><dd>{lastFailure.status}</dd></div>
@@ -975,13 +975,13 @@ export function BackupsView(props: ViewProps) {
             <div><dt>Timestamp</dt><dd>{time(lastFailure.timestamp)}</dd></div>
             <div><dt>Retry</dt><dd>{lastFailure.retryable ? "Retryable after the underlying condition clears" : "Operator intervention may be required"}</dd></div>
           </dl>
-          <div className="cr-actions cr-step8-inline-actions">
+          <div className="ui-actions backup-ui-inline-actions">
             <button
-              className="cr-button"
+              className="ui-button"
               onClick={() => void navigator.clipboard.writeText(JSON.stringify(lastFailure, null, 2))}
             >Copy safe diagnostic</button>
             <button
-              className="cr-button"
+              className="ui-button"
               onClick={() => {
                 setLastFailure(null);
                 try { window.sessionStorage.removeItem(failureKey); } catch {}
@@ -992,11 +992,11 @@ export function BackupsView(props: ViewProps) {
       )}
 
       <Panel title="Verified backup history" aside={<Badge>{fullBackups.length} loaded</Badge>}>
-        <p className="cr-hint cr35-history-note">
+        <p className="ui-hint backup-history-note">
           Verification, retry-upload and retention controls remain available here. Direct server-tree restore is intentionally excluded from the stable Host contract so the always-on Host can keep the Minecraft tree read-only.
         </p>
         {fullBackups.length ? (
-          <div className="cr-table-wrap cr30-backup-table">
+          <div className="ui-table-wrap view-backup-table">
             <table>
               <thead>
                 <tr><th>Created</th><th>Size</th><th>Copies</th><th>Verification</th><th>Result</th><th>Actions</th></tr>
@@ -1012,7 +1012,7 @@ export function BackupsView(props: ViewProps) {
                       <td>{str(backup.verification, str(backup.sha256, "") ? "SHA-256" : "—")}<small title={str(backup.sha256, "")}>{str(backup.sha256, "").slice(0, 12)}{str(backup.sha256, "") ? "…" : ""}</small></td>
                       <td><Badge tone={backup.result === "DEGRADED" || backup.result === "SUCCESS_WITH_WARNING" ? "amber" : backup.errorCode ? "red" : "green"}>{str(backup.result, backup.offsite ? "Verified" : "Local")}</Badge></td>
                       <td>
-                        <div className="cr-actions">
+                        <div className="ui-actions">
                           {backup.local === true && props.can("backup.full.verify", "HOST") && (
                             <ActionButton onClick={async () => { await runOperation("backup.full.verify", { backupId: id }); props.notice("Backup verified."); }}>Verify</ActionButton>
                           )}
@@ -1044,11 +1044,11 @@ export function BackupsView(props: ViewProps) {
       </Panel>
 
       <Panel title="Automatic restart schedule" aside={<Badge>{status.hasSuccess ? str(status.data.timezone, "Host timezone") : "Unknown timezone"}</Badge>}>
-        <div className="cr30-backup-metrics">
-          <article className="cr30-backup-metric"><span>Next restart</span><strong>{status.hasSuccess ? time(status.data.nextRestart) : "Unknown"}</strong><small>Restart-only maintenance</small></article>
-          <article className="cr30-backup-metric"><span>Full backups</span><strong>Manual only</strong><small>No automatic full-backup schedule</small></article>
+        <div className="view-backup-metrics">
+          <article className="view-backup-metric"><span>Next restart</span><strong>{status.hasSuccess ? time(status.data.nextRestart) : "Unknown"}</strong><small>Restart-only maintenance</small></article>
+          <article className="view-backup-metric"><span>Full backups</span><strong>Manual only</strong><small>No automatic full-backup schedule</small></article>
         </div>
-        <div className="cr-actions cr-step8-inline-actions">
+        <div className="ui-actions backup-ui-inline-actions">
           {props.can("maintenance.restart.now", "HOST") && (
             <ActionButton
               danger
@@ -1064,7 +1064,7 @@ export function BackupsView(props: ViewProps) {
 
       {activeDraft && props.can("maintenance.settings.get", "HOST") && (
         <Panel title="Supported maintenance settings" aside={dirty ? <Badge tone="amber">Unsaved</Badge> : <Badge>Host persisted</Badge>}>
-          <div className="cr30-settings-grid">
+          <div className="view-settings-grid">
             <section>
               <h3>Automatic restart schedule</h3>
               <ScheduleEditor
@@ -1104,18 +1104,18 @@ export function BackupsView(props: ViewProps) {
             </section>
             <section>
               <h3>Manual full backup</h3>
-              <p className="cr-hint">Automatic backups are retired. Full backup creation is manually initiated through Fully Backup Now and executed by the always-on Host Companion.</p>
+              <p className="ui-hint">Automatic backups are retired. Full backup creation is manually initiated through Fully Backup Now and executed by the always-on Host Companion.</p>
               <label>Retention<Select aria-label="Retention" value={activeDraft.fullRestorePoint.retentionMode} onValueChange={(selectedValue) => { setDraft({ ...activeDraft, fullRestorePoint: { ...activeDraft.fullRestorePoint, retentionMode: selectedValue as "SINGLE_CURRENT" | "ROTATING" } }); setDirty(true); }}><option value="SINGLE_CURRENT">Single current</option><option value="ROTATING">Rotating</option></Select></label>
               {activeDraft.fullRestorePoint.retentionMode === "ROTATING" && <label>Keep<input type="number" min={1} max={52} value={activeDraft.fullRestorePoint.retentionCount} onChange={(event) => { setDraft({ ...activeDraft, fullRestorePoint: { ...activeDraft.fullRestorePoint, retentionCount: Number(event.target.value) } }); setDirty(true); }} /></label>}
               <label>Canonical filename<input value={activeDraft.fullRestorePoint.canonicalFilename} onChange={(event) => { setDraft({ ...activeDraft, fullRestorePoint: { ...activeDraft.fullRestorePoint, canonicalFilename: event.target.value } }); setDirty(true); }} /></label>
-              <div className="cr-step8-fixed-setting">
+              <div className="backup-ui-fixed-setting">
                 <span>Restart after backup</span>
                 <Badge tone="green">Required</Badge>
                 <small>Minecraft service recovery is mandatory after a manual full backup or safely degraded completion.</small>
               </div>
             </section>
           </div>
-          <div className="cr-actions cr30-settings-actions">
+          <div className="ui-actions view-settings-actions">
             {props.can("maintenance.settings.update", "HOST") && (
               <ActionButton
                 disabled={!dirty}
@@ -1137,22 +1137,22 @@ export function BackupsView(props: ViewProps) {
                 }}
               >Save settings</ActionButton>
             )}
-            <button className="cr-button" disabled={!dirty} onClick={() => { setDraft(null); setDirty(false); }}>Discard</button>
+            <button className="ui-button" disabled={!dirty} onClick={() => { setDraft(null); setDirty(false); }}>Discard</button>
           </div>
         </Panel>
       )}
 
       {confirmBackup && (
-          <dialog ref={backupDialog} className="cr-step8-modal" aria-labelledby="fully-backup-confirm-title"
+          <dialog ref={backupDialog} className="backup-ui-modal" aria-labelledby="fully-backup-confirm-title"
             onCancel={event => { event.preventDefault(); setConfirmBackup(false); }}>
-            <div className="cr-step8-modal-head">
+            <div className="backup-ui-modal-head">
               <div>
                 <span>Destructive maintenance confirmation</span>
                 <h2 id="fully-backup-confirm-title">Fully Backup Now</h2>
               </div>
-              <button className="cr-button" onClick={() => setConfirmBackup(false)}>Cancel</button>
+              <button className="ui-button" onClick={() => setConfirmBackup(false)}>Cancel</button>
             </div>
-            <div className="cr-step8-confirm-copy">
+            <div className="backup-ui-confirm-copy">
               <p>This cold backup runs on <strong>{props.state.ready?.server.serverName ?? "this server"}</strong> (<code>{props.state.serverId.slice(0, 8)}</code>). It continues even if this browser closes or reconnects.</p>
               <ol>
                 <li>The Host begins the selected <strong>{countdownLabel(backupCountdownSeconds)}</strong> player countdown, with notices at {countdownWarningLabel(backupCountdownSeconds)}.</li>
@@ -1163,7 +1163,7 @@ export function BackupsView(props: ViewProps) {
                 <li>If off-site upload ultimately fails after a valid local backup exists, the server is restored online and the job may become degraded/retryable; Retry Upload does not require another shutdown.</li>
               </ol>
             </div>
-            <div className="cr-step8-confirm-grid">
+            <div className="backup-ui-confirm-grid">
               <ReadinessItem label="Host" state="Ready" detail="Connected and authenticated." />
               <ReadinessItem label="Minecraft service" state={serviceKnown ? "Ready" : "Unknown"} detail={serviceKnown ? serviceState : "State unavailable"} />
               <ReadinessItem label="Google Drive" state={providerReadiness} detail={preflight.hasSuccess ? str(preflight.data.providerStatus, providerState) : providerState} />
@@ -1171,8 +1171,8 @@ export function BackupsView(props: ViewProps) {
               <ReadinessItem label="Conflicting operation" state={operationBlocking ? "Failed" : "Ready"} detail={operationBlocking ? phaseLabel(operationPhase) : "None"} />
               <ReadinessItem label="Recovery gate" state={recoveryRequired ? "Failed" : "Ready"} detail={recoveryRequired ? "Recovery required" : "Clear"} />
             </div>
-            <div className="cr-step8-modal-actions">
-              <button className="cr-button" onClick={() => setConfirmBackup(false)}>Cancel</button>
+            <div className="backup-ui-modal-actions">
+              <button className="ui-button" onClick={() => setConfirmBackup(false)}>Cancel</button>
               <ActionButton
                 danger
                 disabled={!actionReady}

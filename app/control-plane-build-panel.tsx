@@ -48,7 +48,7 @@ export function ControlPlaneBuildPanel({
 
   return (
     <Panel title="Control plane builds" aside={<Badge tone={tone}>{label}</Badge>}>
-      <dl className="cr-details cr-pad">
+      <dl className="ui-details ui-pad">
         <div><dt>Dashboard version</dt><dd>{builds?.dashboard?.version ?? "Unavailable"}</dd></div>
         <div><dt>Dashboard build</dt><dd>{shortCommit(builds?.dashboard?.gitCommit)}</dd></div>
         <div><dt>Dashboard built</dt><dd>{buildTime(builds?.dashboard?.buildTimestamp)}</dd></div>
@@ -61,7 +61,7 @@ export function ControlPlaneBuildPanel({
         <div><dt>Host build</dt><dd>{hostVersion ?? "Unavailable"}</dd></div>
         <div><dt>Protocol</dt><dd>{builds?.relay?.protocolVersion ?? builds?.dashboard?.protocolVersion ?? 3}</dd></div>
       </dl>
-      <p className="cr-hint cr-pad">
+      <p className="ui-hint ui-pad">
         {builds?.message ?? "Checking Dashboard and relay build identity. Ready state remains unverified until both are visible."}
       </p>
     </Panel>

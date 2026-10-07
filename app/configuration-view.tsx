@@ -17,13 +17,13 @@ export function ConfigurationView(props: ViewProps) {
   const name = str(props.state.ready?.server.serverName, "Selected server");
   return <div className="configuration-workspace">
     <Panel title="Server configuration" aside={<Badge>{owner ? "Owner access" : props.deviceGrant?.role || "Paired access"}</Badge>}>
-      <div className="cr-pad configuration-intro">
+      <div className="ui-pad configuration-intro">
         <p>Edit Paper and plugin text configuration for <strong>{name}</strong>. Review changes before saving. Some changes need a plugin reload or server restart.</p>
         <details className="workspace-disclosure">
           <summary>Permissions and local policy</summary>
           <p>{owner ? "Owner pairing includes every defined scope. Each agent also enforces its configured local capabilities." : "Your paired role and this server’s local capabilities determine which settings you can change."}</p>
           <dl className="configuration-permissions">{permissions.map(([label, action, kind]) => <div key={action}><dt>{label}</dt><dd><Badge tone={props.can(action, kind) ? "green" : "quiet"}>{props.can(action, kind) ? "Available" : "Unavailable"}</Badge></dd></div>)}</dl>
-          <p className="cr-hint">Paper must be connected to edit files. If editing is disabled, the server operator must enable remote actions, file permissions and a writable root for this instance in PlexonPanel’s local configuration. Host fallback is read-only. Identity, pairing secrets, server.properties and the agent’s own policy remain protected.</p>
+          <p className="ui-hint">Paper must be connected to edit files. If editing is disabled, the server operator must enable remote actions, file permissions and a writable root for this instance in PlexonPanel’s local configuration. Host fallback is read-only. Identity, pairing secrets, server.properties and the agent’s own policy remain protected.</p>
         </details>
       </div>
     </Panel>

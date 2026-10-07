@@ -49,7 +49,7 @@ function OperationTimeline({ pending }: { pending: PendingOperation }) {
   const order = ["requested", "executing", "waiting-paper", "complete"];
   const current = order.indexOf(pending.phase);
   return (
-    <div className="cr21-operation" aria-live="polite">
+    <div className="workspace-operation" aria-live="polite">
       {steps.map((step) => {
         const index = order.indexOf(step.id);
         const stepState =
@@ -67,7 +67,7 @@ function OperationTimeline({ pending }: { pending: PendingOperation }) {
   );
 }
 
-export function ServerView21(props: ViewProps) {
+export function ServerView(props: ViewProps) {
   const hostAvailable = Boolean(props.state.ready?.agents.host);
   const paperOnline = Boolean(props.state.ready?.agents.paper);
   const query = useQuery(
@@ -122,7 +122,7 @@ export function ServerView21(props: ViewProps) {
 
   return (
     <>
-      <div className="cr21-page-toolbar">
+      <div className="workspace-page-toolbar">
         <div>
           <strong>Server lifecycle</strong>
           <span>
@@ -130,7 +130,7 @@ export function ServerView21(props: ViewProps) {
           </span>
         </div>
         <button
-          className="cr-button"
+          className="ui-button"
           disabled={query.busy || !hostAvailable || !props.can("server.status", "HOST")}
           onClick={query.refresh}
         >
@@ -139,8 +139,8 @@ export function ServerView21(props: ViewProps) {
       </div>
 
       <div className="server-workspace-grid">
-      <Panel title="Connections" className="cr21-status-panel">
-        <div className="cr21-status-strip">
+      <Panel title="Connections" className="workspace-status-panel">
+        <div className="workspace-status-strip">
           <Agent
             name="Paper agent"
             online={paperOnline}
@@ -157,8 +157,8 @@ export function ServerView21(props: ViewProps) {
                 : "Not installed"
             }
           />
-          <div className="cr21-status-item">
-            <span className={`cr-dot ${hostAvailable && state === "active" ? "online" : ""}`} />
+          <div className="workspace-status-item">
+            <span className={`ui-dot ${hostAvailable && state === "active" ? "online" : ""}`} />
             <div>
               <strong>{str(service.service, "Server service")}</strong>
               <small>Host systemd lifecycle state</small>
@@ -174,21 +174,21 @@ export function ServerView21(props: ViewProps) {
         title="Lifecycle controls"
         aside={<Badge tone={hostAvailable ? stateTone(state) : "quiet"}>{hostAvailable ? state : "Host unavailable"}</Badge>}
       >
-        <div className="cr21-lifecycle-card">
+        <div className="workspace-lifecycle-card">
           {state === "failed" && hostAvailable && (
-            <div className="cr21-state-banner danger">
+            <div className="workspace-state-banner danger">
               <strong>Service failed.</strong> Review host audit or systemd logs,
               then use Start only after the underlying cause is understood.
             </div>
           )}
           {(state === "activating" || state === "deactivating") && hostAvailable && (
-            <div className="cr21-state-banner">
+            <div className="workspace-state-banner">
               The service is {state}. Conflicting lifecycle actions are disabled
               until systemd reports a stable state.
             </div>
           )}
           {state === "unknown" && hostAvailable && (
-            <div className="cr21-state-banner">
+            <div className="workspace-state-banner">
               Host lifecycle state is unavailable. Refresh Host status before
               issuing a lifecycle action.
             </div>
@@ -199,7 +199,7 @@ export function ServerView21(props: ViewProps) {
               Host companion. Paper monitoring can remain live independently.
             </Empty>
           )}
-          <div className="cr21-lifecycle-actions">
+          <div className="workspace-lifecycle-actions">
             <ActionButton
               disabled={
                 !hostAvailable ||
@@ -236,13 +236,13 @@ export function ServerView21(props: ViewProps) {
               Restart
             </ActionButton>
           </div>
-          <p className="cr-hint">Graceful stop saves the world before shutting down. Start and restart can finish on the Host while Paper is still connecting.</p>
+          <p className="ui-hint">Graceful stop saves the world before shutting down. Start and restart can finish on the Host while Paper is still connecting.</p>
           {effectivePending && <OperationTimeline pending={effectivePending} />}
           {operationError && (
-            <p className="cr-alert" role="alert">{operationError}</p>
+            <p className="ui-alert" role="alert">{operationError}</p>
           )}
           {query.error && (
-            <p className="cr-alert" role="alert">
+            <p className="ui-alert" role="alert">
               {query.error}
             </p>
           )}
@@ -252,7 +252,7 @@ export function ServerView21(props: ViewProps) {
 
       <details className="workspace-disclosure runtime-disclosure"><summary>Runtime and version details</summary>
       <Panel title="Runtime details">
-        <dl className="cr-details cr-pad">
+        <dl className="ui-details ui-pad">
           {[
             ["Host service", hostAvailable ? service.service : undefined],
             ["Host service state", hostAvailable ? state : undefined],

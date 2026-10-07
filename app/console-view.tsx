@@ -68,7 +68,7 @@ function consoleSourceLabel(props: ViewProps): string {
   return "Host • Journal";
 }
 
-export function ConsoleView30(props: ViewProps) {
+export function ConsoleView(props: ViewProps) {
   const [search, setSearch] = useState("");
   const [level, setLevel] = useState("ALL");
   const [fromDate, setFromDate] = useState("");
@@ -270,9 +270,9 @@ export function ConsoleView30(props: ViewProps) {
     .join("\n");
 
   return (
-    <div className="cr30-console-stack">
-      <div className="cr21-filter-toolbar cr30-console-toolbar">
-        <label className="cr-search">
+    <div className="view-console-stack">
+      <div className="workspace-filter-toolbar view-console-toolbar">
+        <label className="ui-search">
           <span className="sr-only">Search console output</span>
           <input
             value={search}
@@ -280,7 +280,7 @@ export function ConsoleView30(props: ViewProps) {
             placeholder="Search loaded lines"
           />
         </label>
-        <div className="cr21-segmented" aria-label="Console severity filter">
+        <div className="workspace-segmented" aria-label="Console severity filter">
           {["ALL", "INFO", "WARN", "ERROR"].map((value) => (
             <button
               key={value}
@@ -295,7 +295,7 @@ export function ConsoleView30(props: ViewProps) {
         <label>History from <input type="date" value={fromDate} onChange={(event) => setFromDate(event.target.value)} /></label>
         <label>History to <input type="date" value={toDate} onChange={(event) => setToDate(event.target.value)} /></label>
         <button
-          className="cr-button"
+          className="ui-button"
           onClick={() => {
             setPaused(paused ? null : [...combined]);
             setUnseenLines(0);
@@ -304,18 +304,18 @@ export function ConsoleView30(props: ViewProps) {
           {paused ? "Resume" : "Pause"}
         </button>
         <button
-          className="cr-button"
+          className="ui-button"
           disabled={!hostOnline || !historyAction || historyBusy || historyKeyLoaded !== historyKey || !historyHasMore}
           onClick={() => void loadOlder()}
         >
           {historyBusy ? "Loading history…" : historyHasMore ? "Load older history" : "No older history"}
         </button>
-        <button className="cr-button" disabled={!hostOnline || !historyAction || historyBusy}
+        <button className="ui-button" disabled={!hostOnline || !historyAction || historyBusy}
           onClick={() => { setClearAt(0); setHistoryRefresh((value) => value + 1); }}>
           Reload retained history
         </button>
-        <details className="cr21-menu">
-          <summary className="cr-button">Display</summary>
+        <details className="workspace-menu">
+          <summary className="ui-button">Display</summary>
           <div>
             <button onClick={() => setTimestamps(!timestamps)}>
               {timestamps ? "Hide timestamps" : "Show timestamps"}
@@ -363,9 +363,9 @@ export function ConsoleView30(props: ViewProps) {
 
       <Panel
         title="Live console"
-        className="cr30-console-panel"
+        className="view-console-panel"
         aside={
-          <div className="cr21-panel-badges">
+          <div className="workspace-panel-badges">
             {paused && <Badge tone="amber">View paused</Badge>}
             {!followTail && !paused && <Badge tone="quiet">Reading history</Badge>}
             <Badge tone={sourceLabel === "Host • Journal" ? "green" : "amber"}>
@@ -375,29 +375,29 @@ export function ConsoleView30(props: ViewProps) {
         }
       >
         {!hostOnline && (
-          <p className="cr-hint cr-pad cr30-console-offline-note">
+          <p className="ui-hint ui-pad view-console-offline-note">
             Host Companion is offline. Live output can continue through the bounded Paper fallback
             when it is enabled; retained history becomes available again only after Host reconnects.
           </p>
         )}
         {hostOnline && !paperOnline && (
-          <p className="cr-hint cr-pad cr30-console-offline-note">
+          <p className="ui-hint ui-pad view-console-offline-note">
             Paper is offline. Host-owned live output and retained journald history remain available;
             command input unlocks after Paper is ready.
           </p>
         )}
-        <p className="cr-hint cr-pad cr30-console-offline-note">
+        <p className="ui-hint ui-pad view-console-offline-note">
           {historyNotice} History date and severity filters run on Host; live lines remain visible. Historical requests return at most 100 lines per page; this view holds at most 1,800 loaded history lines. Search, copy and export cover loaded visible lines only.
           {!historyAction && " This device does not have a Host console-history scope."}
         </p>
         {historyError && (
-          <p className="cr-hint cr-pad cr30-console-offline-note" role="status">
+          <p className="ui-hint ui-pad view-console-offline-note" role="status">
             {historyError}
           </p>
         )}
-        <div className="cr30-console-viewport-wrap">
+        <div className="view-console-viewport-wrap">
           <div
-            className={`cr-console cr21-console ${wrap ? "wrap" : "nowrap"}`}
+            className={`ui-console workspace-console ${wrap ? "wrap" : "nowrap"}`}
             ref={viewport}
             role="log"
             aria-live="off"
@@ -423,16 +423,16 @@ export function ConsoleView30(props: ViewProps) {
                     content,
                   );
                 return (
-                  <div className="cr30-console-entry" key={lineKey(line, index)}>
+                  <div className="view-console-entry" key={lineKey(line, index)}>
                     {showSession && (
-                      <div className="cr30-console-session" role="separator">
+                      <div className="view-console-session" role="separator">
                         <strong>PlexonCraft startup</strong>
                         <span>{time(line.capturedAt)}</span>
                         <code>Session {invocation.slice(0, 8)}…</code>
                       </div>
                     )}
                     <div
-                      className={`cr-console-line ${str(line.level).toLowerCase()} ${dataGap ? "gap" : ""}`}
+                      className={`ui-console-line ${str(line.level).toLowerCase()} ${dataGap ? "gap" : ""}`}
                     >
                       {timestamps && <time>{time(line.capturedAt)}</time>}
                       <span>{str(line.level)}</span>
@@ -469,7 +469,7 @@ export function ConsoleView30(props: ViewProps) {
             )}
           </div>
           {!paused && !followTail && (
-            <button className="cr30-console-new-lines" onClick={jumpToTail}>
+            <button className="view-console-new-lines" onClick={jumpToTail}>
               {unseenLines > 0
                 ? `${unseenLines} new line${unseenLines === 1 ? "" : "s"}`
                 : "Return to live tail"}
@@ -479,7 +479,7 @@ export function ConsoleView30(props: ViewProps) {
 
         {canExecute ? (
           <form
-            className="cr-command cr30-command-bar"
+            className="ui-command view-command-bar"
             onSubmit={(event) => {
               event.preventDefault();
               if (!commandAvailable) return;
@@ -537,14 +537,14 @@ export function ConsoleView30(props: ViewProps) {
               aria-label="Console command"
             />
             <button
-              className="cr-button primary"
+              className="ui-button primary"
               disabled={!commandAvailable || !command.trim()}
             >
               Run
             </button>
           </form>
         ) : (
-          <p className="cr-hint cr-pad">
+          <p className="ui-hint ui-pad">
             Read-only console. Command execution requires a locally enabled capability and device
             scope.
           </p>
@@ -553,10 +553,10 @@ export function ConsoleView30(props: ViewProps) {
 
       {output.length > 0 && (
         <Panel title="Latest command result">
-          <pre className="cr-output">{output.join("\n")}</pre>
+          <pre className="ui-output">{output.join("\n")}</pre>
         </Panel>
       )}
-      <p className="cr-hint cr30-console-authority">
+      <p className="ui-hint view-console-authority">
         Output source: {sourceLabel}. Host owns retained history and is preferred for live capture;
         Paper owns command execution and provides only bounded, non-persistent live fallback.
         Clearing the view remains browser-local and never deletes journal entries.

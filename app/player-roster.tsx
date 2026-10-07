@@ -17,7 +17,7 @@ import { number, records, str, type JsonMap } from "../lib/control-state";
 import { sendDashboardAction } from "../lib/data-source";
 import { PlayerHead } from "../components/player-head";
 import { useUiPreferences } from "../components/ui-preferences-provider";
-import { HistoryPlayerDrawer21 } from "./communication-views";
+import { HistoryPlayerDrawer } from "./communication-views";
 
 type PlayerSort = "name" | "ping" | "session" | "world";
 
@@ -66,7 +66,7 @@ function useMobileLayout() {
   return mobile;
 }
 
-export function PlayersView21(props: ViewProps & { showHistoryTab?: boolean }) {
+export function PlayerRoster(props: ViewProps & { showHistoryTab?: boolean }) {
   const showHistoryTab = props.showHistoryTab !== false;
   const { preferences } = useUiPreferences();
   const mobile = useMobileLayout();
@@ -193,7 +193,7 @@ export function PlayersView21(props: ViewProps & { showHistoryTab?: boolean }) {
 
   return (
     <>
-      {showHistoryTab && <div className="cr-tabs cr21-player-tabs" aria-label="Player views">
+      {showHistoryTab && <div className="ui-tabs workspace-player-tabs" aria-label="Player views">
         <button aria-pressed={tab === "online"} onClick={() => setTab("online")}>Online</button>
         {historyTabAvailable && (
           <button
@@ -210,13 +210,13 @@ export function PlayersView21(props: ViewProps & { showHistoryTab?: boolean }) {
 
       {tab === "online" || !historyTabAvailable ? (
         <>
-          <div className="cr21-filter-toolbar">
-            <label className="cr-search">Search players<input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Name, display name or UUID" /></label>
+          <div className="workspace-filter-toolbar">
+            <label className="ui-search">Search players<input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Name, display name or UUID" /></label>
             <label>World<Select aria-label="World" value={worldFilter} onValueChange={(selectedValue) => setWorldFilter(selectedValue)}><option value="ALL">All worlds</option>{worlds.map((world) => <option key={world}>{world}</option>)}</Select></label>
             <label>Sort<Select aria-label="Sort" value={sort} onValueChange={(selectedValue) => setSort(selectedValue as PlayerSort)}><option value="name">Name</option><option value="ping">Ping</option><option value="session">Session time</option><option value="world">World</option></Select></label>
             <Badge>{props.state.players.length} online</Badge>
             <button
-              className="cr-button"
+              className="ui-button"
               disabled={refreshing || !props.can("players.snapshot.request")}
               onClick={() => {
                 setRefreshing(true);
@@ -229,19 +229,19 @@ export function PlayersView21(props: ViewProps & { showHistoryTab?: boolean }) {
 
           <Panel
             title="Online players"
-            aside={<div className="cr21-panel-badges"><Badge>{players.length} shown</Badge><Badge tone={props.connected && paperOnline ? "green" : "amber"}>{!props.connected ? "Reconnecting" : !paperOnline ? "Paper offline" : props.state.pendingPlayerSnapshot ? "Reconciling" : "Live"}</Badge></div>}
+            aside={<div className="workspace-panel-badges"><Badge>{players.length} shown</Badge><Badge tone={props.connected && paperOnline ? "green" : "amber"}>{!props.connected ? "Reconnecting" : !paperOnline ? "Paper offline" : props.state.pendingPlayerSnapshot ? "Reconciling" : "Live"}</Badge></div>}
           >
             {players.length ? (
               useCards ? (
-                <div className="cr23-player-cards">
+                <div className="display-player-cards">
                   {players.map((item) => {
                     const uuid = str(item.uuid, "");
                     const names = playerNames(item);
                     const shownUuid = displayedUuid(uuid, preferences.playerUuid);
                     const highlighted = preferences.liveRowHighlight && recentlyChanged.has(uuid);
                     return (
-                      <article className={`cr23-player-card${highlighted ? " live" : ""}`} key={uuid}>
-                        <div className="cr23-player-card-identity">
+                      <article className={`display-player-card${highlighted ? " live" : ""}`} key={uuid}>
+                        <div className="display-player-card-identity">
                           <PlayerHead uuid={uuid} name={names.name} skinTextureId={str(item.skinTextureId, "")} size={rowHeadSize} online />
                           <div>
                             <strong>{names.primary}</strong>
@@ -255,13 +255,13 @@ export function PlayersView21(props: ViewProps & { showHistoryTab?: boolean }) {
                           <div><dt>Ping</dt><dd>{metric(item.pingMillis, " ms", 0)}</dd></div>
                           <div><dt>Session</dt><dd>{duration(item.onlineDurationMillis)}</dd></div>
                         </dl>
-                        <button className="cr-button" onClick={() => setSelected(uuid)}>Manage</button>
+                        <button className="ui-button" onClick={() => setSelected(uuid)}>Manage</button>
                       </article>
                     );
                   })}
                 </div>
               ) : (
-                <div className="cr-table-wrap cr23-player-table">
+                <div className="ui-table-wrap display-player-table">
                   <table>
                     <thead><tr><th>Player</th><th>World</th><th>Ping</th><th>Game mode</th><th>Session</th><th>Actions</th></tr></thead>
                     <tbody>
@@ -271,10 +271,10 @@ export function PlayersView21(props: ViewProps & { showHistoryTab?: boolean }) {
                         const shownUuid = displayedUuid(uuid, preferences.playerUuid);
                         const highlighted = preferences.liveRowHighlight && recentlyChanged.has(uuid);
                         return (
-                          <tr key={uuid} className={highlighted ? "cr23-live-player-row" : undefined}>
-                            <td><div className="cr-person"><PlayerHead uuid={uuid} name={names.name} skinTextureId={str(item.skinTextureId, "")} size={rowHeadSize} online /><div><strong>{names.primary}</strong>{names.displayName && <small>{names.name}</small>}{shownUuid && <small>{shownUuid}</small>}</div></div></td>
+                          <tr key={uuid} className={highlighted ? "display-live-player-row" : undefined}>
+                            <td><div className="ui-person"><PlayerHead uuid={uuid} name={names.name} skinTextureId={str(item.skinTextureId, "")} size={rowHeadSize} online /><div><strong>{names.primary}</strong>{names.displayName && <small>{names.name}</small>}{shownUuid && <small>{shownUuid}</small>}</div></div></td>
                             <td>{str(item.world)}</td><td>{metric(item.pingMillis, " ms", 0)}</td><td>{str(item.gameMode).toLowerCase()}</td><td>{duration(item.onlineDurationMillis)}</td>
-                            <td><button className="cr-button" onClick={() => setSelected(uuid)}>Manage</button></td>
+                            <td><button className="ui-button" onClick={() => setSelected(uuid)}>Manage</button></td>
                           </tr>
                         );
                       })}
@@ -293,16 +293,16 @@ export function PlayersView21(props: ViewProps & { showHistoryTab?: boolean }) {
             )}
           </Panel>
 
-          {showHistoryTab && historyUnavailable && <Panel title="Player history"><p className="cr-hint cr-pad">{historyUnavailable}</p></Panel>}
+          {showHistoryTab && historyUnavailable && <Panel title="Player history"><p className="ui-hint ui-pad">{historyUnavailable}</p></Panel>}
         </>
       ) : (
         <>
-          <div className="cr21-filter-toolbar">
-            <label className="cr-search">Search history<input value={historyQuery} maxLength={64} onChange={(event) => setHistoryQuery(event.target.value)} placeholder="Username or UUID" /></label>
+          <div className="workspace-filter-toolbar">
+            <label className="ui-search">Search history<input value={historyQuery} maxLength={64} onChange={(event) => setHistoryQuery(event.target.value)} placeholder="Username or UUID" /></label>
             <label>Status<Select aria-label="Status" value={historyStatus} onValueChange={(selectedValue) => setHistoryStatus(selectedValue)}><option value="ALL">All observations</option><option value="ONLINE">Joined</option><option value="OFFLINE">Left</option></Select></label>
             <label>From<input type="date" value={historyFrom} onChange={(event) => setHistoryFrom(event.target.value)} /></label>
             <label>To<input type="date" value={historyTo} onChange={(event) => setHistoryTo(event.target.value)} /></label>
-            <button className="cr-button" disabled={historyBusy || !props.connected || !paperOnline} onClick={() => void loadHistory(false)}>{historyBusy ? "Loading…" : "Search"}</button>
+            <button className="ui-button" disabled={historyBusy || !props.connected || !paperOnline} onClick={() => void loadHistory(false)}>{historyBusy ? "Loading…" : "Search"}</button>
           </div>
 
           <Panel title="Paper-owned presence history" aside={historyCapturedAt ? <Badge>Captured {time(historyCapturedAt)}</Badge> : undefined}>
@@ -318,19 +318,19 @@ export function PlayersView21(props: ViewProps & { showHistoryTab?: boolean }) {
               <Empty title="Loading player history" />
             ) : historyEntries.length ? (
               <>
-                {historyBounded && <p className="cr21-bounded" role="status">This result is bounded by retention or scan limits and may not include every older observation.</p>}
-                <div className="cr-table-wrap"><table>
+                {historyBounded && <p className="workspace-bounded" role="status">This result is bounded by retention or scan limits and may not include every older observation.</p>}
+                <div className="ui-table-wrap"><table>
                   <thead><tr><th>Player</th><th>Observation</th><th>When</th><th>Duration</th><th>Termination</th><th>Details</th></tr></thead>
                   <tbody>{historyEntries.map((entry) => (
                     <tr key={str(entry.eventId)}>
-                      <td><strong>{str(entry.name)}</strong><small className="cr21-block-id">{str(entry.uuid).slice(0, 8)}</small></td>
+                      <td><strong>{str(entry.name)}</strong><small className="workspace-block-id">{str(entry.uuid).slice(0, 8)}</small></td>
                       <td>{entry.state === "JOINED" ? "Joined" : "Left"}</td><td><Timestamp value={entry.observedAt} /></td><td>{duration(entry.sessionDurationMillis)}</td>
                       <td>{entry.termination === "UNKNOWN_DISCONNECT" ? "Unknown disconnect" : str(entry.termination).toLowerCase()}</td>
-                      <td><button className="cr-button" onClick={() => setSelectedHistory(str(entry.eventId))}>Inspect</button></td>
+                      <td><button className="ui-button" onClick={() => setSelectedHistory(str(entry.eventId))}>Inspect</button></td>
                     </tr>
                   ))}</tbody>
                 </table></div>
-                {historyMore && <div className="cr21-load-more"><button className="cr-button" disabled={historyBusy} onClick={() => void loadHistory(true)}>{historyBusy ? "Loading…" : "Load older observations"}</button></div>}
+                {historyMore && <div className="workspace-load-more"><button className="ui-button" disabled={historyBusy} onClick={() => void loadHistory(true)}>{historyBusy ? "Loading…" : "Load older observations"}</button></div>}
               </>
             ) : historyLoaded ? (
               <Empty title="No matching history">Paper returned no presence observations for these bounded filters.</Empty>
@@ -352,7 +352,7 @@ export function PlayersView21(props: ViewProps & { showHistoryTab?: boolean }) {
         />
       )}
       {historyRecord && tab === "history" && historyTabAvailable && props.connected && paperOnline && (
-        <HistoryPlayerDrawer21 entry={historyRecord} entries={historyEntries.filter((entry) => entry.uuid === historyRecord.uuid)} close={() => setSelectedHistory(null)} />
+        <HistoryPlayerDrawer entry={historyRecord} entries={historyEntries.filter((entry) => entry.uuid === historyRecord.uuid)} close={() => setSelectedHistory(null)} />
       )}
     </>
   );
@@ -401,50 +401,50 @@ function PlayerDrawer23({ player, previousSessions, historyAvailable, close, ...
   ];
 
   return (
-    <dialog className="cr-drawer cr21-player-drawer" ref={ref} onCancel={close} aria-labelledby="player-title">
-      <div className="cr-panel-head cr23-player-drawer-head">
-        <div className="cr23-player-drawer-identity">
+    <dialog className="ui-drawer workspace-player-drawer" ref={ref} onCancel={close} aria-labelledby="player-title">
+      <div className="ui-panel-head display-player-drawer-head">
+        <div className="display-player-drawer-identity">
           <PlayerHead uuid={uuid} name={names.name} skinTextureId={str(player.skinTextureId, "")} size={64} online />
           <div><small>Player management · online now</small><h2 id="player-title">{names.primary}</h2><span>{names.displayName ? `${names.name} · ${uuid}` : uuid}</span></div>
         </div>
-        <button className="cr-button" onClick={close} aria-label="Close player details">×</button>
+        <button className="ui-button" onClick={close} aria-label="Close player details">×</button>
       </div>
-      <div className="cr-tabs">
+      <div className="ui-tabs">
         {["Overview", "Actions", "Moderation"].map((value) => <button key={value} aria-pressed={tab === value} onClick={() => setTab(value)}>{value}</button>)}
       </div>
 
       {tab === "Overview" ? (
-        <div className="cr21-drawer-section">
-          <dl className="cr-details">
+        <div className="workspace-drawer-section">
+          <dl className="ui-details">
             {detailRows.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{String(value ?? "—")}</dd></div>)}
           </dl>
           {!detailRows.some(([label]) => label === "Position" || label === "IP address") && (
-            <p className="cr-hint">Location and address are omitted when local Paper policy or the device grant does not authorize them.</p>
+            <p className="ui-hint">Location and address are omitted when local Paper policy or the device grant does not authorize them.</p>
           )}
-          <p className="cr-hint">{permittedActions.length ? `${permittedActions.length} player actions are allowed for this device and current local policy.` : "This device has read-only access to player details."}</p>
+          <p className="ui-hint">{permittedActions.length ? `${permittedActions.length} player actions are allowed for this device and current local policy.` : "This device has read-only access to player details."}</p>
           {historyAvailable && (
-            <div className="cr21-drawer-section">
+            <div className="workspace-drawer-section">
               <h3>Previous sessions</h3>
-              {previousSessions.length ? <ul className="cr21-session-list">{previousSessions.slice(0, 12).map((session) => <li key={str(session.eventId)}><strong>{time(session.sessionStartedAt)}</strong><span>{time(session.sessionEndedAt)}</span><span>{duration(session.sessionDurationMillis)}</span></li>)}</ul> : <p className="cr-hint">Open the History tab to load bounded previous-session data from Paper. History is never inferred from browser state.</p>}
+              {previousSessions.length ? <ul className="workspace-session-list">{previousSessions.slice(0, 12).map((session) => <li key={str(session.eventId)}><strong>{time(session.sessionStartedAt)}</strong><span>{time(session.sessionEndedAt)}</span><span>{duration(session.sessionDurationMillis)}</span></li>)}</ul> : <p className="ui-hint">Open the History tab to load bounded previous-session data from Paper. History is never inferred from browser state.</p>}
             </div>
           )}
         </div>
       ) : tab === "Actions" ? (
-        <div className="cr-form cr21-drawer-section">
-          {props.can("player.message") && <form onSubmit={(event) => { event.preventDefault(); void props.run("player.message", { ...base, message }).then(() => setMessage("")).catch(() => {}); }}><label>Private message<input value={message} onChange={(event) => setMessage(event.target.value)} maxLength={2000} required /></label><button className="cr-button primary">Send message</button></form>}
-          <div className="cr-actions">{["heal", "feed"].filter((action) => props.can(`player.${action}`)).map((action) => <ActionButton key={action} onClick={() => props.run(`player.${action}`, base)}>{action === "heal" ? "Heal" : "Feed"}</ActionButton>)}</div>
-          {props.can("player.gamemode") && <div className="cr-form"><label>Game mode<Select aria-label="Game mode" value={gameMode} onValueChange={(selectedValue) => setGameMode(selectedValue)}>{["SURVIVAL", "CREATIVE", "ADVENTURE", "SPECTATOR"].map((value) => <option key={value}>{value}</option>)}</Select></label><ActionButton onClick={() => props.run("player.gamemode", { ...base, gameMode })}>Set game mode</ActionButton></div>}
-          {props.can("player.teleport") && <div className="cr-form"><label>Destination world<input value={world} onChange={(event) => setWorld(event.target.value)} /></label><div className="cr-three">{(["x", "y", "z"] as const).map((key) => <label key={key}>{key.toUpperCase()}<input type="number" value={coordinates[key]} onChange={(event) => setCoordinates({ ...coordinates, [key]: event.target.value })} /></label>)}</div><ActionButton disabled={Object.values(coordinates).some((value) => value === "")} onClick={() => props.run("player.teleport", { ...base, world, x: Number(coordinates.x), y: Number(coordinates.y), z: Number(coordinates.z) })}>Teleport</ActionButton></div>}
+        <div className="ui-form workspace-drawer-section">
+          {props.can("player.message") && <form onSubmit={(event) => { event.preventDefault(); void props.run("player.message", { ...base, message }).then(() => setMessage("")).catch(() => {}); }}><label>Private message<input value={message} onChange={(event) => setMessage(event.target.value)} maxLength={2000} required /></label><button className="ui-button primary">Send message</button></form>}
+          <div className="ui-actions">{["heal", "feed"].filter((action) => props.can(`player.${action}`)).map((action) => <ActionButton key={action} onClick={() => props.run(`player.${action}`, base)}>{action === "heal" ? "Heal" : "Feed"}</ActionButton>)}</div>
+          {props.can("player.gamemode") && <div className="ui-form"><label>Game mode<Select aria-label="Game mode" value={gameMode} onValueChange={(selectedValue) => setGameMode(selectedValue)}>{["SURVIVAL", "CREATIVE", "ADVENTURE", "SPECTATOR"].map((value) => <option key={value}>{value}</option>)}</Select></label><ActionButton onClick={() => props.run("player.gamemode", { ...base, gameMode })}>Set game mode</ActionButton></div>}
+          {props.can("player.teleport") && <div className="ui-form"><label>Destination world<input value={world} onChange={(event) => setWorld(event.target.value)} /></label><div className="ui-three">{(["x", "y", "z"] as const).map((key) => <label key={key}>{key.toUpperCase()}<input type="number" value={coordinates[key]} onChange={(event) => setCoordinates({ ...coordinates, [key]: event.target.value })} /></label>)}</div><ActionButton disabled={Object.values(coordinates).some((value) => value === "")} onClick={() => props.run("player.teleport", { ...base, world, x: Number(coordinates.x), y: Number(coordinates.y), z: Number(coordinates.z) })}>Teleport</ActionButton></div>}
           {!permittedActions.some((action) => ["message", "heal", "feed", "gamemode", "teleport"].includes(action)) && <Empty title="Player actions unavailable">The current device scope or local Paper policy does not allow direct player actions.</Empty>}
         </div>
       ) : (
-        <div className="cr-form cr21-drawer-section">
+        <div className="ui-form workspace-drawer-section">
           <label>Moderation reason<input value={reason} onChange={(event) => setReason(event.target.value)} maxLength={2000} /></label>
-          <div className="cr-actions">
+          <div className="ui-actions">
             {["kick", "ban", "unban", "whitelist.add", "whitelist.remove", "kill", "op", "deop"].filter((action) => props.can(`player.${action}`)).map((action) => <ActionButton key={action} danger={["ban", "kill", "op", "deop"].includes(action)} onClick={() => props.run(`player.${action}`, { ...base, reason })}>{action.replaceAll(".", " ")}</ActionButton>)}
           </div>
           {!permittedActions.some((action) => ["kick", "ban", "unban", "whitelist.add", "whitelist.remove", "kill", "op", "deop"].includes(action)) && <Empty title="Moderation unavailable">This device does not have a moderation scope allowed by local policy.</Empty>}
-          <p className="cr-hint">Every operation is checked and audited locally. Operator changes remain Owner-only.</p>
+          <p className="ui-hint">Every operation is checked and audited locally. Operator changes remain Owner-only.</p>
         </div>
       )}
     </dialog>

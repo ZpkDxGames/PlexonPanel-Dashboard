@@ -14,7 +14,7 @@ export function TelemetryFreshness({ state, phase }: { state: ControlState; phas
   return <div className="workspace-freshness" role="group" aria-label="Telemetry freshness">
     {streams.map(stream => {
       const status = telemetryFreshness(stream.sample.capturedAt, stream.connected, now);
-      return <span key={stream.name} className={`cr21-freshness ${status.kind}`}>
+      return <span key={stream.name} className={`workspace-freshness ${status.kind}`}>
         {stream.name}: {status.label}
       </span>;
     })}

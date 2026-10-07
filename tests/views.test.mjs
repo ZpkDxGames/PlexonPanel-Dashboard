@@ -4,20 +4,14 @@ import { readFile } from "node:fs/promises";
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { emptyControlState } from "../.test-dist/lib/control-state.js";
-import {
-  ConsoleView21 as ConsoleView,
-  ChatView21 as ChatView,
-  PluginsView21 as PluginsView,
-
-} from "../.test-dist/app/management-views-2-1.js";
+import { ConsoleView as ConsoleView } from "../.test-dist/app/console-view.js";
+import { ChatView as ChatView, PluginsView as PluginsView } from "../.test-dist/app/communication-views.js";
 import { FilesView } from "../.test-dist/app/advanced-views.js";
 import { BackupsView } from "../.test-dist/app/backups-view.js";
-import { ServerView21 as ServerView } from "../.test-dist/app/server-view-2-1.js";
-import { OverviewView30 as OverviewView } from "../.test-dist/app/overview-view-3-0.js";
-import {
-  HistoryPlayerDrawer21,
-  PlayersView21,
-} from "../.test-dist/app/management-views-2-1.js";
+import { ServerView as ServerView } from "../.test-dist/app/server-view.js";
+import { OverviewView as OverviewView } from "../.test-dist/app/overview-view.js";
+import { HistoryPlayerDrawer } from "../.test-dist/app/communication-views.js";
+import { PlayersView } from "../.test-dist/app/players-view.js";
 const props = {
   state: emptyControlState("test"),
   can: () => false,
@@ -66,7 +60,7 @@ test("uploaded-looking log content and plugin names remain escaped text", () => 
 });
 test("3.0 activity history opens in place instead of navigating away", async () => {
   const source = await readFile(
-    new URL("../app/overview-view-3-0.tsx", import.meta.url),
+    new URL("../app/overview-view.tsx", import.meta.url),
     "utf8",
   );
   assert.match(source, /setHistoryOpen\(true\)/);
@@ -94,7 +88,7 @@ test("Players distinguishes missing scope, local policy and older agents", () =>
   };
   const render = (ready) =>
     renderToStaticMarkup(
-      React.createElement(PlayersView21, {
+      React.createElement(PlayersView, {
         ...props,
         connected: true,
         state: { ...props.state, ready },
@@ -128,7 +122,7 @@ test("offline history detail is read-only and exposes no player actions", () => 
     termination: "UNKNOWN_DISCONNECT",
   };
   const html = renderToStaticMarkup(
-    React.createElement(HistoryPlayerDrawer21, {
+    React.createElement(HistoryPlayerDrawer, {
       entry,
       entries: [entry],
       close: () => {},

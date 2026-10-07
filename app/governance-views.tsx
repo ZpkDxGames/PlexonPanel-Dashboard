@@ -35,7 +35,7 @@ function outcomeTone(value: unknown): "green" | "cyan" | "amber" | "quiet" {
         : "quiet";
 }
 
-export function AuditView21(props: ViewProps) {
+export function AuditView(props: ViewProps) {
   const [kind, setKind] = useState<"PAPER" | "HOST">("PAPER");
   const [filters, setFilters] = useState({
     search: "",
@@ -79,15 +79,15 @@ export function AuditView21(props: ViewProps) {
   };
 
   return (
-    <div className="cr30-audit-stack">
+    <div className="view-audit-stack">
       <form
-        className="cr30-audit-toolbar"
+        className="view-audit-toolbar"
         onSubmit={(event) => {
           event.preventDefault();
           applyServerFilters();
         }}
       >
-        <label className="cr-search cr30-audit-search">
+        <label className="ui-search view-audit-search">
           <span className="sr-only">Search loaded audit records</span>
           <input
             value={filters.search}
@@ -111,15 +111,15 @@ export function AuditView21(props: ViewProps) {
           </Select>
         </label>
         <button
-          className="cr-button"
+          className="ui-button"
           type="button"
           onClick={query.refresh}
           disabled={query.busy}
         >
           {query.busy ? "Refreshing…" : "Refresh"}
         </button>
-        <details className="cr30-audit-filters">
-          <summary className="cr-button">More filters</summary>
+        <details className="view-audit-filters">
+          <summary className="ui-button">More filters</summary>
           <div>
             <label>
               Actor / device
@@ -168,7 +168,7 @@ export function AuditView21(props: ViewProps) {
                 }
               />
             </label>
-            <button className="cr-button primary" type="submit">
+            <button className="ui-button primary" type="submit">
               Apply filters
             </button>
           </div>
@@ -176,7 +176,7 @@ export function AuditView21(props: ViewProps) {
       </form>
 
       {query.error && (
-        <p className="cr-alert" role="alert">
+        <p className="ui-alert" role="alert">
           {query.error}
         </p>
       )}
@@ -188,8 +188,8 @@ export function AuditView21(props: ViewProps) {
         {!allowed ? (
           <Empty title="Audit access unavailable" />
         ) : visible.length ? (
-          <div className="cr30-audit-list" role="list">
-            <div className="cr30-audit-columns" aria-hidden="true">
+          <div className="view-audit-list" role="list">
+            <div className="view-audit-columns" aria-hidden="true">
               <span>Time</span>
               <span>Actor / device</span>
               <span>Action</span>
@@ -200,11 +200,11 @@ export function AuditView21(props: ViewProps) {
               const json = JSON.stringify(entry, null, 2);
               return (
                 <article
-                  className="cr30-audit-event"
+                  className="view-audit-event"
                   role="listitem"
                   key={`${entry.requestId}-${index}`}
                 >
-                  <div className="cr30-audit-event-main">
+                  <div className="view-audit-event-main">
                     <div data-label="Time">
                       <strong>{time(entry.timestamp)}</strong>
                       <small>{metricDuration(entry.durationMillis)}</small>
@@ -227,18 +227,18 @@ export function AuditView21(props: ViewProps) {
                       {entry.code !== undefined && <small>{str(entry.code)}</small>}
                     </div>
                   </div>
-                  <details className="cr30-audit-details">
+                  <details className="view-audit-details">
                     <summary>Advanced event details</summary>
-                    <div className="cr30-audit-detail-body">
-                      <dl className="cr-details">
+                    <div className="view-audit-detail-body">
+                      <dl className="ui-details">
                         <div><dt>Request ID</dt><dd>{str(entry.requestId)}</dd></div>
                         <div><dt>Timestamp</dt><dd>{time(entry.timestamp)}</dd></div>
                         <div><dt>Duration</dt><dd>{metricDuration(entry.durationMillis)}</dd></div>
                         <div><dt>Code</dt><dd>{str(entry.code)}</dd></div>
                       </dl>
-                      <div className="cr-actions">
+                      <div className="ui-actions">
                         <button
-                          className="cr-button"
+                          className="ui-button"
                           onClick={() =>
                             void navigator.clipboard
                               .writeText(str(entry.requestId, ""))
@@ -248,7 +248,7 @@ export function AuditView21(props: ViewProps) {
                           Copy request ID
                         </button>
                         <button
-                          className="cr-button"
+                          className="ui-button"
                           onClick={() =>
                             void navigator.clipboard
                               .writeText(json)
@@ -258,7 +258,7 @@ export function AuditView21(props: ViewProps) {
                           Copy JSON
                         </button>
                       </div>
-                      <pre className="cr-output cr21-audit-json">{json}</pre>
+                      <pre className="ui-output workspace-audit-json">{json}</pre>
                     </div>
                   </details>
                 </article>
@@ -270,9 +270,9 @@ export function AuditView21(props: ViewProps) {
         )}
       </Panel>
 
-      <div className="cr21-pagination cr30-audit-pagination">
+      <div className="workspace-pagination view-audit-pagination">
         <button
-          className="cr-button"
+          className="ui-button"
           disabled={!page}
           onClick={() => setPage((current) => current - 1)}
         >
@@ -280,14 +280,14 @@ export function AuditView21(props: ViewProps) {
         </button>
         <span>Page {page + 1} · 50 records per page</span>
         <button
-          className="cr-button"
+          className="ui-button"
           disabled={!query.data.hasMore}
           onClick={() => setPage((current) => current + 1)}
         >
           Next
         </button>
       </div>
-      <p className="cr-hint cr30-audit-authority">
+      <p className="ui-hint view-audit-authority">
         Records remain authoritative on the selected local agent. This viewer
         searches a bounded query window and does not copy the audit database to
         Vercel or the relay.
@@ -353,7 +353,7 @@ function localCapability(
   return paper[scope] === true || host[scope] === true;
 }
 
-export function AccessView21(
+export function AccessView(
   props: ViewProps & { forget: () => Promise<void>; pair: () => void },
 ) {
   const [search, setSearch] = useState("");
@@ -390,14 +390,14 @@ export function AccessView21(
   );
 
   return (
-    <div className="cr30-access-stack">
+    <div className="view-access-stack">
       <Panel
         title="This device"
         aside={<Badge tone="cyan">{currentRole}</Badge>}
       >
-        <div className="cr30-device-summary">
-          <div className="cr30-device-identity">
-            <span className="cr30-device-mark" aria-hidden="true">
+        <div className="view-device-summary">
+          <div className="view-device-identity">
+            <span className="view-device-mark" aria-hidden="true">
               {current?.name?.slice(0, 1).toUpperCase() ?? "B"}
             </span>
             <div>
@@ -405,14 +405,14 @@ export function AccessView21(
               <p>{props.state.serverId || "Server unavailable"}</p>
             </div>
           </div>
-          <dl className="cr30-device-facts">
+          <dl className="view-device-facts">
             <div><dt>Role</dt><dd>{currentRole}</dd></div>
             <div><dt>Connection</dt><dd>{props.connected ? "Live" : "Offline"}</dd></div>
             <div><dt>Credential expiry</dt><dd>{time(current?.expiresAt)}</dd></div>
             <div><dt>Issued</dt><dd>{time(current?.issuedAt)}</dd></div>
           </dl>
-          <div className="cr-actions cr30-device-actions">
-            <button className="cr-button" onClick={props.pair}>
+          <div className="ui-actions view-device-actions">
+            <button className="ui-button" onClick={props.pair}>
               Pair another server
             </button>
             <ActionButton danger onClick={props.forget}>
@@ -424,7 +424,7 @@ export function AccessView21(
 
       <Panel title="Capability summary" aside={<Badge>Local policy + this grant</Badge>}>
         {currentGrant && !currentGrant.metadataMatches && (
-          <div className="cr30-repair-guidance">
+          <div className="view-repair-guidance">
             <Badge tone="amber">Re-pair required</Badge>
             <p>
               This browser&apos;s signed grant does not match the current device
@@ -434,7 +434,7 @@ export function AccessView21(
             </p>
           </div>
         )}
-        <div className="cr30-capability-grid">
+        <div className="view-capability-grid">
           {CAPABILITY_GROUPS.map((group) => {
             const locallyEnabled = group.scopes.filter((scope) =>
               localCapability(scope, paperCapabilities, hostCapabilities),
@@ -451,7 +451,7 @@ export function AccessView21(
                   ? "Fully available"
                   : `${availableToDevice} of ${locallyEnabled} available`;
             return (
-              <article className="cr30-capability-card" key={group.label}>
+              <article className="view-capability-card" key={group.label}>
                 <div>
                   <h3>{group.label}</h3>
                   {group.future && <Badge tone="quiet">Future workspace</Badge>}
@@ -466,7 +466,7 @@ export function AccessView21(
         </div>
 
         {locallyEnabledButUngraded.length > 0 && (
-          <div className="cr30-repair-guidance">
+          <div className="view-repair-guidance">
             <Badge tone="amber">Immutable device grant</Badge>
             <p>
               {locallyEnabledButUngraded.length} locally enabled capability
@@ -478,9 +478,9 @@ export function AccessView21(
           </div>
         )}
 
-        <details className="cr30-capability-details">
+        <details className="view-capability-details">
           <summary>Advanced capability details</summary>
-          <div className="cr-table-wrap">
+          <div className="ui-table-wrap">
             <table>
               <thead>
                 <tr>
@@ -515,7 +515,7 @@ export function AccessView21(
               </tbody>
             </table>
           </div>
-          <p className="cr-hint cr-pad">
+          <p className="ui-hint ui-pad">
             Local Paper/Host policy remains authoritative. Files and Backups scopes are
             retained here only as Advanced / Future capabilities; Dashboard 3.0 does not
             expose those workspaces as active pages.
@@ -525,8 +525,8 @@ export function AccessView21(
 
       {props.can("devices.list") && (
         <Panel title="Paired devices" aside={<Badge>{devices.length} shown</Badge>}>
-          <div className="cr30-device-toolbar">
-            <label className="cr-search">
+          <div className="view-device-toolbar">
+            <label className="ui-search">
               <span className="sr-only">Search devices</span>
               <input
                 value={search}
@@ -541,13 +541,13 @@ export function AccessView21(
                 {roles.map((value) => <option key={value}>{value}</option>)}
               </Select>
             </label>
-            <button className="cr-button" disabled={query.busy} onClick={query.refresh}>
+            <button className="ui-button" disabled={query.busy} onClick={query.refresh}>
               {query.busy ? "Refreshing…" : "Refresh"}
             </button>
           </div>
 
           {devices.length ? (
-            <div className="cr-table-wrap cr30-device-table">
+            <div className="ui-table-wrap view-device-table">
               <table>
                 <thead>
                   <tr>
@@ -579,8 +579,8 @@ export function AccessView21(
                           )}
                         </td>
                         <td>
-                          <div className="cr-actions">
-                            <button className="cr-button" onClick={() => setSelected(device)}>
+                          <div className="ui-actions">
+                            <button className="ui-button" onClick={() => setSelected(device)}>
                               Details
                             </button>
                             {props.can("devices.revoke") && !isCurrent && (
@@ -606,7 +606,7 @@ export function AccessView21(
           ) : (
             <Empty title="No devices match these filters" />
           )}
-          {query.error && <p className="cr-alert" role="alert">{query.error}</p>}
+          {query.error && <p className="ui-alert" role="alert">{query.error}</p>}
         </Panel>
       )}
 
@@ -641,25 +641,25 @@ function DeviceDialog21({
   const scopes = Array.isArray(device.scopes) ? device.scopes.map(String) : [];
   return (
     <dialog
-      className="cr-drawer cr21-player-drawer"
+      className="ui-drawer workspace-player-drawer"
       ref={ref}
       onCancel={close}
       aria-labelledby="device-title"
     >
-      <div className="cr-panel-head">
+      <div className="ui-panel-head">
         <div>
           <small>Device permissions</small>
           <h2 id="device-title">{str(device.name)}</h2>
         </div>
-        <button className="cr-button" onClick={close} aria-label="Close device details">×</button>
+        <button className="ui-button" onClick={close} aria-label="Close device details">×</button>
       </div>
-      <div className="cr21-drawer-section">
-        <div className="cr-actions">
+      <div className="workspace-drawer-section">
+        <div className="ui-actions">
           <Badge tone={device.role === "Owner" ? "cyan" : "quiet"}>{str(device.role)}</Badge>
           {device.deviceId === currentDeviceId && <Badge tone="green">Current device</Badge>}
           {expired(device.expiresAt) && <Badge tone="amber">Expired</Badge>}
         </div>
-        <dl className="cr-details">
+        <dl className="ui-details">
           <div><dt>Device ID</dt><dd>{str(device.deviceId)}</dd></div>
           <div><dt>Issued</dt><dd>{time(device.issuedAt)}</dd></div>
           <div><dt>Expires</dt><dd>{time(device.expiresAt)}</dd></div>
@@ -667,13 +667,13 @@ function DeviceDialog21({
         </dl>
         <h3>Granted scopes</h3>
         {scopes.length ? (
-          <div className="cr-scope-list">
+          <div className="ui-scope-list">
             {scopes.map((scope) => <Badge key={scope}>{scope}</Badge>)}
           </div>
         ) : (
           <Empty title="No scopes reported" />
         )}
-        <p className="cr-hint">
+        <p className="ui-hint">
           Connected/disconnected state is not inferred from last-seen time. Only
           explicit agent/device data is shown here.
         </p>
