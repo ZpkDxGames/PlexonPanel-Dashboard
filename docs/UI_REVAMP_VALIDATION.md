@@ -13,6 +13,7 @@ This is source and local native-browser verification of the Dashboard implementa
 | Standalone smoke and packaging | PASS | `npm run relay:standalone:smoke`, `npm run relay:standalone:package` |
 | Optimized production build | PASS | `npm run build`; clean build sizes/hashes in `ui-evidence/build-metrics.json` |
 | Production dependency audit | PASS | `npm audit --omit=dev --audit-level=high`: zero vulnerabilities; sharp override 0.35.5 patches GHSA-wq5f-xc86-pv6w |
+| Full development dependency audit | FAIL | Five high findings from the unpatched braces dependency chain in ESLint globbing; see `ui-evidence/dependency-audit.json`. Production audit remains clear |
 | Exact PR-head GitHub CI | NOT_EXECUTED | Recorded after the branch is pushed; a local pass does not substitute for CI |
 | Existing Core main Linux x64 CI | FAIL | [37419700051](https://github.com/ZpkDxGames/PlexonPanel/actions/runs/37419700051): authorization assertion in ResponsiveHostControlTest, line 135; ARM64 passed. No Core diff |
 
@@ -66,7 +67,7 @@ Both use Node 24.19.0 / Next 16.3.8 and clean optimized production output. Sums 
 | Initial HTML JS references | 801,426 B | 699,814 B | −12.7% |
 | Initial HTML JS gzip references | 241,584 B | 216,697 B | −10.3% |
 
-Total JS includes nine charts, reports and lazy workspaces; initial route loads less JS. No chart, animation or UI runtime dependency was added. Removed Tailwind/PostCSS compiler dependencies; Playwright/axe are development verification tools. Repeated builds left old hashed chunks in the output, so these figures were recomputed after moving caches aside. Individual production chunk SHA-256s are recorded in both build JSONs; CI separately packages exact-source relay/build metadata and hashes.
+Total JS includes nine charts, reports and lazy workspaces; initial route loads less JS. No chart, animation or UI runtime dependency was added. Removed Tailwind/PostCSS compiler dependencies; patched same-major brace-expansion 1.1.21 / 5.0.12 and undici 7.29.1 as well as sharp. The unpatched [braces advisory](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm) remains in development-only ESLint globbing; no patched release is published. Playwright/axe are development verification tools. Repeated builds left old hashed chunks in the output, so these figures were recomputed after moving caches aside. Individual production chunk SHA-256s are recorded in both build JSONs; CI separately packages exact-source relay/build metadata and hashes.
 
 ## Native performance limitations
 
