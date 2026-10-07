@@ -1,0 +1,7 @@
+# UI revamp design decision
+
+Use one neutral operational interface: fixed desktop rail, compact selected-server header, one mobile drawer, scoped workspace, and separate global Fleet selection. Keep high-frequency values inside metric tiles; put source diagnostics in disclosures. One semantic CSS token vocabulary governs surfaces, border, text, focus, status, radius, density and motion. Feature classes are descriptive, with no historical version prefixes or override stylesheet. The Select module consumes these same tokens. All workspaces keep the same Panel, Badge, Empty and action primitives.
+
+Retain native lightweight SVG and `chart-geometry` for bounded, extrema-preserving, gap-aware paths. Add one pure metric catalog/series/report adapter so Overview, Performance, tables and exports share field/unit/source/capture semantics. Report only browser-observed 1/5/15/30 minute windows, sample count, observed coverage and sample-based p95. Long-horizon storage is out of scope. Optional service fields are a browser projection of existing Host packets, not a wire-contract change.
+
+Keep all authorization, bound confirmations, reducers and transport in their existing owners. Pages receive typed ViewProps, and heavy workspaces load only when selected. No new runtime dependency. No Core/Host change justified: existing signed packets already supply all necessary values. Protocol 3, schema 5, scopes, identity keys and deployment gate stay intact.
