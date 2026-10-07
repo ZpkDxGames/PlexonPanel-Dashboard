@@ -8,7 +8,7 @@ This is source and local native-browser verification of the Dashboard implementa
 |---|---|---|
 | Generated fleet/scope contracts, ESLint and TypeScript | PASS | `npm run check`, Node 24.19.0 |
 | Relay regression | PASS | 79 tests; Worker and standalone contract fixtures |
-| Dashboard regression | PASS | 182 tests, including five new source/report tests; 177 baseline tests retained |
+| Dashboard regression | PASS | 183 tests, including six new source/report tests; 177 baseline tests retained |
 | Worker relay smoke | PASS | `npm run relay:smoke`; compatibility only, no publication |
 | Standalone smoke and packaging | PASS | `npm run relay:standalone:smoke`, `npm run relay:standalone:package` |
 | Optimized production build | PASS | `npm run build`; clean build sizes/hashes in `ui-evidence/build-metrics.json` |

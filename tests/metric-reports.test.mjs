@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {metricSeries, metricReport, exportMetrics} from '../.test-dist/lib/metric-reports.js';
+import {METRICS, metricSeries, metricReport, exportMetrics} from '../.test-dist/lib/metric-reports.js';
 import {gapSegments} from '../.test-dist/lib/chart-geometry.js';
 import {applyControlMessage,emptyControlState} from '../.test-dist/lib/control-state.js';
 const now=Date.parse('2026-10-07T12:00:00Z');
@@ -37,4 +37,12 @@ test('service history only accepts authenticated Host cgroup resources; no wire 
  state=applyControlMessage(state,msg);assert.equal(state.history.at(-1).serviceCpu,150);assert.equal(state.history.at(-1).sources.service,now);
  assert.equal(applyControlMessage(state,{...msg,serverId:'B'}),state);
  assert.equal(applyControlMessage(state,{...msg,agentSession:'old'}),state);
+});
+
+test('default five-second Paper JVM captures form continuous observed coverage',()=>{
+ const points=[0,5000,10000,15000].map(offset=>({at:now-15000+offset,value:100}));
+ const interval=METRICS.heap.intervalMs;
+ assert.equal(gapSegments(points,interval*3).length,1);
+ const report=metricReport(points,1,now,interval);
+ assert.equal(report.coverage,25);assert.equal(report.count,4);
 });

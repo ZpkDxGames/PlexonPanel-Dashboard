@@ -17,7 +17,7 @@ Baseline `npm run check` passed: 79 relay tests and 177 Dashboard tests, generat
 
 ## Authority and command boundary
 
-Paper: health every 40 ticks, JVM system snapshots, players, chat, plugins, files under local policy. Host: node system (250 ms), exact systemd service resources/status (5 s), lifecycle, journal, backup/provider jobs. Every metric can be null. Capture timestamps remain independent of receipt. Device scopes ∩ capability ∩ compatible target ∩ local policy gate each action; immutable target/session confirmation, signed result reconciliation, 10 s connection timeout, no uncertain/BUSY replay remain unchanged. Browser history is bounded to 35 minutes / 8,192 entries; player history stays private and transient. No 24 h persistence planned.
+Paper: health every 40 ticks, JVM system snapshots (5 s default), players, chat, plugins, files under local policy. Host: node system (250 ms), exact systemd service resources/status (5 s), lifecycle, journal, backup/provider jobs. Every metric can be null. Capture timestamps remain independent of receipt. Device scopes ∩ capability ∩ compatible target ∩ local policy gate each action; immutable target/session confirmation, signed result reconciliation, 10 s connection timeout, no uncertain/BUSY replay remain unchanged. Browser history is bounded to 35 minutes / 8,192 entries; player history stays private and transient. No 24 h persistence planned.
 
 Core already emits systemd CPU in percent of one core and service RAM. The browser currently omits service values from its chart history and combines sources under packet arrival capture time. Solve this omission in the browser reducer/series adapter, with regression tests; no agent JAR or protocol update required.
 
