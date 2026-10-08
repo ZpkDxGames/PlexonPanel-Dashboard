@@ -17,7 +17,10 @@
 | components/select.module.css | Refactor to shared tokens, preserve accessible combobox | keyboard/browser controls |
 | lib/control-state.ts | Add optional capture/source metadata and service history to existing reducer | independent cadence and reorder tests |
 | lib/data-source, fleet-feed, browser-store, scopes | Keep | no parallel transport/store |
+| app/activity + lib/activity-history | Keep bounded read/clear-only cleanup route for unverified preexisting browser archives; no live navigation or new capture/write path | activity-history tests enforce read-only behavior |
 | lib/ui-preferences + provider | Keep v1 schema and single storage key | persistence migration tests |
 | Core, Host, both relay runtimes | Keep runtime/contract unchanged | generated contracts + relay regression |
 
 The existing cache v1 reader is a bounded compatibility adapter for prior telemetry records. Missing new provenance is explicitly reported as legacy, never inferred as newly captured data. Existing optional applied-skin fallback remains because Core #97 is unmerged. No parallel renderer or feature flag retained.
+
+Compatibility retirement: packet-time chart records expire with the existing 35-minute/8,192-point cache bound; remove their adapter after the supported old-client rollback period. The local Activity reader is capped at 5,000 old entries per server and can only clear them; retire the cleanup route after legacy archives are cleared through that same compatibility period. It neither queries Paper nor uploads/merges old entries into the trusted player journal. Optional skin fallback retires only after the canonical Core field is merged and all supported agents provide it. The benchmark alone recognizes historical chart selectors to measure the unchanged main checkout; they are not imported by the application.

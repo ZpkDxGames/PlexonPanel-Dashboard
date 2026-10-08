@@ -1,4 +1,4 @@
-/* Standalone access-controlled Activity route uses the canonical token palette. */
+/* Legacy local Activity cleanup route uses the canonical token palette. */
 .page { min-height: 100dvh; padding: clamp(16px,4vw,48px); background: var(--ui-canvas); color: var(--ui-text-primary); }
 .shell { width: min(1180px,100%); margin: auto; display: grid; gap: 20px; }
 .header { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; }

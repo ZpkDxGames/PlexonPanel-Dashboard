@@ -674,7 +674,7 @@ export default function Dashboard() {
   useEffect(() => {
     if (!sidebarOpen || !mobileNavigation) return;
     const sidebar = document.getElementById("control-room-navigation");
-    const buttons = sidebar?.querySelectorAll<HTMLButtonElement>("button:not(:disabled)");
+    const buttons = sidebar ? Array.from(sidebar.querySelectorAll<HTMLButtonElement>("button:not(:disabled)")).filter(button => button.getClientRects().length > 0) : [];
     buttons?.[0]?.focus();
     const handler = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -1253,6 +1253,9 @@ export default function Dashboard() {
       )}
       <aside
         id="control-room-navigation"
+        role={mobileNavigation && sidebarOpen ? "dialog" : undefined}
+        aria-modal={mobileNavigation && sidebarOpen ? true : undefined}
+        aria-label="Navigation"
         inert={mobileNavigation && !sidebarOpen}
         className={`workspace-sidebar ${sidebarOpen ? "mobile-open" : ""}`}
       >

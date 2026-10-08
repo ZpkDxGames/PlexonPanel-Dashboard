@@ -51,7 +51,7 @@ try {
     await page.waitForTimeout(300);
     const size=await page.evaluate(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth,nodes:document.querySelectorAll('*').length}));
     assert.ok(size.scroll<=size.width,`${name} ${width} overflows (${size.scroll})`);
-    if(name!=='Fleet'&&width<=800)await checkClosedDrawer();
+    if(name!=='Fleet'&&name!=='Legacy archive'&&width<=800)await checkClosedDrawer();
     result.views.push({name,width,theme,...size});
   };
   for(const width of result.widths)await check('Fleet',width,'light');await page.setViewportSize({width:1440,height:1000});
@@ -76,7 +76,7 @@ try {
   await seedSignedContent();
   for(const name of sections){await page.setViewportSize({width:1440,height:1000});await navigate(name);await verifyPopulated(name);console.log('Verify dark/125%: '+name);for(const width of result.widths){await check(name,width,'dark/high contrast/125%/motion off');if(name==='Overview'||width===1440||width===390)await page.screenshot({path:output+`/${name.toLowerCase()}-${width}-dark-125.png`,fullPage:true,animations:'disabled'});}await page.setViewportSize({width:390,height:844});await page.waitForTimeout(300);const axe=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();result.accessibility.push({name:name+' dark/125%',violations:axe.violations.map(v=>({id:v.id,impact:v.impact,nodes:v.nodes.map(n=>n.target)}))});}await page.setViewportSize({width:1440,height:1000});await navigate('Overview');
   await page.setViewportSize({width:390,height:844});await page.waitForTimeout(300);
-  await page.getByRole('button',{name:'Open navigation',exact:true}).click();await page.keyboard.press('Escape');assert.ok(await page.getByRole('button',{name:'Open navigation',exact:true}).isVisible());
+  await page.getByRole('button',{name:'Open navigation',exact:true}).click();const firstNavigation=page.locator('.workspace-nav').getByRole('button',{name:'All servers',exact:true});await firstNavigation.waitFor();assert.ok(await firstNavigation.evaluate(node=>node===document.activeElement),'Drawer focuses first visible navigation control');await page.keyboard.press('Shift+Tab');assert.ok(await page.locator('#control-room-navigation').evaluate(node=>node.contains(document.activeElement)),'Reverse Tab stays in drawer');await page.keyboard.press('Tab');assert.ok(await firstNavigation.evaluate(node=>node===document.activeElement),'Tab wraps to first visible navigation control');await page.keyboard.press('Escape');assert.ok(await page.getByRole('button',{name:'Open navigation',exact:true}).isVisible());
   await page.setViewportSize({width:1440,height:1000});
   await page.getByRole('button',{name:'Appearance'}).click();await page.getByRole('dialog').waitFor();await page.keyboard.press('Escape');assert.equal(await page.getByRole('dialog').count(),0);
   const select=page.getByRole('combobox',{name:'Selected server'});await select.click();await page.getByRole('option').filter({hasText:'TonimSMP'}).click();await page.waitForTimeout(600);assert.ok(await page.locator('.workspace-server-identity').getByText('TonimSMP',{exact:true}).isVisible());
@@ -92,6 +92,8 @@ try {
   const snapshots=[];const duration=Number(process.env.PLEXON_UI_SOAK_MS??60000),start=Date.now();
   while(Date.now()-start<duration){await page.waitForTimeout(Math.min(10000,duration));const metrics=await session.send('Performance.getMetrics');snapshots.push({at:Date.now()-start,metrics:Object.fromEntries(metrics.metrics.filter(m=>['JSHeapUsedSize','Nodes','TaskDuration','ScriptDuration','LayoutCount','RecalcStyleCount'].includes(m.name)).map(m=>[m.name,m.value]))});}
   result.soak={durationMs:Date.now()-start,telemetryIntervalMs:250,snapshots};
+  // A bounded read/clear-only compatibility route; never the current Paper journal.
+  for(const theme of ['light','dark']){await page.evaluate(theme=>localStorage.setItem('plexonpanel-ui-preferences-v1',JSON.stringify({schemaVersion:1,theme,textScale:theme==='dark'?125:100,contrast:theme==='dark'?'high':'normal',motion:'off'})),theme);await page.goto(fixture.origin+'/activity?serverId='+fixture.rooms[0].serverId);await page.getByRole('heading',{name:'Legacy browser activity archive',exact:true}).waitFor();for(const width of result.widths){await check('Legacy archive',width,theme);if(width===390||width===1440)await page.screenshot({path:output+`/legacy-archive-${width}-${theme}.png`,fullPage:true,animations:'disabled'});}const axe=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();result.accessibility.push({name:'Legacy archive '+theme,violations:axe.violations.map(v=>({id:v.id,impact:v.impact,nodes:v.nodes.map(n=>n.target)}))});}
   assert.equal(result.errors.length,0,'Browser JS errors');
   assert.equal(result.accessibility.flatMap(a=>a.violations).length,0,'WCAG A/AA automated violations');
   result.status='PASS';
