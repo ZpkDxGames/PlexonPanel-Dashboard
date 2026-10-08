@@ -2,6 +2,7 @@
 import assert from 'node:assert/strict';
 import {mkdir,writeFile} from 'node:fs/promises';
 import {spawn,execFileSync} from 'node:child_process';
+import {randomUUID} from 'node:crypto';
 import {chromium} from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import {createFleetFixture} from './support/fleet-fixture.mjs';
@@ -12,13 +13,23 @@ const result={schemaVersion:1,sourceCommit:(process.env.PLEXON_SOURCE_COMMIT??ex
 try {
   let backupJob=null;
   fixture=await createFleetFixture({port:8788,names:['PlexonCraft','TonimSMP'],instanceKeys:['plexoncraft','tonimsmp'],intervalMs:250,richerTelemetry:true,
-    async beforeActionResult({body}) {
+    async beforeActionResult({body,room}) {
+      if(body.action==='players.snapshot.request') {
+        const data={snapshotId:randomUUID(),capturedAt:new Date().toISOString(),players:roster(room)};
+        await room.paper.send('inventory.players',{...data,offset:0,complete:true});
+        return {data};
+      }
+      if(body.action.startsWith('console.history'))return {data:{lines:Array.from({length:24},(_,i)=>({capturedAt:new Date(Date.now()-(24-i)*1000).toISOString(),content:i===23?'Fixture journal: world save completed':`Fixture journal entry ${i+1}: ${i%7===0?'slow task observed':'server tick completed'}`,level:i%7===0?'WARN':'INFO',source:'HOST',journalCursor:`fixture-${room.key}-${i}`,journalEpoch:'fixture-epoch'})),hasMore:false}};
       if(body.action==='maintenance.status')return {data:{commandChannel:{enabled:true},currentOperation:backupJob??{}}};
       if(body.action==='maintenance.settings.get')return {data:{settings:{schemaVersion:3,timezone:'UTC',restart:{},fullRestorePoint:{canonicalFilename:'Fixture-Latest.zip'}}}};
       if(body.action==='backup.full.list')return {data:{backups:[],recoveryRequired:false}};
       if(body.action==='provider.status')return {data:{configured:true,status:'CONNECTED',remote:'gdrive:plexonpanel/fixture'}};
       if(body.action==='backup.preflight')return {data:{hostAuthenticated:true,backupRootWritable:true,commandChannelConfigured:true,usableBytes:10000000000,requiredBytes:10000000,provider:'RCLONE',providerStatus:'CONNECTED'}};
     }});
+  function roster(room) {
+    return room.nativePlayers??=Array.from({length:room.players},(_,i)=>({uuid:randomUUID(),name:`${room.key==='plexoncraft'?'Craft':'Tonim'}Player${i+1}`,world:'Survival',pingMillis:28+i*17,gameMode:'SURVIVAL',health:20,maximumHealth:20,onlineDurationMillis:3600000+i*60000,sessionId:randomUUID(),sessionStartedAt:new Date(Date.now()-3600000).toISOString()}));
+  }
+  const seedSignedContent=async()=>{for(const room of fixture.rooms){await room.paper.send('inventory.players',{snapshotId:randomUUID(),capturedAt:new Date().toISOString(),players:roster(room),offset:0,complete:true});await room.paper.send('inventory.plugins',{snapshotId:randomUUID(),capturedAt:new Date().toISOString(),offset:0,plugins:[{name:'PlexonPanel',version:'5.0.0',authors:['Fixture team'],enabled:true},{name:'FixturePermissions',version:'1.0.0',authors:['Fixture team'],enabled:true},{name:'FixtureChat',version:'2.0.0',authors:['Fixture team'],enabled:true},{name:'FixtureMaintenance',version:'1.0.0',authors:['Fixture team'],enabled:false}]});for(const [i,content] of ['Welcome to the fixture survival world.','Meet at the village after the next world save.','The build is ready for review.'].entries())await room.paper.send('chat.message',{messageId:randomUUID(),capturedAt:new Date().toISOString(),playerName:roster(room)[i%room.players].name,content});}};
   next=spawn(process.execPath,['node_modules/next/dist/bin/next','dev','--hostname','127.0.0.1'],{env:{...process.env,NEXT_PUBLIC_PLEXON_RELAY_URL:fixture.base,NEXT_TELEMETRY_DISABLED:'1'},stdio:['ignore','ignore','inherit']});
   let ready=false;for(let i=0;i<200;i++){if(next.exitCode!==null)throw new Error('Next exited during startup');try{const response=await fetch(fixture.origin,{signal:AbortSignal.timeout(5000)});if(response.ok){ready=true;break;}}catch{}await new Promise(r=>setTimeout(r,100));}assert.ok(ready,'Next startup timed out');
   const executable=process.env.PLEXON_CHROMIUM_EXECUTABLE;
@@ -39,14 +50,17 @@ try {
   };
   for(const width of result.widths)await check('Fleet',width,'light');await page.setViewportSize({width:1440,height:1000});
   await page.getByRole('button',{name:/Open PlexonCraft/}).click();await page.getByRole('heading',{name:'Overview',exact:true}).waitFor();
+  await seedSignedContent();
   const sections=['Overview','Performance','Players','Console','Chat','Plugins','Server','Backups','Configuration','Audit','Access','Settings'];
   const navigate=async name=>{if(await page.getByRole('button',{name:'Open navigation',exact:true}).isVisible())await page.getByRole('button',{name:'Open navigation',exact:true}).click();const start=performance.now();await page.locator('.workspace-nav').getByRole('button',{name,exact:true}).click();await page.getByRole('heading',{name,exact:true,level:1}).waitFor();await page.waitForTimeout(200);result.interactions.push({action:'navigate '+name,milliseconds:performance.now()-start});};
-  for(const name of sections){await page.setViewportSize({width:1440,height:1000});await navigate(name);await page.waitForTimeout(300);console.log('Verify light: '+name);for(const width of result.widths)await check(name,width,'light');await page.setViewportSize({width:1440,height:1000});await page.screenshot({path:output+'/'+name.toLowerCase()+'-1440-light.png',fullPage:true});await page.setViewportSize({width:390,height:844});await page.screenshot({path:output+'/'+name.toLowerCase()+'-390-light.png',fullPage:true});
+  const verifyPopulated=async name=>{const text={Players:'CraftPlayer1',Console:'Fixture journal: world save completed',Chat:'Meet at the village after the next world save.',Plugins:'FixturePermissions'}[name];if(text){await page.getByText(text,{exact:true}).first().waitFor();result.interactions.push({action:'populated '+name,transport:'signed Paper inventory/chat or scoped Host history response'});}};
+  for(const name of sections){await page.setViewportSize({width:1440,height:1000});await navigate(name);await verifyPopulated(name);await page.waitForTimeout(300);console.log('Verify light: '+name);for(const width of result.widths)await check(name,width,'light');await page.setViewportSize({width:1440,height:1000});await page.screenshot({path:output+'/'+name.toLowerCase()+'-1440-light.png',fullPage:true});await page.setViewportSize({width:390,height:844});await page.screenshot({path:output+'/'+name.toLowerCase()+'-390-light.png',fullPage:true});
     const axe=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();result.accessibility.push({name,violations:axe.violations.map(v=>({id:v.id,impact:v.impact,nodes:v.nodes.map(n=>n.target)}))});
   }
   await page.setViewportSize({width:1440,height:1000});await navigate('Overview');
   await page.evaluate(()=>{localStorage.setItem('plexonpanel-ui-preferences-v1',JSON.stringify({schemaVersion:1,theme:'dark',textScale:125,contrast:'high',motion:'off'}));});await page.reload();await page.getByRole('heading',{name:'Your servers'}).waitFor();await page.getByRole('button',{name:/Open PlexonCraft/}).click();await page.getByRole('heading',{name:'Overview',exact:true}).waitFor();
-  for(const name of sections){await page.setViewportSize({width:1440,height:1000});await navigate(name);console.log('Verify dark/125%: '+name);for(const width of result.widths){await check(name,width,'dark/high contrast/125%/motion off');if(name==='Overview'||width===1440||width===390)await page.screenshot({path:output+`/${name.toLowerCase()}-${width}-dark-125.png`,fullPage:true});}await page.setViewportSize({width:390,height:844});await page.waitForTimeout(300);const axe=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();result.accessibility.push({name:name+' dark/125%',violations:axe.violations.map(v=>({id:v.id,impact:v.impact,nodes:v.nodes.map(n=>n.target)}))});}await page.setViewportSize({width:1440,height:1000});await navigate('Overview');
+  await seedSignedContent();
+  for(const name of sections){await page.setViewportSize({width:1440,height:1000});await navigate(name);await verifyPopulated(name);console.log('Verify dark/125%: '+name);for(const width of result.widths){await check(name,width,'dark/high contrast/125%/motion off');if(name==='Overview'||width===1440||width===390)await page.screenshot({path:output+`/${name.toLowerCase()}-${width}-dark-125.png`,fullPage:true});}await page.setViewportSize({width:390,height:844});await page.waitForTimeout(300);const axe=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();result.accessibility.push({name:name+' dark/125%',violations:axe.violations.map(v=>({id:v.id,impact:v.impact,nodes:v.nodes.map(n=>n.target)}))});}await page.setViewportSize({width:1440,height:1000});await navigate('Overview');
   await page.setViewportSize({width:390,height:844});await page.waitForTimeout(300);
   await page.getByRole('button',{name:'Open navigation',exact:true}).click();await page.keyboard.press('Escape');assert.ok(await page.getByRole('button',{name:'Open navigation',exact:true}).isVisible());
   await page.setViewportSize({width:1440,height:1000});
