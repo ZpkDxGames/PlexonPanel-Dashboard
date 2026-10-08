@@ -1,0 +1,140 @@
+{
+  "label": "after-fleet",
+  "view": "fleet",
+  "sourceCommit": "89b7aa67faed1cd9d3bc3efe3b4774a9db79f1ff",
+  "root": "/workspace/scratch/cc21ddf06366/dashboard",
+  "durationRequestedMs": 60000,
+  "telemetryIntervalMs": 250,
+  "mode": "Next development, unthrottled headless Chromium, software GPU, signed simulated two-server fixture; all streams stressed at 250ms",
+  "samples": [
+    {
+      "atMs": 3,
+      "Nodes": 540,
+      "LayoutCount": 0,
+      "RecalcStyleCount": 0,
+      "ScriptDuration": 0.000067,
+      "TaskDuration": 0.000173,
+      "JSHeapUsedSize": 40193436,
+      "activeDomNodes": 131,
+      "chartStates": [],
+      "paths": 2,
+      "pathBytes": 252
+    },
+    {
+      "atMs": 10012,
+      "Nodes": 540,
+      "LayoutCount": 20,
+      "RecalcStyleCount": 0,
+      "ScriptDuration": 0.370758,
+      "TaskDuration": 0.417423,
+      "JSHeapUsedSize": 39290336,
+      "activeDomNodes": 131,
+      "chartStates": [],
+      "paths": 2,
+      "pathBytes": 252
+    },
+    {
+      "atMs": 20018,
+      "Nodes": 314,
+      "LayoutCount": 40,
+      "RecalcStyleCount": 0,
+      "ScriptDuration": 0.742468,
+      "TaskDuration": 0.846837,
+      "JSHeapUsedSize": 24850332,
+      "activeDomNodes": 131,
+      "chartStates": [],
+      "paths": 2,
+      "pathBytes": 252
+    },
+    {
+      "atMs": 30036,
+      "Nodes": 314,
+      "LayoutCount": 60,
+      "RecalcStyleCount": 0,
+      "ScriptDuration": 1.132501,
+      "TaskDuration": 1.283868,
+      "JSHeapUsedSize": 24772440,
+      "activeDomNodes": 131,
+      "chartStates": [],
+      "paths": 2,
+      "pathBytes": 252
+    },
+    {
+      "atMs": 40049,
+      "Nodes": 314,
+      "LayoutCount": 79,
+      "RecalcStyleCount": 0,
+      "ScriptDuration": 1.437371,
+      "TaskDuration": 1.626529,
+      "JSHeapUsedSize": 24064384,
+      "activeDomNodes": 131,
+      "chartStates": [],
+      "paths": 2,
+      "pathBytes": 252
+    },
+    {
+      "atMs": 50058,
+      "Nodes": 314,
+      "LayoutCount": 100,
+      "RecalcStyleCount": 0,
+      "ScriptDuration": 1.78604,
+      "TaskDuration": 2.023768,
+      "JSHeapUsedSize": 25003352,
+      "activeDomNodes": 131,
+      "chartStates": [],
+      "paths": 2,
+      "pathBytes": 252
+    },
+    {
+      "atMs": 60004,
+      "Nodes": 314,
+      "LayoutCount": 119,
+      "RecalcStyleCount": 0,
+      "ScriptDuration": 2.112755,
+      "TaskDuration": 2.411134,
+      "JSHeapUsedSize": 28592632,
+      "activeDomNodes": 131,
+      "chartStates": [],
+      "paths": 2,
+      "pathBytes": 252
+    }
+  ],
+  "errors": [],
+  "socketClosures": [
+    {
+      "phase": "cleanup",
+      "at": "2026-10-08T00:57:45.616Z"
+    },
+    {
+      "phase": "cleanup",
+      "at": "2026-10-08T00:57:46.088Z"
+    },
+    {
+      "phase": "cleanup",
+      "at": "2026-10-08T00:57:46.088Z"
+    },
+    {
+      "phase": "cleanup",
+      "at": "2026-10-08T00:57:46.569Z"
+    },
+    {
+      "phase": "cleanup",
+      "at": "2026-10-08T00:57:46.569Z"
+    },
+    {
+      "phase": "cleanup",
+      "at": "2026-10-08T00:57:47.071Z"
+    },
+    {
+      "phase": "cleanup",
+      "at": "2026-10-08T00:57:47.071Z"
+    }
+  ],
+  "durationMs": 60005,
+  "retainedHeapAfterCycles": {
+    "Nodes": 313,
+    "JSHeapUsedSize": 19361204
+  },
+  "postNavigationNodes": 131,
+  "status": "PASS"
+}

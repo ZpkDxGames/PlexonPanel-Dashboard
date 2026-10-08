@@ -28,6 +28,7 @@ try{
  const select=page.getByRole('combobox',{name:'Selected server'});for(let i=0;i<2;i++){for(const name of ['TonimSMP','PlexonCraft']){await select.click();await page.getByRole('option').filter({hasText:name}).click();await page.waitForTimeout(500);}}}else{for(const name of ['PlexonCraft','TonimSMP','PlexonCraft','TonimSMP']){await page.getByRole('button',{name:new RegExp('Open '+name)}).click();await page.locator('nav').getByRole('button',{name:'All servers',exact:true}).click();await page.getByRole('heading',{name:'Your servers'}).waitFor();await page.waitForTimeout(300);}}
  await session.send('HeapProfiler.collectGarbage');result.retainedHeapAfterCycles=Object.fromEntries((await session.send('Performance.getMetrics')).metrics.filter(m=>['JSHeapUsedSize','Nodes'].includes(m.name)).map(m=>[m.name,m.value]));
  result.postNavigationNodes=await page.evaluate(()=>document.querySelectorAll('*').length);
+ assert.equal(result.errors.length,0,'Browser JS errors after navigation cleanup');
  result.status='PASS';
  console.log(JSON.stringify({label,durationMs:result.durationMs,first:result.samples[0],last:result.samples.at(-1)}));
 }catch(error){result.status='FAIL';result.failure=error.message;throw error;}finally{

@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "repository": "ZpkDxGames/PlexonPanel-Dashboard",
+  "sourceCommit": "89b7aa67faed1cd9d3bc3efe3b4774a9db79f1ff",
+  "sourceTree": "745b8e5f5c59813968e281819569b2e6c1314012",
+  "runId": 37707924887,
+  "runUrl": "https://github.com/ZpkDxGames/PlexonPanel-Dashboard/actions/runs/37707924887",
+  "status": "PASS",
+  "sourceChecks": {
+    "relayTests": 79,
+    "dashboardTests": 183,
+    "browserViewportChecks": 162,
+    "automatedAccessibilityScans": 26,
+    "automatedViolations": 0,
+    "browserJavaScriptErrors": 0,
+    "productionDependencyFindings": 0
+  },
+  "artifacts": [
+    {
+      "id": 11520776873,
+      "name": "PlexonPanel-Dashboard-5.0.0",
+      "bytes": 165772,
+      "digest": "sha256:8426baa852985a05767f025fb72b29d6b43464569fda81b8534e7a14239933ed",
+      "expiresAt": "2026-10-22T00:32:57Z"
+    },
+    {
+      "id": 11520433230,
+      "name": "PlexonPanel-UI-Evidence",
+      "bytes": 12202231,
+      "digest": "sha256:1df0717f3c388a27abf03a06644afa9ef45edf1c4e27d1e9b1dc64f51fa4a996",
+      "expiresAt": "2026-10-22T00:32:55Z"
+    }
+  ],
+  "runtimeCertification": "NOT_EXECUTED",
+  "productionActivation": "BLOCKED",
+  "notes": "This is the frozen application implementation commit. Subsequent delivery changes contain documentation, test tooling and evidence only; the final PR head must also pass CI."
+}
