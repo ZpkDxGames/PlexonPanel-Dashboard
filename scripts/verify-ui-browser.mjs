@@ -1,6 +1,6 @@
 // Native Chromium on the real Dashboard + signed local relay. Agents/operations are simulated.
 import assert from 'node:assert/strict';
-import {mkdir,writeFile} from 'node:fs/promises';
+import {mkdir,writeFile,readFile} from 'node:fs/promises';
 import {spawn,execFileSync} from 'node:child_process';
 import {randomUUID} from 'node:crypto';
 import {chromium} from '@playwright/test';
@@ -20,6 +20,10 @@ try {
         return {data};
       }
       if(body.action.startsWith('console.history'))return {data:{lines:Array.from({length:24},(_,i)=>({capturedAt:new Date(Date.now()-(24-i)*1000).toISOString(),content:i===23?'Fixture journal: world save completed':`Fixture journal entry ${i+1}: ${i%7===0?'slow task observed':'server tick completed'}`,level:i%7===0?'WARN':'INFO',source:'HOST',journalCursor:`fixture-${room.key}-${i}`,journalEpoch:'fixture-epoch'})),hasMore:false}};
+      if(body.action==='files.list')return {data:{entries:[{name:'fixture-settings.yml',directory:false,editable:true,size:29}],hasMore:false}};
+      if(body.action==='files.read')return {data:{content:'fixture: true\nview: dashboard\n',sha256:'a'.repeat(64),editable:true}};
+      if(body.action==='audit.list'||body.action==='audit.self')return {data:{entries:[{timestamp:new Date().toISOString(),actorLabel:'Fixture operator',role:'Owner',actionType:'server.status',target:room.key,outcome:'SUCCESS',code:'OK',requestId:randomUUID(),durationMillis:8}],hasMore:false}};
+      if(body.action==='devices.list')return {data:{devices:[{...room.device,name:'Fixture browser grant',issuedAt:Date.now()-60000,expiresAt:Date.now()+3600000,lastSeen:Date.now()}]}};
       if(body.action==='maintenance.status')return {data:{commandChannel:{enabled:true},currentOperation:backupJob??{}}};
       if(body.action==='maintenance.settings.get')return {data:{settings:{schemaVersion:3,timezone:'UTC',restart:{},fullRestorePoint:{canonicalFilename:'Fixture-Latest.zip'}}}};
       if(body.action==='backup.full.list')return {data:{backups:[],recoveryRequired:false}};
@@ -55,8 +59,16 @@ try {
   await seedSignedContent();
   const sections=['Overview','Performance','Players','Console','Chat','Plugins','Server','Backups','Configuration','Audit','Access','Settings'];
   const navigate=async name=>{if(await page.getByRole('button',{name:'Open navigation',exact:true}).isVisible())await page.getByRole('button',{name:'Open navigation',exact:true}).click();const start=performance.now();await page.locator('.workspace-nav').getByRole('button',{name,exact:true}).click();await page.getByRole('heading',{name,exact:true,level:1}).waitFor();await page.waitForTimeout(200);result.interactions.push({action:'navigate '+name,milliseconds:performance.now()-start});};
-  const verifyPopulated=async name=>{const text={Players:'CraftPlayer1',Console:'Fixture journal: world save completed',Chat:'Meet at the village after the next world save.',Plugins:'FixturePermissions'}[name];if(text){await page.getByText(text,{exact:true}).first().waitFor();result.interactions.push({action:'populated '+name,transport:'signed Paper inventory/chat or scoped Host history response'});}};
-  for(const name of sections){await page.setViewportSize({width:1440,height:1000});await navigate(name);await verifyPopulated(name);await page.waitForTimeout(300);console.log('Verify light: '+name);for(const width of result.widths)await check(name,width,'light');await page.setViewportSize({width:1440,height:1000});await page.screenshot({path:output+'/'+name.toLowerCase()+'-1440-light.png',fullPage:true,animations:'disabled'});await page.setViewportSize({width:390,height:844});await page.waitForTimeout(300);await checkClosedDrawer();await page.screenshot({path:output+'/'+name.toLowerCase()+'-390-light.png',fullPage:true,animations:'disabled'});
+  const verifyPopulated=async name=>{const text={Players:'CraftPlayer1',Console:'Fixture journal: world save completed',Chat:'Meet at the village after the next world save.',Plugins:'FixturePermissions',Audit:'Fixture operator',Access:'Fixture browser grant'}[name];if(text){await page.getByText(text,{exact:true}).first().waitFor();result.interactions.push({action:'populated '+name,transport:'signed inventory/chat or scoped agent response'});}if(name==='Configuration'){await page.getByRole('button',{name:/fixture-settings.yml/}).click();await page.getByLabel('File contents').waitFor();assert.equal(await page.getByLabel('File contents').inputValue(),'fixture: true\nview: dashboard\n');result.interactions.push({action:'open configuration text',transport:'scoped signed Paper read'});}};
+  const verifyInteractions=async name=>{
+    const searchLabel={Players:'Search players',Console:'Search console output',Chat:'Search chat',Plugins:'Search plugins'}[name];
+    if(searchLabel){const search=page.getByLabel(searchLabel,{exact:true});await search.fill('no-fixture-match');await page.waitForTimeout(100);assert.equal(await page.getByText({Players:'CraftPlayer1',Console:'Fixture journal: world save completed',Chat:'Meet at the village after the next world save.',Plugins:'FixturePermissions'}[name],{exact:true}).count(),0);await search.fill('');await verifyPopulated(name);result.interactions.push({action:'filter and restore '+name});}
+    if(name==='Performance'){const chart=page.locator('svg.workspace-chart').first();await chart.focus();await page.keyboard.press('ArrowLeft');await page.locator('.workspace-chart-tooltip').first().waitFor();assert.match(await page.locator('.workspace-chart-tooltip').first().innerText(),/Paper health.*ticks\/s.*source capture/s);await page.keyboard.press('Escape');
+      for(const format of ['JSON','CSV']){await page.getByText('Export / history',{exact:true}).click();const pending=page.waitForEvent('download');await page.getByRole('button',{name:'Export '+format,exact:true}).click();const download=await pending;const content=await readFile(await download.path(),'utf8');if(format==='JSON'){const report=JSON.parse(content);assert.equal(report.serverId,fixture.rooms[0].serverId);assert.ok(report.observations.length>0&&report.observations.every(row=>row.serverId===report.serverId&&row.provenance==='source capture'));}else assert.ok(content.startsWith('serverId,metric,capturedAt,value,unit,source,provenance'));assert.ok(!content.includes('CraftPlayer'));await page.getByText('Export / history',{exact:true}).click();}
+      result.interactions.push({action:'keyboard chart inspection and scoped JSON/CSV downloads'});
+    }
+  };
+  for(const name of sections){await page.setViewportSize({width:1440,height:1000});await navigate(name);await verifyPopulated(name);await verifyInteractions(name);await page.waitForTimeout(300);console.log('Verify light: '+name);for(const width of result.widths)await check(name,width,'light');await page.setViewportSize({width:1440,height:1000});await page.screenshot({path:output+'/'+name.toLowerCase()+'-1440-light.png',fullPage:true,animations:'disabled'});await page.setViewportSize({width:390,height:844});await page.waitForTimeout(300);await checkClosedDrawer();await page.screenshot({path:output+'/'+name.toLowerCase()+'-390-light.png',fullPage:true,animations:'disabled'});
     const axe=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();result.accessibility.push({name,violations:axe.violations.map(v=>({id:v.id,impact:v.impact,nodes:v.nodes.map(n=>n.target)}))});
   }
   await page.setViewportSize({width:1440,height:1000});await navigate('Overview');
