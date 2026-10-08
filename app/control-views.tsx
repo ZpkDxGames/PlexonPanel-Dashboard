@@ -56,7 +56,7 @@ export function Badge({
   children: React.ReactNode;
   tone?: string;
 }) {
-  return <span className={`cr-badge ${tone}`}>{children}</span>;
+  return <span className={`ui-badge ${tone}`}>{children}</span>;
 }
 export function Panel({
   title,
@@ -70,8 +70,8 @@ export function Panel({
   className?: string;
 }) {
   return (
-    <section className={`cr-panel ${className}`}>
-      <div className="cr-panel-head">
+    <section className={`ui-panel ${className}`}>
+      <div className="ui-panel-head">
         <h2>{title}</h2>
         {aside}
       </div>
@@ -87,8 +87,8 @@ export function Empty({
   children?: React.ReactNode;
 }) {
   return (
-    <div className="cr-empty">
-      <span className="cr-empty-mark" aria-hidden>
+    <div className="ui-empty">
+      <span className="ui-empty-mark" aria-hidden>
         ◇
       </span>
       <h3>{title}</h3>
@@ -110,7 +110,7 @@ export function ActionButton({
   const [busy, setBusy] = useState(false);
   return (
     <button
-      className={danger ? "cr-button danger" : "cr-button"}
+      className={danger ? "ui-button danger" : "ui-button"}
       disabled={busy || disabled}
       onClick={() => {
         setBusy(true);
@@ -198,8 +198,8 @@ export function Agent({
   detail: string;
 }) {
   return (
-    <div className="cr-agent">
-      <span className={`cr-dot ${online ? "online" : ""}`} />
+    <div className="ui-agent">
+      <span className={`ui-dot ${online ? "online" : ""}`} />
       <div>
         <strong>{name}</strong>
         <small>{detail}</small>

@@ -38,14 +38,15 @@ export function seriesStats(points: readonly TimedValue[]): SeriesStats {
 export function windowedPoints<T extends { at: number }>(
   history: readonly T[],
   minutes: 1 | 5 | 15 | 30 | number,
+  now?: number,
 ): T[] {
-  const end = history.at(-1)?.at;
+  const end = now ?? history.at(-1)?.at;
   if (end === undefined) return [];
   const start = end - minutes * 60_000;
   return history.filter((sample) => sample.at >= start);
 }
 
-export function gapSegments(points: readonly TimedValue[]): TimedValue[][] {
+export function gapSegments(points: readonly TimedValue[], maximumGapMs = Number.POSITIVE_INFINITY): TimedValue[][] {
   const segments: TimedValue[][] = [];
   let current: TimedValue[] = [];
   for (const point of points) {
@@ -53,6 +54,10 @@ export function gapSegments(points: readonly TimedValue[]): TimedValue[][] {
       if (current.length) segments.push(current);
       current = [];
       continue;
+    }
+    if (current.length && point.at - current[current.length - 1].at > maximumGapMs) {
+      segments.push(current);
+      current = [];
     }
     current.push(point);
   }

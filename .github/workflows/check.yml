@@ -31,6 +31,20 @@ jobs:
       - run: npm run relay:standalone:smoke
       - run: npm run relay:standalone:package
       - run: npm run build
+      - name: Install native verification browser
+        run: npx playwright install --with-deps chromium
+      - name: Verify native workspace layouts and accessibility
+        env:
+          PLEXON_UI_SOAK_MS: "10000"
+          PLEXON_SOURCE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: npm run test:browser
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: PlexonPanel-UI-Evidence
+          path: docs/ui-evidence/after/
+          if-no-files-found: warn
+          retention-days: 14
       - id: version
         run: node -e 'const fs=require("node:fs");fs.appendFileSync(process.env.GITHUB_OUTPUT,"value="+require("./package.json").version+"\n")'
       - name: Package coordinated Dashboard and relay evidence

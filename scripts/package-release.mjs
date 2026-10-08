@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
-import { copyFile, readdir, readFile, stat, writeFile } from "node:fs/promises";
+import { copyFile, readdir, readFile, stat, unlink, writeFile } from "node:fs/promises";
 import { resolve, relative } from "node:path";
 import { FLEET_CONTRACT_ID } from "../relay/dist/fleet-contract.js";
 import { ACTION_CONTRACT_ID } from "../relay/dist/scopes.js";
@@ -15,6 +15,25 @@ const sourceCommit = (
   execFileSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" })
 ).trim();
 if (!/^[0-9a-f]{40}$/i.test(sourceCommit)) throw new Error("A full source commit is required");
+
+// This is source-browser evidence only; production browser/runtime gates stay separate.
+let browserEvidence = null;
+await unlink(resolve(output, "ui-browser-evidence.json")).catch(error => { if (error.code !== "ENOENT") throw error; });
+try {
+  const path = resolve(root, "docs/ui-evidence/after/browser-results.json");
+  const evidence = JSON.parse(await readFile(path, "utf8"));
+  if (evidence.schemaVersion === 1 && evidence.sourceCommit === sourceCommit &&
+      evidence.status === "PASS" && evidence.views?.length > 0 &&
+      Array.isArray(evidence.errors) && evidence.errors.length === 0 &&
+      evidence.accessibility?.length > 0 && evidence.accessibility.every(scan => Array.isArray(scan.violations) && scan.violations.length === 0)) {
+    browserEvidence = { environment: evidence.environment, layouts: evidence.views.length,
+      accessibilityScans: evidence.accessibility.length, browserVersion: evidence.browserVersion,
+      productionRuntime: "NOT_EXECUTED" };
+    await copyFile(path, resolve(output, "ui-browser-evidence.json"));
+  }
+} catch {
+  // Missing/stale/malformed evidence cannot claim verification for this source.
+}
 
 async function files(directory) {
   const result = [];
@@ -66,8 +85,9 @@ const manifest = {
     migration: "NOT_EXECUTED",
     security: "SOURCE_TESTED_RUNTIME_NOT_EXECUTED",
     backup: "NOT_EXECUTED",
-    browser: "BLOCKED_WORKSPACE_BROWSER_CAPABILITY",
+    browser: browserEvidence ? "SOURCE_BROWSER_VERIFIED_RUNTIME_NOT_EXECUTED" : "NOT_EXECUTED",
   },
+  browserEvidence,
   artifacts,
 };
 await writeFile(

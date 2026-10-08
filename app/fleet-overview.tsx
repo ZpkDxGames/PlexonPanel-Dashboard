@@ -42,9 +42,10 @@ export function FleetOverview({ credentials, selected, connected, openServer, pa
     connection: connectionState(entry.state, entry.phase, now) }));
   const nodes = nodeSummaries(entries.filter(entry => entry.phase === "live").map(entry => entry.state), now);
   return <section className="fleet-workspace" aria-labelledby="fleet-title">
-    <header className="fleet-heading"><div><p className="cr21-kicker">PAIRED SERVERS</p>
-      <h1 id="fleet-title">Your servers</h1><p>One place for every server. Choose a workspace to get started.</p></div>
+    <header className="fleet-heading"><div><p className="workspace-kicker">PAIRED SERVERS</p>
+      <h1 id="fleet-title">Your servers</h1><p>Live visibility across your network. Open an instance to take control.</p></div>
       <button type="button" onClick={pair}>Pair another server</button></header>
+    <div className="fleet-summary" aria-label="Fleet summary"><span><b>{cards.length}</b>paired instances</span><span><b>{cards.filter(card => card.status === "online").length}</b>healthy connections</span><span><b>{nodes.length}</b>shared nodes</span><span>Source-verified · per-instance access</span></div>
     {!cards.length && <p className="fleet-empty">No paired servers yet. Pair a server to open its workspace.</p>}
     <div className="fleet-cards">
       {cards.map(card => <article key={card.serverId} className="fleet-card" data-selected={card.serverId === selected.serverId}>

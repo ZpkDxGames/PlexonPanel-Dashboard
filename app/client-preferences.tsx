@@ -19,7 +19,7 @@ function SelectField<T extends string | number>({
   hint?: string;
 }) {
   return (
-    <label className="cr23-field">
+    <label className="display-field">
       <span>{label}</span>
       <Select aria-label=""
         value={String(value)}
@@ -55,7 +55,7 @@ function ToggleField({
   disabled?: boolean;
 }) {
   return (
-    <label className="cr23-field cr23-check">
+    <label className="display-field display-check">
       <span>
         <span>{label}</span>
         {hint && <small>{hint}</small>}
@@ -85,8 +85,8 @@ export function ClientPreferences() {
         title="Interface preferences"
         aside={<Badge tone="cyan">Browser-local</Badge>}
       >
-        <div className="cr23-preference-grid cr30-settings-grid">
-          <section className="cr23-preference-group">
+        <div className="display-preference-grid view-settings-grid">
+          <section className="display-preference-group">
             <h3>Appearance</h3>
             <SelectField
               label="Theme"
@@ -124,7 +124,7 @@ export function ClientPreferences() {
             />
           </section>
 
-          <section className="cr23-preference-group">
+          <section className="display-preference-group">
             <h3>Layout</h3>
             <SelectField
               label="Density"
@@ -149,7 +149,7 @@ export function ClientPreferences() {
             />
           </section>
 
-          <section className="cr23-preference-group">
+          <section className="display-preference-group">
             <h3>Motion</h3>
             <SelectField
               label="Motion profile"
@@ -175,7 +175,7 @@ export function ClientPreferences() {
             />
           </section>
 
-          <section className="cr23-preference-group">
+          <section className="display-preference-group">
             <h3>Performance charts</h3>
             <SelectField
               label="Default window"
@@ -223,7 +223,7 @@ export function ClientPreferences() {
             />
           </section>
 
-          <section className="cr23-preference-group">
+          <section className="display-preference-group">
             <h3>Players</h3>
             <ToggleField
               label="Player skin heads"
@@ -271,7 +271,7 @@ export function ClientPreferences() {
             />
           </section>
 
-          <section className="cr23-preference-group cr30-browser-data-group">
+          <section className="display-preference-group view-browser-data-group">
             <h3>Browser data behavior</h3>
             <SelectField
               label="Display update rate"
@@ -286,17 +286,17 @@ export function ClientPreferences() {
               onChange={(value) => updatePreference("displayUpdateRateMs", value)}
               hint="Controls how often accepted live telemetry is painted to this browser. Paper and Host publish fast source telemetry where supported; critical connection, authorization, lifecycle and action state is always applied immediately."
             />
-            <div className="cr30-setting-note">
+            <div className="view-setting-note">
               <span>Browser display: {displayRateLabel(preferences.displayUpdateRateMs)}</span>
             </div>
           </section>
         </div>
 
-        <div className="cr23-settings-actions">
-          <button className="cr-button" onClick={resetPreferences}>
+        <div className="display-settings-actions">
+          <button className="ui-button" onClick={resetPreferences}>
             Reset visual preferences
           </button>
-          <span className="cr-hint">
+          <span className="ui-hint">
             This changes presentation only. It does not forget credentials,
             revoke this device, change Paper/Host policy or clear server data.
           </span>

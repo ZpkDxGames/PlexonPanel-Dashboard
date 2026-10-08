@@ -245,7 +245,7 @@ export function FilesView(props: ViewProps) {
     );
   return (
     <>
-      <div className="cr-toolbar">
+      <div className="ui-toolbar">
         <label>
           Root
           <Select aria-label="Root"
@@ -266,7 +266,7 @@ export function FilesView(props: ViewProps) {
             ))}
           </Select>
         </label>
-        <nav className="cr-breadcrumbs" aria-label="File path">
+        <nav className="ui-breadcrumbs" aria-label="File path">
           <button onClick={() => changeDirectory("")}>{root}</button>
           {path
             .split("/")
@@ -290,20 +290,20 @@ export function FilesView(props: ViewProps) {
         <Badge>{kind === "HOST" ? "Host companion" : "Paper agent"}</Badge>
       </div>
       {(listing.error || error) && (
-        <p className="cr-alert" role="alert">
+        <p className="ui-alert" role="alert">
           {error || listing.error}
         </p>
       )}
-      <div className="cr-file-split">
+      <div className="ui-file-split">
         <Panel
           title="Files"
           aside={
-            <button className="cr-button" onClick={listing.refresh}>
+            <button className="ui-button" onClick={listing.refresh}>
               Refresh
             </button>
           }
         >
-          <div className="cr-pad">
+          <div className="ui-pad">
             <label>
               Find a filename
               <input
@@ -313,7 +313,7 @@ export function FilesView(props: ViewProps) {
               />
             </label>
           </div>
-          <div className="cr-file-list">
+          <div className="ui-file-list">
             {path && (
               <button
                 onClick={() =>
@@ -324,7 +324,7 @@ export function FilesView(props: ViewProps) {
               </button>
             )}
             {listing.busy ? (
-              <p className="cr-pad">Loading folder…</p>
+              <p className="ui-pad">Loading folder…</p>
             ) : (
               entries.map((e) => (
                 <button
@@ -359,9 +359,9 @@ export function FilesView(props: ViewProps) {
               ))
             )}
           </div>
-          <div className="cr-actions cr-pad">
+          <div className="ui-actions ui-pad">
             <button
-              className="cr-button"
+              className="ui-button"
               disabled={!page}
               onClick={() => setPage((p) => p - 1)}
             >
@@ -369,7 +369,7 @@ export function FilesView(props: ViewProps) {
             </button>
             <span>{page + 1}</span>
             <button
-              className="cr-button"
+              className="ui-button"
               disabled={!listing.data.hasMore}
               onClick={() => setPage((p) => p + 1)}
             >
@@ -378,7 +378,7 @@ export function FilesView(props: ViewProps) {
           </div>
           {(props.can("files.create", kind) ||
             props.can("files.upload", kind)) && (
-            <div className="cr-form cr-pad">
+            <div className="ui-form ui-pad">
               <label>
                 New filename
                 <input
@@ -453,18 +453,18 @@ export function FilesView(props: ViewProps) {
         >
           {selected ? (
             <>
-              <div className="cr-toolbar cr-pad">
+              <div className="ui-toolbar ui-pad">
                 <Badge>
                   {selected.editable ? "Editable text" : "Read-only"}
                 </Badge>
                 <button
-                  className="cr-button"
+                  className="ui-button"
                   onClick={() => setSyntax(!syntax)}
                 >
                   {syntax ? "Edit" : "Syntax preview"}
                 </button>
                 <button
-                  className="cr-button"
+                  className="ui-button"
                   disabled={!dirty}
                   onClick={() => setDiff(!diff)}
                 >
@@ -476,7 +476,7 @@ export function FilesView(props: ViewProps) {
                   </ActionButton>
                 )}
                 <button
-                  className="cr-button"
+                  className="ui-button"
                   onClick={() => void open(selected.path)}
                 >
                   Reload file
@@ -486,7 +486,7 @@ export function FilesView(props: ViewProps) {
                 <Syntax content={content} />
               ) : (
                 <textarea
-                  className="cr-editor"
+                  className="ui-editor"
                   aria-label="File contents"
                   spellCheck={false}
                   value={content}
@@ -500,7 +500,7 @@ export function FilesView(props: ViewProps) {
                 />
               )}
               {diff && (
-                <div className="cr-diff">
+                <div className="ui-diff">
                   <div>
                     <h3>On server when opened</h3>
                     <pre>{selected.original}</pre>
@@ -511,12 +511,12 @@ export function FilesView(props: ViewProps) {
                   </div>
                 </div>
               )}
-              <p className="cr-hint cr-pad">
+              <p className="ui-hint ui-pad">
                 Changes use the file hash to detect conflicts. Reload the owning
                 plugin or restart Paper when required. JSON is validated before
                 saving; validate YAML against the plugin&apos;s schema locally.
               </p>
-              <div className="cr-actions cr-pad">
+              <div className="ui-actions ui-pad">
                 {props.can("files.download", kind) && (
                   <ActionButton
                     disabled={download !== null}
@@ -550,7 +550,7 @@ export function FilesView(props: ViewProps) {
                   <>
                     <progress max={1} value={download} />
                     <button
-                      className="cr-button"
+                      className="ui-button"
                       onClick={() => controller.current?.abort()}
                     >
                       Cancel download
@@ -633,7 +633,7 @@ function fuzzy(name: string, query: string) {
 }
 function Syntax({ content }: { content: string }) {
   return (
-    <pre className="cr-syntax">
+    <pre className="ui-syntax">
       {content.split("\n").map((line, i) => {
         const match = /^(\s*)([^:#=]+)([:=])(.*)$/.exec(line);
         return (

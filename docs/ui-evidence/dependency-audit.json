@@ -1,0 +1,54 @@
+{
+  "scope": "Development + production",
+  "productionFindings": 0,
+  "summary": {
+    "info": 0,
+    "low": 0,
+    "moderate": 0,
+    "high": 5,
+    "critical": 0,
+    "total": 5
+  },
+  "remaining": [
+    {
+      "name": "@next/eslint-plugin-next",
+      "severity": "high",
+      "via": [
+        "fast-glob"
+      ]
+    },
+    {
+      "name": "braces",
+      "severity": "high",
+      "via": [
+        {
+          "title": "braces vulnerable to stack-exhaustion denial of service through deeply nested patterns",
+          "url": "https://github.com/advisories/GHSA-vfj7-8cjw-p6xm",
+          "range": "<=3.0.3"
+        }
+      ]
+    },
+    {
+      "name": "eslint-config-next",
+      "severity": "high",
+      "via": [
+        "@next/eslint-plugin-next"
+      ]
+    },
+    {
+      "name": "fast-glob",
+      "severity": "high",
+      "via": [
+        "micromatch"
+      ]
+    },
+    {
+      "name": "micromatch",
+      "severity": "high",
+      "via": [
+        "braces"
+      ]
+    }
+  ],
+  "notes": "Remaining braces advisory has no published patch. These are ESLint globbing development dependencies; production omit=dev audit passes. No Next/ESLint major downgrade or private fork is introduced."
+}

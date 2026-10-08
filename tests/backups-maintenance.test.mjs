@@ -150,7 +150,7 @@ test("automatic backups stay retired while restart-only scheduling remains suppo
   assert.equal(view.includes("restartCountdown(activeDraft.restart.warningSeconds)"), true);
   assert.equal(view.includes("warningSeconds: countdownWarnings(seconds)"), true);
   assert.equal(view.includes("SELECTED_WEEKDAYS"), true);
-  assert.equal(view.includes("cr35-weekday-picker"), true);
+  assert.equal(view.includes("backup-weekday-picker"), true);
   assert.equal(view.includes("Shutdown timeout"), true);
   assert.equal(view.includes("restartAfter: true"), true);
   assert.equal(view.includes("Restart after backup"), true);
@@ -212,21 +212,21 @@ test("destructive maintenance actions remain capability-gated at browser and rel
 test("responsive Step 8 backup layout avoids global scaling and styles the confirmation surface", async () => {
   const css = await source("app/dashboard.css");
   for (const selector of [
-    ".cr341-readiness-grid",
-    ".cr341-phase-list",
-    ".cr-step8-primary",
-    ".cr-step8-modal::backdrop",
-    ".cr-step8-confirm-grid",
-    ".cr-step8-recovery",
-    ".cr-step8-degraded",
-    ".cr35-backup-hero",
-    ".cr35-countdown-grid",
-    ".cr35-countdown-option",
-    ".cr35-live-progress",
-    ".cr35-weekday-picker",
+    ".backup-readiness-grid",
+    ".backup-phase-list",
+    ".backup-ui-primary-panel",
+    "dialog::backdrop",
+    ".backup-ui-confirm-grid",
+    ".backup-ui-recovery",
+    ".backup-ui-degraded",
+    ".backup-hero",
+    ".backup-countdown-grid",
+    ".backup-countdown-option",
+    ".backup-live-progress",
+    ".backup-weekday-picker",
   ]) assert.equal(css.includes(selector), true, `missing responsive selector ${selector}`);
-  assert.equal(css.includes("@container workspace (max-width: 820px)"), true);
-  assert.equal(css.includes("@container workspace (max-width: 480px)"), true);
+  assert.equal(css.includes("@media (max-width: 800px)"), true);
+  assert.equal(css.includes("@media (max-width: 540px)"), true);
   assert.equal(/\bzoom\s*:/.test(css), false);
   assert.equal(/transform\s*:\s*scale\s*\(/.test(css), false);
 });

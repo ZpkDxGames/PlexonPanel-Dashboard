@@ -170,21 +170,21 @@ export function ActivityHistoryModal({
   return (
     <dialog
       ref={dialogRef}
-      className="cr30-activity-dialog"
-      aria-labelledby="cr30-activity-dialog-title"
+      className="view-activity-dialog"
+      aria-labelledby="view-activity-dialog-title"
       onCancel={(event) => { event.preventDefault(); onClose(); }}
       onClick={(event) => { if (event.target === event.currentTarget) onClose(); }}
     >
-      <div className="cr30-activity-modal-shell">
-        <header className="cr30-activity-modal-head">
+      <div className="view-activity-modal-shell">
+        <header className="view-activity-modal-head">
           <div>
             <span>Control Room / Players</span>
-            <h2 id="cr30-activity-dialog-title">Player activity</h2>
+            <h2 id="view-activity-dialog-title">Player activity</h2>
             <p>Paper&apos;s local presence journal is the history source. Opening this view keeps the live dashboard session connected.</p>
           </div>
-          <button type="button" className="cr30-activity-close" onClick={onClose} aria-label="Close activity history">×</button>
+          <button type="button" className="view-activity-close" onClick={onClose} aria-label="Close activity history">×</button>
         </header>
-        <section className="cr30-activity-modal-controls" aria-label="Activity history filters">
+        <section className="view-activity-modal-controls" aria-label="Activity history filters">
           <input ref={searchRef} type="search" maxLength={64} placeholder="Player name or UUID"
             aria-label="Search player activity" value={filters.query}
             onChange={(event) => setFilters((value) => ({ ...value, query: event.target.value }))} />
@@ -197,33 +197,33 @@ export function ActivityHistoryModal({
           <label>To <input type="date" value={filters.to}
             onChange={(event) => setFilters((value) => ({ ...value, to: event.target.value }))} /></label>
         </section>
-        <div className="cr30-activity-modal-scroll" aria-live="polite">
-          {unavailable && <div className="cr30-activity-modal-empty">{unavailable}</div>}
-          {!unavailable && error && <p role="alert" className="cr21-bounded">{error}</p>}
-          {!unavailable && busy && !current && <div className="cr30-activity-modal-empty">Querying Paper history…</div>}
-          {!unavailable && !busy && !current && !error && <div className="cr30-activity-modal-empty">Waiting for Paper history…</div>}
+        <div className="view-activity-modal-scroll" aria-live="polite">
+          {unavailable && <div className="view-activity-modal-empty">{unavailable}</div>}
+          {!unavailable && error && <p role="alert" className="workspace-bounded">{error}</p>}
+          {!unavailable && busy && !current && <div className="view-activity-modal-empty">Querying Paper history…</div>}
+          {!unavailable && !busy && !current && !error && <div className="view-activity-modal-empty">Waiting for Paper history…</div>}
           {!unavailable && current && (
             <>
-              <p className="cr21-bounded" role="status">
+              <p className="workspace-bounded" role="status">
                 Page {current.index + 1} · {current.entries.length} journal records
                 {current.capturedAt ? ` · queried ${time(current.capturedAt)}` : ""}.
                 {current.bounded && " Scan or retention limits may omit older observations."}
                 {" "}Live rows are transient until they appear in the journal.
               </p>
               {entries.length ? (
-                <section className="cr30-activity-modal-groups" aria-label="Paper player activity">
-                  <article className="cr30-activity-modal-group">
+                <section className="view-activity-modal-groups" aria-label="Paper player activity">
+                  <article className="view-activity-modal-group">
                     <header><strong>Newest first</strong><span>{entries.length} shown</span></header>
                     <div>
                       {entries.map((item) => (
-                        <div className="cr30-activity-modal-row" key={item.eventId}>
-                          <span className="cr30-activity-initial" aria-hidden>{item.name.slice(0, 1).toUpperCase()}</span>
-                          <div className="cr30-activity-modal-identity">
+                        <div className="view-activity-modal-row" key={item.eventId}>
+                          <span className="view-activity-initial" aria-hidden>{item.name.slice(0, 1).toUpperCase()}</span>
+                          <div className="view-activity-modal-identity">
                             <strong>{item.name}</strong><small>{item.uuid}</small>
                             {item.termination === "UNKNOWN_DISCONNECT" && <small>Disconnect time unknown</small>}
                             {item.state === "LEFT" && item.sessionDurationMillis !== null && <small>Session {duration(item.sessionDurationMillis)}</small>}
                           </div>
-                          <div className="cr30-activity-modal-meta">
+                          <div className="view-activity-modal-meta">
                             <span data-state={item.state}>{item.state === "JOINED" ? "Joined" : "Left"}</span>
                             <small>{item.durable ? "Paper journal" : "Live · pending"}</small>
                             <time dateTime={item.observedAt} title={item.observedAt}>{time(item.observedAt)}</time>
@@ -233,8 +233,8 @@ export function ActivityHistoryModal({
                     </div>
                   </article>
                 </section>
-              ) : <div className="cr30-activity-modal-empty">No matching journal observations are retained in this bounded page.</div>}
-              <div className="cr30-activity-load-more">
+              ) : <div className="view-activity-modal-empty">No matching journal observations are retained in this bounded page.</div>}
+              <div className="view-activity-load-more">
                 <button type="button" disabled={busy || current.index === 0}
                   onClick={() => void navigate(current.index - 1, cursors[current.index - 1])}>Newer page</button>
                 <button type="button" disabled={busy || !current.nextCursor || current.index >= MAX_ACTIVITY_PAGES - 1}
@@ -245,10 +245,10 @@ export function ActivityHistoryModal({
             </>
           )}
           {unavailable && live.length > 0 && (
-            <p className="cr21-bounded">There are {live.length} recent live presence events in this tab only. They are not a historical record.</p>
+            <p className="workspace-bounded">There are {live.length} recent live presence events in this tab only. They are not a historical record.</p>
           )}
         </div>
-        <footer className="cr30-activity-modal-foot">
+        <footer className="view-activity-modal-foot">
           <span>Times use your device time zone. Pages contain at most {ACTIVITY_PAGE_SIZE} journal records; this view caps navigation at {MAX_ACTIVITY_PAGES} pages.</span>
           <span>Retention and scan limits are set locally on Paper.</span>
         </footer>

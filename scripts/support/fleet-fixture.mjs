@@ -33,7 +33,7 @@ export function inbox(socket, signed = false) {
     });
   };
 }
-export async function createFleetFixture({ port = 0, origin = "http://127.0.0.1:3000", separateNodes = false, names, instanceKeys, beforeActionResult } = {}) {
+export async function createFleetFixture({ port = 0, origin = "http://127.0.0.1:3000", separateNodes = false, names, instanceKeys, beforeActionResult, intervalMs = 1000, richerTelemetry = false } = {}) {
   const directory = await mkdtemp(join(tmpdir(), "plexonpanel-fleet-tcp-"));
   const relayKeys = keys(); const nodeId = randomUUID();
   const config = await loadStandaloneConfig({ PLEXON_RELAY_HOST: "127.0.0.1", PLEXON_RELAY_PORT: "8787",
@@ -90,8 +90,8 @@ export async function createFleetFixture({ port = 0, origin = "http://127.0.0.1:
     await room.paper.send("agent.heartbeat", {});
   }
   async function telemetry() {
-    const capturedAt = new Date().toISOString();
     for (const room of rooms) {
+      const capturedAt = new Date(Date.now() - (room.captureOffsetMs ?? 0)).toISOString();
       await room.paper?.send("telemetry.server", { capturedAt, serverName: room.name, onlinePlayers: room.players, maximumPlayers: 20,
         tps: [20, 20, 20], averageTickMillis: room === rooms[0] ? 12 : 18 });
       await room.host.send("telemetry.system", { capturedAt, nodeId: room.nodeId, metricScope: "NODE", processRole: "HOST",
@@ -99,6 +99,10 @@ export async function createFleetFixture({ port = 0, origin = "http://127.0.0.1:
       await room.host.send("service.status", { nodeId: room.nodeId, state: room.serviceState, minecraftReady: room.serviceState === "active", mainPid: 100,
         resources: { capturedAt, scope: "MINECRAFT_SERVICE", source: "SYSTEMD_CGROUP", cpuUnit: "PERCENT_OF_ONE_CORE",
           cpuAvailable: true, cpuPercent: room === rooms[0] ? 150 : 80, memoryAvailable: true, memoryBytes: room === rooms[0] ? 4e9 : 2e9 } });
+      if (richerTelemetry) {
+        await room.paper.send("telemetry.system", { capturedAt, nodeId: room.nodeId, metricScope: "NODE", processRole: "MINECRAFT", sourceIntervalMillis: intervalMs, processCpuPercent: 22, jvmHeapUsedBytes: 2e9, jvmHeapMaximumBytes: 6e9, processUptimeMillis: 7200000 });
+        await room.paper.send("telemetry.worlds", { capturedAt, worlds: [{ name: "Survival", players: room.players, loadedChunks: 420, entities: 128 }] });
+      }
     }
   }
   async function close() {
@@ -118,7 +122,7 @@ export async function createFleetFixture({ port = 0, origin = "http://127.0.0.1:
         scopes: room.device.scopes, accessToken: await signDashboardAccess(access, config.accessTokenSecret),
         websocketUrl: `${base.replace("http:", "ws:")}/v1/dashboard`, expiresAt: new Date((now + 3600) * 1000).toISOString() };
     }
-    await telemetry(); interval = setInterval(() => { void telemetry().catch(() => {}); }, 1000);
+    await telemetry(); interval = setInterval(() => { void telemetry().catch(() => {}); }, intervalMs);
     return { relay, rooms, base, requests, telemetry, close, sync, attach, origin, credentials: rooms.map(room => room.credential),
       async browser(index) {
         const credential = rooms[index].credential;

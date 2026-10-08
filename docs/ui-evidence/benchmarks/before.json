@@ -1,0 +1,90 @@
+{
+  "label": "before",
+  "sourceCommit": "c59b2f7508d738e1adae860db9fa7a6d0a3193c2",
+  "root": "/tmp/plexon-ui-baseline",
+  "durationRequestedMs": 60000,
+  "telemetryIntervalMs": 250,
+  "mode": "Next development, unthrottled headless Chromium, software GPU, signed simulated two-server fixture; all streams stressed at 250ms",
+  "samples": [
+    {
+      "atMs": 1,
+      "Nodes": 1268,
+      "LayoutCount": 0,
+      "RecalcStyleCount": 0,
+      "ScriptDuration": 0,
+      "TaskDuration": 0.000012,
+      "JSHeapUsedSize": 25386616,
+      "paths": 35,
+      "pathBytes": 4799
+    },
+    {
+      "atMs": 10006,
+      "Nodes": 1268,
+      "LayoutCount": 40,
+      "RecalcStyleCount": 187,
+      "ScriptDuration": 1.920751,
+      "TaskDuration": 2.150479,
+      "JSHeapUsedSize": 27224472,
+      "paths": 35,
+      "pathBytes": 10935
+    },
+    {
+      "atMs": 20010,
+      "Nodes": 1061,
+      "LayoutCount": 80,
+      "RecalcStyleCount": 386,
+      "ScriptDuration": 3.268166,
+      "TaskDuration": 3.689086,
+      "JSHeapUsedSize": 33894524,
+      "paths": 35,
+      "pathBytes": 17059
+    },
+    {
+      "atMs": 30014,
+      "Nodes": 1061,
+      "LayoutCount": 120,
+      "RecalcStyleCount": 581,
+      "ScriptDuration": 4.571431,
+      "TaskDuration": 5.166114,
+      "JSHeapUsedSize": 27389124,
+      "paths": 35,
+      "pathBytes": 23195
+    },
+    {
+      "atMs": 40016,
+      "Nodes": 1061,
+      "LayoutCount": 160,
+      "RecalcStyleCount": 779,
+      "ScriptDuration": 5.905723,
+      "TaskDuration": 6.704765,
+      "JSHeapUsedSize": 35433212,
+      "paths": 35,
+      "pathBytes": 29331
+    },
+    {
+      "atMs": 50020,
+      "Nodes": 1061,
+      "LayoutCount": 200,
+      "RecalcStyleCount": 969,
+      "ScriptDuration": 7.13321,
+      "TaskDuration": 8.120885,
+      "JSHeapUsedSize": 49409844,
+      "paths": 35,
+      "pathBytes": 35467
+    },
+    {
+      "atMs": 60004,
+      "Nodes": 1061,
+      "LayoutCount": 239,
+      "RecalcStyleCount": 1162,
+      "ScriptDuration": 8.488916,
+      "TaskDuration": 9.64274,
+      "JSHeapUsedSize": 42493580,
+      "paths": 35,
+      "pathBytes": 41591
+    }
+  ],
+  "durationMs": 60006,
+  "postNavigationNodes": 582,
+  "status": "PASS"
+}

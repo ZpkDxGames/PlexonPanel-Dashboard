@@ -57,22 +57,20 @@ import {
 import { operationText } from "../lib/operation-messages";
 import { useUiPreferences } from "../components/ui-preferences-provider";
 import { Badge, type ViewProps } from "./control-views";
-import {
-  ChatView21,
-  ConsoleView21,
-  PlayersView21,
-  PluginsView21,
-} from "./management-views-2-1";
-import { AccessView21, AuditView21 } from "./infrastructure-views-2-1";
-import { PerformanceView21 } from "./monitoring-views-2-1";
-import { OverviewView30 } from "./overview-view-3-0";
-import { ServerView21 } from "./server-view-2-1";
+import { ChatView, PluginsView } from "./communication-views";
+const ConsoleView = dynamic(() => import("./console-view").then(module => module.ConsoleView));
+const PlayersView = dynamic(() => import("./players-view").then(module => module.PlayersView));
+const AccessView = dynamic(() => import("./governance-views").then(module => module.AccessView));
+const AuditView = dynamic(() => import("./governance-views").then(module => module.AuditView));
+const PerformanceView = dynamic(() => import("./performance-view").then(module => module.PerformanceView));
+import { OverviewView } from "./overview-view";
+const ServerView = dynamic(() => import("./server-view").then(module => module.ServerView));
 import { ConnectionPills, ConnectionSummary } from "./connection-summary";
 import { TelemetryFreshness } from "./telemetry-freshness";
-import { BackupsView } from "./backups-view";
+const BackupsView = dynamic(() => import("./backups-view").then(module => module.BackupsView));
 
 const SettingsView = dynamic(() =>
-  import("./settings-view-2-1").then((module) => module.SettingsView21),
+  import("./settings-view").then((module) => module.SettingsView),
 );
 const FleetOverview = dynamic(() => import("./fleet-overview").then(module => module.FleetOverview));
 const ConfigurationView = dynamic(() => import("./configuration-view").then(module => module.ConfigurationView));
@@ -103,7 +101,7 @@ const pageDescriptions: Record<Section, string> = {
   Chat: "Read and participate in this server’s chat.",
   Plugins: "Installed plugins and their configuration.",
   Server: "Start, stop or restart this Minecraft instance.",
-  Backups: "Restore points, storage and scheduled maintenance.",
+  Backups: "Manual full backups, verified storage and recovery.",
   Configuration: "Edit configuration files with a review before saving.",
   Audit: "Review operations performed on this server.",
   Access: "Paired devices, permissions and credentials.",
@@ -210,8 +208,8 @@ function Icon({ name, size = 18 }: { name: IconName; size?: number }) {
 
 function Brand({ compact = false }: { compact?: boolean }) {
   return (
-    <div className={`cr21-brand ${compact ? "compact" : ""}`}>
-      <span className="cr21-brand-mark">
+    <div className={`workspace-brand ${compact ? "compact" : ""}`}>
+      <span className="workspace-brand-mark">
         <Icon name="panel" size={19} />
       </span>
       {!compact && (
@@ -244,11 +242,11 @@ function Pairing({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(initialError ?? "");
   return (
-    <main className="cr-pair-screen cr21-pair-screen">
-      <section className="cr-pair-copy">
+    <main className="ui-pair-screen">
+      <section className="ui-pair-copy">
         <Brand />
         <div>
-          <span className="cr-eyebrow">Plexon server control room</span>
+          <span className="ui-eyebrow">Plexon server control room</span>
           <h1>
             Your server.
             <br />
@@ -259,7 +257,7 @@ function Pairing({
             locally controlled access.
           </p>
         </div>
-        <div className="cr-pair-steps">
+        <div className="ui-pair-steps">
           <span>
             <b>01</b> Run <code>/plexonpanel pair</code> locally.
           </span>
@@ -275,7 +273,7 @@ function Pairing({
           capability.
         </small>
       </section>
-      <section className="cr-pair-form">
+      <section className="ui-pair-form">
         <div>
           <Badge tone="cyan">Secure device pairing</Badge>
           <h2>Pair this browser</h2>
@@ -284,7 +282,7 @@ function Pairing({
             when no role is supplied.
           </p>
           <form
-            className="cr-form"
+            className="ui-form"
             onSubmit={(event) => {
               event.preventDefault();
               setBusy(true);
@@ -312,7 +310,7 @@ function Pairing({
             <label>
               Six-digit pairing code
               <input
-                className="cr-code"
+                className="ui-code"
                 value={code}
                 onChange={(event) =>
                   setCode(event.target.value.replace(/\D/g, "").slice(0, 6))
@@ -325,27 +323,27 @@ function Pairing({
               />
             </label>
             {error && (
-              <p className="cr-alert" role="alert">
+              <p className="ui-alert" role="alert">
                 {error}
               </p>
             )}
             <button
-              className="cr-button primary"
+              className="ui-button primary"
               disabled={busy || !/^\d{6}$/.test(code)}
             >
               {busy ? "Waiting for local approval…" : "Open control room"}
             </button>
             {cancel && (
-              <button type="button" className="cr-button" onClick={cancel}>
+              <button type="button" className="ui-button" onClick={cancel}>
                 Back to server
               </button>
             )}
           </form>
-          <p className="cr-hint">
+          <p className="ui-hint">
             Server identity is signed. Telemetry and file contents are not stored
             by the relay.
           </p>
-          {servers.length > 0 && selectServer && <label className="cr-form">
+          {servers.length > 0 && selectServer && <label className="ui-form">
             Open a paired server
             <Select aria-label="Open a paired server" value="" onValueChange={selectedValue => { if (selectedValue) selectServer(selectedValue); }}>
               <option value="" disabled>Choose a server</option>
@@ -374,7 +372,7 @@ function Confirm({ value }: { value: Confirmation }) {
     value.parameters.backupId;
   return (
     <dialog
-      className="cr-confirm cr21-dialog"
+      className="ui-confirm workspace-dialog"
       ref={ref}
       aria-labelledby="confirm-title"
       onCancel={(event) => {
@@ -389,19 +387,19 @@ function Confirm({ value }: { value: Confirmation }) {
         <br /><code>{value.serverId.slice(0, 8)}</code>
       </p>
       {target !== undefined && (
-        <code className="cr-confirm-target">{String(target)}</code>
+        <code className="ui-confirm-target">{String(target)}</code>
       )}
       {value.action === "console.execute" && (
-        <pre className="cr-output">{str(value.parameters.command)}</pre>
+        <pre className="ui-output">{str(value.parameters.command)}</pre>
       )}
       {value.action === "backup.full.delete" && <p>This deletes the history record and any retained VPS archive. The canonical Google Drive backup remains stored.</p>}
       {value.action === "maintenance.recovery.resolve" && <p>Verify Minecraft is online and Host-local RCON readiness is healthy before clearing the recovery gate. The failed backup remains recorded as failed.</p>}
       {value.action === "maintenance.restart.now" && <p>The Host will run its maintenance warning and readiness workflow before restarting this server.</p>}
-      <div className="cr-actions">
-        <button className="cr-button" onClick={() => value.resolve(false)}>
+      <div className="ui-actions">
+        <button className="ui-button" onClick={() => value.resolve(false)}>
           Cancel
         </button>
-        <button className="cr-button danger" onClick={() => value.resolve(true)}>
+        <button className="ui-button danger" onClick={() => value.resolve(true)}>
           Confirm operation
         </button>
       </div>
@@ -457,7 +455,7 @@ function CommandPalette({
   );
   return (
     <dialog
-      className="cr21-command"
+      className="workspace-command"
       ref={ref}
       aria-label="Command palette"
       onCancel={(event) => {
@@ -465,7 +463,7 @@ function CommandPalette({
         finish();
       }}
     >
-      <div className="cr21-command-search">
+      <div className="workspace-command-search">
         <Icon name="search" />
         <input
           autoFocus
@@ -476,7 +474,7 @@ function CommandPalette({
         />
         <kbd>Esc</kbd>
       </div>
-      <div className="cr21-command-list">
+      <div className="workspace-command-list">
         {visible.map((item) => (
           <button
             key={item.label}
@@ -493,7 +491,7 @@ function CommandPalette({
   );
 }
 
-export default function Dashboard21() {
+export default function Dashboard() {
   const { preferences } = useUiPreferences();
   const [credential, setCredential] = useState<RelayCredential | null>(null);
   const [sessionGrant, setSessionGrant] = useState<DeviceGrantLike | null>(null);
@@ -519,6 +517,7 @@ export default function Dashboard21() {
   const cancelConfirmation = useCallback(() => confirmationRef.current?.resolve(false), []);
   const [refreshRevision, setRefreshRevision] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [mobileNavigation, setMobileNavigation] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [preferencesOpen, setPreferencesOpen] = useState(false);
@@ -666,13 +665,31 @@ export default function Dashboard21() {
     return () => window.removeEventListener("keydown", handler);
   }, []);
   useEffect(() => {
-    if (!sidebarOpen) return;
+    const media = window.matchMedia("(max-width: 800px)");
+    const update = () => setMobileNavigation(media.matches);
+    queueMicrotask(update);
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, []);
+  useEffect(() => {
+    if (!sidebarOpen || !mobileNavigation) return;
+    const sidebar = document.getElementById("control-room-navigation");
+    const buttons = sidebar ? Array.from(sidebar.querySelectorAll<HTMLButtonElement>("button:not(:disabled)")).filter(button => button.getClientRects().length > 0) : [];
+    buttons?.[0]?.focus();
     const handler = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setSidebarOpen(false);
+      if (event.key === "Escape") {
+        setSidebarOpen(false);
+        document.querySelector<HTMLButtonElement>(".workspace-mobile-menu")?.focus();
+      }
+      if (event.key === "Tab" && buttons?.length) {
+        const first = buttons[0], last = buttons[buttons.length - 1];
+        if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+        else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+      }
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [sidebarOpen]);
+  }, [sidebarOpen, mobileNavigation]);
 
   useEffect(() => {
     if (!credential) return;
@@ -1125,18 +1142,18 @@ export default function Dashboard21() {
     );
   if (phase === "loading")
     return (
-      <main className="cr-loading">
+      <main className="ui-loading">
         <Brand />
         <p>Opening your browser workspace…</p>
       </main>
     );
 
   if (section === "Fleet") return <main className="paired-server-home">
-    <header className="paired-server-brand"><Brand /><button className="cr-button" onClick={() => setPreferencesOpen(true)}><Icon name="settings" size={16} />Client settings</button></header>
-    {error && <p className="cr-alert" role="alert">{error}</p>}
+    <header className="paired-server-brand"><Brand /><button className="ui-button" onClick={() => setPreferencesOpen(true)}><Icon name="settings" size={16} />Client settings</button></header>
+    {error && <p className="ui-alert" role="alert">{error}</p>}
     <FleetOverview credentials={credentials} selected={state} connected={phase === "live"} phase={phase}
       labels={serverLabels} rememberName={rememberServerName} openServer={switchServer} pair={() => setPairing(true)} />
-    {notice && <p className="cr-alert" role="status">{notice}</p>}
+    {notice && <p className="ui-alert" role="status">{notice}</p>}
     <footer className="paired-server-footer">Your selection is remembered in this browser. Access is granted separately by each server.</footer>
     {preferencesOpen && <PreferencesDialog close={() => setPreferencesOpen(false)} />}
   </main>;
@@ -1154,35 +1171,35 @@ export default function Dashboard21() {
   let view: React.ReactNode;
   switch (section) {
     case "Overview":
-      view = <OverviewView30 {...props} />;
+      view = <OverviewView {...props} />;
       break;
     case "Performance":
-      view = <PerformanceView21 props={props} resetHistory={resetHistory} />;
+      view = <PerformanceView props={props} resetHistory={resetHistory} />;
       break;
     case "Players":
-      view = <PlayersView21 {...props} />;
+      view = <PlayersView {...props} />;
       break;
     case "Console":
-      view = <ConsoleView21 {...props} />;
+      view = <ConsoleView {...props} />;
       break;
     case "Chat":
-      view = <ChatView21 {...props} />;
+      view = <ChatView {...props} />;
       break;
     case "Plugins":
-      view = <PluginsView21 {...props} />;
+      view = <PluginsView {...props} />;
       break;
     case "Server":
-      view = <ServerView21 {...props} />;
+      view = <ServerView {...props} />;
       break;
     case "Backups":
       view = <BackupsView {...props} />;
       break;
     case "Audit":
-      view = <AuditView21 {...props} />;
+      view = <AuditView {...props} />;
       break;
     case "Access":
       view = (
-        <AccessView21 {...props} forget={forget} pair={() => setPairing(true)} />
+        <AccessView {...props} forget={forget} pair={() => setPairing(true)} />
       );
       break;
     case "Settings":
@@ -1215,11 +1232,11 @@ export default function Dashboard21() {
 
   return (
     <div
-      className={`control-room cr21-shell cr30-shell ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}
+      className={`control-room workspace-shell ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}
     >
       <a className="workspace-skip-link" href="#server-workspace">Skip to workspace</a>
       <button
-        className="cr21-mobile-menu"
+        className="workspace-mobile-menu"
         aria-label={sidebarOpen ? "Close navigation" : "Open navigation"}
         aria-expanded={sidebarOpen}
         aria-controls="control-room-navigation"
@@ -1229,19 +1246,23 @@ export default function Dashboard21() {
       </button>
       {sidebarOpen && (
         <button
-          className="cr21-sidebar-scrim"
+          className="workspace-sidebar-scrim"
           aria-label="Close navigation"
           onClick={() => setSidebarOpen(false)}
         />
       )}
       <aside
         id="control-room-navigation"
-        className={`cr21-sidebar ${sidebarOpen ? "mobile-open" : ""}`}
+        role={mobileNavigation && sidebarOpen ? "dialog" : undefined}
+        aria-modal={mobileNavigation && sidebarOpen ? true : undefined}
+        aria-label="Navigation"
+        inert={mobileNavigation && !sidebarOpen}
+        className={`workspace-sidebar ${sidebarOpen ? "mobile-open" : ""}`}
       >
-        <div className="cr21-sidebar-head">
+        <div className="workspace-sidebar-head">
           <Brand compact={sidebarCollapsed} />
           <button
-            className="cr21-collapse"
+            className="workspace-collapse"
             aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
             onClick={() => {
               const next = !sidebarCollapsed;
@@ -1253,8 +1274,8 @@ export default function Dashboard21() {
           </button>
         </div>
         {!sidebarCollapsed && (
-          <div className="cr21-server-identity">
-            <span className={`cr-dot ${paper ? "online" : ""}`} />
+          <div className="workspace-server-identity">
+            <span className={`ui-dot ${paper ? "online" : ""}`} />
             <div>
               <strong>{serverName}</strong>
               <small>
@@ -1265,16 +1286,17 @@ export default function Dashboard21() {
             </div>
           </div>
         )}
-        <nav className="cr21-nav" aria-label="Control room pages">
+        <nav className="workspace-nav" aria-label="Control room pages">
           {navGroups.map((group) => (
-            <div className="cr21-nav-group" key={group.label}>
+            <div className="workspace-nav-group" key={group.label}>
               {!sidebarCollapsed && (
-                <span className="cr21-nav-label">{group.label}</span>
+                <span className="workspace-nav-label">{group.label}</span>
               )}
               {group.sections.map((name) => (
                 <button
                   key={name}
                   className={section === name ? "active" : ""}
+                  aria-label={name === "Fleet" ? "All servers" : name}
                   aria-current={section === name ? "page" : undefined}
                   title={sidebarCollapsed ? name : undefined}
                   onClick={() => navigate(name)}
@@ -1283,19 +1305,19 @@ export default function Dashboard21() {
                   {!sidebarCollapsed && <span>{name === "Fleet" ? "All servers" : name}</span>}
                   {name === "Console" &&
                     state.console.some((line) => line.level === "ERROR") && (
-                      <i className="cr-nav-alert" />
+                      <i className="ui-nav-alert" />
                     )}
                 </button>
               ))}
             </div>
           ))}
         </nav>
-        <div className="cr21-sidebar-foot">
+        <div className="workspace-sidebar-foot">
           {!sidebarCollapsed && (
             <>
               <Badge tone="cyan">{role}</Badge>
               <small>{state.ready?.device.name ?? credential?.name}</small>
-              <button className="cr-text-button" onClick={() => navigate("Access")}>
+              <button className="ui-text-button" onClick={() => navigate("Access")}>
                 Manage access
               </button>
             </>
@@ -1303,12 +1325,12 @@ export default function Dashboard21() {
         </div>
       </aside>
 
-      <div className="cr21-main">
-        <header className="cr21-topbar">
-          <div className="cr21-topbar-server">
-            <span className="cr21-kicker">CURRENT SERVER</span>
+      <div className="workspace-main">
+        <header className="workspace-topbar">
+          <div className="workspace-topbar-server">
+            <span className="workspace-kicker">CURRENT SERVER</span>
             {credentials.length > 0 ? (
-              <label className="cr21-server-select">
+              <label className="workspace-server-select">
                 <span className="sr-only">Selected server</span>
                 <Select aria-label="Selected server"
                   value={state.serverId || credential?.serverId}
@@ -1326,18 +1348,18 @@ export default function Dashboard21() {
             )}
           </div>
           <ConnectionPills state={state} phase={phase} />
-          <div className="cr21-topbar-actions">
-            <button className="cr-button workspace-appearance" onClick={() => setPreferencesOpen(true)} title="Client settings"><Icon name="settings" size={16} /><span>Appearance</span></button>
+          <div className="workspace-topbar-actions">
+            <button className="ui-button workspace-appearance" onClick={() => setPreferencesOpen(true)} title="Client settings"><Icon name="settings" size={16} /><span>Appearance</span></button>
             <button
-              className="cr21-icon-button"
+              className="workspace-icon-button"
               title="Refresh current view"
               aria-label="Refresh current view"
               onClick={refreshCurrent}
             >
               <Icon name="refresh" />
             </button>
-            <details className="cr21-quick-actions">
-              <summary className="cr-button">
+            <details className="workspace-quick-actions">
+              <summary className="ui-button">
                 <Icon name="bolt" size={16} /> Quick actions
               </summary>
               <div>
@@ -1353,29 +1375,30 @@ export default function Dashboard21() {
               </div>
             </details>
             <button
-              className="cr21-command-button"
+              className="workspace-command-button"
+              aria-label="Open command palette"
               onClick={() => setPaletteOpen(true)}
             >
               <Icon name="search" size={16} />
               <span>Command</span>
               <kbd>⌘K</kbd>
             </button>
-            <button className="cr21-role-button" onClick={() => navigate("Access")}>
+            <button className="workspace-role-button" onClick={() => navigate("Access")}>
               <span>{role}</span>
               <Icon name="chevron" size={14} />
             </button>
           </div>
         </header>
 
-        <div className="cr21-page-head">
+        <div className="workspace-page-head">
           <div>
             <span>{serverName} / WORKSPACE</span>
             <h1>{section}</h1>
             <p className="workspace-page-description">{pageDescriptions[section]}</p>
           </div>
-          <div className="cr21-page-meta">
+          <div className="workspace-page-meta">
             <TelemetryFreshness phase={phase} state={state} />
-            <button className="cr-button" onClick={refreshCurrent}>
+            <button className="ui-button" onClick={refreshCurrent}>
               <Icon name="refresh" size={15} /> Refresh
             </button>
           </div>
@@ -1383,7 +1406,7 @@ export default function Dashboard21() {
 
         <ConnectionSummary state={state} phase={phase} retry={() => setReconnect(value => value + 1)} />
         {error && phase === "live" && (
-          <p className="cr-alert" role="alert">
+          <p className="ui-alert" role="alert">
             {error}
           </p>
         )}
@@ -1391,19 +1414,19 @@ export default function Dashboard21() {
         <main
           id="server-workspace"
           tabIndex={-1}
-          className="cr21-content"
+          className="workspace-content"
           key={`${credential?.serverId}-${section}-${refreshRevision}`}
         >
           {view}
         </main>
-        <footer className="cr21-footer">
+        <footer className="workspace-footer">
           <span>Local authority · Signed protocol 3</span>
           <span>{DASHBOARD_LABEL}</span>
         </footer>
       </div>
 
       {notice && (
-        <div className="cr-toast cr21-toast" role="status" aria-live="polite">
+        <div className="ui-toast workspace-toast" role="status" aria-live="polite">
           <span>{notice}</span>
           <button aria-label="Dismiss notification" onClick={() => setNotice("")}>
             ×

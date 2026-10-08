@@ -99,7 +99,7 @@ test("mounted Dashboard selects and operates independent signed instances withou
     await click(option);
   };
   const select = async id => choose(rootElement.querySelector('[role="combobox"]'), id);
-  const currentName = () => rootElement.querySelector(".cr21-server-identity strong")?.textContent;
+  const currentName = () => rootElement.querySelector(".workspace-server-identity strong")?.textContent;
   const health = () => rootElement.querySelector(".workspace-health")?.dataset.state;
   const first = fixture.rooms[0], second = fixture.rooms[1];
   try {
@@ -123,7 +123,7 @@ test("mounted Dashboard selects and operates independent signed instances withou
       assert.equal(captureActionTarget(first.serverId).serverId, first.serverId);
     });
     await t.test("switch resets data and confirmation before a second signed workspace becomes live", async () => {
-      await click(rootElement.querySelector(".cr21-quick-actions button"));
+      await click(rootElement.querySelector(".workspace-quick-actions button"));
       await wait(() => rootElement.querySelector("dialog[open]"), "confirmation");
       assert.match(rootElement.querySelector("dialog").textContent, /PlexonCraft/);
       const oldSocket = sockets.find(socket => socket.protocol === "plexonpanel-v3" && socket.readyState === 1);
@@ -134,7 +134,7 @@ test("mounted Dashboard selects and operates independent signed instances withou
       await wait(() => currentName() === "TonimSMP" && health() === "online", "TonimSMP workspace");
       assert.doesNotMatch(text(), /WRONG_INSTANCE_SENTINEL/);
       assert.equal((await loadRelayCredential()).serverId, second.serverId);
-      await click(rootElement.querySelector(".cr21-quick-actions button"));
+      await click(rootElement.querySelector(".workspace-quick-actions button"));
       await wait(() => rootElement.querySelector("dialog[open]"), "TonimSMP confirmation");
       assert.match(rootElement.querySelector("dialog").textContent, /TonimSMP/);
       await click(button("Confirm operation"));
@@ -167,10 +167,10 @@ test("mounted Dashboard selects and operates independent signed instances withou
       await wait(() => text().includes("Your servers") && text().includes("Continue to workspace"), "remembered selector");
       assert.equal(rootElement.querySelector('.fleet-card[data-selected="true"] h2').textContent, "PlexonCraft");
       await click(button("Continue to workspace"));
-      await wait(() => rootElement.querySelector(".cr21-page-head h1")?.textContent === "Players" && health() === "online", "remembered per-server page");
+      await wait(() => rootElement.querySelector(".workspace-page-head h1")?.textContent === "Players" && health() === "online", "remembered per-server page");
       await select(second.serverId);
       await wait(() => currentName() === "TonimSMP" && health() === "online", "second page scope");
-      assert.equal(rootElement.querySelector(".cr21-page-head h1").textContent, "Overview");
+      assert.equal(rootElement.querySelector(".workspace-page-head h1").textContent, "Overview");
     });
     await t.test("lifecycle commands complete across real signed Paper disconnect and reconnect events", async () => {
       simulateLifecycle = true;
@@ -179,12 +179,12 @@ test("mounted Dashboard selects and operates independent signed instances withou
         await wait(() => button(label) && !button(label).disabled, `${label} available`);
         await click(button(label));
         if (action !== "server.start") { await wait(() => rootElement.querySelector("dialog[open]"), "lifecycle confirmation"); await click(button("Confirm operation")); }
-        await wait(() => rootElement.querySelector(".cr-toast")?.textContent.includes("Simulated fixture response"), `${action} successful completion`);
-        assert.doesNotMatch(rootElement.querySelector(".cr-toast").textContent, /connection changed|could not be completed/);
-        await wait(() => rootElement.querySelector('.cr21-operation [data-state="current"]')?.textContent.includes("Complete"), `${action} observed success`);
+        await wait(() => rootElement.querySelector(".ui-toast")?.textContent.includes("Simulated fixture response"), `${action} successful completion`);
+        assert.doesNotMatch(rootElement.querySelector(".ui-toast").textContent, /connection changed|could not be completed/);
+        await wait(() => rootElement.querySelector('.workspace-operation [data-state="current"]')?.textContent.includes("Complete"), `${action} observed success`);
         assert.equal(fixture.requests.filter(r => r.action === action && r.serverId === second.serverId).length, action === "server.restart" ? 2 : 1);
         await wait(() => health() === expected, `${action} connection state`);
-        await click(rootElement.querySelector('.cr-toast button'));
+        await click(rootElement.querySelector('.ui-toast button'));
       }
       simulateLifecycle = false;
       await click(button("Overview"));
@@ -197,12 +197,12 @@ test("mounted Dashboard selects and operates independent signed instances withou
       await click(button("Graceful stop"));
       await wait(() => rootElement.querySelector("dialog[open]"), "busy stop confirmation");
       await click(button("Confirm operation"));
-      await wait(() => rootElement.querySelector('.cr21-lifecycle-card [role="alert"]')?.textContent.includes("Server control is busy"), "persistent lifecycle rejection");
-      assert.match(rootElement.querySelector('.cr21-lifecycle-card [role="alert"]').textContent, /will not run later/);
+      await wait(() => rootElement.querySelector('.workspace-lifecycle-card [role="alert"]')?.textContent.includes("Server control is busy"), "persistent lifecycle rejection");
+      assert.match(rootElement.querySelector('.workspace-lifecycle-card [role="alert"]').textContent, /will not run later/);
       await wait(() => button("Graceful stop") && !button("Graceful stop").disabled, "rejected stop releases controls");
-      if (rootElement.querySelector('.cr-toast button')) await click(rootElement.querySelector('.cr-toast button'));
-      assert.ok(rootElement.querySelector('.cr21-lifecycle-card [role="alert"]'));
-      assert.equal(rootElement.querySelector(".cr21-operation"), null);
+      if (rootElement.querySelector('.ui-toast button')) await click(rootElement.querySelector('.ui-toast button'));
+      assert.ok(rootElement.querySelector('.workspace-lifecycle-card [role="alert"]'));
+      assert.equal(rootElement.querySelector(".workspace-operation"), null);
       assert.equal(health(), "online");
       assert.equal(fixture.requests.filter(r => r.action === "server.stop" && r.serverId === second.serverId).length, before + 1);
       lifecycleBusy = false;
@@ -210,12 +210,12 @@ test("mounted Dashboard selects and operates independent signed instances withou
     });
     await t.test("Owner configuration uses Paper editing, reviews changes and preserves conflicts and unsaved work", async () => {
       await click(button("Configuration"));
-      const fileButton = () => [...rootElement.querySelectorAll('.cr-file-list button')].find(node => node.textContent.includes("bukkit.yml"));
+      const fileButton = () => [...rootElement.querySelectorAll('.ui-file-list button')].find(node => node.textContent.includes("bukkit.yml"));
       await wait(() => fileButton(), "configuration files");
       await click(fileButton());
-      await wait(() => rootElement.querySelector('.cr-file-split textarea'), "configuration editor");
+      await wait(() => rootElement.querySelector('.ui-file-split textarea'), "configuration editor");
       const edit = async content => {
-        const field = rootElement.querySelector('.cr-file-split textarea');
+        const field = rootElement.querySelector('.ui-file-split textarea');
         await act(async () => { Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, "value").set.call(field, content); field.dispatchEvent(new window.Event("input", { bubbles: true })); });
       };
       const changed = "settings:\n  sample: false\n";
@@ -233,7 +233,7 @@ test("mounted Dashboard selects and operates independent signed instances withou
       await edit("settings:\n  sample: pending\n");
       await click(saveButton()); await click(saveButton());
       await wait(() => text().includes("Conflict: the server file changed"), "conflict keeps edits");
-      assert.match(rootElement.querySelector('.cr-file-split textarea').value, /pending/);
+      assert.match(rootElement.querySelector('.ui-file-split textarea').value, /pending/);
       await select(first.serverId);
       assert.equal(currentName(), "TonimSMP");
       await edit(changed); simulateConflict = false;
@@ -244,23 +244,23 @@ test("mounted Dashboard selects and operates independent signed instances withou
       // Start backup interaction with a fresh authenticated session, like switching instances.
       await select(first.serverId); await wait(() => health() === "online", "first server connected");
       await select(second.serverId); await wait(() => health() === "online", "selected server connected");
-      await click([...rootElement.querySelectorAll('.cr21-nav button')].find(node => node.textContent.trim() === "Backups"));
+      await click([...rootElement.querySelectorAll('.workspace-nav button')].find(node => node.textContent.trim() === "Backups"));
       await wait(() => text().includes("No off-site rclone provider"), "missing provider preflight");
       assert.match(text(), /TonimSMP backup destination/);
       assert.match(text(), /\/var\/backups\/plexonpanel\/instances\/tonimsmp/);
-      const check = label => [...rootElement.querySelectorAll('.cr341-readiness-item')].find(node => node.querySelector('strong').textContent === label).querySelector('.cr-badge').textContent;
+      const check = label => [...rootElement.querySelectorAll('.backup-readiness-item')].find(node => node.querySelector('strong').textContent === label).querySelector('.ui-badge').textContent;
       assert.equal(check("Backup storage"), "Unknown"); assert.equal(check("Filesystem read contract"), "Unknown");
       assert.equal(button("Review & start backup").disabled, true);
       backupMode = "ready-old-provider";
-      await wait(() => !rootElement.querySelector('.cr30-backup-toolbar button').disabled, "refresh available");
-      await click(rootElement.querySelector('.cr30-backup-toolbar button'));
+      await wait(() => !rootElement.querySelector('.view-backup-toolbar button').disabled, "refresh available");
+      await click(rootElement.querySelector('.view-backup-toolbar button'));
       await wait(() => !button("Review & start backup").disabled, "fresh authoritative preflight");
       assert.equal(check("Backup storage"), "Ready");
       await click(button("Re-run Host preflight"));
       await wait(() => check("Google Drive / rclone") === "Ready", "new preflight supersedes stale provider status");
       backupMode = "source-failed";
-      await wait(() => !rootElement.querySelector('.cr30-backup-toolbar button').disabled, "refresh available");
-      await click(rootElement.querySelector('.cr30-backup-toolbar button'));
+      await wait(() => !rootElement.querySelector('.view-backup-toolbar button').disabled, "refresh available");
+      await click(rootElement.querySelector('.view-backup-toolbar button'));
       assert.equal(button("Review & start backup").disabled, true);
       await wait(() => text().includes("Fixture source unreadable"), "source failure replaces readiness");
       assert.equal(check("Filesystem read contract"), "Failed"); assert.equal(check("Backup storage"), "Unknown");
@@ -271,7 +271,7 @@ test("mounted Dashboard selects and operates independent signed instances withou
       assert.ok(window.sessionStorage.getItem(`plexonpanel.backup.last-safe-failure.v3:${second.serverId}`));
       await select(first.serverId);
       await wait(() => health() === "online", "first backup server connected");
-      await click([...rootElement.querySelectorAll('.cr21-nav button')].find(node => node.textContent.trim() === "Backups"));
+      await click([...rootElement.querySelectorAll('.workspace-nav button')].find(node => node.textContent.trim() === "Backups"));
       await wait(() => text().includes("PlexonCraft backup destination"), "first instance backup view");
       assert.equal(text().includes("Last operation failure"), false);
       await select(second.serverId);
@@ -280,8 +280,8 @@ test("mounted Dashboard selects and operates independent signed instances withou
     });
     await t.test("signed upload progress is shown for the active Host job and ignored for other jobs", async () => {
       backupJob = { jobId: "11111111-1111-4111-8111-111111111111", phase: "UPLOADING_REMOTE", localBackupVerified: true };
-      await wait(() => !rootElement.querySelector('.cr30-backup-toolbar button').disabled, "refresh available");
-      await click(rootElement.querySelector('.cr30-backup-toolbar button'));
+      await wait(() => !rootElement.querySelector('.view-backup-toolbar button').disabled, "refresh available");
+      await click(rootElement.querySelector('.view-backup-toolbar button'));
       await wait(() => text().includes("Uploading to Google Drive"), "durable upload job");
       await act(async () => second.host.send("backup.progress", { jobId: backupJob.jobId, phase: "UPLOADING_REMOTE", bytesUploaded: 512, totalBytes: 1024, progress: 0.5, bytesPerSecond: 256 }));
       await wait(() => text().includes("50%"), "live verified job transfer progress");
@@ -289,26 +289,26 @@ test("mounted Dashboard selects and operates independent signed instances withou
       await act(async () => { await sleep(600); });
       assert.equal(text().includes("976.6 KiB"), false);
       backupJob = null;
-      await click([...rootElement.querySelectorAll('.cr21-nav button')].find(node => node.textContent.trim() === "Server"));
+      await click([...rootElement.querySelectorAll('.workspace-nav button')].find(node => node.textContent.trim() === "Server"));
     });
     await t.test("cold backup review cancels without a command and confirms only the selected Host", async () => {
       await select(first.serverId); await wait(() => health() === "online", "first backup session");
       await select(second.serverId); await wait(() => health() === "online", "second backup session");
-      await click([...rootElement.querySelectorAll('.cr21-nav button')].find(node => node.textContent.trim() === "Backups"));
+      await click([...rootElement.querySelectorAll('.workspace-nav button')].find(node => node.textContent.trim() === "Backups"));
       await wait(() => button("Review & start backup") && !button("Review & start backup").disabled, "backup ready for review");
       const requests = () => fixture.requests.filter(request => request.action === "maintenance.full-backup.create");
       await click(button("Review & start backup"));
-      await wait(() => rootElement.querySelector('dialog[open].cr-step8-modal'), "custom backup confirmation");
-      assert.match(rootElement.querySelector('.cr-step8-modal').textContent, /TonimSMP/);
+      await wait(() => rootElement.querySelector('dialog[open].backup-ui-modal'), "custom backup confirmation");
+      assert.match(rootElement.querySelector('.backup-ui-modal').textContent, /TonimSMP/);
       assert.equal(requests().length, 0);
-      await click([...rootElement.querySelectorAll('.cr-step8-modal button')].find(node => node.textContent === "Cancel"));
+      await click([...rootElement.querySelectorAll('.backup-ui-modal button')].find(node => node.textContent === "Cancel"));
       assert.equal(requests().length, 0);
       await click(button("Review & start backup")); await click(button("Confirm Fully Backup Now"));
-      await wait(() => requests().length === 1 && !rootElement.querySelector('.cr-step8-modal'), "confirmed backup queued");
+      await wait(() => requests().length === 1 && !rootElement.querySelector('.backup-ui-modal'), "confirmed backup queued");
       const request = requests()[0];
       assert.equal(request.serverId, second.serverId); assert.equal(request.kind, "HOST");
       assert.equal(request.parameters.confirmed, true); assert.equal(request.parameters.countdownSeconds, 1800);
-      await click([...rootElement.querySelectorAll('.cr21-nav button')].find(node => node.textContent.trim() === "Server"));
+      await click([...rootElement.querySelectorAll('.workspace-nav button')].find(node => node.textContent.trim() === "Server"));
     });
     await t.test("Host-confirmed stop, agent disconnect and relay disconnect are different UI states", async () => {
       second.serviceState = "inactive";

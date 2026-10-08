@@ -1,0 +1,116 @@
+{
+  "dashboardHead": "c59b2f7508d738e1adae860db9fa7a6d0a3193c2",
+  "coreHead": "09deffc568e36828b4cb56c91f576b7f8524122c",
+  "environment": "Node 24.19.0 / Next 16.3.8 / clean optimized production build; all emitted chunks, not initial route transfer",
+  "cssSourceBytes": 169733,
+  "cssSourceLines": 7092,
+  "productionJsBytes": 882930,
+  "productionJsGzipBytes": 268371,
+  "productionCssBytes": 166534,
+  "chunks": [
+    {
+      "file": "0cz1d0mv5g_q7.js",
+      "bytes": 112594,
+      "sha256": "0973c1d64c88adc8e3c950410cb58b288f72118d5965b78049438deb8f2f9683"
+    },
+    {
+      "file": "0jvhpaew_uadu.js",
+      "bytes": 6557,
+      "sha256": "a10568306b34908511b49eb596785512026fba4f2d605bd6406696b9fd767c74"
+    },
+    {
+      "file": "0kle48bru8s_k.css",
+      "bytes": 159645,
+      "sha256": "0a1bfd541f809750fd631ae6b462bacdc594ba6da0f52c07e08f6dedec326be6"
+    },
+    {
+      "file": "0r1p45m7u7vf5.js",
+      "bytes": 12579,
+      "sha256": "dfde87dbf88e5298f75b5bbccf0b8e8f8375fee84675ccaa730780836ca090aa"
+    },
+    {
+      "file": "0v0lnq0inw1__.js",
+      "bytes": 160871,
+      "sha256": "84e25e8c054ff734b6bdf24c7d49a57f0240733dbcce07bb88aae2d1ceee79b5"
+    },
+    {
+      "file": "0ylp3xcpyggiq.js",
+      "bytes": 182236,
+      "sha256": "7009789025ee7a8a2fc8c008e122a6dcb0f49a723de7d6ac5e2db975103a9cef"
+    },
+    {
+      "file": "16nr0-faw0x0t.js",
+      "bytes": 14281,
+      "sha256": "8de20d1ced31c69af61a5805a4c9c9a295d48b96bba11989322a1ad6f113eb31"
+    },
+    {
+      "file": "2cnq-a4-420x6.js",
+      "bytes": 39942,
+      "sha256": "6b228a3c84c440844bc85e6af7677c9962cfed00fa0a14b683995740f7b2f8f6"
+    },
+    {
+      "file": "2lm6ee1ot3_cu.js",
+      "bytes": 227963,
+      "sha256": "53faa5d79f9544d6fe45cce093baa3367d3e64f3fed40e61585ba363496d13b9"
+    },
+    {
+      "file": "3450qyhportkm.js",
+      "bytes": 34015,
+      "sha256": "6f7927041946fafd1fabaaa08dc3bc1deab43dbcadc09584ba7f578ca097e745"
+    },
+    {
+      "file": "34mjvkww9wbk4.js",
+      "bytes": 27010,
+      "sha256": "1533dc45691987e01e950a3431ab550ed8d351415cb6335d6ccf61bb81b1338c"
+    },
+    {
+      "file": "3e_s751b78te5.css",
+      "bytes": 6889,
+      "sha256": "6e3e38daea7e94dd9f8c8810f0ee73267151db89c3f7a2ad90cc27c645d6fbef"
+    },
+    {
+      "file": "3fntmmi971322.js",
+      "bytes": 14377,
+      "sha256": "34ed6abf4c6d0d1bb3dc56d3f133d2a5dbc3a3c89c791deab314e27143ac14ce"
+    },
+    {
+      "file": "3hyg-unyv3fgo.js",
+      "bytes": 517,
+      "sha256": "92426db540f3e87901b459bc7cffd2f9f72336e95f4fa84229ba912fe4fea9f7"
+    },
+    {
+      "file": "3o_ou1n_8qwsl.js",
+      "bytes": 22904,
+      "sha256": "6901e61b97b01859cd1d46adddb49f6aea9099b0c7537992283525708e9e776a"
+    },
+    {
+      "file": "3t904yaerahbc.js",
+      "bytes": 7327,
+      "sha256": "a854e866ab084daef06d0e4b4877b24f3ac2bfbb238bcaccb146d84834f64531"
+    },
+    {
+      "file": "3yjicu8oqqflx.js",
+      "bytes": 10036,
+      "sha256": "c60ad0e581e1de3f1005c4f216fe9dadc9df1e392ae8af0c344714fb2cdde8d3"
+    },
+    {
+      "file": "turbopack-1m9e11ujie628.js",
+      "bytes": 9721,
+      "sha256": "8b95d3f5e2efa603871a26a8dd22314617b005960572e35346d315cf13f6a339"
+    }
+  ],
+  "initialHtmlScripts": [
+    "static/chunks/0jvhpaew_uadu.js",
+    "static/chunks/3450qyhportkm.js",
+    "static/chunks/2lm6ee1ot3_cu.js",
+    "static/chunks/0v0lnq0inw1__.js",
+    "static/chunks/turbopack-1m9e11ujie628.js",
+    "static/chunks/34mjvkww9wbk4.js",
+    "static/chunks/3hyg-unyv3fgo.js",
+    "static/chunks/0ylp3xcpyggiq.js",
+    "static/chunks/2cnq-a4-420x6.js",
+    "static/chunks/0cz1d0mv5g_q7.js"
+  ],
+  "initialHtmlJsBytes": 801426,
+  "initialHtmlJsGzipBytes": 241584
+}

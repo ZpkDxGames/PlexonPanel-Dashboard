@@ -43,6 +43,9 @@ export interface Ready {
 }
 export interface Sample {
   at: number;
+  sources?: { paperHealth: number | null; paperSystem: number | null; hostSystem: number | null; service: number | null };
+  serviceCpu?: number | null;
+  serviceMemory?: number | null;
   tps: number | null;
   mspt: number | null;
   hostCpu: number | null;
@@ -311,15 +314,20 @@ export function applyControlMessage(
   }
   if (
     message.eventType === "telemetry.server" ||
-    message.eventType === "telemetry.system"
+    message.eventType === "telemetry.system" ||
+    message.eventType === "service.status"
   ) {
-    const at = capturedAtMillis(body.capturedAt) ?? receivedAt,
+    const resources = record(next.service.resources);
+    const at = capturedAtMillis(message.eventType === "service.status" ? resources.capturedAt : body.capturedAt) ?? receivedAt,
       host = next.ready?.agents.host ? next.hostSystem : {},
       paper = next.ready?.agents.paper ? next.system : {},
       server = next.ready?.agents.paper ? next.server : {},
       tps = Array.isArray(server.tps) ? number(server.tps[0]) : null;
     const sample: Sample = {
       at,
+      sources: { paperHealth: capturedAtMillis(server.capturedAt), paperSystem: capturedAtMillis(paper.capturedAt), hostSystem: capturedAtMillis(host.capturedAt), service: next.ready?.agents.host ? capturedAtMillis(resources.capturedAt) : null },
+      serviceCpu: resources.scope === "MINECRAFT_SERVICE" && resources.source === "SYSTEMD_CGROUP" && resources.cpuAvailable === true && resources.cpuUnit === "PERCENT_OF_ONE_CORE" ? number(resources.cpuPercent) : null,
+      serviceMemory: resources.scope === "MINECRAFT_SERVICE" && resources.source === "SYSTEMD_CGROUP" && resources.memoryAvailable === true ? number(resources.memoryBytes) : null,
       tps,
       mspt: number(server.averageTickMillis),
       hostCpu: number(host.hostCpuPercent),

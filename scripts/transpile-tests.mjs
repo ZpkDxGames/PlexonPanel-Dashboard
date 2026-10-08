@@ -26,6 +26,7 @@ for (const file of [
   "lib/avatar-provider.ts",
   "lib/backup-readiness.ts",
   "lib/chart-geometry.ts",
+  "lib/metric-reports.ts",
   "components/ui-preferences-provider.tsx",
   "components/player-head.tsx",
   "components/select.tsx",
@@ -34,20 +35,20 @@ for (const file of [
   "app/connection-summary.tsx",
   "app/telemetry-freshness.tsx",
   "app/communication-views.tsx",
-  "app/console-view-3-0.tsx",
-  "app/players-view-2-3.tsx",
+  "app/console-view.tsx",
+  "app/player-roster.tsx",
   "app/activity-history-modal.tsx",
-  "app/players-view-3-0.tsx",
-  "app/management-views-2-1.tsx",
+  "app/players-view.tsx",
   "app/advanced-views.tsx",
   "app/dashboard.tsx",
-  "app/overview-view-3-0.tsx",
-  "app/infrastructure-views-2-1.tsx",
-  "app/monitoring-views-2-1.tsx",
-  "app/server-view-2-1.tsx",
+  "app/overview-view.tsx",
+  "app/governance-views.tsx",
+  "app/performance-view.tsx",
+  "app/telemetry-chart.tsx",
+  "app/server-view.tsx",
   "app/backups-view.tsx",
   "app/backup-destination.tsx",
-  "app/settings-view-2-1.tsx",
+  "app/settings-view.tsx",
   "app/client-preferences.tsx",
   "app/preferences-dialog.tsx",
   "app/configuration-view.tsx",
@@ -58,7 +59,7 @@ for (const file of [
   let source = await readFile(file, "utf8");
   // Render the real lazy workspace components in the DOM harness without the Next chunk loader.
   if (file === "app/dashboard.tsx") source = source.replace('"next/dynamic"', '"../../tests/support/dynamic.mjs"');
-  if (file === "components/select.tsx") source = source.replace('import styles from "./select.module.css";', 'const styles = { trigger: "cr-select", menu: "cr-select-menu", option: "cr-select-option" };');
+  if (file === "components/select.tsx") source = source.replace('import styles from "./select.module.css";', 'const styles = { trigger: "ui-select", menu: "ui-select-menu", option: "ui-select-option" };');
   source = source.replace(/import\((["'])(\.{1,2}\/[^"']+)\1\)/g,
     (all, q, p) => `import(${q}${/\.\w+$/.test(p) ? p : p + ".js"}${q})`);
   const output = ts

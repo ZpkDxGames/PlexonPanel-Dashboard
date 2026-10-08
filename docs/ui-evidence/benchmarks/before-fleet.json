@@ -1,0 +1,140 @@
+{
+  "label": "before-fleet",
+  "view": "fleet",
+  "sourceCommit": "c59b2f7508d738e1adae860db9fa7a6d0a3193c2",
+  "root": "/tmp/plexon-ui-baseline",
+  "durationRequestedMs": 60000,
+  "telemetryIntervalMs": 250,
+  "mode": "Next development, unthrottled headless Chromium, software GPU, signed simulated two-server fixture; all streams stressed at 250ms",
+  "samples": [
+    {
+      "atMs": 1,
+      "Nodes": 529,
+      "LayoutCount": 0,
+      "RecalcStyleCount": 0,
+      "ScriptDuration": 0,
+      "TaskDuration": 0.000011,
+      "JSHeapUsedSize": 40439080,
+      "activeDomNodes": 123,
+      "chartStates": [],
+      "paths": 2,
+      "pathBytes": 252
+    },
+    {
+      "atMs": 10006,
+      "Nodes": 301,
+      "LayoutCount": 20,
+      "RecalcStyleCount": 0,
+      "ScriptDuration": 0.389881,
+      "TaskDuration": 0.465495,
+      "JSHeapUsedSize": 25028688,
+      "activeDomNodes": 123,
+      "chartStates": [],
+      "paths": 2,
+      "pathBytes": 252
+    },
+    {
+      "atMs": 20010,
+      "Nodes": 301,
+      "LayoutCount": 39,
+      "RecalcStyleCount": 0,
+      "ScriptDuration": 0.70118,
+      "TaskDuration": 0.819542,
+      "JSHeapUsedSize": 22261316,
+      "activeDomNodes": 123,
+      "chartStates": [],
+      "paths": 2,
+      "pathBytes": 252
+    },
+    {
+      "atMs": 30014,
+      "Nodes": 301,
+      "LayoutCount": 59,
+      "RecalcStyleCount": 0,
+      "ScriptDuration": 1.071192,
+      "TaskDuration": 1.239154,
+      "JSHeapUsedSize": 25398880,
+      "activeDomNodes": 123,
+      "chartStates": [],
+      "paths": 2,
+      "pathBytes": 252
+    },
+    {
+      "atMs": 40018,
+      "Nodes": 301,
+      "LayoutCount": 79,
+      "RecalcStyleCount": 0,
+      "ScriptDuration": 1.374938,
+      "TaskDuration": 1.585724,
+      "JSHeapUsedSize": 27157556,
+      "activeDomNodes": 123,
+      "chartStates": [],
+      "paths": 2,
+      "pathBytes": 252
+    },
+    {
+      "atMs": 50022,
+      "Nodes": 301,
+      "LayoutCount": 99,
+      "RecalcStyleCount": 0,
+      "ScriptDuration": 1.659221,
+      "TaskDuration": 1.931355,
+      "JSHeapUsedSize": 21668544,
+      "activeDomNodes": 123,
+      "chartStates": [],
+      "paths": 2,
+      "pathBytes": 252
+    },
+    {
+      "atMs": 60005,
+      "Nodes": 301,
+      "LayoutCount": 119,
+      "RecalcStyleCount": 0,
+      "ScriptDuration": 2.007228,
+      "TaskDuration": 2.331139,
+      "JSHeapUsedSize": 24712124,
+      "activeDomNodes": 123,
+      "chartStates": [],
+      "paths": 2,
+      "pathBytes": 252
+    }
+  ],
+  "errors": [],
+  "socketClosures": [
+    {
+      "phase": "cleanup",
+      "at": "2026-10-08T00:50:35.468Z"
+    },
+    {
+      "phase": "cleanup",
+      "at": "2026-10-08T00:50:36.210Z"
+    },
+    {
+      "phase": "cleanup",
+      "at": "2026-10-08T00:50:36.234Z"
+    },
+    {
+      "phase": "cleanup",
+      "at": "2026-10-08T00:50:36.833Z"
+    },
+    {
+      "phase": "cleanup",
+      "at": "2026-10-08T00:50:36.833Z"
+    },
+    {
+      "phase": "cleanup",
+      "at": "2026-10-08T00:50:37.323Z"
+    },
+    {
+      "phase": "cleanup",
+      "at": "2026-10-08T00:50:37.323Z"
+    }
+  ],
+  "durationMs": 60009,
+  "retainedHeapAfterCycles": {
+    "Nodes": 300,
+    "JSHeapUsedSize": 19569960
+  },
+  "postNavigationNodes": 123,
+  "status": "PASS"
+}

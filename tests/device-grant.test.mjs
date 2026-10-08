@@ -78,7 +78,7 @@ test("active dashboard and access views consume the reconciled signed grant", as
     "utf8",
   );
   const access = await readFile(
-    new URL("../app/infrastructure-views-2-1.tsx", import.meta.url),
+    new URL("../app/governance-views.tsx", import.meta.url),
     "utf8",
   );
   const backups = await readFile(

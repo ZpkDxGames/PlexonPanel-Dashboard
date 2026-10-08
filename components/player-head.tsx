@@ -31,9 +31,9 @@ export function PlayerHead({ uuid, name, skinTextureId, size, online = true }: {
   let hash = 0;
   for (const char of name) hash = (hash * 31 + (char.codePointAt(0) ?? 0)) | 0;
   const initials = Array.from(name.trim()).slice(0, 2).join("").toUpperCase() || "?";
-  return <span className={`cr23-player-head cr23-player-head-${Math.abs(hash) % 6}${online ? " online" : ""}`}
+  return <span className={`display-player-head display-player-head-${Math.abs(hash) % 6}${online ? " online" : ""}`}
     style={{ width: size, height: size }} aria-hidden="true">
-    <span className="cr23-player-head-fallback">{initials}</span>
+    <span className="display-player-head-fallback">{initials}</span>
     {url && <AvatarImage key={url} url={url} size={size} motion={resolved.motion === "full"} />}
   </span>;
 }

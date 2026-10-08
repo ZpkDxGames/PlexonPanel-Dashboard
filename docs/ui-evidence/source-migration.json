@@ -1,0 +1,181 @@
+{
+  "before": "c59b2f7508d738e1adae860db9fa7a6d0a3193c2",
+  "after": "89b7aa67faed1cd9d3bc3efe3b4774a9db79f1ff",
+  "files": [
+    {
+      "status": "M",
+      "before": "app/activity-history-modal.tsx",
+      "after": "app/activity-history-modal.tsx"
+    },
+    {
+      "status": "M",
+      "before": "app/activity/activity.module.css",
+      "after": "app/activity/activity.module.css"
+    },
+    {
+      "status": "M",
+      "before": "app/advanced-views.tsx",
+      "after": "app/advanced-views.tsx"
+    },
+    {
+      "status": "M",
+      "before": "app/backup-destination.tsx",
+      "after": "app/backup-destination.tsx"
+    },
+    {
+      "status": "M",
+      "before": "app/backups-view.tsx",
+      "after": "app/backups-view.tsx"
+    },
+    {
+      "status": "M",
+      "before": "app/client-preferences.tsx",
+      "after": "app/client-preferences.tsx"
+    },
+    {
+      "status": "M",
+      "before": "app/communication-views.tsx",
+      "after": "app/communication-views.tsx"
+    },
+    {
+      "status": "M",
+      "before": "app/configuration-view.tsx",
+      "after": "app/configuration-view.tsx"
+    },
+    {
+      "status": "M",
+      "before": "app/connection-summary.tsx",
+      "after": "app/connection-summary.tsx"
+    },
+    {
+      "status": "R093",
+      "before": "app/console-view-3-0.tsx",
+      "after": "app/console-view.tsx"
+    },
+    {
+      "status": "M",
+      "before": "app/control-plane-build-panel.tsx",
+      "after": "app/control-plane-build-panel.tsx"
+    },
+    {
+      "status": "M",
+      "before": "app/control-views.tsx",
+      "after": "app/control-views.tsx"
+    },
+    {
+      "status": "M",
+      "before": "app/dashboard.css",
+      "after": "app/dashboard.css"
+    },
+    {
+      "status": "M",
+      "before": "app/dashboard.tsx",
+      "after": "app/dashboard.tsx"
+    },
+    {
+      "status": "M",
+      "before": "app/fleet-overview.tsx",
+      "after": "app/fleet-overview.tsx"
+    },
+    {
+      "status": "R088",
+      "before": "app/infrastructure-views-2-1.tsx",
+      "after": "app/governance-views.tsx"
+    },
+    {
+      "status": "D",
+      "before": "app/management-views-2-1.tsx",
+      "after": null
+    },
+    {
+      "status": "D",
+      "before": "app/monitoring-views-2-1.tsx",
+      "after": null
+    },
+    {
+      "status": "D",
+      "before": "app/overview-view-3-0.tsx",
+      "after": null
+    },
+    {
+      "status": "A",
+      "before": null,
+      "after": "app/overview-view.tsx"
+    },
+    {
+      "status": "A",
+      "before": null,
+      "after": "app/performance-view.tsx"
+    },
+    {
+      "status": "R085",
+      "before": "app/players-view-2-3.tsx",
+      "after": "app/player-roster.tsx"
+    },
+    {
+      "status": "R079",
+      "before": "app/players-view-3-0.tsx",
+      "after": "app/players-view.tsx"
+    },
+    {
+      "status": "M",
+      "before": "app/preferences-dialog.tsx",
+      "after": "app/preferences-dialog.tsx"
+    },
+    {
+      "status": "R091",
+      "before": "app/server-view-2-1.tsx",
+      "after": "app/server-view.tsx"
+    },
+    {
+      "status": "R081",
+      "before": "app/settings-view-2-1.tsx",
+      "after": "app/settings-view.tsx"
+    },
+    {
+      "status": "A",
+      "before": null,
+      "after": "app/telemetry-chart.tsx"
+    },
+    {
+      "status": "M",
+      "before": "app/telemetry-freshness.tsx",
+      "after": "app/telemetry-freshness.tsx"
+    },
+    {
+      "status": "M",
+      "before": "components/player-head.tsx",
+      "after": "components/player-head.tsx"
+    },
+    {
+      "status": "M",
+      "before": "components/select.module.css",
+      "after": "components/select.module.css"
+    },
+    {
+      "status": "M",
+      "before": "lib/chart-geometry.ts",
+      "after": "lib/chart-geometry.ts"
+    },
+    {
+      "status": "M",
+      "before": "lib/control-state.ts",
+      "after": "lib/control-state.ts"
+    },
+    {
+      "status": "A",
+      "before": null,
+      "after": "lib/metric-reports.ts"
+    },
+    {
+      "status": "M",
+      "before": "package.json",
+      "after": "package.json"
+    },
+    {
+      "status": "D",
+      "before": "postcss.config.mjs",
+      "after": null
+    }
+  ]
+}

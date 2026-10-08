@@ -112,8 +112,8 @@ test("Dashboard 5.0.0 keeps protocol hooks compatible with a selected-server Con
 
 test("Dashboard visible version metadata matches package 5.0.0", async () => {
   const dashboard = await source("app/dashboard.tsx");
-  const settings = await source("app/settings-view-2-1.tsx");
-  const server = await source("app/server-view-2-1.tsx");
+  const settings = await source("app/settings-view.tsx");
+  const server = await source("app/server-view.tsx");
   const versionSource = await source("lib/dashboard-version.ts");
   const packageJson = JSON.parse(await source("package.json"));
   const version = versionSource.match(/DASHBOARD_VERSION = "([^"]+)"/)?.[1];
@@ -127,24 +127,24 @@ test("Dashboard visible version metadata matches package 5.0.0", async () => {
 test("Dashboard 5.0.0 responsive architecture does not globally scale the interface", async () => {
   const css = await source("app/dashboard.css");
   assert.equal(/\bzoom\s*:/.test(css), false);
-  assert.doesNotMatch(css, /\.cr21-shell\s*\{[^}]*transform\s*:\s*scale\s*\(/);
-  assert.equal(css.includes("container-name: workspace"), true);
-  assert.equal(css.includes("@container workspace"), true);
+  assert.doesNotMatch(css, /\.workspace-shell\s*\{[^}]*transform\s*:\s*scale\s*\(/);
+  assert.equal(css.includes(".workspace-sidebar.mobile-open"), true);
+  assert.equal(css.includes("@media (max-width: 800px)"), true);
   assert.equal(css.includes("100dvh"), true);
 });
 
 test("Step 8 Backups workspace has responsive production layout", async () => {
   const css = await source("app/dashboard.css");
   for (const selector of [
-    ".cr30-backup-columns",
-    ".cr30-backup-metrics",
-    ".cr30-settings-grid",
-    ".cr341-readiness-grid",
-    ".cr341-phase-list",
-    ".cr-step8-primary",
-    ".cr-step8-modal",
+    ".view-backup-columns",
+    ".view-backup-metrics",
+    ".view-settings-grid",
+    ".backup-readiness-grid",
+    ".backup-phase-list",
+    ".backup-ui-primary-panel",
+    ".backup-ui-modal",
   ]) assert.equal(css.includes(selector), true, `missing ${selector}`);
-  assert.equal(css.includes("@container workspace"), true);
+  assert.equal(css.includes("@media (max-width: 800px)"), true);
 });
 
 test("Dashboard 5.0.0 display update rate exposes every supported browser cadence", async () => {
@@ -162,6 +162,7 @@ test("production loads one canonical global stylesheet without legacy overlap", 
   const layout = await source("app/layout.tsx");
   assert.deepEqual([...layout.matchAll(/import "(\.\/[^"\n]+\.css)"/g)].map(m => m[1]), ["./dashboard.css"]);
   const css = await source("app/dashboard.css");
+  assert.doesNotMatch(css, /(?:--cr|\.cr(?:\d+)?-)/);
   assert.doesNotMatch(css, /backdrop-filter:\s*blur/);
   assert.ok(css.includes(".client-preferences-dialog"));
   assert.ok(css.includes(".configuration-workspace"));
