@@ -17,7 +17,7 @@ This is source and local native-browser verification of the Dashboard implementa
 | Implementation GitHub CI | PASS | [37707924887](https://github.com/ZpkDxGames/PlexonPanel-Dashboard/actions/runs/37707924887), exact frozen implementation/test commit `89b7aa67faed1cd9d3bc3efe3b4774a9db79f1ff`; 262 tests + 162 native checks + 26 axe scans; final delivery head must also pass CI |
 | Existing Core main Linux x64 CI | FAIL | [37419700051](https://github.com/ZpkDxGames/PlexonPanel/actions/runs/37419700051): authorization assertion in ResponsiveHostControlTest, line 135; ARM64 passed. No Core diff |
 
-CI artifact IDs, SHA-256 digests and expiration dates are recorded in `ui-evidence/source-ci.json`. The frozen source run verifies both relay smokes, standalone packaging, clean build, browser checks and coordinated release packaging. Later delivery commits update documentation/evidence and test tooling; application source remains unchanged.
+CI artifact IDs, SHA-256 digests and expiration dates are recorded in `ui-evidence/source-ci.json`. The frozen source run verifies both relay smokes, standalone packaging, clean build, browser checks and coordinated release packaging. Later delivery commits update documentation/evidence, test tooling and a final chart-file trailing-blank-line cleanup; application behavior remains unchanged. The screenshots and profiles retain their exact frozen-source provenance.
 
 ## Native viewport, accessibility and interactions
 

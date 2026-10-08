@@ -33,5 +33,5 @@
   ],
   "runtimeCertification": "NOT_EXECUTED",
   "productionActivation": "BLOCKED",
-  "notes": "This is the frozen application implementation commit. Subsequent delivery changes contain documentation, test tooling and evidence only; the final PR head must also pass CI."
+  "notes": "This is the frozen application implementation commit. Subsequent delivery changes contain documentation, test tooling, evidence and a trailing-blank-line cleanup in the chart file, with no behavior change; the final PR head must also pass CI."
 }
