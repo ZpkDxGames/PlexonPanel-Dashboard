@@ -57,3 +57,14 @@
 - Await maintainer approval before M2. All final/live acceptance and unbuilt6.0 accessibility/performance gates remain not executed.
 
 - Final M1 clarification: new system-theme/cyan defaults apply only to an absent preference key; existing malformed/partial blobs retain legacy fallbacks. Chat cache clear is selected-server scoped and must prevent old observations reappearing through the next telemetry persistence update; added the explicit test gap. This is a documentation refinement only, not M2/M7 implementation.
+
+## Conditional M1 acceptance — pre-M2 review completed
+
+- Reconciled the M0 baseline against all 120 original PNG hashes and 120 axe entries, with per-workspace/theme/width results. Capture and source-inventory gates passed; zero-serious axe still failed on Fleet in all eight variants. The state inventory and 228-control audit are source reviews; full browser-state/mounted authorization permutations remain not executed.
+- Fixed both malformed dark hex values and Markdown spacing. Read canonical tokens.json for fresh contrast calculation: all 19 documented palette/accent rows match, 134 required pairs pass; text minimum 5.1362 and boundary 3.8763.
+- Reopened the UI font decision under Portuguese/English requirements. Eight real mounted Overview header + fixture Pulse captures at 390/1280 in light/dark show Hanken and Noto without Portuguese fallback. Recommend Hanken for compactness; final selection pending. No fonts vendored.
+- Cold HTTP traces confirm Latin-only demand for tested Portuguese/English, extended demand on Ł and system fallback on Ж. Explicit extended preload defeats demand. Future Next per-subset integration remains not executed; current installed local-font defaults/source were inspected.
+- Built documentation-only loopback Pulse prototype and captured 390/1920 light/dark normal/dense cases. 870 normal captures and exact 8192 stress captures keep one mark each with 12 SVG nodes. Individual 30-minute marks fail mobile readability; dense desktop also fails. Traces show substantial raster work and one 131.57 ms renderer task in mobile dark 4× stress. Product performance gates remain not executed.
+- Demonstrated exact-capture lens/table, with 140 ms spike recoverable. Pixel-bounded full-window summary is proposed for approval, not implemented or silently substituted for the raw mark contract.
+- npm run check passed: exit 0, 79 relay + 183 dashboard, zero failures/skips. Its actual production-mode Next test build contains no documentation-prototype routes/markers. Current kitchen-sink page is not built and its future exclusion gate is not executed.
+- All production source, accepted 5.0 evidence, dependencies and main remain unchanged. UI_6_PRE_M2_REVIEW.md, gallery, reproducible experiments and raw results are the review handoff. Stop before M2; next scope is tokens/layers, chosen fonts, theme switching, primitives/icons and verified dev-only kitchen sink only after the maintainer replies.

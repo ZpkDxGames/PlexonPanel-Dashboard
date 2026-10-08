@@ -33,3 +33,18 @@ Source `86b6a0cefb2c5e420c9c862a7897705e1ea59146`; branch release/6.0.0. This le
 `PlexonPanel-6.0-M0-evidence.zip` contains all 120 captures, raw results, review sheets, smoke, baseline logs and reproducible separate harness. Repository tracks UI_6_SCREENSHOT_MANIFEST.json with individual hashes rather than overwriting5.0 artifacts. `PlexonPanel-6.0-M1-design-evidence.zip` will contain design/contrast/font/wireframe records and portable throwaway font assets/licenses/scripts; production files unchanged.
 
 The container uses isolated npm/pip tooling outside repository manifests; no runtime dependency added. Actual native headless shell render limitations/flags are documented in UI_6_BASELINE.md. M0 final command was rerun with explicit subprocess exit capture after an earlier log ended before complete dashboard totals; only the full 79+183 result is accepted. M1 check returned0 but its spec-report log omitted the dashboard summary. Independent TAP execution confirmed all183 dashboard tests with0 failures/skips; this distinction is retained rather than inventing a missing summary.
+
+## Conditional M1 review checkpoint
+
+| Gate | Command / method | Result | Evidence / limitation |
+|---|---|---|---|
+| M0 record reconciliation | Original manifest/raw scans + SHA256 | passed | All 120 PNG hashes and 120 scan combinations; Fleet cleanliness still failed, full state execution not executed |
+| Corrected token equivalence / contrast | review-experiments/contrast.py reads tokens.json | passed | 19 Markdown rows match; 134 required pairs, minima text 5.1362/boundary 3.8763 |
+| Mounted Overview + Pulse type comparison | 390/1280 × light/dark × Hanken/Noto | passed execution | 8 screenshots; custom faces verified for header/Portuguese, zero page errors/overflow; fonts remain unvendored |
+| Subset demand/preload controls | Cold HTTP traces; exact rendered-font inspection | passed | Both Latin-only for tested English/Portuguese; Ł triggers extended; Ж uses system fallback; preload bypasses demand. Next integration not executed |
+| 30-minute Pulse spike | 390/1920 × light/dark × 870/8192 × CPU1/4; 30 forced redraws | executed; dense readability failed | 12 SVG nodes; exact mark count; raw paths expensive to rasterize; one 131.57 ms renderer task in dense mobile stress. Product performance not certified |
+| Prototype build exclusion | Actual production-mode test build manifest/emitted JS | passed for current documentation prototype | No route/markers; future dev-only kitchen-sink page not built, its exclusion gate not executed |
+| End review check | npm run check | passed | Exit 0; 79 relay + 183 dashboard tests, 0 failures/skips; production-mode Next test build |
+| M2 fonts/theme/primitives/icons/kitchen sink | No implementation | not executed | Wait for maintainer's font/rendering reply |
+
+Detailed results and limitations: [UI_6_PRE_M2_REVIEW.md](UI_6_PRE_M2_REVIEW.md).

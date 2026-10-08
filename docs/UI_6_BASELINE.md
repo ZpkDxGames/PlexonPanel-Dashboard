@@ -1,34 +1,38 @@
-# 6.0.0 discovery baseline — M0 complete
+# 6.0.0 discovery baseline — M0 evidence complete; accessibility gate failed
 
-Date: 2026-10-08 UTC. Branch `release/6.0.0`; production source `86b6a0cefb2c5e420c9c862a7897705e1ea59146` (accepted5.0.0 activation). M0 discovery is complete: the required inventories, untouched check, complete screenshot matrix and baseline axe execution exist. **Baseline accessibility is not clean**: Fleet has one serious rule violation in all8 variants. Recording that defect completes discovery; it does not pass a later zero-violation UI acceptance gate. No production UI/logic/tests/dependencies were changed.
+Date: 2026-10-08 UTC. Branch `release/6.0.0`; production source `86b6a0cefb2c5e420c9c862a7897705e1ea59146` (accepted 5.0.0 activation). M0 required discovery deliverables are complete: the required inventories, untouched check, complete screenshot matrix and baseline axe execution exist. **Baseline accessibility is not clean**: Fleet has one serious rule violation in all 8 variants. Recording that defect completes discovery; it does not pass a later zero-violation UI acceptance gate. No production UI/logic/tests/dependencies were changed.
 
 ## Authority and resolved stop
 
-[UI_6_DECISIONS.md](UI_6_DECISIONS.md) overrides the brief. The earlier mandatory §0.9 stop is resolved by maintainer decision1: correct Host-only service state and the contradictory dashboard-2-1 test in M3, not now. Existing `normalizeServiceState(undefined,true)` returns active; shell restart/palette callers use it, while Server uses false. This approved future correction remains an explicit baseline defect. Decisions preserve six Overview tiles, nine Performance charts, one real backup-progress stream, stored accents, bounded chat cache, active Files/Backups, existing file diff/conflict/dirty guards and navigation-only future palette. Unused CPU fallback removal is approved M8.
+[UI_6_DECISIONS.md](UI_6_DECISIONS.md) overrides the brief. The earlier mandatory §0.9 stop is resolved by maintainer decision 1: correct Host-only service state and the contradictory dashboard-2-1 test in M3, not now. Existing `normalizeServiceState(undefined,true)` returns active; shell restart/palette callers use it, while Server uses false. This approved future correction remains an explicit baseline defect. Decisions preserve six Overview tiles, nine Performance charts, one real backup-progress stream, stored accents, bounded chat cache, active Files/Backups, existing file diff/conflict/dirty guards and navigation-only future palette. Unused CPU fallback removal is approved M8.
 
 ## Executed gates and provenance
 
 | Gate | Result | Evidence / limits |
 |---|---|---|
 | Entire brief, AGENTS.md, CLAUDE.md | Read completely | Root brief exact supplied copy; CLAUDE delegates AGENTS |
-| Rollback anchor / isolation | Passed | Exact sourceSHA above in UI_6_ROLLOUT.md; new release worktree; main untouched; no tag created |
+| Rollback anchor / isolation | Passed | Exact source SHA above in UI_6_ROLLOUT.md; new release worktree; main untouched; no tag created |
 | Untouched `npm ci && npm run check` | Passed |415 packages, Node24.19/npm11.9;79 relay+183 dashboard tests,0 failed/skipped |
 | Installed Next16.3.8 docs | Read relevant guides | Font/CSS/lazy-loading/server/client guides; no Next code written |
 | Playwright bundled Chromium1248 install | Failed | Invalid/truncated ZIP retries; with-deps apt lacked setgroups/seteuid privileges |
 | Native headless-shell one-page smoke before matrix | Passed | Chromium153.0.8010.0 via isolated @sparticuz/chromium153; local page load + smokePNG |
 | Full workspace/route matrix | Passed capture gate |120 full-page screenshots:15 pages×2 themes×4 widths; no pageerror;0 root horizontal overflow |
-| Axe execution on every capture | Executed, findings present |120 scans with WCAG2A/AA/2.1AA tags;8 serious definition-list findings, all Fleet;112 other scans0 violations |
-| Source/control/data/state/test inventories | Complete discovery artifacts | Linked catalogues below; per-state source review distinguished from executed healthy/empty screenshots |
+| Axe execution on every capture | Passed execution gate |120 scans with WCAG2A/AA/2.1AA tags;8 serious definition-list findings, all Fleet;112 other scans0 violations |
+| Per-control authorization audit | Passed source-audit gate | 228 control declarations classified, plus mapped/non-button paths; exhaustive mounted authorization permutations **not executed** |
+| State matrix | Passed source-inventory gate | 15 pages × 8 states source-reviewed (explicit/partial/missing); full 120-state browser execution **not executed** |
+| Data/module/test inventory and gaps | Passed source-inventory gate | 29 TSX modules, 2,328 read expressions, 31 dashboard suites; parity additions planned |
 | M0 end `npm run check` | Passed | Exit0;79 relay+183 dashboard,0 failures/skips; Next production-mode test build passed |
 | Unchanged test:browser / performance soak | Not executed | M0 capture harness is separate; no inferred existing-script execution |
 | Manual WCAG2.2 / screen reader / live systemd/RCON/Drive | Not executed | Baseline scans are not full certification |
-| M1 design experiments / M2+ | Not executed at M0 commit | M1 follows this checkpoint; no production deployment |
+| Zero serious/critical axe acceptance | **Failed** | Fleet definition-list in all 8 variants; remediation still missing (planned M4), then rescan |
+| Full state screenshots and authorization permutations | **Not executed** | Loading/stale/disconnected/degraded/forbidden/busy/error cross-product and mounted parity proofs remain missing (M3–M8) |
+| M1 design experiments / M2+ | Not executed at M0 commit | M1 later ran separately; M2 remains not executed |
 
 ## Screenshot environment and reproduction
 
 Standard Playwright download could not be used in this container. The working executable is genuine Linux Chromium **headless shell**153 (rather than the Playwright1.64 expected Chromium156 build). Playwright drives it with `--disable-gpu --use-angle=swiftshader --enable-unsafe-swiftshader`, plus `--no-sandbox --no-zygote --single-process --disable-dev-shm-usage --disable-webgl --disable-software-rasterizer`; the additional flags bypass unsupported EGL initialization. CSS/HTML/native SVG render in software. `ldd` resolved all required libraries. Native deps installation was attempted and blocked by container privileges; no unexecuted install is claimed successful. Font rasterization/system-font fallback is environment-specific. This proves this native engine capture matrix, not browser-engine parity with the expected bundled build.
 
-The archive includes `capture.mjs`, raw `browser-results.json`, all120 PNGs, review contact sheets, smoke script/log/image and command logs. Extract its ui6-baseline directory to repository `artifacts/ui6-baseline/`; the harness imports existing `scripts/support/fleet-fixture.mjs`. On a normal machine:
+The archive includes `capture.mjs`, raw `browser-results.json`, all 120 PNGs, review contact sheets, smoke script/log/image and command logs. Extract its ui6-baseline directory to repository `artifacts/ui6-baseline/`; the harness imports existing `scripts/support/fleet-fixture.mjs`. On a normal machine:
 
 ```sh
 npm ci
@@ -43,25 +47,27 @@ Development captures contain the Next dev indicator and some genuine signed read
 
 ## Complete screenshot matrix
 
-All files live in `artifacts/ui6-baseline/`, separate from accepted5.0 evidence `docs/ui-evidence/after/`. [UI_6_SCREENSHOT_MANIFEST.json](UI_6_SCREENSHOT_MANIFEST.json) records sourceSHA, browser version, capture timestamp, width/theme, root geometry, DOM count, every per-page axe finding, byte size and SHA256 for all120 PNGs.
+All files live in `artifacts/ui6-baseline/`, separate from accepted 5.0 evidence `docs/ui-evidence/after/`. [UI_6_SCREENSHOT_MANIFEST.json](UI_6_SCREENSHOT_MANIFEST.json) records source SHA, browser version, capture timestamp, width/theme, root geometry, DOM count, every per-page axe finding, byte size and SHA256 for all 120 PNGs.
 
-| Page | File prefix | Light widths | Dark widths |
-|---|---|---|---|
-| Fleet | fleet |390/768/1280/1920 |390/768/1280/1920 |
-| Overview | overview |same4 |same4 |
-| Performance | performance |same4 |same4 |
-| Players | players |same4 |same4 |
-| Console | console |same4 |same4 |
-| Chat | chat |same4 |same4 |
-| Plugins | plugins |same4 |same4 |
-| Server | server |same4 |same4 |
-| Backups | backups |same4 |same4 |
-| Configuration | configuration |same4 |same4 |
-| Audit | audit |same4 |same4 |
-| Access | access |same4 |same4 |
-| Settings | settings |same4 |same4 |
-| Pairing | pairing |same4 |same4 |
-| /activity | legacy-archive |same4 |same4 |
+Reconciled against the original raw browser results and all PNG SHA-256 values on 2026-10-08. Each cell describes the **executed** capture and configured axe scan, not all workspace states. “0 axe” means zero findings under the configured tags, not full WCAG certification.
+
+| Page | Light 390 | Light 768 | Light 1280 | Light 1920 | Dark 390 | Dark 768 | Dark 1280 | Dark 1920 |
+|---|---|---|---|---|---|---|---|---|
+| Fleet | PNG verified; 1 serious | PNG verified; 1 serious | PNG verified; 1 serious | PNG verified; 1 serious | PNG verified; 1 serious | PNG verified; 1 serious | PNG verified; 1 serious | PNG verified; 1 serious |
+| Overview | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe |
+| Performance | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe |
+| Players | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe |
+| Console | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe |
+| Chat | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe |
+| Plugins | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe |
+| Server | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe |
+| Backups | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe |
+| Configuration | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe |
+| Audit | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe |
+| Access | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe |
+| Settings | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe |
+| Legacy archive | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe |
+| Pairing | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe | PNG verified; 0 axe |
 
 Filename format `<prefix>-<width>-<light|dark>.png`. Viewport height844 below800px,1080 otherwise; full-page images include all content. Local prefs use100% text, standard contrast, motion off, optional remote heads disabled. Saved preference migration/high-contrast/zoom/reduced-motion cross-state matrix remains later acceptance, not silently part of this baseline.
 
@@ -122,8 +128,8 @@ Canonical `ViewProps` in `app/control-views.tsx`: `state: ControlState`, optiona
 | Pairing | Marketing headline competes with operational pairing form; mobile form below explanation | Pairing task first, brief trust explanation and real approval states |
 | Legacy | Four empty metric cards overemphasize archive; back link/copy stylistically inconsistent | Small unverified cleanup surface reached from Settings until retirement criteria proved |
 
-Observed screenshot review used all15 pages at390light/1280dark contact sheets, plus individual screenshots and the manifest for all120 dimensions. It is not a timed 3-second operator study. No measured performance improvement is claimed; baseline CPU/memory profiling remains not executed. Source shows bounds/geometry controls, not measured speed.
+Observed screenshot review used all15 pages at390light/1280dark contact sheets, plus individual screenshots and the manifest for all 120 dimensions. It is not a timed 3-second operator study. No measured performance improvement is claimed; baseline CPU/memory profiling remains not executed. Source shows bounds/geometry controls, not measured speed.
 
 ## Reconciliation with brief
 
-All ten maintainer overrides are applied to planning. The brief’s “live compression + upload” description does not create two supplied progress streams; current code has only one latest phase payload. Overview/Performance counts exceed simplified later wording, and are preserved by decisions2/3. Palette currently executes restart; plan navigates. Defaults currently light/monochrome/compact; OS-following/new labels cannot overwrite stored choices. Chat cache100 remains. Active Files/Backups wording is corrected later. New local privacy controls require no protocol change. Undisclosed local policy/agent-last-seen cannot be separately fabricated for explainers; show known gates or “not supplied”. Configuration save confirmation must use existing bound path without replacing diff/conflict/dirty protections. No unresolved backend change is required by this M1 plan.
+All ten maintainer overrides are applied to planning. The brief’s “live compression + upload” description does not create two supplied progress streams; current code has only one latest phase payload. Overview/Performance counts exceed simplified later wording, and are preserved by decisions 2/3. Palette currently executes restart; plan navigates. Defaults currently light/monochrome/compact; OS-following/new labels cannot overwrite stored choices. Chat cache100 remains. Active Files/Backups wording is corrected later. New local privacy controls require no protocol change. Undisclosed local policy/agent-last-seen cannot be separately fabricated for explainers; show known gates or “not supplied”. Configuration save confirmation must use existing bound path without replacing diff/conflict/dirty protections. No unresolved backend change is required by this M1 plan.

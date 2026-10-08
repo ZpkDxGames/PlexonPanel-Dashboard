@@ -1,0 +1,844 @@
+{
+  "recordedAt": "2026-10-08T05:37:08.758Z",
+  "fontFiles": {
+    "hanken-grotesk": {
+      "latin": 34704,
+      "latin-ext": 19588
+    },
+    "noto-sans": {
+      "latin": 35820,
+      "latin-ext": 167960
+    }
+  },
+  "fontLoading": [
+    {
+      "family": "hanken",
+      "englishPortuguese": [
+        {
+          "url": "/fonts/hanken-grotesk-latin-wght-normal.woff2?case=hanken-1791437828837",
+          "bytes": 34704
+        }
+      ],
+      "corpusFonts": [
+        {
+          "familyName": "Hanken Grotesk",
+          "postScriptName": "HankenGrotesk-Regular",
+          "isCustomFont": true,
+          "glyphCount": 64
+        }
+      ],
+      "afterExtended": [
+        {
+          "url": "/fonts/hanken-grotesk-latin-wght-normal.woff2?case=hanken-1791437828837",
+          "bytes": 34704
+        },
+        {
+          "url": "/fonts/hanken-grotesk-latin-ext-wght-normal.woff2?case=hanken-1791437828837",
+          "bytes": 19588
+        }
+      ],
+      "extendedFaces": [
+        {
+          "familyName": "Hanken Grotesk",
+          "postScriptName": "HankenGrotesk-Regular",
+          "isCustomFont": true,
+          "glyphCount": 11
+        }
+      ],
+      "rareFaces": [
+        {
+          "familyName": "Hanken Grotesk",
+          "postScriptName": "HankenGrotesk-Regular",
+          "isCustomFont": true,
+          "glyphCount": 11
+        },
+        {
+          "familyName": "DejaVu Sans",
+          "postScriptName": "DejaVuSans",
+          "isCustomFont": false,
+          "glyphCount": 1
+        }
+      ],
+      "preloadNegativeControl": [
+        {
+          "url": "/fonts/hanken-grotesk-latin-ext-wght-normal.woff2?case=hanken-1791437828837-preload",
+          "bytes": 19588
+        },
+        {
+          "url": "/fonts/hanken-grotesk-latin-wght-normal.woff2?case=hanken-1791437828837-preload",
+          "bytes": 34704
+        }
+      ]
+    },
+    {
+      "family": "noto",
+      "englishPortuguese": [
+        {
+          "url": "/fonts/noto-sans-latin-wght-normal.woff2?case=noto-1791437829230",
+          "bytes": 35820
+        }
+      ],
+      "corpusFonts": [
+        {
+          "familyName": "Noto Sans",
+          "postScriptName": "NotoSans-Regular",
+          "isCustomFont": true,
+          "glyphCount": 64
+        }
+      ],
+      "afterExtended": [
+        {
+          "url": "/fonts/noto-sans-latin-wght-normal.woff2?case=noto-1791437829230",
+          "bytes": 35820
+        },
+        {
+          "url": "/fonts/noto-sans-latin-ext-wght-normal.woff2?case=noto-1791437829230",
+          "bytes": 167960
+        }
+      ],
+      "extendedFaces": [
+        {
+          "familyName": "Noto Sans",
+          "postScriptName": "NotoSans-Regular",
+          "isCustomFont": true,
+          "glyphCount": 11
+        }
+      ],
+      "rareFaces": [
+        {
+          "familyName": "DejaVu Sans",
+          "postScriptName": "DejaVuSans",
+          "isCustomFont": false,
+          "glyphCount": 1
+        },
+        {
+          "familyName": "Noto Sans",
+          "postScriptName": "NotoSans-Regular",
+          "isCustomFont": true,
+          "glyphCount": 11
+        }
+      ],
+      "preloadNegativeControl": [
+        {
+          "url": "/fonts/noto-sans-latin-ext-wght-normal.woff2?case=noto-1791437829230-preload",
+          "bytes": 167960
+        },
+        {
+          "url": "/fonts/noto-sans-latin-wght-normal.woff2?case=noto-1791437829230-preload",
+          "bytes": 35820
+        }
+      ]
+    }
+  ],
+  "mountedFontCaptures": [
+    {
+      "family": "hanken",
+      "theme": "light",
+      "width": 390,
+      "file": "overview-hanken-390-light.png",
+      "metrics": {
+        "width": 390,
+        "scrollWidth": 390,
+        "headingWidth": 210,
+        "headingText": "Overview",
+        "numericWidths": [
+          58,
+          55,
+          82
+        ]
+      },
+      "headingFonts": [
+        {
+          "familyName": "Hanken Grotesk",
+          "postScriptName": "HankenGrotesk-Regular",
+          "isCustomFont": true,
+          "glyphCount": 8
+        }
+      ],
+      "portugueseFonts": [
+        {
+          "familyName": "Hanken Grotesk",
+          "postScriptName": "HankenGrotesk-Regular",
+          "isCustomFont": true,
+          "glyphCount": 63
+        }
+      ]
+    },
+    {
+      "family": "hanken",
+      "theme": "light",
+      "width": 1280,
+      "file": "overview-hanken-1280-light.png",
+      "metrics": {
+        "width": 1280,
+        "scrollWidth": 1280,
+        "headingWidth": 277,
+        "headingText": "Overview",
+        "numericWidths": [
+          71,
+          63,
+          93
+        ]
+      },
+      "headingFonts": [
+        {
+          "familyName": "Hanken Grotesk",
+          "postScriptName": "HankenGrotesk-Regular",
+          "isCustomFont": true,
+          "glyphCount": 8
+        }
+      ],
+      "portugueseFonts": [
+        {
+          "familyName": "Hanken Grotesk",
+          "postScriptName": "HankenGrotesk-Regular",
+          "isCustomFont": true,
+          "glyphCount": 64
+        }
+      ]
+    },
+    {
+      "family": "hanken",
+      "theme": "dark",
+      "width": 390,
+      "file": "overview-hanken-390-dark.png",
+      "metrics": {
+        "width": 390,
+        "scrollWidth": 390,
+        "headingWidth": 210,
+        "headingText": "Overview",
+        "numericWidths": [
+          58,
+          55,
+          82
+        ]
+      },
+      "headingFonts": [
+        {
+          "familyName": "Hanken Grotesk",
+          "postScriptName": "HankenGrotesk-Regular",
+          "isCustomFont": true,
+          "glyphCount": 8
+        }
+      ],
+      "portugueseFonts": [
+        {
+          "familyName": "Hanken Grotesk",
+          "postScriptName": "HankenGrotesk-Regular",
+          "isCustomFont": true,
+          "glyphCount": 63
+        }
+      ]
+    },
+    {
+      "family": "hanken",
+      "theme": "dark",
+      "width": 1280,
+      "file": "overview-hanken-1280-dark.png",
+      "metrics": {
+        "width": 1280,
+        "scrollWidth": 1280,
+        "headingWidth": 277,
+        "headingText": "Overview",
+        "numericWidths": [
+          71,
+          63,
+          93
+        ]
+      },
+      "headingFonts": [
+        {
+          "familyName": "Hanken Grotesk",
+          "postScriptName": "HankenGrotesk-Regular",
+          "isCustomFont": true,
+          "glyphCount": 8
+        }
+      ],
+      "portugueseFonts": [
+        {
+          "familyName": "Hanken Grotesk",
+          "postScriptName": "HankenGrotesk-Regular",
+          "isCustomFont": true,
+          "glyphCount": 64
+        }
+      ]
+    },
+    {
+      "family": "noto",
+      "theme": "light",
+      "width": 390,
+      "file": "overview-noto-390-light.png",
+      "metrics": {
+        "width": 390,
+        "scrollWidth": 390,
+        "headingWidth": 210,
+        "headingText": "Overview",
+        "numericWidths": [
+          63,
+          59,
+          87
+        ]
+      },
+      "headingFonts": [
+        {
+          "familyName": "Noto Sans",
+          "postScriptName": "NotoSans-Regular",
+          "isCustomFont": true,
+          "glyphCount": 8
+        }
+      ],
+      "portugueseFonts": [
+        {
+          "familyName": "Noto Sans",
+          "postScriptName": "NotoSans-Regular",
+          "isCustomFont": true,
+          "glyphCount": 63
+        }
+      ]
+    },
+    {
+      "family": "noto",
+      "theme": "light",
+      "width": 1280,
+      "file": "overview-noto-1280-light.png",
+      "metrics": {
+        "width": 1280,
+        "scrollWidth": 1280,
+        "headingWidth": 285,
+        "headingText": "Overview",
+        "numericWidths": [
+          72,
+          65,
+          95
+        ]
+      },
+      "headingFonts": [
+        {
+          "familyName": "Noto Sans",
+          "postScriptName": "NotoSans-Regular",
+          "isCustomFont": true,
+          "glyphCount": 8
+        }
+      ],
+      "portugueseFonts": [
+        {
+          "familyName": "Noto Sans",
+          "postScriptName": "NotoSans-Regular",
+          "isCustomFont": true,
+          "glyphCount": 64
+        }
+      ]
+    },
+    {
+      "family": "noto",
+      "theme": "dark",
+      "width": 390,
+      "file": "overview-noto-390-dark.png",
+      "metrics": {
+        "width": 390,
+        "scrollWidth": 390,
+        "headingWidth": 210,
+        "headingText": "Overview",
+        "numericWidths": [
+          63,
+          59,
+          87
+        ]
+      },
+      "headingFonts": [
+        {
+          "familyName": "Noto Sans",
+          "postScriptName": "NotoSans-Regular",
+          "isCustomFont": true,
+          "glyphCount": 8
+        }
+      ],
+      "portugueseFonts": [
+        {
+          "familyName": "Noto Sans",
+          "postScriptName": "NotoSans-Regular",
+          "isCustomFont": true,
+          "glyphCount": 63
+        }
+      ]
+    },
+    {
+      "family": "noto",
+      "theme": "dark",
+      "width": 1280,
+      "file": "overview-noto-1280-dark.png",
+      "metrics": {
+        "width": 1280,
+        "scrollWidth": 1280,
+        "headingWidth": 285,
+        "headingText": "Overview",
+        "numericWidths": [
+          72,
+          65,
+          95
+        ]
+      },
+      "headingFonts": [
+        {
+          "familyName": "Noto Sans",
+          "postScriptName": "NotoSans-Regular",
+          "isCustomFont": true,
+          "glyphCount": 8
+        }
+      ],
+      "portugueseFonts": [
+        {
+          "familyName": "Noto Sans",
+          "postScriptName": "NotoSans-Regular",
+          "isCustomFont": true,
+          "glyphCount": 64
+        }
+      ]
+    }
+  ],
+  "pulseRuns": [
+    {
+      "width": 390,
+      "theme": "light",
+      "requestedSlots": 900,
+      "captures": 870,
+      "cpuThrottle": 1,
+      "iterations": 30,
+      "geometryMedianMs": 0.3999999985098839,
+      "geometryP95Ms": 0.599999999627471,
+      "submitMedianMs": 0.2000000011175871,
+      "flushMedianMs": 1.099999999627471,
+      "flushP95Ms": 2.5,
+      "paintTotalMs": 6.803,
+      "rasterTotalMs": 135.582,
+      "layoutTotalMs": 12.08,
+      "styleTotalMs": 5.679,
+      "pathBytes": 30424,
+      "svgNodes": 12,
+      "plotWidth": 332,
+      "averagePitchPx": 0.3688888888888889,
+      "averageMarkWidthPx": 0.2951111111111111,
+      "longTasks": 0,
+      "observedLongTasksMs": [],
+      "file": "pulse-390-light-900-cpu1.png",
+      "lensFile": "pulse-lens-390-light-900.png",
+      "inspection": {
+        "rows": 100,
+        "pages": "Page 1 of 9",
+        "selected": "04:51:18.000 UTC | TPS 20.00 | MSPT 140.00 ms | Paper health fixture"
+      }
+    },
+    {
+      "width": 390,
+      "theme": "light",
+      "requestedSlots": 900,
+      "captures": 870,
+      "cpuThrottle": 4,
+      "iterations": 30,
+      "geometryMedianMs": 1.5,
+      "geometryP95Ms": 2,
+      "submitMedianMs": 0.900000000372529,
+      "flushMedianMs": 5,
+      "flushP95Ms": 5.699999999254942,
+      "paintTotalMs": 35.924,
+      "rasterTotalMs": 132.185,
+      "layoutTotalMs": 49.387,
+      "styleTotalMs": 17.131,
+      "pathBytes": 30424,
+      "svgNodes": 12,
+      "plotWidth": 332,
+      "averagePitchPx": 0.3688888888888889,
+      "averageMarkWidthPx": 0.2951111111111111,
+      "longTasks": 0,
+      "observedLongTasksMs": []
+    },
+    {
+      "width": 390,
+      "theme": "light",
+      "requestedSlots": 8192,
+      "captures": 8192,
+      "cpuThrottle": 1,
+      "iterations": 30,
+      "geometryMedianMs": 3.400000000372529,
+      "geometryP95Ms": 4,
+      "submitMedianMs": 0.5,
+      "flushMedianMs": 4.699999999254942,
+      "flushP95Ms": 5.600000001490116,
+      "paintTotalMs": 8.577,
+      "rasterTotalMs": 1214.222,
+      "layoutTotalMs": 13.333,
+      "styleTotalMs": 5.297,
+      "pathBytes": 286489,
+      "svgNodes": 12,
+      "plotWidth": 332,
+      "averagePitchPx": 0.04052734375,
+      "averageMarkWidthPx": 0.032421875,
+      "longTasks": 0,
+      "observedLongTasksMs": [],
+      "file": "pulse-390-light-8192-cpu1.png",
+      "lensFile": "pulse-lens-390-light-8192.png",
+      "inspection": {
+        "rows": 100,
+        "pages": "Page 1 of 82",
+        "selected": "04:51:35.332 UTC | TPS 20.00 | MSPT 140.00 ms | Paper health fixture"
+      }
+    },
+    {
+      "width": 390,
+      "theme": "light",
+      "requestedSlots": 8192,
+      "captures": 8192,
+      "cpuThrottle": 4,
+      "iterations": 30,
+      "geometryMedianMs": 13.400000000372529,
+      "geometryP95Ms": 17.800000000745058,
+      "submitMedianMs": 2.300000000745058,
+      "flushMedianMs": 19.59999999962747,
+      "flushP95Ms": 24.40000000037253,
+      "paintTotalMs": 32.588,
+      "rasterTotalMs": 1298.519,
+      "layoutTotalMs": 53.824,
+      "styleTotalMs": 25.367,
+      "pathBytes": 286489,
+      "svgNodes": 12,
+      "plotWidth": 332,
+      "averagePitchPx": 0.04052734375,
+      "averageMarkWidthPx": 0.032421875,
+      "longTasks": 0,
+      "observedLongTasksMs": []
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "requestedSlots": 900,
+      "captures": 870,
+      "cpuThrottle": 1,
+      "iterations": 30,
+      "geometryMedianMs": 0.30000000074505806,
+      "geometryP95Ms": 0.40000000037252903,
+      "submitMedianMs": 0.2999999988824129,
+      "flushMedianMs": 1.099999999627471,
+      "flushP95Ms": 1.699999999254942,
+      "paintTotalMs": 6.877,
+      "rasterTotalMs": 116.3,
+      "layoutTotalMs": 11.173,
+      "styleTotalMs": 5.004,
+      "pathBytes": 30424,
+      "svgNodes": 12,
+      "plotWidth": 332,
+      "averagePitchPx": 0.3688888888888889,
+      "averageMarkWidthPx": 0.2951111111111111,
+      "longTasks": 0,
+      "observedLongTasksMs": [],
+      "file": "pulse-390-dark-900-cpu1.png",
+      "lensFile": "pulse-lens-390-dark-900.png",
+      "inspection": {
+        "rows": 100,
+        "pages": "Page 1 of 9",
+        "selected": "04:51:18.000 UTC | TPS 20.00 | MSPT 140.00 ms | Paper health fixture"
+      }
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "requestedSlots": 900,
+      "captures": 870,
+      "cpuThrottle": 4,
+      "iterations": 30,
+      "geometryMedianMs": 1.300000000745058,
+      "geometryP95Ms": 2.100000001490116,
+      "submitMedianMs": 1,
+      "flushMedianMs": 5,
+      "flushP95Ms": 6.199999999254942,
+      "paintTotalMs": 30.234,
+      "rasterTotalMs": 122.526,
+      "layoutTotalMs": 47.681,
+      "styleTotalMs": 23.532,
+      "pathBytes": 30424,
+      "svgNodes": 12,
+      "plotWidth": 332,
+      "averagePitchPx": 0.3688888888888889,
+      "averageMarkWidthPx": 0.2951111111111111,
+      "longTasks": 0,
+      "observedLongTasksMs": []
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "requestedSlots": 8192,
+      "captures": 8192,
+      "cpuThrottle": 1,
+      "iterations": 30,
+      "geometryMedianMs": 3,
+      "geometryP95Ms": 4.599999999627471,
+      "submitMedianMs": 0.5,
+      "flushMedianMs": 4.300000000745058,
+      "flushP95Ms": 6.200000001117587,
+      "paintTotalMs": 6.67,
+      "rasterTotalMs": 1249.296,
+      "layoutTotalMs": 12.207,
+      "styleTotalMs": 5.472,
+      "pathBytes": 286489,
+      "svgNodes": 12,
+      "plotWidth": 332,
+      "averagePitchPx": 0.04052734375,
+      "averageMarkWidthPx": 0.032421875,
+      "longTasks": 0,
+      "observedLongTasksMs": [],
+      "file": "pulse-390-dark-8192-cpu1.png",
+      "lensFile": "pulse-lens-390-dark-8192.png",
+      "inspection": {
+        "rows": 100,
+        "pages": "Page 1 of 82",
+        "selected": "04:51:35.332 UTC | TPS 20.00 | MSPT 140.00 ms | Paper health fixture"
+      }
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "requestedSlots": 8192,
+      "captures": 8192,
+      "cpuThrottle": 4,
+      "iterations": 30,
+      "geometryMedianMs": 13.5,
+      "geometryP95Ms": 22.300000000745058,
+      "submitMedianMs": 2.199999999254942,
+      "flushMedianMs": 19.5,
+      "flushP95Ms": 29,
+      "paintTotalMs": 32.542,
+      "rasterTotalMs": 1249.97,
+      "layoutTotalMs": 56.435,
+      "styleTotalMs": 27.994,
+      "pathBytes": 286489,
+      "svgNodes": 12,
+      "plotWidth": 332,
+      "averagePitchPx": 0.04052734375,
+      "averageMarkWidthPx": 0.032421875,
+      "longTasks": 1,
+      "observedLongTasksMs": []
+    },
+    {
+      "width": 1920,
+      "theme": "light",
+      "requestedSlots": 900,
+      "captures": 870,
+      "cpuThrottle": 1,
+      "iterations": 30,
+      "geometryMedianMs": 0.30000000074505806,
+      "geometryP95Ms": 0.6000000014901161,
+      "submitMedianMs": 0.2000000011175871,
+      "flushMedianMs": 1,
+      "flushP95Ms": 1.3999999985098839,
+      "paintTotalMs": 5.775,
+      "rasterTotalMs": 142.27,
+      "layoutTotalMs": 9.083,
+      "styleTotalMs": 3.961,
+      "pathBytes": 32099,
+      "svgNodes": 12,
+      "plotWidth": 1558,
+      "averagePitchPx": 1.731111111111111,
+      "averageMarkWidthPx": 1.3848888888888888,
+      "longTasks": 0,
+      "observedLongTasksMs": [],
+      "file": "pulse-1920-light-900-cpu1.png",
+      "lensFile": "pulse-lens-1920-light-900.png",
+      "inspection": {
+        "rows": 100,
+        "pages": "Page 1 of 9",
+        "selected": "04:51:18.000 UTC | TPS 20.00 | MSPT 140.00 ms | Paper health fixture"
+      }
+    },
+    {
+      "width": 1920,
+      "theme": "light",
+      "requestedSlots": 900,
+      "captures": 870,
+      "cpuThrottle": 4,
+      "iterations": 30,
+      "geometryMedianMs": 1.6000000014901161,
+      "geometryP95Ms": 2.400000000372529,
+      "submitMedianMs": 1.099999999627471,
+      "flushMedianMs": 5.5,
+      "flushP95Ms": 6.599999999627471,
+      "paintTotalMs": 27.429,
+      "rasterTotalMs": 148.872,
+      "layoutTotalMs": 50.868,
+      "styleTotalMs": 21.173,
+      "pathBytes": 32099,
+      "svgNodes": 12,
+      "plotWidth": 1558,
+      "averagePitchPx": 1.731111111111111,
+      "averageMarkWidthPx": 1.3848888888888888,
+      "longTasks": 0,
+      "observedLongTasksMs": []
+    },
+    {
+      "width": 1920,
+      "theme": "light",
+      "requestedSlots": 8192,
+      "captures": 8192,
+      "cpuThrottle": 1,
+      "iterations": 30,
+      "geometryMedianMs": 3,
+      "geometryP95Ms": 4.700000001117587,
+      "submitMedianMs": 0.5,
+      "flushMedianMs": 4.299999998882413,
+      "flushP95Ms": 8.200000001117587,
+      "paintTotalMs": 6.537,
+      "rasterTotalMs": 1647.81,
+      "layoutTotalMs": 12.703,
+      "styleTotalMs": 4.908,
+      "pathBytes": 302224,
+      "svgNodes": 12,
+      "plotWidth": 1558,
+      "averagePitchPx": 0.190185546875,
+      "averageMarkWidthPx": 0.1521484375,
+      "longTasks": 0,
+      "observedLongTasksMs": [],
+      "file": "pulse-1920-light-8192-cpu1.png",
+      "lensFile": "pulse-lens-1920-light-8192.png",
+      "inspection": {
+        "rows": 100,
+        "pages": "Page 1 of 82",
+        "selected": "04:51:35.332 UTC | TPS 20.00 | MSPT 140.00 ms | Paper health fixture"
+      }
+    },
+    {
+      "width": 1920,
+      "theme": "light",
+      "requestedSlots": 8192,
+      "captures": 8192,
+      "cpuThrottle": 4,
+      "iterations": 30,
+      "geometryMedianMs": 12.799999998882413,
+      "geometryP95Ms": 16.299999998882413,
+      "submitMedianMs": 2.199999999254942,
+      "flushMedianMs": 18.09999999962747,
+      "flushP95Ms": 24.300000000745058,
+      "paintTotalMs": 26.786,
+      "rasterTotalMs": 1712.376,
+      "layoutTotalMs": 50.632,
+      "styleTotalMs": 18.934,
+      "pathBytes": 302224,
+      "svgNodes": 12,
+      "plotWidth": 1558,
+      "averagePitchPx": 0.190185546875,
+      "averageMarkWidthPx": 0.1521484375,
+      "longTasks": 0,
+      "observedLongTasksMs": []
+    },
+    {
+      "width": 1920,
+      "theme": "dark",
+      "requestedSlots": 900,
+      "captures": 870,
+      "cpuThrottle": 1,
+      "iterations": 30,
+      "geometryMedianMs": 0.30000000074505806,
+      "geometryP95Ms": 0.40000000037252903,
+      "submitMedianMs": 0.2000000011175871,
+      "flushMedianMs": 1.099999999627471,
+      "flushP95Ms": 1.200000001117587,
+      "paintTotalMs": 7.487,
+      "rasterTotalMs": 152.158,
+      "layoutTotalMs": 9.818,
+      "styleTotalMs": 4.158,
+      "pathBytes": 32099,
+      "svgNodes": 12,
+      "plotWidth": 1558,
+      "averagePitchPx": 1.731111111111111,
+      "averageMarkWidthPx": 1.3848888888888888,
+      "longTasks": 0,
+      "observedLongTasksMs": [],
+      "file": "pulse-1920-dark-900-cpu1.png",
+      "lensFile": "pulse-lens-1920-dark-900.png",
+      "inspection": {
+        "rows": 100,
+        "pages": "Page 1 of 9",
+        "selected": "04:51:18.000 UTC | TPS 20.00 | MSPT 140.00 ms | Paper health fixture"
+      }
+    },
+    {
+      "width": 1920,
+      "theme": "dark",
+      "requestedSlots": 900,
+      "captures": 870,
+      "cpuThrottle": 4,
+      "iterations": 30,
+      "geometryMedianMs": 1.400000000372529,
+      "geometryP95Ms": 2.599999999627471,
+      "submitMedianMs": 1.099999999627471,
+      "flushMedianMs": 4.400000000372529,
+      "flushP95Ms": 6.5,
+      "paintTotalMs": 39.266,
+      "rasterTotalMs": 143.837,
+      "layoutTotalMs": 41.542,
+      "styleTotalMs": 17.419,
+      "pathBytes": 32099,
+      "svgNodes": 12,
+      "plotWidth": 1558,
+      "averagePitchPx": 1.731111111111111,
+      "averageMarkWidthPx": 1.3848888888888888,
+      "longTasks": 0,
+      "observedLongTasksMs": []
+    },
+    {
+      "width": 1920,
+      "theme": "dark",
+      "requestedSlots": 8192,
+      "captures": 8192,
+      "cpuThrottle": 1,
+      "iterations": 30,
+      "geometryMedianMs": 2.900000000372529,
+      "geometryP95Ms": 3.100000001490116,
+      "submitMedianMs": 0.5,
+      "flushMedianMs": 4.099999999627471,
+      "flushP95Ms": 4.300000000745058,
+      "paintTotalMs": 6.195,
+      "rasterTotalMs": 1717.887,
+      "layoutTotalMs": 9.808,
+      "styleTotalMs": 5.232,
+      "pathBytes": 302224,
+      "svgNodes": 12,
+      "plotWidth": 1558,
+      "averagePitchPx": 0.190185546875,
+      "averageMarkWidthPx": 0.1521484375,
+      "longTasks": 0,
+      "observedLongTasksMs": [],
+      "file": "pulse-1920-dark-8192-cpu1.png",
+      "lensFile": "pulse-lens-1920-dark-8192.png",
+      "inspection": {
+        "rows": 100,
+        "pages": "Page 1 of 82",
+        "selected": "04:51:35.332 UTC | TPS 20.00 | MSPT 140.00 ms | Paper health fixture"
+      }
+    },
+    {
+      "width": 1920,
+      "theme": "dark",
+      "requestedSlots": 8192,
+      "captures": 8192,
+      "cpuThrottle": 4,
+      "iterations": 30,
+      "geometryMedianMs": 14.400000000372529,
+      "geometryP95Ms": 18.40000000037253,
+      "submitMedianMs": 2.300000000745058,
+      "flushMedianMs": 20.5,
+      "flushP95Ms": 25.300000000745058,
+      "paintTotalMs": 39.068,
+      "rasterTotalMs": 1712.481,
+      "layoutTotalMs": 50.002,
+      "styleTotalMs": 26.402,
+      "pathBytes": 302224,
+      "svgNodes": 12,
+      "plotWidth": 1558,
+      "averagePitchPx": 0.190185546875,
+      "averageMarkWidthPx": 0.1521484375,
+      "longTasks": 0,
+      "observedLongTasksMs": []
+    }
+  ],
+  "errors": [],
+  "browserVersion": "153.0.8010.0",
+  "status": "PASS executed experiments; readability requires design judgement"
+}

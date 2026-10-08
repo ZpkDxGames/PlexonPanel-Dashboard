@@ -19,47 +19,47 @@ Deepslate is an instrument room: cool mineral surfaces, useful density and a cle
 Proposed namespace `--ui-*`; files in `docs/ui6-design/` are documentation experiments, not production styles. Components eventually consume tokens only. Layer order: reset, tokens, base, primitives, workspaces, utilities. Quiet borders distinguish tone; essential control boundaries have their own stronger token.
 
 | Semantic color token | Light Quartz | Dark Deepslate | Purpose |
-|---|---|---|---|
-| canvas |#F3F5F4 |#1A2025 | Application canvas |
-| surface |#FFFFFF |#222A31 | Content plane |
-| raised |#FFFFFF |#2B353D | Menus/dialogs |
-| sunken |#E8ECEA |#161B1F | Logs, inputs, table wells |
-| border-quiet |#D3DAD7 |#36424B | Decorative separation only |
-| boundary |#637883 |#8196A5 | Essential input/control/focus boundary |
-| text |#1B2227 |#E6ECEF | Main text |
-| text-muted |#4A5963 |#B 7C3CB | Secondary text, units, axes, disabled explanation |
-| status-ok |#186E4A |#77DCAC | Healthy/verified, icon + explicit word |
-| status-warn |#765608 |#F1CE75 | Degraded/delayed/retryable, triangle + word |
-| status-critical |#AD302C |#FFA6A0 | Failed/unsafe, square or failure icon + word |
-| status-info |#245C9F |#99C5F5 | Pending/info, distinct arrowless activity icon + word |
-| status-unknown |#53616B |#B 7C3CB | Unknown/not supplied, open outline + word |
-| on-accent |#FFFFFF |#161B1F | Filled button text/icon |
+| --- | --- | --- | --- |
+| canvas | #F3F5F4 | #1A2025 | Application canvas |
+| surface | #FFFFFF | #222A31 | Content plane |
+| raised | #FFFFFF | #2B353D | Menus/dialogs |
+| sunken | #E8ECEA | #161B1F | Logs, inputs, table wells |
+| border-quiet | #D3DAD7 | #36424B | Decorative separation only |
+| boundary | #637883 | #8196A5 | Essential input/control/focus boundary |
+| text | #1B2227 | #E6ECEF | Main text |
+| text-muted | #4A5963 | #B7C3CB | Secondary text, units, axes, disabled explanation |
+| status-ok | #186E4A | #77DCAC | Healthy/verified, icon + explicit word |
+| status-warn | #765608 | #F1CE75 | Degraded/delayed/retryable, triangle + word |
+| status-critical | #AD302C | #FFA6A0 | Failed/unsafe, square or failure icon + word |
+| status-info | #245C9F | #99C5F5 | Pending/info, distinct arrowless activity icon + word |
+| status-unknown | #53616B | #B7C3CB | Unknown/not supplied, open outline + word |
+| on-accent | #FFFFFF | #161B1F | Filled button text/icon |
 
 | Stored accent | Existing visible label retained | Light interaction color | Dark interaction color |
-|---|---|---|---|
-| monochrome | Monochrome |#1B2227 |#E6ECEF |
-| cyan | Plexon cyan |#146A85 |#89D9EE |
-| violet | Violet |#654092 |#C5B4F1 |
-| emerald | Emerald |#186E4A |#77DCAC |
-| amber | Amber |#765608 |#F1CE75 |
+| --- | --- | --- | --- |
+| monochrome | Monochrome | #1B2227 | #E6ECEF |
+| cyan | Plexon cyan | #146A85 | #89D9EE |
+| violet | Violet | #654092 | #C5B4F1 |
+| emerald | Emerald | #186E4A | #77DCAC |
+| amber | Amber | #765608 | #F1CE75 |
 
 The accent marks focus/selection/action, with text, shape and position distinguishing interaction from status even when the saved accent is emerald or amber. Status tokens never change with preference. Keep all five stored enum values, the v1 key and existing labels; **no new public accent names in this release**. For a missing preference key only, the proposed first-launch defaults are system theme and the existing cyan accent. Any existing saved key uses legacy defaults for malformed/missing fields and preserves all valid saved values; it must not silently opt that browser into the new OS default. Material names describe the design palette internally. Extra Lapis/Copper candidates in the experiment JSON are tested prospective colors, not new selectable capabilities or required shipped tokens.
 
-Executed contrast calculation:134 required opaque foreground/background pairs passed; minimum normal text/status/accent text5.1362:1, minimum essential boundary 3.8763:1. The 8 quiet-border pairs fail essential-boundary thresholds by design and are restricted to decorative separators. [CSV](ui6-design/contrast-results.csv), [exact JSON](ui6-design/contrast-results.json), [palette inputs](ui6-design/tokens.json). Relative sRGB luminance uses unrounded ratios for threshold decisions. Every text/status/interactive foreground was measured against canvas/surface/raised/sunken in both themes, plus every on-accent fill pair. These are palette computations, **not a rendered-product WCAG certificate**.
+Executed contrast calculation: 134 required opaque foreground/background pairs passed; minimum normal text/status/accent text 5.1362:1, minimum essential boundary 3.8763:1. The 8 quiet-border pairs fail essential-boundary thresholds by design and are restricted to decorative separators. [CSV](ui6-design/contrast-results.csv), [exact JSON](ui6-design/contrast-results.json), [palette inputs](ui6-design/tokens.json). Relative sRGB luminance uses unrounded ratios for threshold decisions. Every text/status/interactive foreground was measured against canvas/surface/raised/sunken in both themes, plus every on-accent fill pair. These are palette computations, **not a rendered-product WCAG certificate**.
 
 No alpha text/status fills or unchecked color-mix tint is specified. Selected rows use an accent boundary/icon and opaque surface; focus is a 2 px boundary at 2 px offset with an inner canvas keyline. High contrast replaces quiet boundaries with essential boundary and removes area fill; forced colors uses Canvas/CanvasText/Highlight with borders and status words/patterns. Disabled text remains readable rather than made translucent. Hover uses a measured opaque surface change; no lift or glow. M2 must measure any new composite color before admitting it.
 
 ## Typeface decision and executed experiments
 
-**Choose Noto Sans for UI and Commit Mono for console output, UUIDs, hostnames, paths and commands.** No general metadata/labels use mono; chart numbers remain UI sans with tabular figures. Exactly two designed families. Self-host through installed `next/font` guidance; no runtime font CDN and no runtime package dependency. Font files and OFL licenses are experiment evidence only until M2 vendors the chosen assets.
+**Typeface choice is reopened pending the maintainer. Recommend Hanken Grotesk for UI; retain the proposed Commit Mono for console output, UUIDs, hostnames, paths and commands.** No general metadata/labels use mono; chart numbers remain UI sans with tabular figures. Exactly two designed families. Self-host through installed `next/font` guidance; no runtime font CDN and no runtime package dependency. No fonts are vendored. M2 may vendor assets only after the maintainer chooses. The requirement is Portuguese and English, with system fallback for rare player-name glyphs; complete Extended-B coverage is not a product gate. [Pre-M2 review](UI_6_PRE_M2_REVIEW.md) contains the mounted Overview/Pulse comparison and network traces.
 
 Three UI candidates were actually rendered: Hanken Grotesk, Schibsted Grotesk and Noto Sans. Public Sans and Source Sans 3 received binary coverage screening and were rejected before the rendered shortlist. Two mono candidates, JetBrains Mono and Commit Mono, were rendered. All packages pinned by recorded file SHA256 and version 5.3.0 in [font-results.json](ui6-design/font-results.json). The package is a distribution wrapper; it does not imply an upstream font version 5.3.0.
 
 | Candidate | Actual tests / measured result | Assessment and choice |
-|---|---|---|
-| Hanken Grotesk | Rendered 12/13 px×400/500/600, tabular widths pass; Portuguese corpus complete; Extended-A 127/128 and B 32/208 | Compact, strong labels; missing long-s plus broader B glyphs forces fallback. Rejected for strict extended coverage, despite appealing personality. |
+| --- | --- | --- |
+| Hanken Grotesk | Rendered 12/13 px×400/500/600, tabular widths pass; Portuguese corpus complete; Extended-A 127/128 and B 32/208 | Compact, strong labels; missing long-s plus broader B glyphs forces fallback. Earlier rejected under an unnecessarily strict criterion. Reopened and now recommended after real Overview/Pulse comparison: more compact Portuguese copy at 390 px. |
 | Schibsted Grotesk | Same 6 rendered cases, tabular pass; Portuguese complete; A 127/128, B 22/208 | Wider numerals/clear weight distinction; takes more room in narrow rows; coverage fallback. Rejected. |
-| Noto Sans | Same 6 cases, tabular pass; exact chosen Latin+Latin-ext wght files A 128/128 and B 208/208, no fallback in specimen; variable weight 100–900 | Clear Portuguese accents and counters at 12/13 px, less distinctive shape but best truthfully verified coverage. Selected; instrument layout/Pulse supplies identity. |
+| Noto Sans | Same 6 cases, tabular pass; exact chosen Latin+Latin-ext wght files A 128/128 and B 208/208, no fallback in specimen; variable weight 100–900 | Clear Portuguese accents and counters at 12/13 px, less distinctive shape but best truthfully verified coverage. Earlier selected for broad coverage. Still suitable for Portuguese/English; final choice pending. The fresh comparison does not require all Extended-B glyphs. |
 | Public Sans | Binary screening only, Portuguese complete; A 124/128, B 44/208 | Not rendered after coverage rejection; never claim a visual comparison was executed. |
 | Source Sans 3 | Binary screening only; A 128/128, B 100/208 | Rejected for incomplete B before rendered shortlist. |
 | JetBrains Mono | Rendered 12/13 px×400/500/600, monospaced digits pass; clear 0/O and 1/l/I; some extended specimen fallback | Legible, but slightly heavier coding-tool character and incomplete A. Runner-up. |
@@ -67,24 +67,26 @@ Three UI candidates were actually rendered: Hanken Grotesk, Schibsted Grotesk an
 
 The experiment loaded local WOFF2 in actual headless Chromium 153. Thirty candidate/size/weight rows passed font-load and digit-width tests, with zero page errors. Chrome rendered-font inspection verified custom faces; Hanken/Schibsted/JetBrains/Commit fallback in the deliberately broad specimen was recorded, not hidden. Noto rendered the whole specimen from its custom face. All digits had equal measured advance within 0.02 px in each row; at 13 px / 400 Noto digits 7 px, Commit 8 px. Binary FontTools cmap/GSUB/fvar inspection complements DOM measurement. Portuguese corpus: `ã ç é ô Ã Ç É Ô á à â ä í ó ú ü ñ õ ê è`, plus broader extended letters. Images: [light specimen](ui6-design/font-comparison-light.png), [dark specimen](ui6-design/font-comparison-dark.png). Visual judgement is mine, not a user readability study.
 
-Chosen Noto Latin WOFF2 is 35,820 bytes, extended 167,960 (combined 203,780). Commit 400 is 48,128 bytes; 500/600 about 48 KiB each. Prefer one normal mono weight 400 for production, using UI sans 500/600 for controls; avoid loading unused mono weights. Variable Noto provides 400/500/600 in one face per subset. Latin-extended inclusion is non-negotiable; preload/subset behavior must be verified against installed Next font API and cold-cache traces. Its comparatively large payload is a real M2 performance risk. Use swap/fallback metrics and reserved layout to reduce CLS; do not declare the LCP budget met from this experiment.
+Fresh cold-cache traces: Hanken Latin WOFF2 is 34,704 bytes; extended 19,588 (combined 54,292). Noto Latin is 35,820 bytes; extended 167,960 (combined 203,780). **Normal tested Portuguese/English text downloads Latin only in both families.** Adding `Ł` triggers the extended file; rare `Ж` uses the system fallback. Explicitly preloading extended downloads it without a matching character, so it must not be preloaded. This corrects the earlier assumption that the combined Noto payload was mandatory on every page. Installed Next 16.3.8 local-font source defaults to preload=true and does not infer distinct per-source unicode ranges; M2 must preserve separate subset faces/ranges and verify the actual emitted CSS/network behavior. These browser experiments do not certify the future Next font integration or cold mobile LCP/CLS.
 
-Type scale: base 14 px, ratio 1.125 (minor second), all tokens in rem relative to a 16 px root: small 0.77778 rem (12.444 px), body 0.875 rem, mobile body 0.984375 rem (15.75 px), subhead 1.107422 rem, heading 1.24585 rem, large 1.40158 rem, display 1.773946 rem (28.383 px). The 12/13 px experiment brackets the smallest UI label. Line-height 1.5 body,1.25 headings,1.65 console. Prose max 75 ch. Use 400 body,500 control labels,600 headings/numbers. Number containers have stable grid width with right alignment and tabular-nums; units occupy separate muted slots. Exceptional large actual values remain recoverable, never silently truncated to fit. Root text-scale100/112.5/125% scales all rem-based typography without globally scaling the interface.
+Commit 400 is 48,128 bytes; use one normal mono weight for output and UI sans 500/600 for controls. Use the chosen UI family and system sans fallback for unsupported identifier glyphs. Do not load unused mono weights or force extended font requests through `document.fonts.load` in production.
+
+Type scale: base 14 px, ratio 1.125 (minor second), all tokens in rem relative to a 16 px root: small 0.77778 rem (12.444 px), body 0.875 rem, mobile body 0.984375 rem (15.75 px), subhead 1.107422 rem, heading 1.24585 rem, large 1.40158 rem, display 1.773946 rem (28.383 px). The 12/13 px experiment brackets the smallest UI label. Line-height 1.5 body, 1.25 headings, 1.65 console. Prose max 75 ch. Use 400 body, 500 control labels, 600 headings/numbers. Number containers have stable grid width with right alignment and tabular-nums; units occupy separate muted slots. Exceptional large actual values remain recoverable, never silently truncated to fit. Root text-scale 100/112.5/125% scales all rem-based typography without globally scaling the interface.
 
 ## Space, shape, elevation and motion
 
 | Token family | Proposed values | Application |
-|---|---|---|
-| space 1–8 |4/8/12/16/20/24/32/40 px as rem | Explicit tokens, not arbitrary padding per view |
-| radius |3/6/10/16 px as rem | Inline status; controls; structural panels; floating dialogs/sheets |
+| --- | --- | --- |
+| space 1–8 | 4/8/12/16/20/24/32/40 px as rem | Explicit tokens, not arbitrary padding per view |
+| radius | 3/6/10/16 px as rem | Inline status; controls; structural panels; floating dialogs/sheets |
 | density compact/comfortable/spacious | desktop row 32/40/48 px; panel padding 12/16/20 px; content gap 12/16/20 px | Only density tokens change. Mobile interactive row/button min 44 px regardless compact setting. |
-| focus |2 px essential boundary,2 px offset, inner canvas keyline | Visible in both themes; no glow |
+| focus | 2 px essential boundary, 2 px offset, inner canvas keyline | Visible in both themes; no glow |
 | elevation | none for content; one 0 8 px 24 px shadow on floating layer | Tone+border do most separation; no stacked card shadows |
-| feedback / floating transition |120/180 ms ease-out; max 240 ms | Opacity/transform only, response to action/state |
-| row insertion |180 ms static highlight or one short fade | Actual new supplied event only; no flashing at idle |
+| feedback / floating transition | 120/180 ms ease-out; max 240 ms | Opacity/transform only, response to action/state |
+| row insertion | 180 ms static highlight or one short fade | Actual new supplied event only; no flashing at idle |
 | numeric update | Immediate | No count-up/tween; existing presentation cadence retained |
 
-No workspace enter animation by default. Existing pageTransitions preference may enable a≤180 ms supported View Transition with immediate fallback; no global slide-up. `livePulse=false` disables sample-motion treatment while retaining the static informative strip; saved preference is not reinterpreted as a hidden health capability. OS reduced motion is a floor even with full selected; reduced uses instantaneous geometry and short opacity only; off is fully static. No idle “heartbeat”, hover lift, animated background or stale pulse. Operational connection/presence/backup/action events bypass presentation throttle exactly as today; no new timer per tile or chart.
+No workspace enter animation by default. Existing pageTransitions preference may enable a≤ 180 ms supported View Transition with immediate fallback; no global slide-up. `livePulse=false` disables sample-motion treatment while retaining the static informative strip; saved preference is not reinterpreted as a hidden health capability. OS reduced motion is a floor even with full selected; reduced uses instantaneous geometry and short opacity only; off is fully static. No idle “heartbeat”, hover lift, animated background or stale pulse. Operational connection/presence/backup/action events bypass presentation throttle exactly as today; no new timer per tile or chart.
 
 Icons: existing inline SVG basis refined into one 16/20 px stroke set (1.75 px stroke, currentColor). Decorative icons aria-hidden; icon-only controls have explicit accessible names. No emoji, icon font, external asset or generic empty-state illustration. Status uses a different shape/word in addition to color.
 
@@ -100,10 +102,10 @@ PaletteCtrl/⌘K navigates to workspace/server and an already loaded player draw
 
 ## Tick Pulse contract
 
-This is the signature instrument, not a decorative animation. Large strip at top of Overview; compact header and Fleet instances read the **same current observed window**. Default1/5/15/30 follows existing chartWindowMinutes; a local window change affects that workspace’s report/pulse consistently, not a second preference store. Header compact version shares the selected observed window and states it explicitly; Fleet uses that preference and its existing per-instance history.
+This is the signature instrument, not a decorative animation. Large strip at top of Overview; compact header and Fleet instances read the **same current observed window**. Default 1/5/15/30 follows existing chartWindowMinutes; a local window change affects that workspace’s report/pulse consistently, not a second preference store. Header compact version shares the selected observed window and states it explicitly; Fleet uses that preference and its existing per-instance history.
 
 | Aspect | Exact proposed behavior |
-|---|---|
+| --- | --- |
 | Data | Existing ControlState.history and metric-reports source semantics. Include only actual valid `sources.paperHealth` capture timestamps with TPS/MSPT from that same health capture. Legacy records without trusted Paper-health capture provenance remain available through existing report adapter but are omitted from Pulse with a clear provenance note. No polling, transport, second store or synthetic heartbeat. |
 | Dedupe/order | Key by server and Paper-health capture millis; exact duplicate replaces. Sort real captures, apply existing window/cap bounds. Duplicate Host/JVM receipt cannot append Paper slots. On switch use the new instance’s observed data only. |
 | Horizontal scale | Actual capture time in `[now-window, now]`; right edge labels Now. One graphical mark per real capture; slot spacing reflects time, not a uniform synthetic sampling cadence. Before observation started and after last capture are honestly empty. No presumed missing sample values. |
@@ -119,20 +121,22 @@ This is the signature instrument, not a decorative animation. Large strip at top
 | Dense/mobile | Time scale can produce subpixel bars. Inspect via nearest capture and table; a labelled local zoom/scroll lens of already observed data may show≥2 px marks without aggregating or inventing values. Do not manufacture one-per-column summaries. Avoid forced entire-page horizontal scroll; lens is an intentional named well. |
 | Fleet/header | Compact same-domain paths with sample-count/age text and Inspect destination. No unrelated miniature animation, no per-card timer, no resampling shared-node or process CPU into health. |
 
-M4 acceptance must cover19/15/50 ms boundaries, real zero, null TPS/MSPT independently, duplicate/out-of-order/future timestamps, no health samples, exact-source joining, high source cadence, visible gaps, legacy provenance, frozen/offline data, head/table parity, keyboard/mobile hit testing, disabled motion and bounded draw work. These tests are planned, not executed in M1.
+Pre-M2 throwaway results qualify the rendering proposal: one-capture subpaths remain exact, but subpixel marks are not individually readable at 390 px over 30 minutes; at 8,192 captures both tested widths fail individual readability and dense raster work is substantial. The [review](UI_6_PRE_M2_REVIEW.md) proposes a one-minute exact-capture lens/table and an explicitly labelled pixel-bounded overview as a possible fallback. **The aggregated overview is a proposal, not an approved change to the one-mark rule or a production implementation.**
+
+M4 acceptance must cover 19/15/50 ms boundaries, real zero, null TPS/MSPT independently, duplicate/out-of-order/future timestamps, no health samples, exact-source joining, high source cadence, visible gaps, legacy provenance, frozen/offline data, head/table parity, keyboard/mobile hit testing, disabled motion and bounded draw work. These tests are planned, not executed in M1.
 
 ## Charts and reports
 
-Keep all nine charts: TPS, MSPT, Host CPU, Paper process CPU, Host memory used, JVM heap used, online players, service CPU and service RAM. Group tick pair, Host/Paper resources, then players/service resources. Service CPU says “% of one core” and can exceed100; Host/Paper CPU each “% of machine capacity”. Units/metadata always use data inventory. GC stays in actual CSV/JSON export even without a tenth chart.
+Keep all nine charts: TPS, MSPT, Host CPU, Paper process CPU, Host memory used, JVM heap used, online players, service CPU and service RAM. Group tick pair, Host/Paper resources, then players/service resources. Service CPU says “% of one core” and can exceed 100; Host/Paper CPU each “% of machine capacity”. Units/metadata always use data inventory. GC stays in actual CSV/JSON export even without a tenth chart.
 
-Keep geometry gap-aware extrema thinning, source-specific dedupe, timestamps, sample p95 and observed coverage. Add shared inspection **time**, not a shared made-up value: each chart resolves its own nearest real source capture and shows its own timestamp/age. Different cadence or missing captures never become coincident synchronized samples. Threshold lines TPS19/15 and MSPT50 ms are labelled defaults; use shapes/patterns and direct names, no color-only legends. Chart style/grid/layout/timezone preferences survive. Area option uses measured/essential stroke; fill is decorative and can be removed in high contrast. Offscreen rendering work paused, observers disconnected; reducer collection continues. Native renderers only, no chart library.
+Keep geometry gap-aware extrema thinning, source-specific dedupe, timestamps, sample p 95 and observed coverage. Add shared inspection **time**, not a shared made-up value: each chart resolves its own nearest real source capture and shows its own timestamp/age. Different cadence or missing captures never become coincident synchronized samples. Threshold lines TPS 19/15 and MSPT 50 ms are labelled defaults; use shapes/patterns and direct names, no color-only legends. Chart style/grid/layout/timezone preferences survive. Area option uses measured/essential stroke; fill is decorative and can be removed in high contrast. Offscreen rendering work paused, observers disconnected; reducer collection continues. Native renderers only, no chart library.
 
 ## Mobile and desktop wireframes for every workspace
 
-[Interactive wireframe index](ui6-design/wireframes.html) contains30 rendered sketches (desktop+mobile for all 15 pages). Per-page SVG links below remain viewable without the index. These **rendered vector wireframes replace ASCII boxes** so long control/authority labels remain legible; they are layout documentation, not a built product or simulated server data. Labels refer to supplied fields; there are no invented metric values. Region boxes in low-fidelity sketches do not prescribe one shared final radius/card style; the role-based token specification controls final shapes.
+[Interactive wireframe index](ui6-design/wireframes.html) contains 30 rendered sketches (desktop+mobile for all 15 pages). Per-page SVG links below remain viewable without the index. These **rendered vector wireframes replace ASCII boxes** so long control/authority labels remain legible; they are layout documentation, not a built product or simulated server data. Labels refer to supplied fields; there are no invented metric values. Region boxes in low-fidelity sketches do not prescribe one shared final radius/card style; the role-based token specification controls final shapes.
 
 | Workspace / sketch | Desktop layout concept | Mobile layout concept / preserved intent |
-|---|---|---|
+| --- | --- | --- |
 | [Fleet](ui6-design/fleet-wireframes.svg) | Global task header; supplied instance rows/cards with name, separate agents, tick health/mini Pulse, players and service resources; shared node table once | Stacked instance instruments; one 44 px Open target; shared infrastructure disclosure; Pair available. No fan-out operations. |
 | [Overview](ui6-design/overview-wireframes.svg) | Pulse first; dominant linked TPS/MSPT instruments, online players as separate destination; heap/service CPU/RAM compact lower row; recent events/worlds paired; existing TPS/MSPT charts/table remain in Tick history disclosure | Pulse→TPS/MSPT pair→players→runtime row→activity/worlds→source/tick history. Six real tiles retained at unequal emphasis, no delta chips. |
 | [Performance](ui6-design/performance-wireframes.svg) | Single report toolbar and observed coverage; paired source-labelled charts in deliberate groups, all 9; table/exports below | Chart layout preference retained (adaptive single by default); window/pause/export compact; all 9 in source order; bounded table. Do not drop charts to shorten screen. |
@@ -157,7 +161,7 @@ Bound confirmation shows server, immutable action and target parameters (player 
 
 Backup details: exact 15 phases QUEUED→PREFLIGHT→COUNTDOWN→FINAL_SAVE→STOPPING_SERVER→WAITING_FOR_STOP→ARCHIVING→HASHING→VERIFYING_LOCAL→UPLOADING_REMOTE→VERIFYING_REMOTE→CLEANING_LOCAL→STARTING_SERVER→VERIFYING_STARTUP→COMPLETED; DEGRADED/FAILED/RECOVERY_REQUIRED separate outcomes. Current phase, supplied durable timestamps and verification flags distinguish pending/observed/completed; do **not** assume every earlier phase was successful because an enum is later. The ordered phase guide is workflow definition, not proof all phases occurred. Counters/rate appear only from current matching live payload; when absent say “not supplied”. Countdown clock uses only supplied remaining/deadline, not an inferred job start. A reload reconstructs Host status and cannot cancel job. No compression/upload twin bars, automatic backups, snapshot creation, restore, credential controls or Host-tree writes. Restart scheduler independent; canonical remote ZIP semantics preserved. Fully Backup Now and Retry Upload names stay exact.
 
-All workspaces receive an error boundary with recover action and8 designed states, using [baseline matrix](UI_6_STATE_MATRIX.md). Loading has truthful shaped skeletons (no invented rows/numbers), empty distinguishes no source data vs no matches vs scoped unreadable; stale/disconnected retain labelled last-known data; partial panels show their independent authority; forbidden explains known scope and re-pair requirement; busy holds target; error keeps safe code/stage/requestID if supplied. States are parameterized by known fields, not a fabricated backend-status enum. A local browser-only Settings control is not labelled forbidden merely because Host is offline.
+All workspaces receive an error boundary with recover action and 8 designed states, using [baseline matrix](UI_6_STATE_MATRIX.md). Loading has truthful shaped skeletons (no invented rows/numbers), empty distinguishes no source data vs no matches vs scoped unreadable; stale/disconnected retain labelled last-known data; partial panels show their independent authority; forbidden explains known scope and re-pair requirement; busy holds target; error keeps safe code/stage/requestID if supplied. States are parameterized by known fields, not a fabricated backend-status enum. A local browser-only Settings control is not labelled forbidden merely because Host is offline.
 
 The disabled explainer orders known blockers: invalid/expired grant or contract, incompatible target, disconnected authority, missing canonical scope, absent advertised capability, Owner-only rule, known state/preflight/busy requirement, confirmation pending. Agent policy unknown remains unknown; an actual refusal can name its reason. Access visually presents known intersection; no separately measured local-policy checkmark is invented.
 
@@ -169,10 +173,10 @@ Virtualize bounded console/chat only with platform primitives when buffer length
 
 ## Anti-template self-review against §6.2
 
-Written review pass1 found several generic answers; pass2 changes below are already incorporated in layout/spec. This is plan self-review, **not screenshot certification of unbuilt6.0 UI**.
+Written review pass 1 found several generic answers; pass 2 changes below are already incorporated in layout/spec. This is plan self-review, **not screenshot certification of unbuilt 6.0 UI**.
 
 | Workspace | Generic temptation | Revision recorded / accessory removed |
-|---|---|---|
+| --- | --- | --- |
 | Fleet | Identical server cards and four headline KPIs | Per-instance source instrument; shared node once; removed duplicate connection sentences/count-stat strip. Instance identity can be consistent without equal metric cards. |
 | Overview | Six equal rounded metric cards with deltas | Pulse first, dominant TPS/MSPT pair; player destination then compact runtime strip; removed invented delta/trend chips and expanded duplicate charts from initial viewport (charts remain disclosure). |
 | Performance | All9 charts same-sized cards and giant summary numbers | Three task/source groups, shared inspection time and real coverage; removed duplicate workspace intro/source paragraphs. No chart removed. |
@@ -190,10 +194,10 @@ Written review pass1 found several generic answers; pass2 changes below are alre
 | Legacy | Four empty analytics cards | Small old-data cleanup surface with clear unverified provenance; removed total/joins/leaves/unique headline cards, local filters preserved. |
 
 | Rejection rule | Plan self-review result |
-|---|---|
+| --- | --- |
 | Six identical cards, gradients/delta chips | Rejected; six inputs survive unequal hierarchy. No delta exists to invent. |
 | Cream/serif/terracotta; near-black acid-green/red; broadsheet rules | Cool Quartz/Deepslate, sans UI, constant multi-status colors; thicker functional boundaries and tone. No editorial hairline layout. |
-| One radius/shadow everywhere |3/6/10/16 by role; no content shadow, one restrained floating shadow. Sketch boxes are schematic regions, not final cards. |
+| One radius/shadow everywhere | 3/6/10/16 by role; no content shadow, one restrained floating shadow. Sketch boxes are schematic regions, not final cards. |
 | Gradient/glass/glow | None. Focus uses solid keylines, Now a solid rule; no exceptional decorative use. |
 | Tracked capitals/eyebrows, middle-dot metadata, trailing arrows, unearned numbers | Sentence-case nav/headings, labelled source/value groups on separate lines; no repeated category eyebrow or arrow-suffixed action. Actual countdown/phase sequence may enumerate only a real sequence. |
 | Heading word accent or meaningless label | No colored heading word, “selected instance” duplicate eyebrow removed; server identity belongs to target header. |
@@ -201,12 +205,12 @@ Written review pass1 found several generic answers; pass2 changes below are alre
 | Universal section entrance/hover lift/count-up/ambient animation | None. Actual action/capture feedback only, instant numeric values, static motion-off. |
 | Emoji/stock illustrations/lorem/fake shipped data | Inline SVG; plain real next-step empty copy; doc sketches use field labels, no fake metrics/production values. |
 
-The strongest remaining template risk is letting instrument rows become another six-card grid during implementation. M4 review must compare hierarchy at 390 and 1920 before accepting it. Noto is deliberately quiet; identity must not be rescued with decorative type/texture if Pulse is hard to implement. Each later milestone screenshot critique removes one accessory again, without deleting a control or hiding truth.
+The strongest remaining template risk is letting instrument rows become another six-card grid during implementation. M4 review must compare hierarchy at 390 and 1920 before accepting it. The UI typeface is deliberately quiet; identity must not be rescued with decorative type/texture if Pulse is hard to implement. Each later milestone screenshot critique removes one accessory again, without deleting a control or hiding truth.
 
 ## Engineering handoff, risks and milestone boundary
 
 | Owner preserved | Later presentation change / proof |
-|---|---|
+| --- | --- |
 | data-source, reducer, FleetFeed, browser-store, generated contracts | No parallel owners; M3 signed two-room mounted flow remains anchor |
 | dashboard action/selection/confirmation logic | Extract with tests before new shell; target invalidation/grant intersection unchanged; Host-only correction explicitly M3 |
 | ui-preferences/provider | Key/enums 19 saved fields survive; absence-only OS theme default, no destructive migration; test malformed and full 5.0 blobs |
@@ -218,11 +222,11 @@ The strongest remaining template risk is letting instrument rows become another 
 Riskiest choices:
 
 - Pulse exact capture marks at high source cadence/mobile subpixel density. Grouped SVG plus roving/table inspection must remain fast and truthful; reject any “helpful” aggregation that silently breaks one mark per sample.
-- Noto's 203,780-byte UI subsets plus mono. Coverage beats a small stylish font, but cold mobile LCP/CLS need measured fallback/preload strategy; no performance pass claimed.
+- Typeface selection remains pending. Latin-only cold payloads are similar; Noto’s much larger optional extended file matters when those characters occur. Verify subset preload behavior, fallback metrics and cold mobile LCP/CLS in M2; no production performance pass claimed.
 - Disclosure depth for tick charts, console filters and backup scheduling. It removes repetitive chrome but must not bury emergency workflow or existing parity controls; keyboard and 390 px task walkthrough are necessary.
 - Shell extraction and new file confirmation. Visual simplicity cannot alter immutable target/authorization or conflict preservation; existing mounted regression is the gate, not static source grep.
 - Virtualized log/chat selection and scroll anchoring; test realistic long lines, filters, pause, copy/export and IME while telemetry arrives.
 
 Conflicts resolved by decisions: missing Host state fallback; six tiles/nine charts; two hypothetical backup streams; palette restart; new accent enums/default overwrite; no-chat-persistence wording; active Files/Backups copy; dead CPU cleanup; file confirmation path. Additional code/brief limits: no retained service-state history array, no independently exposed local-policy/agent-last-seen fact, pushed Plugins/Performance refresh is not a query, no per-sample receipt timestamp in observed Sample. Omit invented surfaces, label unknown, retain actual local pending operations. No backend modification is required or requested.
 
-This plan and its font/contrast/wireframe experiments are M1 deliverables. Production design, actual accessibility cleanup, preference migration tests, Pulse, error boundaries, virtualization, performance budget, Vercel preview and live acceptance are **not executed**. M1 ends with npm run check and its documentation commit. Do not start M2 until maintainer approves this direction.
+This plan and its font/contrast/wireframe experiments are M1 deliverables. Production design, actual accessibility cleanup, preference migration tests, Pulse, error boundaries, virtualization, performance budget, Vercel preview and live acceptance are **not executed**. M1 was conditionally accepted; the pre-M2 review and experiments are complete. M2 remains not executed and awaits the maintainer’s font/rendering reply. Its first scope will be tokens/layers, chosen vendored fonts, theme switching, primitives, icons and a dev-only kitchen-sink page with production-build exclusion verified.
