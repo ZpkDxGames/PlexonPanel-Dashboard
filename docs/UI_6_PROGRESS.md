@@ -32,8 +32,26 @@
 
 - Native one-page smoke passed before full matrix using Chromium headless shell153.0.8010.0 driven by Playwright, software-rendering flags. Bundled Chromium156 download failed invalid ZIP; apt system-deps attempt blocked privileges. These environment limits remain recorded, not passed.
 - Captured120 PNGs and executed120 per-page axe scans under artifacts/ui6-baseline; accepted5.0 evidence untouched. All15 pages×light/dark×390/768/1280/1920,0 pageerrors/overflow.
-- Axe recorded serious definition-list on Fleet in all8 variants; other112 scans0 configured violations. Accessibility cleanup gate is not passed. Mobile Access visual wrapping defect documented despite axe0.
-- Completed source/module/data inventories,228-control authorization/confirmation audit, eight-state matrix for all15 pages and prioritized test gaps. Scenario matrix is source review, not a claim all states were browser-executed.
+- Axe recorded serious definition-list on Fleet in all 8 variants; other112 scans0 configured violations. Accessibility cleanup gate is not passed. Mobile Access visual wrapping defect documented despite axe0.
+- Completed source/module/data inventories,228-control authorization/confirmation audit, eight-state matrix for all 15 pages and prioritized test gaps. Scenario matrix is source review, not a claim all states were browser-executed.
 - Repeated npm run check at milestone end: exit0;79 relay+183 dashboard tests,0 failures/skips. Production-mode Next test build executed by npm test also passed.
 - Restored generated next-env.d.ts exactly; production source, tests, manifests, generated contracts unchanged. M0 complete; M1 begins after this milestone commit.
 - Authorized remote release branch created through connected GitHub integration because git CLI lacks credentials; documentation commits will be mirrored with equal trees, no force/main/tag changes.
+
+## M1 design work
+
+- Produced UI_6_DESIGN.md with measured palette/type/spacing/radius/elevation/motion, all 15 workspace/route desktop+mobile vector wireframes, Tick Pulse truth/inspection/rendering contract, per-workspace anti-template revision pass and specific risks. Rendered vector sketches replace ASCII geometry for legible labels;30 layouts are documented, not built UI.
+- Executed134 required opaque contrast pairs: all passed, min text 5.1362 and essential boundary 3.8763. Decorative border failures are explicitly restricted.
+- Screened five UI font files for glyph coverage; rendered exactly three UI candidates (Hanken,Schibsted,Noto) and two mono (JetBrains,Commit) at 12/13 px×400/500/600 in light/dark.30 loaded/tabular cases pass; no pageerrors. Noto chosen for full 128A/208B, Commit Mono for code/identifiers with Noto fallback. Public/Source Sans received binary screening only; no visual comparison claimed.
+- Noto chosen assets203,780 bytes; performance/CLS/preload risk documented, no speed gate claimed. All fonts/tests are throwaway artifacts or docs; no production font/code/manifests changed.
+- M0 documentation mirrored to origin through authorized connected GitHub, with identical local/remote trees and fast-forward refs. Main/tags untouched. M1 publication follows final checks.
+- Full6.0 states/accessibility cleanup, signed-flow implementation regressions, migration tests, performance profiling, preview/live acceptance and M2 remain not executed.
+
+## M1 completed — stop before M2
+
+- All15 rendered SVGs decoded and text bounds checked in native Chromium; mobile and desktop each included.30 rendered font cases passed; all documentation links resolve.
+- npm run check at milestone end returned exit0 and reported79 relay tests. Its spec output omitted complete dashboard totals; independent TAP rerun passed183 dashboard tests,0 failures/skips. Validation ledger preserves this distinction.
+- Refined manual audit: Forget has dirty-leave guard but no general confirmation; operation Retry Upload and listed-row readiness differ; MiniMessage checkbox uses ready scope/capability and needs explicit effective-grant DOM coverage; non-button chart/select/keyboard paths included. No production behavior changed.
+- Design risks: exact high-cadence Pulse/mobile inspection, full-coverage font payload, disclosure discoverability, signed shell/file-confirmation extraction and virtualized text selection. Backend-unavailable history/policy/last-seen/receipt details omitted, never invented.
+- M0/M1 evidence packages preserve120 baseline captures, logs and portable experiments. Documentation-only milestone committed and authorized release branch published with identical local/remote trees; no force push, main/tag edit, deployment or M2 work.
+- Await maintainer approval before M2. All final/live acceptance and unbuilt6.0 accessibility/performance gates remain not executed.

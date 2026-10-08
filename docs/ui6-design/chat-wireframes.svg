@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1770" height="1280" viewBox="0 0 1770 1280" role="img" aria-labelledby="title desc">
+<title id="title">Chat desktop and mobile wireframes</title>
+<desc id="desc">Documentation layout only. Labels refer to actual supplied data and existing controls. No example values or simulated production states.</desc>
+<rect width="1770" height="1280" fill="#f3f5f4"/>
+<style>text{font-family:Arial,sans-serif;fill:#1b2227}.label{font-size:20px;font-weight:600}.body{font-size:16px}.note{font-size:15px;fill:#4a5963}</style>
+<text x="24" y="32" class="label">Chat: desktop</text>
+<text x="1374" y="32" class="label">Chat: mobile</text>
+<rect x="24" y="54" width="1298" height="72" rx="10" fill="#ffffff" stroke="#637883"/>
+<text x="40" y="82" class="label">Selected server and connection authority</text>
+<text x="40" y="109" class="body">Relay / Paper / Host separately; compact observed Pulse; navigation palette</text>
+<rect x="24" y="144" width="220" height="925" rx="10" fill="#ffffff" stroke="#637883"/>
+<text x="40" y="172" class="label">Navigation</text>
+<text x="40" y="199" class="body">Fleet; Monitor;</text>
+<text x="40" y="220" class="body">Operate; Manage. Local</text>
+<text x="40" y="241" class="body">navigation only.</text>
+<rect x="264" y="144" width="1058" height="70" rx="10" fill="#ffffff" stroke="#637883"/>
+<text x="280" y="172" class="label">Local read controls</text>
+<text x="280" y="199" class="body">Search; pause; follow tail; clear local display</text>
+<rect x="264" y="228" width="1058" height="320" rx="10" fill="#ffffff" stroke="#637883"/>
+<text x="280" y="256" class="label">Message stream</text>
+<text x="280" y="283" class="body">Supplied sender/head, content, exact timestamp disclosure; bounded200</text>
+<rect x="264" y="562" width="1058" height="120" rx="10" fill="#ffffff" stroke="#637883"/>
+<text x="280" y="590" class="label">Paper composer</text>
+<text x="280" y="617" class="body">Plain text; scoped MiniMessage; device identity; signed send result</text>
+<rect x="264" y="696" width="1058" height="70" rx="10" fill="#ffffff" stroke="#637883"/>
+<text x="280" y="724" class="label">Cache disclosure</text>
+<text x="280" y="751" class="body">Local bounded cache100; Settings data/privacy clear control</text>
+<rect x="1374" y="54" width="372" height="110" rx="10" fill="#ffffff" stroke="#637883"/>
+<text x="1390" y="82" class="label">Menu / server / search</text>
+<text x="1390" y="109" class="body">Authority text; palette; no bottom bar</text>
+<rect x="1374" y="184" width="372" height="86" rx="10" fill="#ffffff" stroke="#637883"/>
+<text x="1390" y="212" class="label">Chat controls</text>
+<text x="1390" y="239" class="body">Search; local read menu</text>
+<rect x="1374" y="284" width="372" height="350" rx="10" fill="#ffffff" stroke="#637883"/>
+<text x="1390" y="312" class="label">Message stream</text>
+<text x="1390" y="339" class="body">Text-first rows, supplied sender/head and</text>
+<text x="1390" y="360" class="body">time</text>
+<rect x="1374" y="648" width="372" height="145" rx="10" fill="#ffffff" stroke="#637883"/>
+<text x="1390" y="676" class="label">Composer</text>
+<text x="1390" y="703" class="body">Paper-only,≤2000 chars; optional</text>
+<text x="1390" y="724" class="body">authorized MiniMessage</text>
+<rect x="1374" y="807" width="372" height="86" rx="10" fill="#ffffff" stroke="#637883"/>
+<text x="1390" y="835" class="label">Local cache notice</text>
+<text x="1390" y="862" class="body">Settings &gt; data &amp; privacy</text>
+<text x="24" y="1238" class="note">Single content scroll; intentional table/log wells remain labelled. Desktop rail from1024px; tablet drawer; mobile targets44px.</text>
+</svg>

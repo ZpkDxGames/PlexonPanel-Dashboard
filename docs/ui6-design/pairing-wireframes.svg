@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1770" height="1280" viewBox="0 0 1770 1280" role="img" aria-labelledby="title desc">
+<title id="title">Pairing desktop and mobile wireframes</title>
+<desc id="desc">Documentation layout only. Labels refer to actual supplied data and existing controls. No example values or simulated production states.</desc>
+<rect width="1770" height="1280" fill="#f3f5f4"/>
+<style>text{font-family:Arial,sans-serif;fill:#1b2227}.label{font-size:20px;font-weight:600}.body{font-size:16px}.note{font-size:15px;fill:#4a5963}</style>
+<text x="24" y="32" class="label">Pairing: desktop</text>
+<text x="1374" y="32" class="label">Pairing: mobile</text>
+<rect x="24" y="54" width="1298" height="72" rx="10" fill="#ffffff" stroke="#637883"/>
+<text x="40" y="82" class="label">PlexonPanel</text>
+<text x="40" y="109" class="body">Global paired instances or public/legacy task; no lifecycle shortcut</text>
+<rect x="24" y="144" width="1298" height="285" rx="10" fill="#ffffff" stroke="#637883"/>
+<text x="40" y="172" class="label">Pair this browser</text>
+<text x="40" y="199" class="body">Device name; one-time code input; signed local approval; busy/error</text>
+<rect x="24" y="443" width="1298" height="130" rx="10" fill="#ffffff" stroke="#637883"/>
+<text x="40" y="471" class="label">Trust explanation</text>
+<text x="40" y="498" class="body">Local operator grants role; signedProtocol3; saved-server open/cancel</text>
+<rect x="1374" y="54" width="372" height="110" rx="10" fill="#ffffff" stroke="#637883"/>
+<text x="1390" y="82" class="label">Menu / server / search</text>
+<text x="1390" y="109" class="body">Task header; return/navigation</text>
+<rect x="1374" y="184" width="372" height="310" rx="10" fill="#ffffff" stroke="#637883"/>
+<text x="1390" y="212" class="label">Pair this browser</text>
+<text x="1390" y="239" class="body">Task first; name/code inputs; real</text>
+<text x="1390" y="260" class="body">approval pending/error</text>
+<rect x="1374" y="508" width="372" height="150" rx="10" fill="#ffffff" stroke="#637883"/>
+<text x="1390" y="536" class="label">Signed local access</text>
+<text x="1390" y="563" class="body">Brief approval explanation; saved</text>
+<text x="1390" y="584" class="body">instances and cancel</text>
+<text x="24" y="1238" class="note">Single content scroll; intentional table/log wells remain labelled. Desktop rail from1024px; tablet drawer; mobile targets44px.</text>
+</svg>

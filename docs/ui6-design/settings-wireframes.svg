@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1770" height="1280" viewBox="0 0 1770 1280" role="img" aria-labelledby="title desc">
+<title id="title">Settings desktop and mobile wireframes</title>
+<desc id="desc">Documentation layout only. Labels refer to actual supplied data and existing controls. No example values or simulated production states.</desc>
+<rect width="1770" height="1280" fill="#f3f5f4"/>
+<style>text{font-family:Arial,sans-serif;fill:#1b2227}.label{font-size:20px;font-weight:600}.body{font-size:16px}.note{font-size:15px;fill:#4a5963}</style>
+<text x="24" y="32" class="label">Settings: desktop</text>
+<text x="1374" y="32" class="label">Settings: mobile</text>
+<rect x="24" y="54" width="1298" height="72" rx="10" fill="#ffffff" stroke="#637883"/>
+<text x="40" y="82" class="label">Selected server and connection authority</text>
+<text x="40" y="109" class="body">Relay / Paper / Host separately; compact observed Pulse; navigation palette</text>
+<rect x="24" y="144" width="220" height="925" rx="10" fill="#ffffff" stroke="#637883"/>
+<text x="40" y="172" class="label">Navigation</text>
+<text x="40" y="199" class="body">Fleet; Monitor;</text>
+<text x="40" y="220" class="body">Operate; Manage. Local</text>
+<text x="40" y="241" class="body">navigation only.</text>
+<rect x="264" y="144" width="1058" height="180" rx="10" fill="#ffffff" stroke="#637883"/>
+<text x="280" y="172" class="label">Appearance + preview</text>
+<text x="280" y="199" class="body">Theme/accent/contrast/density/text/motion; saved values survive</text>
+<rect x="264" y="338" width="1058" height="230" rx="10" fill="#ffffff" stroke="#637883"/>
+<text x="280" y="366" class="label">Charts / Players</text>
+<text x="280" y="393" class="body">All existing chart/head/UUID/mobile-row/cadence preferences</text>
+<rect x="264" y="582" width="1058" height="135" rx="10" fill="#ffffff" stroke="#637883"/>
+<text x="280" y="610" class="label">Data &amp; privacy</text>
+<text x="280" y="637" class="body">Clear local chat cache100; local telemetry/cache copy; legacy cleanup link</text>
+<rect x="264" y="731" width="1058" height="115" rx="10" fill="#ffffff" stroke="#637883"/>
+<text x="280" y="759" class="label">Connection / About</text>
+<text x="280" y="786" class="body">Reconnect; safe diagnostics; real build/version/protocol and relay hostname</text>
+<rect x="1374" y="54" width="372" height="110" rx="10" fill="#ffffff" stroke="#637883"/>
+<text x="1390" y="82" class="label">Menu / server / search</text>
+<text x="1390" y="109" class="body">Authority text; palette; no bottom bar</text>
+<rect x="1374" y="184" width="372" height="240" rx="10" fill="#ffffff" stroke="#637883"/>
+<text x="1390" y="212" class="label">Appearance</text>
+<text x="1390" y="239" class="body">Live token preview; saved preference enums</text>
+<text x="1390" y="260" class="body">untouched</text>
+<rect x="1374" y="438" width="372" height="280" rx="10" fill="#ffffff" stroke="#637883"/>
+<text x="1390" y="466" class="label">Charts / Players</text>
+<text x="1390" y="493" class="body">Existing fieldsets in disclosures; all</text>
+<text x="1390" y="514" class="body">current controls retained</text>
+<rect x="1374" y="732" width="372" height="155" rx="10" fill="#ffffff" stroke="#637883"/>
+<text x="1390" y="760" class="label">Data &amp; privacy</text>
+<text x="1390" y="787" class="body">Clear local chat cache; bounded old</text>
+<text x="1390" y="808" class="body">archive cleanup</text>
+<rect x="1374" y="901" width="372" height="145" rx="10" fill="#ffffff" stroke="#637883"/>
+<text x="1390" y="929" class="label">About / connection</text>
+<text x="1390" y="956" class="body">Real build metadata, relay hostname,</text>
+<text x="1390" y="977" class="body">reconnect, safe diagnostics</text>
+<text x="24" y="1238" class="note">Single content scroll; intentional table/log wells remain labelled. Desktop rail from1024px; tablet drawer; mobile targets44px.</text>
+</svg>

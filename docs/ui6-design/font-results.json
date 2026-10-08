@@ -1,0 +1,1487 @@
+{
+  "browser": "153.0.8010.0",
+  "method": "Loaded local wght Latin+Latin-ext WOFF2,12/13px×400/500/600, DOM digit widths with tabular-nums; CDP rendered fonts verify custom font faces. Binary metadata is complementary.",
+  "metrics": [
+    {
+      "family": "Hanken Grotesk Variable",
+      "size": 12,
+      "weight": 400,
+      "widths": [
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7
+      ],
+      "tabularPassed": true,
+      "fontLoaded": true,
+      "height": 19.796875
+    },
+    {
+      "family": "Hanken Grotesk Variable",
+      "size": 12,
+      "weight": 500,
+      "widths": [
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7
+      ],
+      "tabularPassed": true,
+      "fontLoaded": true,
+      "height": 19.796875
+    },
+    {
+      "family": "Hanken Grotesk Variable",
+      "size": 12,
+      "weight": 600,
+      "widths": [
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7
+      ],
+      "tabularPassed": true,
+      "fontLoaded": true,
+      "height": 19.796875
+    },
+    {
+      "family": "Hanken Grotesk Variable",
+      "size": 13,
+      "weight": 400,
+      "widths": [
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7
+      ],
+      "tabularPassed": true,
+      "fontLoaded": true,
+      "height": 21.4375
+    },
+    {
+      "family": "Hanken Grotesk Variable",
+      "size": 13,
+      "weight": 500,
+      "widths": [
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7
+      ],
+      "tabularPassed": true,
+      "fontLoaded": true,
+      "height": 21.4375
+    },
+    {
+      "family": "Hanken Grotesk Variable",
+      "size": 13,
+      "weight": 600,
+      "widths": [
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7
+      ],
+      "tabularPassed": true,
+      "fontLoaded": true,
+      "height": 21.4375
+    },
+    {
+      "family": "Schibsted Grotesk Variable",
+      "size": 12,
+      "weight": 400,
+      "widths": [
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8
+      ],
+      "tabularPassed": true,
+      "fontLoaded": true,
+      "height": 19.796875
+    },
+    {
+      "family": "Schibsted Grotesk Variable",
+      "size": 12,
+      "weight": 500,
+      "widths": [
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8
+      ],
+      "tabularPassed": true,
+      "fontLoaded": true,
+      "height": 19.796875
+    },
+    {
+      "family": "Schibsted Grotesk Variable",
+      "size": 12,
+      "weight": 600,
+      "widths": [
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8
+      ],
+      "tabularPassed": true,
+      "fontLoaded": true,
+      "height": 19.796875
+    },
+    {
+      "family": "Schibsted Grotesk Variable",
+      "size": 13,
+      "weight": 400,
+      "widths": [
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8
+      ],
+      "tabularPassed": true,
+      "fontLoaded": true,
+      "height": 21.4375
+    },
+    {
+      "family": "Schibsted Grotesk Variable",
+      "size": 13,
+      "weight": 500,
+      "widths": [
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8
+      ],
+      "tabularPassed": true,
+      "fontLoaded": true,
+      "height": 21.4375
+    },
+    {
+      "family": "Schibsted Grotesk Variable",
+      "size": 13,
+      "weight": 600,
+      "widths": [
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8
+      ],
+      "tabularPassed": true,
+      "fontLoaded": true,
+      "height": 21.4375
+    },
+    {
+      "family": "Noto Sans Variable",
+      "size": 12,
+      "weight": 400,
+      "widths": [
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7
+      ],
+      "tabularPassed": true,
+      "fontLoaded": true,
+      "height": 19.796875
+    },
+    {
+      "family": "Noto Sans Variable",
+      "size": 12,
+      "weight": 500,
+      "widths": [
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7
+      ],
+      "tabularPassed": true,
+      "fontLoaded": true,
+      "height": 19.796875
+    },
+    {
+      "family": "Noto Sans Variable",
+      "size": 12,
+      "weight": 600,
+      "widths": [
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7
+      ],
+      "tabularPassed": true,
+      "fontLoaded": true,
+      "height": 19.796875
+    },
+    {
+      "family": "Noto Sans Variable",
+      "size": 13,
+      "weight": 400,
+      "widths": [
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7
+      ],
+      "tabularPassed": true,
+      "fontLoaded": true,
+      "height": 21.4375
+    },
+    {
+      "family": "Noto Sans Variable",
+      "size": 13,
+      "weight": 500,
+      "widths": [
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7
+      ],
+      "tabularPassed": true,
+      "fontLoaded": true,
+      "height": 21.4375
+    },
+    {
+      "family": "Noto Sans Variable",
+      "size": 13,
+      "weight": 600,
+      "widths": [
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7
+      ],
+      "tabularPassed": true,
+      "fontLoaded": true,
+      "height": 21.4375
+    },
+    {
+      "family": "JetBrains Mono Variable",
+      "size": 12,
+      "weight": 400,
+      "widths": [
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7
+      ],
+      "tabularPassed": true,
+      "fontLoaded": true,
+      "height": 19.796875
+    },
+    {
+      "family": "JetBrains Mono Variable",
+      "size": 12,
+      "weight": 500,
+      "widths": [
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7
+      ],
+      "tabularPassed": true,
+      "fontLoaded": true,
+      "height": 19.796875
+    },
+    {
+      "family": "JetBrains Mono Variable",
+      "size": 12,
+      "weight": 600,
+      "widths": [
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7
+      ],
+      "tabularPassed": true,
+      "fontLoaded": true,
+      "height": 19.796875
+    },
+    {
+      "family": "JetBrains Mono Variable",
+      "size": 13,
+      "weight": 400,
+      "widths": [
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8
+      ],
+      "tabularPassed": true,
+      "fontLoaded": true,
+      "height": 21.4375
+    },
+    {
+      "family": "JetBrains Mono Variable",
+      "size": 13,
+      "weight": 500,
+      "widths": [
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8
+      ],
+      "tabularPassed": true,
+      "fontLoaded": true,
+      "height": 21.4375
+    },
+    {
+      "family": "JetBrains Mono Variable",
+      "size": 13,
+      "weight": 600,
+      "widths": [
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8
+      ],
+      "tabularPassed": true,
+      "fontLoaded": true,
+      "height": 21.4375
+    },
+    {
+      "family": "Commit Mono",
+      "size": 12,
+      "weight": 400,
+      "widths": [
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7
+      ],
+      "tabularPassed": true,
+      "fontLoaded": true,
+      "height": 19.796875
+    },
+    {
+      "family": "Commit Mono",
+      "size": 12,
+      "weight": 500,
+      "widths": [
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7
+      ],
+      "tabularPassed": true,
+      "fontLoaded": true,
+      "height": 19.796875
+    },
+    {
+      "family": "Commit Mono",
+      "size": 12,
+      "weight": 600,
+      "widths": [
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7
+      ],
+      "tabularPassed": true,
+      "fontLoaded": true,
+      "height": 19.796875
+    },
+    {
+      "family": "Commit Mono",
+      "size": 13,
+      "weight": 400,
+      "widths": [
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8
+      ],
+      "tabularPassed": true,
+      "fontLoaded": true,
+      "height": 21.4375
+    },
+    {
+      "family": "Commit Mono",
+      "size": 13,
+      "weight": 500,
+      "widths": [
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8
+      ],
+      "tabularPassed": true,
+      "fontLoaded": true,
+      "height": 21.4375
+    },
+    {
+      "family": "Commit Mono",
+      "size": 13,
+      "weight": 600,
+      "widths": [
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8
+      ],
+      "tabularPassed": true,
+      "fontLoaded": true,
+      "height": 21.4375
+    }
+  ],
+  "renderedFonts": [
+    [
+      {
+        "familyName": "Hanken Grotesk",
+        "postScriptName": "HankenGrotesk-Regular",
+        "isCustomFont": true,
+        "glyphCount": 76
+      },
+      {
+        "familyName": "DejaVu Sans",
+        "postScriptName": "DejaVuSans",
+        "isCustomFont": false,
+        "glyphCount": 2
+      }
+    ],
+    [
+      {
+        "familyName": "Hanken Grotesk",
+        "postScriptName": "HankenGrotesk-Regular",
+        "isCustomFont": true,
+        "glyphCount": 76
+      },
+      {
+        "familyName": "DejaVu Sans",
+        "postScriptName": "DejaVuSans",
+        "isCustomFont": false,
+        "glyphCount": 2
+      }
+    ],
+    [
+      {
+        "familyName": "Hanken Grotesk",
+        "postScriptName": "HankenGrotesk-Regular",
+        "isCustomFont": true,
+        "glyphCount": 76
+      },
+      {
+        "familyName": "DejaVu Sans",
+        "postScriptName": "DejaVuSans-Bold",
+        "isCustomFont": false,
+        "glyphCount": 2
+      }
+    ],
+    [
+      {
+        "familyName": "Hanken Grotesk",
+        "postScriptName": "HankenGrotesk-Regular",
+        "isCustomFont": true,
+        "glyphCount": 76
+      },
+      {
+        "familyName": "DejaVu Sans",
+        "postScriptName": "DejaVuSans",
+        "isCustomFont": false,
+        "glyphCount": 2
+      }
+    ],
+    [
+      {
+        "familyName": "Hanken Grotesk",
+        "postScriptName": "HankenGrotesk-Regular",
+        "isCustomFont": true,
+        "glyphCount": 76
+      },
+      {
+        "familyName": "DejaVu Sans",
+        "postScriptName": "DejaVuSans",
+        "isCustomFont": false,
+        "glyphCount": 2
+      }
+    ],
+    [
+      {
+        "familyName": "Hanken Grotesk",
+        "postScriptName": "HankenGrotesk-Regular",
+        "isCustomFont": true,
+        "glyphCount": 76
+      },
+      {
+        "familyName": "DejaVu Sans",
+        "postScriptName": "DejaVuSans-Bold",
+        "isCustomFont": false,
+        "glyphCount": 2
+      }
+    ],
+    [
+      {
+        "familyName": "Schibsted Grotesk",
+        "postScriptName": "SchibstedGrotesk-Regular",
+        "isCustomFont": true,
+        "glyphCount": 76
+      },
+      {
+        "familyName": "DejaVu Sans",
+        "postScriptName": "DejaVuSans",
+        "isCustomFont": false,
+        "glyphCount": 2
+      }
+    ],
+    [
+      {
+        "familyName": "Schibsted Grotesk",
+        "postScriptName": "SchibstedGrotesk-Regular",
+        "isCustomFont": true,
+        "glyphCount": 76
+      },
+      {
+        "familyName": "DejaVu Sans",
+        "postScriptName": "DejaVuSans",
+        "isCustomFont": false,
+        "glyphCount": 2
+      }
+    ],
+    [
+      {
+        "familyName": "Schibsted Grotesk",
+        "postScriptName": "SchibstedGrotesk-Regular",
+        "isCustomFont": true,
+        "glyphCount": 76
+      },
+      {
+        "familyName": "DejaVu Sans",
+        "postScriptName": "DejaVuSans-Bold",
+        "isCustomFont": false,
+        "glyphCount": 2
+      }
+    ],
+    [
+      {
+        "familyName": "Schibsted Grotesk",
+        "postScriptName": "SchibstedGrotesk-Regular",
+        "isCustomFont": true,
+        "glyphCount": 76
+      },
+      {
+        "familyName": "DejaVu Sans",
+        "postScriptName": "DejaVuSans",
+        "isCustomFont": false,
+        "glyphCount": 2
+      }
+    ],
+    [
+      {
+        "familyName": "Schibsted Grotesk",
+        "postScriptName": "SchibstedGrotesk-Regular",
+        "isCustomFont": true,
+        "glyphCount": 76
+      },
+      {
+        "familyName": "DejaVu Sans",
+        "postScriptName": "DejaVuSans",
+        "isCustomFont": false,
+        "glyphCount": 2
+      }
+    ],
+    [
+      {
+        "familyName": "Schibsted Grotesk",
+        "postScriptName": "SchibstedGrotesk-Regular",
+        "isCustomFont": true,
+        "glyphCount": 76
+      },
+      {
+        "familyName": "DejaVu Sans",
+        "postScriptName": "DejaVuSans-Bold",
+        "isCustomFont": false,
+        "glyphCount": 2
+      }
+    ],
+    [
+      {
+        "familyName": "Noto Sans",
+        "postScriptName": "NotoSans-Regular",
+        "isCustomFont": true,
+        "glyphCount": 78
+      }
+    ],
+    [
+      {
+        "familyName": "Noto Sans",
+        "postScriptName": "NotoSans-Regular",
+        "isCustomFont": true,
+        "glyphCount": 78
+      }
+    ],
+    [
+      {
+        "familyName": "Noto Sans",
+        "postScriptName": "NotoSans-Regular",
+        "isCustomFont": true,
+        "glyphCount": 78
+      }
+    ],
+    [
+      {
+        "familyName": "Noto Sans",
+        "postScriptName": "NotoSans-Regular",
+        "isCustomFont": true,
+        "glyphCount": 78
+      }
+    ],
+    [
+      {
+        "familyName": "Noto Sans",
+        "postScriptName": "NotoSans-Regular",
+        "isCustomFont": true,
+        "glyphCount": 78
+      }
+    ],
+    [
+      {
+        "familyName": "Noto Sans",
+        "postScriptName": "NotoSans-Regular",
+        "isCustomFont": true,
+        "glyphCount": 78
+      }
+    ],
+    [
+      {
+        "familyName": "DejaVu Sans",
+        "postScriptName": "DejaVuSans",
+        "isCustomFont": false,
+        "glyphCount": 2
+      },
+      {
+        "familyName": "JetBrains Mono",
+        "postScriptName": "JetBrainsMono-Regular",
+        "isCustomFont": true,
+        "glyphCount": 76
+      }
+    ],
+    [
+      {
+        "familyName": "DejaVu Sans",
+        "postScriptName": "DejaVuSans",
+        "isCustomFont": false,
+        "glyphCount": 2
+      },
+      {
+        "familyName": "JetBrains Mono",
+        "postScriptName": "JetBrainsMono-Regular",
+        "isCustomFont": true,
+        "glyphCount": 76
+      }
+    ],
+    [
+      {
+        "familyName": "JetBrains Mono",
+        "postScriptName": "JetBrainsMono-Regular",
+        "isCustomFont": true,
+        "glyphCount": 76
+      },
+      {
+        "familyName": "DejaVu Sans",
+        "postScriptName": "DejaVuSans-Bold",
+        "isCustomFont": false,
+        "glyphCount": 2
+      }
+    ],
+    [
+      {
+        "familyName": "DejaVu Sans",
+        "postScriptName": "DejaVuSans",
+        "isCustomFont": false,
+        "glyphCount": 2
+      },
+      {
+        "familyName": "JetBrains Mono",
+        "postScriptName": "JetBrainsMono-Regular",
+        "isCustomFont": true,
+        "glyphCount": 76
+      }
+    ],
+    [
+      {
+        "familyName": "DejaVu Sans",
+        "postScriptName": "DejaVuSans",
+        "isCustomFont": false,
+        "glyphCount": 2
+      },
+      {
+        "familyName": "JetBrains Mono",
+        "postScriptName": "JetBrainsMono-Regular",
+        "isCustomFont": true,
+        "glyphCount": 76
+      }
+    ],
+    [
+      {
+        "familyName": "JetBrains Mono",
+        "postScriptName": "JetBrainsMono-Regular",
+        "isCustomFont": true,
+        "glyphCount": 76
+      },
+      {
+        "familyName": "DejaVu Sans",
+        "postScriptName": "DejaVuSans-Bold",
+        "isCustomFont": false,
+        "glyphCount": 2
+      }
+    ],
+    [
+      {
+        "familyName": "CommitMono",
+        "postScriptName": "CommitMono-400Regular",
+        "isCustomFont": true,
+        "glyphCount": 77
+      },
+      {
+        "familyName": "DejaVu Sans",
+        "postScriptName": "DejaVuSans",
+        "isCustomFont": false,
+        "glyphCount": 1
+      }
+    ],
+    [
+      {
+        "familyName": "CommitMono",
+        "postScriptName": "CommitMono-500Regular",
+        "isCustomFont": true,
+        "glyphCount": 77
+      },
+      {
+        "familyName": "DejaVu Sans",
+        "postScriptName": "DejaVuSans",
+        "isCustomFont": false,
+        "glyphCount": 1
+      }
+    ],
+    [
+      {
+        "familyName": "CommitMono",
+        "postScriptName": "CommitMono-600Regular",
+        "isCustomFont": true,
+        "glyphCount": 77
+      },
+      {
+        "familyName": "DejaVu Sans",
+        "postScriptName": "DejaVuSans-Bold",
+        "isCustomFont": false,
+        "glyphCount": 1
+      }
+    ],
+    [
+      {
+        "familyName": "CommitMono",
+        "postScriptName": "CommitMono-400Regular",
+        "isCustomFont": true,
+        "glyphCount": 77
+      },
+      {
+        "familyName": "DejaVu Sans",
+        "postScriptName": "DejaVuSans",
+        "isCustomFont": false,
+        "glyphCount": 1
+      }
+    ],
+    [
+      {
+        "familyName": "CommitMono",
+        "postScriptName": "CommitMono-500Regular",
+        "isCustomFont": true,
+        "glyphCount": 77
+      },
+      {
+        "familyName": "DejaVu Sans",
+        "postScriptName": "DejaVuSans",
+        "isCustomFont": false,
+        "glyphCount": 1
+      }
+    ],
+    [
+      {
+        "familyName": "CommitMono",
+        "postScriptName": "CommitMono-600Regular",
+        "isCustomFont": true,
+        "glyphCount": 77
+      },
+      {
+        "familyName": "DejaVu Sans",
+        "postScriptName": "DejaVuSans-Bold",
+        "isCustomFont": false,
+        "glyphCount": 1
+      }
+    ]
+  ],
+  "metadata": [
+    {
+      "family": "hanken-grotesk",
+      "packageVersion": "5.3.0",
+      "license": "OFL-1.1",
+      "faces": [
+        {
+          "file": "hanken-grotesk-latin-ext-wght-normal.woff2",
+          "bytes": 19588,
+          "sha256": "768af2923e0ab1549f1dfba0a5c8ea749c4c01f01d8e77ffaf7fcd12f57a0a24",
+          "features": [
+            "ccmp",
+            "locl"
+          ],
+          "axes": [
+            {
+              "tag": "wght",
+              "min": 100,
+              "max": 900
+            }
+          ],
+          "codepointCount": 199
+        },
+        {
+          "file": "hanken-grotesk-latin-wght-normal.woff2",
+          "bytes": 34704,
+          "sha256": "e9201eddf1d41d0b62253295d869ce3cf65768f7102b797f02c7f8c876b4a9d5",
+          "features": [
+            "ccmp",
+            "dnom",
+            "frac",
+            "liga",
+            "locl",
+            "numr"
+          ],
+          "axes": [
+            {
+              "tag": "wght",
+              "min": 100,
+              "max": 900
+            }
+          ],
+          "codepointCount": 222
+        }
+      ],
+      "testString": "ãçéôÃÇÉÔáàâäíóúüñõêèšžğŁĐŐĂ",
+      "missingTestCharacters": [],
+      "latinExtendedACount": 127,
+      "latinExtendedBCount": 32
+    },
+    {
+      "family": "schibsted-grotesk",
+      "packageVersion": "5.3.0",
+      "license": "OFL-1.1",
+      "faces": [
+        {
+          "file": "schibsted-grotesk-latin-ext-wght-normal.woff2",
+          "bytes": 20924,
+          "sha256": "ee9eeb232cc1fe7979dad813a570f4b19f1eb4496daf56c94ec9de63abdb2936",
+          "features": [
+            "calt",
+            "ccmp",
+            "locl"
+          ],
+          "axes": [
+            {
+              "tag": "wght",
+              "min": 400,
+              "max": 900
+            }
+          ],
+          "codepointCount": 180
+        },
+        {
+          "file": "schibsted-grotesk-latin-wght-normal.woff2",
+          "bytes": 46752,
+          "sha256": "4c8b93f431d462c696e12b9d6a033feb3394d36e66e781357c496b95d8a75e05",
+          "features": [
+            "ccmp",
+            "dnom",
+            "frac",
+            "liga",
+            "locl",
+            "numr",
+            "pnum",
+            "tnum"
+          ],
+          "axes": [
+            {
+              "tag": "wght",
+              "min": 400,
+              "max": 900
+            }
+          ],
+          "codepointCount": 227
+        }
+      ],
+      "testString": "ãçéôÃÇÉÔáàâäíóúüñõêèšžğŁĐŐĂ",
+      "missingTestCharacters": [],
+      "latinExtendedACount": 127,
+      "latinExtendedBCount": 22
+    },
+    {
+      "family": "public-sans",
+      "packageVersion": "5.3.0",
+      "license": "OFL-1.1",
+      "faces": [
+        {
+          "file": "public-sans-latin-ext-wght-normal.woff2",
+          "bytes": 18472,
+          "sha256": "3a00a32f0242b723dcea79935747d6d27dd93675d03ef23f470dfe274e79586a",
+          "features": [
+            "locl",
+            "pnum",
+            "tnum"
+          ],
+          "axes": [
+            {
+              "tag": "wght",
+              "min": 100,
+              "max": 900
+            }
+          ],
+          "codepointCount": 220
+        },
+        {
+          "file": "public-sans-latin-wght-normal.woff2",
+          "bytes": 26832,
+          "sha256": "5ed4d31c988e73b258894244f209069ebe77dc7e564861954b21198b6de90d68",
+          "features": [
+            "calt",
+            "ccmp",
+            "dnom",
+            "frac",
+            "liga",
+            "locl",
+            "numr",
+            "pnum",
+            "tnum"
+          ],
+          "axes": [
+            {
+              "tag": "wght",
+              "min": 100,
+              "max": 900
+            }
+          ],
+          "codepointCount": 226
+        }
+      ],
+      "testString": "ãçéôÃÇÉÔáàâäíóúüñõêèšžğŁĐŐĂ",
+      "missingTestCharacters": [],
+      "latinExtendedACount": 124,
+      "latinExtendedBCount": 44
+    },
+    {
+      "family": "source-sans-3",
+      "packageVersion": "5.3.0",
+      "license": "OFL-1.1",
+      "faces": [
+        {
+          "file": "source-sans-3-latin-ext-wght-normal.woff2",
+          "bytes": 60088,
+          "sha256": "a85a7459bdb3cdc1136751e151a506bae653fc29ada3ca86237477df6f1b59e6",
+          "features": [
+            "ccmp",
+            "liga",
+            "locl"
+          ],
+          "axes": [
+            {
+              "tag": "wght",
+              "min": 200,
+              "max": 900
+            }
+          ],
+          "codepointCount": 563
+        },
+        {
+          "file": "source-sans-3-latin-wght-normal.woff2",
+          "bytes": 28740,
+          "sha256": "7a19a7027e125257d310c6dbd78ae3a30b5ea1e3794d60b12bb28227a003bfda",
+          "features": [
+            "ccmp",
+            "dnom",
+            "frac",
+            "liga",
+            "locl",
+            "numr",
+            "pnum"
+          ],
+          "axes": [
+            {
+              "tag": "wght",
+              "min": 200,
+              "max": 900
+            }
+          ],
+          "codepointCount": 231
+        }
+      ],
+      "testString": "ãçéôÃÇÉÔáàâäíóúüñõêèšžğŁĐŐĂ",
+      "missingTestCharacters": [],
+      "latinExtendedACount": 128,
+      "latinExtendedBCount": 100
+    },
+    {
+      "family": "noto-sans",
+      "packageVersion": "5.3.0",
+      "license": "OFL-1.1",
+      "faces": [
+        {
+          "file": "noto-sans-latin-ext-standard-normal.woff2",
+          "bytes": 289888,
+          "sha256": "709b5845b07d0b1fff96861a75c61b1bac560bdce9efdac690d4486edc893c56",
+          "features": [
+            "ccmp",
+            "locl"
+          ],
+          "axes": [
+            {
+              "tag": "wght",
+              "min": 100,
+              "max": 900
+            },
+            {
+              "tag": "wdth",
+              "min": 62.5,
+              "max": 100
+            }
+          ],
+          "codepointCount": 1138
+        },
+        {
+          "file": "noto-sans-latin-ext-wdth-normal.woff2",
+          "bytes": 289888,
+          "sha256": "709b5845b07d0b1fff96861a75c61b1bac560bdce9efdac690d4486edc893c56",
+          "features": [
+            "ccmp",
+            "locl"
+          ],
+          "axes": [
+            {
+              "tag": "wght",
+              "min": 100,
+              "max": 900
+            },
+            {
+              "tag": "wdth",
+              "min": 62.5,
+              "max": 100
+            }
+          ],
+          "codepointCount": 1138
+        },
+        {
+          "file": "noto-sans-latin-ext-wght-normal.woff2",
+          "bytes": 167960,
+          "sha256": "6d5a79315528df191b9d86f97b0c4272a8b588fcb166773fe6588ac795de0613",
+          "features": [
+            "ccmp",
+            "locl"
+          ],
+          "axes": [
+            {
+              "tag": "wght",
+              "min": 100,
+              "max": 900
+            }
+          ],
+          "codepointCount": 1138
+        },
+        {
+          "file": "noto-sans-latin-standard-normal.woff2",
+          "bytes": 59928,
+          "sha256": "df8c8215937ab2a4270c0cd997101b3fb8cdd444c9903d342200d6179ebcc097",
+          "features": [
+            "ccmp",
+            "dnom",
+            "frac",
+            "liga",
+            "locl",
+            "numr",
+            "pnum",
+            "tnum"
+          ],
+          "axes": [
+            {
+              "tag": "wght",
+              "min": 100,
+              "max": 900
+            },
+            {
+              "tag": "wdth",
+              "min": 62.5,
+              "max": 100
+            }
+          ],
+          "codepointCount": 232
+        },
+        {
+          "file": "noto-sans-latin-wdth-normal.woff2",
+          "bytes": 59928,
+          "sha256": "df8c8215937ab2a4270c0cd997101b3fb8cdd444c9903d342200d6179ebcc097",
+          "features": [
+            "ccmp",
+            "dnom",
+            "frac",
+            "liga",
+            "locl",
+            "numr",
+            "pnum",
+            "tnum"
+          ],
+          "axes": [
+            {
+              "tag": "wght",
+              "min": 100,
+              "max": 900
+            },
+            {
+              "tag": "wdth",
+              "min": 62.5,
+              "max": 100
+            }
+          ],
+          "codepointCount": 232
+        },
+        {
+          "file": "noto-sans-latin-wght-normal.woff2",
+          "bytes": 35820,
+          "sha256": "51ca196f49a33e79e7870ff88ebd2829a3f627a51e7d690986618f0e7ad2b52d",
+          "features": [
+            "ccmp",
+            "dnom",
+            "frac",
+            "liga",
+            "locl",
+            "numr",
+            "pnum",
+            "tnum"
+          ],
+          "axes": [
+            {
+              "tag": "wght",
+              "min": 100,
+              "max": 900
+            }
+          ],
+          "codepointCount": 232
+        }
+      ],
+      "testString": "ãçéôÃÇÉÔáàâäíóúüñõêèšžğŁĐŐĂ",
+      "missingTestCharacters": [],
+      "latinExtendedACount": 128,
+      "latinExtendedBCount": 208
+    },
+    {
+      "family": "jetbrains-mono",
+      "packageVersion": "5.3.0",
+      "license": "OFL-1.1",
+      "faces": [
+        {
+          "file": "jetbrains-mono-latin-ext-wght-normal.woff2",
+          "bytes": 15196,
+          "sha256": "79bfdab9ba467e26eea4122e6f2567e188dd8a09a8c730d501fc487c4ab99c6e",
+          "features": [
+            "ccmp",
+            "locl"
+          ],
+          "axes": [
+            {
+              "tag": "wght",
+              "min": 100,
+              "max": 800
+            }
+          ],
+          "codepointCount": 190
+        },
+        {
+          "file": "jetbrains-mono-latin-wght-normal.woff2",
+          "bytes": 40404,
+          "sha256": "18be452724bfdc236c074ca94a249a7f41a86752c7d04ab258ce9ed5651f6a7e",
+          "features": [
+            "calt",
+            "ccmp",
+            "frac",
+            "locl"
+          ],
+          "axes": [
+            {
+              "tag": "wght",
+              "min": 100,
+              "max": 800
+            }
+          ],
+          "codepointCount": 229
+        }
+      ],
+      "testString": "ãçéôÃÇÉÔáàâäíóúüñõêèšžğŁĐŐĂ",
+      "missingTestCharacters": [],
+      "latinExtendedACount": 126,
+      "latinExtendedBCount": 25
+    },
+    {
+      "family": "commit-mono",
+      "packageVersion": "5.3.0",
+      "license": "OFL-1.1",
+      "faces": [
+        {
+          "file": "commit-mono-latin-400-normal.woff2",
+          "bytes": 48128,
+          "sha256": "86132abb57fc615f2ab900cde4cd9d5796e9791daf1f85d79fc933aa50b3b15c",
+          "features": [
+            "calt",
+            "cv01",
+            "cv02",
+            "cv03",
+            "cv04",
+            "cv05",
+            "cv06",
+            "cv07",
+            "cv08",
+            "cv09",
+            "cv10",
+            "cv11",
+            "ss01",
+            "ss02",
+            "ss03",
+            "ss04",
+            "ss05"
+          ],
+          "axes": [],
+          "codepointCount": 1175
+        },
+        {
+          "file": "commit-mono-latin-500-normal.woff2",
+          "bytes": 47920,
+          "sha256": "ff7e7c2446edb30d854a636c0e5edefbf90c5739476779636d83448797e2e2de",
+          "features": [
+            "calt",
+            "cv01",
+            "cv02",
+            "cv03",
+            "cv04",
+            "cv05",
+            "cv06",
+            "cv07",
+            "cv08",
+            "cv09",
+            "cv10",
+            "cv11",
+            "ss01",
+            "ss02",
+            "ss03",
+            "ss04",
+            "ss05"
+          ],
+          "axes": [],
+          "codepointCount": 1175
+        },
+        {
+          "file": "commit-mono-latin-600-normal.woff2",
+          "bytes": 48056,
+          "sha256": "48b7064512777b347f5338f1e30b69e27c1164f5e4a9e8d5310b5f953fe50bde",
+          "features": [
+            "calt",
+            "cv01",
+            "cv02",
+            "cv03",
+            "cv04",
+            "cv05",
+            "cv06",
+            "cv07",
+            "cv08",
+            "cv09",
+            "cv10",
+            "cv11",
+            "ss01",
+            "ss02",
+            "ss03",
+            "ss04",
+            "ss05"
+          ],
+          "axes": [],
+          "codepointCount": 1175
+        }
+      ],
+      "testString": "ãçéôÃÇÉÔáàâäíóúüñõêèšžğŁĐŐĂ",
+      "missingTestCharacters": [],
+      "latinExtendedACount": 128,
+      "latinExtendedBCount": 12
+    }
+  ],
+  "errors": []
+}
