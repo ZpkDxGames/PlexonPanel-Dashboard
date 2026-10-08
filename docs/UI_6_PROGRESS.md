@@ -55,3 +55,5 @@
 - Design risks: exact high-cadence Pulse/mobile inspection, full-coverage font payload, disclosure discoverability, signed shell/file-confirmation extraction and virtualized text selection. Backend-unavailable history/policy/last-seen/receipt details omitted, never invented.
 - M0/M1 evidence packages preserve120 baseline captures, logs and portable experiments. Documentation-only milestone committed and authorized release branch published with identical local/remote trees; no force push, main/tag edit, deployment or M2 work.
 - Await maintainer approval before M2. All final/live acceptance and unbuilt6.0 accessibility/performance gates remain not executed.
+
+- Final M1 clarification: new system-theme/cyan defaults apply only to an absent preference key; existing malformed/partial blobs retain legacy fallbacks. Chat cache clear is selected-server scoped and must prevent old observations reappearing through the next telemetry persistence update; added the explicit test gap. This is a documentation refinement only, not M2/M7 implementation.
