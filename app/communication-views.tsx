@@ -205,7 +205,7 @@ export function ChatView(props: ViewProps) {
                   <p>{str(item.content)}</p>
                 </div>
                 <button
-                  className="workspace-copy-message"
+                  className="ui-button"
                   aria-label="Copy chat message"
                   onClick={() =>
                     void navigator.clipboard
