@@ -1,0 +1,2052 @@
+{
+  "schemaVersion": 1,
+  "sourceCommit": "86b6a0cefb2c5e420c9c862a7897705e1ea59146",
+  "capturedAt": "2026-10-08T03:52:04.441Z",
+  "environment": "Chromium / local Next development server / signed standalone relay / simulated agents",
+  "widths": [
+    390,
+    768,
+    1280,
+    1920
+  ],
+  "views": [
+    {
+      "name": "Fleet",
+      "theme": "light",
+      "width": 390,
+      "file": "fleet-390-light.png",
+      "scrollWidth": 390,
+      "nodes": 143,
+      "sha256": "471f1540008d8084e7dc85310ccdab4cfefe09e5da4b66ffd8642c9368d230c5",
+      "bytes": 80287
+    },
+    {
+      "name": "Fleet",
+      "theme": "light",
+      "width": 768,
+      "file": "fleet-768-light.png",
+      "scrollWidth": 768,
+      "nodes": 143,
+      "sha256": "dde445849494013f63afd9a787c5b16fb0a7e6142b3e690a311fdb952a289f06",
+      "bytes": 83024
+    },
+    {
+      "name": "Fleet",
+      "theme": "light",
+      "width": 1280,
+      "file": "fleet-1280-light.png",
+      "scrollWidth": 1280,
+      "nodes": 143,
+      "sha256": "06286bc34e1fbca88d297758c5a24fa63dfaf5c0c19afe837062643b10adf1b5",
+      "bytes": 66748
+    },
+    {
+      "name": "Fleet",
+      "theme": "light",
+      "width": 1920,
+      "file": "fleet-1920-light.png",
+      "scrollWidth": 1920,
+      "nodes": 143,
+      "sha256": "2aa8a070b0ba8a87eec1aa98de430beece310cad79f071be1a87b4c491de1827",
+      "bytes": 69709
+    },
+    {
+      "name": "Overview",
+      "theme": "light",
+      "width": 390,
+      "file": "overview-390-light.png",
+      "scrollWidth": 390,
+      "nodes": 424,
+      "sha256": "6261df6306c640839505c55bf9e0a71dcaf05aa9ee55c220f6d5e1519b4f58c4",
+      "bytes": 110104
+    },
+    {
+      "name": "Overview",
+      "theme": "light",
+      "width": 768,
+      "file": "overview-768-light.png",
+      "scrollWidth": 768,
+      "nodes": 424,
+      "sha256": "c7ae8b349d44a77e725c8eccd2dae82d100277517a5770d49a170c85c788fdb5",
+      "bytes": 114219
+    },
+    {
+      "name": "Overview",
+      "theme": "light",
+      "width": 1280,
+      "file": "overview-1280-light.png",
+      "scrollWidth": 1280,
+      "nodes": 424,
+      "sha256": "ccaf08f8ab51d993aeb43938e6f882c56c76bd0a623e490bb236d6e9aaff1800",
+      "bytes": 139805
+    },
+    {
+      "name": "Overview",
+      "theme": "light",
+      "width": 1920,
+      "file": "overview-1920-light.png",
+      "scrollWidth": 1920,
+      "nodes": 424,
+      "sha256": "226e014bc8dfd2660559a8f80cc93cfd40b609a30de2d92c6082d49c81b51b76",
+      "bytes": 144726
+    },
+    {
+      "name": "Performance",
+      "theme": "light",
+      "width": 390,
+      "file": "performance-390-light.png",
+      "scrollWidth": 390,
+      "nodes": 752,
+      "sha256": "0135d769e826e1b218c036a596b38b4d756331e63826e664fe40af355dd908bd",
+      "bytes": 263107
+    },
+    {
+      "name": "Performance",
+      "theme": "light",
+      "width": 768,
+      "file": "performance-768-light.png",
+      "scrollWidth": 768,
+      "nodes": 752,
+      "sha256": "d0c7d3693441d29d1768bfeceff078bbb960580286e0c11f1efbe14e1a23339d",
+      "bytes": 280209
+    },
+    {
+      "name": "Performance",
+      "theme": "light",
+      "width": 1280,
+      "file": "performance-1280-light.png",
+      "scrollWidth": 1280,
+      "nodes": 752,
+      "sha256": "9644b6549855cce12adccf2ba651886aaac69c51c460f79c7daff7fe0362116f",
+      "bytes": 261769
+    },
+    {
+      "name": "Performance",
+      "theme": "light",
+      "width": 1920,
+      "file": "performance-1920-light.png",
+      "scrollWidth": 1920,
+      "nodes": 752,
+      "sha256": "58a309cd4693465c63d4495d5a518b5618636d08259b47560e91a7983b3c0924",
+      "bytes": 273864
+    },
+    {
+      "name": "Players",
+      "theme": "light",
+      "width": 390,
+      "file": "players-390-light.png",
+      "scrollWidth": 390,
+      "nodes": 325,
+      "sha256": "33aa76cdc777cd008eab8a7e7b322ba05f49ca446ee0290710733add16509de3",
+      "bytes": 99628
+    },
+    {
+      "name": "Players",
+      "theme": "light",
+      "width": 768,
+      "file": "players-768-light.png",
+      "scrollWidth": 768,
+      "nodes": 317,
+      "sha256": "d1e4e85fc44272473bc528e6bad79e0c8d2b5b81f7b6d313ece5bb5cf73f2f07",
+      "bytes": 95523
+    },
+    {
+      "name": "Players",
+      "theme": "light",
+      "width": 1280,
+      "file": "players-1280-light.png",
+      "scrollWidth": 1280,
+      "nodes": 317,
+      "sha256": "d0ecf6775f68ae7a81e0c02523a4e273574762aa6e95c9131a7df6b084635782",
+      "bytes": 139434
+    },
+    {
+      "name": "Players",
+      "theme": "light",
+      "width": 1920,
+      "file": "players-1920-light.png",
+      "scrollWidth": 1920,
+      "nodes": 317,
+      "sha256": "4542869aee1e9b43ff9de38bbb6f5f5e672da0b1bda304750a0856d6554934bb",
+      "bytes": 144264
+    },
+    {
+      "name": "Console",
+      "theme": "light",
+      "width": 390,
+      "file": "console-390-light.png",
+      "scrollWidth": 390,
+      "nodes": 411,
+      "sha256": "ca03d0b0e06049f2d2c6e0b4a9cf331e93c9ffe89e9cd4cbf4aba0ca91e6401b",
+      "bytes": 109744
+    },
+    {
+      "name": "Console",
+      "theme": "light",
+      "width": 768,
+      "file": "console-768-light.png",
+      "scrollWidth": 768,
+      "nodes": 413,
+      "sha256": "6daf14ce6c290209ff03d24bd6dbb70ebcc13e7f32a0ee7ed7da16d981792b12",
+      "bytes": 129809
+    },
+    {
+      "name": "Console",
+      "theme": "light",
+      "width": 1280,
+      "file": "console-1280-light.png",
+      "scrollWidth": 1280,
+      "nodes": 413,
+      "sha256": "34516e3f476a048366cee48dba7de4cd6d3ef413ce53b787894b3a05b60e50d9",
+      "bytes": 181456
+    },
+    {
+      "name": "Console",
+      "theme": "light",
+      "width": 1920,
+      "file": "console-1920-light.png",
+      "scrollWidth": 1920,
+      "nodes": 413,
+      "sha256": "3bd72b126f46be086bf641b4ddade9b0f869f1b5344e4c269a3ba3f6df307183",
+      "bytes": 183731
+    },
+    {
+      "name": "Chat",
+      "theme": "light",
+      "width": 390,
+      "file": "chat-390-light.png",
+      "scrollWidth": 390,
+      "nodes": 264,
+      "sha256": "9b4d9073b9ed59d45db922e9b889f0c17fbedc0bd9d28706dae4a6a82e6c3661",
+      "bytes": 81475
+    },
+    {
+      "name": "Chat",
+      "theme": "light",
+      "width": 768,
+      "file": "chat-768-light.png",
+      "scrollWidth": 768,
+      "nodes": 264,
+      "sha256": "89b2869ac99e7b4da9b45df5159a3b4ea0751ba684d72433aa6c8414c1cc5a55",
+      "bytes": 82463
+    },
+    {
+      "name": "Chat",
+      "theme": "light",
+      "width": 1280,
+      "file": "chat-1280-light.png",
+      "scrollWidth": 1280,
+      "nodes": 264,
+      "sha256": "bf76eebae4cae3626cc2d77c81f96f73a3e33cda4dae6b2fb554b685552e87b4",
+      "bytes": 119805
+    },
+    {
+      "name": "Chat",
+      "theme": "light",
+      "width": 1920,
+      "file": "chat-1920-light.png",
+      "scrollWidth": 1920,
+      "nodes": 264,
+      "sha256": "33d3fd81544271ba569470e26d2fa4fb413bcd7e8e2e85319da70c46d6a54b3a",
+      "bytes": 127115
+    },
+    {
+      "name": "Plugins",
+      "theme": "light",
+      "width": 390,
+      "file": "plugins-390-light.png",
+      "scrollWidth": 390,
+      "nodes": 287,
+      "sha256": "d42a078ea01b5bf9212a0baf6c580e2b396e7a6a4b0672a31b05092b357f2f96",
+      "bytes": 56869
+    },
+    {
+      "name": "Plugins",
+      "theme": "light",
+      "width": 768,
+      "file": "plugins-768-light.png",
+      "scrollWidth": 768,
+      "nodes": 287,
+      "sha256": "6a617a889510bfe87696a0be13cfd3fa7783087b41c89e78cbfcdfe144bb50cb",
+      "bytes": 69138
+    },
+    {
+      "name": "Plugins",
+      "theme": "light",
+      "width": 1280,
+      "file": "plugins-1280-light.png",
+      "scrollWidth": 1280,
+      "nodes": 287,
+      "sha256": "7b18e8ea44954904a259519ab617cf38b93877202d305f83ff9b1d076401985f",
+      "bytes": 109879
+    },
+    {
+      "name": "Plugins",
+      "theme": "light",
+      "width": 1920,
+      "file": "plugins-1920-light.png",
+      "scrollWidth": 1920,
+      "nodes": 287,
+      "sha256": "13da1e0bf5b076ebb4cf03ee36dce627f8e5a4b5437b3bf899d0abd4e06add49",
+      "bytes": 116668
+    },
+    {
+      "name": "Server",
+      "theme": "light",
+      "width": 390,
+      "file": "server-390-light.png",
+      "scrollWidth": 390,
+      "nodes": 305,
+      "sha256": "d22695a61810756b5f9a93cb7dfedd5d32014bc4f44ea3f621823498f143ba35",
+      "bytes": 61857
+    },
+    {
+      "name": "Server",
+      "theme": "light",
+      "width": 768,
+      "file": "server-768-light.png",
+      "scrollWidth": 768,
+      "nodes": 305,
+      "sha256": "069a640c39110ef922711bbb20879897282bd251a79d0d36b2f20bba3b16599a",
+      "bytes": 63681
+    },
+    {
+      "name": "Server",
+      "theme": "light",
+      "width": 1280,
+      "file": "server-1280-light.png",
+      "scrollWidth": 1280,
+      "nodes": 305,
+      "sha256": "5e3def1437b7868de0e498d1ea5d0420a2a1aa338f4e181dc62b0b17438e110e",
+      "bytes": 104000
+    },
+    {
+      "name": "Server",
+      "theme": "light",
+      "width": 1920,
+      "file": "server-1920-light.png",
+      "scrollWidth": 1920,
+      "nodes": 305,
+      "sha256": "a58552bf489b1e33b5bb24027ec1aa4314c8e1a1cbb3d3a3d9a98361eedb6462",
+      "bytes": 108261
+    },
+    {
+      "name": "Backups",
+      "theme": "light",
+      "width": 390,
+      "file": "backups-390-light.png",
+      "scrollWidth": 390,
+      "nodes": 467,
+      "sha256": "97c8620ac8d300052ab5fcb75e6a0f15120ddb56740a70e5e75dea82deec1c34",
+      "bytes": 292262
+    },
+    {
+      "name": "Backups",
+      "theme": "light",
+      "width": 768,
+      "file": "backups-768-light.png",
+      "scrollWidth": 768,
+      "nodes": 467,
+      "sha256": "97dfcf39f195224d3366d7eb09552890648b92aba6f40a7417faaf26955b433c",
+      "bytes": 293397
+    },
+    {
+      "name": "Backups",
+      "theme": "light",
+      "width": 1280,
+      "file": "backups-1280-light.png",
+      "scrollWidth": 1280,
+      "nodes": 467,
+      "sha256": "ae255856739906780712c9c05636281a4f2d24ab1b3f00edc52fcd1d4dbc1dd3",
+      "bytes": 321783
+    },
+    {
+      "name": "Backups",
+      "theme": "light",
+      "width": 1920,
+      "file": "backups-1920-light.png",
+      "scrollWidth": 1920,
+      "nodes": 467,
+      "sha256": "9c9dfdf6d068ef7e7ced6cc2ed56919629e4b0755a9da42ecba1e7b66c403559",
+      "bytes": 323725
+    },
+    {
+      "name": "Configuration",
+      "theme": "light",
+      "width": 390,
+      "file": "configuration-390-light.png",
+      "scrollWidth": 390,
+      "nodes": 312,
+      "sha256": "a07da2d3919a5f8d6aa5fbd586593fc6bd599647cf4a178812dd4857e71899f2",
+      "bytes": 105794
+    },
+    {
+      "name": "Configuration",
+      "theme": "light",
+      "width": 768,
+      "file": "configuration-768-light.png",
+      "scrollWidth": 768,
+      "nodes": 312,
+      "sha256": "8286e8a064e2098d991d2a25b42a7abe644881ede025c31210b48e479c6c12e8",
+      "bytes": 112752
+    },
+    {
+      "name": "Configuration",
+      "theme": "light",
+      "width": 1280,
+      "file": "configuration-1280-light.png",
+      "scrollWidth": 1280,
+      "nodes": 312,
+      "sha256": "ebda2006e271f8ee66e5602295b664358f01a52a984610dfba14133a484a35d3",
+      "bytes": 151881
+    },
+    {
+      "name": "Configuration",
+      "theme": "light",
+      "width": 1920,
+      "file": "configuration-1920-light.png",
+      "scrollWidth": 1920,
+      "nodes": 312,
+      "sha256": "fd025fd67607e972229ed2838403485257de21649ee756df5fa1eb4564ae4ca6",
+      "bytes": 155844
+    },
+    {
+      "name": "Audit",
+      "theme": "light",
+      "width": 390,
+      "file": "audit-390-light.png",
+      "scrollWidth": 390,
+      "nodes": 306,
+      "sha256": "ea8ebb21d0145800c5ea4527ea308d384a3fb6c6c6614266c50100712d24bc40",
+      "bytes": 67519
+    },
+    {
+      "name": "Audit",
+      "theme": "light",
+      "width": 768,
+      "file": "audit-768-light.png",
+      "scrollWidth": 768,
+      "nodes": 306,
+      "sha256": "4a3026386c0890cd20a347b2aee2098e46a8de643bca929e1fc2e8313c086600",
+      "bytes": 72415
+    },
+    {
+      "name": "Audit",
+      "theme": "light",
+      "width": 1280,
+      "file": "audit-1280-light.png",
+      "scrollWidth": 1280,
+      "nodes": 306,
+      "sha256": "7ab272b2ec02ebb1c27227872a536d8c2a95bcc11d50902e656a4d5ff53a529c",
+      "bytes": 109149
+    },
+    {
+      "name": "Audit",
+      "theme": "light",
+      "width": 1920,
+      "file": "audit-1920-light.png",
+      "scrollWidth": 1920,
+      "nodes": 306,
+      "sha256": "85ffac6c9668da2c79edf3eb728f7e5f50df5a9e6a666594f5abd3a7c68c2835",
+      "bytes": 115128
+    },
+    {
+      "name": "Access",
+      "theme": "light",
+      "width": 390,
+      "file": "access-390-light.png",
+      "scrollWidth": 390,
+      "nodes": 744,
+      "sha256": "6ad6aa3cc9848c906ab4b9b41d92f044e65e8130955b2bf984e4c36213df347c",
+      "bytes": 126950
+    },
+    {
+      "name": "Access",
+      "theme": "light",
+      "width": 768,
+      "file": "access-768-light.png",
+      "scrollWidth": 768,
+      "nodes": 744,
+      "sha256": "1fce15098b70f058810aac80d3222f11c33204684bfeff8b02ccfa7f46a7fb47",
+      "bytes": 121497
+    },
+    {
+      "name": "Access",
+      "theme": "light",
+      "width": 1280,
+      "file": "access-1280-light.png",
+      "scrollWidth": 1280,
+      "nodes": 744,
+      "sha256": "5955452ede4ea2988bc24ae3378020a1f877f56329144737db480cb14c179c59",
+      "bytes": 158971
+    },
+    {
+      "name": "Access",
+      "theme": "light",
+      "width": 1920,
+      "file": "access-1920-light.png",
+      "scrollWidth": 1920,
+      "nodes": 741,
+      "sha256": "55f779933ef662c3f10b81693045242ae50c87cfd285c8fd5cbc7fdea123fbe2",
+      "bytes": 155709
+    },
+    {
+      "name": "Settings",
+      "theme": "light",
+      "width": 390,
+      "file": "settings-390-light.png",
+      "scrollWidth": 390,
+      "nodes": 458,
+      "sha256": "f7eeaeb065ff1eb1c677e95abb4cf1d1e0385edddbfecdccdb971e3248d102d1",
+      "bytes": 211399
+    },
+    {
+      "name": "Settings",
+      "theme": "light",
+      "width": 768,
+      "file": "settings-768-light.png",
+      "scrollWidth": 768,
+      "nodes": 458,
+      "sha256": "e749b060b84d804e6ecec1dd8575c7ddbd0f7f84a20918510799f80618cf46c6",
+      "bytes": 217303
+    },
+    {
+      "name": "Settings",
+      "theme": "light",
+      "width": 1280,
+      "file": "settings-1280-light.png",
+      "scrollWidth": 1280,
+      "nodes": 458,
+      "sha256": "55d122b7ee0711bf45ad5c95a4c65e4fc9519bbbdf2257fd777440131c26734d",
+      "bytes": 255722
+    },
+    {
+      "name": "Settings",
+      "theme": "light",
+      "width": 1920,
+      "file": "settings-1920-light.png",
+      "scrollWidth": 1920,
+      "nodes": 458,
+      "sha256": "d77a01244e3de48b22c3e2768462b1bb9d930149fa4a6cb29f94977f07482ab9",
+      "bytes": 260387
+    },
+    {
+      "name": "Legacy archive",
+      "theme": "light",
+      "width": 390,
+      "file": "legacy-archive-390-light.png",
+      "scrollWidth": 390,
+      "nodes": 72,
+      "sha256": "8b4eb555637f13d722989704dd3509fc92a71b5532b6dab56e0f23fbe5b6a0c9",
+      "bytes": 47978
+    },
+    {
+      "name": "Legacy archive",
+      "theme": "light",
+      "width": 768,
+      "file": "legacy-archive-768-light.png",
+      "scrollWidth": 768,
+      "nodes": 72,
+      "sha256": "3fd71637182f06b9c5144496f0f66b732c8f3de3eb880368070611182036e9ee",
+      "bytes": 52008
+    },
+    {
+      "name": "Legacy archive",
+      "theme": "light",
+      "width": 1280,
+      "file": "legacy-archive-1280-light.png",
+      "scrollWidth": 1280,
+      "nodes": 72,
+      "sha256": "30173499d01a75ec7778e85a8d093480a451b0adc2789e1bce06e1b64eb0bf63",
+      "bytes": 53082
+    },
+    {
+      "name": "Legacy archive",
+      "theme": "light",
+      "width": 1920,
+      "file": "legacy-archive-1920-light.png",
+      "scrollWidth": 1920,
+      "nodes": 72,
+      "sha256": "67a73fc286e60808ce54b4ea3a06d38d8639020222ab7c471e89572f8feb5f79",
+      "bytes": 56305
+    },
+    {
+      "name": "Fleet",
+      "theme": "dark",
+      "width": 390,
+      "file": "fleet-390-dark.png",
+      "scrollWidth": 390,
+      "nodes": 143,
+      "sha256": "57b593d7e34b59b2ade828c695bc9df7bd7ff5535aadb1f15eb1616bcb1ac8aa",
+      "bytes": 83773
+    },
+    {
+      "name": "Fleet",
+      "theme": "dark",
+      "width": 768,
+      "file": "fleet-768-dark.png",
+      "scrollWidth": 768,
+      "nodes": 143,
+      "sha256": "dcb75540187391b7a1061bf045b0bb0665f906291ed9788f6b1f3bc41e6d194a",
+      "bytes": 85495
+    },
+    {
+      "name": "Fleet",
+      "theme": "dark",
+      "width": 1280,
+      "file": "fleet-1280-dark.png",
+      "scrollWidth": 1280,
+      "nodes": 143,
+      "sha256": "72bc4839a2cb4fa08e02b967ff714c8f2152fe51d72c2ff8fd1fa1da8009309e",
+      "bytes": 68753
+    },
+    {
+      "name": "Fleet",
+      "theme": "dark",
+      "width": 1920,
+      "file": "fleet-1920-dark.png",
+      "scrollWidth": 1920,
+      "nodes": 143,
+      "sha256": "2c221b7e21600e9d4b4c7ee9d0c8f43b97a4a2e7d81d637e604da21e34afda70",
+      "bytes": 71740
+    },
+    {
+      "name": "Overview",
+      "theme": "dark",
+      "width": 390,
+      "file": "overview-390-dark.png",
+      "scrollWidth": 390,
+      "nodes": 424,
+      "sha256": "b38d33c0799dd9edf455a25c814ef5ec674d0eaefbbfa8ec4244ab48d18a5df3",
+      "bytes": 113692
+    },
+    {
+      "name": "Overview",
+      "theme": "dark",
+      "width": 768,
+      "file": "overview-768-dark.png",
+      "scrollWidth": 768,
+      "nodes": 424,
+      "sha256": "d4475f2e9d7da58ab85ea3f995622c295d2191a10e33ab24efe32f426406bda3",
+      "bytes": 117942
+    },
+    {
+      "name": "Overview",
+      "theme": "dark",
+      "width": 1280,
+      "file": "overview-1280-dark.png",
+      "scrollWidth": 1280,
+      "nodes": 424,
+      "sha256": "f9d354d13f1de82b29a178232bf678d012a353e35d3807be9f23a2d7e0990c84",
+      "bytes": 143661
+    },
+    {
+      "name": "Overview",
+      "theme": "dark",
+      "width": 1920,
+      "file": "overview-1920-dark.png",
+      "scrollWidth": 1920,
+      "nodes": 424,
+      "sha256": "7e47e891100539163fc99da112e13a571832b22c84ff85f34805bbda74d770d6",
+      "bytes": 148202
+    },
+    {
+      "name": "Performance",
+      "theme": "dark",
+      "width": 390,
+      "file": "performance-390-dark.png",
+      "scrollWidth": 390,
+      "nodes": 752,
+      "sha256": "52523eeca865edd92b57c1985a11d802910d2c5d3c45960855d50171306ffdc6",
+      "bytes": 268532
+    },
+    {
+      "name": "Performance",
+      "theme": "dark",
+      "width": 768,
+      "file": "performance-768-dark.png",
+      "scrollWidth": 768,
+      "nodes": 752,
+      "sha256": "0c12aeab01823f2d6ac6cd2749f4de4786193a42478e2a69a6823efaedb72adf",
+      "bytes": 284617
+    },
+    {
+      "name": "Performance",
+      "theme": "dark",
+      "width": 1280,
+      "file": "performance-1280-dark.png",
+      "scrollWidth": 1280,
+      "nodes": 752,
+      "sha256": "5cf76db6015326017e3281b67782fb406addc5b63a907b3fb1b95a27e8a3528d",
+      "bytes": 263696
+    },
+    {
+      "name": "Performance",
+      "theme": "dark",
+      "width": 1920,
+      "file": "performance-1920-dark.png",
+      "scrollWidth": 1920,
+      "nodes": 752,
+      "sha256": "acb0a790a367e6d468eec013af4898812c61f52686a7980f0725fa5c9688bf45",
+      "bytes": 277508
+    },
+    {
+      "name": "Players",
+      "theme": "dark",
+      "width": 390,
+      "file": "players-390-dark.png",
+      "scrollWidth": 390,
+      "nodes": 325,
+      "sha256": "b0531db1c2937f30825b3ffba1db19cc0b74c727ba424413ee1abf9466fbdc51",
+      "bytes": 100710
+    },
+    {
+      "name": "Players",
+      "theme": "dark",
+      "width": 768,
+      "file": "players-768-dark.png",
+      "scrollWidth": 768,
+      "nodes": 317,
+      "sha256": "595428969660135f19a6c586e47bb080a695ee7fccd66f395ccb2012cf8b8f56",
+      "bytes": 96796
+    },
+    {
+      "name": "Players",
+      "theme": "dark",
+      "width": 1280,
+      "file": "players-1280-dark.png",
+      "scrollWidth": 1280,
+      "nodes": 317,
+      "sha256": "061b642bb878d205a05147e9e1f514a90982648a45deb2da2e376d18ad66495c",
+      "bytes": 140618
+    },
+    {
+      "name": "Players",
+      "theme": "dark",
+      "width": 1920,
+      "file": "players-1920-dark.png",
+      "scrollWidth": 1920,
+      "nodes": 317,
+      "sha256": "79a01cfc68b06ebfbf30967815276db3d72143f29b585e898494a73d0e1cc4f5",
+      "bytes": 145341
+    },
+    {
+      "name": "Console",
+      "theme": "dark",
+      "width": 390,
+      "file": "console-390-dark.png",
+      "scrollWidth": 390,
+      "nodes": 411,
+      "sha256": "11251f3c2812fcea281f8f5847995bd2fca6bd8dc6a95a7f7821a8b25dbab615",
+      "bytes": 108737
+    },
+    {
+      "name": "Console",
+      "theme": "dark",
+      "width": 768,
+      "file": "console-768-dark.png",
+      "scrollWidth": 768,
+      "nodes": 413,
+      "sha256": "5ca4c91133fa93828482812b4b9508c6640e4e5ecb7d0157c4b84ba88ce32b62",
+      "bytes": 127812
+    },
+    {
+      "name": "Console",
+      "theme": "dark",
+      "width": 1280,
+      "file": "console-1280-dark.png",
+      "scrollWidth": 1280,
+      "nodes": 413,
+      "sha256": "8bf1303b846706f12bb1bec5b28df8c29c32604144e68281d737bca79ca4667d",
+      "bytes": 179670
+    },
+    {
+      "name": "Console",
+      "theme": "dark",
+      "width": 1920,
+      "file": "console-1920-dark.png",
+      "scrollWidth": 1920,
+      "nodes": 413,
+      "sha256": "4076896679cd44624bec8e94a612202d6332ab035be25ac9a0396d4c845e1aa4",
+      "bytes": 181662
+    },
+    {
+      "name": "Chat",
+      "theme": "dark",
+      "width": 390,
+      "file": "chat-390-dark.png",
+      "scrollWidth": 390,
+      "nodes": 264,
+      "sha256": "c92e99361a1e9044b8b54b195362a4e99cedac17673ec2c74779f893a12596d6",
+      "bytes": 79954
+    },
+    {
+      "name": "Chat",
+      "theme": "dark",
+      "width": 768,
+      "file": "chat-768-dark.png",
+      "scrollWidth": 768,
+      "nodes": 264,
+      "sha256": "7f5a0724ceffed627e87a914165b84bc29886711ccbbf4b86fa623cfc9778fa5",
+      "bytes": 79825
+    },
+    {
+      "name": "Chat",
+      "theme": "dark",
+      "width": 1280,
+      "file": "chat-1280-dark.png",
+      "scrollWidth": 1280,
+      "nodes": 264,
+      "sha256": "08a7c5c35384a9acadd7311e73ae4d3df230ca370d8cdc567ff93bdae438e842",
+      "bytes": 118250
+    },
+    {
+      "name": "Chat",
+      "theme": "dark",
+      "width": 1920,
+      "file": "chat-1920-dark.png",
+      "scrollWidth": 1920,
+      "nodes": 264,
+      "sha256": "c90beef5098e5434f85100ca14397b4ee00cc93296c19a1b40e6585176b86d13",
+      "bytes": 125524
+    },
+    {
+      "name": "Plugins",
+      "theme": "dark",
+      "width": 390,
+      "file": "plugins-390-dark.png",
+      "scrollWidth": 390,
+      "nodes": 290,
+      "sha256": "beb3bb35b080e2c3686b9a7eeeeacaa0936a529178561a7aa2ef5ced6d3b9536",
+      "bytes": 66175
+    },
+    {
+      "name": "Plugins",
+      "theme": "dark",
+      "width": 768,
+      "file": "plugins-768-dark.png",
+      "scrollWidth": 768,
+      "nodes": 287,
+      "sha256": "304de2bc4f1b1ccd16300f9aa55caa5751d4ec3a3ea3938dcac22b0829539b3b",
+      "bytes": 69899
+    },
+    {
+      "name": "Plugins",
+      "theme": "dark",
+      "width": 1280,
+      "file": "plugins-1280-dark.png",
+      "scrollWidth": 1280,
+      "nodes": 287,
+      "sha256": "c0ae6e53a5405413afcd01e73a6588159ceb462f980fa723ae8c5173a864d006",
+      "bytes": 110954
+    },
+    {
+      "name": "Plugins",
+      "theme": "dark",
+      "width": 1920,
+      "file": "plugins-1920-dark.png",
+      "scrollWidth": 1920,
+      "nodes": 287,
+      "sha256": "ec221659abebe022bc1e156dd3baab1fe47758a337161906c302b7f0d30208c1",
+      "bytes": 117608
+    },
+    {
+      "name": "Server",
+      "theme": "dark",
+      "width": 390,
+      "file": "server-390-dark.png",
+      "scrollWidth": 390,
+      "nodes": 305,
+      "sha256": "1aefa1b06780b0a3735c676ae716241a229cb9bde078db12cc814336a5c481b3",
+      "bytes": 62609
+    },
+    {
+      "name": "Server",
+      "theme": "dark",
+      "width": 768,
+      "file": "server-768-dark.png",
+      "scrollWidth": 768,
+      "nodes": 305,
+      "sha256": "568538a56eb3920e85addf79057cf3994f88c8e826c4ba6ab0d5755fe6decf96",
+      "bytes": 64152
+    },
+    {
+      "name": "Server",
+      "theme": "dark",
+      "width": 1280,
+      "file": "server-1280-dark.png",
+      "scrollWidth": 1280,
+      "nodes": 305,
+      "sha256": "0e404861e7f31578ba0bca777ebebebc8b556355dcad905340b1e36a5b2d3585",
+      "bytes": 104615
+    },
+    {
+      "name": "Server",
+      "theme": "dark",
+      "width": 1920,
+      "file": "server-1920-dark.png",
+      "scrollWidth": 1920,
+      "nodes": 305,
+      "sha256": "786769e4c5f9c4faf22ea69970b544207aaa0e75e0920b8f7ee5fa3bf0e1c34d",
+      "bytes": 108770
+    },
+    {
+      "name": "Backups",
+      "theme": "dark",
+      "width": 390,
+      "file": "backups-390-dark.png",
+      "scrollWidth": 390,
+      "nodes": 467,
+      "sha256": "e1ca4becbf23210593ef5fdf9ecc468588f9d072be174f0d31d407e7fa9ac773",
+      "bytes": 295401
+    },
+    {
+      "name": "Backups",
+      "theme": "dark",
+      "width": 768,
+      "file": "backups-768-dark.png",
+      "scrollWidth": 768,
+      "nodes": 467,
+      "sha256": "fe560ff0fb52cbd03d5db8414a70b9fd92534faf364ed5abd8a54e8b947abb8e",
+      "bytes": 296372
+    },
+    {
+      "name": "Backups",
+      "theme": "dark",
+      "width": 1280,
+      "file": "backups-1280-dark.png",
+      "scrollWidth": 1280,
+      "nodes": 467,
+      "sha256": "d3ced13f4865a65f931eebd74a1b61b1449b4c958796b995a9874e91af62cbde",
+      "bytes": 325166
+    },
+    {
+      "name": "Backups",
+      "theme": "dark",
+      "width": 1920,
+      "file": "backups-1920-dark.png",
+      "scrollWidth": 1920,
+      "nodes": 467,
+      "sha256": "63e3775afd1f61ace4234ec2e41d475a91fd76730b9b9e641b4db358e6f0af77",
+      "bytes": 326885
+    },
+    {
+      "name": "Configuration",
+      "theme": "dark",
+      "width": 390,
+      "file": "configuration-390-dark.png",
+      "scrollWidth": 390,
+      "nodes": 312,
+      "sha256": "6f7a6004ce31bb3e37252fe4d45b3edd5b0f709450ad5d23dfd9c3cdaf8b7cdd",
+      "bytes": 105618
+    },
+    {
+      "name": "Configuration",
+      "theme": "dark",
+      "width": 768,
+      "file": "configuration-768-dark.png",
+      "scrollWidth": 768,
+      "nodes": 312,
+      "sha256": "5671a094175956d100018de2abfd9da8c93eb11dded1532bdf358e250871c020",
+      "bytes": 112060
+    },
+    {
+      "name": "Configuration",
+      "theme": "dark",
+      "width": 1280,
+      "file": "configuration-1280-dark.png",
+      "scrollWidth": 1280,
+      "nodes": 312,
+      "sha256": "4434b44f813bd1acffa9a39f50be0bea4ef329099758926ef6d0446b8b43a43c",
+      "bytes": 150703
+    },
+    {
+      "name": "Configuration",
+      "theme": "dark",
+      "width": 1920,
+      "file": "configuration-1920-dark.png",
+      "scrollWidth": 1920,
+      "nodes": 312,
+      "sha256": "41016a630a455f394e83623162639f25381ce6f129b72f060e9485d643a3d657",
+      "bytes": 154568
+    },
+    {
+      "name": "Audit",
+      "theme": "dark",
+      "width": 390,
+      "file": "audit-390-dark.png",
+      "scrollWidth": 390,
+      "nodes": 306,
+      "sha256": "698526505cd20862d3ccec56a69b5ce5fcc5a15a61da3a5a91aecfb77ac668a0",
+      "bytes": 65608
+    },
+    {
+      "name": "Audit",
+      "theme": "dark",
+      "width": 768,
+      "file": "audit-768-dark.png",
+      "scrollWidth": 768,
+      "nodes": 306,
+      "sha256": "2abb456c639645fff7a4236ad465a4b54ff06f6ef7dd7a847bb713e5a993d5fd",
+      "bytes": 70558
+    },
+    {
+      "name": "Audit",
+      "theme": "dark",
+      "width": 1280,
+      "file": "audit-1280-dark.png",
+      "scrollWidth": 1280,
+      "nodes": 306,
+      "sha256": "a9c7e9013c7b95ec559bc9bf0b25a5a3e947e13c9fa81e976859003f64f0b3f1",
+      "bytes": 108929
+    },
+    {
+      "name": "Audit",
+      "theme": "dark",
+      "width": 1920,
+      "file": "audit-1920-dark.png",
+      "scrollWidth": 1920,
+      "nodes": 306,
+      "sha256": "457a2a8e9da82fce2927a3e8eddc3dd81b489ee36e49cfa65ec235a95e9d6005",
+      "bytes": 113936
+    },
+    {
+      "name": "Access",
+      "theme": "dark",
+      "width": 390,
+      "file": "access-390-dark.png",
+      "scrollWidth": 390,
+      "nodes": 744,
+      "sha256": "65d49f6104ec2d3cea43824818c2664117555e2bb64cda303b6ba95bdd486c5a",
+      "bytes": 125813
+    },
+    {
+      "name": "Access",
+      "theme": "dark",
+      "width": 768,
+      "file": "access-768-dark.png",
+      "scrollWidth": 768,
+      "nodes": 744,
+      "sha256": "3b6f56b400bb8a3acfdbfaa1b0d8ff9d0f9b8bdfebb52b5b56c56890cdc24342",
+      "bytes": 119623
+    },
+    {
+      "name": "Access",
+      "theme": "dark",
+      "width": 1280,
+      "file": "access-1280-dark.png",
+      "scrollWidth": 1280,
+      "nodes": 741,
+      "sha256": "1aa6beb76450d12c1f8ad043faa718e8284bda2c2d345193dafe8ed2e3ccafd9",
+      "bytes": 150806
+    },
+    {
+      "name": "Access",
+      "theme": "dark",
+      "width": 1920,
+      "file": "access-1920-dark.png",
+      "scrollWidth": 1920,
+      "nodes": 741,
+      "sha256": "2a1de529fc458bd283ffdb2e3a40ff453028955d25dfb93159cd078338bb21ce",
+      "bytes": 156853
+    },
+    {
+      "name": "Settings",
+      "theme": "dark",
+      "width": 390,
+      "file": "settings-390-dark.png",
+      "scrollWidth": 390,
+      "nodes": 458,
+      "sha256": "457a01a0bf2889665e1df91c94898f992947862b44d786302718f2a9aefcad47",
+      "bytes": 213797
+    },
+    {
+      "name": "Settings",
+      "theme": "dark",
+      "width": 768,
+      "file": "settings-768-dark.png",
+      "scrollWidth": 768,
+      "nodes": 458,
+      "sha256": "8312a2145ba5005a924c4bedebddb0952debd9f79ade0eb4ca344259c15c2eaf",
+      "bytes": 219068
+    },
+    {
+      "name": "Settings",
+      "theme": "dark",
+      "width": 1280,
+      "file": "settings-1280-dark.png",
+      "scrollWidth": 1280,
+      "nodes": 458,
+      "sha256": "040720ac92844d47a78fe14353e3a83234a22168ab982e6d0a5f2ee361c695cd",
+      "bytes": 256987
+    },
+    {
+      "name": "Settings",
+      "theme": "dark",
+      "width": 1920,
+      "file": "settings-1920-dark.png",
+      "scrollWidth": 1920,
+      "nodes": 458,
+      "sha256": "b976a3b8e8746e0227846542277c7f22dff0d4b0bfe0f7ba55a3b04d9a916010",
+      "bytes": 261232
+    },
+    {
+      "name": "Legacy archive",
+      "theme": "dark",
+      "width": 390,
+      "file": "legacy-archive-390-dark.png",
+      "scrollWidth": 390,
+      "nodes": 72,
+      "sha256": "cf0819d5b223e3d3a985e3e92b474d79a9727e26120d76ef0d5e5125f34a8162",
+      "bytes": 47819
+    },
+    {
+      "name": "Legacy archive",
+      "theme": "dark",
+      "width": 768,
+      "file": "legacy-archive-768-dark.png",
+      "scrollWidth": 768,
+      "nodes": 72,
+      "sha256": "351d42eab48e78334dfecb9a48972fb9dad018a7c9bccf295334f594fcd72889",
+      "bytes": 52422
+    },
+    {
+      "name": "Legacy archive",
+      "theme": "dark",
+      "width": 1280,
+      "file": "legacy-archive-1280-dark.png",
+      "scrollWidth": 1280,
+      "nodes": 72,
+      "sha256": "7759a91cfdc11a7a0241cde858bb82a7619311f0efe4873b6b95e16d123ebc59",
+      "bytes": 53415
+    },
+    {
+      "name": "Legacy archive",
+      "theme": "dark",
+      "width": 1920,
+      "file": "legacy-archive-1920-dark.png",
+      "scrollWidth": 1920,
+      "nodes": 72,
+      "sha256": "6ab63979f6e0acac8b14af8f537c6519a8f91994153722b237e09ee9bdf4dfab",
+      "bytes": 56644
+    },
+    {
+      "name": "Pairing",
+      "theme": "light",
+      "width": 390,
+      "file": "pairing-390-light.png",
+      "scrollWidth": 390,
+      "nodes": 76,
+      "sha256": "07ef6b041a05f848dc89540b753af81e4d29beec4e45046e02707613f4cd93bb",
+      "bytes": 42739
+    },
+    {
+      "name": "Pairing",
+      "theme": "light",
+      "width": 768,
+      "file": "pairing-768-light.png",
+      "scrollWidth": 768,
+      "nodes": 76,
+      "sha256": "5b295f45b524d0cd18767a3cd49608cc86652f77fdcbd82d4ab05784ced89865",
+      "bytes": 45121
+    },
+    {
+      "name": "Pairing",
+      "theme": "light",
+      "width": 1280,
+      "file": "pairing-1280-light.png",
+      "scrollWidth": 1280,
+      "nodes": 76,
+      "sha256": "de23a4066946846bf0d8d23b6d567b869f2a8ae8705eea5204daf5c1497d84ed",
+      "bytes": 63450
+    },
+    {
+      "name": "Pairing",
+      "theme": "light",
+      "width": 1920,
+      "file": "pairing-1920-light.png",
+      "scrollWidth": 1920,
+      "nodes": 76,
+      "sha256": "06a7829757c2ddb78fb8d1ae0a58222b30a9481430743fafcdd4dde70a6f4e1e",
+      "bytes": 67529
+    },
+    {
+      "name": "Pairing",
+      "theme": "dark",
+      "width": 390,
+      "file": "pairing-390-dark.png",
+      "scrollWidth": 390,
+      "nodes": 76,
+      "sha256": "1c01094954de64a0ce34626a9f7880baec37f8c810bae145cf10cf0eb5ca5289",
+      "bytes": 42847
+    },
+    {
+      "name": "Pairing",
+      "theme": "dark",
+      "width": 768,
+      "file": "pairing-768-dark.png",
+      "scrollWidth": 768,
+      "nodes": 76,
+      "sha256": "9eda356ae1037f339651ae9998a3dfd1159ab0f173a9f00f01152c6f93021572",
+      "bytes": 44853
+    },
+    {
+      "name": "Pairing",
+      "theme": "dark",
+      "width": 1280,
+      "file": "pairing-1280-dark.png",
+      "scrollWidth": 1280,
+      "nodes": 76,
+      "sha256": "2072e60b3dbfcd528d3c3549a71bf086e4c57f647b36953124b37dc852996b4c",
+      "bytes": 63328
+    },
+    {
+      "name": "Pairing",
+      "theme": "dark",
+      "width": 1920,
+      "file": "pairing-1920-dark.png",
+      "scrollWidth": 1920,
+      "nodes": 76,
+      "sha256": "85e90abcc58ee7d6e26dae2ac7c2534cabbb13229c2360ae24e78267aee652cc",
+      "bytes": 67291
+    }
+  ],
+  "errors": [],
+  "accessibility": [
+    {
+      "name": "Fleet",
+      "theme": "light",
+      "width": 390,
+      "violations": [
+        {
+          "id": "definition-list",
+          "impact": "serious",
+          "description": "Ensure <dl> elements are structured correctly",
+          "nodes": [
+            [
+              "article[data-selected=\"true\"] > dl"
+            ],
+            [
+              "article[data-selected=\"false\"] > dl"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Fleet",
+      "theme": "light",
+      "width": 768,
+      "violations": [
+        {
+          "id": "definition-list",
+          "impact": "serious",
+          "description": "Ensure <dl> elements are structured correctly",
+          "nodes": [
+            [
+              "article[data-selected=\"true\"] > dl"
+            ],
+            [
+              "article[data-selected=\"false\"] > dl"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Fleet",
+      "theme": "light",
+      "width": 1280,
+      "violations": [
+        {
+          "id": "definition-list",
+          "impact": "serious",
+          "description": "Ensure <dl> elements are structured correctly",
+          "nodes": [
+            [
+              "article[data-selected=\"true\"] > dl"
+            ],
+            [
+              "article[data-selected=\"false\"] > dl"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Fleet",
+      "theme": "light",
+      "width": 1920,
+      "violations": [
+        {
+          "id": "definition-list",
+          "impact": "serious",
+          "description": "Ensure <dl> elements are structured correctly",
+          "nodes": [
+            [
+              "article[data-selected=\"true\"] > dl"
+            ],
+            [
+              "article[data-selected=\"false\"] > dl"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Overview",
+      "theme": "light",
+      "width": 390,
+      "violations": []
+    },
+    {
+      "name": "Overview",
+      "theme": "light",
+      "width": 768,
+      "violations": []
+    },
+    {
+      "name": "Overview",
+      "theme": "light",
+      "width": 1280,
+      "violations": []
+    },
+    {
+      "name": "Overview",
+      "theme": "light",
+      "width": 1920,
+      "violations": []
+    },
+    {
+      "name": "Performance",
+      "theme": "light",
+      "width": 390,
+      "violations": []
+    },
+    {
+      "name": "Performance",
+      "theme": "light",
+      "width": 768,
+      "violations": []
+    },
+    {
+      "name": "Performance",
+      "theme": "light",
+      "width": 1280,
+      "violations": []
+    },
+    {
+      "name": "Performance",
+      "theme": "light",
+      "width": 1920,
+      "violations": []
+    },
+    {
+      "name": "Players",
+      "theme": "light",
+      "width": 390,
+      "violations": []
+    },
+    {
+      "name": "Players",
+      "theme": "light",
+      "width": 768,
+      "violations": []
+    },
+    {
+      "name": "Players",
+      "theme": "light",
+      "width": 1280,
+      "violations": []
+    },
+    {
+      "name": "Players",
+      "theme": "light",
+      "width": 1920,
+      "violations": []
+    },
+    {
+      "name": "Console",
+      "theme": "light",
+      "width": 390,
+      "violations": []
+    },
+    {
+      "name": "Console",
+      "theme": "light",
+      "width": 768,
+      "violations": []
+    },
+    {
+      "name": "Console",
+      "theme": "light",
+      "width": 1280,
+      "violations": []
+    },
+    {
+      "name": "Console",
+      "theme": "light",
+      "width": 1920,
+      "violations": []
+    },
+    {
+      "name": "Chat",
+      "theme": "light",
+      "width": 390,
+      "violations": []
+    },
+    {
+      "name": "Chat",
+      "theme": "light",
+      "width": 768,
+      "violations": []
+    },
+    {
+      "name": "Chat",
+      "theme": "light",
+      "width": 1280,
+      "violations": []
+    },
+    {
+      "name": "Chat",
+      "theme": "light",
+      "width": 1920,
+      "violations": []
+    },
+    {
+      "name": "Plugins",
+      "theme": "light",
+      "width": 390,
+      "violations": []
+    },
+    {
+      "name": "Plugins",
+      "theme": "light",
+      "width": 768,
+      "violations": []
+    },
+    {
+      "name": "Plugins",
+      "theme": "light",
+      "width": 1280,
+      "violations": []
+    },
+    {
+      "name": "Plugins",
+      "theme": "light",
+      "width": 1920,
+      "violations": []
+    },
+    {
+      "name": "Server",
+      "theme": "light",
+      "width": 390,
+      "violations": []
+    },
+    {
+      "name": "Server",
+      "theme": "light",
+      "width": 768,
+      "violations": []
+    },
+    {
+      "name": "Server",
+      "theme": "light",
+      "width": 1280,
+      "violations": []
+    },
+    {
+      "name": "Server",
+      "theme": "light",
+      "width": 1920,
+      "violations": []
+    },
+    {
+      "name": "Backups",
+      "theme": "light",
+      "width": 390,
+      "violations": []
+    },
+    {
+      "name": "Backups",
+      "theme": "light",
+      "width": 768,
+      "violations": []
+    },
+    {
+      "name": "Backups",
+      "theme": "light",
+      "width": 1280,
+      "violations": []
+    },
+    {
+      "name": "Backups",
+      "theme": "light",
+      "width": 1920,
+      "violations": []
+    },
+    {
+      "name": "Configuration",
+      "theme": "light",
+      "width": 390,
+      "violations": []
+    },
+    {
+      "name": "Configuration",
+      "theme": "light",
+      "width": 768,
+      "violations": []
+    },
+    {
+      "name": "Configuration",
+      "theme": "light",
+      "width": 1280,
+      "violations": []
+    },
+    {
+      "name": "Configuration",
+      "theme": "light",
+      "width": 1920,
+      "violations": []
+    },
+    {
+      "name": "Audit",
+      "theme": "light",
+      "width": 390,
+      "violations": []
+    },
+    {
+      "name": "Audit",
+      "theme": "light",
+      "width": 768,
+      "violations": []
+    },
+    {
+      "name": "Audit",
+      "theme": "light",
+      "width": 1280,
+      "violations": []
+    },
+    {
+      "name": "Audit",
+      "theme": "light",
+      "width": 1920,
+      "violations": []
+    },
+    {
+      "name": "Access",
+      "theme": "light",
+      "width": 390,
+      "violations": []
+    },
+    {
+      "name": "Access",
+      "theme": "light",
+      "width": 768,
+      "violations": []
+    },
+    {
+      "name": "Access",
+      "theme": "light",
+      "width": 1280,
+      "violations": []
+    },
+    {
+      "name": "Access",
+      "theme": "light",
+      "width": 1920,
+      "violations": []
+    },
+    {
+      "name": "Settings",
+      "theme": "light",
+      "width": 390,
+      "violations": []
+    },
+    {
+      "name": "Settings",
+      "theme": "light",
+      "width": 768,
+      "violations": []
+    },
+    {
+      "name": "Settings",
+      "theme": "light",
+      "width": 1280,
+      "violations": []
+    },
+    {
+      "name": "Settings",
+      "theme": "light",
+      "width": 1920,
+      "violations": []
+    },
+    {
+      "name": "Legacy archive",
+      "theme": "light",
+      "width": 390,
+      "violations": []
+    },
+    {
+      "name": "Legacy archive",
+      "theme": "light",
+      "width": 768,
+      "violations": []
+    },
+    {
+      "name": "Legacy archive",
+      "theme": "light",
+      "width": 1280,
+      "violations": []
+    },
+    {
+      "name": "Legacy archive",
+      "theme": "light",
+      "width": 1920,
+      "violations": []
+    },
+    {
+      "name": "Fleet",
+      "theme": "dark",
+      "width": 390,
+      "violations": [
+        {
+          "id": "definition-list",
+          "impact": "serious",
+          "description": "Ensure <dl> elements are structured correctly",
+          "nodes": [
+            [
+              "article[data-selected=\"true\"] > dl"
+            ],
+            [
+              "article[data-selected=\"false\"] > dl"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Fleet",
+      "theme": "dark",
+      "width": 768,
+      "violations": [
+        {
+          "id": "definition-list",
+          "impact": "serious",
+          "description": "Ensure <dl> elements are structured correctly",
+          "nodes": [
+            [
+              "article[data-selected=\"true\"] > dl"
+            ],
+            [
+              "article[data-selected=\"false\"] > dl"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Fleet",
+      "theme": "dark",
+      "width": 1280,
+      "violations": [
+        {
+          "id": "definition-list",
+          "impact": "serious",
+          "description": "Ensure <dl> elements are structured correctly",
+          "nodes": [
+            [
+              "article[data-selected=\"true\"] > dl"
+            ],
+            [
+              "article[data-selected=\"false\"] > dl"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Fleet",
+      "theme": "dark",
+      "width": 1920,
+      "violations": [
+        {
+          "id": "definition-list",
+          "impact": "serious",
+          "description": "Ensure <dl> elements are structured correctly",
+          "nodes": [
+            [
+              "article[data-selected=\"true\"] > dl"
+            ],
+            [
+              "article[data-selected=\"false\"] > dl"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Overview",
+      "theme": "dark",
+      "width": 390,
+      "violations": []
+    },
+    {
+      "name": "Overview",
+      "theme": "dark",
+      "width": 768,
+      "violations": []
+    },
+    {
+      "name": "Overview",
+      "theme": "dark",
+      "width": 1280,
+      "violations": []
+    },
+    {
+      "name": "Overview",
+      "theme": "dark",
+      "width": 1920,
+      "violations": []
+    },
+    {
+      "name": "Performance",
+      "theme": "dark",
+      "width": 390,
+      "violations": []
+    },
+    {
+      "name": "Performance",
+      "theme": "dark",
+      "width": 768,
+      "violations": []
+    },
+    {
+      "name": "Performance",
+      "theme": "dark",
+      "width": 1280,
+      "violations": []
+    },
+    {
+      "name": "Performance",
+      "theme": "dark",
+      "width": 1920,
+      "violations": []
+    },
+    {
+      "name": "Players",
+      "theme": "dark",
+      "width": 390,
+      "violations": []
+    },
+    {
+      "name": "Players",
+      "theme": "dark",
+      "width": 768,
+      "violations": []
+    },
+    {
+      "name": "Players",
+      "theme": "dark",
+      "width": 1280,
+      "violations": []
+    },
+    {
+      "name": "Players",
+      "theme": "dark",
+      "width": 1920,
+      "violations": []
+    },
+    {
+      "name": "Console",
+      "theme": "dark",
+      "width": 390,
+      "violations": []
+    },
+    {
+      "name": "Console",
+      "theme": "dark",
+      "width": 768,
+      "violations": []
+    },
+    {
+      "name": "Console",
+      "theme": "dark",
+      "width": 1280,
+      "violations": []
+    },
+    {
+      "name": "Console",
+      "theme": "dark",
+      "width": 1920,
+      "violations": []
+    },
+    {
+      "name": "Chat",
+      "theme": "dark",
+      "width": 390,
+      "violations": []
+    },
+    {
+      "name": "Chat",
+      "theme": "dark",
+      "width": 768,
+      "violations": []
+    },
+    {
+      "name": "Chat",
+      "theme": "dark",
+      "width": 1280,
+      "violations": []
+    },
+    {
+      "name": "Chat",
+      "theme": "dark",
+      "width": 1920,
+      "violations": []
+    },
+    {
+      "name": "Plugins",
+      "theme": "dark",
+      "width": 390,
+      "violations": []
+    },
+    {
+      "name": "Plugins",
+      "theme": "dark",
+      "width": 768,
+      "violations": []
+    },
+    {
+      "name": "Plugins",
+      "theme": "dark",
+      "width": 1280,
+      "violations": []
+    },
+    {
+      "name": "Plugins",
+      "theme": "dark",
+      "width": 1920,
+      "violations": []
+    },
+    {
+      "name": "Server",
+      "theme": "dark",
+      "width": 390,
+      "violations": []
+    },
+    {
+      "name": "Server",
+      "theme": "dark",
+      "width": 768,
+      "violations": []
+    },
+    {
+      "name": "Server",
+      "theme": "dark",
+      "width": 1280,
+      "violations": []
+    },
+    {
+      "name": "Server",
+      "theme": "dark",
+      "width": 1920,
+      "violations": []
+    },
+    {
+      "name": "Backups",
+      "theme": "dark",
+      "width": 390,
+      "violations": []
+    },
+    {
+      "name": "Backups",
+      "theme": "dark",
+      "width": 768,
+      "violations": []
+    },
+    {
+      "name": "Backups",
+      "theme": "dark",
+      "width": 1280,
+      "violations": []
+    },
+    {
+      "name": "Backups",
+      "theme": "dark",
+      "width": 1920,
+      "violations": []
+    },
+    {
+      "name": "Configuration",
+      "theme": "dark",
+      "width": 390,
+      "violations": []
+    },
+    {
+      "name": "Configuration",
+      "theme": "dark",
+      "width": 768,
+      "violations": []
+    },
+    {
+      "name": "Configuration",
+      "theme": "dark",
+      "width": 1280,
+      "violations": []
+    },
+    {
+      "name": "Configuration",
+      "theme": "dark",
+      "width": 1920,
+      "violations": []
+    },
+    {
+      "name": "Audit",
+      "theme": "dark",
+      "width": 390,
+      "violations": []
+    },
+    {
+      "name": "Audit",
+      "theme": "dark",
+      "width": 768,
+      "violations": []
+    },
+    {
+      "name": "Audit",
+      "theme": "dark",
+      "width": 1280,
+      "violations": []
+    },
+    {
+      "name": "Audit",
+      "theme": "dark",
+      "width": 1920,
+      "violations": []
+    },
+    {
+      "name": "Access",
+      "theme": "dark",
+      "width": 390,
+      "violations": []
+    },
+    {
+      "name": "Access",
+      "theme": "dark",
+      "width": 768,
+      "violations": []
+    },
+    {
+      "name": "Access",
+      "theme": "dark",
+      "width": 1280,
+      "violations": []
+    },
+    {
+      "name": "Access",
+      "theme": "dark",
+      "width": 1920,
+      "violations": []
+    },
+    {
+      "name": "Settings",
+      "theme": "dark",
+      "width": 390,
+      "violations": []
+    },
+    {
+      "name": "Settings",
+      "theme": "dark",
+      "width": 768,
+      "violations": []
+    },
+    {
+      "name": "Settings",
+      "theme": "dark",
+      "width": 1280,
+      "violations": []
+    },
+    {
+      "name": "Settings",
+      "theme": "dark",
+      "width": 1920,
+      "violations": []
+    },
+    {
+      "name": "Legacy archive",
+      "theme": "dark",
+      "width": 390,
+      "violations": []
+    },
+    {
+      "name": "Legacy archive",
+      "theme": "dark",
+      "width": 768,
+      "violations": []
+    },
+    {
+      "name": "Legacy archive",
+      "theme": "dark",
+      "width": 1280,
+      "violations": []
+    },
+    {
+      "name": "Legacy archive",
+      "theme": "dark",
+      "width": 1920,
+      "violations": []
+    },
+    {
+      "name": "Pairing",
+      "theme": "light",
+      "width": 390,
+      "violations": []
+    },
+    {
+      "name": "Pairing",
+      "theme": "light",
+      "width": 768,
+      "violations": []
+    },
+    {
+      "name": "Pairing",
+      "theme": "light",
+      "width": 1280,
+      "violations": []
+    },
+    {
+      "name": "Pairing",
+      "theme": "light",
+      "width": 1920,
+      "violations": []
+    },
+    {
+      "name": "Pairing",
+      "theme": "dark",
+      "width": 390,
+      "violations": []
+    },
+    {
+      "name": "Pairing",
+      "theme": "dark",
+      "width": 768,
+      "violations": []
+    },
+    {
+      "name": "Pairing",
+      "theme": "dark",
+      "width": 1280,
+      "violations": []
+    },
+    {
+      "name": "Pairing",
+      "theme": "dark",
+      "width": 1920,
+      "violations": []
+    }
+  ],
+  "interactions": [],
+  "browserVersion": "153.0.8010.0",
+  "status": "PASS"
+}

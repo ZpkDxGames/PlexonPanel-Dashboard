@@ -1,42 +1,75 @@
-# 6.0.0 discovery baseline — interrupted checkpoint
+# 6.0.0 discovery baseline — M0 complete
 
-Date: 2026-10-08 UTC. Branch: `release/6.0.0`. Source: `86b6a0cefb2c5e420c9c862a7897705e1ea59146`, accepted 5.0.0 activation. **M0 is incomplete; M1 has not started.** This report must not be used as a milestone acceptance receipt.
+Date: 2026-10-08 UTC. Branch `release/6.0.0`; production source `86b6a0cefb2c5e420c9c862a7897705e1ea59146` (accepted5.0.0 activation). M0 discovery is complete: the required inventories, untouched check, complete screenshot matrix and baseline axe execution exist. **Baseline accessibility is not clean**: Fleet has one serious rule violation in all8 variants. Recording that defect completes discovery; it does not pass a later zero-violation UI acceptance gate. No production UI/logic/tests/dependencies were changed.
 
-## Mandatory stop condition
+## Authority and resolved stop
 
-The brief §0.9 says: “Stop and report (do not guess) if … an existing test encodes behavior you believe is wrong.” Section 3 says Paper connectivity must be separate from Host service state and the UI must never fabricate an active service state.
-
-`tests/dashboard-2-1.test.mjs`, test “Paper connection only fills missing service state and never overrides explicit inactive”, requires `normalizeServiceState(undefined, true)` to equal `active`. `lib/lifecycle-state.ts` implements that fallback. `app/dashboard.tsx` uses `normalizeServiceState(state.service.state, paper)` when calculating `restartAvailable`, which is passed to the current command palette. Thus a missing Host state plus connected Paper can make the palette offer a restart as if the service were known active. Host authorization still remains authoritative, but presentation violates the new hard gate.
-
-The Server workspace and `lib/connection-state.ts` already call the same helper with `false`, preserving unknown state. This is a concrete inconsistency, not a request for a new backend capability. No test or implementation has been changed.
-
-### Proposed resolutions for maintainer decision
-
-1. **Recommended:** approve a frontend-only correction for a later implementation milestone: missing Host service state always remains unknown; all lifecycle callers use Host state only; revise the contradictory assertion and add a mounted palette gating regression. Continue M0/M1 with current code/tests unchanged, treating this as an explicitly approved future correction.
-2. Keep historical helper behavior solely as a compatibility API, forbid its Paper fallback in every production caller, and add a regression proving it is not used by any service-state/lifecycle presentation. This preserves the old test but leaves misleading dead behavior and adds maintenance cost.
-
-Neither option needs Core, Host, relay, protocol, a VPS restart or production deployment. Approval is needed because the brief explicitly requires stopping on this test conflict.
+[UI_6_DECISIONS.md](UI_6_DECISIONS.md) overrides the brief. The earlier mandatory §0.9 stop is resolved by maintainer decision1: correct Host-only service state and the contradictory dashboard-2-1 test in M3, not now. Existing `normalizeServiceState(undefined,true)` returns active; shell restart/palette callers use it, while Server uses false. This approved future correction remains an explicit baseline defect. Decisions preserve six Overview tiles, nine Performance charts, one real backup-progress stream, stored accents, bounded chat cache, active Files/Backups, existing file diff/conflict/dirty guards and navigation-only future palette. Unused CPU fallback removal is approved M8.
 
 ## Executed gates and provenance
 
-| Gate | Method | Result | Evidence |
+| Gate | Result | Evidence / limits |
+|---|---|---|
+| Entire brief, AGENTS.md, CLAUDE.md | Read completely | Root brief exact supplied copy; CLAUDE delegates AGENTS |
+| Rollback anchor / isolation | Passed | Exact sourceSHA above in UI_6_ROLLOUT.md; new release worktree; main untouched; no tag created |
+| Untouched `npm ci && npm run check` | Passed |415 packages, Node24.19/npm11.9;79 relay+183 dashboard tests,0 failed/skipped |
+| Installed Next16.3.8 docs | Read relevant guides | Font/CSS/lazy-loading/server/client guides; no Next code written |
+| Playwright bundled Chromium1248 install | Failed | Invalid/truncated ZIP retries; with-deps apt lacked setgroups/seteuid privileges |
+| Native headless-shell one-page smoke before matrix | Passed | Chromium153.0.8010.0 via isolated @sparticuz/chromium153; local page load + smokePNG |
+| Full workspace/route matrix | Passed capture gate |120 full-page screenshots:15 pages×2 themes×4 widths; no pageerror;0 root horizontal overflow |
+| Axe execution on every capture | Executed, findings present |120 scans with WCAG2A/AA/2.1AA tags;8 serious definition-list findings, all Fleet;112 other scans0 violations |
+| Source/control/data/state/test inventories | Complete discovery artifacts | Linked catalogues below; per-state source review distinguished from executed healthy/empty screenshots |
+| M0 end `npm run check` | Passed | Exit0;79 relay+183 dashboard,0 failures/skips; Next production-mode test build passed |
+| Unchanged test:browser / performance soak | Not executed | M0 capture harness is separate; no inferred existing-script execution |
+| Manual WCAG2.2 / screen reader / live systemd/RCON/Drive | Not executed | Baseline scans are not full certification |
+| M1 design experiments / M2+ | Not executed at M0 commit | M1 follows this checkpoint; no production deployment |
+
+## Screenshot environment and reproduction
+
+Standard Playwright download could not be used in this container. The working executable is genuine Linux Chromium **headless shell**153 (rather than the Playwright1.64 expected Chromium156 build). Playwright drives it with `--disable-gpu --use-angle=swiftshader --enable-unsafe-swiftshader`, plus `--no-sandbox --no-zygote --single-process --disable-dev-shm-usage --disable-webgl --disable-software-rasterizer`; the additional flags bypass unsupported EGL initialization. CSS/HTML/native SVG render in software. `ldd` resolved all required libraries. Native deps installation was attempted and blocked by container privileges; no unexecuted install is claimed successful. Font rasterization/system-font fallback is environment-specific. This proves this native engine capture matrix, not browser-engine parity with the expected bundled build.
+
+The archive includes `capture.mjs`, raw `browser-results.json`, all120 PNGs, review contact sheets, smoke script/log/image and command logs. Extract its ui6-baseline directory to repository `artifacts/ui6-baseline/`; the harness imports existing `scripts/support/fleet-fixture.mjs`. On a normal machine:
+
+```sh
+npm ci
+npx playwright install --with-deps --only-shell chromium
+npm run relay:build
+PLEXON_SOURCE_COMMIT=86b6a0cefb2c5e420c9c862a7897705e1ea59146 node artifacts/ui6-baseline/capture.mjs
+```
+
+The harness automatically uses Playwright's bundled engine when PLEXON_CHROMIUM_EXECUTABLE is unset. In this container the executable/library path points to the isolated software-rendering shell. The harness starts Next development on loopback3000 and a signed standalone relay8788. Two simulated agents supply actual signed fixture envelopes with random ephemeral identities/grants; Minecraft/systemd/RCON/Drive are not contacted. No real credentials, entered pairing codes, tokens or keys are in screenshots. The pairing capture uses an empty placeholder, not an issued code.
+
+Development captures contain the Next dev indicator and some genuine signed read-result notices. They are documented baseline environment artifacts, not desired production UI. Fleet's earliest light capture includes a waiting-for-first-telemetry second instance; later widths have received it. Console fixture ready state chooses signed PAPER_FALLBACK while scoped Host history responses are supplied; no real journald authority acceptance is claimed. Backup history is an honest empty fixture; no invented operation was added to the normal matrix.
+
+## Complete screenshot matrix
+
+All files live in `artifacts/ui6-baseline/`, separate from accepted5.0 evidence `docs/ui-evidence/after/`. [UI_6_SCREENSHOT_MANIFEST.json](UI_6_SCREENSHOT_MANIFEST.json) records sourceSHA, browser version, capture timestamp, width/theme, root geometry, DOM count, every per-page axe finding, byte size and SHA256 for all120 PNGs.
+
+| Page | File prefix | Light widths | Dark widths |
 |---|---|---|---|
-| Entire brief | Read all 534 lines of supplied file | Passed | Root `PLEXONPANEL_6.0.0_REVAMP.md` is an exact copy |
-| Instructions | Read AGENTS.md and CLAUDE.md; CLAUDE delegates to AGENTS | Passed | Next breaking-change notice intact |
-| Remote source / rollback | `git ls-remote origin HEAD refs/heads/main refs/heads/release/6.0.0 refs/tags/v5.0.0` | Passed | HEAD/main exact SHA above; no tag/release branch returned at discovery |
-| Isolation | `git worktree add -b release/6.0.0 … 86b6a0c…` | Passed | Isolated worktree; no edits to main |
-| Untouched install | `npm ci` | Passed | 415 packages; Node v24.19.0, npm 11.9.0 |
-| Untouched checks | `npm run check` | Passed | Scope/fleet generation checks, lint, typecheck, 79 relay tests, 183 dashboard tests; 0 failed/skipped/cancelled |
-| Next guidance | Installed `next/dist/docs/01-app` font, CSS, lazy-loading, server/client material | Read | Dynamic import boundaries, local font paths and production CSS ordering noted; no Next code written |
-| Baseline screenshots | Signed loopback relay + Next + Playwright capture attempted | Failed | Initial browser missing; Playwright install returned invalid ZIPs; fallback Chromium 153 launched but EGL initialization failed |
-| Screenshot matrix | 13 workspaces plus pairing/legacy route, light/dark, 390/768/1280/1920 | Not executed | Zero screenshots captured; failed attempt is not visual evidence |
-| Baseline axe | Capture harness intended scans | Not executed | Browser did not reach a page |
-| M1 font/contrast experiments | Not started | Not executed | Stop condition found before M0 completion |
-| M1 design / M2+ / deployment | Not started | Not executed | Explicit session boundary and stop rule |
+| Fleet | fleet |390/768/1280/1920 |390/768/1280/1920 |
+| Overview | overview |same4 |same4 |
+| Performance | performance |same4 |same4 |
+| Players | players |same4 |same4 |
+| Console | console |same4 |same4 |
+| Chat | chat |same4 |same4 |
+| Plugins | plugins |same4 |same4 |
+| Server | server |same4 |same4 |
+| Backups | backups |same4 |same4 |
+| Configuration | configuration |same4 |same4 |
+| Audit | audit |same4 |same4 |
+| Access | access |same4 |same4 |
+| Settings | settings |same4 |same4 |
+| Pairing | pairing |same4 |same4 |
+| /activity | legacy-archive |same4 |same4 |
 
-The check command ran before any tracked file changes. Next dev subsequently regenerated `next-env.d.ts`; that generated change was restored byte-for-byte from the source anchor. The branch checkpoint contains documentation only. Local agents were simulated with fresh random identities and signed messages, with no Minecraft/systemd/RCON actions or deployed credentials. The attempted screenshots never exposed credentials. Live PlexonCraft acceptance is not implied.
+Filename format `<prefix>-<width>-<light|dark>.png`. Viewport height844 below800px,1080 otherwise; full-page images include all content. Local prefs use100% text, standard contrast, motion off, optional remote heads disabled. Saved preference migration/high-contrast/zoom/reduced-motion cross-state matrix remains later acceptance, not silently part of this baseline.
 
-## Preliminary route and owner map
+## Baseline accessibility result
+
+Fleet: `definition-list`, serious, both server-card `<dl>` elements in each width/theme. Direct `<small>` children break valid dt/dd or grouping structure; fix markup while preserving source details during M4. Other112 scans found0 configured-rule violations. Axe does not prove manual target sizes, keyboard state transitions or WCAG2.2 focus obscuration. Access390 remains severely unusable from per-character text wrapping despite no root overflow and no axe finding: this is a concrete reason visual and manual acceptance must accompany automation.
+
+## Route and owner map
 
 The app has `/` (server selector and selected-server workspaces), `/activity` (read/clear-only legacy archive), and `/api/build` (nonsecret deployment build identity). Boot, pairing, confirmations and command palette live in `app/dashboard.tsx`, not separate routes.
 
@@ -60,46 +93,37 @@ Canonical `ViewProps` in `app/control-views.tsx`: `state: ControlState`, optiona
 | Pair/boot/shell | `app/dashboard.tsx` | data-source/browser-store/control-state/device-grant/display-cadence; pairing and immutable bound operations |
 | Legacy archive | `app/activity/page.tsx` | activity-history/avatar-provider; bounded existing unverified entries, local clear only, no Paper journal merge |
 
-## Source-level catalogues
+## Completed parity inventories
 
-`UI_6_SOURCE_CATALOGUE.json` contains the exact source expressions from all 29 app/components TSX files: 228 control declarations (buttons, forms, inputs, selectors, dialogs, disclosures, links and progress controls), ancestor conditions, disabled/event attributes, labels, full source fragments, imports, function parameter types and 2,328 property-read expressions. Mapped controls retain their source array/condition rather than being mistaken for one runtime button. This is a reproducible raw parity index, **not** a completed manual authorization audit. Its file/line anchors refer to the source SHA, not future code.
+- [UI_6_MODULE_INVENTORY.md](UI_6_MODULE_INVENTORY.md): every29 TSX presentation module, function/props signature and direct imported owners; workspace map above supplies canonical state/action props.
+- [UI_6_CONTROL_AUDIT.md](UI_6_CONTROL_AUDIT.md): every228 control declaration, authorization, confirmation and local-vs-server effect, including mapped actions/weekday/window/preferences and production-hidden history controls. Exact ancestor conditions/callbacks in raw index retain action-specific parameters.
+- [UI_6_DATA_INVENTORY.md](UI_6_DATA_INVENTORY.md): every reducer/result domain with source/units/cadence/nullable behavior; exact field-read index covers aliases; service CPU/RAM, tick metrics, roster, console authority, durable15-phase backups and optional counters explicitly resolved.
+- [UI_6_STATE_MATRIX.md](UI_6_STATE_MATRIX.md): all15 pages×8 requested states; identifies complete, partial and missing current designs. Source review is not execution of every state scenario.
+- [UI_6_TEST_CATALOGUE.md](UI_6_TEST_CATALOGUE.md): all31 dashboard suites/titles; [UI_6_TEST_GAPS.md](UI_6_TEST_GAPS.md) maps remaining mounted parity gaps to milestones and accurately states browser-script coverage.
+- [UI_6_SOURCE_CATALOGUE.json](UI_6_SOURCE_CATALOGUE.json): reproducible TypeScript AST index of imports, function parameters,228 controls and2328 read expressions. No user secrets/runtime data are included.
 
-`UI_6_TEST_CATALOGUE.md` records titles in all 31 dashboard test files. The runtime check totals above are authoritative. Several suites contain static source assertions, so a green suite alone does not certify interaction or styling parity. `scripts/verify-ui-browser.mjs` covers signed simulated agents, populated workspaces, six widths, light/default and dark/high-contrast/125% variants, mobile drawer keyboard/inert behavior, selected-server switching, chart keyboard inspection, scoped export, stale/Paper-offline/stopped states, an uploading durable job, axe, and a timed Performance soak. It does not capture every requested M0 width/theme per workspace; M0 needs its own matrix without overwriting the accepted 5.0 evidence.
+## Visual findings that drive M1
 
-## Preliminary data truth map
+| Screen | Observed pain point | Design consequence |
+|---|---|---|
+| Fleet | Repeated connection sentences/status rows per instance, equal emphasis for every metric, large blank wide-screen margins; serious dl markup | Compact source-aware instrument rows and useful shared infrastructure, no duplicate node totals |
+| Overview | Six equal rounded cards followed by large sparse TPS/MSPT charts, repeated server/service/source identity | Keep all6 metrics but privilege tick health/Pulse, narrow secondary instrument row; details on demand |
+| Performance | Nine tall chart panels create a long mobile page; repeated statistics/source lines and short observed coverage | Retain9, group by source/job, make low-history/gap truth prominent and stats concise; chart layout pref survives |
+| Players | Mobile Manage button consumes a separate action row per player; fresh-vs-last snapshot age not obvious | Entire row opens drawer, compact identity/session data, keep supplied-only details and all13 gated actions |
+| Console | Several toolbar rows consume reading space; timestamp wraps across lines; replay explanation dominates; local operations look like server commands | Console-first log well, compact filter drawer, sticky explicitly Paper-only command composer, readable timestamp columns |
+| Chat | Multiple pill controls and large composer leave little chat reading area on phone; cache/privacy not visible | Plain message stream, compact local toolbar, explicit bounded cache control in Settings |
+| Plugins | Narrow phone table hides detail/actions behind internal scrolling; Refresh sounds like an RPC but is notice-only | Compact inventory rows with metadata drawer; retain truthful pushed-snapshot behavior |
+| Server | Large connection card duplicates shell authority; start/stop/restart equal visual footprint with sparse content | Host state as decisive instrument, one clear safe operation strip, pending stages and bound effects |
+| Backups | Very long stacked readiness/forms on mobile; destination/capability prose repeated; settings compete with active workflow | Readiness summary + one durable phase progress, settings/history collapsed by intent, no lost safe diagnostics/actions |
+| Configuration | Long introduction before list/editor; create/upload controls dominate tiny phone editor; review/save distinction subtle | File browser→editor mobile flow, pinned source/path and dirty state, actual diff plus existing bound action path |
+| Audit | Date/actor filters split from local search meaning; event detail copy is distant | Query-vs-loaded-search labels, actual timestamped event rows with safe expandable detail |
+| Access |390px this-device panel wraps role, connection and expiry one character per line; obsolete Advanced/Future copy | Stacked semantic key/value metadata, immutable grant visual intersection, active Files/Backups wording |
+| Settings | One long all-settings grid with repeated browser-local explanations | Group Appearance/Charts/Players/Data & privacy; saved values intact; cache clear separate from visual reset |
+| Pairing | Marketing headline competes with operational pairing form; mobile form below explanation | Pairing task first, brief trust explanation and real approval states |
+| Legacy | Four empty metric cards overemphasize archive; back link/copy stylistically inconsistent | Small unverified cleanup surface reached from Settings until retirement criteria proved |
 
-All dynamic JsonMap fields may be absent unless validated, so missing numbers remain unavailable. Source-capture timestamps and receipt (`updatedAt`, `telemetryUpdatedAt`) are separate. History is 35 minutes / 8,192 records; metricSeries deduplicates each source timestamp and preserves provenance. Display cadence defaults to 500 ms, selectable 0/250/500/1000/2000; operational messages bypass it.
+Observed screenshot review used all15 pages at390light/1280dark contact sheets, plus individual screenshots and the manifest for all120 dimensions. It is not a timed 3-second operator study. No measured performance improvement is claimed; baseline CPU/memory profiling remains not executed. Source shows bounds/geometry controls, not measured speed.
 
-| Fields / adapter | Source | Unit / nominal cadence | Missing behavior |
-|---|---|---|---|
-| server.capturedAt, server.tps[0], averageTickMillis, onlinePlayers, maximumPlayers | Paper health | ISO time, ticks/s, ms, counts; adapter 2 s | nullable; never synthesize zero |
-| system.capturedAt, processCpuPercent, jvmHeapUsedBytes/jvmHeapMaximumBytes, gcPauseTotalMillis, processUptimeMillis, javaVersion/operatingSystem/architecture | Paper JVM/process | CPU % machine capacity, bytes, ms, text; adapter 5 s | independent from Host |
-| hostSystem.capturedAt, nodeId, hostCpuPercent, physicalMemoryUsedBytes/physicalMemoryTotalBytes, diskUsedBytes/diskTotalBytes, operatingSystem/architecture | Host machine | CPU % machine capacity, bytes; adapter 250 ms | fresh node sample only; no Paper substitution |
-| service.state, service/service pid, mainPid, minecraftReady, recoveryRequired | Host service status | enum/text/boolean; signed status cadence | unknown remains unknown in Server; shell fallback is the blocker |
-| service.resources.capturedAt/scope/source/cpuUnit/cpuAvailable/cpuPercent/memoryAvailable/memoryBytes | Host systemd cgroup | % one core (can exceed 100), bytes; adapter 5 s | requires MINECRAFT_SERVICE + SYSTEMD_CGROUP; exact unit/availability flags |
-| worlds[].name/players/loadedChunks/entities | Paper worlds | text/counts; push | optional; current Overview gates on health freshness |
-| players[].uuid/name/displayName/world/pingMillis/gameMode/health/maximumHealth/food/experienceLevel/op/whitelisted/onlineDurationMillis/sessionId/sessionStartedAt/firstSeenAt/lastLoginAt/position/address | Paper roster/presence | identifiers/text/ms/counts/coordinates/address; pushed inventories + immediate presence deltas | snapshot/session reconciliation; sensitive fields require grant and actual supply; explicit drawer scope recheck needs parity coverage |
-| plugins[].name/version/enabled/authors/description/dependencies/softDependencies/website | Paper inventory | metadata; push | optional details only; configured reload capability |
-| ready.consoleAuthority/consoleSourceState; console[].capturedAt/content/level/source/journalCursor/journalEpoch/invocationId/streamSession/sourceSequence | Relay-signed authority, Host replay or authorized Paper live fallback | enum/time/text/IDs; immediate | full/errors visibility; 2,500 lines; cache at most 500 |
-| chat[].messageId/capturedAt/playerName/content/source/integration | Paper chat | time/text; immediate | 200 messages; current safeCache keeps up to 100 (brief §9.7 says no persistence) |
-| history[].at/sources/tps/mspt/hostCpu/processCpu/heap/memory/players/gc/serviceCpu/serviceMemory | Reducer observations | source-specific units/cadence above | source captures optional for bounded legacy adapter; no interpolation across gaps |
-| backupProgress.jobId/phase/progress/bytesUploaded/bytes/totalBytes/bytesPerSecond/providerState/warnings | Host live progress | ratio/bytes/bytes per second; immediate | only current matching durable job, phase not behind durable state; one latest progress payload |
+## Reconciliation with brief
 
-Backup reads also come from scoped action results, not just reducers: maintenance.status/currentOperation has jobId, operationId, type, phase, phaseTimestamp, startedAt, result, backupId, progressPercent, localBackupVerified, remoteBackupVerified, warnings and recovery flags; countdownRemainingSeconds/countdownInitialSeconds and commandChannel.enabled belong to status. Preflight carries hostAuthenticated, operationBusy, recoveryRequired, backupRootWritable, commandChannelConfigured, usableBytes/backupRootUsableBytes, requiredBytes, unreadableDurableCount, missingIncludes, symlinkIssues, provider/providerStatus/remote. Provider status and backup list retain distinct connectivity-test and remote-verification fields. Settings preserve timezone, restart schedule/frequency/weekdays/time/countdown/stop/start timeouts and manual-backup retention/filename fields. No provider credentials are required by the view.
-
-Exact current phase keys: QUEUED, PREFLIGHT, COUNTDOWN, FINAL_SAVE, STOPPING_SERVER, WAITING_FOR_STOP, ARCHIVING, HASHING, VERIFYING_LOCAL, UPLOADING_REMOTE, VERIFYING_REMOTE, CLEANING_LOCAL, STARTING_SERVER, VERIFYING_STARTUP, COMPLETED. Additional outcomes DEGRADED, FAILED and RECOVERY_REQUIRED have explicit behavior; recovery is blocking, not normal completion.
-
-## Other findings requiring the full baseline/design pass
-
-- Overview is six equal metric tiles: TPS, MSPT, online players, JVM heap, service CPU, service RAM. Performance has nine charts (six primary plus players/service CPU/service RAM), not only six. Preserve these capabilities in a designed hierarchy. No new metrics are needed.
-- Access still labels Files/Backups “Advanced / Future” and claims 3.0 does not expose them; these are active. Copy should follow actual current ownership.
-- Fleet already publishes ControlState histories through existing FleetFeed, so observed mini Pulse does not need a second transport.
-- Preferences default to light/monochrome/compact, with existing accent enums monochrome/cyan/violet/emerald/amber. New names/defaults must preserve saved choices and require additive parsing/migration tests.
-- Current command palette includes an actual restart entry (bound confirmation still applies); the brief wants navigation only. Proposed new palette must navigate to Server rather than execute.
-- Current Configuration already has a local original/edited diff and hash conflict preservation. New save confirmation should be added only through the existing bound action path; do not drop dirty-leave protection, download verification/cancellation, create/upload/rename/delete scopes.
-- One latest backup progress event exists; do not invent simultaneous compression/upload counters or reload-retained phase counters. In a design, inactive/unknown bars must explicitly say not supplied.
-- Current chat is persisted by safeCache up to 100 messages; §9.7 calls for no persistence. This needs an explicit design/migration decision; no change was made.
-- Legacy Activity retirement conditions are not proved; retain its bounded cleanup capability. Optional applied-skin fallback remains until supported Core agents supply the canonical field.
-- `lib/cpu-load.js` is unused by app/components but its tests preserve a combined system/process fallback. Do not use it for 6.0 monitoring; decide whether to remove the dead helper and obsolete tests with a later approved cleanup.
-
-No visual pain points beyond source-observable hierarchy/copy are claimed: browser screenshots are unavailable. Full state matrices (loading/empty/stale/disconnected/degraded/forbidden/busy/error), per-control manual rules, complete semantic field interpretation, screenshot review, performance baseline and test-gap prioritization remain to complete after the stop condition is resolved.
+All ten maintainer overrides are applied to planning. The brief’s “live compression + upload” description does not create two supplied progress streams; current code has only one latest phase payload. Overview/Performance counts exceed simplified later wording, and are preserved by decisions2/3. Palette currently executes restart; plan navigates. Defaults currently light/monochrome/compact; OS-following/new labels cannot overwrite stored choices. Chat cache100 remains. Active Files/Backups wording is corrected later. New local privacy controls require no protocol change. Undisclosed local policy/agent-last-seen cannot be separately fabricated for explainers; show known gates or “not supplied”. Configuration save confirmation must use existing bound path without replacing diff/conflict/dirty protections. No unresolved backend change is required by this M1 plan.

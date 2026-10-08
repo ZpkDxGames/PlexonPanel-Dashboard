@@ -27,3 +27,13 @@
 - Maintainer approved Host-only service-state correction for M3, leaving all current production code/tests unchanged during M0/M1. UI_6_DECISIONS.md is the authoritative override for all ten decisions and the A/B/C task order.
 - Explicit authorization now covers pushing release/6.0.0 to origin. The earlier rejection is superseded by this new authorization; main and tags remain untouched.
 - Resume begins with a native headless-shell one-page smoke test; the full matrix will not run until it succeeds.
+
+## M0 completed
+
+- Native one-page smoke passed before full matrix using Chromium headless shell153.0.8010.0 driven by Playwright, software-rendering flags. Bundled Chromium156 download failed invalid ZIP; apt system-deps attempt blocked privileges. These environment limits remain recorded, not passed.
+- Captured120 PNGs and executed120 per-page axe scans under artifacts/ui6-baseline; accepted5.0 evidence untouched. All15 pages×light/dark×390/768/1280/1920,0 pageerrors/overflow.
+- Axe recorded serious definition-list on Fleet in all8 variants; other112 scans0 configured violations. Accessibility cleanup gate is not passed. Mobile Access visual wrapping defect documented despite axe0.
+- Completed source/module/data inventories,228-control authorization/confirmation audit, eight-state matrix for all15 pages and prioritized test gaps. Scenario matrix is source review, not a claim all states were browser-executed.
+- Repeated npm run check at milestone end: exit0;79 relay+183 dashboard tests,0 failures/skips. Production-mode Next test build executed by npm test also passed.
+- Restored generated next-env.d.ts exactly; production source, tests, manifests, generated contracts unchanged. M0 complete; M1 begins after this milestone commit.
+- Authorized remote release branch created through connected GitHub integration because git CLI lacks credentials; documentation commits will be mirrored with equal trees, no force/main/tag changes.
