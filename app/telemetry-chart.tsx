@@ -74,16 +74,20 @@ export function TelemetryChart({
   const [inspectIndex, setInspectIndex] = useState<number | null>(null);
   const [documentVisible, setDocumentVisible] = useState(true);
   const [inViewport, setInViewport] = useState(true);
+  const [chartWidth, setChartWidth] = useState(720);
   const now = useTelemetryNow(history.at(-1)?.at ?? 0);
   const series = useMemo(() => metricSeries(history, spec.field, windowMinutes, now), [history, spec.field, windowMinutes, now]);
   const points = series;
   const legacyCount = series.filter(point => point.provenance === "legacy packet timestamp" && point.value !== null).length;
   const values = series.map((point) => point.value).filter((value): value is number => value !== null);
   const stats = metricReport(series, windowMinutes, now, sourceIntervalMs ?? METRICS[spec.field].intervalMs);
+  const hasData = stats.count > 0;
   const [lower, upper] = resolveDomain(values, { fixed: spec.domain, percentage: spec.percentage, capacity, reference: spec.reference?.value });
   const end = now;
   const start = end - windowMinutes * 60_000;
-  const xFor = (at: number) => 62 + ((at - start) / Math.max(1, end - start)) * 638;
+  const plotRight = chartWidth - 20;
+  const plotWidth = plotRight - 62;
+  const xFor = (at: number) => 62 + ((at - start) / Math.max(1, end - start)) * plotWidth;
   const yFor = (value: number) => 178 - ((value - lower) / Math.max(0.001, upper - lower)) * 142;
   const renderSegments = useMemo(
     () => gapSegments(series, Math.max(1000, (sourceIntervalMs ?? METRICS[spec.field].intervalMs) * 3)).map((segment) => thinSegment(segment, 800)),
@@ -106,11 +110,16 @@ export function TelemetryChart({
   }, []);
 
   useEffect(() => {
-    if (!viewportRef.current || typeof IntersectionObserver === "undefined") return;
-    const observer = new IntersectionObserver((entries) => setInViewport(entries[0]?.isIntersecting ?? true), { rootMargin: "120px" });
-    observer.observe(viewportRef.current);
-    return () => observer.disconnect();
-  }, []);
+    const element = viewportRef.current;
+    if (!element) return;
+    const updateWidth = () => setChartWidth(Math.max(300, Math.min(720, element.clientWidth - 20)));
+    queueMicrotask(updateWidth);
+    const resize = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(updateWidth);
+    resize?.observe(element);
+    const observer = typeof IntersectionObserver === "undefined" ? null : new IntersectionObserver((entries) => setInViewport(entries[0]?.isIntersecting ?? true), { rootMargin: "120px" });
+    observer?.observe(element);
+    return () => { resize?.disconnect(); observer?.disconnect(); };
+  }, [hasData]);
 
   const moveInspection = (direction: -1 | 1) => {
     if (!series.length) return;
@@ -161,7 +170,7 @@ export function TelemetryChart({
           <svg
             ref={svgRef}
             className={`workspace-chart display-series-${spec.series}`}
-            viewBox="0 0 720 210"
+            viewBox={`0 0 ${chartWidth} 210`}
             role="img"
             tabIndex={0}
             aria-describedby={descriptionId}
@@ -179,8 +188,8 @@ export function TelemetryChart({
               if (!series.length) return;
               const rect = svgRef.current?.getBoundingClientRect();
               if (!rect) return;
-              const x = ((event.clientX - rect.left) / rect.width) * 720;
-              const ratioX = Math.max(0, Math.min(1, (x - 62) / 638));
+              const x = ((event.clientX - rect.left) / rect.width) * chartWidth;
+              const ratioX = Math.max(0, Math.min(1, (x - 62) / plotWidth));
               const at = start + ratioX * (end - start);
               const index = nearestValueIndex(series, at);
               setInspectIndex(index !== null && Math.abs(series[index].at - at) <= Math.max(1000, (sourceIntervalMs ?? METRICS[spec.field].intervalMs) * 3) ? index : null);
@@ -192,7 +201,7 @@ export function TelemetryChart({
                 <stop offset="100%" stopColor="var(--ui-series)" stopOpacity="0" />
               </linearGradient>
             </defs>
-            {[36, 107, 178].map((y) => <line key={y} x1="62" x2="700" y1={y} y2={y} className="workspace-gridline" />)}
+            {[36, 107, 178].map((y) => <line key={y} x1="62" x2={plotRight} y1={y} y2={y} className="workspace-gridline" />)}
             {ticks.map((tick, index) => (
               <text key={index} x="55" y={[40, 111, 182][index]} textAnchor="end" className="workspace-axis-label">
                 {spec.field === "memory" || spec.field === "heap" || spec.field === "serviceMemory" ? bytes(tick) : tick.toFixed(tick >= 100 ? 0 : 1)}
@@ -200,9 +209,9 @@ export function TelemetryChart({
             ))}
             {spec.reference && spec.reference.value >= lower && spec.reference.value <= upper && (
               <>
-                <rect x="62" width="638" y={Math.max(30, yFor(spec.reference.value) - 4)} height="8" className="display-reference-band" />
-                <line x1="62" x2="700" y1={yFor(spec.reference.value)} y2={yFor(spec.reference.value)} className="workspace-reference-line" />
-                <text x="694" y={Math.max(15, yFor(spec.reference.value) - 7)} textAnchor="end" className="workspace-reference-label">{spec.reference.label}</text>
+                <rect x="62" width={plotWidth} y={Math.max(30, yFor(spec.reference.value) - 4)} height="8" className="display-reference-band" />
+                <line x1="62" x2={plotRight} y1={yFor(spec.reference.value)} y2={yFor(spec.reference.value)} className="workspace-reference-line" />
+                <text x={plotRight - 6} y={Math.max(15, yFor(spec.reference.value) - 7)} textAnchor="end" className="workspace-reference-label">{spec.reference.label}</text>
               </>
             )}
             {preferences.chartStyle === "area" && paths.area && <path d={paths.area} fill={`url(#${gradientId})`} className="display-chart-area" />}
@@ -214,7 +223,7 @@ export function TelemetryChart({
               </>
             )}
             <text x="62" y="201" className="workspace-axis-label">{displayTime(start, preferences.timeZone)}</text>
-            <text x="700" y="201" textAnchor="end" className="workspace-axis-label">{displayTime(end, preferences.timeZone)}</text>
+            <text x={plotRight} y="201" textAnchor="end" className="workspace-axis-label">{displayTime(end, preferences.timeZone)}</text>
           </svg>
           {inspected && inspectedValue !== null && (
             <div className="workspace-chart-tooltip" title={`UTC: ${new Date(inspected.at).toISOString()}`}>

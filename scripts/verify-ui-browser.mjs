@@ -19,7 +19,7 @@ try {
         await room.paper.send('inventory.players',{...data,offset:0,complete:true});
         return {data};
       }
-      if(body.action.startsWith('console.history'))return {data:{lines:Array.from({length:24},(_,i)=>({capturedAt:new Date(Date.now()-(24-i)*1000).toISOString(),content:i===23?'Fixture journal: world save completed':`Fixture journal entry ${i+1}: ${i%7===0?'slow task observed':'server tick completed'}`,level:i%7===0?'WARN':'INFO',source:'HOST',journalCursor:`fixture-${room.key}-${i}`,journalEpoch:'fixture-epoch'})),hasMore:false}};
+      if(body.action.startsWith('console.history'))return {data:{lines:Array.from({length:24},(_,i)=>({capturedAt:new Date(Date.now()-(24-i)*1000).toISOString(),content:i===23?'Fixture journal: world save completed':`Fixture journal entry ${i+1}: ${i%7===0?'slow task observed':'server tick completed'}`,level:i%7===0?'WARN':'INFO',source:'HOST',journalCursor:`fixture-${room.key}-${i}`,journalEpoch:'fixture-epoch',invocationId:'fixture-startup-'+room.key})),hasMore:false}};
       if(body.action==='files.list')return {data:{entries:[{name:'fixture-settings.yml',directory:false,editable:true,size:29}],hasMore:false}};
       if(body.action==='files.read')return {data:{content:'fixture: true\nview: dashboard\n',sha256:'a'.repeat(64),editable:true}};
       if(body.action==='audit.list'||body.action==='audit.self')return {data:{entries:[{timestamp:new Date().toISOString(),actorLabel:'Fixture operator',role:'Owner',actionType:'server.status',target:room.key,outcome:'SUCCESS',code:'OK',requestId:randomUUID(),durationMillis:8}],hasMore:false}};
@@ -45,13 +45,14 @@ try {
   await page.evaluate(async credentials=>{await new Promise((resolve,reject)=>{const r=indexedDB.open('plexonpanel-browser-v3',1);r.onupgradeneeded=()=>r.result.createObjectStore('workspace');r.onsuccess=()=>{const db=r.result,tx=db.transaction('workspace','readwrite'),s=tx.objectStore('workspace');for(const c of credentials)s.put(c,'credential:'+c.serverId);s.put(credentials[0].serverId,'selected');tx.oncomplete=()=>{db.close();resolve()};tx.onerror=()=>reject(tx.error)}})},fixture.credentials);
   await page.reload();await page.getByRole('heading',{name:'Your servers'}).waitFor();await page.waitForTimeout(1200);
   await page.screenshot({path:output+'/fleet-1440-light.png',fullPage:true,animations:'disabled'});
-  const checkClosedDrawer=async()=>{const position=await page.locator('#control-room-navigation').evaluate(node=>({right:node.getBoundingClientRect().right,inert:node.inert}));assert.ok(position.right<=1&&position.inert,'Closed mobile drawer is offscreen and inert');};
+  const checkClosedDrawer=async()=>{await page.waitForFunction(()=>{const node=document.getElementById('control-room-navigation');return node?.inert&&node.getBoundingClientRect().right<=1;});const position=await page.locator('#control-room-navigation').evaluate(node=>({right:node.getBoundingClientRect().right,inert:node.inert}));assert.ok(position.right<=1&&position.inert,'Closed mobile drawer is offscreen and inert: '+JSON.stringify(position));};
   const check=async(name,width,theme)=>{
     await page.setViewportSize({width,height:width<800?844:1000});
     await page.waitForTimeout(300);
     const size=await page.evaluate(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth,nodes:document.querySelectorAll('*').length}));
     assert.ok(size.scroll<=size.width,`${name} ${width} overflows (${size.scroll})`);
     if(name!=='Fleet'&&name!=='Legacy archive'&&width<=800)await checkClosedDrawer();
+    if(name==='Overview'||name==='Performance'){const axis=await page.locator('svg.workspace-chart').first().evaluate(node=>({font:parseFloat(getComputedStyle(node.querySelector('.workspace-axis-label')).fontSize)*node.getBoundingClientRect().width/node.viewBox.baseVal.width,canvasWidth:node.viewBox.baseVal.width}));assert.ok(axis.font>=10,'Readable chart axis at '+width+': '+JSON.stringify(axis));}
     result.views.push({name,width,theme,...size});
   };
   for(const width of result.widths)await check('Fleet',width,'light');await page.setViewportSize({width:1440,height:1000});
@@ -79,7 +80,7 @@ try {
   await page.getByRole('button',{name:'Open navigation',exact:true}).click();const firstNavigation=page.locator('.workspace-nav').getByRole('button',{name:'All servers',exact:true});await firstNavigation.waitFor();assert.ok(await firstNavigation.evaluate(node=>node===document.activeElement),'Drawer focuses first visible navigation control');await page.keyboard.press('Shift+Tab');assert.ok(await page.locator('#control-room-navigation').evaluate(node=>node.contains(document.activeElement)),'Reverse Tab stays in drawer');await page.keyboard.press('Tab');assert.ok(await firstNavigation.evaluate(node=>node===document.activeElement),'Tab wraps to first visible navigation control');await page.keyboard.press('Escape');assert.ok(await page.getByRole('button',{name:'Open navigation',exact:true}).isVisible());
   await page.setViewportSize({width:1440,height:1000});
   await page.getByRole('button',{name:'Appearance'}).click();await page.getByRole('dialog').waitFor();await page.keyboard.press('Escape');assert.equal(await page.getByRole('dialog').count(),0);
-  const select=page.getByRole('combobox',{name:'Selected server'});await select.click();await page.getByRole('option').filter({hasText:'TonimSMP'}).click();await page.waitForTimeout(600);assert.ok(await page.locator('.workspace-server-identity').getByText('TonimSMP',{exact:true}).isVisible());
+  const select=page.getByRole('combobox',{name:'Selected server'});await select.click();await page.getByRole('option').filter({hasText:'TonimSMP'}).click();await page.waitForTimeout(600);assert.ok(await page.locator('.workspace-server-identity').getByText('TonimSMP',{exact:true}).isVisible());await navigate('Console');await page.getByText('TonimSMP startup',{exact:true}).waitFor();assert.equal(await page.getByText('PlexonCraft startup',{exact:true}).count(),0);result.interactions.push({action:'TonimSMP journal session label stays server-bound'});
   await select.click();await page.getByRole('option').filter({hasText:'PlexonCraft'}).click();await page.waitForTimeout(600);
   fixture.rooms[0].paper.socket.close();await page.waitForTimeout(150);fixture.rooms[0].captureOffsetMs=60000;await fixture.attach(fixture.rooms[0],'PAPER');await fixture.sync(fixture.rooms[0]);await fixture.telemetry();await page.waitForTimeout(1300);await page.screenshot({path:output+'/overview-stale.png',fullPage:true,animations:'disabled'});assert.match(await page.locator('.workspace-health').innerText(),/telemetry unavailable/);
   fixture.rooms[0].captureOffsetMs=0;await fixture.telemetry();await page.waitForTimeout(600);

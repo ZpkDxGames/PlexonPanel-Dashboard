@@ -282,7 +282,7 @@ summary { cursor: pointer; font-weight: 550; }
 .display-series-6 { --ui-series: #84776a; }
 :root[data-plexon-theme="dark"] .workspace-chart { --ui-series: #9eb5cf; }
 .workspace-gridline { stroke: var(--ui-border-soft); stroke-width: 1; }
-.workspace-axis-label, .workspace-reference-label { fill: var(--ui-text-muted); font-size: 11px; font-family: inherit; }
+.workspace-axis-label, .workspace-reference-label { fill: var(--ui-text-muted); font-size: .6875rem; font-family: inherit; }
 .workspace-trend { fill: none; stroke: var(--ui-series); stroke-width: 2; vector-effect: non-scaling-stroke; }
 .workspace-crosshair { stroke: var(--ui-text-muted); stroke-dasharray: 3 4; }
 .workspace-sample-dot { fill: var(--ui-series); stroke: var(--ui-surface-1); stroke-width: 2; }

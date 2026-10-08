@@ -426,7 +426,7 @@ export function ConsoleView(props: ViewProps) {
                   <div className="view-console-entry" key={lineKey(line, index)}>
                     {showSession && (
                       <div className="view-console-session" role="separator">
-                        <strong>PlexonCraft startup</strong>
+                        <strong>{str(props.state.ready?.server.serverName, "Minecraft")} startup</strong>
                         <span>{time(line.capturedAt)}</span>
                         <code>Session {invocation.slice(0, 8)}…</code>
                       </div>
