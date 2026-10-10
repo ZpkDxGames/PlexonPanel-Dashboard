@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "version": "6.0.0",
-  "state": "HOLD",
+  "state": "READY",
   "target": "dashboard-production",
   "branch": "main",
   "scope": {
@@ -9,16 +9,16 @@
     "vercelTeam": "zpkdxgames-projects",
     "vercelProject": "plexon-panel-dashboard"
   },
-  "acceptedDashboardSourceCommit": null,
+  "acceptedDashboardSourceCommit": "178f51a9f6cba7bb2f5b1de55136909f57e8e3ea",
   "acceptedCoreSourceCommit": "fb3c5444715179425183aec6d1f1fbe140211753",
-  "dashboardCiRun": null,
+  "dashboardCiRun": 38073792233,
   "runtimeCertification": "NOT_EXECUTED",
   "evidence": {
-    "check": "NOT_EXECUTED",
-    "build": "NOT_EXECUTED",
-    "browser": "NOT_EXECUTED",
-    "axe": "NOT_EXECUTED",
-    "audit": "NOT_EXECUTED"
+    "check": "PASS",
+    "build": "PASS",
+    "browser": "PASS",
+    "axe": "PASS",
+    "audit": "PASS"
   },
   "manualChecks": {
     "pcAndVpsClocks": "NOT_EXECUTED",
@@ -30,7 +30,7 @@
     "realPhoneWorkspaces": "NOT_EXECUTED"
   },
   "operatorDecision": {
-    "approved": false,
+    "approved": true,
     "intent": "DASHBOARD_PRODUCTION",
     "deferLiveCertification": true,
     "confirmedAt": "2026-10-10T17:49:02Z",
