@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Script from "next/script";
-import "./dashboard.css";
+import "./styles/foundation.css";
+import { hankenLatin, hankenExtended, commitMono } from "./fonts";
 import { UiPreferencesProvider } from "../components/ui-preferences-provider";
 
 export const metadata: Metadata = {
@@ -19,7 +20,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body>
+      <body className={`${hankenLatin.variable} ${hankenExtended.variable} ${commitMono.variable}`}>
         <Script src="/ui-preferences-init.js" strategy="beforeInteractive" />
         <UiPreferencesProvider>{children}</UiPreferencesProvider>
       </body>

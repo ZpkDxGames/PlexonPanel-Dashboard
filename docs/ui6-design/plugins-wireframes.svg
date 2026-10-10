@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1770" height="1280" viewBox="0 0 1770 1280" role="img" aria-labelledby="title desc">
+<title id="title">Plugins desktop and mobile wireframes</title>
+<desc id="desc">Documentation layout only. Labels refer to actual supplied data and existing controls. No example values or simulated production states.</desc>
+<rect width="1770" height="1280" fill="#f3f5f4"/>
+<style>text{font-family:Arial,sans-serif;fill:#1b2227}.label{font-size:20px;font-weight:600}.body{font-size:16px}.note{font-size:15px;fill:#4a5963}</style>
+<text x="24" y="32" class="label">Plugins: desktop</text>
+<text x="1374" y="32" class="label">Plugins: mobile</text>
+<rect x="24" y="54" width="1298" height="72" rx="10" fill="#ffffff" stroke="#637883"/>
+<text x="40" y="82" class="label">Selected server and connection authority</text>
+<text x="40" y="109" class="body">Relay / Paper / Host separately; compact observed Pulse; navigation palette</text>
+<rect x="24" y="144" width="220" height="925" rx="10" fill="#ffffff" stroke="#637883"/>
+<text x="40" y="172" class="label">Navigation</text>
+<text x="40" y="199" class="body">Fleet; Monitor;</text>
+<text x="40" y="220" class="body">Operate; Manage. Local</text>
+<text x="40" y="241" class="body">navigation only.</text>
+<rect x="264" y="144" width="1058" height="75" rx="10" fill="#ffffff" stroke="#637883"/>
+<text x="280" y="172" class="label">Inventory toolbar</text>
+<text x="280" y="199" class="body">Search, enabled state, sort; pushed snapshot age</text>
+<rect x="264" y="233" width="1058" height="280" rx="10" fill="#ffffff" stroke="#637883"/>
+<text x="280" y="261" class="label">Inventory rows</text>
+<text x="280" y="288" class="body">Name, version, supplied state/author; open metadata drawer</text>
+<rect x="264" y="527" width="1058" height="160" rx="10" fill="#ffffff" stroke="#637883"/>
+<text x="280" y="555" class="label">Details drawer</text>
+<text x="280" y="582" class="body">Authors/dependencies/website if supplied; configured reload gate and bound confirm</text>
+<rect x="1374" y="54" width="372" height="110" rx="10" fill="#ffffff" stroke="#637883"/>
+<text x="1390" y="82" class="label">Menu / server / search</text>
+<text x="1390" y="109" class="body">Authority text; palette; no bottom bar</text>
+<rect x="1374" y="184" width="372" height="107" rx="10" fill="#ffffff" stroke="#637883"/>
+<text x="1390" y="212" class="label">Inventory controls</text>
+<text x="1390" y="239" class="body">Search and state; sort; received snapshot</text>
+<text x="1390" y="260" class="body">disclosure</text>
+<rect x="1374" y="305" width="372" height="300" rx="10" fill="#ffffff" stroke="#637883"/>
+<text x="1390" y="333" class="label">Plugin rows</text>
+<text x="1390" y="360" class="body">Name/version/state; tap opens details</text>
+<rect x="1374" y="619" width="372" height="210" rx="10" fill="#ffffff" stroke="#637883"/>
+<text x="1390" y="647" class="label">Plugin detail sheet</text>
+<text x="1390" y="674" class="body">Supplied metadata and existing configured</text>
+<text x="1390" y="695" class="body">reload only</text>
+<text x="24" y="1238" class="note">Single content scroll; intentional table/log wells remain labelled. Desktop rail from1024px; tablet drawer; mobile targets44px.</text>
+</svg>

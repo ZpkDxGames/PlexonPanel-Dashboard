@@ -2,15 +2,12 @@
 
 import { useEffect, useMemo, useState } from "react";
 import {
-  ActionButton,
-  Agent,
-  Badge,
-  Empty,
-  Panel,
   useQuery,
   type ViewProps,
 } from "./control-views";
-import { str } from "../lib/control-state";
+import { ActionButton, Badge, Button, Empty, PageHeader, Panel, SourceFacts } from "./ui/workspace";
+import { Disclosure } from "./ui/primitives";
+import { record, str } from "../lib/control-state";
 import { DASHBOARD_VERSION } from "../lib/dashboard-version";
 import { operationText } from "../lib/operation-messages";
 import {
@@ -82,7 +79,7 @@ export function ServerView(props: ViewProps) {
   );
   // systemd lifecycle state is Host-owned. Paper connectivity is displayed
   // separately and must never be used to fabricate an active service state.
-  const state = normalizeServiceState(service.state, false);
+  const state = normalizeServiceState(service.state);
   const [pending, setPending] = useState<PendingOperation | null>(null);
   const [operationError, setOperationError] = useState("");
 
@@ -103,13 +100,14 @@ export function ServerView(props: ViewProps) {
     await Promise.resolve();
     setPending({ action, phase: "executing" });
     try {
-      await props.run(`server.${action}`, {}, "HOST");
+      const result=await props.run(`server.${action}`, {}, "HOST");
       query.refresh();
       if ((action === "start" || action === "restart") && !paperOnline) {
         setPending({ action, phase: "waiting-paper" });
       } else {
         setPending({ action, phase: "complete" });
       }
+      return result;
     } catch (error) {
       setPending(null);
       if (!(error instanceof Error && error.message === "Cancelled")) {
@@ -121,74 +119,39 @@ export function ServerView(props: ViewProps) {
   };
 
   return (
-    <>
-      <div className="workspace-page-toolbar">
-        <div>
-          <strong>Server lifecycle</strong>
-          <span>
-            Control this Minecraft instance and follow its connection progress.
-          </span>
-        </div>
-        <button
-          className="ui-button"
-          disabled={query.busy || !hostAvailable || !props.can("server.status", "HOST")}
-          onClick={query.refresh}
-        >
-          {query.busy ? "Refreshing…" : "Refresh Host status"}
-        </button>
-      </div>
+    <section className="pp-workspace" data-ui6-workspace="Server">
+      <PageHeader title="Server" description={`Host service: ${hostAvailable ? state : "unavailable"}. Paper is ${paperOnline ? "connected" : "disconnected"}.`}
+        primary={<Button variant="primary" disabled={query.busy || !hostAvailable || !props.can("server.status", "HOST")} disabledReason="Requires server.status on the authenticated Host." busy={query.busy} onClick={query.refresh}>Refresh Host status</Button>}/>
 
-      <div className="server-workspace-grid">
-      <Panel title="Connections" className="workspace-status-panel">
-        <div className="workspace-status-strip">
-          <Agent
-            name="Paper agent"
-            online={paperOnline}
-            detail={
-              props.state.ready?.server.pluginVersion ?? "Waiting for identity"
-            }
-          />
-          <Agent
-            name="Host companion"
-            online={hostAvailable}
-            detail={
-              props.state.ready?.agents.hostInstalled
-                ? (props.state.ready?.server.hostVersion ?? "Disconnected")
-                : "Not installed"
-            }
-          />
-          <div className="workspace-status-item">
-            <span className={`ui-dot ${hostAvailable && state === "active" ? "online" : ""}`} />
-            <div>
-              <strong>{str(service.service, "Server service")}</strong>
-              <small>Host systemd lifecycle state</small>
-            </div>
-            <Badge tone={hostAvailable ? stateTone(state) : "quiet"}>
-              {hostAvailable ? state : "Host unavailable"}
-            </Badge>
-          </div>
-        </div>
+      <div className="pp-data-grid">
+      <Panel title="Connections" className="pp-stack">
+        <dl className="pp-facts">
+          <div><dt>Paper agent</dt><dd><Badge tone={paperOnline ? "green" : "quiet"}>{paperOnline ? "Connected" : "Disconnected"}</Badge><small>{props.state.ready?.server.pluginVersion ?? "Waiting for identity"}</small></dd></div>
+          <div><dt>Host companion</dt><dd><Badge tone={hostAvailable ? "green" : "quiet"}>{hostAvailable ? "Connected" : "Disconnected"}</Badge><small>{props.state.ready?.agents.hostInstalled ? (props.state.ready?.server.hostVersion ?? "Disconnected") : "Not installed"}</small></dd></div>
+          <div><dt>{str(service.service, "Server service")}</dt><dd><Badge tone={hostAvailable ? stateTone(state) : "quiet"}>{hostAvailable ? state : "Host unavailable"}</Badge><small>Host systemd lifecycle state</small></dd></div>
+        </dl>
+
       </Panel>
 
       <Panel
         title="Lifecycle controls"
         aside={<Badge tone={hostAvailable ? stateTone(state) : "quiet"}>{hostAvailable ? state : "Host unavailable"}</Badge>}
       >
-        <div className="workspace-lifecycle-card">
+        <div className="pp-stack workspace-lifecycle-card">
           {state === "failed" && hostAvailable && (
-            <div className="workspace-state-banner danger">
+            <div className="pp-notice">
               <strong>Service failed.</strong> Review host audit or systemd logs,
               then use Start only after the underlying cause is understood.
             </div>
           )}
           {(state === "activating" || state === "deactivating") && hostAvailable && (
-            <div className="workspace-state-banner">
+            <div className="pp-notice">
               The service is {state}. Conflicting lifecycle actions are disabled
               until systemd reports a stable state.
             </div>
           )}
           {state === "unknown" && hostAvailable && (
-            <div className="workspace-state-banner">
+            <div className="pp-notice">
               Host lifecycle state is unavailable. Refresh Host status before
               issuing a lifecycle action.
             </div>
@@ -199,7 +162,7 @@ export function ServerView(props: ViewProps) {
               Host companion. Paper monitoring can remain live independently.
             </Empty>
           )}
-          <div className="workspace-lifecycle-actions">
+          <div className="pp-row">
             <ActionButton
               disabled={
                 !hostAvailable ||
@@ -207,9 +170,10 @@ export function ServerView(props: ViewProps) {
                 !lifecycleActionAllowed("start", state) ||
                 pending !== null
               }
+              disabledReason={!hostAvailable ? "Requires the authenticated Host." : pending ? "Wait for this operation to finish." : state === "unknown" ? "Refresh Host status first." : "Unavailable for this service state or device grant."}
               onClick={() => runLifecycle("start")}
             >
-              Start
+              Start server
             </ActionButton>
             <ActionButton
               danger
@@ -219,9 +183,10 @@ export function ServerView(props: ViewProps) {
                 !lifecycleActionAllowed("stop", state) ||
                 pending !== null
               }
+              disabledReason={!hostAvailable ? "Requires the authenticated Host." : pending ? "Wait for this operation to finish." : state === "unknown" ? "Refresh Host status first." : "Unavailable for this service state or device grant."}
               onClick={() => runLifecycle("stop")}
             >
-              Graceful stop
+              Stop server
             </ActionButton>
             <ActionButton
               danger
@@ -231,18 +196,19 @@ export function ServerView(props: ViewProps) {
                 !lifecycleActionAllowed("restart", state) ||
                 pending !== null
               }
+              disabledReason={!hostAvailable ? "Requires the authenticated Host." : pending ? "Wait for this operation to finish." : state === "unknown" ? "Refresh Host status first." : "Unavailable for this service state or device grant."}
               onClick={() => runLifecycle("restart")}
             >
-              Restart
+              Restart server
             </ActionButton>
           </div>
-          <p className="ui-hint">Graceful stop saves the world before shutting down. Start and restart can finish on the Host while Paper is still connecting.</p>
+          <p className="pp-muted">Graceful stop saves the world before shutting down. Start and restart can finish on the Host while Paper is still connecting.</p>
           {effectivePending && <OperationTimeline pending={effectivePending} />}
           {operationError && (
-            <p className="ui-alert" role="alert">{operationError}</p>
+            <p className="pp-notice" role="alert">{operationError}</p>
           )}
           {query.error && (
-            <p className="ui-alert" role="alert">
+            <p className="pp-notice" role="alert">
               {query.error}
             </p>
           )}
@@ -250,9 +216,10 @@ export function ServerView(props: ViewProps) {
       </Panel>
       </div>
 
-      <details className="workspace-disclosure runtime-disclosure"><summary>Runtime and version details</summary>
+      <Disclosure title="Runtime and version details">
+      <SourceFacts source="Host systemd / Paper runtime" unit="state and runtime identity" capturedAt={record(props.state.service.resources).capturedAt} receivedAt={props.state.receipts?.service}/>
       <Panel title="Runtime details">
-        <dl className="ui-details ui-pad">
+        <dl className="pp-facts">
           {[
             ["Host service", hostAvailable ? service.service : undefined],
             ["Host service state", hostAvailable ? state : undefined],
@@ -275,7 +242,7 @@ export function ServerView(props: ViewProps) {
           ))}
         </dl>
       </Panel>
-      </details>
-    </>
+      </Disclosure>
+    </section>
   );
 }

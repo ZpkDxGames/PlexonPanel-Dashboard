@@ -1,0 +1,12 @@
+{
+  "checkedAt": "2026-10-08",
+  "screenshotsSha256Verified": 120,
+  "axeScansExecuted": 120,
+  "variantsWithSerious": 8,
+  "otherVariantsWithZeroConfiguredFindings": 112,
+  "errors": [],
+  "sourceControlAudit": "228 declarations; not exhaustive mounted execution",
+  "sourceStateMatrix": "15 \u00d7 8; not browser execution of all states",
+  "sourceCommit": "86b6a0cefb2c5e420c9c862a7897705e1ea59146",
+  "allExpectedCombinationsPresent": true
+}

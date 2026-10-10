@@ -1,0 +1,20 @@
+{
+  "task": "Plugins",
+  "environment": "Chromium, signed local relay, simulated agents; no live-server certification",
+  "status": "failed",
+  "screenshots": [
+    "plugins-light-390.png",
+    "plugins-light-1280.png",
+    "plugins-dark-390.png",
+    "plugins-dark-1280.png"
+  ],
+  "axe": [
+    {
+      "workspace": "Plugins",
+      "violations": []
+    }
+  ],
+  "keyboard": [],
+  "errors": [],
+  "failure": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /FixtureMaintenance/. Input:\n\n'Run configured reload\\n' +\n  'Confirm operation\\n' +\n  '\\n' +\n  'This operation will run on PlexonCraft using this device’s local permissions.\\n' +\n  '\\n' +\n  'fe4c28b5-dee8-42ff-8b62-979442417961\\n' +\n  'Cancel\\n' +\n  'Run configured reload'\n\n    at file:///workspace/scratch/28b97b04a664/PlexonPanel-Dashboard/scripts/verify-ui6-fast-track.mjs:90:528"
+}

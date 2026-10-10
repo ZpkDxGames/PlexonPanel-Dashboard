@@ -1,28 +1,28 @@
 .trigger {
   display: inline-flex; align-items: center; justify-content: space-between; gap: 12px;
-  min-width: 100px; min-height: 40px; max-width: 100%; padding: 8px 12px;
-  border: 1px solid var(--ui-border-strong); border-radius: 999px;
-  background: var(--ui-surface-2); color: var(--ui-text-primary);
+  min-width: 100px; min-height: 44px; max-width: 100%; padding: 8px 12px;
+  border: 1px solid var(--ds-boundary); border-radius: 999px;
+  background: var(--ds-sunken); color: var(--ds-text);
   font: inherit; font-size: .875rem; text-align: left; cursor: pointer;
 }
 .trigger > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .trigger > svg { flex: none; position: static; }
-.trigger:hover:not(:disabled), .trigger[aria-expanded="true"] { border-color: var(--ui-text-muted); }
-.trigger:focus-visible { outline: 2px solid var(--ui-accent); outline-offset: 3px; }
+.trigger:hover:not(:disabled), .trigger[aria-expanded="true"] { border-color: var(--ds-muted); }
+.trigger:focus-visible { outline: 2px solid var(--ds-accent); outline-offset: 3px; }
 .trigger:disabled { opacity: .55; cursor: not-allowed; }
 .menu {
   z-index: 10000; overflow: auto; overscroll-behavior: contain; padding: 5px;
-  border: 1px solid var(--ui-border-strong); border-radius: 16px;
-  background: var(--ui-surface-1); color: var(--ui-text-primary);
-  box-shadow: var(--ui-elevated-shadow); font: inherit; font-size: .875rem;
+  border: 1px solid var(--ds-boundary); border-radius: 16px;
+  background: var(--ds-surface); color: var(--ds-text);
+  box-shadow: var(--ds-float-shadow); font: inherit; font-size: .875rem;
 }
 .option {
   display: flex; justify-content: space-between; align-items: center; gap: 12px;
-  min-height: 38px; padding: 8px 10px; border-radius: 10px; cursor: pointer;
+  min-height: 44px; padding: 8px 10px; border-radius: 10px; cursor: pointer;
 }
 .option > span:first-child { overflow-wrap: anywhere; }
 .option > span:last-child { flex: none; min-width: 12px; }
-.option[data-active="true"] { background: var(--ui-surface-3); outline: 1px solid var(--ui-border-soft); }
+.option[data-active="true"] { background: var(--ds-raised); outline: 1px solid var(--ds-border-quiet); }
 .option[aria-selected="true"] { font-weight: 650; }
 .option[aria-disabled="true"] { opacity: .45; cursor: not-allowed; }
 @media (forced-colors: active) { .trigger, .menu { border-color: ButtonText; } .option[data-active="true"] { outline-color: Highlight; } }

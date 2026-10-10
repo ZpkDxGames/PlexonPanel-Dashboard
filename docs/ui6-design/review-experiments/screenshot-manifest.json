@@ -1,0 +1,126 @@
+{
+  "images": [
+    {
+      "file": "overview-hanken-390-light.png",
+      "bytes": 52227,
+      "sha256": "2692da5cf8d931cf5f9ae466ccd47d9a11b745987bc70892933cee6f6252519f"
+    },
+    {
+      "file": "pulse-lens-1920-light-8192.png",
+      "bytes": 83399,
+      "sha256": "6e96859a074bf2177d14eb4ede1d0de49031ed443ea18fa986c1e9216a895a74"
+    },
+    {
+      "file": "pulse-lens-390-dark-900.png",
+      "bytes": 53380,
+      "sha256": "4e08623ad5ada0e8fc3c126b033e907cb593c15c03ffb5af0fc07063e1852532"
+    },
+    {
+      "file": "pulse-1920-dark-8192-cpu1.png",
+      "bytes": 67669,
+      "sha256": "f8b9397c81a7f6225fd769a3f7e55e3e7e34e916237393109c2b95bbccdec8bd"
+    },
+    {
+      "file": "pulse-390-dark-900-cpu1.png",
+      "bytes": 44765,
+      "sha256": "fb5b8bc366e60dcea207c9ee5ae47dbb2e183a839155cf9f328d3a4df925bd6d"
+    },
+    {
+      "file": "pulse-lens-1920-dark-900.png",
+      "bytes": 74045,
+      "sha256": "547468c109496853e7eccc61f6c3b1a8bb5076190ebc16337c0236abcf51e53f"
+    },
+    {
+      "file": "pulse-lens-390-light-8192.png",
+      "bytes": 57601,
+      "sha256": "c8ffaaf5c7f31dc53df7098bbbc6bdc7d544ae45a281d817e2cf9e42af7a6e1f"
+    },
+    {
+      "file": "overview-noto-390-dark.png",
+      "bytes": 56373,
+      "sha256": "6b3eddaf120f540cfc2dc57d2dbe97cbdb557faecb71a0cc4ec18116c60a984d"
+    },
+    {
+      "file": "pulse-1920-dark-900-cpu1.png",
+      "bytes": 60953,
+      "sha256": "b2293978717815c2eceb016dfb2009e7db0a08ba56280999c981e06d5099580b"
+    },
+    {
+      "file": "pulse-lens-1920-light-900.png",
+      "bytes": 72746,
+      "sha256": "b423d0612c9e4370723244a3a60ed8ca3d0aa32b05a4f3673947101ca9c0ad34"
+    },
+    {
+      "file": "pulse-390-dark-8192-cpu1.png",
+      "bytes": 48208,
+      "sha256": "9ce4ed6c8b5611e7e8afae4d1809526a165506ef630d474bf64d4081c3b4273b"
+    },
+    {
+      "file": "overview-hanken-390-dark.png",
+      "bytes": 52589,
+      "sha256": "ae303e8162f120a266251e06d787bdfda5b3e436d136d1a5e5025676c85d2ac3"
+    },
+    {
+      "file": "pulse-390-light-8192-cpu1.png",
+      "bytes": 47602,
+      "sha256": "a6e3b912d83de469e3952c82d3abe3ee1ea23048d651ca019933547e0dd0ce39"
+    },
+    {
+      "file": "overview-hanken-1280-dark.png",
+      "bytes": 70743,
+      "sha256": "050d556b251859c846d4ec74d282c495a6540d48d88178240cc9bf74fa3e0e6d"
+    },
+    {
+      "file": "overview-noto-1280-light.png",
+      "bytes": 74064,
+      "sha256": "4b84ee322224199accb61847465d0b0c2109eb115d2f0b9d2709bd0cbd76e249"
+    },
+    {
+      "file": "pulse-lens-390-dark-8192.png",
+      "bytes": 58374,
+      "sha256": "f2d56756c3141d8af766c1f61af46176dc99da1c7d17746d746195222abeadd5"
+    },
+    {
+      "file": "overview-hanken-1280-light.png",
+      "bytes": 69659,
+      "sha256": "4ce2438e10e580a5d90f52d23896b0dd541e84693d18e2c0d4b207f51817df70"
+    },
+    {
+      "file": "pulse-1920-light-900-cpu1.png",
+      "bytes": 59859,
+      "sha256": "5306969196541ee5ce6bd324842e633704d7ac6b5450214de6bc66cf90fd9afa"
+    },
+    {
+      "file": "pulse-1920-light-8192-cpu1.png",
+      "bytes": 65979,
+      "sha256": "57d2d2e684bf6605058d12d926269113fcbc9db714ba46d3ce673810a76e1bc8"
+    },
+    {
+      "file": "overview-noto-390-light.png",
+      "bytes": 55521,
+      "sha256": "5614305960d0bbd5da838da973abfbd4013916a81c2395e985c4243d0d08edba"
+    },
+    {
+      "file": "overview-noto-1280-dark.png",
+      "bytes": 75269,
+      "sha256": "f1adc56315f6225f5d0838e07d846af10dbf87f50fcac0176a1c53bf18ba422f"
+    },
+    {
+      "file": "pulse-390-light-900-cpu1.png",
+      "bytes": 44530,
+      "sha256": "983daa8317782ecf67cc3596da9ce5b850b953ba14c090753426a081d5c5f954"
+    },
+    {
+      "file": "pulse-lens-1920-dark-8192.png",
+      "bytes": 85799,
+      "sha256": "495fb5ffad5fbeff50c2ed64d33ecbd5ce90f145663bed17dae6e3eebbd813e8"
+    },
+    {
+      "file": "pulse-lens-390-light-900.png",
+      "bytes": 52908,
+      "sha256": "b5df1af6715d91f7b2ea01698286f3760ba60422b6832857ecf180069ed05f13"
+    }
+  ],
+  "source": "final pre-M2 experiment",
+  "fontAssetsVendored": false
+}

@@ -15,11 +15,10 @@ import {
   operationText,
 } from "../.test-dist/lib/operation-messages.js";
 
-const dashboardSource = () =>
-  readFile(new URL("../app/dashboard.tsx", import.meta.url), "utf8");
+const dashboardSource = async () => (await Promise.all(["app/dashboard.tsx", "app/use-dashboard-session.ts", "app/use-signed-operations.ts", "app/shell.tsx", "app/workspaces.tsx"].map(path => readFile(new URL(`../${path}`, import.meta.url), "utf8")))).join("\n");
 
 test("active service disables Start and allows stop/restart", () => {
-  const state = normalizeServiceState("active", true);
+  const state = normalizeServiceState("active");
   assert.equal(state, "active");
   assert.equal(lifecycleActionAllowed("start", state), false);
   assert.equal(lifecycleActionAllowed("stop", state), true);
@@ -27,7 +26,7 @@ test("active service disables Start and allows stop/restart", () => {
 });
 
 test("inactive service allows only Start", () => {
-  const state = normalizeServiceState("inactive", false);
+  const state = normalizeServiceState("inactive");
   assert.equal(state, "inactive");
   assert.equal(lifecycleActionAllowed("start", state), true);
   assert.equal(lifecycleActionAllowed("stop", state), false);
@@ -42,17 +41,16 @@ test("transitioning and unknown service states block lifecycle actions", () => {
 });
 
 test("failed service permits recovery Start but not stop/restart", () => {
-  const state = normalizeServiceState("failed", false);
+  const state = normalizeServiceState("failed");
   assert.equal(state, "failed");
   assert.equal(lifecycleActionAllowed("start", state), true);
   assert.equal(lifecycleActionAllowed("stop", state), false);
   assert.equal(lifecycleActionAllowed("restart", state), false);
 });
 
-test("Paper connection only fills missing service state and never overrides explicit inactive", () => {
-  assert.equal(normalizeServiceState(undefined, true), "active");
-  assert.equal(normalizeServiceState(undefined, false), "unknown");
-  assert.equal(normalizeServiceState("inactive", true), "inactive");
+test("missing Host service state stays unknown regardless of Paper connectivity", () => {
+  for (const missing of [undefined, null, "", "unrecognized"]) assert.equal(normalizeServiceState(missing), "unknown");
+  assert.equal(normalizeServiceState("inactive"), "inactive");
 });
 
 test("known action codes map to safe actionable guidance", () => {
@@ -88,9 +86,9 @@ test("lifecycle busy explains rejection without suggesting a deferred stop", () 
     "Another operation is running");
 });
 
-test("safe diagnostics identify Dashboard 5.0.0 without changing protocol 3", () => {
+test("safe diagnostics identify Dashboard 6.0.0 without changing protocol 3", () => {
   const output = diagnostics(emptyControlState("test-server"));
-  assert.match(output, /PlexonPanel Dashboard 5\.0\.0 \/ Protocol 3/);
+  assert.match(output, /PlexonPanel Dashboard 6\.0\.0 \/ Protocol 3/);
   assert.doesNotMatch(output, /Dashboard 2\.2\.0/);
 });
 

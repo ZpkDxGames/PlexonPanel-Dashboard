@@ -1,15 +1,11 @@
 "use client";
 
-import { Select } from "../components/select";
+import { ActionButton, Badge, Button, Empty, Panel, PageHeader, Select } from "./ui/workspace";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ActionError, captureActionTarget, sendDashboardAction } from "../lib/data-source";
 import { number, records, str, type JsonMap } from "../lib/control-state";
 import {
-  ActionButton,
-  Badge,
   bytes,
-  Empty,
-  Panel,
   useQuery,
   type ViewProps,
 } from "./control-views";
@@ -213,6 +209,7 @@ export function FilesView(props: ViewProps) {
       });
       setDiff(false);
       listing.refresh();
+      return r;
     } catch (e) {
       setError(
         e instanceof ActionError && e.status === "CONFLICT"
@@ -244,8 +241,9 @@ export function FilesView(props: ViewProps) {
       </Empty>
     );
   return (
-    <>
-      <div className="ui-toolbar">
+    <section className="pp-workspace" data-ui6-workspace="Configuration">
+      <PageHeader title="Configuration" description={kind==='HOST'?'Host fallback is read-only.':dirty?'Unsaved changes need review.':'Read and edit permitted text files.'} primary={<ActionButton variant="primary" disabled={!selected?.editable || !dirty || !props.can("files.write",kind)} disabledReason="Open a writable file and make changes first." onClick={save}>{diff?"Save reviewed changes":"Review changes"}</ActionButton>}/>
+      <div className="pp-toolbar">
         <label>
           Root
           <Select aria-label="Root"
@@ -266,13 +264,13 @@ export function FilesView(props: ViewProps) {
             ))}
           </Select>
         </label>
-        <nav className="ui-breadcrumbs" aria-label="File path">
-          <button onClick={() => changeDirectory("")}>{root}</button>
+        <nav className="pp-row" aria-label="File path">
+          <Button onClick={() => changeDirectory("")}>{root}</Button>
           {path
             .split("/")
             .filter(Boolean)
             .map((part, i) => (
-              <button
+              <Button
                 key={i}
                 onClick={() =>
                   changeDirectory(
@@ -284,26 +282,26 @@ export function FilesView(props: ViewProps) {
                 }
               >
                 / {part}
-              </button>
+              </Button>
             ))}
         </nav>
         <Badge>{kind === "HOST" ? "Host companion" : "Paper agent"}</Badge>
       </div>
       {(listing.error || error) && (
-        <p className="ui-alert" role="alert">
+        <p className="pp-notice" role="alert">
           {error || listing.error}
         </p>
       )}
-      <div className="ui-file-split">
+      <div className="pp-file-split">
         <Panel
           title="Files"
           aside={
-            <button className="ui-button" onClick={listing.refresh}>
+            <Button className="" onClick={listing.refresh}>
               Refresh
-            </button>
+            </Button>
           }
         >
-          <div className="ui-pad">
+          <div className="pp-stack">
             <label>
               Find a filename
               <input
@@ -313,21 +311,21 @@ export function FilesView(props: ViewProps) {
               />
             </label>
           </div>
-          <div className="ui-file-list">
+          <div className="pp-file-list">
             {path && (
-              <button
+              <Button
                 onClick={() =>
                   changeDirectory(path.split("/").slice(0, -1).join("/"))
                 }
               >
                 ↰ Parent folder
-              </button>
+              </Button>
             )}
             {listing.busy ? (
-              <p className="ui-pad">Loading folder…</p>
+              <p className="pp-stack">Loading folder…</p>
             ) : (
               entries.map((e) => (
-                <button
+                <Button
                   key={str(e.name)}
                   className={
                     selected?.path === (path ? path + "/" : "") + e.name
@@ -352,33 +350,33 @@ export function FilesView(props: ViewProps) {
                     <small>
                       {e.directory
                         ? "Folder"
-                        : `${bytes(e.size)}${e.editable ? "" : " · read-only"}`}
+                        : `${bytes(e.size)}${e.editable ? "" : ". read-only"}`}
                     </small>
                   </span>
-                </button>
+                </Button>
               ))
             )}
           </div>
-          <div className="ui-actions ui-pad">
-            <button
-              className="ui-button"
+          <div className="pp-row pp-stack">
+            <Button
+              className=""
               disabled={!page}
               onClick={() => setPage((p) => p - 1)}
             >
               Previous
-            </button>
+            </Button>
             <span>{page + 1}</span>
-            <button
-              className="ui-button"
+            <Button
+              className=""
               disabled={!listing.data.hasMore}
               onClick={() => setPage((p) => p + 1)}
             >
               Next
-            </button>
+            </Button>
           </div>
           {(props.can("files.create", kind) ||
             props.can("files.upload", kind)) && (
-            <div className="ui-form ui-pad">
+            <div className="pp-form pp-stack">
               <label>
                 New filename
                 <input
@@ -413,7 +411,7 @@ export function FilesView(props: ViewProps) {
               )}
               {props.can("files.upload", kind) && (
                 <label>
-                  Upload text file · up to 24 KiB
+                  Upload text file. up to 24 KiB
                   <input
                     type="file"
                     accept=".yml,.yaml,.json,.properties,.conf,.toml,.txt,.md"
@@ -453,40 +451,40 @@ export function FilesView(props: ViewProps) {
         >
           {selected ? (
             <>
-              <div className="ui-toolbar ui-pad">
+              <div className="pp-toolbar pp-stack">
                 <Badge>
                   {selected.editable ? "Editable text" : "Read-only"}
                 </Badge>
-                <button
-                  className="ui-button"
+                <Button
+                  className=""
                   onClick={() => setSyntax(!syntax)}
                 >
                   {syntax ? "Edit" : "Syntax preview"}
-                </button>
-                <button
-                  className="ui-button"
+                </Button>
+                <Button
+                  className=""
                   disabled={!dirty}
                   onClick={() => setDiff(!diff)}
                 >
                   {diff ? "Hide diff" : "Review diff"}
-                </button>
+                </Button>
                 {props.can("files.write", kind) && selected.editable && (
                   <ActionButton disabled={!dirty} onClick={save}>
                     {diff ? "Save reviewed changes" : "Review changes"}
                   </ActionButton>
                 )}
-                <button
-                  className="ui-button"
+                <Button
+                  className=""
                   onClick={() => void open(selected.path)}
                 >
                   Reload file
-                </button>
+                </Button>
               </div>
               {syntax ? (
                 <Syntax content={content} />
               ) : (
                 <textarea
-                  className="ui-editor"
+                  className="pp-editor"
                   aria-label="File contents"
                   spellCheck={false}
                   value={content}
@@ -500,7 +498,7 @@ export function FilesView(props: ViewProps) {
                 />
               )}
               {diff && (
-                <div className="ui-diff">
+                <div className="pp-diff">
                   <div>
                     <h3>On server when opened</h3>
                     <pre>{selected.original}</pre>
@@ -511,12 +509,12 @@ export function FilesView(props: ViewProps) {
                   </div>
                 </div>
               )}
-              <p className="ui-hint ui-pad">
+              <p className="pp-muted pp-stack">
                 Changes use the file hash to detect conflicts. Reload the owning
                 plugin or restart Paper when required. JSON is validated before
                 saving; validate YAML against the plugin&apos;s schema locally.
               </p>
-              <div className="ui-actions ui-pad">
+              <div className="pp-row pp-stack">
                 {props.can("files.download", kind) && (
                   <ActionButton
                     disabled={download !== null}
@@ -549,12 +547,12 @@ export function FilesView(props: ViewProps) {
                 {download !== null && (
                   <>
                     <progress max={1} value={download} />
-                    <button
-                      className="ui-button"
+                    <Button
+                      className=""
                       onClick={() => controller.current?.abort()}
                     >
                       Cancel download
-                    </button>
+                    </Button>
                   </>
                 )}
                 {props.can("files.rename", kind) && (
@@ -623,7 +621,7 @@ export function FilesView(props: ViewProps) {
           )}
         </Panel>
       </div>
-    </>
+    </section>
   );
 }
 function fuzzy(name: string, query: string) {
@@ -633,7 +631,7 @@ function fuzzy(name: string, query: string) {
 }
 function Syntax({ content }: { content: string }) {
   return (
-    <pre className="ui-syntax">
+    <pre className="pp-syntax">
       {content.split("\n").map((line, i) => {
         const match = /^(\s*)([^:#=]+)([:=])(.*)$/.exec(line);
         return (

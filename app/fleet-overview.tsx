@@ -1,12 +1,21 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import type { RelayCredential } from "../lib/browser-store";
-import { emptyControlState, type ControlState } from "../lib/control-state";
+import { capturedAtMillis, number, emptyControlState, type Sample, type ControlState } from "../lib/control-state";
 import { FleetFeed, type FleetSnapshot } from "../lib/fleet-feed";
 import { connectionState, type ConnectionPhase } from "../lib/connection-state";
 import { fleetCard, nodeSummaries } from "../lib/fleet-model";
 import { useTelemetryNow } from "../lib/telemetry-clock";
 
+import { Badge, Button, Empty, PageHeader, Panel, SourceFacts } from './ui/workspace';
+import { Disclosure } from './ui/primitives';
+import { TickPulse } from './charts/tick-pulse';
+
+function latestHistory(state:ControlState):Sample[] {
+  if(state.history.length)return state.history;
+  const at=capturedAtMillis(state.server.capturedAt);
+  return at===null?[]:[{at,sources:{paperHealth:at,paperSystem:null,hostSystem:null,service:null},tps:number(Array.isArray(state.server.tps)?state.server.tps[0]:null),mspt:number(state.server.averageTickMillis),players:number(state.server.onlinePlayers),heap:null,hostCpu:null,processCpu:null,memory:null,gc:null,serviceCpu:null,serviceMemory:null}];
+}
 function bytes(value: number | null): string {
   return value === null ? "Unavailable" : `${(value / 1024 ** 3).toFixed(2)} GiB`;
 }
@@ -18,6 +27,7 @@ export function FleetOverview({ credentials, selected, connected, openServer, pa
   openServer: (id: string) => void; pair: () => void;
   labels?: Record<string, string>; rememberName?: (id: string, name: string) => void; phase?: ConnectionPhase;
 }) {
+  const [layout,setLayout]=useState("grid");
   const feed = useRef<FleetFeed | null>(null);
   const [snapshots, setSnapshots] = useState<FleetSnapshot[]>([]);
   const now = useTelemetryNow(Math.max(selected.updatedAt, ...snapshots.map(snapshot => snapshot.state.updatedAt)));
@@ -41,41 +51,29 @@ export function FleetOverview({ credentials, selected, connected, openServer, pa
     name: entry.state.ready?.server.serverName || labels[entry.serverId] || `Server ${entry.serverId.slice(0, 8)}`,
     connection: connectionState(entry.state, entry.phase, now) }));
   const nodes = nodeSummaries(entries.filter(entry => entry.phase === "live").map(entry => entry.state), now);
-  return <section className="fleet-workspace" aria-labelledby="fleet-title">
-    <header className="fleet-heading"><div><p className="workspace-kicker">PAIRED SERVERS</p>
-      <h1 id="fleet-title">Your servers</h1><p>Live visibility across your network. Open an instance to take control.</p></div>
-      <button type="button" onClick={pair}>Pair another server</button></header>
-    <div className="fleet-summary" aria-label="Fleet summary"><span><b>{cards.length}</b>paired instances</span><span><b>{cards.filter(card => card.status === "online").length}</b>healthy connections</span><span><b>{nodes.length}</b>shared nodes</span><span>Source-verified · per-instance access</span></div>
-    {!cards.length && <p className="fleet-empty">No paired servers yet. Pair a server to open its workspace.</p>}
-    <div className="fleet-cards">
-      {cards.map(card => <article key={card.serverId} className="fleet-card" data-selected={card.serverId === selected.serverId}>
-        <header><div><h2>{card.name}</h2><span className="fleet-id">{card.serverId.slice(0, 8)}{card.serverId === selected.serverId && " · Last selected"}</span></div>
-          <span className={`fleet-status fleet-status-${card.status}`}>{card.connection.label}</span></header>
-        <p className="fleet-reason">{card.connection.detail}</p>
-        <dl className="fleet-metrics">
-          <div><dt>Players</dt><dd>{card.players ?? "Unavailable"}</dd></div>
-          <div><dt>TPS / MSPT</dt><dd>{metric(card.tps)} / {metric(card.mspt)}</dd></div>
-          <div><dt>Minecraft service CPU</dt><dd>{metric(card.serviceCpu, "%")}</dd><small>100% = one CPU core</small></div>
-          <div><dt>Minecraft service memory</dt><dd>{bytes(card.serviceMemory)}</dd></div>
-        </dl>
-        <p className="fleet-source">Relay: {card.connection.relay} · Host: {card.connection.host}</p>
-        <p className="fleet-source">Minecraft: {card.connection.minecraft}</p>
-        {card.nodeId && cards.filter(other => other.nodeId === card.nodeId).length > 1 &&
-          <p className="fleet-source">Shared node · {cards.filter(other => other.nodeId === card.nodeId).length} paired servers</p>}
-        <p className="fleet-source">Last sample: {card.lastUpdate === null ? "unavailable" : new Date(card.lastUpdate).toLocaleTimeString()}</p>
-        <button type="button" onClick={() => openServer(card.serverId)} aria-label={`Open ${card.name} ${card.serverId.slice(0, 8)}`}>
-          {card.serverId === selected.serverId ? "Continue to workspace" : "Open server"}</button>
-      </article>)}
+  const online=cards.filter(card=>card.status==='online').length;
+  return <div className="pp-workspace" data-ui6-workspace="Fleet">
+    <PageHeader title="Your servers" description={!cards.length?'Pair a server to open its workspace.':online===0?'All paired instances need a connection review.':online<cards.length?'Some instances need a connection review.':`${cards.length} paired ${cards.length===1?'instance':'instances'} ready to inspect.`} primary={<Button variant="primary" onClick={pair}>Pair another server</Button>} secondary={<div className="pp-segmented" aria-label="Instance layout"><Button aria-pressed={layout==='grid'} onClick={()=>setLayout('grid')}>Grid</Button><Button aria-pressed={layout==='list'} onClick={()=>setLayout('list')}>List</Button></div>}/>
+    <Panel title="Shared infrastructure" aside={<Badge>{nodes.length} {nodes.length===1?'node':'nodes'}</Badge>}>
+      <div className="pp-reserved-region" role="region" aria-label="Shared node totals" tabIndex={0}>
+        {nodes.length?nodes.map(node=><article className="pp-record" key={node.nodeId}>
+          <header><h3>Node {node.nodeId.slice(0,8)}</h3><span className="pp-muted">{node.servers} paired {node.servers===1?'server':'servers'}</span></header>
+          <dl className="pp-facts"><div><dt>Host CPU (machine)</dt><dd>{metric(node.cpu,'%')}</dd></div><div><dt>Host RAM used / total</dt><dd>{bytes(node.usedMemory)} / {bytes(node.totalMemory)}</dd></div><div><dt>Filesystem used / total</dt><dd>{bytes(node.diskUsed)} / {bytes(node.diskTotal)}</dd></div></dl>
+          <Disclosure title="Node source details"><p className="pp-muted">One fresh Host sample per node. {node.sourceServerId?`Host source: ${node.sourceServerId.slice(0,8)}`:'No fresh connected Host sample.'}</p><SourceFacts source="Host node" unit="CPU percent; memory and filesystem bytes" capturedAt={entries.find(entry=>entry.serverId===node.sourceServerId)?.state.hostSystem.capturedAt} receivedAt={entries.find(entry=>entry.serverId===node.sourceServerId)?.state.updatedAt}/></Disclosure>
+        </article>):<Empty title="Shared totals unavailable">A fresh authenticated Host node association is required.</Empty>}
+      </div>
+    </Panel>
+    {!cards.length&&<Empty title="No paired servers">Use Pair another server to connect your first instance.</Empty>}
+    <div className="pp-data-grid" data-layout={layout} aria-label="Paired instances">
+      {cards.map(card=>{const entry=entries.find(entry=>entry.serverId===card.serverId)!;return <article key={card.serverId} className="fleet-card pp-record" data-selected={card.serverId===selected.serverId}>
+        <header><div><h3>{card.name}</h3><small className="pp-muted">{card.serverId.slice(0,8)}{card.serverId===selected.serverId?' / Last selected':''}</small></div><Badge tone={card.status==='online'?'green':card.status==='offline'?'quiet':'amber'}>{card.connection.label}</Badge></header>
+        <p className="pp-muted pp-status-line">Relay: {card.connection.relay}. Host: {card.connection.host}. Minecraft: {card.connection.minecraft}.</p>
+        <dl className="pp-facts"><div><dt>Players</dt><dd>{card.players??'Unavailable'}</dd></div><div><dt>TPS / MSPT</dt><dd>{metric(card.tps)} / {metric(card.mspt)}</dd></div><div><dt>Minecraft service CPU</dt><dd>{metric(card.serviceCpu,'%')}<small className="pp-muted"> / 100% = one CPU core</small></dd></div><div><dt>Minecraft service memory</dt><dd>{bytes(card.serviceMemory)}</dd></div><div><dt>Last seen</dt><dd>{card.lastUpdate===null?'Unavailable':new Date(card.lastUpdate).toLocaleTimeString()}</dd></div></dl>
+        <TickPulse history={latestHistory(entry.state)} receivedAt={entry.state.updatedAt} compact accessibleLabel={`Tick Pulse for ${card.name}`} status={card.connection.label}/>
+        {!entry.state.history.length&&<small className="pp-muted">Latest Paper capture only. Background Fleet subscriptions do not retain history.</small>}
+        <Disclosure title="Connection sources"><p>{card.connection.detail}</p><SourceFacts source="Paper health" unit="ticks/s; milliseconds; players" capturedAt={entry.state.server.capturedAt} receivedAt={entry.state.updatedAt}/><SourceFacts source="Host service cgroup" unit="CPU percent of one core; memory bytes" capturedAt={(entry.state.service.resources as Record<string,unknown>)?.capturedAt} receivedAt={entry.state.updatedAt}/>{card.nodeId&&<p className="pp-muted">Shared node {card.nodeId.slice(0,8)}.</p>}</Disclosure>
+        <Button onClick={()=>openServer(card.serverId)} aria-label={`Open ${card.name} ${card.serverId.slice(0,8)}`}>{card.serverId===selected.serverId?'Continue to workspace':'Open server'}</Button>
+      </article>})}
     </div>
-    <details className="fleet-node-details"><summary>Shared infrastructure <span>{nodes.length} {nodes.length === 1 ? "node" : "nodes"}</span></summary><p className="fleet-source">Node totals use one fresh Host sample per node.</p>
-    {!nodes.length && <p className="fleet-empty">No authenticated fleet node association is available yet.</p>}
-    <div className="fleet-nodes">
-      {nodes.map(node => <article key={node.nodeId} className="fleet-card"><header><h3>Node {node.nodeId.slice(0, 8)}</h3><span>{node.servers} paired {node.servers === 1 ? "server" : "servers"}</span></header>
-        <dl className="fleet-metrics"><div><dt>Node CPU</dt><dd>{metric(node.cpu, "%")}</dd></div>
-          <div><dt>Node memory used / total</dt><dd>{bytes(node.usedMemory)} / {bytes(node.totalMemory)}</dd></div>
-          <div><dt>Sampled filesystem used / total</dt><dd>{bytes(node.diskUsed)} / {bytes(node.diskTotal)}</dd></div></dl>
-        <p className="fleet-source">{node.sourceServerId ? `Host source: ${node.sourceServerId.slice(0, 8)}` : "No fresh connected Host sample"}</p>
-      </article>)}
-    </div></details>
-  </section>;
+  </div>;
 }

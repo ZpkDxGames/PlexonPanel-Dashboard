@@ -1,0 +1,34 @@
+{
+  "status": "passed",
+  "branch": "release/6.0.0",
+  "baseline": "ef33927",
+  "localMain": "No local main branch exists in the recovered release-only metadata. No main ref write was executed.",
+  "protectedPaths": [
+    "package.json",
+    "package-lock.json",
+    "relay",
+    "lib/control-state.ts",
+    "lib/browser-store.ts",
+    "lib/data-source.ts",
+    "lib/telemetry-clock.ts",
+    "lib/telemetry-freshness.ts",
+    "lib/metric-reports.ts",
+    "lib/tick-pulse-model.ts",
+    "lib/lifecycle-state.ts",
+    "app/use-signed-operations.ts",
+    "app/use-dashboard-session.ts",
+    "app/use-dirty-leave.ts",
+    "scripts/verify-ui-browser.mjs",
+    "docs/UI_REVAMP_*",
+    "docs/UI_6_BASELINE.md",
+    "docs/UI_6_SCREENSHOT_MANIFEST.json",
+    "artifacts"
+  ],
+  "changedProtectedFiles": [],
+  "runtimeSourceFingerprint": {
+    "method": "SHA256 over sorted path+NUL+bytes of app/lib/components/next.config.ts, after frozen-source captures",
+    "files": 98,
+    "sha256": "2219e11501f74e2253724686194db86054c951e85f8c202afa746ab0cfc52dde"
+  },
+  "limitations": "No remote mutation, push, tags or deployment executed. Current remote main was not re-queried by this audit. Core/Host repositories are not present; no contract/relay/transport/state changes made here."
+}

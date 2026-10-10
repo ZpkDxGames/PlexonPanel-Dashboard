@@ -1,0 +1,22 @@
+{
+  "task": "Backups",
+  "environment": "Chromium, signed local relay, simulated agents; no live-server certification",
+  "status": "passed",
+  "screenshots": [
+    "backups-light-390.png",
+    "backups-light-1280.png",
+    "backups-dark-390.png",
+    "backups-dark-1280.png"
+  ],
+  "axe": [
+    {
+      "workspace": "Backups",
+      "violations": []
+    }
+  ],
+  "keyboard": [
+    "Fully Backup Now review with Enter; Escape restores focus; backup dispatch not executed",
+    "Backup review and countdown reached by keyboard; cancel preserves target; dispatch not executed"
+  ],
+  "errors": []
+}

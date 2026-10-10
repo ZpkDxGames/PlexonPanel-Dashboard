@@ -1,7 +1,7 @@
 import { capturedAtMillis, number, record, str, type ControlState } from "./control-state";
 import { FLEET_CONTRACT_ID, validFleetUuid } from "./fleet-contract";
 import type { FleetPhase } from "./fleet-feed";
-import { TELEMETRY_STALE_MS } from "./telemetry-freshness";
+import { TELEMETRY_STALE_MS, classifyTelemetry } from "./telemetry-freshness";
 export const FLEET_STALE_MS = TELEMETRY_STALE_MS;
 export interface FleetCard {
   serverId: string; name: string; nodeId: string | null;
@@ -14,9 +14,8 @@ export interface NodeSummary {
   cpu: number | null; usedMemory: number | null; totalMemory: number | null;
   diskUsed: number | null; diskTotal: number | null;
 }
-export function fresh(value: unknown, now: number): boolean {
-  const at = capturedAtMillis(value);
-  return at !== null && at <= now + 5_000 && now - at <= FLEET_STALE_MS;
+export function fresh(value: unknown, now: number, receivedAt?:number): boolean {
+  return classifyTelemetry({capturedAt:value,receivedAt,connected:true,now}).usable;
 }
 export function boundNode(state: ControlState): string | null {
   const server = state.ready?.server;
@@ -26,9 +25,9 @@ export function boundNode(state: ControlState): string | null {
 export function fleetCard(state: ControlState, phase: FleetPhase, now: number): FleetCard {
   const live = phase === "live" && !state.cached;
   const paper = live && Boolean(state.ready?.agents.paper), host = live && Boolean(state.ready?.agents.host);
-  const serverFresh = paper && fresh(state.server.capturedAt, now);
+  const serverFresh = paper && fresh(state.server.capturedAt, now,state.receipts?.paperHealth);
   const resources = record(state.service.resources);
-  const serviceFresh = host && state.ready?.server.hostTargetCompatible !== false && fresh(resources.capturedAt, now) && resources.scope === "MINECRAFT_SERVICE" && resources.source === "SYSTEMD_CGROUP";
+  const serviceFresh = host && state.ready?.server.hostTargetCompatible !== false && fresh(resources.capturedAt, now,state.receipts?.service) && resources.scope === "MINECRAFT_SERVICE" && resources.source === "SYSTEMD_CGROUP";
   let status: FleetCard["status"] = "online", reason = "Paper and Host are connected";
   if (phase === "revoked") { status = "offline"; reason = "Browser grant expired or was revoked; pair this server again"; }
   else if (phase === "limited") { status = "stale"; reason = "Subscription limit reached; open this server to prioritize it"; }
@@ -58,7 +57,7 @@ export function nodeSummaries(states: readonly ControlState[], now: number): Nod
   return [...groups].map(([nodeId, members]) => {
     const source = members.filter(state => !state.cached && state.ready?.agents.host &&
       state.hostSystem.nodeId === nodeId && state.hostSystem.processRole === "HOST" && state.hostSystem.metricScope === "NODE" &&
-      fresh(state.hostSystem.capturedAt, now))
+      fresh(state.hostSystem.capturedAt, now,state.receipts?.hostSystem))
       .sort((a, b) => (capturedAtMillis(b.hostSystem.capturedAt) ?? 0) - (capturedAtMillis(a.hostSystem.capturedAt) ?? 0))[0];
     const sample = source?.hostSystem ?? {};
     return { nodeId, servers: members.length, sourceServerId: source?.serverId ?? null,

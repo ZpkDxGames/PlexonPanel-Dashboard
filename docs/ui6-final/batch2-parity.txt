@@ -1,0 +1,10 @@
+Fast-track control parity review against docs/UI_6_CONTROL_AUDIT.md
+Fleet: pairing, instance open, all existing source facts; grid/list added.
+Performance: 1/5/15/30 min, pause/resume, latest refresh, diagnostics, CSV/JSON, local reset, report and world table retained.
+Players: roster search/world/sort/refresh, detail, all thirteen gated actions and Paper history filters/pages retained.
+Console: Host history/date/severity/pages, local pause/follow/search/wrap/time/copy/export/clear, Paper-only execute and allowlisted command recall retained.
+Chat: local pause/follow/search/clear/copy, MiniMessage gate and signed send retained; bounded cache owner unchanged.
+Plugins: search/state/sort/latest refresh/detail/configured reload/project website retained with existing gates.
+Native detail dialogs now use the shared focus trap, Escape and focus restoration.
+No runtime dependencies, backend, protocol, relay, Core or Host source changes.
+Real-device and live-server action checks: not executed.

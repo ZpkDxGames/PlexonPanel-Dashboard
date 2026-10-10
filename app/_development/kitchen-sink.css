@@ -1,0 +1,25 @@
+@layer workspaces {
+  /* PLEXON_UI6_KITCHEN_SINK_DEV_ONLY */
+  .lab { min-height: 100dvh; padding: var(--ds-space-7) var(--ds-space-4); }
+  .lab-header, .lab-controls, .lab-main, .lab-footer { max-width: var(--ds-page-width); margin-inline: auto; }
+  .lab-header { display: flex; justify-content: space-between; align-items: start; gap: var(--ds-gap); padding-bottom: var(--ds-space-6); }
+  .lab-header > div { display: flex; flex-direction: column; gap: var(--ds-space-2); }
+  .lab-controls { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--ds-gap); border-block: var(--ds-line) solid var(--ds-boundary); padding-block: var(--ds-space-4); }
+  .lab-section { display: flex; flex-direction: column; gap: var(--ds-space-4); padding-block: var(--ds-space-7); border-bottom: var(--ds-line) solid var(--ds-border-quiet); }
+  .lab-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--ds-space-4); }
+  .lab-type-specimen { font-size: var(--ds-type-heading); font-weight: var(--ds-weight-heading); }
+  .lab-button-row { display: grid; grid-template-columns: var(--ds-menu-width) 1fr; gap: var(--ds-gap); align-items: center; }
+  .lab-icons { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--ds-space-3); }
+  .lab-icons li { display: flex; gap: var(--ds-space-2); align-items: center; min-height: var(--ds-row); }
+  .lab-footer { padding-top: var(--ds-space-4); overflow-wrap: anywhere; }
+  .lab code { overflow-wrap: anywhere; }
+  .lab-skip { position: fixed; left: var(--ds-space-4); top: var(--ds-space-2); transform: translateY(-200%); background: var(--ds-raised); color: var(--ds-text); padding: var(--ds-space-2); z-index: var(--ds-z-float); }
+  .lab-skip:focus { transform: none; }
+  @media (max-width: 48rem) {
+    .lab { padding: var(--ds-space-4); }
+    .lab-header { flex-direction: column; }
+    .lab-controls, .lab-icons { grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--ds-control-min)), 1fr)); }
+    .lab-grid, .lab-button-row { grid-template-columns: 1fr; }
+    .lab-icons { font-size: var(--ds-type-small); }
+  }
+}

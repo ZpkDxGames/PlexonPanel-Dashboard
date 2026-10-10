@@ -1,0 +1,21 @@
+{
+  "task": "Performance",
+  "environment": "Chromium, signed local relay, simulated agents; no live-server certification",
+  "status": "passed",
+  "screenshots": [
+    "performance-light-390.png",
+    "performance-light-1280.png",
+    "performance-dark-390.png",
+    "performance-dark-1280.png"
+  ],
+  "axe": [
+    {
+      "workspace": "Performance",
+      "violations": []
+    }
+  ],
+  "keyboard": [
+    "Keyboard chart inspection and Escape"
+  ],
+  "errors": []
+}

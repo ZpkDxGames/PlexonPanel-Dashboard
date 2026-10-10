@@ -1,13 +1,10 @@
 "use client";
 
-import { Select } from "../components/select";
+import { ActionButton, Badge, Button, Empty, Panel, Select, SourceFacts } from "./ui/workspace";
+import { Dialog, Disclosure, Table } from "./ui/primitives";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
-  ActionButton,
-  Badge,
-  Empty,
-  Panel,
   duration,
   metric,
   time,
@@ -193,10 +190,10 @@ export function PlayerRoster(props: ViewProps & { showHistoryTab?: boolean }) {
 
   return (
     <>
-      {showHistoryTab && <div className="ui-tabs workspace-player-tabs" aria-label="Player views">
-        <button aria-pressed={tab === "online"} onClick={() => setTab("online")}>Online</button>
+      {showHistoryTab && <div className="pp-segmented" aria-label="Player views">
+        <Button aria-pressed={tab === "online"} onClick={() => setTab("online")}>Online</Button>
         {historyTabAvailable && (
-          <button
+          <Button
             aria-pressed={tab === "history"}
             onClick={() => {
               setTab("history");
@@ -204,19 +201,19 @@ export function PlayerRoster(props: ViewProps & { showHistoryTab?: boolean }) {
             }}
           >
             History
-          </button>
+          </Button>
         )}
       </div>}
 
       {tab === "online" || !historyTabAvailable ? (
         <>
-          <div className="workspace-filter-toolbar">
-            <label className="ui-search">Search players<input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Name, display name or UUID" /></label>
-            <label>World<Select aria-label="World" value={worldFilter} onValueChange={(selectedValue) => setWorldFilter(selectedValue)}><option value="ALL">All worlds</option>{worlds.map((world) => <option key={world}>{world}</option>)}</Select></label>
-            <label>Sort<Select aria-label="Sort" value={sort} onValueChange={(selectedValue) => setSort(selectedValue as PlayerSort)}><option value="name">Name</option><option value="ping">Ping</option><option value="session">Session time</option><option value="world">World</option></Select></label>
+          <div className="pp-toolbar">
+            <label className="pp-field">Search players<input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Name, display name or UUID" /></label>
+            <Select aria-label="World" value={worldFilter} onValueChange={(selectedValue) => setWorldFilter(selectedValue)}><option value="ALL">All worlds</option>{worlds.map((world) => <option key={world}>{world}</option>)}</Select>
+            <Select aria-label="Sort" value={sort} onValueChange={(selectedValue) => setSort(selectedValue as PlayerSort)}><option value="name">Name</option><option value="ping">Ping</option><option value="session">Session time</option><option value="world">World</option></Select>
             <Badge>{props.state.players.length} online</Badge>
-            <button
-              className="ui-button"
+            <Button
+
               disabled={refreshing || !props.can("players.snapshot.request")}
               onClick={() => {
                 setRefreshing(true);
@@ -224,63 +221,52 @@ export function PlayerRoster(props: ViewProps & { showHistoryTab?: boolean }) {
               }}
             >
               {refreshing ? "Requesting…" : "Refresh"}
-            </button>
+            </Button>
           </div>
 
           <Panel
             title="Online players"
-            aside={<div className="workspace-panel-badges"><Badge>{players.length} shown</Badge><Badge tone={props.connected && paperOnline ? "green" : "amber"}>{!props.connected ? "Reconnecting" : !paperOnline ? "Paper offline" : props.state.pendingPlayerSnapshot ? "Reconciling" : "Live"}</Badge></div>}
+            aside={<div className="pp-row"><Badge>{players.length} shown</Badge><Badge tone={props.connected && paperOnline ? "green" : "amber"}>{!props.connected ? "Reconnecting" : !paperOnline ? "Paper offline" : props.state.pendingPlayerSnapshot ? "Reconciling" : "Live"}</Badge></div>}
           >
             {players.length ? (
               useCards ? (
-                <div className="display-player-cards">
+                <div className="pp-data-grid">
                   {players.map((item) => {
                     const uuid = str(item.uuid, "");
                     const names = playerNames(item);
                     const shownUuid = displayedUuid(uuid, preferences.playerUuid);
                     const highlighted = preferences.liveRowHighlight && recentlyChanged.has(uuid);
                     return (
-                      <article className={`display-player-card${highlighted ? " live" : ""}`} key={uuid}>
-                        <div className="display-player-card-identity">
+                      <article className={`pp-record${highlighted ? " pp-new-row" : ""}`} key={uuid}>
+                        <div className="pp-row">
                           <PlayerHead uuid={uuid} name={names.name} skinTextureId={str(item.skinTextureId, "")} size={rowHeadSize} online />
-                          <div>
+                          <div className="pp-row-details">
                             <strong>{names.primary}</strong>
                             {names.displayName && <small>{names.name}</small>}
-                            {shownUuid && <small>{shownUuid}</small>}
-                            <span><i /> Online</span>
+                            {shownUuid && <small className="pp-identifier">{shownUuid}</small>}
+                            <Badge tone="green">Online</Badge>
                           </div>
                         </div>
-                        <dl>
+                        <dl className="pp-facts">
                           <div><dt>World</dt><dd>{str(item.world)}</dd></div>
                           <div><dt>Ping</dt><dd>{metric(item.pingMillis, " ms", 0)}</dd></div>
                           <div><dt>Session</dt><dd>{duration(item.onlineDurationMillis)}</dd></div>
                         </dl>
-                        <button className="ui-button" onClick={() => setSelected(uuid)}>Manage</button>
+                        <Button  onClick={() => setSelected(uuid)}>Manage</Button>
                       </article>
                     );
                   })}
                 </div>
               ) : (
-                <div className="ui-table-wrap display-player-table">
-                  <table>
-                    <thead><tr><th>Player</th><th>World</th><th>Ping</th><th>Game mode</th><th>Session</th><th>Actions</th></tr></thead>
-                    <tbody>
-                      {players.map((item) => {
-                        const uuid = str(item.uuid, "");
-                        const names = playerNames(item);
-                        const shownUuid = displayedUuid(uuid, preferences.playerUuid);
-                        const highlighted = preferences.liveRowHighlight && recentlyChanged.has(uuid);
-                        return (
-                          <tr key={uuid} className={highlighted ? "display-live-player-row" : undefined}>
-                            <td><div className="ui-person"><PlayerHead uuid={uuid} name={names.name} skinTextureId={str(item.skinTextureId, "")} size={rowHeadSize} online /><div><strong>{names.primary}</strong>{names.displayName && <small>{names.name}</small>}{shownUuid && <small>{shownUuid}</small>}</div></div></td>
-                            <td>{str(item.world)}</td><td>{metric(item.pingMillis, " ms", 0)}</td><td>{str(item.gameMode).toLowerCase()}</td><td>{duration(item.onlineDurationMillis)}</td>
-                            <td><button className="ui-button" onClick={() => setSelected(uuid)}>Manage</button></td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
+                <Table caption="Online player roster" rows={players} rowKey={item=>str(item.uuid)} rowClassName={item=>preferences.liveRowHighlight&&recentlyChanged.has(str(item.uuid))?'pp-new-row':undefined} columns={[
+                  {key:'player',label:'Player',rowHeader:true,render:item=>{const names=playerNames(item);const shownUuid=displayedUuid(str(item.uuid),preferences.playerUuid);return <div className="pp-row"><PlayerHead uuid={str(item.uuid)} name={names.name} skinTextureId={str(item.skinTextureId,'')} size={rowHeadSize} online/><div className="pp-row-details"><strong>{names.primary}</strong>{names.displayName&&<small>{names.name}</small>}{shownUuid&&<small className="pp-identifier">{shownUuid}</small>}</div></div>;}},
+                  {key:'world',label:'World',render:item=>str(item.world)},
+                  {key:'ping',label:'Ping',render:item=><span className="pp-number">{metric(item.pingMillis,' ms',0)}</span>},
+                  {key:'mode',label:'Game mode',render:item=>str(item.gameMode).toLowerCase()},
+                  {key:'session',label:'Session',render:item=>duration(item.onlineDurationMillis)},
+                  {key:'actions',label:'Actions',render:item=><Button onClick={()=>setSelected(str(item.uuid))}>Manage</Button>},
+                ]}/>
+
               )
             ) : !props.connected ? (
               <Empty title="Roster unavailable while reconnecting">A fresh authoritative snapshot will replace the roster after the signed session reconnects.</Empty>
@@ -293,16 +279,17 @@ export function PlayerRoster(props: ViewProps & { showHistoryTab?: boolean }) {
             )}
           </Panel>
 
-          {showHistoryTab && historyUnavailable && <Panel title="Player history"><p className="ui-hint ui-pad">{historyUnavailable}</p></Panel>}
+          <Disclosure title="Roster source and timing"><SourceFacts source="Paper player snapshot" unit="players; milliseconds; blocks" receivedAt={props.state.updatedAt}/><p className="pp-muted">Completed roster capture timestamps are not retained by this view. Position and address require an existing grant and a supplied field.</p></Disclosure>
+          {showHistoryTab && historyUnavailable && <Panel title="Player history"><p className="pp-muted">{historyUnavailable}</p></Panel>}
         </>
       ) : (
         <>
-          <div className="workspace-filter-toolbar">
-            <label className="ui-search">Search history<input value={historyQuery} maxLength={64} onChange={(event) => setHistoryQuery(event.target.value)} placeholder="Username or UUID" /></label>
-            <label>Status<Select aria-label="Status" value={historyStatus} onValueChange={(selectedValue) => setHistoryStatus(selectedValue)}><option value="ALL">All observations</option><option value="ONLINE">Joined</option><option value="OFFLINE">Left</option></Select></label>
+          <div className="pp-toolbar">
+            <label className="pp-field">Search history<input value={historyQuery} maxLength={64} onChange={(event) => setHistoryQuery(event.target.value)} placeholder="Username or UUID" /></label>
+            <Select aria-label="Status" value={historyStatus} onValueChange={(selectedValue) => setHistoryStatus(selectedValue)}><option value="ALL">All observations</option><option value="ONLINE">Joined</option><option value="OFFLINE">Left</option></Select>
             <label>From<input type="date" value={historyFrom} onChange={(event) => setHistoryFrom(event.target.value)} /></label>
             <label>To<input type="date" value={historyTo} onChange={(event) => setHistoryTo(event.target.value)} /></label>
-            <button className="ui-button" disabled={historyBusy || !props.connected || !paperOnline} onClick={() => void loadHistory(false)}>{historyBusy ? "Loading…" : "Search"}</button>
+            <Button  disabled={historyBusy || !props.connected || !paperOnline} onClick={() => void loadHistory(false)}>{historyBusy ? "Loading…" : "Search"}</Button>
           </div>
 
           <Panel title="Paper-owned presence history" aside={historyCapturedAt ? <Badge>Captured {time(historyCapturedAt)}</Badge> : undefined}>
@@ -318,19 +305,19 @@ export function PlayerRoster(props: ViewProps & { showHistoryTab?: boolean }) {
               <Empty title="Loading player history" />
             ) : historyEntries.length ? (
               <>
-                {historyBounded && <p className="workspace-bounded" role="status">This result is bounded by retention or scan limits and may not include every older observation.</p>}
-                <div className="ui-table-wrap"><table>
+                {historyBounded && <p className="pp-notice" role="status">This result is bounded by retention or scan limits and may not include every older observation.</p>}
+                <div className="pp-table-scroll" data-cards="true" role="region" aria-label="Loaded presence history" tabIndex={0}><table className="pp-table">
                   <thead><tr><th>Player</th><th>Observation</th><th>When</th><th>Duration</th><th>Termination</th><th>Details</th></tr></thead>
                   <tbody>{historyEntries.map((entry) => (
                     <tr key={str(entry.eventId)}>
-                      <td><strong>{str(entry.name)}</strong><small className="workspace-block-id">{str(entry.uuid).slice(0, 8)}</small></td>
-                      <td>{entry.state === "JOINED" ? "Joined" : "Left"}</td><td><Timestamp value={entry.observedAt} /></td><td>{duration(entry.sessionDurationMillis)}</td>
-                      <td>{entry.termination === "UNKNOWN_DISCONNECT" ? "Unknown disconnect" : str(entry.termination).toLowerCase()}</td>
-                      <td><button className="ui-button" onClick={() => setSelectedHistory(str(entry.eventId))}>Inspect</button></td>
+                      <td data-label="Player"><strong>{str(entry.name)}</strong><small className="pp-identifier">{str(entry.uuid).slice(0, 8)}</small></td>
+                      <td data-label="Observation">{entry.state === "JOINED" ? "Joined" : "Left"}</td><td data-label="When"><Timestamp value={entry.observedAt} /></td><td data-label="Duration">{duration(entry.sessionDurationMillis)}</td>
+                      <td data-label="Termination">{entry.termination === "UNKNOWN_DISCONNECT" ? "Unknown disconnect" : str(entry.termination).toLowerCase()}</td>
+                      <td data-label="Details"><Button  onClick={() => setSelectedHistory(str(entry.eventId))}>Inspect</Button></td>
                     </tr>
                   ))}</tbody>
                 </table></div>
-                {historyMore && <div className="workspace-load-more"><button className="ui-button" disabled={historyBusy} onClick={() => void loadHistory(true)}>{historyBusy ? "Loading…" : "Load older observations"}</button></div>}
+                {historyMore && <div className="pp-row"><Button  disabled={historyBusy} onClick={() => void loadHistory(true)}>{historyBusy ? "Loading…" : "Load older observations"}</Button></div>}
               </>
             ) : historyLoaded ? (
               <Empty title="No matching history">Paper returned no presence observations for these bounded filters.</Empty>
@@ -358,29 +345,9 @@ export function PlayerRoster(props: ViewProps & { showHistoryTab?: boolean }) {
   );
 }
 
-function PlayerDrawer23({ player, previousSessions, historyAvailable, close, ...props }: ViewProps & {
-  player: JsonMap;
-  previousSessions: JsonMap[];
-  historyAvailable: boolean;
-  close: () => void;
-}) {
-  const [tab, setTab] = useState("Overview");
-  const [message, setMessage] = useState("");
-  const [reason, setReason] = useState("");
-  const [gameMode, setGameMode] = useState(str(player.gameMode, "SURVIVAL"));
-  const [world, setWorld] = useState(str(player.world, ""));
-  const [coordinates, setCoordinates] = useState({ x: "", y: "", z: "" });
-  const ref = useRef<HTMLDialogElement>(null);
-  useEffect(() => {
-    const dialog = ref.current;
-    if (dialog && !dialog.open) dialog.showModal();
-    return () => { if (dialog?.open) dialog.close(); };
-  }, []);
-  const base = { playerId: player.uuid };
-  const permittedActions = ["message", "heal", "feed", "teleport", "gamemode", "kick", "ban", "unban", "whitelist.add", "whitelist.remove", "kill", "op", "deop"].filter((action) => props.can(`player.${action}`));
-  const uuid = str(player.uuid, "");
-  const names = playerNames(player);
-  const detailRows: Array<[string, unknown]> = [
+export function playerDetailRows(player:JsonMap,scopes:readonly string[]){
+  const names=playerNames(player);
+  return [
     ["UUID", player.uuid],
     ...(names.displayName ? [["Display name", names.displayName] as [string, unknown]] : []),
     ["World", player.world],
@@ -396,57 +363,70 @@ function PlayerDrawer23({ player, previousSessions, historyAvailable, close, ...
     ["Session ID", player.sessionId],
     ...(typeof player.firstSeenAt === "string" ? [["First observed", time(player.firstSeenAt)] as [string, unknown]] : []),
     ...(typeof player.lastLoginAt === "string" ? [["Last login", time(player.lastLoginAt)] as [string, unknown]] : []),
-    ...(player.position && typeof player.position === "object" ? [["Position", JSON.stringify(player.position)] as [string, unknown]] : []),
-    ...(typeof player.address === "string" && player.address ? [["IP address", player.address] as [string, unknown]] : []),
-  ];
+    ...(scopes.includes("players.location") && player.position && typeof player.position === "object" ? [["Position", JSON.stringify(player.position)] as [string, unknown]] : []),
+    ...(scopes.includes("players.address") && typeof player.address === "string" && player.address ? [["IP address", player.address] as [string, unknown]] : []),
+  ] as Array<[string, unknown]>;
+}
+
+function PlayerDrawer23({ player, previousSessions, historyAvailable, close, ...props }: ViewProps & {
+  player: JsonMap;
+  previousSessions: JsonMap[];
+  historyAvailable: boolean;
+  close: () => void;
+}) {
+  const [tab, setTab] = useState("Overview");
+  const [message, setMessage] = useState("");
+  const [reason, setReason] = useState("");
+  const [gameMode, setGameMode] = useState(str(player.gameMode, "SURVIVAL"));
+  const [world, setWorld] = useState(str(player.world, ""));
+  const [coordinates, setCoordinates] = useState({ x: "", y: "", z: "" });
+  const base = { playerId: player.uuid };
+  const permittedActions = ["message", "heal", "feed", "teleport", "gamemode", "kick", "ban", "unban", "whitelist.add", "whitelist.remove", "kill", "op", "deop"].filter((action) => props.can(`player.${action}`));
+  const uuid = str(player.uuid, "");
+  const names = playerNames(player);
+  const detailRows=playerDetailRows(player,props.deviceGrant?.scopes??props.state.ready?.device.scopes??[]);
 
   return (
-    <dialog className="ui-drawer workspace-player-drawer" ref={ref} onCancel={close} aria-labelledby="player-title">
-      <div className="ui-panel-head display-player-drawer-head">
-        <div className="display-player-drawer-identity">
-          <PlayerHead uuid={uuid} name={names.name} skinTextureId={str(player.skinTextureId, "")} size={64} online />
-          <div><small>Player management · online now</small><h2 id="player-title">{names.primary}</h2><span>{names.displayName ? `${names.name} · ${uuid}` : uuid}</span></div>
-        </div>
-        <button className="ui-button" onClick={close} aria-label="Close player details">×</button>
-      </div>
-      <div className="ui-tabs">
-        {["Overview", "Actions", "Moderation"].map((value) => <button key={value} aria-pressed={tab === value} onClick={() => setTab(value)}>{value}</button>)}
+    <Dialog open onClose={close} title={names.primary} description="Current Paper player. Actions apply to this bound player target.">
+      <div className="pp-row"><PlayerHead uuid={uuid} name={names.name} skinTextureId={str(player.skinTextureId,'')} size={64} online/><code className="pp-identifier">{uuid}</code></div>
+      <div className="pp-segmented">
+        {["Overview", "Actions", "Moderation"].map((value) => <Button key={value} aria-pressed={tab === value} onClick={() => setTab(value)}>{value}</Button>)}
       </div>
 
       {tab === "Overview" ? (
-        <div className="workspace-drawer-section">
-          <dl className="ui-details">
+        <div className="pp-stack">
+          <dl className="pp-facts">
             {detailRows.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{String(value ?? "—")}</dd></div>)}
           </dl>
           {!detailRows.some(([label]) => label === "Position" || label === "IP address") && (
-            <p className="ui-hint">Location and address are omitted when local Paper policy or the device grant does not authorize them.</p>
+            <p className="pp-muted">Location and address are omitted when local Paper policy or the device grant does not authorize them.</p>
           )}
-          <p className="ui-hint">{permittedActions.length ? `${permittedActions.length} player actions are allowed for this device and current local policy.` : "This device has read-only access to player details."}</p>
+          <p className="pp-muted">{permittedActions.length ? `${permittedActions.length} player actions are allowed for this device and current local policy.` : "This device has read-only access to player details."}</p>
           {historyAvailable && (
-            <div className="workspace-drawer-section">
+            <div className="pp-stack">
               <h3>Previous sessions</h3>
-              {previousSessions.length ? <ul className="workspace-session-list">{previousSessions.slice(0, 12).map((session) => <li key={str(session.eventId)}><strong>{time(session.sessionStartedAt)}</strong><span>{time(session.sessionEndedAt)}</span><span>{duration(session.sessionDurationMillis)}</span></li>)}</ul> : <p className="ui-hint">Open the History tab to load bounded previous-session data from Paper. History is never inferred from browser state.</p>}
+              {previousSessions.length ? <ul className="pp-list">{previousSessions.slice(0, 12).map((session) => <li key={str(session.eventId)}><strong>{time(session.sessionStartedAt)}</strong><span>{time(session.sessionEndedAt)}</span><span>{duration(session.sessionDurationMillis)}</span></li>)}</ul> : <p className="pp-muted">Open the History tab to load bounded previous-session data from Paper. History is never inferred from browser state.</p>}
             </div>
           )}
         </div>
       ) : tab === "Actions" ? (
-        <div className="ui-form workspace-drawer-section">
-          {props.can("player.message") && <form onSubmit={(event) => { event.preventDefault(); void props.run("player.message", { ...base, message }).then(() => setMessage("")).catch(() => {}); }}><label>Private message<input value={message} onChange={(event) => setMessage(event.target.value)} maxLength={2000} required /></label><button className="ui-button primary">Send message</button></form>}
-          <div className="ui-actions">{["heal", "feed"].filter((action) => props.can(`player.${action}`)).map((action) => <ActionButton key={action} onClick={() => props.run(`player.${action}`, base)}>{action === "heal" ? "Heal" : "Feed"}</ActionButton>)}</div>
-          {props.can("player.gamemode") && <div className="ui-form"><label>Game mode<Select aria-label="Game mode" value={gameMode} onValueChange={(selectedValue) => setGameMode(selectedValue)}>{["SURVIVAL", "CREATIVE", "ADVENTURE", "SPECTATOR"].map((value) => <option key={value}>{value}</option>)}</Select></label><ActionButton onClick={() => props.run("player.gamemode", { ...base, gameMode })}>Set game mode</ActionButton></div>}
-          {props.can("player.teleport") && <div className="ui-form"><label>Destination world<input value={world} onChange={(event) => setWorld(event.target.value)} /></label><div className="ui-three">{(["x", "y", "z"] as const).map((key) => <label key={key}>{key.toUpperCase()}<input type="number" value={coordinates[key]} onChange={(event) => setCoordinates({ ...coordinates, [key]: event.target.value })} /></label>)}</div><ActionButton disabled={Object.values(coordinates).some((value) => value === "")} onClick={() => props.run("player.teleport", { ...base, world, x: Number(coordinates.x), y: Number(coordinates.y), z: Number(coordinates.z) })}>Teleport</ActionButton></div>}
+        <div className="pp-form pp-stack">
+          {props.can("player.message") && <form onSubmit={(event) => { event.preventDefault(); void props.run("player.message", { ...base, message }).then(() => setMessage("")).catch(() => {}); }}><label>Private message<input value={message} onChange={(event) => setMessage(event.target.value)} maxLength={2000} required /></label><Button variant="primary" type="submit">Send message</Button></form>}
+          <div className="pp-row">{["heal", "feed"].filter((action) => props.can(`player.${action}`)).map((action) => <ActionButton key={action} onClick={() => props.run(`player.${action}`, base)}>{action === "heal" ? "Heal" : "Feed"}</ActionButton>)}</div>
+          {props.can("player.gamemode") && <div className="pp-form"><Select aria-label="Game mode" value={gameMode} onValueChange={(selectedValue) => setGameMode(selectedValue)}>{["SURVIVAL", "CREATIVE", "ADVENTURE", "SPECTATOR"].map((value) => <option key={value}>{value}</option>)}</Select><ActionButton onClick={() => props.run("player.gamemode", { ...base, gameMode })}>Set game mode</ActionButton></div>}
+          {props.can("player.teleport") && <div className="pp-form"><label>Destination world<input value={world} onChange={(event) => setWorld(event.target.value)} /></label><div className="pp-stat-grid">{(["x", "y", "z"] as const).map((key) => <label key={key}>{key.toUpperCase()}<input type="number" value={coordinates[key]} onChange={(event) => setCoordinates({ ...coordinates, [key]: event.target.value })} /></label>)}</div><ActionButton disabled={Object.values(coordinates).some((value) => value === "")} disabledReason="Enter all three destination coordinates." onClick={() => props.run("player.teleport", { ...base, world, x: Number(coordinates.x), y: Number(coordinates.y), z: Number(coordinates.z) })}>Teleport</ActionButton></div>}
           {!permittedActions.some((action) => ["message", "heal", "feed", "gamemode", "teleport"].includes(action)) && <Empty title="Player actions unavailable">The current device scope or local Paper policy does not allow direct player actions.</Empty>}
         </div>
       ) : (
-        <div className="ui-form workspace-drawer-section">
+        <div className="pp-form pp-stack">
           <label>Moderation reason<input value={reason} onChange={(event) => setReason(event.target.value)} maxLength={2000} /></label>
-          <div className="ui-actions">
-            {["kick", "ban", "unban", "whitelist.add", "whitelist.remove", "kill", "op", "deop"].filter((action) => props.can(`player.${action}`)).map((action) => <ActionButton key={action} danger={["ban", "kill", "op", "deop"].includes(action)} onClick={() => props.run(`player.${action}`, { ...base, reason })}>{action.replaceAll(".", " ")}</ActionButton>)}
+          <div className="pp-row">
+            {["kick", "ban", "unban", "whitelist.add", "whitelist.remove", "kill", "op", "deop"].filter((action) => props.can(`player.${action}`)).map((action) => <ActionButton key={action} danger={["ban", "kill", "op", "deop"].includes(action)} onClick={() => props.run(`player.${action}`, { ...base, reason })}>{({kick:"Kick player",ban:"Ban player",unban:"Unban player","whitelist.add":"Add to whitelist","whitelist.remove":"Remove from whitelist",kill:"Kill player",op:"Grant operator",deop:"Remove operator"} as Record<string,string>)[action]}</ActionButton>)}
           </div>
           {!permittedActions.some((action) => ["kick", "ban", "unban", "whitelist.add", "whitelist.remove", "kill", "op", "deop"].includes(action)) && <Empty title="Moderation unavailable">This device does not have a moderation scope allowed by local policy.</Empty>}
-          <p className="ui-hint">Every operation is checked and audited locally. Operator changes remain Owner-only.</p>
+          <p className="pp-muted">Every operation is checked and audited locally. Operator changes remain Owner-only.</p>
         </div>
       )}
-    </dialog>
+    </Dialog>
   );
 }

@@ -1,13 +1,10 @@
 "use client";
 
-import { Select } from "../components/select";
+import { ActionButton, Badge, Button, Empty, Panel, PageHeader, Select } from "./ui/workspace";
+import { Dialog, Disclosure, Skeleton, Table } from "./ui/primitives";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import {
-  ActionButton,
-  Badge,
-  Empty,
-  Panel,
   time,
   useQuery,
   type ViewProps,
@@ -22,8 +19,10 @@ function metricDuration(value: unknown) {
 
 function expired(value: unknown) {
   const timestamp = number(value);
-  return timestamp !== null && timestamp < Date.now();
+  return timestamp !== null && (timestamp < 1e12 ? timestamp * 1000 : timestamp) < Date.now();
 }
+
+function deviceTime(value:unknown){const at=number(value);return time(at===null?value:at<1e12?at:at/1000);}
 
 function outcomeTone(value: unknown): "green" | "cyan" | "amber" | "quiet" {
   return value === "SUCCESS"
@@ -47,6 +46,7 @@ export function AuditView(props: ViewProps) {
   });
   const [submitted, setSubmitted] = useState<JsonMap>({});
   const [page, setPage] = useState(0);
+  const [layout,setLayout]=useState("timeline");
   const action = props.can("audit.list", kind) ? "audit.list" : "audit.self";
   const allowed = props.can(action, kind);
   const query = useQuery(action, { ...submitted, page }, allowed, kind);
@@ -79,16 +79,18 @@ export function AuditView(props: ViewProps) {
   };
 
   return (
-    <div className="view-audit-stack">
+    <div className="pp-workspace" data-ui6-workspace="Audit">
+      <PageHeader title="Audit" description={`${kind==='PAPER'?'Paper':'Host'} records. ${visible.length} loaded in this bounded page.`} primary={<Button variant="primary" busy={query.busy} disabled={!allowed} onClick={query.refresh}>Refresh audit</Button>}/>
+      <div className="pp-row"><Button aria-pressed={layout==='timeline'} onClick={()=>setLayout('timeline')}>Timeline</Button><Button aria-pressed={layout==='table'} onClick={()=>setLayout('table')}>Table</Button></div>
       <form
-        className="view-audit-toolbar"
+        className="pp-toolbar"
         onSubmit={(event) => {
           event.preventDefault();
           applyServerFilters();
         }}
       >
-        <label className="ui-search view-audit-search">
-          <span className="sr-only">Search loaded audit records</span>
+        <label className=" view-audit-search">
+          <span className="">Search loaded audit records</span>
           <input
             value={filters.search}
             onChange={(event) =>
@@ -98,9 +100,9 @@ export function AuditView(props: ViewProps) {
           />
         </label>
         <label>
-          <span className="sr-only">Audit source</span>
+          <span className="">Audit source</span>
           <Select aria-label="Audit source"
-            value={kind}
+            value={kind==='PAPER'?'Paper':'Host'}
             onValueChange={(selectedValue) => {
               setKind(selectedValue as "PAPER" | "HOST");
               setPage(0);
@@ -110,16 +112,16 @@ export function AuditView(props: ViewProps) {
             {props.state.ready?.agents.host && <option value="HOST">Host audit</option>}
           </Select>
         </label>
-        <button
-          className="ui-button"
+        <Button
+          className=""
           type="button"
           onClick={query.refresh}
           disabled={query.busy}
         >
           {query.busy ? "Refreshing…" : "Refresh"}
-        </button>
-        <details className="view-audit-filters">
-          <summary className="ui-button">More filters</summary>
+        </Button>
+        <details className="pp-disclosure">
+          <summary className="">More filters</summary>
           <div>
             <label>
               Actor / device
@@ -168,15 +170,15 @@ export function AuditView(props: ViewProps) {
                 }
               />
             </label>
-            <button className="ui-button primary" type="submit">
+            <Button className="" type="submit">
               Apply filters
-            </button>
+            </Button>
           </div>
         </details>
       </form>
 
       {query.error && (
-        <p className="ui-alert" role="alert">
+        <p className="pp-notice" role="alert">
           {query.error}
         </p>
       )}
@@ -186,10 +188,10 @@ export function AuditView(props: ViewProps) {
         aside={<Badge>{visible.length} loaded</Badge>}
       >
         {!allowed ? (
-          <Empty title="Audit access unavailable" />
-        ) : visible.length ? (
-          <div className="view-audit-list" role="list">
-            <div className="view-audit-columns" aria-hidden="true">
+          <Empty title="Audit access unavailable">The required audit scope or local policy is unavailable. Re-pair for newly introduced scopes.</Empty>
+        ) : query.busy&&!query.hasSuccess ? <Skeleton label="Loading audit"/> : layout==='table' ? <Table caption="Loaded audit records" rows={visible} rowKey={e=>str(e.requestId)} columns={[{key:'time',label:'Time',render:e=>time(e.timestamp)},{key:'actor',label:'Actor / device',render:e=>str(e.actorLabel)},{key:'action',label:'Action',render:e=>str(e.actionType)},{key:'target',label:'Target',render:e=>str(e.target)},{key:'result',label:'Result',render:e=><Badge tone={outcomeTone(e.outcome)}>{str(e.outcome).toLowerCase()}</Badge>}]} empty={<Empty title="No matching records"/>}/> : visible.length ? (
+          <div className="pp-stack" role="list">
+            <div className="pp-sr-only" aria-hidden="true">
               <span>Time</span>
               <span>Actor / device</span>
               <span>Action</span>
@@ -199,12 +201,12 @@ export function AuditView(props: ViewProps) {
             {visible.map((entry, index) => {
               const json = JSON.stringify(entry, null, 2);
               return (
-                <article
-                  className="view-audit-event"
+                <div
+                  className="pp-record"
                   role="listitem"
                   key={`${entry.requestId}-${index}`}
                 >
-                  <div className="view-audit-event-main">
+                  <div className="pp-data-grid">
                     <div data-label="Time">
                       <strong>{time(entry.timestamp)}</strong>
                       <small>{metricDuration(entry.durationMillis)}</small>
@@ -227,18 +229,18 @@ export function AuditView(props: ViewProps) {
                       {entry.code !== undefined && <small>{str(entry.code)}</small>}
                     </div>
                   </div>
-                  <details className="view-audit-details">
+                  <details className="pp-disclosure">
                     <summary>Advanced event details</summary>
-                    <div className="view-audit-detail-body">
-                      <dl className="ui-details">
+                    <div className="pp-stack">
+                      <dl className="pp-facts">
                         <div><dt>Request ID</dt><dd>{str(entry.requestId)}</dd></div>
                         <div><dt>Timestamp</dt><dd>{time(entry.timestamp)}</dd></div>
                         <div><dt>Duration</dt><dd>{metricDuration(entry.durationMillis)}</dd></div>
                         <div><dt>Code</dt><dd>{str(entry.code)}</dd></div>
                       </dl>
-                      <div className="ui-actions">
-                        <button
-                          className="ui-button"
+                      <div className="pp-row">
+                        <Button
+                          className=""
                           onClick={() =>
                             void navigator.clipboard
                               .writeText(str(entry.requestId, ""))
@@ -246,9 +248,9 @@ export function AuditView(props: ViewProps) {
                           }
                         >
                           Copy request ID
-                        </button>
-                        <button
-                          className="ui-button"
+                        </Button>
+                        <Button
+                          className=""
                           onClick={() =>
                             void navigator.clipboard
                               .writeText(json)
@@ -256,12 +258,12 @@ export function AuditView(props: ViewProps) {
                           }
                         >
                           Copy JSON
-                        </button>
+                        </Button>
                       </div>
-                      <pre className="ui-output workspace-audit-json">{json}</pre>
+                      <pre className="pp-output workspace-audit-json">{json}</pre>
                     </div>
                   </details>
-                </article>
+                </div>
               );
             })}
           </div>
@@ -270,24 +272,24 @@ export function AuditView(props: ViewProps) {
         )}
       </Panel>
 
-      <div className="workspace-pagination view-audit-pagination">
-        <button
-          className="ui-button"
+      <div className="pp-row">
+        <Button
+          className=""
           disabled={!page}
           onClick={() => setPage((current) => current - 1)}
         >
           Previous
-        </button>
-        <span>Page {page + 1} · 50 records per page</span>
-        <button
-          className="ui-button"
+        </Button>
+        <span>Page {page + 1}. 50 records per page</span>
+        <Button
+          className=""
           disabled={!query.data.hasMore}
           onClick={() => setPage((current) => current + 1)}
         >
           Next
-        </button>
+        </Button>
       </div>
-      <p className="ui-hint view-audit-authority">
+      <p className="pp-muted pp-muted">
         Records remain authoritative on the selected local agent. This viewer
         searches a bounded query window and does not copy the audit database to
         Vercel or the relay.
@@ -299,7 +301,7 @@ export function AuditView(props: ViewProps) {
 type CapabilityGroup = {
   label: string;
   scopes: readonly Scope[];
-  future?: boolean;
+
 };
 
 const CAPABILITY_GROUPS: CapabilityGroup[] = [
@@ -337,10 +339,9 @@ const CAPABILITY_GROUPS: CapabilityGroup[] = [
     ),
   },
   {
-    label: "Advanced / Future",
-    future: true,
+    label: "Files and Backups",
     scopes: SCOPES.filter(
-      (scope) => scope.startsWith("files.") || scope.startsWith("backup."),
+      (scope) => scope.startsWith("files.") || scope.startsWith("backup.") || scope.startsWith("maintenance.") || scope.startsWith("provider."),
     ),
   },
 ];
@@ -390,13 +391,14 @@ export function AccessView(
   );
 
   return (
-    <div className="view-access-stack">
+    <div className="pp-workspace" data-ui6-workspace="Access">
+      <PageHeader title="Access" description="Scopes and local policy define this immutable device grant." primary={<Button variant="primary" onClick={props.pair}>Pair another server</Button>} secondary={<Disclosure title="More"><ActionButton danger onClick={props.forget}>Forget this device</ActionButton></Disclosure>}/>
       <Panel
         title="This device"
         aside={<Badge tone="cyan">{currentRole}</Badge>}
       >
-        <div className="view-device-summary">
-          <div className="view-device-identity">
+        <div className="pp-stack">
+          <div className="pp-row">
             <span className="view-device-mark" aria-hidden="true">
               {current?.name?.slice(0, 1).toUpperCase() ?? "B"}
             </span>
@@ -405,26 +407,19 @@ export function AccessView(
               <p>{props.state.serverId || "Server unavailable"}</p>
             </div>
           </div>
-          <dl className="view-device-facts">
+          <dl className="pp-facts">
             <div><dt>Role</dt><dd>{currentRole}</dd></div>
             <div><dt>Connection</dt><dd>{props.connected ? "Live" : "Offline"}</dd></div>
-            <div><dt>Credential expiry</dt><dd>{time(current?.expiresAt)}</dd></div>
-            <div><dt>Issued</dt><dd>{time(current?.issuedAt)}</dd></div>
+            <div><dt>Credential expiry</dt><dd>{deviceTime(current?.expiresAt)}</dd></div>
+            <div><dt>Issued</dt><dd>{deviceTime(current?.issuedAt)}</dd></div>
           </dl>
-          <div className="ui-actions view-device-actions">
-            <button className="ui-button" onClick={props.pair}>
-              Pair another server
-            </button>
-            <ActionButton danger onClick={props.forget}>
-              Forget this device
-            </ActionButton>
-          </div>
+
         </div>
       </Panel>
 
-      <Panel title="Capability summary" aside={<Badge>Local policy + this grant</Badge>}>
+      <Panel title="Capability summary" aside={<Badge>Local policy + this grant</Badge>}><div className="pp-row" aria-label="Effective permission intersection">{["Scope","Agent","Capability","Local policy","Action rules","Confirmation"].map((label,index)=><span key={label}>{index>0&&<span aria-hidden="true"> ∩ </span>}<Badge>{label}</Badge></span>)}</div><p>Effective permission requires the signed scope, connected agent, capability, local policy, action rules and bound confirmation. The agent reports any undisclosed restriction.</p>
         {currentGrant && !currentGrant.metadataMatches && (
-          <div className="view-repair-guidance">
+          <div className="pp-notice">
             <Badge tone="amber">Re-pair required</Badge>
             <p>
               This browser&apos;s signed grant does not match the current device
@@ -434,7 +429,7 @@ export function AccessView(
             </p>
           </div>
         )}
-        <div className="view-capability-grid">
+        <div className="pp-data-grid">
           {CAPABILITY_GROUPS.map((group) => {
             const locallyEnabled = group.scopes.filter((scope) =>
               localCapability(scope, paperCapabilities, hostCapabilities),
@@ -448,17 +443,17 @@ export function AccessView(
               locallyEnabled === 0
                 ? "Unavailable locally"
                 : availableToDevice === locallyEnabled
-                  ? "Fully available"
-                  : `${availableToDevice} of ${locallyEnabled} available`;
+                  ? "All locally enabled scopes granted"
+                  : `${availableToDevice} of ${locallyEnabled} locally enabled scopes granted`;
             return (
-              <article className="view-capability-card" key={group.label}>
+              <article className="pp-record" key={group.label}>
                 <div>
                   <h3>{group.label}</h3>
-                  {group.future && <Badge tone="quiet">Future workspace</Badge>}
+
                 </div>
                 <strong>{label}</strong>
                 <small>
-                  {locallyEnabled} local · {group.scopes.length} known scopes
+                  {locallyEnabled} local. {group.scopes.length} known scopes
                 </small>
               </article>
             );
@@ -466,7 +461,7 @@ export function AccessView(
         </div>
 
         {locallyEnabledButUngraded.length > 0 && (
-          <div className="view-repair-guidance">
+          <div className="pp-notice">
             <Badge tone="amber">Immutable device grant</Badge>
             <p>
               {locallyEnabledButUngraded.length} locally enabled capability
@@ -478,10 +473,10 @@ export function AccessView(
           </div>
         )}
 
-        <details className="view-capability-details">
+        <details className="pp-disclosure">
           <summary>Advanced capability details</summary>
-          <div className="ui-table-wrap">
-            <table>
+          <div className="pp-table-scroll" data-cards="true" role="region" aria-label="Advertised scope policy" tabIndex={0}>
+            <table className="pp-table">
               <thead>
                 <tr>
                   <th>Scope</th>
@@ -494,40 +489,38 @@ export function AccessView(
                 {CAPABILITY_GROUPS.flatMap((group) =>
                   group.scopes.map((scope) => (
                     <tr key={scope}>
-                      <td>
+                      <td data-label="Scope">
                         <strong>{scope}</strong>
-                        {group.future && <small>Advanced / Future</small>}
+
                       </td>
-                      <td>
+                      <td data-label="Paper policy">
                         <Badge tone={paperCapabilities[scope] ? "green" : "quiet"}>
                           {paperCapabilities[scope] ? "Enabled" : "Disabled"}
                         </Badge>
                       </td>
-                      <td>
+                      <td data-label="Host policy">
                         <Badge tone={hostCapabilities[scope] ? "green" : "quiet"}>
                           {hostCapabilities[scope] ? "Enabled" : "Disabled"}
                         </Badge>
                       </td>
-                      <td>{currentScopes.has(scope) ? "Granted" : "Not granted"}</td>
+                      <td data-label="This device">{currentScopes.has(scope) ? "Granted" : "Not granted"}</td>
                     </tr>
                   )),
                 )}
               </tbody>
             </table>
           </div>
-          <p className="ui-hint ui-pad">
-            Local Paper/Host policy remains authoritative. Files and Backups scopes are
-            retained here only as Advanced / Future capabilities; Dashboard 3.0 does not
-            expose those workspaces as active pages.
+          <p className="pp-muted pp-stack">
+            Files and Backups are active workspaces. The agent still enforces action rules; these counts describe scopes and advertised local policy only.
           </p>
         </details>
       </Panel>
 
       {props.can("devices.list") && (
         <Panel title="Paired devices" aside={<Badge>{devices.length} shown</Badge>}>
-          <div className="view-device-toolbar">
-            <label className="ui-search">
-              <span className="sr-only">Search devices</span>
+          <div className="pp-toolbar">
+            <label className="">
+              <span className="">Search devices</span>
               <input
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
@@ -535,78 +528,26 @@ export function AccessView(
               />
             </label>
             <label>
-              <span className="sr-only">Filter devices by role</span>
+              <span className="">Filter devices by role</span>
               <Select aria-label="Filter devices by role" value={role} onValueChange={(selectedValue) => setRole(selectedValue)}>
                 <option value="ALL">All roles</option>
                 {roles.map((value) => <option key={value}>{value}</option>)}
               </Select>
             </label>
-            <button className="ui-button" disabled={query.busy} onClick={query.refresh}>
+            <Button className="" disabled={query.busy} onClick={query.refresh}>
               {query.busy ? "Refreshing…" : "Refresh"}
-            </button>
+            </Button>
           </div>
 
-          {devices.length ? (
-            <div className="ui-table-wrap view-device-table">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Device</th>
-                    <th>Role</th>
-                    <th>Last seen</th>
-                    <th>Expires</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {devices.map((device) => {
-                    const isCurrent = device.deviceId === current?.deviceId;
-                    const isExpired = expired(device.expiresAt);
-                    return (
-                      <tr key={str(device.deviceId)}>
-                        <td><strong>{str(device.name)}</strong><small>{str(device.deviceId)}</small></td>
-                        <td><Badge tone={device.role === "Owner" ? "cyan" : "quiet"}>{str(device.role)}</Badge></td>
-                        <td>{time(device.lastSeen)}</td>
-                        <td>{time(device.expiresAt)}</td>
-                        <td>
-                          {isCurrent ? (
-                            <Badge tone="green">Current</Badge>
-                          ) : isExpired ? (
-                            <Badge tone="amber">Expired</Badge>
-                          ) : (
-                            <Badge>Paired</Badge>
-                          )}
-                        </td>
-                        <td>
-                          <div className="ui-actions">
-                            <button className="ui-button" onClick={() => setSelected(device)}>
-                              Details
-                            </button>
-                            {props.can("devices.revoke") && !isCurrent && (
-                              <ActionButton
-                                danger
-                                onClick={() =>
-                                  props
-                                    .run("devices.revoke", { deviceId: device.deviceId })
-                                    .then(() => query.refresh())
-                                }
-                              >
-                                Revoke
-                              </ActionButton>
-                            )}
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <Empty title="No devices match these filters" />
-          )}
-          {query.error && <p className="ui-alert" role="alert">{query.error}</p>}
+          <Table caption="Reported device grants" loading={query.busy} rows={devices} rowKey={d=>str(d.deviceId)} columns={[
+            {key:'device',label:'Device',rowHeader:true,render:d=><><strong>{str(d.name)}</strong><small className="pp-identifier">{str(d.deviceId)}</small></>},
+            {key:'role',label:'Role',render:d=><Badge>{str(d.role)}</Badge>},
+            {key:'seen',label:'Last seen',render:d=>deviceTime(d.lastSeen)},
+            {key:'expires',label:'Expires',render:d=>deviceTime(d.expiresAt)},
+            {key:'status',label:'Status',render:d=><Badge tone={d.deviceId===current?.deviceId?'green':expired(d.expiresAt)?'amber':'quiet'}>{d.deviceId===current?.deviceId?'Current':expired(d.expiresAt)?'Expired':'Paired'}</Badge>},
+            {key:'actions',label:'Actions',render:d=><div className="pp-row"><Button onClick={()=>setSelected(d)}>Details</Button>{props.can('devices.revoke')&&d.deviceId!==current?.deviceId&&<ActionButton danger onClick={()=>props.run('devices.revoke',{deviceId:d.deviceId}).then(result=>{query.refresh();return result;})}>Revoke</ActionButton>}</div>}
+          ]} empty={<Empty title="No devices match these filters"/>}/>
+          {query.error && <p className="pp-notice" role="alert">{query.error}</p>}
         </Panel>
       )}
 
@@ -621,63 +562,7 @@ export function AccessView(
   );
 }
 
-function DeviceDialog21({
-  device,
-  currentDeviceId,
-  close,
-}: {
-  device: JsonMap;
-  currentDeviceId?: string;
-  close: () => void;
-}) {
-  const ref = useRef<HTMLDialogElement>(null);
-  useEffect(() => {
-    const dialog = ref.current;
-    if (dialog && !dialog.open) dialog.showModal();
-    return () => {
-      if (dialog?.open) dialog.close();
-    };
-  }, []);
-  const scopes = Array.isArray(device.scopes) ? device.scopes.map(String) : [];
-  return (
-    <dialog
-      className="ui-drawer workspace-player-drawer"
-      ref={ref}
-      onCancel={close}
-      aria-labelledby="device-title"
-    >
-      <div className="ui-panel-head">
-        <div>
-          <small>Device permissions</small>
-          <h2 id="device-title">{str(device.name)}</h2>
-        </div>
-        <button className="ui-button" onClick={close} aria-label="Close device details">×</button>
-      </div>
-      <div className="workspace-drawer-section">
-        <div className="ui-actions">
-          <Badge tone={device.role === "Owner" ? "cyan" : "quiet"}>{str(device.role)}</Badge>
-          {device.deviceId === currentDeviceId && <Badge tone="green">Current device</Badge>}
-          {expired(device.expiresAt) && <Badge tone="amber">Expired</Badge>}
-        </div>
-        <dl className="ui-details">
-          <div><dt>Device ID</dt><dd>{str(device.deviceId)}</dd></div>
-          <div><dt>Issued</dt><dd>{time(device.issuedAt)}</dd></div>
-          <div><dt>Expires</dt><dd>{time(device.expiresAt)}</dd></div>
-          <div><dt>Last seen</dt><dd>{time(device.lastSeen)}</dd></div>
-        </dl>
-        <h3>Granted scopes</h3>
-        {scopes.length ? (
-          <div className="ui-scope-list">
-            {scopes.map((scope) => <Badge key={scope}>{scope}</Badge>)}
-          </div>
-        ) : (
-          <Empty title="No scopes reported" />
-        )}
-        <p className="ui-hint">
-          Connected/disconnected state is not inferred from last-seen time. Only
-          explicit agent/device data is shown here.
-        </p>
-      </div>
-    </dialog>
-  );
+function DeviceDialog21({device,currentDeviceId,close}:{device:JsonMap;currentDeviceId?:string;close:()=>void}){
+ const scopes=Array.isArray(device.scopes)?device.scopes.map(String):[];
+ return <Dialog open onClose={close} title={str(device.name)} description="Immutable device permissions"><div className="pp-row"><Badge>{str(device.role)}</Badge>{device.deviceId===currentDeviceId&&<Badge tone="green">Current device</Badge>}{expired(device.expiresAt)&&<Badge tone="amber">Expired</Badge>}</div><dl className="pp-facts"><div><dt>Device ID</dt><dd>{str(device.deviceId)}</dd></div><div><dt>Issued</dt><dd>{deviceTime(device.issuedAt)}</dd></div><div><dt>Expires</dt><dd>{deviceTime(device.expiresAt)}</dd></div><div><dt>Last seen</dt><dd>{deviceTime(device.lastSeen)}</dd></div></dl><h3>Granted scopes</h3>{scopes.length?<div className="pp-row">{scopes.map(scope=><Badge key={scope}>{scope}</Badge>)}</div>:<Empty title="No scopes reported"/>}<p className="pp-muted">Only supplied device data is shown. Last seen does not prove a connection.</p></Dialog>;
 }

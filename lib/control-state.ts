@@ -1,6 +1,6 @@
 import { DASHBOARD_LABEL } from "./dashboard-version";
 import type { Scope } from "./scopes";
-import { capturedAtMillis, telemetryFreshness } from "./telemetry-freshness";
+import { capturedAtMillis, classifyTelemetry } from "./telemetry-freshness";
 export { capturedAtMillis } from "./telemetry-freshness";
 export type JsonMap = Record<string, unknown>;
 export interface Device {
@@ -86,6 +86,7 @@ export interface ControlState {
   updatedAt: number;
   telemetryUpdatedAt: number;
   paperConnectedAt?: number;
+  receipts?: {paperHealth?:number;paperSystem?:number;hostSystem?:number;service?:number};
   cached: boolean;
 }
 
@@ -160,6 +161,7 @@ export function applyControlMessage(
     return {
       ...state,
       ready,
+      receipts:{paperHealth:ready.agents.paper&&samePaperSession&&!state.cached?state.receipts?.paperHealth:undefined,paperSystem:ready.agents.paper&&samePaperSession&&!state.cached?state.receipts?.paperSystem:undefined,hostSystem:ready.agents.host&&!state.cached&&state.ready?.server.hostSession===ready.server.hostSession?state.receipts?.hostSystem:undefined,service:ready.agents.host&&!state.cached&&state.ready?.server.hostSession===ready.server.hostSession?state.receipts?.service:undefined},
       updatedAt: Date.now(),
       paperConnectedAt: ready.agents.paper
         ? samePaperSession && state.ready?.agents.paper && !state.cached
@@ -199,11 +201,13 @@ export function applyControlMessage(
     case "telemetry.server":
       if (kind !== "PAPER" || supersededCapture(state.server, body)) return state;
       next.server = body;
+      next.receipts={...next.receipts,paperHealth:receivedAt};
       break;
     case "telemetry.system":
       if (supersededCapture(kind === "HOST" ? state.hostSystem : state.system, body)) return state;
       if (kind === "HOST") next.hostSystem = body;
       else next.system = body;
+      next.receipts={...next.receipts,[kind==="HOST"?"hostSystem":"paperSystem"]:receivedAt};
       break;
     case "telemetry.worlds":
       next.worlds = records(body.worlds, 64);
@@ -305,6 +309,7 @@ export function applyControlMessage(
       if (kind !== "HOST") return state;
       if (supersededCapture(record(state.service.resources), record(body.resources))) return state;
       next.service = body;
+      next.receipts={...next.receipts,service:receivedAt};
       break;
     case "backup.progress":
       next.backupProgress = body;
@@ -368,6 +373,7 @@ export function safeCache(state: ControlState): ControlState {
       : [],
     cached: true,
     paperConnectedAt: undefined,
+    receipts:undefined,
   };
 }
 export function diagnostics(state: ControlState): string {
@@ -388,8 +394,8 @@ export function diagnostics(state: ControlState): string {
     `Paper connected: ${Boolean(state.ready?.agents.paper)}`,
     `Host connected: ${Boolean(state.ready?.agents.host)}`,
     `Browser time: ${new Date(now).toISOString()}`,
-    `Minecraft sample: ${timestamp(state.server.capturedAt)} / ${telemetryFreshness(state.server.capturedAt, live && Boolean(state.ready?.agents.paper), now).label}`,
-    `Host sample: ${timestamp(host.capturedAt)} / ${telemetryFreshness(host.capturedAt, live && Boolean(state.ready?.agents.host), now).label}`,
+    `Minecraft sample: ${timestamp(state.server.capturedAt)} / ${classifyTelemetry({capturedAt:state.server.capturedAt,receivedAt:state.receipts?.paperHealth,connected:live&&Boolean(state.ready?.agents.paper),now}).label}`,
+    `Host sample: ${timestamp(host.capturedAt)} / ${classifyTelemetry({capturedAt:host.capturedAt,receivedAt:state.receipts?.hostSystem,connected:live&&Boolean(state.ready?.agents.host),now}).label}`,
     `Console authority: ${state.ready?.consoleAuthority ?? "UNAVAILABLE"}`,
     `Console source state: ${state.ready?.consoleSourceState ?? "unknown"}`,
     `Java: ${str(paper.javaVersion)}`,

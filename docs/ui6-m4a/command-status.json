@@ -1,0 +1,284 @@
+[
+  {
+    "name": "foundation",
+    "command": "node scripts/verify-ui6-foundation.mjs",
+    "env": {
+      "UI6_OUTPUT": "docs/ui6-m4a/foundation"
+    },
+    "startedAt": "2026-10-08T20:44:33.304Z",
+    "finishedAt": "2026-10-08T20:44:58.016Z",
+    "exitCode": 1,
+    "result": "failed"
+  },
+  {
+    "name": "foundation",
+    "command": "node scripts/verify-ui6-foundation.mjs",
+    "env": {
+      "UI6_OUTPUT": "docs/ui6-m4a/foundation"
+    },
+    "startedAt": "2026-10-08T20:45:46.883Z",
+    "finishedAt": "2026-10-08T20:47:51.578Z",
+    "exitCode": 1,
+    "result": "failed"
+  },
+  {
+    "name": "foundation",
+    "command": "node scripts/verify-ui6-foundation.mjs",
+    "env": {
+      "UI6_OUTPUT": "docs/ui6-m4a/foundation"
+    },
+    "startedAt": "2026-10-08T20:49:02.942Z",
+    "finishedAt": "2026-10-08T20:51:18.122Z",
+    "exitCode": 0,
+    "result": "passed"
+  },
+  {
+    "name": "check",
+    "command": "npm run check",
+    "env": {},
+    "startedAt": "2026-10-08T20:51:43.954Z",
+    "finishedAt": "2026-10-08T20:55:02.138Z",
+    "exitCode": 1,
+    "result": "failed"
+  },
+  {
+    "name": "check",
+    "command": "npm run check",
+    "env": {},
+    "startedAt": "2026-10-08T20:56:42.534Z",
+    "finishedAt": "2026-10-08T20:59:55.608Z",
+    "exitCode": 0,
+    "result": "passed"
+  },
+  {
+    "name": "production-build",
+    "command": "npm run build",
+    "env": {
+      "NEXT_PUBLIC_PLEXON_RELAY_URL": "http://127.0.0.1:8788"
+    },
+    "startedAt": "2026-10-08T21:00:35.643Z",
+    "finishedAt": "2026-10-08T21:01:06.640Z",
+    "exitCode": 0,
+    "result": "passed"
+  },
+  {
+    "name": "production-metrics",
+    "command": "node scripts/verify-ui6-overview.mjs",
+    "env": {
+      "UI6_MODE": "production",
+      "UI6_TASK": "metrics",
+      "UI6_OUTPUT": "docs/ui6-m4a/production"
+    },
+    "startedAt": "2026-10-08T21:01:20.909Z",
+    "finishedAt": "2026-10-08T21:02:51.582Z",
+    "exitCode": 1,
+    "result": "failed"
+  },
+  {
+    "name": "production-build",
+    "command": "npm run build",
+    "env": {
+      "NEXT_PUBLIC_PLEXON_RELAY_URL": "http://127.0.0.1:8788"
+    },
+    "startedAt": "2026-10-08T21:08:52.000Z",
+    "finishedAt": "2026-10-08T21:09:30.096Z",
+    "exitCode": 0,
+    "result": "passed"
+  },
+  {
+    "name": "production-metrics",
+    "command": "node scripts/verify-ui6-overview.mjs",
+    "env": {
+      "UI6_MODE": "production",
+      "UI6_TASK": "metrics",
+      "UI6_OUTPUT": "docs/ui6-m4a/production"
+    },
+    "startedAt": "2026-10-08T21:10:08.137Z",
+    "finishedAt": "2026-10-08T21:10:34.329Z",
+    "exitCode": 1,
+    "result": "failed"
+  },
+  {
+    "name": "production-metrics",
+    "command": "node scripts/verify-ui6-overview.mjs",
+    "env": {
+      "UI6_MODE": "production",
+      "UI6_TASK": "metrics",
+      "UI6_OUTPUT": "docs/ui6-m4a/production"
+    },
+    "startedAt": "2026-10-08T21:12:50.623Z",
+    "finishedAt": "2026-10-08T21:13:04.688Z",
+    "exitCode": 1,
+    "result": "failed"
+  },
+  {
+    "name": "production-metrics",
+    "command": "node scripts/verify-ui6-overview.mjs",
+    "env": {
+      "UI6_MODE": "production",
+      "UI6_TASK": "metrics",
+      "UI6_OUTPUT": "docs/ui6-m4a/production"
+    },
+    "startedAt": "2026-10-08T21:13:30.156Z",
+    "finishedAt": "2026-10-08T21:15:25.692Z",
+    "exitCode": 0,
+    "result": "passed"
+  },
+  {
+    "name": "production-build",
+    "command": "npm run build",
+    "env": {
+      "NEXT_PUBLIC_PLEXON_RELAY_URL": "http://127.0.0.1:8788"
+    },
+    "startedAt": "2026-10-08T21:20:15.423Z",
+    "finishedAt": "2026-10-08T21:20:43.403Z",
+    "exitCode": 0,
+    "result": "passed"
+  },
+  {
+    "name": "production-build",
+    "command": "npm run build",
+    "env": {
+      "NEXT_PUBLIC_PLEXON_RELAY_URL": "http://127.0.0.1:8788"
+    },
+    "startedAt": "2026-10-08T21:24:24.686Z",
+    "finishedAt": "2026-10-08T21:24:46.523Z",
+    "exitCode": 0,
+    "result": "passed"
+  },
+  {
+    "name": "production-metrics",
+    "command": "node scripts/verify-ui6-overview.mjs",
+    "env": {
+      "UI6_MODE": "production",
+      "UI6_TASK": "metrics",
+      "UI6_OUTPUT": "docs/ui6-m4a/production"
+    },
+    "startedAt": "2026-10-08T21:26:15.171Z",
+    "finishedAt": "2026-10-08T21:27:59.614Z",
+    "exitCode": 0,
+    "result": "passed"
+  },
+  {
+    "name": "matrix-1",
+    "command": "node scripts/verify-ui6-overview.mjs",
+    "env": {
+      "UI6_MODE": "production",
+      "UI6_TASK": "matrix",
+      "UI6_STATES": "healthy,lagging",
+      "UI6_OUTPUT": "docs/ui6-m4a/final-1"
+    },
+    "startedAt": "2026-10-08T21:31:01.206Z",
+    "finishedAt": "2026-10-08T21:33:16.315Z",
+    "exitCode": 0,
+    "result": "passed"
+  },
+  {
+    "name": "matrix-2",
+    "command": "node scripts/verify-ui6-overview.mjs",
+    "env": {
+      "UI6_MODE": "production",
+      "UI6_TASK": "matrix",
+      "UI6_STATES": "outage-gap,stale",
+      "UI6_OUTPUT": "docs/ui6-m4a/final-2"
+    },
+    "startedAt": "2026-10-08T21:34:08.047Z",
+    "finishedAt": "2026-10-08T21:35:38.886Z",
+    "exitCode": 0,
+    "result": "passed"
+  },
+  {
+    "name": "matrix-3",
+    "command": "node scripts/verify-ui6-overview.mjs",
+    "env": {
+      "UI6_MODE": "production",
+      "UI6_TASK": "matrix",
+      "UI6_STATES": "host-offline-paper-fallback,paper-offline",
+      "UI6_OUTPUT": "docs/ui6-m4a/final-3"
+    },
+    "startedAt": "2026-10-08T21:35:57.507Z",
+    "finishedAt": "2026-10-08T21:37:49.210Z",
+    "exitCode": 0,
+    "result": "passed"
+  },
+  {
+    "name": "matrix-4",
+    "command": "node scripts/verify-ui6-overview.mjs",
+    "env": {
+      "UI6_MODE": "production",
+      "UI6_TASK": "matrix",
+      "UI6_STATES": "backup-degraded,empty",
+      "UI6_OUTPUT": "docs/ui6-m4a/final-4"
+    },
+    "startedAt": "2026-10-08T21:37:54.823Z",
+    "finishedAt": "2026-10-08T21:39:39.016Z",
+    "exitCode": 0,
+    "result": "passed"
+  },
+  {
+    "name": "matrix-5",
+    "command": "node scripts/verify-ui6-overview.mjs",
+    "env": {
+      "UI6_MODE": "production",
+      "UI6_TASK": "matrix",
+      "UI6_STATES": "dense-30-minute,lens-open",
+      "UI6_OUTPUT": "docs/ui6-m4a/final-5"
+    },
+    "startedAt": "2026-10-08T21:39:59.669Z",
+    "finishedAt": "2026-10-08T21:42:15.668Z",
+    "exitCode": 0,
+    "result": "passed"
+  },
+  {
+    "name": "production-fonts",
+    "command": "node scripts/verify-ui6-foundation.mjs",
+    "env": {
+      "UI6_MODE": "production",
+      "UI6_OUTPUT": "docs/ui6-m4a/production-fonts"
+    },
+    "startedAt": "2026-10-08T21:42:27.419Z",
+    "finishedAt": "2026-10-08T21:42:31.563Z",
+    "exitCode": 0,
+    "result": "passed"
+  },
+  {
+    "name": "foundation",
+    "command": "node scripts/verify-ui6-foundation.mjs",
+    "env": {
+      "UI6_OUTPUT": "docs/ui6-m4a/foundation"
+    },
+    "startedAt": "2026-10-08T21:43:06.815Z",
+    "finishedAt": "2026-10-08T21:43:36.868Z",
+    "exitCode": 1,
+    "result": "failed"
+  },
+  {
+    "name": "foundation",
+    "command": "node scripts/verify-ui6-foundation.mjs",
+    "env": {
+      "UI6_OUTPUT": "docs/ui6-m4a/foundation"
+    },
+    "startedAt": "2026-10-08T21:44:47.586Z",
+    "finishedAt": "2026-10-08T21:46:30.024Z",
+    "exitCode": 0,
+    "result": "passed"
+  },
+  {
+    "name": "check",
+    "command": "npm run check",
+    "env": {},
+    "startedAt": "2026-10-08T21:47:03.303Z",
+    "finishedAt": "2026-10-08T21:49:59.166Z",
+    "exitCode": 1,
+    "result": "failed"
+  },
+  {
+    "name": "check",
+    "command": "npm run check",
+    "env": {},
+    "startedAt": "2026-10-08T21:53:08.547Z",
+    "finishedAt": "2026-10-08T21:55:50.101Z",
+    "exitCode": 0,
+    "result": "passed"
+  }
+]

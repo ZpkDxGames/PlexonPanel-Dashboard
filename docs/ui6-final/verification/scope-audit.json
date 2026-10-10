@@ -1,0 +1,11 @@
+{
+  "baseline": "5820da5faea58372d0dede3f64efbd2abe9d1d8c",
+  "baseline_is_ancestor": true,
+  "protected_source_and_original_regression_evidence_unchanged": true,
+  "dependencies_unchanged": true,
+  "lockfile_only_root_version_changed": true,
+  "stash": "0a8c1dc1dd477adccfe04151c530eaafdb73f504",
+  "push": "not executed",
+  "deployment": "not executed",
+  "main_or_tag_mutation": "not executed"
+}

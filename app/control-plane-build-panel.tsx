@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { loadControlPlaneBuilds, type ControlPlaneBuilds } from "../lib/build-identity";
-import { Badge, Panel } from "./control-views";
+import { Badge, Panel } from "./ui/workspace";
 
 const BUILD_TIME_FORMAT = new Intl.DateTimeFormat("en-GB", {
   dateStyle: "medium",
@@ -43,12 +43,12 @@ export function ControlPlaneBuildPanel({
   }, []);
 
   const status = builds?.status ?? "UNVERIFIED";
-  const tone = status === "MATCHED" ? "cyan" : status === "MISMATCH" ? "red" : "amber";
-  const label = status === "MATCHED" ? "Matched" : status === "MISMATCH" ? "Mismatch" : "Unverified";
+  const tone = status === "MATCHED" || status === "COMPATIBLE" ? "cyan" : status === "MISMATCH" ? "red" : "amber";
+  const label = status === "COMPATIBLE" ? "Compatible" : status === "MATCHED" ? "Matched" : status === "MISMATCH" ? "Mismatch" : "Unverified";
 
   return (
     <Panel title="Control plane builds" aside={<Badge tone={tone}>{label}</Badge>}>
-      <dl className="ui-details ui-pad">
+      <dl className="pp-facts">
         <div><dt>Dashboard version</dt><dd>{builds?.dashboard?.version ?? "Unavailable"}</dd></div>
         <div><dt>Dashboard build</dt><dd>{shortCommit(builds?.dashboard?.gitCommit)}</dd></div>
         <div><dt>Dashboard built</dt><dd>{buildTime(builds?.dashboard?.buildTimestamp)}</dd></div>
@@ -61,7 +61,7 @@ export function ControlPlaneBuildPanel({
         <div><dt>Host build</dt><dd>{hostVersion ?? "Unavailable"}</dd></div>
         <div><dt>Protocol</dt><dd>{builds?.relay?.protocolVersion ?? builds?.dashboard?.protocolVersion ?? 3}</dd></div>
       </dl>
-      <p className="ui-hint ui-pad">
+      <p className="pp-muted">
         {builds?.message ?? "Checking Dashboard and relay build identity. Ready state remains unverified until both are visible."}
       </p>
     </Panel>

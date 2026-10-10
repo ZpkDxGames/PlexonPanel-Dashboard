@@ -1,0 +1,24 @@
+{
+  "task": "mobile",
+  "environment": "Chromium, signed local relay, simulated agents; no live-server certification",
+  "status": "failed",
+  "screenshots": [
+    "fleet-light-360.png"
+  ],
+  "axe": [],
+  "keyboard": [],
+  "errors": [],
+  "firstScreen": [
+    {
+      "name": "Fleet",
+      "theme": "light",
+      "width": 360,
+      "scroll": 360,
+      "small": [],
+      "title": 355.390625,
+      "status": 432.203125,
+      "primary": 488.203125
+    }
+  ],
+  "failure": "AssertionError [ERR_ASSERTION]: Overview: primary action in first screen\n    at capture (file:///workspace/scratch/28b97b04a664/PlexonPanel-Dashboard/scripts/verify-ui6-mobile.mjs:74:150)\n    at async file:///workspace/scratch/28b97b04a664/PlexonPanel-Dashboard/scripts/verify-ui6-mobile.mjs:78:296"
+}
