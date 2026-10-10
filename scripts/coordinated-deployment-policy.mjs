@@ -1,5 +1,6 @@
 export const RECEIPT_PATH = "docs/coordinated-deployment-5.0.0.json";
 export const DASHBOARD_PREVIEW_PATH = "docs/dashboard-preview-6.0.0.json";
+export const DASHBOARD_PRODUCTION_PATH = "docs/dashboard-production-6.0.0.json";
 const SHA = /^[0-9a-f]{40}$/;
 const EVIDENCE = ["currentOperationalBackup", "offVpsIntegrity", "rollbackRehearsal", "operatorDeploymentReady"];
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
@@ -8,6 +9,39 @@ const EXCEPTION_STATUS = {
   offVpsIntegrity: "SKIPPED_OPERATOR_DECISION",
   rollbackRehearsal: "NOT_EXECUTED_OPERATOR_ACCEPTED",
 };
+
+const SIX_MANUAL_CHECKS = ["pcAndVpsClocks", "realServerClocks", "driveRetryUpload",
+  "fullBackupBrowserReload", "consolePaperStopped", "boundPlayerAction", "realPhoneWorkspaces"];
+
+export function dashboardProductionDecision({ version, receipt, parent, changedPaths, environment, branch }) {
+  if (version !== "6.0.0" || environment !== "production" || branch !== "main")
+    return { allowed: false, code: "SIX_PRODUCTION_DEPLOYMENT_HELD" };
+  if (!receipt || receipt.schemaVersion !== 1 || receipt.version !== version || receipt.state !== "READY"
+      || receipt.target !== "dashboard-production" || receipt.branch !== branch
+      || receipt.scope?.repository !== "ZpkDxGames/PlexonPanel-Dashboard"
+      || receipt.scope?.vercelTeam !== "zpkdxgames-projects"
+      || receipt.scope?.vercelProject !== "plexon-panel-dashboard"
+      || receipt.runtimeCertification !== "NOT_EXECUTED"
+      || !SIX_MANUAL_CHECKS.every(key => receipt.manualChecks?.[key] === "NOT_EXECUTED")
+      || receipt.operatorDecision?.approved !== true
+      || receipt.operatorDecision.intent !== "DASHBOARD_PRODUCTION"
+      || receipt.operatorDecision.deferLiveCertification !== true
+      || typeof receipt.operatorDecision.reason !== "string" || !receipt.operatorDecision.reason.trim()
+      || receipt.operatorDecision.reason.length > 500
+      || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/.test(receipt.operatorDecision.confirmedAt ?? "")
+      || !Number.isFinite(Date.parse(receipt.operatorDecision.confirmedAt)))
+    return { allowed: false, code: "SIX_PRODUCTION_AUTHORIZATION_INCOMPLETE" };
+  if (!SHA.test(receipt.acceptedDashboardSourceCommit ?? "")
+      || receipt.acceptedDashboardSourceCommit !== parent
+      || receipt.acceptedCoreSourceCommit !== "fb3c5444715179425183aec6d1f1fbe140211753")
+    return { allowed: false, code: "ACCEPTED_SOURCE_MISMATCH" };
+  if (!Array.isArray(changedPaths) || changedPaths.length !== 1 || changedPaths[0] !== DASHBOARD_PRODUCTION_PATH)
+    return { allowed: false, code: "ACTIVATION_COMMIT_CHANGED_SOURCE" };
+  if (!Number.isSafeInteger(receipt.dashboardCiRun) || receipt.dashboardCiRun <= 0
+      || !["check", "build", "browser", "axe", "audit"].every(key => receipt.evidence?.[key] === "PASS"))
+    return { allowed: false, code: "SIX_PRODUCTION_CI_EVIDENCE_INCOMPLETE" };
+  return { allowed: true, code: "OPERATOR_AUTHORIZED_SIX_DASHBOARD_PRODUCTION" };
+}
 
 export function dashboardPreviewDecision({ version, receipt, parent, changedPaths, environment, branch }) {
   if (version !== "6.0.0") return { allowed: false, code: "UNSUPPORTED_DEPLOYMENT_VERSION" };

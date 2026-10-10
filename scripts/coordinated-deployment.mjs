@@ -2,7 +2,8 @@ import { execFileSync } from "node:child_process";
 import { appendFileSync, lstatSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { isDeepStrictEqual } from "node:util";
-import { dashboardPreviewDecision, deploymentDecision, DASHBOARD_PREVIEW_PATH, RECEIPT_PATH } from "./coordinated-deployment-policy.mjs";
+import { dashboardPreviewDecision, dashboardProductionDecision, deploymentDecision,
+  DASHBOARD_PREVIEW_PATH, DASHBOARD_PRODUCTION_PATH, RECEIPT_PATH } from "./coordinated-deployment-policy.mjs";
 
 const root = resolve(import.meta.dirname, "..");
 const requireWorker = process.argv.includes("--require-worker");
@@ -10,9 +11,12 @@ let result = { allowed: false, code: "COORDINATION_CHECK_UNAVAILABLE" };
 let workerAllowed = false;
 try {
   const version = JSON.parse(readFileSync(resolve(root, "package.json"), "utf8")).version;
+  const sixProduction = version === "6.0.0" && process.env.VERCEL === "1" && process.env.VERCEL_ENV === "production";
   let receipt = null, parent = null, changedPaths = null;
   if (version === "5.0.0" || version === "6.0.0") {
-    receipt = JSON.parse(readFileSync(resolve(root, version === "6.0.0" ? DASHBOARD_PREVIEW_PATH : RECEIPT_PATH), "utf8"));
+    receipt = JSON.parse(readFileSync(resolve(root, version === "6.0.0"
+      ? sixProduction ? DASHBOARD_PRODUCTION_PATH : DASHBOARD_PREVIEW_PATH
+      : RECEIPT_PATH), "utf8"));
     // A VPS staging receipt never authorizes Worker publication, even in a shallow checkout.
     // Reject that target before reading activation ancestry; Dashboard checks still require it.
     const workerTargetHeld = requireWorker && (version === "6.0.0" || receipt.schemaVersion === 2);
@@ -26,7 +30,8 @@ try {
       let equivalentVercelConfig = false;
       const equivalentConfigAllowed = process.env.VERCEL === "1" && (version === "5.0.0"
         ? process.env.VERCEL_ENV === "production" && process.env.VERCEL_GIT_COMMIT_REF === "main"
-        : process.env.VERCEL_ENV === "preview" && process.env.VERCEL_GIT_COMMIT_REF === "release/6.0.0");
+        : (process.env.VERCEL_ENV === "preview" && process.env.VERCEL_GIT_COMMIT_REF === "release/6.0.0")
+          || (process.env.VERCEL_ENV === "production" && process.env.VERCEL_GIT_COMMIT_REF === "main"));
       if (status === "M vercel.json" && equivalentConfigAllowed) {
         const info = lstatSync(resolve(root, "vercel.json"));
         if (info.isFile() && !info.isSymbolicLink() && !(info.mode & 0o111)) {
@@ -54,7 +59,7 @@ try {
   result = version === "6.0.0"
     ? requireWorker
       ? { allowed: false, code: "WORKER_PUBLICATION_NOT_AUTHORIZED_FOR_DASHBOARD_RELEASE" }
-      : dashboardPreviewDecision({ version, receipt, parent, changedPaths,
+      : (sixProduction ? dashboardProductionDecision : dashboardPreviewDecision)({ version, receipt, parent, changedPaths,
         environment: process.env.VERCEL === "1" ? process.env.VERCEL_ENV : null,
         branch: process.env.VERCEL_GIT_COMMIT_REF })
     : requireWorker && version === "5.0.0" && receipt?.schemaVersion === 2
