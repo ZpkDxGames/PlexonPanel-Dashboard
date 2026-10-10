@@ -1,8 +1,12 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useTelemetryNow } from "../lib/telemetry-clock";
 import { liveActivity } from "../lib/durable-activity";
-import { Badge, Empty, Panel, time, type ViewProps } from "./control-views";
+import { time, type ViewProps } from "./control-views";
+import { Badge, Button, Empty, PageHeader, Panel } from "./ui/workspace";
+import { Disclosure } from "./ui/primitives";
+import { useUiPreferences } from "../components/ui-preferences-provider";
 import { ActivityHistoryModal } from "./activity-history-modal";
 import { PlayerRoster } from "./player-roster";
 
@@ -22,7 +26,9 @@ function journalStatus(props: ViewProps) {
 }
 
 export function PlayersView(props: ViewProps) {
+  const { preferences } = useUiPreferences();
   const [activityOpen, setActivityOpen] = useState(false);
+  const now = useTelemetryNow(props.state.updatedAt);
   const journal = journalStatus(props);
   const live = useMemo(
     () => props.connected && props.state.ready?.agents.paper &&
@@ -33,25 +39,26 @@ export function PlayersView(props: ViewProps) {
   );
 
   return (
-    <>
+    <div className="pp-workspace" data-ui6-workspace="Players">
+      <PageHeader title="Player roster" description={props.connected&&props.state.ready?.agents.paper?'Current players from Paper.':'Paper roster unavailable while disconnected.'} primary={<Button variant="primary" disabled={!props.state.serverId} onClick={()=>setActivityOpen(true)}>Browse activity history</Button>}/>
       <PlayerRoster {...props} showHistoryTab={false} />
       <Panel
         title="Recent player activity"
-        className="player-activity-panel"
-        aside={<div className="player-activity-badges">
+        className="pp-stack"
+        aside={<div className="pp-row">
           <Badge tone={props.connected && props.state.ready?.agents.paper ? "green" : "amber"}>
             {props.connected && props.state.ready?.agents.paper ? "Live" : "Source offline"}
           </Badge>
           <Badge>{live.length} recent in this session</Badge>
         </div>}
       >
-        <p className="ui-hint ui-pad">Live updates are transient. The Paper journal supplies retained activity when locally enabled.</p>
-        <div className="player-activity-body">
-          <section className="player-activity-feed" aria-label="Recent live join and leave activity">
+        <p className="pp-muted">Live updates are transient. The Paper journal supplies retained activity when locally enabled.</p>
+        <div className="pp-data-grid">
+          <section className="pp-list" aria-label="Recent live join and leave activity">
             {live.length ? live.slice(0, 8).map((event) => (
-              <article key={event.eventId}>
-                <span className="view-activity-initial" aria-hidden>{event.name.slice(0, 1).toUpperCase()}</span>
-                <div className="player-activity-identity">
+              <article className={`pp-list-row${preferences.liveRowHighlight && now-Date.parse(event.observedAt)<6000?" pp-new-row":""}`} key={event.eventId}>
+                <span className="pp-initial" aria-hidden>{event.name.slice(0, 1).toUpperCase()}</span>
+                <div className="pp-row-details">
                   <strong>{event.name}</strong><small>{event.uuid.slice(0, 8)}</small>
                 </div>
                 <span data-state={event.state}>{event.state === "JOINED" ? "Joined" : "Left"}</span>
@@ -59,27 +66,21 @@ export function PlayersView(props: ViewProps) {
               </article>
             )) : <Empty title="No recent live activity">Paper joins and leaves appear here during this signed session.</Empty>}
           </section>
-          <aside className="player-history-context">
+          <aside className="pp-stack">
             <div>
-              <span className="player-history-kicker">Paper journal</span>
-              <div className="player-history-status">
+              <span className="pp-muted">Paper journal</span>
+              <div className="pp-row">
                 <strong>Retained history</strong><Badge tone={journal.tone}>{journal.label}</Badge>
               </div>
               <p>{journal.detail}</p>
             </div>
-            <div className="player-history-actions">
-              <button type="button" className="ui-button primary"
-                disabled={!props.state.serverId} onClick={() => setActivityOpen(true)}>
-                Browse activity history
-              </button>
-              <small>Paper controls retention and access. This view does not keep a browser history archive.</small>
-            </div>
+            <Disclosure title="History and privacy"><p>Paper controls retention and access. This view does not keep a browser history archive.</p></Disclosure>
           </aside>
         </div>
       </Panel>
       {activityOpen && <ActivityHistoryModal
         props={props} open onClose={() => setActivityOpen(false)}
       />}
-    </>
+    </div>
   );
 }

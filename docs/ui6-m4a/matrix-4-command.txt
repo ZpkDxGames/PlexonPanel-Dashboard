@@ -1,0 +1,24 @@
+{"component":"PlexonPanelRelay","runtime":"standalone","event":"started","host":"127.0.0.1","port":8788,"storage":"coordination-only","version":"5.0.0","gitCommit":"unavailable","buildTimestamp":"unavailable","protocolVersion":3,"runtimeKind":"standalone"}
+captured backup-degraded-light-360
+captured backup-degraded-light-390
+captured backup-degraded-light-768
+captured backup-degraded-light-1280
+captured backup-degraded-light-1920
+captured backup-degraded-dark-360
+captured backup-degraded-dark-390
+captured backup-degraded-dark-768
+captured backup-degraded-dark-1280
+captured backup-degraded-dark-1920
+captured empty-light-360
+captured empty-light-390
+captured empty-light-768
+captured empty-light-1280
+captured empty-light-1920
+captured empty-dark-360
+captured empty-dark-390
+captured empty-dark-768
+captured empty-dark-1280
+captured empty-dark-1920
+{"component":"PlexonPanelRelay","runtime":"standalone","code":"PEER_DELIVERY_FAILED","serverId":"44876afd-e9a8-4348-9ea7-dae5b2ca6c22","agentKind":"HOST","messageType":"paper.connection","error":"WebSocket send failed"}
+{"component":"PlexonPanelRelay","runtime":"standalone","code":"PEER_DELIVERY_FAILED","serverId":"0ba3e274-026e-446e-a5a9-0f38d15c9d25","agentKind":"HOST","messageType":"paper.connection","error":"WebSocket send failed"}
+{"status":"passed","screenshots":20,"axe":20,"errors":[],"cls":[]}

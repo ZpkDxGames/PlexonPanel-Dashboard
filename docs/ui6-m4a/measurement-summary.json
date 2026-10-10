@@ -1,0 +1,139 @@
+{
+  "recordedAt": "2026-10-08T21:26:16.239Z",
+  "mode": "production",
+  "draw": [
+    {
+      "width": 390,
+      "cpuThrottle": 4,
+      "full": {
+        "count": 12,
+        "medianMs": 2.449999999254942,
+        "p95Ms": 20.09999999962747,
+        "maxMs": 20.09999999962747
+      },
+      "compact": {
+        "count": 12,
+        "medianMs": 3.099999999627471,
+        "p95Ms": 16.59999999962747,
+        "maxMs": 16.59999999962747
+      },
+      "wholePageLongTasks": {
+        "count": 15,
+        "medianMs": 64,
+        "p95Ms": 394,
+        "maxMs": 394
+      },
+      "tracedPaint": {
+        "count": 54,
+        "medianMs": 3.2359999999999998,
+        "p95Ms": 7.923,
+        "maxMs": 10.926
+      },
+      "tracedRaster": {
+        "count": 111,
+        "medianMs": 0.122,
+        "p95Ms": 1.033,
+        "maxMs": 1.795
+      }
+    },
+    {
+      "width": 1920,
+      "cpuThrottle": 4,
+      "full": {
+        "count": 12,
+        "medianMs": 9.299999999813735,
+        "p95Ms": 33.59999999962747,
+        "maxMs": 33.59999999962747
+      },
+      "compact": {
+        "count": 12,
+        "medianMs": 8.700000000186265,
+        "p95Ms": 48,
+        "maxMs": 48
+      },
+      "wholePageLongTasks": {
+        "count": 19,
+        "medianMs": 78,
+        "p95Ms": 284,
+        "maxMs": 284
+      },
+      "tracedPaint": {
+        "count": 54,
+        "medianMs": 4.794499999999999,
+        "p95Ms": 17.824,
+        "maxMs": 30.702
+      },
+      "tracedRaster": {
+        "count": 277,
+        "medianMs": 0.123,
+        "p95Ms": 0.689,
+        "maxMs": 4.023
+      }
+    }
+  ],
+  "longTaskBudget": {
+    "status": "failed",
+    "limitMs": 100,
+    "scope": "Whole-page stress with 6000 retained synthetic captures at 4x CPU, 12 untraced new captures; default balanced display cadence. Realtime hardware certification not executed."
+  },
+  "cls": [
+    {
+      "theme": "light",
+      "width": 390,
+      "cls": 0.04382377651155429,
+      "fontDelayMs": 1200,
+      "includesHydrationAndSyntheticServerSelection": true,
+      "status": "passed"
+    },
+    {
+      "theme": "light",
+      "width": 1280,
+      "cls": 0.022451226128472224,
+      "fontDelayMs": 1200,
+      "includesHydrationAndSyntheticServerSelection": true,
+      "status": "passed"
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "cls": 0.04404635327635328,
+      "fontDelayMs": 1200,
+      "includesHydrationAndSyntheticServerSelection": true,
+      "status": "passed"
+    },
+    {
+      "theme": "dark",
+      "width": 1280,
+      "cls": 0.021674663628472222,
+      "fontDelayMs": 1200,
+      "includesHydrationAndSyntheticServerSelection": true,
+      "status": "passed"
+    }
+  ],
+  "keyboard": [
+    {
+      "homeEndArrowsEnterEscape": "passed",
+      "exactTableParity": "passed",
+      "focusRestore": "passed"
+    }
+  ],
+  "pointer": {
+    "tooltipLensTableParity": "passed",
+    "inspectionWithoutRaster": "passed"
+  },
+  "idleClock": {
+    "before": 10,
+    "after": 10,
+    "waitMs": 2400,
+    "status": "passed"
+  },
+  "reducedMotion": {
+    "media": "reduce",
+    "preference": "off",
+    "canvasAnimations": [
+      "none",
+      "none"
+    ],
+    "status": "passed"
+  }
+}

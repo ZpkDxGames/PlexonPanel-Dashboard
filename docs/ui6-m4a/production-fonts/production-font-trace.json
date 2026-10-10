@@ -1,0 +1,113 @@
+{
+  "recordedAt": "2026-10-08T21:42:30.184Z",
+  "browser": "153.0.8010.0",
+  "mode": "production",
+  "pages": [],
+  "interactions": [],
+  "errors": [],
+  "productionBuildId": "50gvVyic8Wy-k31o34A84",
+  "fontTrace": {
+    "cacheDisabled": true,
+    "preloads": [
+      "/_next/static/media/hanken_latin-s.p.3241148m1u9do.woff2"
+    ],
+    "fontFiles": {
+      "commit_mono_400.07vxzlkrmhahd.woff2": "commit-mono-400.woff2",
+      "hanken_latin-s.p.3241148m1u9do.woff2": "hanken-latin.woff2",
+      "hanken_latin_ext.23qn2_caajicl.woff2": "hanken-latin-ext.woff2"
+    },
+    "initial": [
+      {
+        "url": "http://127.0.0.1:3400/_next/static/media/hanken_latin-s.p.3241148m1u9do.woff2",
+        "file": "hanken-latin.woff2",
+        "status": 200,
+        "bytes": 34704
+      },
+      {
+        "url": "http://127.0.0.1:3400/_next/static/media/commit_mono_400.07vxzlkrmhahd.woff2",
+        "file": "commit-mono-400.woff2",
+        "status": 200,
+        "bytes": 48128
+      }
+    ],
+    "portuguese": [
+      {
+        "url": "http://127.0.0.1:3400/_next/static/media/hanken_latin-s.p.3241148m1u9do.woff2",
+        "file": "hanken-latin.woff2",
+        "status": 200,
+        "bytes": 34704
+      },
+      {
+        "url": "http://127.0.0.1:3400/_next/static/media/commit_mono_400.07vxzlkrmhahd.woff2",
+        "file": "commit-mono-400.woff2",
+        "status": 200,
+        "bytes": 48128
+      }
+    ],
+    "allRequests": [
+      {
+        "url": "http://127.0.0.1:3400/_next/static/media/hanken_latin-s.p.3241148m1u9do.woff2",
+        "file": "hanken-latin.woff2",
+        "status": 200,
+        "bytes": 34704
+      },
+      {
+        "url": "http://127.0.0.1:3400/_next/static/media/commit_mono_400.07vxzlkrmhahd.woff2",
+        "file": "commit-mono-400.woff2",
+        "status": 200,
+        "bytes": 48128
+      },
+      {
+        "url": "http://127.0.0.1:3400/_next/static/media/hanken_latin_ext.23qn2_caajicl.woff2",
+        "file": "hanken-latin-ext.woff2",
+        "status": 200,
+        "bytes": 19588
+      }
+    ],
+    "portugueseFonts": [
+      {
+        "familyName": "Hanken Grotesk",
+        "postScriptName": "HankenGrotesk-Regular",
+        "isCustomFont": true,
+        "glyphCount": 48
+      }
+    ],
+    "extendedFonts": [
+      {
+        "familyName": "Hanken Grotesk",
+        "postScriptName": "HankenGrotesk-Regular",
+        "isCustomFont": true,
+        "glyphCount": 6
+      }
+    ],
+    "monoFonts": [
+      {
+        "familyName": "CommitMono",
+        "postScriptName": "CommitMono-400Regular",
+        "isCustomFont": true,
+        "glyphCount": 29
+      }
+    ],
+    "fallbackFonts": [
+      {
+        "familyName": "DejaVu Sans",
+        "postScriptName": "DejaVuSans",
+        "isCustomFont": false,
+        "glyphCount": 1
+      }
+    ],
+    "emittedCss": [
+      {
+        "file": "3t0kccp8ab27b.css",
+        "faces": [
+          "@font-face{font-family:Plexon Hanken;unicode-range:U+??,U+131,U+152-153,U+2BB-2BC,U+2C6,U+2DA,U+2DC,U+304,U+308,U+329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;src:url(../media/hanken_latin-s.p.3241148m1u9do.woff2)format(\"woff2\");font-display:swap;font-weight:100 900}",
+          "@font-face{font-family:hankenLatin Fallback;src:local(Arial);ascent-override:98.46%;descent-override:29.83%;line-gap-override:0.0%;size-adjust:101.56%}",
+          "@font-face{font-family:Plexon Hanken;unicode-range:U+100-2BA,U+2BD-2C5,U+2C7-2CC,U+2CE-2D7,U+2DD-2FF,U+304,U+308,U+329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF;src:url(../media/hanken_latin_ext.23qn2_caajicl.woff2)format(\"woff2\");font-display:swap;font-weight:100 900}",
+          "@font-face{font-family:Plexon Commit Mono;unicode-range:U+??,U+131,U+152-153,U+2BB-2BC,U+2C6,U+2DA,U+2DC,U+304,U+308,U+329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;src:url(../media/commit_mono_400.07vxzlkrmhahd.woff2)format(\"woff2\");font-display:swap;font-weight:400}"
+        ]
+      }
+    ]
+  },
+  "productionKitchenSinkHttp": 404,
+  "status": "PASS"
+}

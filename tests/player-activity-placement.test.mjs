@@ -7,7 +7,7 @@ async function source(path) {
 }
 
 test("recent player activity is presented by the Players workspace", async () => {
-  const management = await source("app/dashboard.tsx");
+  const management = await source("app/workspaces.tsx");
   const players = await source("app/players-view.tsx");
   assert.equal(
     management.includes('PlayersView'),
@@ -20,11 +20,11 @@ test("recent player activity is presented by the Players workspace", async () =>
 });
 
 test("Overview uses a brief observed activity summary without hidden legacy cards", async () => {
-  const css = await source("app/dashboard.css");
+  const css = await source("app/ui/workspace.css");
   const overview = await source("app/overview-view.tsx");
   assert.equal(overview.includes("presenceDeltas.slice(-6)"), true);
   assert.equal(css.includes(":has(.view-activity-actions)"), false);
-  assert.equal(css.includes(".player-activity-body"), true);
+  assert.equal(css.includes(".player-activity-body"), false);
 });
 
 test("the 3.x Activity modal queries Paper and suppresses the duplicate History tab", async () => {

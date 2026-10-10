@@ -1,77 +1,88 @@
-"use client";
-import { useState } from "react";
-import { Badge, Empty, Panel, bytes, duration, time, type ViewProps } from "./control-views";
-import { ActivityHistoryModal } from "./activity-history-modal";
-import { TelemetryChart, type ChartSpec } from "./telemetry-chart";
-import { capturedAtMillis, diagnostics, number, record, str, type Sample } from "../lib/control-state";
-import { METRICS, metricSeries, type MetricField } from "../lib/metric-reports";
-import { buildSvgPaths, gapSegments, resolveDomain, thinSegment } from "../lib/chart-geometry";
-import { telemetryFreshness } from "../lib/telemetry-freshness";
-import { useTelemetryNow } from "../lib/telemetry-clock";
-import { fleetCard } from "../lib/fleet-model";
-import { useUiPreferences } from "../components/ui-preferences-provider";
-
-function MetricTile({ label, value, detail, history, field, now, fresh }: {
-  label: string; value: string; detail: string; history: Sample[]; field: MetricField; now: number; fresh: boolean;
+'use client';
+import './styles/overview.css';
+import { memo, useEffect, useState } from 'react';
+import { bytes, duration, time, useQuery, type ViewProps } from './control-views';
+import { Badge, Button, Disclosure, EmptyState, Panel, Popover } from './ui/primitives';
+import { ActivityHistoryModal } from './activity-history-modal';
+import { TelemetryChart, type ChartSpec } from './telemetry-chart';
+import { TickPulse } from './charts/tick-pulse';
+import { Sparkline } from './charts/sparkline';
+import { capturedAtMillis, diagnostics, number, record, str } from '../lib/control-state';
+import { METRICS, type MetricField } from '../lib/metric-reports';
+import { classifyTelemetry } from '../lib/telemetry-freshness';
+import { clockDiagnostics } from '../lib/clock-diagnostics';
+import { useTelemetryNow } from '../lib/telemetry-clock';
+import { fleetCard } from '../lib/fleet-model';
+import { normalizeServiceState } from '../lib/lifecycle-state';
+import { useUiPreferences } from '../components/ui-preferences-provider';
+const charts: ChartSpec[] = [{ field: 'tps', label: 'Tick health', shortLabel: 'TPS', format: n => `${n.toFixed(2)} TPS`, source: 'paper-health', domain: [0, 20], series: 1 }, { field: 'mspt', label: 'Tick duration', shortLabel: 'MSPT', format: n => `${n.toFixed(2)} ms`, source: 'paper-health', reference: { value: 50, label: '50 ms tick budget' }, series: 2 }];
+const fresh = (f: ReturnType<typeof classifyTelemetry>) => f.usable;
+const label = (f: ReturnType<typeof classifyTelemetry>) => f.label;
+const Instrument = memo(function Instrument({ props, field, title, value, detail, capturedAt, receivedAt, connected, now, importance, warning }: {
+    props: ViewProps;
+    field: MetricField;
+    title: string;
+    value: string;
+    detail: string;
+    capturedAt: unknown;
+    receivedAt?:number;
+    connected: boolean;
+    now: number;
+    importance: 'primary' | 'presence' | 'resource';
+    warning?:string;
 }) {
-  const points = metricSeries(history, field, 5, now);
-  const values = points.flatMap(p => p.value === null ? [] : [p.value]);
-  const [low, high] = resolveDomain(values, { fixed: field === "tps" ? [0, 20] : undefined });
-  const first = points[0]?.at ?? now;
-  const paths = buildSvgPaths(gapSegments(points, Math.max(1000, METRICS[field].intervalMs * 3)).map(segment => thinSegment(segment, 160)),
-    at => 2 + (at - first) / Math.max(1, now - first) * 196, value => 40 - (value - low) / (high - low) * 34, 40);
-  return <article className="metric-tile" data-stale={!fresh || undefined}>
-    <div className="metric-label"><span>{label}</span><span className="metric-origin">{METRICS[field].source === "service" ? "HOST" : "PAPER"}</span></div>
-    <strong>{fresh ? value : "—"}</strong><small>{detail}</small>
-    <svg viewBox="0 0 200 44" preserveAspectRatio="none" role="img" aria-label={`${label}: browser-observed five-minute history, ${values.length} source values. Gaps remain empty.`}><path d={paths.line} /></svg>
-  </article>;
+    const freshness = classifyTelemetry({capturedAt,receivedAt,connected,now});
+    const source = METRICS[field].origin.replace(' · ', ' / ');
+    return <article className={`instrument instrument-${importance}`} data-instrument={field}><div className="instrument-label"><h3>{title}</h3><span>{source}</span></div><div className="instrument-reading"><strong>{value}</strong><small>{detail}</small>{warning&&<Badge tone="warn">{warning}</Badge>}</div><Sparkline history={props.state.history} field={field} now={now} sourceCapturedAt={capturedAt} intervalMs={number(field === 'heap' ? props.state.system.sourceIntervalMillis : field === 'serviceCpu' || field === 'serviceMemory' ? record(props.state.service.resources).sourceIntervalMillis : props.state.server.sourceIntervalMillis) ?? METRICS[field].intervalMs}/><div className="instrument-provenance"><span>{label(freshness)}</span><Popover label={`${title} source`} title={`${title} freshness`}><dl className="pulse-facts"><div><dt>Source</dt><dd>{source}</dd></div><div><dt>Unit</dt><dd>{METRICS[field].unit}</dd></div><div><dt>Captured</dt><dd>{typeof capturedAt === 'string' ? capturedAt : 'Not supplied'}</dd></div><div><dt>Latest browser receipt</dt><dd>{receivedAt ? new Date(receivedAt).toISOString() : 'Not supplied'}</dd></div></dl><p>Per-capture receipt is not supplied. Unknown and stale values are unavailable; history retains observed values and gaps.</p></Popover></div></article>;
+}, (a,b) => a.props.state.serverId===b.props.state.serverId && a.field===b.field && a.title===b.title && a.value===b.value && a.detail===b.detail && a.capturedAt===b.capturedAt && a.receivedAt===b.receivedAt && a.connected===b.connected && classifyTelemetry({capturedAt:a.capturedAt,receivedAt:a.receivedAt,connected:a.connected,now:a.now}).label===classifyTelemetry({capturedAt:b.capturedAt,receivedAt:b.receivedAt,connected:b.connected,now:b.now}).label && a.importance===b.importance && a.warning===b.warning);
+function OverviewAttention({props,host,paper,service}:{props:ViewProps;host:boolean;paper:boolean;service:ReturnType<typeof classifyTelemetry>}) {
+    const {state}=props;
+    const backupReadAllowed = host && props.can('maintenance.status', 'HOST');
+    const status = useQuery('maintenance.status', {}, backupReadAllowed, 'HOST');
+    const operation = status.hasSuccess ? record(status.data.currentOperation) : {};
+    const progress = record(state.backupProgress);
+    const progressJob = str(progress.jobId, '');
+    const progressPhase = str(progress.phase, '');
+    const refreshStatus = status.refresh;
+    useEffect(() => { if (backupReadAllowed && progressJob)
+        refreshStatus(); }, [backupReadAllowed, progressJob, progressPhase, refreshStatus]);
+    const phase = progressJob && progressJob === str(operation.jobId, '') && ['DEGRADED', 'FAILED', 'RECOVERY_REQUIRED'].includes(progressPhase) ? progressPhase : str(operation.phase, '');
+    const attention = [...(!host ? [{ text: 'Host unavailable — service controls and backups need Host.', workspace: 'Server' as const }] : state.ready?.server.hostTargetCompatible === false || service.kind === 'stale' || ['failed'].includes(normalizeServiceState(state.service.state)) ? [{ text: 'Host service needs review. Check its state and source freshness.', workspace: 'Server' as const }] : []), ...(!paper ? [{ text: 'Paper offline — game telemetry is unavailable.', workspace: 'Server' as const }] : []), ...((['DEGRADED', 'RECOVERY_REQUIRED'].includes(phase) || phase === 'FAILED' && operation.retryable === true) ? [{ text: `Backup ${phase.toLowerCase().replaceAll('_', ' ')} — review the supplied job state.`, workspace: 'Backups' as const }] : [])];
+    return attention.length > 0 ? <section className="overview-attention" aria-label="Needs attention"><h2>Needs attention</h2>{attention.map((a, i) => <div key={i}><Badge tone="warn">Review</Badge><span>{a.text}</span><Button variant="quiet" onClick={() => props.navigate?.(a.workspace)}>Open {a.workspace}</Button></div>)}</section> : null;
 }
-const OVERVIEW_CHARTS: ChartSpec[] = [
-  { field: "tps", label: "Tick health", shortLabel: "TPS", format: n => `${n.toFixed(2)} TPS`, source: "paper-health", domain: [0, 20], series: 1 },
-  { field: "mspt", label: "Tick duration", shortLabel: "MSPT", format: n => `${n.toFixed(2)} ms`, source: "paper-health", reference: { value: 50, label: "50 ms tick budget" }, series: 2 },
-];
 export function OverviewView(props: ViewProps) {
-  const { state } = props;
-  const { preferences } = useUiPreferences();
-  const now = useTelemetryNow(state.updatedAt);
-  const [historyOpen, setHistoryOpen] = useState(false);
-  const card = fleetCard(state, props.connected ? "live" : "reconnecting", now);
-  const paper = props.connected && !state.cached && Boolean(state.ready?.agents.paper);
-  const host = props.connected && !state.cached && Boolean(state.ready?.agents.host);
-  const healthFresh = telemetryFreshness(state.server.capturedAt, paper, now);
-  const jvmFresh = telemetryFreshness(state.system.capturedAt, paper, now);
-  const valid = (freshness: ReturnType<typeof telemetryFreshness>) => freshness.kind === "live" || freshness.kind === "delayed";
-  const tps = card.tps, mspt = card.mspt;
-  const warnings = [
-    ...(tps !== null && tps < 18 ? [{ title: "TPS below target", detail: `${tps.toFixed(2)} ticks/s from Paper's latest capture.` }] : []),
-    ...(mspt !== null && mspt > 50 ? [{ title: "Tick budget exceeded", detail: `${mspt.toFixed(2)} ms from Paper's latest capture; budget is 50 ms.` }] : []),
-  ];
-  const activity = state.presenceDeltas.slice(-6).reverse();
-  const resource = record(state.service.resources);
-  return <div className="overview-workspace">
-    <section className="overview-context" aria-label="Instance context">
-      <div><span className="workspace-kicker">SELECTED INSTANCE</span><strong>{state.ready?.server.instanceKey ?? "Identity unavailable"}</strong><small>{state.serverId.slice(0, 8)} · Signed source</small></div>
-      <dl><div><dt>Service</dt><dd>{card.serviceState}</dd></div><div><dt>Paper uptime</dt><dd>{valid(jvmFresh) ? duration(state.system.processUptimeMillis) : "—"}</dd></div><div><dt>Version</dt><dd>{state.ready?.server.minecraftVersion ?? "—"}</dd></div></dl>
-    </section>
-    <section className="metric-grid" aria-label="Primary server signals">
-      <MetricTile label="TPS" value={tps === null ? "—" : tps.toFixed(2)} detail={`20 ticks/s target · ${healthFresh.label}`} history={state.history} field="tps" now={now} fresh={valid(healthFresh)} />
-      <MetricTile label="MSPT" value={mspt === null ? "—" : `${mspt.toFixed(2)} ms`} detail={`50 ms tick budget · ${healthFresh.label}`} history={state.history} field="mspt" now={now} fresh={valid(healthFresh)} />
-      <MetricTile label="Online players" value={card.players === null ? "—" : String(card.players)} detail={`${number(state.server.maximumPlayers) ?? "Unknown"} slots · ${healthFresh.label}`} history={state.history} field="players" now={now} fresh={valid(healthFresh)} />
-      <MetricTile label="JVM heap" value={bytes(state.system.jvmHeapUsedBytes)} detail={`${bytes(state.system.jvmHeapMaximumBytes)} capacity · ${jvmFresh.label}`} history={state.history} field="heap" now={now} fresh={valid(jvmFresh)} />
-      <MetricTile label="Service CPU" value={card.serviceCpu === null ? "—" : `${card.serviceCpu.toFixed(1)}%`} detail="Minecraft cgroup · 100% = one core" history={state.history} field="serviceCpu" now={now} fresh={card.serviceCpu !== null} />
-      <MetricTile label="Service RAM" value={bytes(card.serviceMemory)} detail="Minecraft cgroup · separate from heap" history={state.history} field="serviceMemory" now={now} fresh={card.serviceMemory !== null} />
-    </section>
-    {warnings.length > 0 && <section className="overview-insights" aria-label="Derived telemetry warnings">{warnings.map(warning => <div key={warning.title}><Badge tone="amber">Derived warning</Badge><strong>{warning.title}</strong><span>{warning.detail}</span></div>)}</section>}
-    <div className="workspace-chart-grid overview-trends">{OVERVIEW_CHARTS.map(spec => <TelemetryChart key={spec.field} history={state.history} spec={spec} windowMinutes={preferences.chartWindowMinutes} sourceLabel="Paper health · source capture" sourceIntervalMs={number(state.server.sourceIntervalMillis)} sourceCapturedAt={capturedAtMillis(state.server.capturedAt)} status={!paper ? "disconnected" : valid(healthFresh) ? "live" : "stale"} />)}</div>
-    <div className="overview-details-grid">
-      <Panel title="Recent activity" aside={<button className="ui-text-button" onClick={() => setHistoryOpen(true)}>View history</button>}>
-        {activity.length ? <div className="activity-list">{activity.map(event => <article key={str(event.eventId, `${event.uuid}-${event.observedAt}`)}><span className="activity-initial" aria-hidden>{str(event.name, "?").slice(0, 1)}</span><div><strong>{str(event.name, "Player")}</strong><small>Observed {event.state === "LEFT" ? "leave" : "join"} · Paper</small></div><time>{time(event.observedAt)}</time></article>)}</div> : <Empty title="No recent presence activity">Authorized Paper join and leave observations appear here.</Empty>}
-      </Panel>
-      <Panel title="World activity" aside={<Badge>{state.worlds.length} worlds</Badge>}>
-        {valid(healthFresh) && state.worlds.length ? <div className="ui-table-wrap"><table><thead><tr><th>World</th><th>Players</th><th>Chunks</th><th>Entities</th></tr></thead><tbody>{state.worlds.slice(0, 8).map(world => <tr key={str(world.name)}><td>{str(world.name)}</td><td>{String(world.players ?? "—")}</td><td>{String(world.loadedChunks ?? "—")}</td><td>{String(world.entities ?? "—")}</td></tr>)}</tbody></table></div> : <Empty title="Waiting for world telemetry">Fresh Paper world samples are required.</Empty>}
-      </Panel>
-    </div>
-    <details className="workspace-disclosure overview-sources"><summary>Source details and safe diagnostics</summary><dl className="ui-details"><div><dt>Paper health</dt><dd>{healthFresh.label}</dd></div><div><dt>Paper JVM</dt><dd>{jvmFresh.label}</dd></div><div><dt>Host service</dt><dd>{telemetryFreshness(resource.capturedAt, host, now).label}</dd></div><div><dt>Shared node</dt><dd>{telemetryFreshness(state.hostSystem.capturedAt, host, now).label} · shown once in Fleet</dd></div></dl><button className="ui-button" onClick={() => void navigator.clipboard.writeText(diagnostics(state)).then(() => props.notice("Safe diagnostics copied."))}>Copy safe diagnostics</button></details>
-    {historyOpen && <ActivityHistoryModal props={props} open onClose={() => setHistoryOpen(false)} />}
-  </div>;
+    const { state } = props;
+    const { preferences } = useUiPreferences();
+    const now = useTelemetryNow(state.updatedAt);
+    const [historyOpen, setHistoryOpen] = useState(false);
+    const [chartsOpen,setChartsOpen]=useState(false);
+    const paper = props.connected && !state.cached && Boolean(state.ready?.agents.paper);
+    const host = props.connected && !state.cached && Boolean(state.ready?.agents.host);
+    const health = classifyTelemetry({capturedAt:state.server.capturedAt,receivedAt:state.receipts?.paperHealth,connected:paper,now}), jvm = classifyTelemetry({capturedAt:state.system.capturedAt,receivedAt:state.receipts?.paperSystem,connected:paper,now});
+    const resources = record(state.service.resources);
+    const service = classifyTelemetry({capturedAt:resources.capturedAt,receivedAt:state.receipts?.service,connected:host,now});
+    const serviceClockIsLatest=capturedAtMillis(resources.capturedAt)!==null&&(capturedAtMillis(state.hostSystem.capturedAt)===null||(state.receipts?.service??0)>(state.receipts?.hostSystem??0));
+    const clocks = clockDiagnostics({now,paperCapturedAt:state.server.capturedAt,paperReceivedAt:state.receipts?.paperHealth,hostCapturedAt:serviceClockIsLatest?resources.capturedAt:state.hostSystem.capturedAt,hostReceivedAt:serviceClockIsLatest?state.receipts?.service:state.receipts?.hostSystem});
+    const card = fleetCard(state, props.connected ? 'live' : 'reconnecting', now);
+    const activity = state.presenceDeltas.slice(-6).reverse();
+    const unavailable = '—';
+    const common = { props, now };
+    const numeric = (n: number | null, unit: string, digits = 2) => n === null || n < 0 ? unavailable : `${n.toFixed(digits)}${unit}`;
+    return <div className="overview-workspace" data-ui6-overview>
+  <TickPulse history={state.history} receivedAt={state.receipts?.paperHealth??0} capturedAt={state.server.capturedAt??null} connected={paper} windowEndAt={props.pulseWindowEndAt} intervalMs={number(state.server.sourceIntervalMillis) ?? 2000} status={!paper ? 'Paper disconnected' : label(health)}/>
+  <OverviewAttention key={state.ready?.server.hostSession ?? 'no-host-session'} props={props} host={host} paper={paper} service={service}/>
+  <section className="overview-instruments" aria-labelledby="overview-instrument-title"><h2 id="overview-instrument-title" className="pp-sr-only">Server instruments</h2>
+   <Instrument {...common} field="tps" warning={card.tps!==null&&card.tps<18?'Below target':undefined} title="TPS" value={numeric(card.tps, '')} detail="ticks/s / 20 target" capturedAt={state.server.capturedAt} receivedAt={state.receipts?.paperHealth} connected={paper} importance="primary"/>
+   <Instrument {...common} field="mspt" warning={card.mspt!==null&&card.mspt>50?'Tick budget exceeded':undefined} title="MSPT" value={numeric(card.mspt, ' ms')} detail="50 ms tick budget" capturedAt={state.server.capturedAt} receivedAt={state.receipts?.paperHealth} connected={paper} importance="primary"/>
+   <Instrument {...common} field="players" title="Online players" value={card.players === null ? unavailable : String(card.players)} detail={`${number(state.server.maximumPlayers) ?? 'Unknown'} slots`} capturedAt={state.server.capturedAt} receivedAt={state.receipts?.paperHealth} connected={paper} importance="presence"/>
+   <Instrument {...common} field="heap" title="JVM heap" value={fresh(jvm) ? bytes(state.system.jvmHeapUsedBytes) : unavailable} detail={`${fresh(jvm) ? bytes(state.system.jvmHeapMaximumBytes) : 'Unknown'} capacity`} capturedAt={state.system.capturedAt} receivedAt={state.receipts?.paperSystem} connected={paper} importance="resource"/>
+   <Instrument {...common} field="serviceCpu" title="Service CPU" value={numeric(card.serviceCpu, '%', 1)} detail="100% = one core" capturedAt={resources.capturedAt} receivedAt={state.receipts?.service} connected={host} importance="resource"/>
+   <Instrument {...common} field="serviceMemory" title="Service RAM" value={card.serviceMemory === null ? unavailable : bytes(card.serviceMemory)} detail="Minecraft cgroup / separate from heap" capturedAt={resources.capturedAt} receivedAt={state.receipts?.service} connected={host} importance="resource"/>
+  </section>
+  <section className="overview-identity" aria-label="Selected instance identity"><div><span>Selected instance</span><strong>{state.ready?.server.instanceKey ?? 'Identity unavailable'}</strong><code>{state.serverId}</code></div><dl><div><dt>Host service</dt><dd>{host && state.ready?.server.hostTargetCompatible !== false ? normalizeServiceState(state.service.state) : 'Unknown'} / {label(service)}</dd></div><div><dt>Service uptime</dt><dd>Not supplied</dd></div><div><dt>Paper uptime</dt><dd>{fresh(jvm) ? state.system.processUptimeMillis===undefined?'Not supplied':duration(state.system.processUptimeMillis) : unavailable}</dd></div><div><dt>Minecraft version</dt><dd>{state.ready?.server.minecraftVersion ?? unavailable}</dd></div><div><dt>Paper agent version</dt><dd>{state.ready?.server.pluginVersion ?? unavailable}</dd></div></dl></section>
+  <div className="overview-details"><Panel title="Recent presence activity" actions={<Button variant="quiet" onClick={() => setHistoryOpen(true)}>View history</Button>}>{activity.length ? <ol className="overview-presence">{activity.map(event => <li key={str(event.eventId, `${event.uuid}-${event.observedAt}`)}><strong>{str(event.name, 'Player')}</strong><span>Observed {event.state === 'LEFT' ? 'leave' : 'join'} from Paper</span><time>{time(event.observedAt)}</time></li>)}</ol> : <EmptyState title="No recent presence activity">Authorized Paper join and leave observations appear here.</EmptyState>}</Panel><Panel title="World activity" actions={<span>{state.worlds.length ? `${state.worlds.length} ${state.worlds.length===1?'world':'worlds'}` : 'No world rows'}</span>}>{fresh(health) && state.worlds.length ? <div className="overview-worlds" tabIndex={0} role="region" aria-label="World activity table"><table><caption className="pp-sr-only">Paper world activity; capture time unavailable</caption><thead><tr><th scope="col">World</th><th scope="col">Players</th><th scope="col">Chunks</th><th scope="col">Entities</th></tr></thead><tbody>{state.worlds.slice(0, 8).map(world => <tr key={str(world.name)}><th scope="row">{str(world.name)}</th><td>{String(world.players ?? unavailable)}</td><td>{String(world.loadedChunks ?? unavailable)}</td><td>{String(world.entities ?? unavailable)}</td></tr>)}</tbody></table></div> : <EmptyState title="Waiting for world telemetry">Fresh Paper health and supplied world rows are required. World capture time is not retained in this view.</EmptyState>}</Panel></div>
+  <details className="pp-disclosure" onToggle={event=>setChartsOpen(event.currentTarget.open)}><summary>Tick history charts</summary>{chartsOpen&&<div className="pp-stack"><div className="workspace-chart-grid">{charts.map(spec => <TelemetryChart key={spec.field} history={state.history} spec={spec} windowMinutes={preferences.chartWindowMinutes} sourceLabel="Paper health / source capture" sourceIntervalMs={number(state.server.sourceIntervalMillis)} sourceCapturedAt={capturedAtMillis(state.server.capturedAt)} receivedAt={state.receipts?.paperHealth} status={!paper ? 'disconnected' : fresh(health) ? 'live' : 'stale'}/>)}</div></div>}</details>
+  <Disclosure title="Source details and safe diagnostics"><section aria-label="Clocks"><h3>Clocks</h3><dl className="pulse-facts pp-tabular">{clocks.rows.map(([name,value])=><div key={name}><dt>{name}</dt><dd>{value}</dd></div>)}</dl><p>{clocks.interpretation}</p><Button onClick={()=>void navigator.clipboard.writeText(clocks.text).then(()=>props.notice('Clock details copied.')).catch(()=>props.notice('Could not copy clock details.'))}>Copy clock details</Button></section><dl className="pulse-facts"><div><dt>Paper health</dt><dd>{label(health)}</dd></div><div><dt>Paper JVM</dt><dd>{label(jvm)}</dd></div><div><dt>Host service</dt><dd>{label(service)}</dd></div><div><dt>World numbers</dt><dd>Paper world telemetry; units: players, chunks and entities. World capture timestamp is not retained. Latest browser receipt (any packet): {state.updatedAt?new Date(state.updatedAt).toISOString():'Not supplied'}.</dd></div><div><dt>Shared node</dt><dd>{label(classifyTelemetry({capturedAt:state.hostSystem.capturedAt,receivedAt:state.receipts?.hostSystem,connected:host,now}))}; shown in Fleet and Performance, separate from service CPU.</dd></div></dl><Button onClick={() => void navigator.clipboard.writeText(diagnostics(state)).then(() => props.notice('Safe diagnostics copied.')).catch(() => props.notice('Could not copy safe diagnostics.'))}>Copy safe diagnostics</Button></Disclosure>
+  {historyOpen && <ActivityHistoryModal props={props} open onClose={() => setHistoryOpen(false)}/>}
+ </div>;
 }

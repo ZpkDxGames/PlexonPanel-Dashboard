@@ -1,0 +1,439 @@
+{
+  "task": "Fleet",
+  "environment": "Chromium, signed local relay, simulated agents; no live-server certification",
+  "status": "passed",
+  "screenshots": [
+    "fleet-light-390.png",
+    "fleet-light-1280.png",
+    "fleet-dark-390.png",
+    "fleet-dark-1280.png"
+  ],
+  "axe": [
+    {
+      "workspace": "Fleet",
+      "violations": []
+    }
+  ],
+  "keyboard": [
+    "List/grid and open instance with Enter"
+  ],
+  "errors": [],
+  "fleetHydration": [
+    {
+      "theme": "light",
+      "shifts": [
+        {
+          "value": 0.0004849002849002849,
+          "fleet": false,
+          "sources": [
+            {
+              "previous": {
+                "x": 54,
+                "y": 207.65625,
+                "width": 204,
+                "height": 16,
+                "top": 207.65625,
+                "right": 258,
+                "bottom": 223.65625,
+                "left": 54
+              },
+              "current": {
+                "x": 54,
+                "y": 207.65625,
+                "width": 159,
+                "height": 16,
+                "top": 207.65625,
+                "right": 213,
+                "bottom": 223.65625,
+                "left": 54
+              }
+            },
+            {
+              "tag": "B",
+              "cls": "pulse-count",
+              "previous": {
+                "x": 130,
+                "y": 206.65625,
+                "width": 35,
+                "height": 18.65625,
+                "top": 206.65625,
+                "right": 165,
+                "bottom": 225.3125,
+                "left": 130
+              },
+              "current": {
+                "x": 85,
+                "y": 206.65625,
+                "width": 35,
+                "height": 18.65625,
+                "top": 206.65625,
+                "right": 120,
+                "bottom": 225.3125,
+                "left": 85
+              }
+            }
+          ]
+        },
+        {
+          "value": 0.0019370845204178537,
+          "fleet": false,
+          "sources": [
+            {
+              "previous": {
+                "x": 201,
+                "y": 727.625,
+                "width": 147,
+                "height": 21,
+                "top": 727.625,
+                "right": 348,
+                "bottom": 748.625,
+                "left": 201
+              },
+              "current": {
+                "x": 201,
+                "y": 704,
+                "width": 147,
+                "height": 21,
+                "top": 704,
+                "right": 348,
+                "bottom": 725,
+                "left": 201
+              }
+            },
+            {
+              "previous": {
+                "x": 201,
+                "y": 704,
+                "width": 147,
+                "height": 21,
+                "top": 704,
+                "right": 348,
+                "bottom": 725,
+                "left": 201
+              },
+              "current": {
+                "x": 201,
+                "y": 704,
+                "width": 147,
+                "height": 21,
+                "top": 704,
+                "right": 348,
+                "bottom": 725,
+                "left": 201
+              }
+            },
+            {
+              "tag": "SPAN",
+              "cls": "",
+              "previous": {
+                "x": 100,
+                "y": 163.328125,
+                "width": 64,
+                "height": 18.65625,
+                "top": 163.328125,
+                "right": 164,
+                "bottom": 181.984375,
+                "left": 100
+              },
+              "current": {
+                "x": 73,
+                "y": 163.328125,
+                "width": 64,
+                "height": 18.65625,
+                "top": 163.328125,
+                "right": 137,
+                "bottom": 181.984375,
+                "left": 73
+              }
+            },
+            {
+              "tag": "svg",
+              "cls": {},
+              "previous": {
+                "x": 172,
+                "y": 164.65625,
+                "width": 16,
+                "height": 16,
+                "top": 164.65625,
+                "right": 188,
+                "bottom": 180.65625,
+                "left": 172
+              },
+              "current": {
+                "x": 145,
+                "y": 164.65625,
+                "width": 16,
+                "height": 16,
+                "top": 164.65625,
+                "right": 161,
+                "bottom": 180.65625,
+                "left": 145
+              }
+            }
+          ]
+        },
+        {
+          "value": 0.0004849002849002849,
+          "fleet": false,
+          "sources": [
+            {
+              "previous": {
+                "x": 54,
+                "y": 207.65625,
+                "width": 159,
+                "height": 16,
+                "top": 207.65625,
+                "right": 213,
+                "bottom": 223.65625,
+                "left": 54
+              },
+              "current": {
+                "x": 54,
+                "y": 207.65625,
+                "width": 204,
+                "height": 16,
+                "top": 207.65625,
+                "right": 258,
+                "bottom": 223.65625,
+                "left": 54
+              }
+            },
+            {
+              "tag": "B",
+              "cls": "pulse-count",
+              "previous": {
+                "x": 85,
+                "y": 206.65625,
+                "width": 35,
+                "height": 18.65625,
+                "top": 206.65625,
+                "right": 120,
+                "bottom": 225.3125,
+                "left": 85
+              },
+              "current": {
+                "x": 130,
+                "y": 206.65625,
+                "width": 35,
+                "height": 18.65625,
+                "top": 206.65625,
+                "right": 165,
+                "bottom": 225.3125,
+                "left": 130
+              }
+            }
+          ]
+        }
+      ],
+      "fleetShift": 0
+    },
+    {
+      "theme": "dark",
+      "shifts": [
+        {
+          "value": 0.0004849002849002849,
+          "fleet": false,
+          "sources": [
+            {
+              "previous": {
+                "x": 54,
+                "y": 207.65625,
+                "width": 204,
+                "height": 16,
+                "top": 207.65625,
+                "right": 258,
+                "bottom": 223.65625,
+                "left": 54
+              },
+              "current": {
+                "x": 54,
+                "y": 207.65625,
+                "width": 159,
+                "height": 16,
+                "top": 207.65625,
+                "right": 213,
+                "bottom": 223.65625,
+                "left": 54
+              }
+            },
+            {
+              "tag": "B",
+              "cls": "pulse-count",
+              "previous": {
+                "x": 130,
+                "y": 206.65625,
+                "width": 35,
+                "height": 18.65625,
+                "top": 206.65625,
+                "right": 165,
+                "bottom": 225.3125,
+                "left": 130
+              },
+              "current": {
+                "x": 85,
+                "y": 206.65625,
+                "width": 35,
+                "height": 18.65625,
+                "top": 206.65625,
+                "right": 120,
+                "bottom": 225.3125,
+                "left": 85
+              }
+            }
+          ]
+        },
+        {
+          "value": 0.0019370845204178537,
+          "fleet": false,
+          "sources": [
+            {
+              "previous": {
+                "x": 201,
+                "y": 727.625,
+                "width": 147,
+                "height": 21,
+                "top": 727.625,
+                "right": 348,
+                "bottom": 748.625,
+                "left": 201
+              },
+              "current": {
+                "x": 201,
+                "y": 704,
+                "width": 147,
+                "height": 21,
+                "top": 704,
+                "right": 348,
+                "bottom": 725,
+                "left": 201
+              }
+            },
+            {
+              "previous": {
+                "x": 201,
+                "y": 704,
+                "width": 147,
+                "height": 21,
+                "top": 704,
+                "right": 348,
+                "bottom": 725,
+                "left": 201
+              },
+              "current": {
+                "x": 201,
+                "y": 704,
+                "width": 147,
+                "height": 21,
+                "top": 704,
+                "right": 348,
+                "bottom": 725,
+                "left": 201
+              }
+            },
+            {
+              "tag": "SPAN",
+              "cls": "",
+              "previous": {
+                "x": 100,
+                "y": 163.328125,
+                "width": 64,
+                "height": 18.65625,
+                "top": 163.328125,
+                "right": 164,
+                "bottom": 181.984375,
+                "left": 100
+              },
+              "current": {
+                "x": 73,
+                "y": 163.328125,
+                "width": 64,
+                "height": 18.65625,
+                "top": 163.328125,
+                "right": 137,
+                "bottom": 181.984375,
+                "left": 73
+              }
+            },
+            {
+              "tag": "svg",
+              "cls": {},
+              "previous": {
+                "x": 172,
+                "y": 164.65625,
+                "width": 16,
+                "height": 16,
+                "top": 164.65625,
+                "right": 188,
+                "bottom": 180.65625,
+                "left": 172
+              },
+              "current": {
+                "x": 145,
+                "y": 164.65625,
+                "width": 16,
+                "height": 16,
+                "top": 164.65625,
+                "right": 161,
+                "bottom": 180.65625,
+                "left": 145
+              }
+            }
+          ]
+        },
+        {
+          "value": 0.0004849002849002849,
+          "fleet": false,
+          "sources": [
+            {
+              "previous": {
+                "x": 54,
+                "y": 207.65625,
+                "width": 159,
+                "height": 16,
+                "top": 207.65625,
+                "right": 213,
+                "bottom": 223.65625,
+                "left": 54
+              },
+              "current": {
+                "x": 54,
+                "y": 207.65625,
+                "width": 204,
+                "height": 16,
+                "top": 207.65625,
+                "right": 258,
+                "bottom": 223.65625,
+                "left": 54
+              }
+            },
+            {
+              "tag": "B",
+              "cls": "pulse-count",
+              "previous": {
+                "x": 85,
+                "y": 206.65625,
+                "width": 35,
+                "height": 18.65625,
+                "top": 206.65625,
+                "right": 120,
+                "bottom": 225.3125,
+                "left": 85
+              },
+              "current": {
+                "x": 130,
+                "y": 206.65625,
+                "width": 35,
+                "height": 18.65625,
+                "top": 206.65625,
+                "right": 165,
+                "bottom": 225.3125,
+                "left": 130
+              }
+            }
+          ]
+        }
+      ],
+      "fleetShift": 0
+    }
+  ]
+}

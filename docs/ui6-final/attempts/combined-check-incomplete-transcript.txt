@@ -1,0 +1,15 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> plexonpanel-dashboard@6.0.0 check
+> npm run scopes:check && npm run fleet:check && npm run lint && npm run typecheck && npm run relay:test && npm test
+
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> plexonpanel-dashboard@6.0.0 scopes:check
+> node scripts/generate-scope-contract.mjs --check
+
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> plexonpanel-dashboard@6.0.0 fleet:check
+> node scripts/generate-fleet-contract.mjs --check
+

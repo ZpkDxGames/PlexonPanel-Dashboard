@@ -1,0 +1,32 @@
+{"component":"PlexonPanelRelay","runtime":"standalone","event":"started","host":"127.0.0.1","port":0,"storage":"coordination-only","version":"5.0.0","gitCommit":"unavailable","buildTimestamp":"unavailable","protocolVersion":3,"runtimeKind":"standalone"}
+▶ mounted Dashboard selects and operates independent signed instances without stale transitions
+  ✔ opening selector shows live named cards and remembers the selected server (1266.828129ms)
+  ✔ every mounted palette destination navigates without an operation, including server choices (1617.046057ms)
+  ✔ switch resets data and confirmation before a second signed workspace becomes live (1021.875669ms)
+  ✔ rapid A to B to A dropdown switches establish a fresh live command channel (789.967782ms)
+  ✔ a delayed session grant for an abandoned selection cannot replace the current socket (1055.042247ms)
+  ✔ reload returns to the selector while preserving selection and independent page history (1954.040391ms)
+  ✔ confirmation binds the original server, action and command parameters even if the form changes (214.687161ms)
+  ✔ same-server target generation replacement cancels confirmation before dispatch (313.430749ms)
+  ✔ a completion from an abandoned server is never displayed in the selected workspace (1527.210365ms)
+  ✔ reported grant expansion cannot expand the verified signed grant or dispatch (2001.766562ms)
+  ✔ mounted navigation-only palette and lifecycle controls preserve unknown Host service state (345.458076ms)
+  ✔ lifecycle commands complete across real signed Paper disconnect and reconnect events (8416.466321ms)
+  ✔ a busy stop stays visible in lifecycle controls without delayed or automatic replay (305.196884ms)
+  ✔ Owner configuration uses Paper editing, reviews changes and preserves conflicts and unsaved work (605.06889ms)
+  ✔ backup setup is instance-specific, unverified checks stay unknown and cached preflight cannot authorize a new job (7695.396424ms)
+  ✔ signed upload progress is shown for the active Host job and ignored for other jobs (931.560552ms)
+  ✔ cold backup review cancels without a command and confirms only the selected Host (2120.609214ms)
+  ✔ Host-confirmed stop, agent disconnect and relay disconnect are different UI states (418.992729ms)
+{"component":"PlexonPanelRelay","runtime":"standalone","code":"PEER_DELIVERY_FAILED","serverId":"bd54a4be-7299-4fa7-8717-9df085382e12","agentKind":"HOST","messageType":"paper.connection","error":"WebSocket send failed"}
+{"component":"PlexonPanelRelay","runtime":"standalone","code":"PEER_DELIVERY_FAILED","serverId":"af4b470c-30fa-47cc-b1f0-7959661b0fd6","agentKind":"HOST","messageType":"paper.connection","error":"WebSocket send failed"}
+  ✔ revoking one paired server keeps the other available and selectable (1335.779115ms)
+✔ mounted Dashboard selects and operates independent signed instances without stale transitions (34516.188296ms)
+ℹ tests 20
+ℹ suites 0
+ℹ pass 20
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 46583.483729

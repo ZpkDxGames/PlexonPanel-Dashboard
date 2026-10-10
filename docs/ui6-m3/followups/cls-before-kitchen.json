@@ -1,0 +1,2383 @@
+{
+  "stage": "before",
+  "production": false,
+  "fontDelayMs": 1200,
+  "samples": [
+    {
+      "theme": "light",
+      "width": 390,
+      "repeat": 0,
+      "cls": 0.0311773915796138,
+      "shifts": [
+        {
+          "value": 0.0311773915796138,
+          "time": 1634.2000000000698,
+          "recentInput": false,
+          "sources": [
+            {
+              "tag": "SECTION",
+              "classes": "lab-section",
+              "previous": {
+                "x": 16,
+                "y": 809.28125,
+                "width": 358,
+                "height": 90.71875,
+                "top": 809.28125,
+                "right": 374,
+                "bottom": 900,
+                "left": 16
+              },
+              "current": {
+                "x": 16,
+                "y": 755.75,
+                "width": 358,
+                "height": 144.25,
+                "top": 755.75,
+                "right": 374,
+                "bottom": 900,
+                "left": 16
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "",
+              "previous": {
+                "x": 16,
+                "y": 729.03125,
+                "width": 358,
+                "height": 47.25,
+                "top": 729.03125,
+                "right": 374,
+                "bottom": 776.28125,
+                "left": 16
+              },
+              "current": {
+                "x": 16,
+                "y": 675.5,
+                "width": 358,
+                "height": 47.25,
+                "top": 675.5,
+                "right": 374,
+                "bottom": 722.75,
+                "left": 16
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "pp-muted",
+              "previous": {
+                "x": 16,
+                "y": 562.90625,
+                "width": 358,
+                "height": 47.25,
+                "top": 562.90625,
+                "right": 374,
+                "bottom": 610.15625,
+                "left": 16
+              },
+              "current": {
+                "x": 16,
+                "y": 533,
+                "width": 358,
+                "height": 47.25,
+                "top": 533,
+                "right": 374,
+                "bottom": 580.25,
+                "left": 16
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "",
+              "previous": {
+                "x": 16,
+                "y": 626.15625,
+                "width": 358,
+                "height": 47.25,
+                "top": 626.15625,
+                "right": 374,
+                "bottom": 673.40625,
+                "left": 16
+              },
+              "current": {
+                "x": 16,
+                "y": 596.25,
+                "width": 358,
+                "height": 23.625,
+                "top": 596.25,
+                "right": 374,
+                "bottom": 619.875,
+                "left": 16
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "",
+              "previous": {
+                "x": 16,
+                "y": 689.40625,
+                "width": 358,
+                "height": 23.625,
+                "top": 689.40625,
+                "right": 374,
+                "bottom": 713.03125,
+                "left": 16
+              },
+              "current": {
+                "x": 16,
+                "y": 635.875,
+                "width": 358,
+                "height": 23.625,
+                "top": 635.875,
+                "right": 374,
+                "bottom": 659.5,
+                "left": 16
+              }
+            }
+          ]
+        }
+      ],
+      "fontsBefore": [
+        {
+          "family": "Plexon Hanken",
+          "status": "loading"
+        },
+        {
+          "family": "hankenLatin Fallback",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Hanken",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Commit Mono",
+          "status": "loading"
+        }
+      ],
+      "fontsAfter": [
+        {
+          "family": "Plexon Hanken",
+          "status": "loaded"
+        },
+        {
+          "family": "hankenLatin Fallback",
+          "status": "error"
+        },
+        {
+          "family": "Plexon Hanken",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Commit Mono",
+          "status": "loaded"
+        },
+        {
+          "family": "__nextjs-Geist",
+          "status": "unloaded"
+        },
+        {
+          "family": "__nextjs-Geist Mono",
+          "status": "unloaded"
+        },
+        {
+          "family": "__nextjs-Geist",
+          "status": "unloaded"
+        },
+        {
+          "family": "__nextjs-Geist Mono",
+          "status": "unloaded"
+        }
+      ],
+      "stack": "\"Plexon Hanken\", \"hankenLatin Fallback\", Arial, sans-serif",
+      "fontResources": [
+        {
+          "url": "http://127.0.0.1:3400/_next/static/media/hanken_latin-s.p.3241148m1u9do.woff2",
+          "start": 405.80000000004657,
+          "end": 1624.2000000000698
+        },
+        {
+          "url": "http://127.0.0.1:3400/_next/static/media/commit_mono_400.07vxzlkrmhahd.woff2",
+          "start": 406,
+          "end": 1623.0999999999767
+        }
+      ]
+    },
+    {
+      "theme": "light",
+      "width": 390,
+      "repeat": 1,
+      "cls": 0.0311773915796138,
+      "shifts": [
+        {
+          "value": 0.0311773915796138,
+          "time": 1392.0999999999767,
+          "recentInput": false,
+          "sources": [
+            {
+              "tag": "SECTION",
+              "classes": "lab-section",
+              "previous": {
+                "x": 16,
+                "y": 809.28125,
+                "width": 358,
+                "height": 90.71875,
+                "top": 809.28125,
+                "right": 374,
+                "bottom": 900,
+                "left": 16
+              },
+              "current": {
+                "x": 16,
+                "y": 755.75,
+                "width": 358,
+                "height": 144.25,
+                "top": 755.75,
+                "right": 374,
+                "bottom": 900,
+                "left": 16
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "",
+              "previous": {
+                "x": 16,
+                "y": 729.03125,
+                "width": 358,
+                "height": 47.25,
+                "top": 729.03125,
+                "right": 374,
+                "bottom": 776.28125,
+                "left": 16
+              },
+              "current": {
+                "x": 16,
+                "y": 675.5,
+                "width": 358,
+                "height": 47.25,
+                "top": 675.5,
+                "right": 374,
+                "bottom": 722.75,
+                "left": 16
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "pp-muted",
+              "previous": {
+                "x": 16,
+                "y": 562.90625,
+                "width": 358,
+                "height": 47.25,
+                "top": 562.90625,
+                "right": 374,
+                "bottom": 610.15625,
+                "left": 16
+              },
+              "current": {
+                "x": 16,
+                "y": 533,
+                "width": 358,
+                "height": 47.25,
+                "top": 533,
+                "right": 374,
+                "bottom": 580.25,
+                "left": 16
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "",
+              "previous": {
+                "x": 16,
+                "y": 626.15625,
+                "width": 358,
+                "height": 47.25,
+                "top": 626.15625,
+                "right": 374,
+                "bottom": 673.40625,
+                "left": 16
+              },
+              "current": {
+                "x": 16,
+                "y": 596.25,
+                "width": 358,
+                "height": 23.625,
+                "top": 596.25,
+                "right": 374,
+                "bottom": 619.875,
+                "left": 16
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "",
+              "previous": {
+                "x": 16,
+                "y": 689.40625,
+                "width": 358,
+                "height": 23.625,
+                "top": 689.40625,
+                "right": 374,
+                "bottom": 713.03125,
+                "left": 16
+              },
+              "current": {
+                "x": 16,
+                "y": 635.875,
+                "width": 358,
+                "height": 23.625,
+                "top": 635.875,
+                "right": 374,
+                "bottom": 659.5,
+                "left": 16
+              }
+            }
+          ]
+        }
+      ],
+      "fontsBefore": [
+        {
+          "family": "Plexon Hanken",
+          "status": "unloaded"
+        },
+        {
+          "family": "hankenLatin Fallback",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Hanken",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Commit Mono",
+          "status": "unloaded"
+        }
+      ],
+      "fontsAfter": [
+        {
+          "family": "Plexon Hanken",
+          "status": "loaded"
+        },
+        {
+          "family": "hankenLatin Fallback",
+          "status": "error"
+        },
+        {
+          "family": "Plexon Hanken",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Commit Mono",
+          "status": "loaded"
+        },
+        {
+          "family": "__nextjs-Geist",
+          "status": "unloaded"
+        },
+        {
+          "family": "__nextjs-Geist Mono",
+          "status": "unloaded"
+        },
+        {
+          "family": "__nextjs-Geist",
+          "status": "unloaded"
+        },
+        {
+          "family": "__nextjs-Geist Mono",
+          "status": "unloaded"
+        }
+      ],
+      "stack": "\"Plexon Hanken\", \"hankenLatin Fallback\", Arial, sans-serif",
+      "fontResources": [
+        {
+          "url": "http://127.0.0.1:3400/_next/static/media/hanken_latin-s.p.3241148m1u9do.woff2",
+          "start": 83.69999999995343,
+          "end": 1383.8999999999069
+        },
+        {
+          "url": "http://127.0.0.1:3400/_next/static/media/commit_mono_400.07vxzlkrmhahd.woff2",
+          "start": 83.79999999993015,
+          "end": 1386.1999999999534
+        }
+      ]
+    },
+    {
+      "theme": "light",
+      "width": 390,
+      "repeat": 2,
+      "cls": 0.0311773915796138,
+      "shifts": [
+        {
+          "value": 0.0311773915796138,
+          "time": 1307.5,
+          "recentInput": false,
+          "sources": [
+            {
+              "tag": "SECTION",
+              "classes": "lab-section",
+              "previous": {
+                "x": 16,
+                "y": 809.28125,
+                "width": 358,
+                "height": 90.71875,
+                "top": 809.28125,
+                "right": 374,
+                "bottom": 900,
+                "left": 16
+              },
+              "current": {
+                "x": 16,
+                "y": 755.75,
+                "width": 358,
+                "height": 144.25,
+                "top": 755.75,
+                "right": 374,
+                "bottom": 900,
+                "left": 16
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "",
+              "previous": {
+                "x": 16,
+                "y": 729.03125,
+                "width": 358,
+                "height": 47.25,
+                "top": 729.03125,
+                "right": 374,
+                "bottom": 776.28125,
+                "left": 16
+              },
+              "current": {
+                "x": 16,
+                "y": 675.5,
+                "width": 358,
+                "height": 47.25,
+                "top": 675.5,
+                "right": 374,
+                "bottom": 722.75,
+                "left": 16
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "pp-muted",
+              "previous": {
+                "x": 16,
+                "y": 562.90625,
+                "width": 358,
+                "height": 47.25,
+                "top": 562.90625,
+                "right": 374,
+                "bottom": 610.15625,
+                "left": 16
+              },
+              "current": {
+                "x": 16,
+                "y": 533,
+                "width": 358,
+                "height": 47.25,
+                "top": 533,
+                "right": 374,
+                "bottom": 580.25,
+                "left": 16
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "",
+              "previous": {
+                "x": 16,
+                "y": 626.15625,
+                "width": 358,
+                "height": 47.25,
+                "top": 626.15625,
+                "right": 374,
+                "bottom": 673.40625,
+                "left": 16
+              },
+              "current": {
+                "x": 16,
+                "y": 596.25,
+                "width": 358,
+                "height": 23.625,
+                "top": 596.25,
+                "right": 374,
+                "bottom": 619.875,
+                "left": 16
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "",
+              "previous": {
+                "x": 16,
+                "y": 689.40625,
+                "width": 358,
+                "height": 23.625,
+                "top": 689.40625,
+                "right": 374,
+                "bottom": 713.03125,
+                "left": 16
+              },
+              "current": {
+                "x": 16,
+                "y": 635.875,
+                "width": 358,
+                "height": 23.625,
+                "top": 635.875,
+                "right": 374,
+                "bottom": 659.5,
+                "left": 16
+              }
+            }
+          ]
+        }
+      ],
+      "fontsBefore": [
+        {
+          "family": "Plexon Hanken",
+          "status": "loading"
+        },
+        {
+          "family": "hankenLatin Fallback",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Hanken",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Commit Mono",
+          "status": "loading"
+        }
+      ],
+      "fontsAfter": [
+        {
+          "family": "Plexon Hanken",
+          "status": "loaded"
+        },
+        {
+          "family": "hankenLatin Fallback",
+          "status": "error"
+        },
+        {
+          "family": "Plexon Hanken",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Commit Mono",
+          "status": "loaded"
+        },
+        {
+          "family": "__nextjs-Geist",
+          "status": "unloaded"
+        },
+        {
+          "family": "__nextjs-Geist Mono",
+          "status": "unloaded"
+        },
+        {
+          "family": "__nextjs-Geist",
+          "status": "unloaded"
+        },
+        {
+          "family": "__nextjs-Geist Mono",
+          "status": "unloaded"
+        }
+      ],
+      "stack": "\"Plexon Hanken\", \"hankenLatin Fallback\", Arial, sans-serif",
+      "fontResources": [
+        {
+          "url": "http://127.0.0.1:3400/_next/static/media/hanken_latin-s.p.3241148m1u9do.woff2",
+          "start": 89.09999999997672,
+          "end": 1298
+        },
+        {
+          "url": "http://127.0.0.1:3400/_next/static/media/commit_mono_400.07vxzlkrmhahd.woff2",
+          "start": 89.20000000006985,
+          "end": 1299.2000000000698
+        }
+      ]
+    },
+    {
+      "theme": "light",
+      "width": 1280,
+      "repeat": 0,
+      "cls": 0.000894482421875,
+      "shifts": [
+        {
+          "value": 0.000894482421875,
+          "time": 1492.5,
+          "recentInput": false,
+          "sources": [
+            {
+              "previous": {
+                "x": 32,
+                "y": 398.3125,
+                "width": 1216,
+                "height": 16,
+                "top": 398.3125,
+                "right": 1248,
+                "bottom": 414.3125,
+                "left": 32
+              },
+              "current": {
+                "x": 32,
+                "y": 398.3125,
+                "width": 1216,
+                "height": 16,
+                "top": 398.3125,
+                "right": 1248,
+                "bottom": 414.3125,
+                "left": 32
+              }
+            },
+            {
+              "previous": {
+                "x": 32,
+                "y": 472.3125,
+                "width": 1216,
+                "height": 16,
+                "top": 472.3125,
+                "right": 1248,
+                "bottom": 488.3125,
+                "left": 32
+              },
+              "current": {
+                "x": 32,
+                "y": 472.3125,
+                "width": 1216,
+                "height": 16,
+                "top": 472.3125,
+                "right": 1248,
+                "bottom": 488.3125,
+                "left": 32
+              }
+            },
+            {
+              "tag": "BUTTON",
+              "classes": "pp-button pp-button-danger",
+              "previous": {
+                "x": 522,
+                "y": 778.234375,
+                "width": 122,
+                "height": 32,
+                "top": 778.234375,
+                "right": 644,
+                "bottom": 810.234375,
+                "left": 522
+              },
+              "current": {
+                "x": 504,
+                "y": 778.234375,
+                "width": 112,
+                "height": 32,
+                "top": 778.234375,
+                "right": 616,
+                "bottom": 810.234375,
+                "left": 504
+              }
+            },
+            {
+              "tag": "BUTTON",
+              "classes": "pp-button pp-button-quiet",
+              "previous": {
+                "x": 459,
+                "y": 730.234375,
+                "width": 122,
+                "height": 32,
+                "top": 730.234375,
+                "right": 581,
+                "bottom": 762.234375,
+                "left": 459
+              },
+              "current": {
+                "x": 448,
+                "y": 730.234375,
+                "width": 112,
+                "height": 32,
+                "top": 730.234375,
+                "right": 560,
+                "bottom": 762.234375,
+                "left": 448
+              }
+            },
+            {
+              "tag": "BUTTON",
+              "classes": "pp-button pp-button-primary",
+              "previous": {
+                "x": 459,
+                "y": 634.234375,
+                "width": 122,
+                "height": 32,
+                "top": 634.234375,
+                "right": 581,
+                "bottom": 666.234375,
+                "left": 459
+              },
+              "current": {
+                "x": 448,
+                "y": 634.234375,
+                "width": 112,
+                "height": 32,
+                "top": 634.234375,
+                "right": 560,
+                "bottom": 666.234375,
+                "left": 448
+              }
+            }
+          ]
+        }
+      ],
+      "fontsBefore": [
+        {
+          "family": "Plexon Hanken",
+          "status": "unloaded"
+        },
+        {
+          "family": "hankenLatin Fallback",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Hanken",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Commit Mono",
+          "status": "unloaded"
+        }
+      ],
+      "fontsAfter": [
+        {
+          "family": "Plexon Hanken",
+          "status": "loaded"
+        },
+        {
+          "family": "hankenLatin Fallback",
+          "status": "error"
+        },
+        {
+          "family": "Plexon Hanken",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Commit Mono",
+          "status": "loaded"
+        },
+        {
+          "family": "__nextjs-Geist",
+          "status": "unloaded"
+        },
+        {
+          "family": "__nextjs-Geist Mono",
+          "status": "unloaded"
+        },
+        {
+          "family": "__nextjs-Geist",
+          "status": "unloaded"
+        },
+        {
+          "family": "__nextjs-Geist Mono",
+          "status": "unloaded"
+        }
+      ],
+      "stack": "\"Plexon Hanken\", \"hankenLatin Fallback\", Arial, sans-serif",
+      "fontResources": [
+        {
+          "url": "http://127.0.0.1:3400/_next/static/media/hanken_latin-s.p.3241148m1u9do.woff2",
+          "start": 164,
+          "end": 1468.2000000000698
+        },
+        {
+          "url": "http://127.0.0.1:3400/_next/static/media/commit_mono_400.07vxzlkrmhahd.woff2",
+          "start": 164.20000000006985,
+          "end": 1469.3000000000466
+        }
+      ]
+    },
+    {
+      "theme": "light",
+      "width": 1280,
+      "repeat": 1,
+      "cls": 0.000983544921875,
+      "shifts": [
+        {
+          "value": 0.000983544921875,
+          "time": 1490.9000000000233,
+          "recentInput": false,
+          "sources": [
+            {
+              "previous": {
+                "x": 32,
+                "y": 398.3125,
+                "width": 1216,
+                "height": 18,
+                "top": 398.3125,
+                "right": 1248,
+                "bottom": 416.3125,
+                "left": 32
+              },
+              "current": {
+                "x": 32,
+                "y": 397.3125,
+                "width": 1216,
+                "height": 18,
+                "top": 397.3125,
+                "right": 1248,
+                "bottom": 415.3125,
+                "left": 32
+              }
+            },
+            {
+              "previous": {
+                "x": 32,
+                "y": 472.3125,
+                "width": 1216,
+                "height": 18,
+                "top": 472.3125,
+                "right": 1248,
+                "bottom": 490.3125,
+                "left": 32
+              },
+              "current": {
+                "x": 32,
+                "y": 471.3125,
+                "width": 1216,
+                "height": 18,
+                "top": 471.3125,
+                "right": 1248,
+                "bottom": 489.3125,
+                "left": 32
+              }
+            },
+            {
+              "tag": "BUTTON",
+              "classes": "pp-button pp-button-danger",
+              "previous": {
+                "x": 522,
+                "y": 778.234375,
+                "width": 122,
+                "height": 32,
+                "top": 778.234375,
+                "right": 644,
+                "bottom": 810.234375,
+                "left": 522
+              },
+              "current": {
+                "x": 504,
+                "y": 778.234375,
+                "width": 112,
+                "height": 32,
+                "top": 778.234375,
+                "right": 616,
+                "bottom": 810.234375,
+                "left": 504
+              }
+            },
+            {
+              "tag": "BUTTON",
+              "classes": "pp-button pp-button-quiet",
+              "previous": {
+                "x": 459,
+                "y": 730.234375,
+                "width": 122,
+                "height": 32,
+                "top": 730.234375,
+                "right": 581,
+                "bottom": 762.234375,
+                "left": 459
+              },
+              "current": {
+                "x": 448,
+                "y": 730.234375,
+                "width": 112,
+                "height": 32,
+                "top": 730.234375,
+                "right": 560,
+                "bottom": 762.234375,
+                "left": 448
+              }
+            },
+            {
+              "tag": "BUTTON",
+              "classes": "pp-button pp-button-primary",
+              "previous": {
+                "x": 459,
+                "y": 634.234375,
+                "width": 122,
+                "height": 32,
+                "top": 634.234375,
+                "right": 581,
+                "bottom": 666.234375,
+                "left": 459
+              },
+              "current": {
+                "x": 448,
+                "y": 634.234375,
+                "width": 112,
+                "height": 32,
+                "top": 634.234375,
+                "right": 560,
+                "bottom": 666.234375,
+                "left": 448
+              }
+            }
+          ]
+        }
+      ],
+      "fontsBefore": [
+        {
+          "family": "Plexon Hanken",
+          "status": "unloaded"
+        },
+        {
+          "family": "hankenLatin Fallback",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Hanken",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Commit Mono",
+          "status": "unloaded"
+        }
+      ],
+      "fontsAfter": [
+        {
+          "family": "Plexon Hanken",
+          "status": "loaded"
+        },
+        {
+          "family": "hankenLatin Fallback",
+          "status": "error"
+        },
+        {
+          "family": "Plexon Hanken",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Commit Mono",
+          "status": "loaded"
+        },
+        {
+          "family": "__nextjs-Geist",
+          "status": "unloaded"
+        },
+        {
+          "family": "__nextjs-Geist Mono",
+          "status": "unloaded"
+        },
+        {
+          "family": "__nextjs-Geist",
+          "status": "unloaded"
+        },
+        {
+          "family": "__nextjs-Geist Mono",
+          "status": "unloaded"
+        }
+      ],
+      "stack": "\"Plexon Hanken\", \"hankenLatin Fallback\", Arial, sans-serif",
+      "fontResources": [
+        {
+          "url": "http://127.0.0.1:3400/_next/static/media/hanken_latin-s.p.3241148m1u9do.woff2",
+          "start": 159.5,
+          "end": 1482.4000000000233
+        },
+        {
+          "url": "http://127.0.0.1:3400/_next/static/media/commit_mono_400.07vxzlkrmhahd.woff2",
+          "start": 159.69999999995343,
+          "end": 1483.5999999999767
+        }
+      ]
+    },
+    {
+      "theme": "light",
+      "width": 1280,
+      "repeat": 2,
+      "cls": 0.000983544921875,
+      "shifts": [
+        {
+          "value": 0.000983544921875,
+          "time": 1450.4000000000233,
+          "recentInput": false,
+          "sources": [
+            {
+              "previous": {
+                "x": 32,
+                "y": 398.3125,
+                "width": 1216,
+                "height": 18,
+                "top": 398.3125,
+                "right": 1248,
+                "bottom": 416.3125,
+                "left": 32
+              },
+              "current": {
+                "x": 32,
+                "y": 397.3125,
+                "width": 1216,
+                "height": 18,
+                "top": 397.3125,
+                "right": 1248,
+                "bottom": 415.3125,
+                "left": 32
+              }
+            },
+            {
+              "previous": {
+                "x": 32,
+                "y": 472.3125,
+                "width": 1216,
+                "height": 18,
+                "top": 472.3125,
+                "right": 1248,
+                "bottom": 490.3125,
+                "left": 32
+              },
+              "current": {
+                "x": 32,
+                "y": 471.3125,
+                "width": 1216,
+                "height": 18,
+                "top": 471.3125,
+                "right": 1248,
+                "bottom": 489.3125,
+                "left": 32
+              }
+            },
+            {
+              "tag": "BUTTON",
+              "classes": "pp-button pp-button-danger",
+              "previous": {
+                "x": 522,
+                "y": 778.234375,
+                "width": 122,
+                "height": 32,
+                "top": 778.234375,
+                "right": 644,
+                "bottom": 810.234375,
+                "left": 522
+              },
+              "current": {
+                "x": 504,
+                "y": 778.234375,
+                "width": 112,
+                "height": 32,
+                "top": 778.234375,
+                "right": 616,
+                "bottom": 810.234375,
+                "left": 504
+              }
+            },
+            {
+              "tag": "BUTTON",
+              "classes": "pp-button pp-button-quiet",
+              "previous": {
+                "x": 459,
+                "y": 730.234375,
+                "width": 122,
+                "height": 32,
+                "top": 730.234375,
+                "right": 581,
+                "bottom": 762.234375,
+                "left": 459
+              },
+              "current": {
+                "x": 448,
+                "y": 730.234375,
+                "width": 112,
+                "height": 32,
+                "top": 730.234375,
+                "right": 560,
+                "bottom": 762.234375,
+                "left": 448
+              }
+            },
+            {
+              "tag": "BUTTON",
+              "classes": "pp-button pp-button-primary",
+              "previous": {
+                "x": 459,
+                "y": 634.234375,
+                "width": 122,
+                "height": 32,
+                "top": 634.234375,
+                "right": 581,
+                "bottom": 666.234375,
+                "left": 459
+              },
+              "current": {
+                "x": 448,
+                "y": 634.234375,
+                "width": 112,
+                "height": 32,
+                "top": 634.234375,
+                "right": 560,
+                "bottom": 666.234375,
+                "left": 448
+              }
+            }
+          ]
+        }
+      ],
+      "fontsBefore": [
+        {
+          "family": "Plexon Hanken",
+          "status": "unloaded"
+        },
+        {
+          "family": "hankenLatin Fallback",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Hanken",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Commit Mono",
+          "status": "unloaded"
+        }
+      ],
+      "fontsAfter": [
+        {
+          "family": "Plexon Hanken",
+          "status": "loaded"
+        },
+        {
+          "family": "hankenLatin Fallback",
+          "status": "error"
+        },
+        {
+          "family": "Plexon Hanken",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Commit Mono",
+          "status": "loaded"
+        },
+        {
+          "family": "__nextjs-Geist",
+          "status": "unloaded"
+        },
+        {
+          "family": "__nextjs-Geist Mono",
+          "status": "unloaded"
+        },
+        {
+          "family": "__nextjs-Geist",
+          "status": "unloaded"
+        },
+        {
+          "family": "__nextjs-Geist Mono",
+          "status": "unloaded"
+        }
+      ],
+      "stack": "\"Plexon Hanken\", \"hankenLatin Fallback\", Arial, sans-serif",
+      "fontResources": [
+        {
+          "url": "http://127.0.0.1:3400/_next/static/media/hanken_latin-s.p.3241148m1u9do.woff2",
+          "start": 125.59999999997672,
+          "end": 1440.9000000000233
+        },
+        {
+          "url": "http://127.0.0.1:3400/_next/static/media/commit_mono_400.07vxzlkrmhahd.woff2",
+          "start": 127.40000000002328,
+          "end": 1442.5999999999767
+        }
+      ]
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "repeat": 0,
+      "cls": 0.0311773915796138,
+      "shifts": [
+        {
+          "value": 0.0311773915796138,
+          "time": 1326.6999999999534,
+          "recentInput": false,
+          "sources": [
+            {
+              "tag": "SECTION",
+              "classes": "lab-section",
+              "previous": {
+                "x": 16,
+                "y": 809.28125,
+                "width": 358,
+                "height": 90.71875,
+                "top": 809.28125,
+                "right": 374,
+                "bottom": 900,
+                "left": 16
+              },
+              "current": {
+                "x": 16,
+                "y": 755.75,
+                "width": 358,
+                "height": 144.25,
+                "top": 755.75,
+                "right": 374,
+                "bottom": 900,
+                "left": 16
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "",
+              "previous": {
+                "x": 16,
+                "y": 729.03125,
+                "width": 358,
+                "height": 47.25,
+                "top": 729.03125,
+                "right": 374,
+                "bottom": 776.28125,
+                "left": 16
+              },
+              "current": {
+                "x": 16,
+                "y": 675.5,
+                "width": 358,
+                "height": 47.25,
+                "top": 675.5,
+                "right": 374,
+                "bottom": 722.75,
+                "left": 16
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "pp-muted",
+              "previous": {
+                "x": 16,
+                "y": 562.90625,
+                "width": 358,
+                "height": 47.25,
+                "top": 562.90625,
+                "right": 374,
+                "bottom": 610.15625,
+                "left": 16
+              },
+              "current": {
+                "x": 16,
+                "y": 533,
+                "width": 358,
+                "height": 47.25,
+                "top": 533,
+                "right": 374,
+                "bottom": 580.25,
+                "left": 16
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "",
+              "previous": {
+                "x": 16,
+                "y": 626.15625,
+                "width": 358,
+                "height": 47.25,
+                "top": 626.15625,
+                "right": 374,
+                "bottom": 673.40625,
+                "left": 16
+              },
+              "current": {
+                "x": 16,
+                "y": 596.25,
+                "width": 358,
+                "height": 23.625,
+                "top": 596.25,
+                "right": 374,
+                "bottom": 619.875,
+                "left": 16
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "",
+              "previous": {
+                "x": 16,
+                "y": 689.40625,
+                "width": 358,
+                "height": 23.625,
+                "top": 689.40625,
+                "right": 374,
+                "bottom": 713.03125,
+                "left": 16
+              },
+              "current": {
+                "x": 16,
+                "y": 635.875,
+                "width": 358,
+                "height": 23.625,
+                "top": 635.875,
+                "right": 374,
+                "bottom": 659.5,
+                "left": 16
+              }
+            }
+          ]
+        }
+      ],
+      "fontsBefore": [
+        {
+          "family": "Plexon Hanken",
+          "status": "loading"
+        },
+        {
+          "family": "hankenLatin Fallback",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Hanken",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Commit Mono",
+          "status": "loading"
+        }
+      ],
+      "fontsAfter": [
+        {
+          "family": "Plexon Hanken",
+          "status": "loaded"
+        },
+        {
+          "family": "hankenLatin Fallback",
+          "status": "error"
+        },
+        {
+          "family": "Plexon Hanken",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Commit Mono",
+          "status": "loaded"
+        },
+        {
+          "family": "__nextjs-Geist",
+          "status": "unloaded"
+        },
+        {
+          "family": "__nextjs-Geist Mono",
+          "status": "unloaded"
+        },
+        {
+          "family": "__nextjs-Geist",
+          "status": "unloaded"
+        },
+        {
+          "family": "__nextjs-Geist Mono",
+          "status": "unloaded"
+        }
+      ],
+      "stack": "\"Plexon Hanken\", \"hankenLatin Fallback\", Arial, sans-serif",
+      "fontResources": [
+        {
+          "url": "http://127.0.0.1:3400/_next/static/media/hanken_latin-s.p.3241148m1u9do.woff2",
+          "start": 108.90000000002328,
+          "end": 1317
+        },
+        {
+          "url": "http://127.0.0.1:3400/_next/static/media/commit_mono_400.07vxzlkrmhahd.woff2",
+          "start": 109.09999999997672,
+          "end": 1318.1999999999534
+        }
+      ]
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "repeat": 1,
+      "cls": 0.0311773915796138,
+      "shifts": [
+        {
+          "value": 0.0311773915796138,
+          "time": 1331.4000000000233,
+          "recentInput": false,
+          "sources": [
+            {
+              "tag": "SECTION",
+              "classes": "lab-section",
+              "previous": {
+                "x": 16,
+                "y": 809.28125,
+                "width": 358,
+                "height": 90.71875,
+                "top": 809.28125,
+                "right": 374,
+                "bottom": 900,
+                "left": 16
+              },
+              "current": {
+                "x": 16,
+                "y": 755.75,
+                "width": 358,
+                "height": 144.25,
+                "top": 755.75,
+                "right": 374,
+                "bottom": 900,
+                "left": 16
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "",
+              "previous": {
+                "x": 16,
+                "y": 729.03125,
+                "width": 358,
+                "height": 47.25,
+                "top": 729.03125,
+                "right": 374,
+                "bottom": 776.28125,
+                "left": 16
+              },
+              "current": {
+                "x": 16,
+                "y": 675.5,
+                "width": 358,
+                "height": 47.25,
+                "top": 675.5,
+                "right": 374,
+                "bottom": 722.75,
+                "left": 16
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "pp-muted",
+              "previous": {
+                "x": 16,
+                "y": 562.90625,
+                "width": 358,
+                "height": 47.25,
+                "top": 562.90625,
+                "right": 374,
+                "bottom": 610.15625,
+                "left": 16
+              },
+              "current": {
+                "x": 16,
+                "y": 533,
+                "width": 358,
+                "height": 47.25,
+                "top": 533,
+                "right": 374,
+                "bottom": 580.25,
+                "left": 16
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "",
+              "previous": {
+                "x": 16,
+                "y": 626.15625,
+                "width": 358,
+                "height": 47.25,
+                "top": 626.15625,
+                "right": 374,
+                "bottom": 673.40625,
+                "left": 16
+              },
+              "current": {
+                "x": 16,
+                "y": 596.25,
+                "width": 358,
+                "height": 23.625,
+                "top": 596.25,
+                "right": 374,
+                "bottom": 619.875,
+                "left": 16
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "",
+              "previous": {
+                "x": 16,
+                "y": 689.40625,
+                "width": 358,
+                "height": 23.625,
+                "top": 689.40625,
+                "right": 374,
+                "bottom": 713.03125,
+                "left": 16
+              },
+              "current": {
+                "x": 16,
+                "y": 635.875,
+                "width": 358,
+                "height": 23.625,
+                "top": 635.875,
+                "right": 374,
+                "bottom": 659.5,
+                "left": 16
+              }
+            }
+          ]
+        }
+      ],
+      "fontsBefore": [
+        {
+          "family": "Plexon Hanken",
+          "status": "loading"
+        },
+        {
+          "family": "hankenLatin Fallback",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Hanken",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Commit Mono",
+          "status": "loading"
+        }
+      ],
+      "fontsAfter": [
+        {
+          "family": "Plexon Hanken",
+          "status": "loaded"
+        },
+        {
+          "family": "hankenLatin Fallback",
+          "status": "error"
+        },
+        {
+          "family": "Plexon Hanken",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Commit Mono",
+          "status": "loaded"
+        },
+        {
+          "family": "__nextjs-Geist",
+          "status": "unloaded"
+        },
+        {
+          "family": "__nextjs-Geist Mono",
+          "status": "unloaded"
+        },
+        {
+          "family": "__nextjs-Geist",
+          "status": "unloaded"
+        },
+        {
+          "family": "__nextjs-Geist Mono",
+          "status": "unloaded"
+        }
+      ],
+      "stack": "\"Plexon Hanken\", \"hankenLatin Fallback\", Arial, sans-serif",
+      "fontResources": [
+        {
+          "url": "http://127.0.0.1:3400/_next/static/media/hanken_latin-s.p.3241148m1u9do.woff2",
+          "start": 92.19999999995343,
+          "end": 1305.5999999999767
+        },
+        {
+          "url": "http://127.0.0.1:3400/_next/static/media/commit_mono_400.07vxzlkrmhahd.woff2",
+          "start": 92.40000000002328,
+          "end": 1307
+        }
+      ]
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "repeat": 2,
+      "cls": 0.0311773915796138,
+      "shifts": [
+        {
+          "value": 0.0311773915796138,
+          "time": 1313.3999999999069,
+          "recentInput": false,
+          "sources": [
+            {
+              "tag": "SECTION",
+              "classes": "lab-section",
+              "previous": {
+                "x": 16,
+                "y": 809.28125,
+                "width": 358,
+                "height": 90.71875,
+                "top": 809.28125,
+                "right": 374,
+                "bottom": 900,
+                "left": 16
+              },
+              "current": {
+                "x": 16,
+                "y": 755.75,
+                "width": 358,
+                "height": 144.25,
+                "top": 755.75,
+                "right": 374,
+                "bottom": 900,
+                "left": 16
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "",
+              "previous": {
+                "x": 16,
+                "y": 729.03125,
+                "width": 358,
+                "height": 47.25,
+                "top": 729.03125,
+                "right": 374,
+                "bottom": 776.28125,
+                "left": 16
+              },
+              "current": {
+                "x": 16,
+                "y": 675.5,
+                "width": 358,
+                "height": 47.25,
+                "top": 675.5,
+                "right": 374,
+                "bottom": 722.75,
+                "left": 16
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "pp-muted",
+              "previous": {
+                "x": 16,
+                "y": 562.90625,
+                "width": 358,
+                "height": 47.25,
+                "top": 562.90625,
+                "right": 374,
+                "bottom": 610.15625,
+                "left": 16
+              },
+              "current": {
+                "x": 16,
+                "y": 533,
+                "width": 358,
+                "height": 47.25,
+                "top": 533,
+                "right": 374,
+                "bottom": 580.25,
+                "left": 16
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "",
+              "previous": {
+                "x": 16,
+                "y": 626.15625,
+                "width": 358,
+                "height": 47.25,
+                "top": 626.15625,
+                "right": 374,
+                "bottom": 673.40625,
+                "left": 16
+              },
+              "current": {
+                "x": 16,
+                "y": 596.25,
+                "width": 358,
+                "height": 23.625,
+                "top": 596.25,
+                "right": 374,
+                "bottom": 619.875,
+                "left": 16
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "",
+              "previous": {
+                "x": 16,
+                "y": 689.40625,
+                "width": 358,
+                "height": 23.625,
+                "top": 689.40625,
+                "right": 374,
+                "bottom": 713.03125,
+                "left": 16
+              },
+              "current": {
+                "x": 16,
+                "y": 635.875,
+                "width": 358,
+                "height": 23.625,
+                "top": 635.875,
+                "right": 374,
+                "bottom": 659.5,
+                "left": 16
+              }
+            }
+          ]
+        }
+      ],
+      "fontsBefore": [
+        {
+          "family": "Plexon Hanken",
+          "status": "loading"
+        },
+        {
+          "family": "hankenLatin Fallback",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Hanken",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Commit Mono",
+          "status": "loading"
+        }
+      ],
+      "fontsAfter": [
+        {
+          "family": "Plexon Hanken",
+          "status": "loaded"
+        },
+        {
+          "family": "hankenLatin Fallback",
+          "status": "error"
+        },
+        {
+          "family": "Plexon Hanken",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Commit Mono",
+          "status": "loaded"
+        },
+        {
+          "family": "__nextjs-Geist",
+          "status": "unloaded"
+        },
+        {
+          "family": "__nextjs-Geist Mono",
+          "status": "unloaded"
+        },
+        {
+          "family": "__nextjs-Geist",
+          "status": "unloaded"
+        },
+        {
+          "family": "__nextjs-Geist Mono",
+          "status": "unloaded"
+        }
+      ],
+      "stack": "\"Plexon Hanken\", \"hankenLatin Fallback\", Arial, sans-serif",
+      "fontResources": [
+        {
+          "url": "http://127.0.0.1:3400/_next/static/media/hanken_latin-s.p.3241148m1u9do.woff2",
+          "start": 96.09999999997672,
+          "end": 1304.8999999999069
+        },
+        {
+          "url": "http://127.0.0.1:3400/_next/static/media/commit_mono_400.07vxzlkrmhahd.woff2",
+          "start": 96.19999999995343,
+          "end": 1305.8999999999069
+        }
+      ]
+    },
+    {
+      "theme": "dark",
+      "width": 1280,
+      "repeat": 0,
+      "cls": 0.000983544921875,
+      "shifts": [
+        {
+          "value": 0.000983544921875,
+          "time": 1322.2000000000698,
+          "recentInput": false,
+          "sources": [
+            {
+              "previous": {
+                "x": 32,
+                "y": 398.3125,
+                "width": 1216,
+                "height": 18,
+                "top": 398.3125,
+                "right": 1248,
+                "bottom": 416.3125,
+                "left": 32
+              },
+              "current": {
+                "x": 32,
+                "y": 397.3125,
+                "width": 1216,
+                "height": 18,
+                "top": 397.3125,
+                "right": 1248,
+                "bottom": 415.3125,
+                "left": 32
+              }
+            },
+            {
+              "previous": {
+                "x": 32,
+                "y": 472.3125,
+                "width": 1216,
+                "height": 18,
+                "top": 472.3125,
+                "right": 1248,
+                "bottom": 490.3125,
+                "left": 32
+              },
+              "current": {
+                "x": 32,
+                "y": 471.3125,
+                "width": 1216,
+                "height": 18,
+                "top": 471.3125,
+                "right": 1248,
+                "bottom": 489.3125,
+                "left": 32
+              }
+            },
+            {
+              "tag": "BUTTON",
+              "classes": "pp-button pp-button-danger",
+              "previous": {
+                "x": 522,
+                "y": 778.234375,
+                "width": 122,
+                "height": 32,
+                "top": 778.234375,
+                "right": 644,
+                "bottom": 810.234375,
+                "left": 522
+              },
+              "current": {
+                "x": 504,
+                "y": 778.234375,
+                "width": 112,
+                "height": 32,
+                "top": 778.234375,
+                "right": 616,
+                "bottom": 810.234375,
+                "left": 504
+              }
+            },
+            {
+              "tag": "BUTTON",
+              "classes": "pp-button pp-button-quiet",
+              "previous": {
+                "x": 459,
+                "y": 730.234375,
+                "width": 122,
+                "height": 32,
+                "top": 730.234375,
+                "right": 581,
+                "bottom": 762.234375,
+                "left": 459
+              },
+              "current": {
+                "x": 448,
+                "y": 730.234375,
+                "width": 112,
+                "height": 32,
+                "top": 730.234375,
+                "right": 560,
+                "bottom": 762.234375,
+                "left": 448
+              }
+            },
+            {
+              "tag": "BUTTON",
+              "classes": "pp-button pp-button-primary",
+              "previous": {
+                "x": 459,
+                "y": 634.234375,
+                "width": 122,
+                "height": 32,
+                "top": 634.234375,
+                "right": 581,
+                "bottom": 666.234375,
+                "left": 459
+              },
+              "current": {
+                "x": 448,
+                "y": 634.234375,
+                "width": 112,
+                "height": 32,
+                "top": 634.234375,
+                "right": 560,
+                "bottom": 666.234375,
+                "left": 448
+              }
+            }
+          ]
+        }
+      ],
+      "fontsBefore": [
+        {
+          "family": "Plexon Hanken",
+          "status": "loading"
+        },
+        {
+          "family": "hankenLatin Fallback",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Hanken",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Commit Mono",
+          "status": "loading"
+        }
+      ],
+      "fontsAfter": [
+        {
+          "family": "Plexon Hanken",
+          "status": "loaded"
+        },
+        {
+          "family": "hankenLatin Fallback",
+          "status": "error"
+        },
+        {
+          "family": "Plexon Hanken",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Commit Mono",
+          "status": "loaded"
+        },
+        {
+          "family": "__nextjs-Geist",
+          "status": "unloaded"
+        },
+        {
+          "family": "__nextjs-Geist Mono",
+          "status": "unloaded"
+        },
+        {
+          "family": "__nextjs-Geist",
+          "status": "unloaded"
+        },
+        {
+          "family": "__nextjs-Geist Mono",
+          "status": "unloaded"
+        }
+      ],
+      "stack": "\"Plexon Hanken\", \"hankenLatin Fallback\", Arial, sans-serif",
+      "fontResources": [
+        {
+          "url": "http://127.0.0.1:3400/_next/static/media/hanken_latin-s.p.3241148m1u9do.woff2",
+          "start": 97.30000000004657,
+          "end": 1310.7000000000698
+        },
+        {
+          "url": "http://127.0.0.1:3400/_next/static/media/commit_mono_400.07vxzlkrmhahd.woff2",
+          "start": 97.5,
+          "end": 1311.7000000000698
+        }
+      ]
+    },
+    {
+      "theme": "dark",
+      "width": 1280,
+      "repeat": 1,
+      "cls": 0.000983544921875,
+      "shifts": [
+        {
+          "value": 0.000983544921875,
+          "time": 1315.6999999999534,
+          "recentInput": false,
+          "sources": [
+            {
+              "previous": {
+                "x": 32,
+                "y": 398.3125,
+                "width": 1216,
+                "height": 18,
+                "top": 398.3125,
+                "right": 1248,
+                "bottom": 416.3125,
+                "left": 32
+              },
+              "current": {
+                "x": 32,
+                "y": 397.3125,
+                "width": 1216,
+                "height": 18,
+                "top": 397.3125,
+                "right": 1248,
+                "bottom": 415.3125,
+                "left": 32
+              }
+            },
+            {
+              "previous": {
+                "x": 32,
+                "y": 472.3125,
+                "width": 1216,
+                "height": 18,
+                "top": 472.3125,
+                "right": 1248,
+                "bottom": 490.3125,
+                "left": 32
+              },
+              "current": {
+                "x": 32,
+                "y": 471.3125,
+                "width": 1216,
+                "height": 18,
+                "top": 471.3125,
+                "right": 1248,
+                "bottom": 489.3125,
+                "left": 32
+              }
+            },
+            {
+              "tag": "BUTTON",
+              "classes": "pp-button pp-button-danger",
+              "previous": {
+                "x": 522,
+                "y": 778.234375,
+                "width": 122,
+                "height": 32,
+                "top": 778.234375,
+                "right": 644,
+                "bottom": 810.234375,
+                "left": 522
+              },
+              "current": {
+                "x": 504,
+                "y": 778.234375,
+                "width": 112,
+                "height": 32,
+                "top": 778.234375,
+                "right": 616,
+                "bottom": 810.234375,
+                "left": 504
+              }
+            },
+            {
+              "tag": "BUTTON",
+              "classes": "pp-button pp-button-quiet",
+              "previous": {
+                "x": 459,
+                "y": 730.234375,
+                "width": 122,
+                "height": 32,
+                "top": 730.234375,
+                "right": 581,
+                "bottom": 762.234375,
+                "left": 459
+              },
+              "current": {
+                "x": 448,
+                "y": 730.234375,
+                "width": 112,
+                "height": 32,
+                "top": 730.234375,
+                "right": 560,
+                "bottom": 762.234375,
+                "left": 448
+              }
+            },
+            {
+              "tag": "BUTTON",
+              "classes": "pp-button pp-button-primary",
+              "previous": {
+                "x": 459,
+                "y": 634.234375,
+                "width": 122,
+                "height": 32,
+                "top": 634.234375,
+                "right": 581,
+                "bottom": 666.234375,
+                "left": 459
+              },
+              "current": {
+                "x": 448,
+                "y": 634.234375,
+                "width": 112,
+                "height": 32,
+                "top": 634.234375,
+                "right": 560,
+                "bottom": 666.234375,
+                "left": 448
+              }
+            }
+          ]
+        }
+      ],
+      "fontsBefore": [
+        {
+          "family": "Plexon Hanken",
+          "status": "unloaded"
+        },
+        {
+          "family": "hankenLatin Fallback",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Hanken",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Commit Mono",
+          "status": "unloaded"
+        }
+      ],
+      "fontsAfter": [
+        {
+          "family": "Plexon Hanken",
+          "status": "loaded"
+        },
+        {
+          "family": "hankenLatin Fallback",
+          "status": "error"
+        },
+        {
+          "family": "Plexon Hanken",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Commit Mono",
+          "status": "loaded"
+        },
+        {
+          "family": "__nextjs-Geist",
+          "status": "unloaded"
+        },
+        {
+          "family": "__nextjs-Geist Mono",
+          "status": "unloaded"
+        },
+        {
+          "family": "__nextjs-Geist",
+          "status": "unloaded"
+        },
+        {
+          "family": "__nextjs-Geist Mono",
+          "status": "unloaded"
+        }
+      ],
+      "stack": "\"Plexon Hanken\", \"hankenLatin Fallback\", Arial, sans-serif",
+      "fontResources": [
+        {
+          "url": "http://127.0.0.1:3400/_next/static/media/hanken_latin-s.p.3241148m1u9do.woff2",
+          "start": 100.69999999995343,
+          "end": 1306.9000000000233
+        },
+        {
+          "url": "http://127.0.0.1:3400/_next/static/media/commit_mono_400.07vxzlkrmhahd.woff2",
+          "start": 100.80000000004657,
+          "end": 1307.9000000000233
+        }
+      ]
+    },
+    {
+      "theme": "dark",
+      "width": 1280,
+      "repeat": 2,
+      "cls": 0.000983544921875,
+      "shifts": [
+        {
+          "value": 0.000983544921875,
+          "time": 1413.7999999999302,
+          "recentInput": false,
+          "sources": [
+            {
+              "previous": {
+                "x": 32,
+                "y": 398.3125,
+                "width": 1216,
+                "height": 18,
+                "top": 398.3125,
+                "right": 1248,
+                "bottom": 416.3125,
+                "left": 32
+              },
+              "current": {
+                "x": 32,
+                "y": 397.3125,
+                "width": 1216,
+                "height": 18,
+                "top": 397.3125,
+                "right": 1248,
+                "bottom": 415.3125,
+                "left": 32
+              }
+            },
+            {
+              "previous": {
+                "x": 32,
+                "y": 472.3125,
+                "width": 1216,
+                "height": 18,
+                "top": 472.3125,
+                "right": 1248,
+                "bottom": 490.3125,
+                "left": 32
+              },
+              "current": {
+                "x": 32,
+                "y": 471.3125,
+                "width": 1216,
+                "height": 18,
+                "top": 471.3125,
+                "right": 1248,
+                "bottom": 489.3125,
+                "left": 32
+              }
+            },
+            {
+              "tag": "BUTTON",
+              "classes": "pp-button pp-button-danger",
+              "previous": {
+                "x": 522,
+                "y": 778.234375,
+                "width": 122,
+                "height": 32,
+                "top": 778.234375,
+                "right": 644,
+                "bottom": 810.234375,
+                "left": 522
+              },
+              "current": {
+                "x": 504,
+                "y": 778.234375,
+                "width": 112,
+                "height": 32,
+                "top": 778.234375,
+                "right": 616,
+                "bottom": 810.234375,
+                "left": 504
+              }
+            },
+            {
+              "tag": "BUTTON",
+              "classes": "pp-button pp-button-quiet",
+              "previous": {
+                "x": 459,
+                "y": 730.234375,
+                "width": 122,
+                "height": 32,
+                "top": 730.234375,
+                "right": 581,
+                "bottom": 762.234375,
+                "left": 459
+              },
+              "current": {
+                "x": 448,
+                "y": 730.234375,
+                "width": 112,
+                "height": 32,
+                "top": 730.234375,
+                "right": 560,
+                "bottom": 762.234375,
+                "left": 448
+              }
+            },
+            {
+              "tag": "BUTTON",
+              "classes": "pp-button pp-button-primary",
+              "previous": {
+                "x": 459,
+                "y": 634.234375,
+                "width": 122,
+                "height": 32,
+                "top": 634.234375,
+                "right": 581,
+                "bottom": 666.234375,
+                "left": 459
+              },
+              "current": {
+                "x": 448,
+                "y": 634.234375,
+                "width": 112,
+                "height": 32,
+                "top": 634.234375,
+                "right": 560,
+                "bottom": 666.234375,
+                "left": 448
+              }
+            }
+          ]
+        }
+      ],
+      "fontsBefore": [
+        {
+          "family": "Plexon Hanken",
+          "status": "unloaded"
+        },
+        {
+          "family": "hankenLatin Fallback",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Hanken",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Commit Mono",
+          "status": "unloaded"
+        }
+      ],
+      "fontsAfter": [
+        {
+          "family": "Plexon Hanken",
+          "status": "loaded"
+        },
+        {
+          "family": "hankenLatin Fallback",
+          "status": "error"
+        },
+        {
+          "family": "Plexon Hanken",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Commit Mono",
+          "status": "loaded"
+        },
+        {
+          "family": "__nextjs-Geist",
+          "status": "unloaded"
+        },
+        {
+          "family": "__nextjs-Geist Mono",
+          "status": "unloaded"
+        },
+        {
+          "family": "__nextjs-Geist",
+          "status": "unloaded"
+        },
+        {
+          "family": "__nextjs-Geist Mono",
+          "status": "unloaded"
+        }
+      ],
+      "stack": "\"Plexon Hanken\", \"hankenLatin Fallback\", Arial, sans-serif",
+      "fontResources": [
+        {
+          "url": "http://127.0.0.1:3400/_next/static/media/hanken_latin-s.p.3241148m1u9do.woff2",
+          "start": 101.89999999990687,
+          "end": 1403.1999999999534
+        },
+        {
+          "url": "http://127.0.0.1:3400/_next/static/media/commit_mono_400.07vxzlkrmhahd.woff2",
+          "start": 102.29999999993015,
+          "end": 1404.2999999999302
+        }
+      ]
+    }
+  ]
+}

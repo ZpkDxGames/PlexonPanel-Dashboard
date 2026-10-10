@@ -1,0 +1,66 @@
+{
+  "browser": "153.0.8010.0",
+  "method": "All15 SVG images decoded in Chromium; actual SVG text getBBox checked against viewBox; mobile/desktop each included; per-control product accessibility not claimed",
+  "pages": [
+    {
+      "slug": "fleet",
+      "overflow": []
+    },
+    {
+      "slug": "overview",
+      "overflow": []
+    },
+    {
+      "slug": "performance",
+      "overflow": []
+    },
+    {
+      "slug": "players",
+      "overflow": []
+    },
+    {
+      "slug": "console",
+      "overflow": []
+    },
+    {
+      "slug": "chat",
+      "overflow": []
+    },
+    {
+      "slug": "plugins",
+      "overflow": []
+    },
+    {
+      "slug": "server",
+      "overflow": []
+    },
+    {
+      "slug": "backups",
+      "overflow": []
+    },
+    {
+      "slug": "configuration",
+      "overflow": []
+    },
+    {
+      "slug": "audit",
+      "overflow": []
+    },
+    {
+      "slug": "access",
+      "overflow": []
+    },
+    {
+      "slug": "settings",
+      "overflow": []
+    },
+    {
+      "slug": "pairing",
+      "overflow": []
+    },
+    {
+      "slug": "legacy-archive",
+      "overflow": []
+    }
+  ]
+}

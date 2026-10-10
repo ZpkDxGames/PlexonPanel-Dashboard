@@ -1,0 +1,66 @@
+✔ Host lifecycle completion survives Paper presence and session changes without replay (2.649369ms)
+✔ Host session or signed grant replacement rejects its pending lifecycle command (0.55624ms)
+✔ confirmation captured for Server A cannot send on Server B after an asynchronous switch (0.355044ms)
+✔ a confirmation cannot survive agent or grant replacement on the same Dashboard socket (0.262696ms)
+✔ action completion must match the original server, socket, action and source authority (0.437905ms)
+✔ legacy relay rejection without a server field is accepted only from its original bound socket (0.476389ms)
+✔ relay queue acknowledgement never reports an operation completed (1.050173ms)
+✔ file conflicts reject with structured status so unsaved edits can be retained (0.411379ms)
+✔ disconnect rejects uncertain completion and never replays the command (0.331019ms)
+✔ a stale socket cannot unbind the current authorized connection (0.287988ms)
+✔ active service disables Start and allows stop/restart (0.815699ms)
+✔ inactive service allows only Start (0.119699ms)
+✔ transitioning and unknown service states block lifecycle actions (0.143672ms)
+✔ failed service permits recovery Start but not stop/restart (0.098717ms)
+✔ Paper connection only fills missing service state and never overrides explicit inactive (0.116612ms)
+✔ known action codes map to safe actionable guidance (0.539134ms)
+✔ unknown action codes retain the sanitized agent message (0.199011ms)
+✔ lifecycle busy explains rejection without suggesting a deferred stop (0.154561ms)
+✔ safe diagnostics identify Dashboard 5.0.0 without changing protocol 3 (0.78526ms)
+✔ live actions are bound to the exact signed socket grant (10.207028ms)
+✔ preconfirmed maintenance actions are sent once with confirmation (2.179004ms)
+✔ Dashboard 5.0.0 exposes the active manual-only Backups workspace (6.893701ms)
+✔ Backups workspace is wired only to supported Host manual maintenance actions (1.698501ms)
+✔ Dashboard and relay expose identical maintenance/provider scopes (1.292349ms)
+✔ legacy backup.create scope remains compatibility-only and is not an active dashboard action (3.701599ms)
+✔ retired Paper coordination protocol cannot return (0.759566ms)
+✔ Dashboard 5.0.0 keeps protocol hooks compatible with a selected-server Configuration workspace (0.896008ms)
+✔ Dashboard visible version metadata matches package 5.0.0 (1.85913ms)
+✔ Dashboard 5.0.0 responsive architecture does not globally scale the interface (1.006185ms)
+✔ Step 8 Backups workspace has responsive production layout (1.274189ms)
+✔ Dashboard 5.0.0 display update rate exposes every supported browser cadence (1.367798ms)
+✔ foundation is global and the current workspace skin stays out of the development gallery (3.082511ms)
+{"component":"PlexonPanelRelay","runtime":"standalone","event":"started","host":"127.0.0.1","port":0,"storage":"coordination-only","version":"5.0.0","gitCommit":"unavailable","buildTimestamp":"unavailable","protocolVersion":3,"runtimeKind":"standalone"}
+▶ mounted Dashboard selects and operates independent signed instances without stale transitions
+  ✔ opening selector shows live named cards and remembers the selected server (921.268922ms)
+  ✔ switch resets data and confirmation before a second signed workspace becomes live (1041.065933ms)
+  ✔ rapid A to B to A dropdown switches establish a fresh live command channel (955.90034ms)
+  ✔ a delayed session grant for an abandoned selection cannot replace the current socket (1045.073795ms)
+  ✔ reload returns to the selector while preserving selection and independent page history (1950.758146ms)
+  ✔ confirmation binds the original server, action and command parameters even if the form changes (124.391922ms)
+  ✔ same-server target generation replacement cancels confirmation before dispatch (95.769515ms)
+  ✔ a completion from an abandoned server is never displayed in the selected workspace (1799.157612ms)
+  ✔ reported grant expansion cannot expand the verified signed grant or dispatch (1983.584058ms)
+  ✔ lifecycle commands complete across real signed Paper disconnect and reconnect events (8273.843122ms)
+  ✔ a busy stop stays visible in lifecycle controls without delayed or automatic replay (107.523532ms)
+  ✔ Owner configuration uses Paper editing, reviews changes and preserves conflicts and unsaved work (206.60615ms)
+  ✔ backup setup is instance-specific, unverified checks stay unknown and cached preflight cannot authorize a new job (7473.741107ms)
+  ✔ signed upload progress is shown for the active Host job and ignored for other jobs (723.201809ms)
+  ✔ cold backup review cancels without a command and confirms only the selected Host (1370.996985ms)
+  ✔ Host-confirmed stop, agent disconnect and relay disconnect are different UI states (223.64588ms)
+{"component":"PlexonPanelRelay","runtime":"standalone","code":"PEER_DELIVERY_FAILED","serverId":"3e3c9dfe-00c6-4130-a173-e27fa761387f","agentKind":"HOST","messageType":"paper.connection","error":"WebSocket send failed"}
+{"component":"PlexonPanelRelay","runtime":"standalone","code":"PEER_DELIVERY_FAILED","serverId":"28eb4bf7-b66e-45fb-92c8-a623a722ded8","agentKind":"HOST","messageType":"paper.connection","error":"WebSocket send failed"}
+  ✔ revoking one paired server keeps the other available and selectable (677.035653ms)
+✔ mounted Dashboard selects and operates independent signed instances without stale transitions (29177.489047ms)
+✔ device permissions use the intersection of signed and reported scopes (1.796925ms)
+✔ matching signed and reported grants remain fully available (0.189504ms)
+✔ device or role disagreements fail closed (0.139615ms)
+✔ active dashboard and access views consume the reconciled signed grant (20.970257ms)
+ℹ tests 54
+ℹ suites 0
+ℹ pass 54
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 40051.158026

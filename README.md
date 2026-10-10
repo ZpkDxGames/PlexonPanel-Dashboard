@@ -1,8 +1,8 @@
-# PlexonPanel Dashboard 5.0.0
+# PlexonPanel Dashboard 6.0.0
 
-PlexonPanel Dashboard is a responsive Next.js/Vercel control room for signed Protocol 3 PlexonPanel Paper and Host agents. Dashboard 5.0.0 preserves existing identity, pairing, immutable device grants, local Paper/Host policy authority, confirmation rules, and `/v1` transport while adding truthful live ZIP/upload progress and verified local cleanup.
+PlexonPanel Dashboard is a responsive Next.js/Vercel control room for signed Protocol 3 PlexonPanel Paper and Host agents. Dashboard 6.0.0 uses the shared Deepslate controls across every workspace, adds receipt-aware clock-skew warnings and copyable clock diagnostics, and preserves identity, immutable grants, signed actions, local policy and `/v1` transport.
 
-## Control Room 5.0.0
+## Control room 6.0.0
 
 Fleet is the global paired-instance view. Selected-server workspaces are Overview, Performance, Players, Console, Chat, Plugins, Server, Backups, Configuration, Audit, Access and Settings. Configuration exposes the existing permission-gated file workflow.
 

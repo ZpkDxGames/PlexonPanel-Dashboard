@@ -1,0 +1,181 @@
+{
+  "recordedAt": "2026-10-08T15:34:22.611Z",
+  "buildId": "R2qMbEzCng4u6Q6Fr8CAY",
+  "screenshotCount": 71,
+  "productionMatrix": {
+    "screenshots": 67,
+    "scans": 71,
+    "newShellScans": 67,
+    "newShellViolations": 0,
+    "retainedFleetFailures": [
+      {
+        "name": "retained-fleet-light-390",
+        "ids": [
+          "definition-list"
+        ]
+      },
+      {
+        "name": "retained-fleet-light-1280",
+        "ids": [
+          "definition-list"
+        ]
+      },
+      {
+        "name": "retained-fleet-dark-390",
+        "ids": [
+          "definition-list"
+        ]
+      },
+      {
+        "name": "retained-fleet-dark-1280",
+        "ids": [
+          "definition-list"
+        ]
+      }
+    ],
+    "contrastReviews": 389,
+    "referenceReviews": 118,
+    "browser": "153.0.8010.0",
+    "errors": [],
+    "keyboard": [
+      {
+        "theme": "light",
+        "width": 360,
+        "drawerTrap22Tabs": "passed",
+        "inert": "passed",
+        "focusRestore": "passed"
+      },
+      {
+        "theme": "light",
+        "width": 390,
+        "drawerTrap22Tabs": "passed",
+        "inert": "passed",
+        "focusRestore": "passed"
+      },
+      {
+        "theme": "light",
+        "width": 768,
+        "drawerTrap22Tabs": "passed",
+        "inert": "passed",
+        "focusRestore": "passed"
+      },
+      {
+        "theme": "dark",
+        "width": 360,
+        "drawerTrap22Tabs": "passed",
+        "inert": "passed",
+        "focusRestore": "passed"
+      },
+      {
+        "theme": "dark",
+        "width": 390,
+        "drawerTrap22Tabs": "passed",
+        "inert": "passed",
+        "focusRestore": "passed"
+      },
+      {
+        "theme": "dark",
+        "width": 768,
+        "drawerTrap22Tabs": "passed",
+        "inert": "passed",
+        "focusRestore": "passed"
+      },
+      {
+        "paletteKeyboardNavigation": "passed",
+        "gChord": "passed",
+        "typingIgnored": "passed",
+        "navigationMutations": 0
+      }
+    ]
+  },
+  "paintOrder": [
+    {
+      "theme": "light",
+      "width": 390,
+      "shellMark": 131.79999999981374,
+      "workspaceJSRequest": 134.01904296875,
+      "workspaceCSSRequests": [
+        {
+          "url": "http://127.0.0.1:3430/_next/static/chunks/2qygp-ahd764z.css",
+          "start": 133.673095703125
+        }
+      ],
+      "shellVisible": true,
+      "workspaceMountedAtGate": false
+    },
+    {
+      "theme": "light",
+      "width": 1280,
+      "shellMark": 105.20000000018626,
+      "workspaceJSRequest": 106.880126953125,
+      "workspaceCSSRequests": [
+        {
+          "url": "http://127.0.0.1:3430/_next/static/chunks/2qygp-ahd764z.css",
+          "start": 106.65673828125
+        }
+      ],
+      "shellVisible": true,
+      "workspaceMountedAtGate": false
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "shellMark": 103.20000000018626,
+      "workspaceJSRequest": 105.364013671875,
+      "workspaceCSSRequests": [
+        {
+          "url": "http://127.0.0.1:3430/_next/static/chunks/2qygp-ahd764z.css",
+          "start": 105.11083984375
+        }
+      ],
+      "shellVisible": true,
+      "workspaceMountedAtGate": false
+    },
+    {
+      "theme": "dark",
+      "width": 1280,
+      "shellMark": 160.59999999962747,
+      "workspaceJSRequest": 162.6201171875,
+      "workspaceCSSRequests": [
+        {
+          "url": "http://127.0.0.1:3430/_next/static/chunks/2qygp-ahd764z.css",
+          "start": 162.343017578125
+        }
+      ],
+      "shellVisible": true,
+      "workspaceMountedAtGate": false
+    }
+  ],
+  "layoutShift": {
+    "sampleCount": 8,
+    "maximumShell": 0.010397404241848688,
+    "mobileLegacyFleetRange": [
+      0.08706407090851535,
+      0.08943066793289015
+    ],
+    "desktopLegacyFleetRange": [
+      0.037312960645887586,
+      0.03909698978000217
+    ]
+  },
+  "bundles": {
+    "before": {
+      "bytes": 701911,
+      "gzipBytes": 217425
+    },
+    "after": {
+      "bytes": 658963,
+      "gzipBytes": 205063
+    },
+    "initialGzipPercentChange": -5.685638725997466,
+    "beforeAll": {
+      "bytes": 895235,
+      "gzipBytes": 278323
+    },
+    "afterAll": {
+      "bytes": 999397,
+      "gzipBytes": 314203
+    },
+    "allGzipPercentChange": 12.89149657053137
+  }
+}

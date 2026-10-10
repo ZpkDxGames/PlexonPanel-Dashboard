@@ -1,0 +1,22 @@
+{
+  "task": "Server",
+  "environment": "Chromium, signed local relay, simulated agents; no live-server certification",
+  "status": "passed",
+  "screenshots": [
+    "server-light-390.png",
+    "server-light-1280.png",
+    "server-dark-390.png",
+    "server-dark-1280.png"
+  ],
+  "axe": [
+    {
+      "workspace": "Server",
+      "violations": []
+    }
+  ],
+  "keyboard": [
+    "Refresh Host status with Enter; lifecycle dispatch not executed",
+    "Restart bound confirmation with Enter; Escape restores focus; dispatch not executed"
+  ],
+  "errors": []
+}

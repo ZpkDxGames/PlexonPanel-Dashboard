@@ -1,0 +1,44 @@
+✔ Host lifecycle completion survives Paper presence and session changes without replay (2.396131ms)
+✔ Host session or signed grant replacement rejects its pending lifecycle command (0.551563ms)
+✔ confirmation captured for Server A cannot send on Server B after an asynchronous switch (0.357046ms)
+✔ a confirmation cannot survive agent or grant replacement on the same Dashboard socket (0.282916ms)
+✔ action completion must match the original server, socket, action and source authority (0.469742ms)
+✔ legacy relay rejection without a server field is accepted only from its original bound socket (1.062645ms)
+✔ relay queue acknowledgement never reports an operation completed (0.402238ms)
+✔ file conflicts reject with structured status so unsaved edits can be retained (0.394185ms)
+✔ disconnect rejects uncertain completion and never replays the command (0.311418ms)
+✔ a stale socket cannot unbind the current authorized connection (0.288666ms)
+{"component":"PlexonPanelRelay","runtime":"standalone","event":"started","host":"127.0.0.1","port":0,"storage":"coordination-only","version":"5.0.0","gitCommit":"unavailable","buildTimestamp":"unavailable","protocolVersion":3,"runtimeKind":"standalone"}
+▶ mounted Dashboard selects and operates independent signed instances without stale transitions
+  ✔ opening selector shows live named cards and remembers the selected server (912.464718ms)
+  ✔ switch resets data and confirmation before a second signed workspace becomes live (1051.687292ms)
+  ✔ rapid A to B to A dropdown switches establish a fresh live command channel (939.705693ms)
+  ✔ a delayed session grant for an abandoned selection cannot replace the current socket (1061.422435ms)
+  ✔ reload returns to the selector while preserving selection and independent page history (1952.569285ms)
+  ✔ confirmation binds the original server, action and command parameters even if the form changes (106.063803ms)
+  ✔ same-server target generation replacement cancels confirmation before dispatch (112.572825ms)
+  ✔ a completion from an abandoned server is never displayed in the selected workspace (1775.455086ms)
+  ✔ reported grant expansion cannot expand the verified signed grant or dispatch (2002.260053ms)
+  ✔ lifecycle commands complete across real signed Paper disconnect and reconnect events (8101.478645ms)
+  ✔ a busy stop stays visible in lifecycle controls without delayed or automatic replay (96.164836ms)
+  ✔ Owner configuration uses Paper editing, reviews changes and preserves conflicts and unsaved work (214.313132ms)
+  ✔ backup setup is instance-specific, unverified checks stay unknown and cached preflight cannot authorize a new job (7658.310002ms)
+  ✔ signed upload progress is shown for the active Host job and ignored for other jobs (733.808264ms)
+  ✔ cold backup review cancels without a command and confirms only the selected Host (1372.594648ms)
+  ✔ Host-confirmed stop, agent disconnect and relay disconnect are different UI states (226.491848ms)
+{"component":"PlexonPanelRelay","runtime":"standalone","code":"PEER_DELIVERY_FAILED","serverId":"d079600f-8140-45d7-a0cd-5d363cdcffd3","agentKind":"HOST","messageType":"paper.connection","error":"WebSocket send failed"}
+{"component":"PlexonPanelRelay","runtime":"standalone","code":"PEER_DELIVERY_FAILED","serverId":"8ff2d37a-72e1-4224-9e2e-19dc520e44af","agentKind":"HOST","messageType":"paper.connection","error":"WebSocket send failed"}
+  ✔ revoking one paired server keeps the other available and selectable (653.895495ms)
+✔ mounted Dashboard selects and operates independent signed instances without stale transitions (29167.07373ms)
+✔ device permissions use the intersection of signed and reported scopes (1.403093ms)
+✔ matching signed and reported grants remain fully available (0.186271ms)
+✔ device or role disagreements fail closed (0.148887ms)
+✔ active dashboard and access views consume the reconciled signed grant (5.518492ms)
+ℹ tests 32
+ℹ suites 0
+ℹ pass 32
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 39787.942269

@@ -11,6 +11,8 @@ import {
 import type { EffectiveDeviceGrant } from "../lib/device-grant";
 export interface ViewProps {
   state: ControlState;
+  pulseWindowEndAt?: number;
+  navigate?: (section: import("../lib/workspace-navigation").Section) => void;
   deviceGrant?: EffectiveDeviceGrant;
   can: (action: string, kind?: "PAPER" | "HOST") => boolean;
   run: (
@@ -22,6 +24,7 @@ export interface ViewProps {
   notice: (message: string) => void;
   connected: boolean;
   setUnsaved?: (dirty: boolean) => void;
+  observeBackupPhase?: (jobId: string, phase: string) => void;
 }
 export function bytes(value: unknown): string {
   const n = number(value);
@@ -48,80 +51,6 @@ export function duration(value: unknown): string {
   return minutes < 60
     ? `${minutes}m`
     : `${Math.floor(minutes / 60)}h ${minutes % 60}m`;
-}
-export function Badge({
-  children,
-  tone = "quiet",
-}: {
-  children: React.ReactNode;
-  tone?: string;
-}) {
-  return <span className={`ui-badge ${tone}`}>{children}</span>;
-}
-export function Panel({
-  title,
-  aside,
-  children,
-  className = "",
-}: {
-  title: string;
-  aside?: React.ReactNode;
-  children: React.ReactNode;
-  className?: string;
-}) {
-  return (
-    <section className={`ui-panel ${className}`}>
-      <div className="ui-panel-head">
-        <h2>{title}</h2>
-        {aside}
-      </div>
-      {children}
-    </section>
-  );
-}
-export function Empty({
-  title,
-  children,
-}: {
-  title: string;
-  children?: React.ReactNode;
-}) {
-  return (
-    <div className="ui-empty">
-      <span className="ui-empty-mark" aria-hidden>
-        ◇
-      </span>
-      <h3>{title}</h3>
-      {children && <p>{children}</p>}
-    </div>
-  );
-}
-export function ActionButton({
-  children,
-  onClick,
-  danger = false,
-  disabled = false,
-}: {
-  children: React.ReactNode;
-  onClick: () => Promise<unknown>;
-  danger?: boolean;
-  disabled?: boolean;
-}) {
-  const [busy, setBusy] = useState(false);
-  return (
-    <button
-      className={danger ? "ui-button danger" : "ui-button"}
-      disabled={busy || disabled}
-      onClick={() => {
-        setBusy(true);
-        void onClick()
-          .catch(() => {})
-          .finally(() => setBusy(false));
-      }}
-    >
-      {busy ? "Working…" : children}
-    </button>
-  );
 }
 export function useQuery(
   action: string,
@@ -187,26 +116,4 @@ export function ratio(a: unknown, b: unknown) {
   const x = number(a),
     y = number(b);
   return x !== null && y !== null && y > 0 ? (x / y) * 100 : null;
-}
-export function Agent({
-  name,
-  online,
-  detail,
-}: {
-  name: string;
-  online: boolean;
-  detail: string;
-}) {
-  return (
-    <div className="ui-agent">
-      <span className={`ui-dot ${online ? "online" : ""}`} />
-      <div>
-        <strong>{name}</strong>
-        <small>{detail}</small>
-      </div>
-      <Badge tone={online ? "green" : "quiet"}>
-        {online ? "Connected" : "Disconnected"}
-      </Badge>
-    </div>
-  );
 }

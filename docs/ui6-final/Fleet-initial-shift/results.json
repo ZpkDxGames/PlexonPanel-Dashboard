@@ -1,0 +1,59 @@
+{
+  "task": "Fleet",
+  "environment": "Chromium, signed local relay, simulated agents; no live-server certification",
+  "status": "passed",
+  "screenshots": [
+    "fleet-light-390.png",
+    "fleet-light-1280.png",
+    "fleet-dark-390.png",
+    "fleet-dark-1280.png"
+  ],
+  "axe": [
+    {
+      "workspace": "Fleet",
+      "violations": []
+    }
+  ],
+  "keyboard": [
+    "List/grid and open instance with Enter"
+  ],
+  "errors": [],
+  "fleetHydration": [
+    {
+      "theme": "light",
+      "shifts": [
+        {
+          "value": 0.0004849002849002849,
+          "fleet": false
+        },
+        {
+          "value": 0.02330820512820513,
+          "fleet": true
+        },
+        {
+          "value": 0.00006169040835707502,
+          "fleet": true
+        }
+      ],
+      "fleetShift": 0.023369895536562203
+    },
+    {
+      "theme": "dark",
+      "shifts": [
+        {
+          "value": 0.0004849002849002849,
+          "fleet": false
+        },
+        {
+          "value": 0.020528110161443496,
+          "fleet": true
+        },
+        {
+          "value": 0.0008814814814814816,
+          "fleet": true
+        }
+      ],
+      "fleetShift": 0.02140959164292498
+    }
+  ]
+}

@@ -1,7 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Badge, Empty, Panel, time, type ViewProps } from "./control-views";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { time, type ViewProps } from "./control-views";
+import { Badge, Button, DisabledReason, Empty, PageHeader, Panel, SourceFacts } from "./ui/workspace";
+import { Disclosure } from "./ui/primitives";
 import { str, type JsonMap } from "../lib/control-state";
 
 const RETENTION_NOTICE =
@@ -51,24 +53,23 @@ function mergeConsoleLines(history: JsonMap[], live: JsonMap[]): JsonMap[] {
   });
 }
 
-function consoleSourceLabel(props: ViewProps): string {
-  if (!props.connected) return "Reconnecting";
-  const ready = props.state.ready;
-  if (ready?.consoleAuthority === "PAPER_FALLBACK") return "Paper • Live fallback";
-  if (ready?.consoleAuthority === "UNAVAILABLE") return "Console unavailable";
-  if (!ready?.agents.host) return "Host offline";
-  if (ready.consoleSourceState === "RECOVERING") return "Host • History replay";
-  if (ready.consoleSourceState === "RESTARTING") return "Host • Reconnecting";
-  if (ready.consoleSourceState === "JOURNAL_PERMISSION_DENIED")
-    return "Host • Permission required";
-  if (ready.consoleSourceState === "JOURNAL_UNAVAILABLE") return "Host • Console unavailable";
-  if (ready.consoleSourceState === "STARTING") return "Host • Starting";
-  if (ready.consoleSourceState === "DISABLED") return "Host • Console disabled";
-  if (ready.consoleSourceState === "STOPPED") return "Host • Console stopped";
-  return "Host • Journal";
+function consoleSourceLabel(props:ViewProps):string {
+  if(!props.connected)return 'UNAVAILABLE';
+  if(props.state.ready?.consoleAuthority==='PAPER_FALLBACK'&&props.state.ready.agents.paper)return 'PAPER fallback';
+  if(props.state.ready?.consoleAuthority==='HOST'&&props.state.ready.agents.host)return 'HOST';
+  return 'UNAVAILABLE';
+}
+function highlight(content:string,query:string):ReactNode {
+  if(!query)return content;
+  const parts:ReactNode[]=[];const needle=query.toLowerCase();let cursor=0;let found=content.toLowerCase().indexOf(needle);
+  while(found!==-1){parts.push(content.slice(cursor,found),<mark key={found}>{content.slice(found,found+query.length)}</mark>);cursor=found+query.length;found=content.toLowerCase().indexOf(needle,cursor);}
+  parts.push(content.slice(cursor));return parts;
 }
 
 export function ConsoleView(props: ViewProps) {
+  const [windowOffset,setWindowOffset]=useState(0);
+  const [matchIndex,setMatchIndex]=useState(0);
+  const [executing,setExecuting]=useState(false);
   const [search, setSearch] = useState("");
   const [level, setLevel] = useState("ALL");
   const [fromDate, setFromDate] = useState("");
@@ -127,6 +128,16 @@ export function ConsoleView(props: ViewProps) {
         .slice(-2500),
     [source, clearAt, level, search],
   );
+
+  const windowEnd=Math.max(0,entries.length-(followTail?0:Math.min(windowOffset,Math.max(0,entries.length-250))));
+  const windowStart=Math.max(0,windowEnd-250);
+  const renderedEntries=entries.slice(windowStart,windowEnd);
+  const moveMatch=(direction:-1|1)=>{
+    if(!entries.length)return;
+    const next=(matchIndex+direction+entries.length)%entries.length;
+    setMatchIndex(next);setFollowTail(false);setWindowOffset(Math.max(0,entries.length-next-250));
+    requestAnimationFrame(()=>viewport.current?.querySelector<HTMLElement>(`[data-console-index="${next}"]`)?.focus());
+  };
 
   useEffect(() => {
     const requests = historyGeneration;
@@ -199,6 +210,7 @@ export function ConsoleView(props: ViewProps) {
       setUnseenLines(0);
     } else if (!paused && delta > 0) {
       setUnseenLines((current) => Math.min(2500, current + delta));
+      setWindowOffset(current=>Math.min(Math.max(0,entries.length-250),current+delta));
     }
   }, [entries.length, followTail, paused, source.length]);
 
@@ -209,6 +221,7 @@ export function ConsoleView(props: ViewProps) {
 
   const jumpToTail = () => {
     setFollowTail(true);
+    setWindowOffset(0);
     setUnseenLines(0);
     requestAnimationFrame(() => {
       if (viewport.current)
@@ -270,70 +283,64 @@ export function ConsoleView(props: ViewProps) {
     .join("\n");
 
   return (
-    <div className="view-console-stack">
-      <div className="workspace-filter-toolbar view-console-toolbar">
-        <label className="ui-search">
-          <span className="sr-only">Search console output</span>
+    <div className="pp-workspace" data-ui6-workspace="Console">
+      <PageHeader title="Server console" description={sourceLabel==='HOST'?'Host journal output. Commands run through Paper.':sourceLabel==='PAPER fallback'?'Paper live fallback. Retained queries use Host.':'Live console source unavailable; loaded history stays readable.'} primary={<Button variant="primary" onClick={()=>{setPaused(paused?null:[...combined]);setUnseenLines(0);}}>{paused?'Resume local view':'Pause local view'}</Button>}/>
+
+      <div className="pp-toolbar pp-sticky-toolbar">
+        <label className="pp-field">
+          <span>Search console output</span>
           <input
             value={search}
-            onChange={(event) => setSearch(event.target.value)}
+            onChange={(event) => {setSearch(event.target.value);setWindowOffset(0);setMatchIndex(0);}}
             placeholder="Search loaded lines"
           />
         </label>
-        <div className="workspace-segmented" aria-label="Console severity filter">
+        <div className="pp-segmented" aria-label="Console severity filter">
           {["ALL", "INFO", "WARN", "ERROR"].map((value) => (
-            <button
+            <Button
               key={value}
               type="button"
               aria-pressed={level === value}
               onClick={() => setLevel(value)}
             >
-              {value}
-            </button>
+              {value==='ALL'?'All levels':value}
+            </Button>
           ))}
         </div>
         <label>History from <input type="date" value={fromDate} onChange={(event) => setFromDate(event.target.value)} /></label>
         <label>History to <input type="date" value={toDate} onChange={(event) => setToDate(event.target.value)} /></label>
-        <button
-          className="ui-button"
-          onClick={() => {
-            setPaused(paused ? null : [...combined]);
-            setUnseenLines(0);
-          }}
-        >
-          {paused ? "Resume" : "Pause"}
-        </button>
-        <button
-          className="ui-button"
+        {search&&<div className="pp-row"><Button disabled={!entries.length} disabledReason="No loaded matches." onClick={()=>moveMatch(-1)}>Previous match</Button><Button disabled={!entries.length} disabledReason="No loaded matches." onClick={()=>moveMatch(1)}>Next match</Button><span className="pp-muted">{entries.length?Math.min(matchIndex+1,entries.length):0} / {entries.length} loaded matches</span></div>}
+        <Button
+
           disabled={!hostOnline || !historyAction || historyBusy || historyKeyLoaded !== historyKey || !historyHasMore}
           onClick={() => void loadOlder()}
         >
           {historyBusy ? "Loading history…" : historyHasMore ? "Load older history" : "No older history"}
-        </button>
-        <button className="ui-button" disabled={!hostOnline || !historyAction || historyBusy}
+        </Button>
+        <Button  disabled={!hostOnline || !historyAction || historyBusy}
           onClick={() => { setClearAt(0); setHistoryRefresh((value) => value + 1); }}>
           Reload retained history
-        </button>
-        <details className="workspace-menu">
-          <summary className="ui-button">Display</summary>
-          <div>
-            <button onClick={() => setTimestamps(!timestamps)}>
+        </Button>
+        <details className="pp-disclosure">
+          <summary>More</summary>
+          <div className="pp-stack">
+            <Button onClick={() => setTimestamps(!timestamps)}>
               {timestamps ? "Hide timestamps" : "Show timestamps"}
-            </button>
-            <button onClick={() => setWrap(!wrap)}>
+            </Button>
+            <Button onClick={() => setWrap(!wrap)}>
               {wrap ? "Disable wrapping" : "Enable wrapping"}
-            </button>
-            <button
+            </Button>
+            <Button
               disabled={!entries.length}
               onClick={() =>
                 void navigator.clipboard
                   .writeText(visibleText)
-                  .then(() => props.notice("Visible console lines copied."))
+                  .then(() => props.notice("Loaded console matches copied."))
               }
             >
-              Copy visible lines
-            </button>
-            <button
+              Copy loaded matches
+            </Button>
+            <Button
               disabled={!entries.length}
               onClick={() =>
                 downloadText(
@@ -342,9 +349,9 @@ export function ConsoleView(props: ViewProps) {
                 )
               }
             >
-              Export visible log
-            </button>
-            <button
+              Export loaded log
+            </Button>
+            <Button
               onClick={() => {
                 setClearAt(Date.now());
                 setHistorical([]);
@@ -355,7 +362,7 @@ export function ConsoleView(props: ViewProps) {
               }}
             >
               Clear local display
-            </button>
+            </Button>
           </div>
         </details>
         <Badge>{entries.length} lines</Badge>
@@ -363,48 +370,56 @@ export function ConsoleView(props: ViewProps) {
 
       <Panel
         title="Live console"
-        className="view-console-panel"
+        className="pp-stack"
         aside={
-          <div className="workspace-panel-badges">
+          <div className="pp-row">
             {paused && <Badge tone="amber">View paused</Badge>}
             {!followTail && !paused && <Badge tone="quiet">Reading history</Badge>}
-            <Badge tone={sourceLabel === "Host • Journal" ? "green" : "amber"}>
+            <Badge tone={sourceLabel === "HOST" ? "green" : "amber"}>
               {sourceLabel}
             </Badge>
           </div>
         }
       >
+        <Disclosure title="Source, history and local controls">
         {!hostOnline && (
-          <p className="ui-hint ui-pad view-console-offline-note">
+          <p className="pp-muted">
             Host Companion is offline. Live output can continue through the bounded Paper fallback
             when it is enabled; retained history becomes available again only after Host reconnects.
           </p>
         )}
         {hostOnline && !paperOnline && (
-          <p className="ui-hint ui-pad view-console-offline-note">
+          <p className="pp-muted">
             Paper is offline. Host-owned live output and retained journald history remain available;
             command input unlocks after Paper is ready.
           </p>
         )}
-        <p className="ui-hint ui-pad view-console-offline-note">
+        <p className="pp-muted">
           {historyNotice} History date and severity filters run on Host; live lines remain visible. Historical requests return at most 100 lines per page; this view holds at most 1,800 loaded history lines. Search, copy and export cover loaded visible lines only.
           {!historyAction && " This device does not have a Host console-history scope."}
         </p>
         {historyError && (
-          <p className="ui-hint ui-pad view-console-offline-note" role="status">
+          <p className="pp-muted" role="status">
             {historyError}
           </p>
         )}
-        <div className="view-console-viewport-wrap">
+        <p className="pp-muted">Pause is local. Clears this view only. Server logs are not deleted. Copy and export include every filtered loaded line, including lines outside the rendered window.</p>
+        <SourceFacts source="Host journal or declared Paper live fallback" unit="log lines" receivedAt={props.state.updatedAt}/><p className="pp-muted">Each line carries its supplied capture time; per-line received-at timestamps are not retained.</p>
+        <p className="pp-muted">Declared source state: {props.state.ready?.consoleSourceState??'not supplied'}. Search and display controls are local; history date and severity queries use Host.</p>
+        </Disclosure>
+        <div className="pp-row"><span className="pp-muted">Lines {entries.length?windowStart+1:0}–{windowEnd} of {entries.length} loaded.</span><Button disabled={windowStart===0} disabledReason="You are at the earliest loaded line." onClick={()=>{setFollowTail(false);setWindowOffset(current=>Math.min(Math.max(0,entries.length-250),current+250));}}>Show earlier loaded lines</Button><Button disabled={windowOffset===0} disabledReason="You are at the latest loaded line." onClick={()=>setWindowOffset(current=>Math.max(0,current-250))}>Show later loaded lines</Button></div>
+        <div className="pp-stack pp-log-surface">
           <div
-            className={`ui-console workspace-console ${wrap ? "wrap" : "nowrap"}`}
+            className={`pp-log-pane ${wrap ? "wrap" : "nowrap"}`}
+            aria-label="Loaded console output"
+            tabIndex={0}
             ref={viewport}
             role="log"
             aria-live="off"
             onScroll={() => {
               const element = viewport.current;
               if (!element || paused) return;
-              if (atConsoleTail(element)) {
+              if (atConsoleTail(element) && windowOffset===0) {
                 if (!followTail) setFollowTail(true);
                 if (unseenLines) setUnseenLines(0);
               } else if (followTail) {
@@ -413,7 +428,8 @@ export function ConsoleView(props: ViewProps) {
             }}
           >
             {entries.length ? (
-              entries.map((line, index) => {
+              renderedEntries.map((line, visibleIndex) => {
+                const index=windowStart+visibleIndex;
                 const invocation = str(line.invocationId, ""),
                   previousInvocation =
                     index > 0 ? str(entries[index - 1].invocationId, "") : "",
@@ -423,29 +439,29 @@ export function ConsoleView(props: ViewProps) {
                     content,
                   );
                 return (
-                  <div className="view-console-entry" key={lineKey(line, index)}>
+                  <div className="pp-console-entry" data-console-index={index} tabIndex={-1} key={lineKey(line, index)}>
                     {showSession && (
-                      <div className="view-console-session" role="separator">
+                      <div className="pp-log-session" role="separator">
                         <strong>{str(props.state.ready?.server.serverName, "Minecraft")} startup</strong>
                         <span>{time(line.capturedAt)}</span>
                         <code>Session {invocation.slice(0, 8)}…</code>
                       </div>
                     )}
                     <div
-                      className={`ui-console-line ${str(line.level).toLowerCase()} ${dataGap ? "gap" : ""}`}
+                      className={`pp-console-line ${str(line.level).toLowerCase()} ${dataGap ? "gap" : ""}`}
                     >
                       {timestamps && <time>{time(line.capturedAt)}</time>}
                       <span>{str(line.level)}</span>
                       <code>
-                        {content.replace(
+                        {highlight(content.replace(
                           new RegExp(
                             String.fromCharCode(27) + "\\[[0-?]*[ -/]*[@-~]",
                             "g",
                           ),
                           "",
-                        )}
+                        ),search)}
                       </code>
-                      <button
+                      <Button
                         title="Copy line"
                         aria-label="Copy console line"
                         onClick={() =>
@@ -455,7 +471,7 @@ export function ConsoleView(props: ViewProps) {
                         }
                       >
                         Copy
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 );
@@ -469,23 +485,23 @@ export function ConsoleView(props: ViewProps) {
             )}
           </div>
           {!paused && !followTail && (
-            <button className="view-console-new-lines" onClick={jumpToTail}>
+            <Button variant="primary" onClick={jumpToTail}>
               {unseenLines > 0
-                ? `${unseenLines} new line${unseenLines === 1 ? "" : "s"}`
-                : "Return to live tail"}
-            </button>
+                ? `${unseenLines} new line${unseenLines === 1 ? "" : "s"}. Jump to latest`
+                : "Jump to latest"}
+            </Button>
           )}
-        </div>
 
-        {canExecute ? (
+        {(
           <form
-            className="ui-command view-command-bar"
+            className="pp-composer view-command-bar"
             onSubmit={(event) => {
               event.preventDefault();
               if (!commandAvailable) return;
               const value = command.trim();
               if (!value) return;
               setCommand("");
+              setExecuting(true);
               void props
                 .run("console.execute", { command: value, confirmed: true })
                 .then((result) => {
@@ -504,10 +520,10 @@ export function ConsoleView(props: ViewProps) {
                     );
                   setHistoryIndex(-1);
                 })
-                .catch(() => {});
+                .catch(() => {}).finally(()=>setExecuting(false));
             }}
           >
-            <span aria-hidden>›</span>
+            <label className="pp-field">Paper command
             <input
               value={command}
               disabled={!commandAvailable}
@@ -536,31 +552,29 @@ export function ConsoleView(props: ViewProps) {
               }
               aria-label="Console command"
             />
-            <button
-              className="ui-button primary"
+            </label><Button type="submit" variant="primary" busy={executing}
+              disabledReason={!paperOnline?"Paper is offline. History remains readable.":!canExecute?"Read-only console. Command execution requires a locally enabled capability and device scope.":"Enter an allowlisted command."}
               disabled={!commandAvailable || !command.trim()}
             >
-              Run
-            </button>
+              {executing?"Waiting for signed result…":"Run"}
+            </Button>
           </form>
-        ) : (
-          <p className="ui-hint ui-pad">
-            Read-only console. Command execution requires a locally enabled capability and device
-            scope.
-          </p>
         )}
+        {!commandAvailable&&<DisabledReason reason={!paperOnline?'Paper is offline. History remains readable.':'Read-only console. Command execution requires a locally enabled capability and device scope.'}/>}
+        </div>
+
       </Panel>
 
       {output.length > 0 && (
         <Panel title="Latest command result">
-          <pre className="ui-output">{output.join("\n")}</pre>
+          <pre className="pp-output">{output.join("\n")}</pre>
         </Panel>
       )}
-      <p className="ui-hint view-console-authority">
+      <Disclosure title="Console authority"><p className="pp-muted">
         Output source: {sourceLabel}. Host owns retained history and is preferred for live capture;
         Paper owns command execution and provides only bounded, non-persistent live fallback.
         Clearing the view remains browser-local and never deletes journal entries.
-      </p>
+      </p></Disclosure>
     </div>
   );
 }

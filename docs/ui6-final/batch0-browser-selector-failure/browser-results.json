@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "sourceCommit": "b2879746d01a8ed3166479d466f86b8e5e5aa6f0",
+  "capturedAt": "2026-10-09T04:59:05.970Z",
+  "environment": "Chromium / local Next development server / signed standalone relay / simulated agents",
+  "widths": [
+    360,
+    390,
+    768,
+    1024,
+    1440,
+    1920
+  ],
+  "views": [
+    {
+      "name": "Fleet",
+      "width": 360,
+      "theme": "light",
+      "scroll": 360,
+      "nodes": 531
+    },
+    {
+      "name": "Fleet",
+      "width": 390,
+      "theme": "light",
+      "scroll": 390,
+      "nodes": 531
+    },
+    {
+      "name": "Fleet",
+      "width": 768,
+      "theme": "light",
+      "scroll": 768,
+      "nodes": 531
+    },
+    {
+      "name": "Fleet",
+      "width": 1024,
+      "theme": "light",
+      "scroll": 1024,
+      "nodes": 531
+    },
+    {
+      "name": "Fleet",
+      "width": 1440,
+      "theme": "light",
+      "scroll": 1440,
+      "nodes": 531
+    },
+    {
+      "name": "Fleet",
+      "width": 1920,
+      "theme": "light",
+      "scroll": 1920,
+      "nodes": 531
+    }
+  ],
+  "errors": [],
+  "accessibility": [],
+  "interactions": [],
+  "browserVersion": "153.0.8010.0",
+  "status": "FAIL",
+  "failure": "locator.click: Timeout 20000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.workspace-nav').getByRole('button', { name: 'Overview', exact: true })\u001b[22m\n"
+}

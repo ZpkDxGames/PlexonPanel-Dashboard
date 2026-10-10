@@ -116,3 +116,37 @@ test("system resolution honors reduced motion as a safety floor", () => {
     "off",
   );
 });
+
+test('OS theme and cyan defaults apply only when the v1 key is absent', () => {
+  assert.equal(loadUiPreferences(storage()).theme, 'system');
+  assert.equal(loadUiPreferences(storage()).accent, 'cyan');
+  for (const raw of ['', '{', '{}', 'null', '[]', 'true', 'x'.repeat(9000)]) {
+    const loaded = loadUiPreferences(storage({[UI_PREFERENCES_KEY]:raw,'plexonpanel-density':'spacious'}));
+    assert.equal(loaded.theme, 'light',raw);
+    assert.equal(loaded.accent, 'monochrome',raw);
+    assert.equal(loaded.density, 'compact',raw);
+  }
+});
+
+test('all saved accents and complete existing preference values survive additive loading', () => {
+  for(const accent of ['monochrome','cyan','violet','emerald','amber']) {
+    const saved={...createDefaultUiPreferences(true),theme:'dark',accent,contrast:'high',density:'spacious',textScale:125,mobilePlayerRows:'table',playerHeadSize:'small',playerUuid:'full',liveRowHighlight:false,chartWindowMinutes:30,chartStyle:'line',chartGrid:false,chartLayout:'double',timeZone:'utc',motion:'off',livePulse:false,pageTransitions:false,displayUpdateRateMs:0};
+    const local=storage({[UI_PREFERENCES_KEY]:JSON.stringify(saved)});
+    assert.deepEqual(loadUiPreferences(local,true),saved);
+    saveUiPreferences(local,loadUiPreferences(local,true));
+    assert.deepEqual(JSON.parse(local.value(UI_PREFERENCES_KEY)),saved);
+  }
+  assert.equal(loadUiPreferences(storage({[UI_PREFERENCES_KEY]:'{"accent":"amber"}'})).theme,'light');
+});
+
+test('before-paint preference initializer matches the runtime parser for absent and saved keys',async()=>{
+  const {readFile}=await import('node:fs/promises');const {runInNewContext}=await import('node:vm');
+  const source=await readFile('public/ui-preferences-init.js','utf8');
+  for(const raw of [null,'','{','{}','null','[]','true','x'.repeat(9000),JSON.stringify({theme:'dark',accent:'violet',density:'spacious',contrast:'high',motion:'off',textScale:125})])for(const dark of [false,true]) {
+    const local=storage({...raw===null?{}:{[UI_PREFERENCES_KEY]:raw},'plexonpanel-density':'comfortable'});
+    const root={dataset:{}};
+    runInNewContext(source,{document:{documentElement:root},localStorage:local,window:{matchMedia:query=>({matches:query.includes('color-scheme')?dark:query.includes('reduced-motion')})}});
+    const loaded=loadUiPreferences(local);const resolved=resolveUiPresentation(loaded,{dark,highContrast:false,reducedMotion:true});
+    assert.deepEqual({...root.dataset},{plexonTheme:resolved.theme,plexonAccent:loaded.accent,plexonContrast:resolved.contrast,plexonDensity:loaded.density,plexonTextScale:String(loaded.textScale),plexonMotion:resolved.motion});
+  }
+});

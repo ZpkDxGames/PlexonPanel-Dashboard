@@ -1,0 +1,41 @@
+@layer workspaces {
+.tick-pulse { min-width: 0; font-variant-numeric: tabular-nums; }
+.pulse-heading { display: flex; align-items: center; flex-wrap: wrap; gap: var(--ds-space-3); margin-bottom: var(--ds-space-3); }
+.pulse-heading > strong, .pulse-heading > h2 { margin: 0; font-size: var(--ds-type-subhead); }
+.pulse-actions { margin-left: auto; display: flex; flex-wrap: wrap; align-items: end; gap: var(--ds-space-3); }
+.pulse-actions .pp-field { min-width: min(var(--ds-control-min),100%); }
+.pulse-mode { color: var(--ds-text); font-weight: var(--ds-weight-heading); }
+.pulse-mode > span { color: var(--ds-muted); font-weight: var(--ds-weight-body); margin-left: var(--ds-space-2); }
+.pulse-count { display: inline-block; min-inline-size: 5ch; font-weight: var(--ds-weight-body); }
+.pulse-cursor { position: absolute; inset-block: 0; border-left: var(--ds-focus-width) solid var(--ds-text); pointer-events: none; }
+.pulse-scale time { min-inline-size: 12ch; }
+.pulse-scale time:last-child { text-align: right; }
+.pulse-plot { position: relative; min-width: 0; }
+.pulse-inspect { min-block-size:var(--ds-touch); display: block; padding: 0; width: 100%; border: var(--ds-line) solid var(--ds-boundary); background: var(--ds-sunken); cursor: crosshair; }
+.pulse-inspect:disabled { cursor: default; }
+.pulse-inspect canvas { display: block; width: 100%; }
+.pulse-scale { display: flex; justify-content: space-between; flex-wrap: wrap; gap: var(--ds-space-2); color: var(--ds-muted); font-size: var(--ds-type-small); margin-top: var(--ds-space-2); }
+.pulse-legend { display: flex; flex-wrap: wrap; gap: var(--ds-space-3); font-size: var(--ds-type-small); margin-block: var(--ds-space-3); }
+.pulse-help { font-size: var(--ds-type-small); margin: 0; }
+.pulse-tooltip { position: absolute; z-index: var(--ds-z-float); right: 0; top: 100%; width: min(var(--ds-float-width),100%); padding: var(--ds-space-4); background: var(--ds-raised); border: var(--ds-line) solid var(--ds-boundary); box-shadow: var(--ds-float-shadow); pointer-events: none; }
+.pulse-facts { display: grid; gap: var(--ds-space-2); margin: 0; font-variant-numeric: tabular-nums; }
+.pulse-facts > div { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,2fr); gap: var(--ds-space-3); }
+.pulse-facts dt { color: var(--ds-muted); }
+.pulse-facts dd { margin: 0; overflow-wrap: anywhere; }
+.pulse-lens { width: min(var(--ds-page-width),calc(100vw - var(--ds-space-7))); }
+.pulse-lens-controls { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--ds-space-2); padding-block: var(--ds-space-4); }
+.pulse-lens-strip { display: flex; gap: var(--ds-space-1); overflow: auto; }
+.pulse-lens-strip button { flex: 1 0 var(--ds-touch); padding: var(--ds-space-2); background: var(--ds-sunken); color: var(--ds-text); border: var(--ds-line) solid var(--ds-boundary); }
+.pulse-lens-strip button[aria-pressed="true"] { border-width: var(--ds-focus-width); }
+.pulse-lens-strip span { display: block; font-size: var(--ds-type-small); white-space: nowrap; }
+.pulse-table { overflow: auto; }
+.pulse-table table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+.pulse-table caption { text-align: left; padding-block: var(--ds-space-3); font-weight: var(--ds-weight-heading); }
+.pulse-table th, .pulse-table td { text-align: left; padding: var(--ds-space-3); border-bottom: var(--ds-line) solid var(--ds-border-quiet); white-space: nowrap; }
+.pulse-table button[aria-current="true"] { text-decoration-style: double; font-weight: var(--ds-weight-heading); }
+.pulse-table button { min-height: var(--ds-touch); color: var(--ds-text); background: transparent; border: 0; text-decoration: underline; padding: var(--ds-space-1); }
+.tick-pulse-compact .pulse-heading { font-size: var(--ds-type-small); gap: var(--ds-space-2); margin-bottom: var(--ds-space-1); }
+.tick-pulse-compact .pulse-heading > strong, .pulse-heading > h2 { margin: 0; font-size: inherit; }
+.tick-pulse-compact .pulse-mode > span { margin-left: var(--ds-space-1); }
+@media (max-width: 767px) { .pulse-actions { margin-left: 0; width: 100%; } .pulse-actions .pp-field { flex: 1; } .pulse-mode > span { display: block; margin-left: 0; } .tick-pulse-compact .pulse-mode > span { display: inline; } .pulse-scale > span { order: 3; flex-basis: 100%; } }
+}

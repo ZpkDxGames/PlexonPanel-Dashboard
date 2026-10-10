@@ -1,0 +1,21 @@
+{
+  "task": "Players",
+  "environment": "Chromium, signed local relay, simulated agents; no live-server certification",
+  "status": "passed",
+  "screenshots": [
+    "players-light-390.png",
+    "players-light-1280.png",
+    "players-dark-390.png",
+    "players-dark-1280.png"
+  ],
+  "axe": [
+    {
+      "workspace": "Players",
+      "violations": []
+    }
+  ],
+  "keyboard": [
+    "Activity and player detail opened with Enter; Escape restores focus"
+  ],
+  "errors": []
+}

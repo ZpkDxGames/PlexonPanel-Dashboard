@@ -1,1 +1,5 @@
 @AGENTS.md
+
+## 6.0.0 design system rules
+
+The approved decisions in `docs/UI_6_DECISIONS.md` override the original revamp brief. Use `app/styles/` layers in this order: reset, tokens, base, primitives, workspaces, utilities. New UI consumes `--ds-*` tokens only; raw palette values belong in `tokens.css`. Prefer the `app/ui/` primitives and stroke `Icon` set. Hanken Grotesk is the UI face; Commit Mono 400 is limited to console, UUIDs, hostnames, paths and commands. Preserve the existing saved-preference key/enums and legacy fallbacks for any present key. Follow the anti-template self-review in `docs/UI_6_DESIGN.md`: an instrument hierarchy, purposeful disclosure, no ornamental card grid, gradients, glows, fake data or decorative heartbeat. The kitchen sink is development-only via `page.dev.tsx`; its production manifest/chunk exclusion test must pass. Pulse rendering follows decision 12; a summarized view never replaces exact retained captures. Keep the Next.js notice in AGENTS.md. Never change protocol/relay/Core/Host as a visual workaround.

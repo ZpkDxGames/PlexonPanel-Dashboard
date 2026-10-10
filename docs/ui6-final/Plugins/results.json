@@ -1,0 +1,21 @@
+{
+  "task": "Plugins",
+  "environment": "Chromium, signed local relay, simulated agents; no live-server certification",
+  "status": "passed",
+  "screenshots": [
+    "plugins-light-390.png",
+    "plugins-light-1280.png",
+    "plugins-dark-390.png",
+    "plugins-dark-1280.png"
+  ],
+  "axe": [
+    {
+      "workspace": "Plugins",
+      "violations": []
+    }
+  ],
+  "keyboard": [
+    "Refresh latest and plugin detail with Enter; Escape restores focus; reload not executed"
+  ],
+  "errors": []
+}

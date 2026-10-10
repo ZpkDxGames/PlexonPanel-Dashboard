@@ -1,0 +1,10 @@
+{
+  "command": "node --test --test-concurrency=1 tests/dashboard-flow.test.mjs",
+  "exitCode": 0,
+  "status": "passed",
+  "tests": 20,
+  "signedSubcases": 19,
+  "failures": 0,
+  "skipped": 0,
+  "recordedAt": "2026-10-08T21:53:05.892Z"
+}

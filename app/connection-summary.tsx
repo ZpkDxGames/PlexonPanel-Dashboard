@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "./ui/primitives";
 import type { ControlState } from "../lib/control-state";
 import { connectionState, type ConnectionPhase, type ConnectionState } from "../lib/connection-state";
 import { useTelemetryNow } from "../lib/telemetry-clock";
@@ -19,6 +20,6 @@ export function ConnectionSummary({ state, phase, retry }: { state: ControlState
   const status = useConnectionState(state, phase);
   return <section className="workspace-health" data-state={status.kind} aria-label="Selected server status" role="status">
     <div><strong>{status.label}</strong><p>{status.detail}{state.cached && " Showing this server's saved history; commands are disabled."}</p></div>
-    {phase === "reconnecting" && <button className="ui-button" onClick={retry}>Retry connection</button>}
+    {phase === "reconnecting" && <Button onClick={retry}>Retry connection</Button>}
   </section>;
 }

@@ -1,0 +1,5 @@
+@layer workspaces {
+.instrument-sparkline { width: 100%; height: var(--ds-touch); }
+.instrument-sparkline path { fill: none; stroke: var(--ds-info); stroke-width: var(--ds-focus-width); vector-effect: non-scaling-stroke; }
+.instrument-history-note { grid-column: 1 / -1; color: var(--ds-muted); font-size: var(--ds-type-small); }
+}

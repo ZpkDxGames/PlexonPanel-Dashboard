@@ -1,0 +1,4254 @@
+{
+  "recordedAt": "2026-10-08T14:00:50.138Z",
+  "browser": "153.0.8010.0",
+  "mode": "development",
+  "pages": [
+    {
+      "name": "light-390-closed",
+      "violations": [],
+      "passes": 51,
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            {
+              "target": [
+                "button[aria-label=\"Light — Theme\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1paatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"cyan — Accent\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1qaatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"compact — Density\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1raatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"System — Contrast\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1saatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"First option — Normal select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7f4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"Unavailable — Disabled select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7h4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-readonly=\"true\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7j4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"Choose… — Invalid select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7l4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"Choose… — Empty select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7n4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_n5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_n5eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_p5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_p5eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_b5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_b5eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_d5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_d5eatpesnelb_\""
+            }
+          ]
+        }
+      ],
+      "supplementalReviews": {
+        "controlledTargets": [
+          {
+            "name": "Light — Theme",
+            "id": "_R_1paatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "cyan — Accent",
+            "id": "_R_1qaatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "compact — Density",
+            "id": "_R_1raatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "System — Contrast",
+            "id": "_R_1saatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "First option — Normal select",
+            "id": "_R_7f4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Unavailable — Disabled select",
+            "id": "_R_7h4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Fixed selection — Read-only select",
+            "id": "_R_7j4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Choose… — Invalid select",
+            "id": "_R_7l4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Choose… — Empty select",
+            "id": "_R_7n4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Open popover",
+            "id": "_R_n5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Disabled popover",
+            "id": "_R_p5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Open menu",
+            "id": "_R_b5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Disabled menu",
+            "id": "_R_d5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Current",
+            "id": "_R_16eatpesnelb_-panel-current",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "History",
+            "id": "_R_16eatpesnelb_-panel-history",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "Unavailable",
+            "id": "_R_16eatpesnelb_-panel-disabled",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "First option — Dialog select",
+            "id": "_R_f7iatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          }
+        ],
+        "contrastReviews": []
+      }
+    },
+    {
+      "name": "light-390-select",
+      "violations": [],
+      "passes": 51,
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            {
+              "target": [
+                "button[aria-label=\"Light — Theme\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1paatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"cyan — Accent\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1qaatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"compact — Density\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1raatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"System — Contrast\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1saatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"First option — Normal select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7f4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"Unavailable — Disabled select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7h4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-readonly=\"true\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7j4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"Choose… — Invalid select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7l4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"Choose… — Empty select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7n4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_n5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_n5eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_p5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_p5eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_b5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_b5eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_d5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_d5eatpesnelb_\""
+            }
+          ]
+        }
+      ],
+      "supplementalReviews": {
+        "controlledTargets": [
+          {
+            "name": "Light — Theme",
+            "id": "_R_1paatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "cyan — Accent",
+            "id": "_R_1qaatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "compact — Density",
+            "id": "_R_1raatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "System — Contrast",
+            "id": "_R_1saatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "First option — Normal select",
+            "id": "_R_7f4eatpesnelb_",
+            "exists": true,
+            "expanded": "true",
+            "nativeOpen": true
+          },
+          {
+            "name": "Unavailable — Disabled select",
+            "id": "_R_7h4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Fixed selection — Read-only select",
+            "id": "_R_7j4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Choose… — Invalid select",
+            "id": "_R_7l4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Choose… — Empty select",
+            "id": "_R_7n4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Open popover",
+            "id": "_R_n5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Disabled popover",
+            "id": "_R_p5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Open menu",
+            "id": "_R_b5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Disabled menu",
+            "id": "_R_d5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Current",
+            "id": "_R_16eatpesnelb_-panel-current",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "History",
+            "id": "_R_16eatpesnelb_-panel-history",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "Unavailable",
+            "id": "_R_16eatpesnelb_-panel-disabled",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "First option — Dialog select",
+            "id": "_R_f7iatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          }
+        ],
+        "contrastReviews": []
+      }
+    },
+    {
+      "name": "light-390-menu",
+      "violations": [],
+      "passes": 51,
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            {
+              "target": [
+                "button[aria-label=\"Light — Theme\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1paatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"cyan — Accent\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1qaatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"compact — Density\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1raatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"System — Contrast\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1saatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"Second option — Normal select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7f4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"Unavailable — Disabled select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7h4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-readonly=\"true\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7j4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"Choose… — Invalid select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7l4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"Choose… — Empty select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7n4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_n5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_n5eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_p5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_p5eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_b5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_b5eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_d5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_d5eatpesnelb_\""
+            }
+          ]
+        }
+      ],
+      "supplementalReviews": {
+        "controlledTargets": [
+          {
+            "name": "Light — Theme",
+            "id": "_R_1paatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "cyan — Accent",
+            "id": "_R_1qaatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "compact — Density",
+            "id": "_R_1raatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "System — Contrast",
+            "id": "_R_1saatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Second option — Normal select",
+            "id": "_R_7f4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Unavailable — Disabled select",
+            "id": "_R_7h4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Fixed selection — Read-only select",
+            "id": "_R_7j4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Choose… — Invalid select",
+            "id": "_R_7l4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Choose… — Empty select",
+            "id": "_R_7n4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Open popover",
+            "id": "_R_n5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Disabled popover",
+            "id": "_R_p5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Open menu",
+            "id": "_R_b5eatpesnelb_",
+            "exists": true,
+            "expanded": "true",
+            "nativeOpen": true
+          },
+          {
+            "name": "Disabled menu",
+            "id": "_R_d5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Current",
+            "id": "_R_16eatpesnelb_-panel-current",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "History",
+            "id": "_R_16eatpesnelb_-panel-history",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "Unavailable",
+            "id": "_R_16eatpesnelb_-panel-disabled",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "Second option — Dialog select",
+            "id": "_R_f7iatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          }
+        ],
+        "contrastReviews": []
+      }
+    },
+    {
+      "name": "light-390-popover",
+      "violations": [],
+      "passes": 52,
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            {
+              "target": [
+                "button[aria-label=\"Light — Theme\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1paatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"cyan — Accent\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1qaatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"compact — Density\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1raatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"System — Contrast\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1saatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"Second option — Normal select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7f4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"Unavailable — Disabled select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7h4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-readonly=\"true\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7j4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"Choose… — Invalid select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7l4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"Choose… — Empty select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7n4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_n5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_n5eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_p5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_p5eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_b5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_b5eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_d5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_d5eatpesnelb_\""
+            }
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [
+                "#_R_n5eatpesnelb_ > .pp-stack > p"
+              ],
+              "summary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+            }
+          ]
+        }
+      ],
+      "supplementalReviews": {
+        "controlledTargets": [
+          {
+            "name": "Light — Theme",
+            "id": "_R_1paatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "cyan — Accent",
+            "id": "_R_1qaatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "compact — Density",
+            "id": "_R_1raatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "System — Contrast",
+            "id": "_R_1saatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Second option — Normal select",
+            "id": "_R_7f4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Unavailable — Disabled select",
+            "id": "_R_7h4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Fixed selection — Read-only select",
+            "id": "_R_7j4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Choose… — Invalid select",
+            "id": "_R_7l4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Choose… — Empty select",
+            "id": "_R_7n4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Open popover",
+            "id": "_R_n5eatpesnelb_",
+            "exists": true,
+            "expanded": "true",
+            "nativeOpen": true
+          },
+          {
+            "name": "Disabled popover",
+            "id": "_R_p5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Open menu",
+            "id": "_R_b5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Disabled menu",
+            "id": "_R_d5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Current",
+            "id": "_R_16eatpesnelb_-panel-current",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "History",
+            "id": "_R_16eatpesnelb_-panel-history",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "Unavailable",
+            "id": "_R_16eatpesnelb_-panel-disabled",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "Second option — Dialog select",
+            "id": "_R_f7iatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          }
+        ],
+        "contrastReviews": [
+          {
+            "target": [
+              "#_R_n5eatpesnelb_ > .pp-stack > p"
+            ],
+            "foreground": "rgb(27, 34, 39)",
+            "background": "rgb(255, 255, 255)",
+            "ratio": 16.095530991800484,
+            "status": "PASS"
+          }
+        ]
+      }
+    },
+    {
+      "name": "light-390-dialog",
+      "violations": [],
+      "passes": 29,
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            {
+              "target": [
+                "button[aria-label=\"Second option — Dialog select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_f7iatpesnelb_\""
+            }
+          ]
+        }
+      ],
+      "supplementalReviews": {
+        "controlledTargets": [
+          {
+            "name": "Light — Theme",
+            "id": "_R_1paatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "cyan — Accent",
+            "id": "_R_1qaatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "compact — Density",
+            "id": "_R_1raatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "System — Contrast",
+            "id": "_R_1saatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Second option — Normal select",
+            "id": "_R_7f4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Unavailable — Disabled select",
+            "id": "_R_7h4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Fixed selection — Read-only select",
+            "id": "_R_7j4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Choose… — Invalid select",
+            "id": "_R_7l4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Choose… — Empty select",
+            "id": "_R_7n4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Open popover",
+            "id": "_R_n5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Disabled popover",
+            "id": "_R_p5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Open menu",
+            "id": "_R_b5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Disabled menu",
+            "id": "_R_d5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Current",
+            "id": "_R_16eatpesnelb_-panel-current",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "History",
+            "id": "_R_16eatpesnelb_-panel-history",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "Unavailable",
+            "id": "_R_16eatpesnelb_-panel-disabled",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "Second option — Dialog select",
+            "id": "_R_f7iatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          }
+        ],
+        "contrastReviews": []
+      }
+    },
+    {
+      "name": "light-1280-closed",
+      "violations": [],
+      "passes": 51,
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            {
+              "target": [
+                "button[aria-label=\"Light — Theme\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1paatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"cyan — Accent\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1qaatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"compact — Density\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1raatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"System — Contrast\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1saatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"First option — Normal select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7f4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"Unavailable — Disabled select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7h4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-readonly=\"true\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7j4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"Choose… — Invalid select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7l4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"Choose… — Empty select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7n4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_n5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_n5eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_p5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_p5eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_b5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_b5eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_d5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_d5eatpesnelb_\""
+            }
+          ]
+        }
+      ],
+      "supplementalReviews": {
+        "controlledTargets": [
+          {
+            "name": "Light — Theme",
+            "id": "_R_1paatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "cyan — Accent",
+            "id": "_R_1qaatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "compact — Density",
+            "id": "_R_1raatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "System — Contrast",
+            "id": "_R_1saatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "First option — Normal select",
+            "id": "_R_7f4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Unavailable — Disabled select",
+            "id": "_R_7h4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Fixed selection — Read-only select",
+            "id": "_R_7j4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Choose… — Invalid select",
+            "id": "_R_7l4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Choose… — Empty select",
+            "id": "_R_7n4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Open popover",
+            "id": "_R_n5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Disabled popover",
+            "id": "_R_p5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Open menu",
+            "id": "_R_b5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Disabled menu",
+            "id": "_R_d5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Current",
+            "id": "_R_16eatpesnelb_-panel-current",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "History",
+            "id": "_R_16eatpesnelb_-panel-history",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "Unavailable",
+            "id": "_R_16eatpesnelb_-panel-disabled",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "First option — Dialog select",
+            "id": "_R_f7iatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          }
+        ],
+        "contrastReviews": []
+      }
+    },
+    {
+      "name": "light-1280-select",
+      "violations": [],
+      "passes": 51,
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            {
+              "target": [
+                "button[aria-label=\"Light — Theme\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1paatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"cyan — Accent\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1qaatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"compact — Density\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1raatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"System — Contrast\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1saatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"First option — Normal select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7f4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"Unavailable — Disabled select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7h4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-readonly=\"true\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7j4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"Choose… — Invalid select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7l4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"Choose… — Empty select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7n4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_n5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_n5eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_p5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_p5eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_b5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_b5eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_d5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_d5eatpesnelb_\""
+            }
+          ]
+        }
+      ],
+      "supplementalReviews": {
+        "controlledTargets": [
+          {
+            "name": "Light — Theme",
+            "id": "_R_1paatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "cyan — Accent",
+            "id": "_R_1qaatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "compact — Density",
+            "id": "_R_1raatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "System — Contrast",
+            "id": "_R_1saatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "First option — Normal select",
+            "id": "_R_7f4eatpesnelb_",
+            "exists": true,
+            "expanded": "true",
+            "nativeOpen": true
+          },
+          {
+            "name": "Unavailable — Disabled select",
+            "id": "_R_7h4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Fixed selection — Read-only select",
+            "id": "_R_7j4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Choose… — Invalid select",
+            "id": "_R_7l4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Choose… — Empty select",
+            "id": "_R_7n4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Open popover",
+            "id": "_R_n5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Disabled popover",
+            "id": "_R_p5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Open menu",
+            "id": "_R_b5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Disabled menu",
+            "id": "_R_d5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Current",
+            "id": "_R_16eatpesnelb_-panel-current",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "History",
+            "id": "_R_16eatpesnelb_-panel-history",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "Unavailable",
+            "id": "_R_16eatpesnelb_-panel-disabled",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "First option — Dialog select",
+            "id": "_R_f7iatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          }
+        ],
+        "contrastReviews": []
+      }
+    },
+    {
+      "name": "light-1280-menu",
+      "violations": [],
+      "passes": 51,
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            {
+              "target": [
+                "button[aria-label=\"Light — Theme\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1paatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"cyan — Accent\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1qaatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"compact — Density\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1raatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"System — Contrast\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1saatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"Second option — Normal select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7f4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"Unavailable — Disabled select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7h4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-readonly=\"true\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7j4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"Choose… — Invalid select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7l4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"Choose… — Empty select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7n4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_n5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_n5eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_p5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_p5eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_b5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_b5eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_d5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_d5eatpesnelb_\""
+            }
+          ]
+        }
+      ],
+      "supplementalReviews": {
+        "controlledTargets": [
+          {
+            "name": "Light — Theme",
+            "id": "_R_1paatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "cyan — Accent",
+            "id": "_R_1qaatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "compact — Density",
+            "id": "_R_1raatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "System — Contrast",
+            "id": "_R_1saatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Second option — Normal select",
+            "id": "_R_7f4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Unavailable — Disabled select",
+            "id": "_R_7h4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Fixed selection — Read-only select",
+            "id": "_R_7j4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Choose… — Invalid select",
+            "id": "_R_7l4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Choose… — Empty select",
+            "id": "_R_7n4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Open popover",
+            "id": "_R_n5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Disabled popover",
+            "id": "_R_p5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Open menu",
+            "id": "_R_b5eatpesnelb_",
+            "exists": true,
+            "expanded": "true",
+            "nativeOpen": true
+          },
+          {
+            "name": "Disabled menu",
+            "id": "_R_d5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Current",
+            "id": "_R_16eatpesnelb_-panel-current",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "History",
+            "id": "_R_16eatpesnelb_-panel-history",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "Unavailable",
+            "id": "_R_16eatpesnelb_-panel-disabled",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "Second option — Dialog select",
+            "id": "_R_f7iatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          }
+        ],
+        "contrastReviews": []
+      }
+    },
+    {
+      "name": "light-1280-popover",
+      "violations": [],
+      "passes": 52,
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            {
+              "target": [
+                "button[aria-label=\"Light — Theme\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1paatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"cyan — Accent\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1qaatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"compact — Density\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1raatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"System — Contrast\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1saatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"Second option — Normal select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7f4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"Unavailable — Disabled select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7h4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-readonly=\"true\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7j4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"Choose… — Invalid select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7l4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"Choose… — Empty select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7n4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_n5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_n5eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_p5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_p5eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_b5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_b5eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_d5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_d5eatpesnelb_\""
+            }
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [
+                "#_R_n5eatpesnelb_ > .pp-stack > p"
+              ],
+              "summary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+            }
+          ]
+        }
+      ],
+      "supplementalReviews": {
+        "controlledTargets": [
+          {
+            "name": "Light — Theme",
+            "id": "_R_1paatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "cyan — Accent",
+            "id": "_R_1qaatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "compact — Density",
+            "id": "_R_1raatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "System — Contrast",
+            "id": "_R_1saatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Second option — Normal select",
+            "id": "_R_7f4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Unavailable — Disabled select",
+            "id": "_R_7h4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Fixed selection — Read-only select",
+            "id": "_R_7j4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Choose… — Invalid select",
+            "id": "_R_7l4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Choose… — Empty select",
+            "id": "_R_7n4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Open popover",
+            "id": "_R_n5eatpesnelb_",
+            "exists": true,
+            "expanded": "true",
+            "nativeOpen": true
+          },
+          {
+            "name": "Disabled popover",
+            "id": "_R_p5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Open menu",
+            "id": "_R_b5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Disabled menu",
+            "id": "_R_d5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Current",
+            "id": "_R_16eatpesnelb_-panel-current",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "History",
+            "id": "_R_16eatpesnelb_-panel-history",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "Unavailable",
+            "id": "_R_16eatpesnelb_-panel-disabled",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "Second option — Dialog select",
+            "id": "_R_f7iatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          }
+        ],
+        "contrastReviews": [
+          {
+            "target": [
+              "#_R_n5eatpesnelb_ > .pp-stack > p"
+            ],
+            "foreground": "rgb(27, 34, 39)",
+            "background": "rgb(255, 255, 255)",
+            "ratio": 16.095530991800484,
+            "status": "PASS"
+          }
+        ]
+      }
+    },
+    {
+      "name": "light-1280-dialog",
+      "violations": [],
+      "passes": 29,
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            {
+              "target": [
+                "button[aria-label=\"Second option — Dialog select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_f7iatpesnelb_\""
+            }
+          ]
+        }
+      ],
+      "supplementalReviews": {
+        "controlledTargets": [
+          {
+            "name": "Light — Theme",
+            "id": "_R_1paatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "cyan — Accent",
+            "id": "_R_1qaatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "compact — Density",
+            "id": "_R_1raatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "System — Contrast",
+            "id": "_R_1saatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Second option — Normal select",
+            "id": "_R_7f4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Unavailable — Disabled select",
+            "id": "_R_7h4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Fixed selection — Read-only select",
+            "id": "_R_7j4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Choose… — Invalid select",
+            "id": "_R_7l4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Choose… — Empty select",
+            "id": "_R_7n4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Open popover",
+            "id": "_R_n5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Disabled popover",
+            "id": "_R_p5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Open menu",
+            "id": "_R_b5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Disabled menu",
+            "id": "_R_d5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Current",
+            "id": "_R_16eatpesnelb_-panel-current",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "History",
+            "id": "_R_16eatpesnelb_-panel-history",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "Unavailable",
+            "id": "_R_16eatpesnelb_-panel-disabled",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "Second option — Dialog select",
+            "id": "_R_f7iatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          }
+        ],
+        "contrastReviews": []
+      }
+    },
+    {
+      "name": "dark-390-closed",
+      "violations": [],
+      "passes": 51,
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            {
+              "target": [
+                "button[aria-label=\"Dark — Theme\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1paatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"cyan — Accent\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1qaatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"compact — Density\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1raatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"System — Contrast\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1saatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"First option — Normal select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7f4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"Unavailable — Disabled select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7h4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-readonly=\"true\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7j4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"Choose… — Invalid select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7l4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"Choose… — Empty select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7n4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_n5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_n5eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_p5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_p5eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_b5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_b5eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_d5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_d5eatpesnelb_\""
+            }
+          ]
+        }
+      ],
+      "supplementalReviews": {
+        "controlledTargets": [
+          {
+            "name": "Dark — Theme",
+            "id": "_R_1paatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "cyan — Accent",
+            "id": "_R_1qaatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "compact — Density",
+            "id": "_R_1raatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "System — Contrast",
+            "id": "_R_1saatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "First option — Normal select",
+            "id": "_R_7f4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Unavailable — Disabled select",
+            "id": "_R_7h4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Fixed selection — Read-only select",
+            "id": "_R_7j4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Choose… — Invalid select",
+            "id": "_R_7l4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Choose… — Empty select",
+            "id": "_R_7n4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Open popover",
+            "id": "_R_n5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Disabled popover",
+            "id": "_R_p5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Open menu",
+            "id": "_R_b5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Disabled menu",
+            "id": "_R_d5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Current",
+            "id": "_R_16eatpesnelb_-panel-current",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "History",
+            "id": "_R_16eatpesnelb_-panel-history",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "Unavailable",
+            "id": "_R_16eatpesnelb_-panel-disabled",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "First option — Dialog select",
+            "id": "_R_f7iatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          }
+        ],
+        "contrastReviews": []
+      }
+    },
+    {
+      "name": "dark-390-select",
+      "violations": [],
+      "passes": 51,
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            {
+              "target": [
+                "button[aria-label=\"Dark — Theme\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1paatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"cyan — Accent\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1qaatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"compact — Density\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1raatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"System — Contrast\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1saatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"First option — Normal select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7f4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"Unavailable — Disabled select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7h4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-readonly=\"true\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7j4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"Choose… — Invalid select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7l4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"Choose… — Empty select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7n4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_n5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_n5eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_p5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_p5eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_b5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_b5eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_d5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_d5eatpesnelb_\""
+            }
+          ]
+        }
+      ],
+      "supplementalReviews": {
+        "controlledTargets": [
+          {
+            "name": "Dark — Theme",
+            "id": "_R_1paatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "cyan — Accent",
+            "id": "_R_1qaatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "compact — Density",
+            "id": "_R_1raatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "System — Contrast",
+            "id": "_R_1saatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "First option — Normal select",
+            "id": "_R_7f4eatpesnelb_",
+            "exists": true,
+            "expanded": "true",
+            "nativeOpen": true
+          },
+          {
+            "name": "Unavailable — Disabled select",
+            "id": "_R_7h4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Fixed selection — Read-only select",
+            "id": "_R_7j4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Choose… — Invalid select",
+            "id": "_R_7l4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Choose… — Empty select",
+            "id": "_R_7n4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Open popover",
+            "id": "_R_n5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Disabled popover",
+            "id": "_R_p5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Open menu",
+            "id": "_R_b5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Disabled menu",
+            "id": "_R_d5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Current",
+            "id": "_R_16eatpesnelb_-panel-current",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "History",
+            "id": "_R_16eatpesnelb_-panel-history",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "Unavailable",
+            "id": "_R_16eatpesnelb_-panel-disabled",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "First option — Dialog select",
+            "id": "_R_f7iatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          }
+        ],
+        "contrastReviews": []
+      }
+    },
+    {
+      "name": "dark-390-menu",
+      "violations": [],
+      "passes": 51,
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            {
+              "target": [
+                "button[aria-label=\"Dark — Theme\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1paatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"cyan — Accent\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1qaatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"compact — Density\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1raatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"System — Contrast\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1saatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"Second option — Normal select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7f4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"Unavailable — Disabled select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7h4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-readonly=\"true\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7j4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"Choose… — Invalid select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7l4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"Choose… — Empty select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7n4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_n5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_n5eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_p5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_p5eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_b5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_b5eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_d5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_d5eatpesnelb_\""
+            }
+          ]
+        }
+      ],
+      "supplementalReviews": {
+        "controlledTargets": [
+          {
+            "name": "Dark — Theme",
+            "id": "_R_1paatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "cyan — Accent",
+            "id": "_R_1qaatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "compact — Density",
+            "id": "_R_1raatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "System — Contrast",
+            "id": "_R_1saatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Second option — Normal select",
+            "id": "_R_7f4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Unavailable — Disabled select",
+            "id": "_R_7h4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Fixed selection — Read-only select",
+            "id": "_R_7j4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Choose… — Invalid select",
+            "id": "_R_7l4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Choose… — Empty select",
+            "id": "_R_7n4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Open popover",
+            "id": "_R_n5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Disabled popover",
+            "id": "_R_p5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Open menu",
+            "id": "_R_b5eatpesnelb_",
+            "exists": true,
+            "expanded": "true",
+            "nativeOpen": true
+          },
+          {
+            "name": "Disabled menu",
+            "id": "_R_d5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Current",
+            "id": "_R_16eatpesnelb_-panel-current",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "History",
+            "id": "_R_16eatpesnelb_-panel-history",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "Unavailable",
+            "id": "_R_16eatpesnelb_-panel-disabled",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "Second option — Dialog select",
+            "id": "_R_f7iatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          }
+        ],
+        "contrastReviews": []
+      }
+    },
+    {
+      "name": "dark-390-popover",
+      "violations": [],
+      "passes": 52,
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            {
+              "target": [
+                "button[aria-label=\"Dark — Theme\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1paatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"cyan — Accent\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1qaatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"compact — Density\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1raatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"System — Contrast\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1saatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"Second option — Normal select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7f4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"Unavailable — Disabled select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7h4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-readonly=\"true\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7j4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"Choose… — Invalid select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7l4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"Choose… — Empty select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7n4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_n5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_n5eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_p5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_p5eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_b5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_b5eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_d5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_d5eatpesnelb_\""
+            }
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [
+                "#_R_n5eatpesnelb_ > .pp-stack > p"
+              ],
+              "summary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+            }
+          ]
+        }
+      ],
+      "supplementalReviews": {
+        "controlledTargets": [
+          {
+            "name": "Dark — Theme",
+            "id": "_R_1paatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "cyan — Accent",
+            "id": "_R_1qaatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "compact — Density",
+            "id": "_R_1raatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "System — Contrast",
+            "id": "_R_1saatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Second option — Normal select",
+            "id": "_R_7f4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Unavailable — Disabled select",
+            "id": "_R_7h4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Fixed selection — Read-only select",
+            "id": "_R_7j4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Choose… — Invalid select",
+            "id": "_R_7l4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Choose… — Empty select",
+            "id": "_R_7n4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Open popover",
+            "id": "_R_n5eatpesnelb_",
+            "exists": true,
+            "expanded": "true",
+            "nativeOpen": true
+          },
+          {
+            "name": "Disabled popover",
+            "id": "_R_p5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Open menu",
+            "id": "_R_b5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Disabled menu",
+            "id": "_R_d5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Current",
+            "id": "_R_16eatpesnelb_-panel-current",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "History",
+            "id": "_R_16eatpesnelb_-panel-history",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "Unavailable",
+            "id": "_R_16eatpesnelb_-panel-disabled",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "Second option — Dialog select",
+            "id": "_R_f7iatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          }
+        ],
+        "contrastReviews": [
+          {
+            "target": [
+              "#_R_n5eatpesnelb_ > .pp-stack > p"
+            ],
+            "foreground": "rgb(230, 236, 239)",
+            "background": "rgb(43, 53, 61)",
+            "ratio": 10.485749518395044,
+            "status": "PASS"
+          }
+        ]
+      }
+    },
+    {
+      "name": "dark-390-dialog",
+      "violations": [],
+      "passes": 29,
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            {
+              "target": [
+                "button[aria-label=\"Second option — Dialog select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_f7iatpesnelb_\""
+            }
+          ]
+        }
+      ],
+      "supplementalReviews": {
+        "controlledTargets": [
+          {
+            "name": "Dark — Theme",
+            "id": "_R_1paatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "cyan — Accent",
+            "id": "_R_1qaatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "compact — Density",
+            "id": "_R_1raatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "System — Contrast",
+            "id": "_R_1saatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Second option — Normal select",
+            "id": "_R_7f4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Unavailable — Disabled select",
+            "id": "_R_7h4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Fixed selection — Read-only select",
+            "id": "_R_7j4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Choose… — Invalid select",
+            "id": "_R_7l4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Choose… — Empty select",
+            "id": "_R_7n4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Open popover",
+            "id": "_R_n5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Disabled popover",
+            "id": "_R_p5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Open menu",
+            "id": "_R_b5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Disabled menu",
+            "id": "_R_d5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Current",
+            "id": "_R_16eatpesnelb_-panel-current",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "History",
+            "id": "_R_16eatpesnelb_-panel-history",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "Unavailable",
+            "id": "_R_16eatpesnelb_-panel-disabled",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "Second option — Dialog select",
+            "id": "_R_f7iatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          }
+        ],
+        "contrastReviews": []
+      }
+    },
+    {
+      "name": "dark-1280-closed",
+      "violations": [],
+      "passes": 51,
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            {
+              "target": [
+                "button[aria-label=\"Dark — Theme\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1paatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"cyan — Accent\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1qaatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"compact — Density\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1raatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"System — Contrast\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1saatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"First option — Normal select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7f4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"Unavailable — Disabled select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7h4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-readonly=\"true\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7j4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"Choose… — Invalid select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7l4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"Choose… — Empty select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7n4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_n5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_n5eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_p5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_p5eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_b5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_b5eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_d5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_d5eatpesnelb_\""
+            }
+          ]
+        }
+      ],
+      "supplementalReviews": {
+        "controlledTargets": [
+          {
+            "name": "Dark — Theme",
+            "id": "_R_1paatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "cyan — Accent",
+            "id": "_R_1qaatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "compact — Density",
+            "id": "_R_1raatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "System — Contrast",
+            "id": "_R_1saatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "First option — Normal select",
+            "id": "_R_7f4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Unavailable — Disabled select",
+            "id": "_R_7h4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Fixed selection — Read-only select",
+            "id": "_R_7j4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Choose… — Invalid select",
+            "id": "_R_7l4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Choose… — Empty select",
+            "id": "_R_7n4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Open popover",
+            "id": "_R_n5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Disabled popover",
+            "id": "_R_p5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Open menu",
+            "id": "_R_b5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Disabled menu",
+            "id": "_R_d5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Current",
+            "id": "_R_16eatpesnelb_-panel-current",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "History",
+            "id": "_R_16eatpesnelb_-panel-history",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "Unavailable",
+            "id": "_R_16eatpesnelb_-panel-disabled",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "First option — Dialog select",
+            "id": "_R_f7iatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          }
+        ],
+        "contrastReviews": []
+      }
+    },
+    {
+      "name": "dark-1280-select",
+      "violations": [],
+      "passes": 51,
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            {
+              "target": [
+                "button[aria-label=\"Dark — Theme\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1paatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"cyan — Accent\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1qaatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"compact — Density\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1raatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"System — Contrast\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1saatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"First option — Normal select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7f4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"Unavailable — Disabled select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7h4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-readonly=\"true\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7j4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"Choose… — Invalid select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7l4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"Choose… — Empty select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7n4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_n5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_n5eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_p5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_p5eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_b5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_b5eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_d5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_d5eatpesnelb_\""
+            }
+          ]
+        }
+      ],
+      "supplementalReviews": {
+        "controlledTargets": [
+          {
+            "name": "Dark — Theme",
+            "id": "_R_1paatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "cyan — Accent",
+            "id": "_R_1qaatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "compact — Density",
+            "id": "_R_1raatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "System — Contrast",
+            "id": "_R_1saatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "First option — Normal select",
+            "id": "_R_7f4eatpesnelb_",
+            "exists": true,
+            "expanded": "true",
+            "nativeOpen": true
+          },
+          {
+            "name": "Unavailable — Disabled select",
+            "id": "_R_7h4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Fixed selection — Read-only select",
+            "id": "_R_7j4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Choose… — Invalid select",
+            "id": "_R_7l4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Choose… — Empty select",
+            "id": "_R_7n4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Open popover",
+            "id": "_R_n5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Disabled popover",
+            "id": "_R_p5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Open menu",
+            "id": "_R_b5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Disabled menu",
+            "id": "_R_d5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Current",
+            "id": "_R_16eatpesnelb_-panel-current",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "History",
+            "id": "_R_16eatpesnelb_-panel-history",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "Unavailable",
+            "id": "_R_16eatpesnelb_-panel-disabled",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "First option — Dialog select",
+            "id": "_R_f7iatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          }
+        ],
+        "contrastReviews": []
+      }
+    },
+    {
+      "name": "dark-1280-menu",
+      "violations": [],
+      "passes": 51,
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            {
+              "target": [
+                "button[aria-label=\"Dark — Theme\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1paatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"cyan — Accent\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1qaatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"compact — Density\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1raatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"System — Contrast\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1saatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"Second option — Normal select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7f4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"Unavailable — Disabled select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7h4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-readonly=\"true\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7j4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"Choose… — Invalid select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7l4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"Choose… — Empty select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7n4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_n5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_n5eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_p5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_p5eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_b5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_b5eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_d5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_d5eatpesnelb_\""
+            }
+          ]
+        }
+      ],
+      "supplementalReviews": {
+        "controlledTargets": [
+          {
+            "name": "Dark — Theme",
+            "id": "_R_1paatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "cyan — Accent",
+            "id": "_R_1qaatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "compact — Density",
+            "id": "_R_1raatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "System — Contrast",
+            "id": "_R_1saatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Second option — Normal select",
+            "id": "_R_7f4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Unavailable — Disabled select",
+            "id": "_R_7h4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Fixed selection — Read-only select",
+            "id": "_R_7j4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Choose… — Invalid select",
+            "id": "_R_7l4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Choose… — Empty select",
+            "id": "_R_7n4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Open popover",
+            "id": "_R_n5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Disabled popover",
+            "id": "_R_p5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Open menu",
+            "id": "_R_b5eatpesnelb_",
+            "exists": true,
+            "expanded": "true",
+            "nativeOpen": true
+          },
+          {
+            "name": "Disabled menu",
+            "id": "_R_d5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Current",
+            "id": "_R_16eatpesnelb_-panel-current",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "History",
+            "id": "_R_16eatpesnelb_-panel-history",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "Unavailable",
+            "id": "_R_16eatpesnelb_-panel-disabled",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "Second option — Dialog select",
+            "id": "_R_f7iatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          }
+        ],
+        "contrastReviews": []
+      }
+    },
+    {
+      "name": "dark-1280-popover",
+      "violations": [],
+      "passes": 52,
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            {
+              "target": [
+                "button[aria-label=\"Dark — Theme\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1paatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"cyan — Accent\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1qaatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"compact — Density\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1raatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"System — Contrast\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_1saatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"Second option — Normal select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7f4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"Unavailable — Disabled select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7h4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-readonly=\"true\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7j4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"Choose… — Invalid select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7l4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-label=\"Choose… — Empty select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_7n4eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_n5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_n5eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_p5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_p5eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_b5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_b5eatpesnelb_\""
+            },
+            {
+              "target": [
+                "button[aria-controls=\"_R_d5eatpesnelb_\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_d5eatpesnelb_\""
+            }
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "nodes": [
+            {
+              "target": [
+                "#_R_n5eatpesnelb_ > .pp-stack > p"
+              ],
+              "summary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+            }
+          ]
+        }
+      ],
+      "supplementalReviews": {
+        "controlledTargets": [
+          {
+            "name": "Dark — Theme",
+            "id": "_R_1paatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "cyan — Accent",
+            "id": "_R_1qaatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "compact — Density",
+            "id": "_R_1raatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "System — Contrast",
+            "id": "_R_1saatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Second option — Normal select",
+            "id": "_R_7f4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Unavailable — Disabled select",
+            "id": "_R_7h4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Fixed selection — Read-only select",
+            "id": "_R_7j4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Choose… — Invalid select",
+            "id": "_R_7l4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Choose… — Empty select",
+            "id": "_R_7n4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Open popover",
+            "id": "_R_n5eatpesnelb_",
+            "exists": true,
+            "expanded": "true",
+            "nativeOpen": true
+          },
+          {
+            "name": "Disabled popover",
+            "id": "_R_p5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Open menu",
+            "id": "_R_b5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Disabled menu",
+            "id": "_R_d5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Current",
+            "id": "_R_16eatpesnelb_-panel-current",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "History",
+            "id": "_R_16eatpesnelb_-panel-history",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "Unavailable",
+            "id": "_R_16eatpesnelb_-panel-disabled",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "Second option — Dialog select",
+            "id": "_R_f7iatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          }
+        ],
+        "contrastReviews": [
+          {
+            "target": [
+              "#_R_n5eatpesnelb_ > .pp-stack > p"
+            ],
+            "foreground": "rgb(230, 236, 239)",
+            "background": "rgb(43, 53, 61)",
+            "ratio": 10.485749518395044,
+            "status": "PASS"
+          }
+        ]
+      }
+    },
+    {
+      "name": "dark-1280-dialog",
+      "violations": [],
+      "passes": 29,
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "nodes": [
+            {
+              "target": [
+                "button[aria-label=\"Second option — Dialog select\"]"
+              ],
+              "summary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_R_f7iatpesnelb_\""
+            }
+          ]
+        }
+      ],
+      "supplementalReviews": {
+        "controlledTargets": [
+          {
+            "name": "Dark — Theme",
+            "id": "_R_1paatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "cyan — Accent",
+            "id": "_R_1qaatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "compact — Density",
+            "id": "_R_1raatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "System — Contrast",
+            "id": "_R_1saatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Second option — Normal select",
+            "id": "_R_7f4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Unavailable — Disabled select",
+            "id": "_R_7h4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Fixed selection — Read-only select",
+            "id": "_R_7j4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Choose… — Invalid select",
+            "id": "_R_7l4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Choose… — Empty select",
+            "id": "_R_7n4eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Open popover",
+            "id": "_R_n5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Disabled popover",
+            "id": "_R_p5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Open menu",
+            "id": "_R_b5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Disabled menu",
+            "id": "_R_d5eatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          },
+          {
+            "name": "Current",
+            "id": "_R_16eatpesnelb_-panel-current",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "History",
+            "id": "_R_16eatpesnelb_-panel-history",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "Unavailable",
+            "id": "_R_16eatpesnelb_-panel-disabled",
+            "exists": true,
+            "expanded": null,
+            "nativeOpen": false
+          },
+          {
+            "name": "Second option — Dialog select",
+            "id": "_R_f7iatpesnelb_",
+            "exists": true,
+            "expanded": "false",
+            "nativeOpen": false
+          }
+        ],
+        "contrastReviews": []
+      }
+    }
+  ],
+  "interactions": [
+    {
+      "theme": "light",
+      "width": 390,
+      "nonColorFieldAndSelectModes": [
+        {
+          "mode": "readonly",
+          "cue": "Read only",
+          "border": "double"
+        },
+        {
+          "mode": "disabled",
+          "cue": "Unavailable",
+          "border": "dashed"
+        },
+        {
+          "mode": "disabled",
+          "cue": "Unavailable",
+          "border": "dashed"
+        },
+        {
+          "mode": "readonly",
+          "cue": "Read only",
+          "border": "double"
+        },
+        {
+          "mode": "disabled",
+          "cue": "Unavailable",
+          "border": "dashed"
+        }
+      ]
+    },
+    {
+      "theme": "light",
+      "width": 390,
+      "select": "PASS",
+      "menu": "PASS",
+      "popover": "PASS",
+      "dialogFocusTrapRestoreAndNestedSelect": "PASS",
+      "tabsManualActivation": "PASS",
+      "disclosure": "PASS"
+    },
+    {
+      "theme": "light",
+      "width": 1280,
+      "nonColorFieldAndSelectModes": [
+        {
+          "mode": "readonly",
+          "cue": "Read only",
+          "border": "double"
+        },
+        {
+          "mode": "disabled",
+          "cue": "Unavailable",
+          "border": "dashed"
+        },
+        {
+          "mode": "disabled",
+          "cue": "Unavailable",
+          "border": "dashed"
+        },
+        {
+          "mode": "readonly",
+          "cue": "Read only",
+          "border": "double"
+        },
+        {
+          "mode": "disabled",
+          "cue": "Unavailable",
+          "border": "dashed"
+        }
+      ]
+    },
+    {
+      "theme": "light",
+      "width": 1280,
+      "select": "PASS",
+      "menu": "PASS",
+      "popover": "PASS",
+      "dialogFocusTrapRestoreAndNestedSelect": "PASS",
+      "tabsManualActivation": "PASS",
+      "disclosure": "PASS"
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "nonColorFieldAndSelectModes": [
+        {
+          "mode": "readonly",
+          "cue": "Read only",
+          "border": "double"
+        },
+        {
+          "mode": "disabled",
+          "cue": "Unavailable",
+          "border": "dashed"
+        },
+        {
+          "mode": "disabled",
+          "cue": "Unavailable",
+          "border": "dashed"
+        },
+        {
+          "mode": "readonly",
+          "cue": "Read only",
+          "border": "double"
+        },
+        {
+          "mode": "disabled",
+          "cue": "Unavailable",
+          "border": "dashed"
+        }
+      ]
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "select": "PASS",
+      "menu": "PASS",
+      "popover": "PASS",
+      "dialogFocusTrapRestoreAndNestedSelect": "PASS",
+      "tabsManualActivation": "PASS",
+      "disclosure": "PASS"
+    },
+    {
+      "theme": "dark",
+      "width": 1280,
+      "nonColorFieldAndSelectModes": [
+        {
+          "mode": "readonly",
+          "cue": "Read only",
+          "border": "double"
+        },
+        {
+          "mode": "disabled",
+          "cue": "Unavailable",
+          "border": "dashed"
+        },
+        {
+          "mode": "disabled",
+          "cue": "Unavailable",
+          "border": "dashed"
+        },
+        {
+          "mode": "readonly",
+          "cue": "Read only",
+          "border": "double"
+        },
+        {
+          "mode": "disabled",
+          "cue": "Unavailable",
+          "border": "dashed"
+        }
+      ]
+    },
+    {
+      "theme": "dark",
+      "width": 1280,
+      "select": "PASS",
+      "menu": "PASS",
+      "popover": "PASS",
+      "dialogFocusTrapRestoreAndNestedSelect": "PASS",
+      "tabsManualActivation": "PASS",
+      "disclosure": "PASS"
+    }
+  ],
+  "errors": [],
+  "smoke": "PASS",
+  "savedAndSystemTheme": "PASS",
+  "text200AndForcedColors": "PASS",
+  "status": "PASS"
+}

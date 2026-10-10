@@ -1,0 +1,712 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> plexonpanel-dashboard@6.0.0 check
+> npm run scopes:check && npm run fleet:check && npm run lint && npm run typecheck && npm run relay:test && npm test
+
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> plexonpanel-dashboard@6.0.0 scopes:check
+> node scripts/generate-scope-contract.mjs --check
+
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> plexonpanel-dashboard@6.0.0 fleet:check
+> node scripts/generate-fleet-contract.mjs --check
+
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> plexonpanel-dashboard@6.0.0 lint
+> eslint . --ignore-pattern .next --ignore-pattern node_modules --ignore-pattern artifacts
+
+
+/workspace/scratch/28b97b04a664/PlexonPanel-Dashboard/scripts/verify-ui6-mobile.mjs
+  6:8  warning  'AxeBuilder' is defined but never used  @typescript-eslint/no-unused-vars
+
+✖ 1 problem (0 errors, 1 warning)
+
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> plexonpanel-dashboard@6.0.0 typecheck
+> tsc --noEmit && npm run relay:build
+
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> plexonpanel-dashboard@6.0.0 relay:build
+> npm run relay:prepare && tsc -p relay/tsconfig.json
+
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> plexonpanel-dashboard@6.0.0 relay:prepare
+> npm run scopes:generate && npm run fleet:generate
+
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> plexonpanel-dashboard@6.0.0 scopes:generate
+> node scripts/generate-scope-contract.mjs
+
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> plexonpanel-dashboard@6.0.0 fleet:generate
+> node scripts/generate-fleet-contract.mjs
+
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> plexonpanel-dashboard@6.0.0 relay:test
+> npm run relay:build && node --test relay/tests/*.test.mjs
+
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> plexonpanel-dashboard@6.0.0 relay:build
+> npm run relay:prepare && tsc -p relay/tsconfig.json
+
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> plexonpanel-dashboard@6.0.0 relay:prepare
+> npm run scopes:generate && npm run fleet:generate
+
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> plexonpanel-dashboard@6.0.0 scopes:generate
+> node scripts/generate-scope-contract.mjs
+
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> plexonpanel-dashboard@6.0.0 fleet:generate
+> node scripts/generate-fleet-contract.mjs
+
+✔ Worker relay immediately reports failed Paper backup coordination (20.901202ms)
+✔ standalone relay immediately reports failed Paper backup coordination (30.959139ms)
+✔ relay build identity exposes only bounded non-secret metadata (2.658724ms)
+✔ Worker health advertises the deployed commit and runtime kind (7.341286ms)
+✔ Worker and standalone tolerate valid Host replay before console.source authority (10.512973ms)
+✔ Worker and standalone accept Host 3.4.0 empty replay snapshots as no-ops (14.292384ms)
+✔ console ordering tolerance does not remove 3.3 maintenance parity (6.458421ms)
+✔ console error and full scopes retain existing event filtering semantics (2.32407ms)
+✔ history actions preserve existing console scopes without adding privilege (0.169205ms)
+✔ Worker and standalone prefer Host with explicit Paper fallback and Paper-only execution (17.293138ms)
+✔ 3.4 adapters preserve the certified 3.3 relay cores as explicit source units (15.259211ms)
+{"component":"PlexonPanelRelay","runtime":"standalone","event":"started","host":"127.0.0.1","port":0,"storage":"coordination-only","version":"5.0.0","gitCommit":"unavailable","buildTimestamp":"unavailable","protocolVersion":3,"runtimeKind":"standalone"}
+{"component":"PlexonPanelRelay","runtime":"standalone","code":"PEER_DELIVERY_FAILED","serverId":"6c5d5542-f778-4838-9822-6a77a2c444b8","agentKind":"HOST","messageType":"paper.connection","error":"WebSocket send failed"}
+{"component":"PlexonPanelRelay","runtime":"standalone","code":"PEER_DELIVERY_FAILED","serverId":"d613807f-d251-42fa-adb1-a51e597957b4","agentKind":"HOST","messageType":"paper.connection","error":"WebSocket send failed"}
+✔ actual standalone TCP fleet isolates two signed rooms, completions and credential revocation (326.40302ms)
+✔ node telemetry binds source role to authenticated kind and requires the declared node scope (1.814402ms)
+✔ service accounting is Host-only and binds the node and service metric contract (0.54434ms)
+✔ legacy Host node/service status remains readable while Paper cannot impersonate systemd (0.2593ms)
+✔ fleet controls require exact 5.0 association while legacy rooms remain compatible (0.585712ms)
+✔ generates matching protected relay bindings without printing them (436.586641ms)
+✔ Worker relay preserves 3.3 maintenance coordination in the 3.4 console release (69.261618ms)
+✔ Worker relay routes maintenance and provider actions to Host and keeps full restore Owner-only (2.670432ms)
+✔ standalone relay preserves 3.3 maintenance coordination in the 3.4 console release (9.638139ms)
+✔ standalone relay routes maintenance and provider actions to Host and keeps full restore Owner-only (1.534581ms)
+✔ standalone runtime identity reports the matched 5.0.0 build (6.665934ms)
+✔ Cloudflare room migration preserves storage while forcing the 3.5.0 class (10.034192ms)
+✔ Worker routes Owner backup.preflight to Host and returns only the private success result (16.200307ms)
+✔ standalone relay satisfies the same backup.preflight Host contract (20.37174ms)
+✔ standalone relay recognizes recovery and reports unknown actions separately (8.809948ms)
+✔ standalone relay mirrors Paper authorization to Host and enforces refresh direction (12.481247ms)
+✔ signs and verifies protocol v3 envelopes with Ed25519 (25.111408ms)
+✔ normalizes omitted nullable fields from 3.0.1 presence JOIN envelopes (5.870375ms)
+✔ issues scoped dashboard credentials and rejects expiry (10.931333ms)
+✔ pairing lookups are deterministic, peppered, and six-digit only (5.36211ms)
+✔ v2 claims and client-invented scopes are never upgraded implicitly (11.097632ms)
+✔ verifies the shared Java/TypeScript canonical vector (10.207974ms)
+{"component":"PlexonPanelRelay","code":"HOST_GRANT_CONFLICT","serverId":"f1a81179-0e59-4fdf-8bd3-fb853a45a4e2","agentKind":"HOST","messageType":"access.sync","sessionAgeMillis":8,"sequence":3}
+✔ Host stale generation is ignored without disconnecting transport (42.444536ms)
+✔ Host stale revision is ignored without rolling metadata backward (19.34338ms)
+✔ Host may confirm the same known grants at a newer revision (11.302982ms)
+{"component":"PlexonPanelRelay","code":"HOST_GRANT_CONFLICT","serverId":"9ba45a45-cf1c-4854-b411-7bb29c615b70","agentKind":"HOST","messageType":"access.sync","sessionAgeMillis":6,"sequence":4}
+✔ Host may publish a real local revocation but cannot restore it (13.526055ms)
+{"component":"PlexonPanelRelay","code":"HOST_GRANT_CONFLICT","serverId":"8cd2042e-c6cc-4e26-b3dd-360f16008d78","agentKind":"HOST","messageType":"access.sync","sessionAgeMillis":2,"sequence":3}
+✔ Host unknown grant is diagnosed and ignored without transport rejection (15.428586ms)
+{"component":"PlexonPanelRelay","code":"INVALID_IDENTITY","serverId":"9a21fdfc-fc0a-440d-af9b-deda6822dce4","agentKind":"HOST","messageType":"agent.hello","sessionAgeMillis":null,"sequence":null}
+{"component":"PlexonPanelRelay","code":"INVALID_IDENTITY","serverId":"9a21fdfc-fc0a-440d-af9b-deda6822dce4","agentKind":"PAPER","messageType":"agent.hello","sessionAgeMillis":null,"sequence":null}
+✔ Paper and pinned host authenticate independently; wrong server and host keys fail (76.476372ms)
+{"component":"PlexonPanelRelay","code":"SESSION_REPLAY","serverId":"90011665-5487-48b4-9659-4fb68c69e20b","agentKind":"PAPER","messageType":"telemetry.system","sessionAgeMillis":625,"sequence":602}
+✔ replay is rejected while a long transfer keeps its attachment bounded (640.124674ms)
+{"component":"PlexonPanelRelay","code":"SESSION_REPLAY","serverId":"524ed75c-1e6a-4b15-adc9-3bd064d66bde","agentKind":"PAPER","messageType":"telemetry.system","sessionAgeMillis":3,"sequence":2}
+✔ old session packets are rejected after reconnect and hibernation (12.568609ms)
+{"component":"PlexonPanelRelay","code":"WRONG_SERVER","serverId":"ee6f40eb-dee9-40eb-b00a-1004ebbdb141","agentKind":"PAPER","messageType":"telemetry.system","sessionAgeMillis":2,"sequence":2}
+{"component":"PlexonPanelRelay","code":"INVALID_SIGNATURE","serverId":"34eb365c-de57-47cd-9aff-62ff47fba263","agentKind":"PAPER","messageType":"telemetry.system","sessionAgeMillis":2,"sequence":2}
+{"component":"PlexonPanelRelay","code":"PROTOCOL_MISMATCH","serverId":"8d2765b2-e303-49f4-9e42-d778eadd2fbf","agentKind":"PAPER","messageType":"telemetry.system","sessionAgeMillis":2,"sequence":2}
+✔ wrong room, tampered signature and stale timestamp fail before routing (18.456315ms)
+✔ relay checks device scope, local capability and high-risk confirmation (6.041839ms)
+✔ recovery action is recognized, routed to Host and never conflated with scope denial (5.216376ms)
+✔ queued is not completed; results are private to the requesting device and survive hibernation (6.530014ms)
+✔ revocation closes the browser immediately and old generations cannot roll it back (8.497636ms)
+{"component":"PlexonPanelRelay","code":"HOST_GRANT_CONFLICT","serverId":"7259b5ac-47d4-45eb-bdd2-f8e3e95c9b3c","agentKind":"HOST","messageType":"access.sync","sessionAgeMillis":1,"sequence":3}
+✔ expiry alarms reject expired devices and a host cannot invent a grant (9.271944ms)
+{"component":"PlexonPanelRelay","code":"DASHBOARD_DELIVERY_FAILED","serverId":"3848c027-1f40-47ba-b89f-3707061882bd","agentKind":null,"messageType":"server.event","sessionAgeMillis":null,"sequence":null}
+✔ broken Dashboard fan-out cannot disconnect an authenticated Paper agent (6.557556ms)
+{"component":"PlexonPanelRelay","code":"PEER_DELIVERY_FAILED","serverId":"25b1bf7f-cac7-4aad-b3c1-3f88a8875f8b","agentKind":"HOST","messageType":"paper.connection","sessionAgeMillis":3,"sequence":2}
+✔ broken Host peer delivery cannot retroactively reject healthy Paper (7.519234ms)
+{"component":"PlexonPanelRelay","code":"PEER_DELIVERY_FAILED","serverId":"4cd5434a-69ea-4309-9f6c-e2b945f548d0","agentKind":"PAPER","messageType":"access.authority.request","sessionAgeMillis":8,"sequence":2}
+✔ broken Paper peer delivery cannot retroactively reject healthy Host (11.416693ms)
+✔ client cannot exceed command, transfer, parameter or in-flight request limits (15.801392ms)
+✔ one-use pairing is consumed only after the locally selected grant is persisted (19.692191ms)
+✔ pairing rejects local revocation racing approval (8.933944ms)
+✔ events filter player addresses, locations, console levels and local capabilities (0.825268ms)
+{"component":"PlexonPanelRelay","code":"INVALID_EVENT","serverId":"60f98818-63df-4149-9287-8b19e508fc8d","agentKind":"HOST","messageType":"players.presence","sessionAgeMillis":1,"sequence":3}
+{"component":"PlexonPanelRelay","code":"INVALID_EVENT","serverId":"d4d86181-0835-401e-ba64-5036f961bd47","agentKind":"PAPER","messageType":"players.presence","sessionAgeMillis":2,"sequence":3}
+{"component":"PlexonPanelRelay","code":"INVALID_EVENT","serverId":"add8eb40-ba61-46a4-aee6-8c0288cee511","agentKind":"PAPER","messageType":"players.presence","sessionAgeMillis":2,"sequence":3}
+✔ presence is Paper-only, validated, scope-filtered and never stored (20.493672ms)
+✔ history and snapshot actions enforce new scope, capability, fields and rate (12.355677ms)
+✔ directory rate limit, code expiry and internal route authentication are enforced (8.294461ms)
+✔ malformed claims fail closed without throwing (0.255465ms)
+✔ Paper access sync is mirrored to Host and Host can request a refresh (13.010999ms)
+{"component":"PlexonPanelRelay","code":"INVALID_EVENT","serverId":"cecea183-d276-4a5e-bebe-5c867338eab7","agentKind":"PAPER","messageType":"access.authority.request","sessionAgeMillis":5,"sequence":4}
+{"component":"PlexonPanelRelay","code":"INVALID_EVENT","serverId":"c2ba3d25-d98d-49ab-b12d-11341f2892e8","agentKind":"PAPER","messageType":"access.authority.sync","sessionAgeMillis":2,"sequence":3}
+✔ Paper cannot forge Host authorization control messages and access sync tolerates Host offline (18.024485ms)
+{"component":"PlexonPanelRelay","code":"FLEET_CONTRACT_REJECTED","serverId":"afc818f8-54b5-4a06-8bdf-c90a8e4e8da2","agentKind":"HOST","messageType":"agent.hello","sessionAgeMillis":null,"sequence":null}
+{"component":"PlexonPanelRelay","code":"FLEET_CONTRACT_REJECTED","serverId":"afc818f8-54b5-4a06-8bdf-c90a8e4e8da2","agentKind":"HOST","messageType":"agent.hello","sessionAgeMillis":null,"sequence":null}
+{"component":"PlexonPanelRelay","code":"FLEET_CONTRACT_REJECTED","serverId":"afc818f8-54b5-4a06-8bdf-c90a8e4e8da2","agentKind":"HOST","messageType":"telemetry.system","sessionAgeMillis":3,"sequence":3}
+✔ signed fleet hello binds Paper and Host to the same node and exact instance (17.512904ms)
+{"component":"PlexonPanelRelay","code":"FLEET_CONTRACT_REJECTED","serverId":"a42cb3b8-a68d-4176-9202-91b2997ab4dd","agentKind":"PAPER","messageType":"service.status","sessionAgeMillis":9,"sequence":3}
+✔ signed service status uses Host authority and Paper cannot impersonate its systemd source (15.669959ms)
+{"component":"PlexonPanelRelay","code":"INVALID_ENVELOPE","serverId":"e624a568-3792-4c0b-887c-afba81799f7b","agentKind":"PAPER","messageType":"agent.challenge_response","sessionAgeMillis":null,"sequence":2}
+{"component":"PlexonPanelRelay","code":"FLEET_CONTRACT_REJECTED","serverId":"e624a568-3792-4c0b-887c-afba81799f7b","agentKind":"PAPER","messageType":"agent.hello","sessionAgeMillis":null,"sequence":null}
+✔ fleet identity cannot be downgraded or replaced by a simultaneous cloned session (19.16346ms)
+{"component":"PlexonPanelRelay","code":"FLEET_CONTRACT_REJECTED","serverId":"f89a8562-5b08-4bda-a982-adfba98e39f1","agentKind":"PAPER","messageType":"agent.hello","sessionAgeMillis":null,"sequence":null}
+{"component":"PlexonPanelRelay","code":"FLEET_CONTRACT_REJECTED","serverId":"90416a05-9f50-40d7-94f6-05019a7c61ef","agentKind":"PAPER","messageType":"agent.hello","sessionAgeMillis":null,"sequence":null}
+{"component":"PlexonPanelRelay","code":"FLEET_CONTRACT_REJECTED","serverId":"267754bd-0b89-4339-8ba5-162edbe7ff2f","agentKind":"PAPER","messageType":"agent.hello","sessionAgeMillis":null,"sequence":null}
+{"component":"PlexonPanelRelay","code":"INVALID_ENVELOPE","serverId":"a99ce3d5-3867-463e-8d36-3384b0160e73","agentKind":"PAPER","messageType":"agent.hello","sessionAgeMillis":null,"sequence":null}
+{"component":"PlexonPanelRelay","code":"FLEET_CONTRACT_REJECTED","serverId":"37de436e-e768-4c34-8d32-d512082f1126","agentKind":"PAPER","messageType":"agent.hello","sessionAgeMillis":null,"sequence":null}
+✔ unsupported, incomplete or substituted fleet contracts fail before challenge (13.118025ms)
+{"component":"PlexonPanelRelay","code":"FLEET_CONTRACT_REJECTED","serverId":"cb16c8f1-19d4-4fa0-ab77-9b26c1c2ad79","agentKind":"HOST","messageType":"agent.hello","sessionAgeMillis":null,"sequence":null}
+✔ 5.0 Paper cannot route service actions to a previously authenticated legacy Host (11.014342ms)
+✔ bound 5.0 Host can start its service after Paper disconnects without losing its immutable association (10.979216ms)
+✔ configuration is loopback-first and rejects wildcard origins (12.599234ms)
+✔ coordination store persists only bounded room metadata and rate limits pairing (17.888806ms)
+{"component":"PlexonPanelRelay","runtime":"standalone","event":"started","host":"127.0.0.1","port":0,"storage":"coordination-only","version":"5.0.0","gitCommit":"8b68f32423efb56eda1c535b7c3e36ea5a30a5e7","buildTimestamp":"2026-09-14T02:17:15.000Z","protocolVersion":3,"runtimeKind":"standalone"}
+✔ standalone health route is safe and advertises Protocol 3 build identity (50.9397ms)
+✔ fleet coordination persistence keeps shared and separate nodes isolated and rejects substitution (9.761521ms)
+✔ Step 5 rejects every retired Paper backup coordination message (2.770362ms)
+✔ Step 5 denylist remains narrow enough for normal Host events (0.634315ms)
+✔ health describes coordination-only storage (8.992417ms)
+✔ pairing rejects a non-allowlisted browser before lookup (1.26889ms)
+✔ pairing returns a bounded error for invalid JSON (2.087784ms)
+✔ dashboard session validation requires a credential (1.162691ms)
+✔ pairing issues a scoped credential only after the room consumes its challenge (22.650382ms)
+✔ pairing does not accept client-selected roles or scopes (5.595006ms)
+✔ chunked pairing payloads are bounded without Content-Length (1.648893ms)
+ℹ tests 79
+ℹ suites 0
+ℹ pass 79
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 10743.009603
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> plexonpanel-dashboard@6.0.0 test
+> node scripts/transpile-tests.mjs && node scripts/build-test.mjs && node --test --test-concurrency=1 tests/*.test.mjs
+
+▲ Next.js 16.3.8 (Turbopack)
+✓ Running next.config.ts took 48ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 547ms
+  Running TypeScript ...
+  Finished TypeScript in 4.2s ...
+  Collecting page data using 6 workers ...
+  Generating static pages using 6 workers (0/4) ...
+  Generating static pages using 6 workers (1/4) 
+  Generating static pages using 6 workers (2/4) 
+  Generating static pages using 6 workers (3/4) 
+✓ Generating static pages using 6 workers (4/4) in 565ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ○ /activity
+└ ƒ /api/build
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
+✔ verified legacy session payload keeps signed claims without requiring deviceId (1.475491ms)
+✔ an explicit session action-contract mismatch still fails closed (0.824451ms)
+✔ invalid signed session contract reports the safe field without deleting credentials (0.370328ms)
+✔ relay SCOPE_DENIED preserves boundary, action, scope, agent and request ID (1.7531ms)
+✔ relay UNKNOWN_ACTION is distinct from a missing device scope (0.490729ms)
+✔ Host lifecycle completion survives Paper presence and session changes without replay (3.556416ms)
+✔ Host session or signed grant replacement rejects its pending lifecycle command (1.016391ms)
+✔ confirmation captured for Server A cannot send on Server B after an asynchronous switch (0.512963ms)
+✔ a confirmation cannot survive agent or grant replacement on the same Dashboard socket (0.457379ms)
+✔ action completion must match the original server, socket, action and source authority (0.658692ms)
+✔ legacy relay rejection without a server field is accepted only from its original bound socket (1.491927ms)
+✔ relay queue acknowledgement never reports an operation completed (0.467394ms)
+✔ file conflicts reject with structured status so unsaved edits can be retained (0.553463ms)
+✔ disconnect rejects uncertain completion and never replays the command (0.700304ms)
+✔ a stale socket cannot unbind the current authorized connection (0.815929ms)
+✔ legacy browser archive remains read-only, isolated and unverified (2.102136ms)
+✔ display cadence cannot persist live presence to the legacy archive (7.110513ms)
+✔ server-side filters use bounded Paper parameters and opaque cursors (0.510339ms)
+✔ a live duplicate is replaced by the journal record; pages never mix (8.9282ms)
+✔ live filters reject malformed rows and do not invent a leave (0.395025ms)
+✔ normalizes dashed and undashed UUIDs to lowercase hex (1.332777ms)
+✔ uses MCHeads when deployment does not configure an avatar template (0.53124ms)
+✔ accepts one HTTPS uuid template and derives exact CSP origin (0.532291ms)
+✔ allows development HTTP only on loopback (0.291599ms)
+✔ rejects malformed, repeated, secret-bearing, fragment, and unsafe templates (0.353622ms)
+✔ rejects unsupported sizes and malformed UUIDs without producing a request URL (0.212951ms)
+✔ applied texture wins, offline UUID uses the real account name, online UUID remains stable (0.767025ms)
+✔ a missing Drive provider does not invent storage or source failures (1.144123ms)
+✔ new successful Drive preflight supersedes an older degraded provider snapshot (0.41813ms)
+✔ later provider failures and pending refreshes cannot reuse a successful Drive preflight (0.265449ms)
+✔ only the failing preflight stage is marked failed (0.164117ms)
+✔ refresh and unclassified failure do not promote cached success to current readiness (0.18572ms)
+✔ 3.5 promotes Fully Backup Now with selectable durable countdowns (9.708946ms)
+✔ Host preflight is authoritative and gates Fully Backup Now (2.990248ms)
+✔ durable Host job reconstructs the active timeline after refresh (1.908164ms)
+✔ truthful progress and verification details do not invent an ETA (1.496063ms)
+✔ degraded and recovery-required states block or recover safely (3.037013ms)
+✔ automatic backups stay retired while restart-only scheduling remains supported (1.248721ms)
+✔ stable backup history exposes read-only-safe Host operations (1.330003ms)
+✔ safe failures remain structured and browser boundary retains provider secrecy (2.303314ms)
+✔ destructive maintenance actions remain capability-gated at browser and relay boundaries (6.14617ms)
+✔ Backups uses shared responsive panels and the common confirmation surface (2.389368ms)
+✔ provider view keeps latest test and last remote verification as distinct Host-authoritative fields (5.216075ms)
+✔ removing background A atomically preserves selected B and B's credential/cache (9.935723ms)
+✔ a slow earlier selection cannot overwrite a newer selection in browser storage (20.248606ms)
+✔ server labels are presentation metadata, persist independently and are removed only with their server (11.910446ms)
+✔ an explicit missing capture is hatched even inside the normal source gap tolerance (33.954501ms)
+✔ series statistics preserve zero as a real value (1.647321ms)
+✔ empty and all-null series stay unavailable (0.149536ms)
+✔ gap segmentation never connects across missing samples (0.252771ms)
+✔ high-frequency SVG thinning stays bounded and preserves local extrema (2.674868ms)
+✔ percentage, capacity and adaptive domains are stable and truthful (0.224849ms)
+✔ nearest selection clamps naturally to first/last available value (0.195695ms)
+✔ window filtering uses the newest sample as the browser-local tail (0.194693ms)
+✔ SVG paths create separate subpaths and close area fills at the baseline (0.585922ms)
+✔ receipt-aware classifier preserves skew values and expires stopped receipts (6.226137ms)
+✔ Overview, chart, compact Pulse and banner agree at +6 s (373.816516ms)
+✔ Overview, chart, compact Pulse and banner agree at +30 s (82.871821ms)
+✔ Overview, chart, compact Pulse and banner agree at +120 s (81.434246ms)
+✔ skew receipt clock advances at Display rate 0 (87.176404ms)
+✔ skew receipt clock advances at Display rate 500 (107.305748ms)
+✔ skew receipt clock advances at Display rate 2000 (200.717401ms)
+✔ new Paper session clears source receipts and accepts first captures with missing uptime (54.99482ms)
+✔ clock diagnostics separate Paper, Host, receipt and capture offsets without speculating (0.761737ms)
+✔ mounted Clocks disclosure copies only the already observed diagnostic values (49.238946ms)
+✔ memoized instruments disclose each actual Paper receipt and ignore unrelated Host traffic (73.392842ms)
+✖ Clocks selects the most recently received Host capture instead of the largest timestamp (45.00751ms)
+✔ a fresh Host confirmation distinguishes stopped Minecraft from Host and relay loss (1.990628ms)
+✔ cached, expired, missing and inconsistent signals cannot fabricate stopped status (0.287122ms)
+✔ service transitions, failure and running process without plugin are distinct (0.29162ms)
+✔ compatibility, revocation, stale telemetry and subscription limits remain explicit (0.273021ms)
+✔ connection summaries expose readable status and retry controls without color dependence (11.838243ms)
+✔ console history actions reuse the existing least-privilege view scopes (2.567467ms)
+✔ console UI queries Host explicitly and discloses journald retention (8.383725ms)
+✔ relay adapters expose explicit Host, Paper fallback, and unavailable authority states (6.202831ms)
+✔ console renders a bounded window of real loaded lines and keeps offline command input disabled (81.76884ms)
+✔ CPU zero is a real sample and Paper process metrics never masquerade as Host metrics (2.391132ms)
+✔ Host telemetry owns machine CPU and memory while Paper remains independently unavailable (0.579602ms)
+✔ telemetry history uses trusted source capture timestamps at sub-second cadence (1.240628ms)
+✔ same captured instant replaces rather than duplicates a chart sample (0.793765ms)
+✔ unrelated telemetry snapshots do not duplicate performance history (0.256236ms)
+✔ high-frequency telemetry history remains strictly bounded (6.059826ms)
+✔ cross-server and incompatible-ready events cannot contaminate the workspace (0.209836ms)
+✔ inventory pagination never combines snapshots or appends a missing first page (0.342105ms)
+✔ presence deltas are idempotent and an old session cannot remove a reconnect (0.334804ms)
+✔ a complete snapshot replays only deltas newer than its capture (8.30054ms)
+✔ console and cache remain bounded and exclude players, files and action results (19.922828ms)
+✔ console journal identifiers and short cross-source transitions suppress duplicates (0.871332ms)
+✔ UI actions require the intersection of exact scopes and local capabilities (0.860346ms)
+✔ operator exceptions distinguish staged deployment from executed evidence (2.484261ms)
+✔ incomplete, unapproved and overbroad operator exceptions fail closed (0.334494ms)
+✔ five is held until exact accepted source and executed coordination evidence (0.208314ms)
+✔ committed receipt cannot authorize unrelated fixture ancestry (0.619813ms)
+✔ Vercel ignore and explicit build exit conventions agree for the current receipt (166.096692ms)
+✔ actual activation ancestry, dirty source, preview hold and Vercel exit codes (5033.807736ms)
+✔ Cloudflare deployment consumes the Worker-specific authorization (1.531446ms)
+✔ creates the one-variable Vercel import without Firebase credentials (87.686947ms)
+✔ rejects non-HTTPS relay URLs and accidental overwrites (375.610187ms)
+✔ custom select supports arrows, disabled options, typeahead, Enter, Escape, Tab and outside dismissal (227.152378ms)
+✔ custom dropdown belongs to its dialog and unmount removes the portaled menu (36.925207ms)
+✔ player heads use applied textures and reset load/failure state when the identity changes (41.786478ms)
+✔ active service disables Start and allows stop/restart (1.396062ms)
+✔ inactive service allows only Start (0.208524ms)
+✔ transitioning and unknown service states block lifecycle actions (0.188524ms)
+✔ failed service permits recovery Start but not stop/restart (0.246811ms)
+✔ missing Host service state stays unknown regardless of Paper connectivity (0.282746ms)
+✔ known action codes map to safe actionable guidance (0.563749ms)
+✔ unknown action codes retain the sanitized agent message (0.1396ms)
+✔ lifecycle busy explains rejection without suggesting a deferred stop (0.243336ms)
+✖ safe diagnostics identify Dashboard 5.0.0 without changing protocol 3 (1.731257ms)
+✔ live actions are bound to the exact signed socket grant (15.35878ms)
+✔ preconfirmed maintenance actions are sent once with confirmation (3.122853ms)
+✔ Dashboard 5.0.0 exposes the active manual-only Backups workspace (9.79441ms)
+✔ Backups workspace is wired only to supported Host manual maintenance actions (1.717426ms)
+✔ Dashboard and relay expose identical maintenance/provider scopes (1.430093ms)
+✔ legacy backup.create scope remains compatibility-only and is not an active dashboard action (3.745561ms)
+✔ retired Paper coordination protocol cannot return (0.65697ms)
+✔ Dashboard 5.0.0 keeps protocol hooks compatible with a selected-server Configuration workspace (1.712248ms)
+✔ Dashboard visible version metadata matches package 6.0.0 (3.100339ms)
+✔ Dashboard 5.0.0 responsive architecture does not globally scale the interface (1.625347ms)
+✔ Backups production layout uses the shared responsive workspace grid (0.636338ms)
+✔ Dashboard 5.0.0 display update rate exposes every supported browser cadence (2.029776ms)
+✔ foundation is global and the current workspace skin stays out of the development gallery (3.645079ms)
+{"component":"PlexonPanelRelay","runtime":"standalone","event":"started","host":"127.0.0.1","port":0,"storage":"coordination-only","version":"5.0.0","gitCommit":"unavailable","buildTimestamp":"unavailable","protocolVersion":3,"runtimeKind":"standalone"}
+▶ mounted Dashboard selects and operates independent signed instances without stale transitions
+  ✔ opening selector shows live named cards and remembers the selected server (875.544339ms)
+  ✔ signed full shell agrees through skew at actual saved Display rates (3851.18955ms)
+  ✔ every mounted palette destination navigates without an operation, including server choices (1110.032178ms)
+  ✔ switch resets data and confirmation before a second signed workspace becomes live (1309.504058ms)
+  ✔ rapid A to B to A dropdown switches establish a fresh live command channel (751.593238ms)
+  ✔ a delayed session grant for an abandoned selection cannot replace the current socket (1058.402222ms)
+  ✔ reload returns to the selector while preserving selection and independent page history (1949.574794ms)
+  ✖ confirmation binds the original server, action and command parameters even if the form changes (113.87971ms)
+  ✔ player confirmation preserves the supplied name and short UUID when the roster changes (1251.758184ms)
+  ✔ chat send and configured plugin reload confirm their bound server and await signed results (841.623565ms)
+  ✔ same-server target generation replacement cancels confirmation before dispatch (295.461614ms)
+  ✔ a completion from an abandoned server is never displayed in the selected workspace (1536.762479ms)
+  ✔ reported grant expansion cannot expand the verified signed grant or dispatch (2941.201572ms)
+  ✖ mounted navigation-only palette and lifecycle controls preserve unknown Host service state (123.546131ms)
+  ✖ lifecycle commands complete across real signed Paper disconnect and reconnect events (7021.77513ms)
+  ✖ a busy stop stays visible in lifecycle controls without delayed or automatic replay (7022.936474ms)
+  ✔ Owner configuration uses Paper editing, reviews changes and preserves conflicts and unsaved work (706.575885ms)
+  ✖ backup setup is instance-specific, unverified checks stay unknown and cached preflight cannot authorize a new job (8292.248388ms)
+  ✖ signed degraded job separates verification and retry from preflight-gated launch (8909.789515ms)
+  ✔ signed upload progress is shown for the active Host job and ignored for other jobs (1116.162561ms)
+  ✖ cold backup review cancels without a command and confirms only the selected Host (8916.981902ms)
+  ✖ Retry Upload and scheduler save keep their target and wait for signed completion (7006.880084ms)
+  ✔ Host-confirmed stop, agent disconnect and relay disconnect are different UI states (459.166816ms)
+  ✔ access revocation confirms the device and retains its row until the signed response (2008.359507ms)
+  ✖ Settings clears selected-server chat and cache in memory and storage without an agent action (521.373598ms)
+An update to DashboardShell inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to DashboardShell inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to Dashboard inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+{"component":"PlexonPanelRelay","runtime":"standalone","code":"PEER_DELIVERY_FAILED","serverId":"691cf0bf-68fe-44b7-8de8-4d7e82660511","agentKind":"HOST","messageType":"paper.connection","error":"WebSocket send failed"}
+{"component":"PlexonPanelRelay","runtime":"standalone","code":"PEER_DELIVERY_FAILED","serverId":"6b739812-2367-4969-a27a-0918ac231b28","agentKind":"HOST","messageType":"paper.connection","error":"WebSocket send failed"}
+  ✔ revoking one paired server keeps the other available and selectable (1131.424341ms)
+✖ mounted Dashboard selects and operates independent signed instances without stale transitions (71416.36769ms)
+✔ device permissions use the intersection of signed and reported scopes (3.591919ms)
+✔ matching signed and reported grants remain fully available (0.496428ms)
+✔ device or role disagreements fail closed (0.647415ms)
+✔ active dashboard and access views consume the reconciled signed grant (19.314762ms)
+✔ critical and operational state bypasses the presentation throttle (1.102741ms)
+✔ telemetry and bounded inventory remain presentation-throttled (0.214573ms)
+✔ display rate labels distinguish realtime from bounded cadence (0.200743ms)
+✔ five build verification requires coordinated version, protocol, action and fleet contracts (10.901947ms)
+✔ six UI distinguishes contract compatibility, revision parity and unavailable evidence (3.812622ms)
+✔ fleet fixtures cover two servers on one node and independent nodes in both runtimes (1.978871ms)
+✔ renaming keeps routing identities and exact systemd target unchanged (0.23262ms)
+✔ same server on a substituted node is a different target (0.234744ms)
+✔ unit injection, invalid identifiers and control characters fail without echoing input (0.868388ms)
+✔ fleet feed reuses sessions, rejects cross-room events, and keeps credentials out of published snapshots (8.092938ms)
+✔ one revoked background server does not revoke another, and a changed credential starts a new session (3.283956ms)
+✔ subscription limit counts the selected socket and ignores a late grant after unsubscription (0.994948ms)
+✔ shared node totals use one fresh Host sample, separate nodes stay separate, stale and Paper data stay unavailable (1.330363ms)
+✔ cards distinguish service one-core CPU from node CPU and do not fabricate stale or missing metrics (0.898924ms)
+✔ Host replacement clears old metrics and ignores delayed old-session events (0.194403ms)
+✔ fleet rendering exposes selected-server navigation and unavailable metrics without credentials (35.151006ms)
+✔ mixed-version fleet hides service/node totals and blocks Host controls (0.353021ms)
+✔ selector remembers labels while connections are unavailable and distinguishes them from browser device names (6.411216ms)
+✔ a relay socket that never supplies an authenticated ready cannot remain connecting indefinitely (3.619311ms)
+✔ 250ms Host updates cannot manufacture Paper samples or inflate observed p95 (2.191911ms)
+✔ actual source gaps break paths, future clocks are rejected and null is never a zero (0.193391ms)
+✔ window coverage does not bridge missing captures and labels nearest-rank p95 as sampled (0.49143ms)
+✔ systemd CPU stays above 100% with explicit one-core units in scoped exports (1.477786ms)
+✔ service history only accepts authenticated Host cgroup resources; no wire change (1.048338ms)
+✔ default five-second Paper JVM captures form continuous observed coverage (0.419742ms)
+✔ Overview real zero stays a real reading and all six existing instruments remain (293.286463ms)
+✔ unknown and stale values never borrow zero or unrelated traffic freshness (171.430605ms)
+✔ service CPU never borrows Host node CPU or Paper process CPU when cgroup provenance is absent (58.86554ms)
+✔ Host offline leaves fresh Paper metrics available while service values remain unknown (47.906185ms)
+✔ recent player activity is presented by the Players workspace (4.373326ms)
+✔ Overview uses a brief observed activity summary without hidden legacy cards (3.607273ms)
+✔ the 3.x Activity modal queries Paper and suppresses the duplicate History tab (3.476676ms)
+✔ private player facts require an existing grant and a supplied value; real zero stays zero (1.807131ms)
+✔ backup.preflight is authorized by the canonical backup.view contract (1.272026ms)
+✔ browser and relay scope modules are generated from one checked-in manifest (8.643261ms)
+✔ renders the PlexonPanel dashboard shell (664.901846ms)
+✔ does not expose the removed server-side session API (26.480314ms)
+✔ session tray copies only canonical metadata, never operation content or unknown error text (2.536771ms)
+✔ session tray retains repeated completions and bounds the latest 50 items (0.679914ms)
+✔ connection and validated backup-phase snapshots deduplicate, but real changes remain (0.313452ms)
+✔ sample freshness rejects missing, expired, future and disconnected samples consistently (2.509319ms)
+✔ fresh Host traffic cannot label missing Minecraft samples as live or fabricate server metrics (11.235655ms)
+✔ old captures stay stale after replay and switching instances cannot reuse another server's freshness (3.022011ms)
+✔ ready waits for the first current-session sample once, without extending the outage on repeated ready packets (1.350043ms)
+✔ older captures cannot replace current telemetry or service state; role and session boundaries remain enforced (0.815728ms)
+✔ packet receipts prevent timer/skew flicker, one clock serves all indicators, and foregrounding reveals real loss (252.873442ms)
+✔ raw selection uses the minimum actual spacing, including the exact 2px boundary (2.078581ms)
+✔ summary buckets are half-open and the exact right endpoint is retained (0.996451ms)
+✔ TPS thresholds retain real zero and expose unknown independently (0.21949ms)
+✔ null metrics never become zero and one metric cannot supply the other (0.526723ms)
+✔ gaps and unobserved time remain separate even inside an occupied summary bucket (0.409116ms)
+✔ gap tolerance equality follows the existing report adapter and no interval is invented (0.184247ms)
+✔ out-of-order captures are sorted, exact duplicates replace, and input is not mutated (0.26554ms)
+✔ future, invalid and outside-window captures stay in diagnostics and never become live marks (0.851592ms)
+✔ empty and single observations have unknown time and zero fabricated coverage (0.401385ms)
+✔ 8192 retained captures remain exact while raster-facing output is pixel-bounded at mobile and desktop (18.159703ms)
+✔ fractional and tiny plot widths still have bounded buckets and hatch columns (0.898704ms)
+✔ invalid model geometry is rejected instead of fabricated (0.592653ms)
+✔ Pulse uses only source captures, preserves null and zero, deduplicates and sorts (1.659269ms)
+✔ Host repeats do not manufacture Paper captures or merge CPU meanings (0.441344ms)
+✔ exact capture lookup retains endpoints and deterministically chooses the earlier equidistant capture (0.344519ms)
+✔ mounted Pulse keeps exact lens/table parity and never rasterizes for age ticks or Host-only repeats (2002.488857ms)
+✔ Host receipts and age ticks never advance the shared Pulse frame or admit a future Paper capture (2.304331ms)
+✔ a new capture and an instance switch get a new browser-time frame; no extra clock/store is created (0.864532ms)
+✔ actual production manifest and emitted chunks exclude the development kitchen sink (64.869211ms)
+✔ production emits joined Hanken subset faces and a non-preloaded Commit Mono face (4.967911ms)
+✔ foundation components use palette tokens and vendored font licenses are present (45.715191ms)
+✔ UI preferences use provider-aware safe defaults (0.954658ms)
+✔ strict parsing drops unknown and corrupt preference values (0.993907ms)
+✔ invalid display update rates migrate to the balanced default (0.374244ms)
+✔ oversized or invalid stored JSON falls back safely (0.936781ms)
+✔ legacy density and chart window migrate without touching other keys (0.341935ms)
+✔ saved schema mirrors temporary legacy compatibility keys (0.4715ms)
+✔ system resolution honors reduced motion as a safety floor (0.247803ms)
+✔ OS theme and cyan defaults apply only when the v1 key is absent (0.541936ms)
+✔ all saved accents and complete existing preference values survive additive loading (1.044283ms)
+✔ before-paint preference initializer matches the runtime parser for absent and saved keys (33.135831ms)
+✔ production initial root scripts exclude the workspace owner and Fleet rendering payload (28.047233ms)
+✔ read-only console and chat do not enable execution controls (38.031755ms)
+✔ host and file routes show explicit unavailable states without privileged controls (23.559375ms)
+✔ uploaded-looking log content and plugin names remain escaped text (52.931473ms)
+✔ 3.0 activity history opens in place instead of navigating away (8.113064ms)
+✔ Players distinguishes missing scope, local policy and older agents (15.22639ms)
+✔ offline history detail is read-only and exposes no player actions (2.481808ms)
+✔ ordered visible history uses logarithmic bounds and preserves nulls and source provenance (19.294817ms)
+ℹ tests 239
+ℹ suites 0
+ℹ pass 227
+ℹ fail 12
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 104658.82008
+
+✖ failing tests:
+
+test at tests/clock-skew.test.mjs:98:1
+✖ Clocks selects the most recently received Host capture instead of the largest timestamp (45.00751ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  '+0.0 s' !== '0.0 s'
+  
+      at file:///workspace/scratch/28b97b04a664/PlexonPanel-Dashboard/tests/clock-skew.test.mjs:102:9
+      at async mounted (file:///workspace/scratch/28b97b04a664/PlexonPanel-Dashboard/tests/clock-skew.test.mjs:41:7)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '+0.0 s',
+    expected: '0.0 s',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/dashboard-2-1.test.mjs:89:1
+✖ safe diagnostics identify Dashboard 5.0.0 without changing protocol 3 (1.731257ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /PlexonPanel Dashboard 5\.0\.0 \/ Protocol 3/. Input:
+  
+  'PlexonPanel Dashboard 6.0.0 / Protocol 3\n' +
+    'Paper agent: unknown\n' +
+    'Host agent: not installed\n' +
+    'Paper connected: false\n' +
+    'Host connected: false\n' +
+    'Browser time: 2026-10-10T13:27:47.453Z\n' +
+    'Minecraft sample: unavailable / disconnected\n' +
+    'Host sample: unavailable / disconnected\n' +
+    'Console authority: UNAVAILABLE\n' +
+    'Console source state: unknown\n' +
+    'Java: —\n' +
+    'OS / architecture: — / —\n' +
+    'TPS: unavailable\n' +
+    'MSPT: unavailable\n' +
+    'Host CPU: unavailable\n' +
+    'Paper process CPU: unavailable\n' +
+    'JVM heap bytes: unavailable'
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/28b97b04a664/PlexonPanel-Dashboard/tests/dashboard-2-1.test.mjs:91:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'PlexonPanel Dashboard 6.0.0 / Protocol 3\nPaper agent: unknown\nHost agent: not installed\nPaper connected: false\nHost connected: false\nBrowser time: 2026-10-10T13:27:47.453Z\nMinecraft sample: unavailable / disconnected\nHost sample: unavailable / disconnected\nConsole authority: UNAVAILABLE\nConsole source state: unknown\nJava: —\nOS / architecture: — / —\nTPS: unavailable\nMSPT: unavailable\nHost CPU: unavailable\nPaper process CPU: unavailable\nJVM heap bytes: unavailable',
+    expected: /PlexonPanel Dashboard 5\.0\.0 \/ Protocol 3/,
+    operator: 'match',
+    diff: 'simple'
+  }
+
+test at tests/dashboard-flow.test.mjs:272:13
+✖ confirmation binds the original server, action and command parameters even if the form changes (113.87971ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /TonimSMP.*console|console.*TonimSMP/s. Input:
+  
+  'Run commandConfirm operationThis operation will run on TonimSMP using this device’s local permissions.6b739812-2367-4969-a27a-0918ac231b28tpsCancelRun command'
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/28b97b04a664/PlexonPanel-Dashboard/tests/dashboard-flow.test.mjs:282:14)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async TestContext.<anonymous> (file:///workspace/scratch/28b97b04a664/PlexonPanel-Dashboard/tests/dashboard-flow.test.mjs:272:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'Run commandConfirm operationThis operation will run on TonimSMP using this device’s local permissions.6b739812-2367-4969-a27a-0918ac231b28tpsCancelRun command',
+    expected: /TonimSMP.*console|console.*TonimSMP/s,
+    operator: 'match',
+    diff: 'simple'
+  }
+
+test at tests/dashboard-flow.test.mjs:356:13
+✖ mounted navigation-only palette and lifecycle controls preserve unknown Host service state (123.546131ms)
+  TypeError: Cannot read properties of undefined (reading 'disabled')
+      at TestContext.<anonymous> (file:///workspace/scratch/28b97b04a664/PlexonPanel-Dashboard/tests/dashboard-flow.test.mjs:366:90)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async TestContext.<anonymous> (file:///workspace/scratch/28b97b04a664/PlexonPanel-Dashboard/tests/dashboard-flow.test.mjs:356:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+
+test at tests/dashboard-flow.test.mjs:372:13
+✖ lifecycle commands complete across real signed Paper disconnect and reconnect events (7021.77513ms)
+  AssertionError [ERR_ASSERTION]: Timed out: Stop server available; page:  service stateunknownLast received in browser8:28:13 AMService sample captured2026-10-10T13:28:13.634ZDevice roleOwnerBound server6b739812-2367-4969-a27a-0918ac231b28CloseServerRefreshOnlineMinecraft, Host, and relay are connected.ServerHost service: unknown. Paper is connected.Refresh Host statusConnectionsPaper agentConnected5.0.0Host companionConnected5.0.0Server serviceunknownHost systemd lifecycle stateLifecycle controlsunknownHost lifecycle state is unavailable. Refresh Host status before issuing a lifecycle action.Start serverRefresh Host status first.Action unavailableRefresh Host status first.CloseStop serverRefresh Host status first.Action unavailableRefresh Host status first.CloseRestart serverRefresh Host status first.Action unavailableRefresh Host status first.CloseGraceful stop saves the world before shutting down. Start and restart can finish on the Host while Paper is still connecting.Runtime and version detailsSource / unitHost systemd / Paper runtime / state and runtime identityCaptured at2026-10-10T13:28:13.634ZLatest browser packet received at2026-10-10T13:28:13.636ZRuntime detailsHost serviceUnavailableHost service stateunknownHost service PIDUnavailableHost operating systemUnavailableHost architectureUnavailablePaper JavaUnavailablePaper operating systemUnavailablePaper architectureUnavailableMinecraft26.2Paper agent5.0.0Host agent5.0.0Dashboard6.0.0Protocol3Access is granted separately by each server. Operations use the current signed instance.NavigationPlexonPanelControl room 6.0.0FleetMonitorOverviewPerformanceOperatePlayersConsoleChatPluginsServerBackupsManageConfigurationAccessAuditSettingsKeyboard shortcutsGo to workspaceNavigate to a workspace or a paired server. Operations are reviewed in their workspace.Find workspace or serverGo to FleetGo to OverviewGo to PerformanceGo to PlayersGo to ConsoleGo to ChatGo to PluginsGo to ServerGo to BackupsGo to ConfigurationGo to AuditGo to AccessGo to SettingsPaired serversPlexonCraftTonimSMPKeyboard shortcutsNavigation only. Two-key shortcuts are ignored while typing or when a dialog is open.Find workspace or serverCtrl / ⌘ KShow shortcuts?Fleetg then gOverviewg then oPerformanceg then pPlayersg then lConsoleg then cChatg then hPluginsg then iServerg then sBackupsg then bConfigurationg then fAccessg then aAuditg then uSettingsg then tSession activityThe latest 50 metadata items observed in this tab. No commands, file contents or chat messages are retained here. This is not the server audit log.8:27:57 AMPlexonCraftRelay connecting. Paper Unknown. Host Unknown8:27:57 AMPlexonCraftRelay live. Paper Connected. Host Connected8:27:58 AMTonimSMPRelay connecting. Paper Unknown. Host Unknown8:27:58 AMTonimSMPRelay live. Paper Connected. Host Connected8:27:59 AMTonimSMPconsole history. HOST. SUCCESS. OK8:28:00 AMTonimSMPplayer ban. PAPER. SUCCESS. OK8:28:01 AMTonimSMPchat global send. PAPER. SUCCESS. OK8:28:01 AMTonimSMPplugin command reload. PAPER. SUCCESS. OK8:28:02 AMTonimSMPRelay live. Paper Connected. Host Disconnected8:28:02 AMTonimSMPRelay live. Paper Connected. Host Connected8:28:02 AMPlexonCraftRelay connecting. Paper Unknown. Host Unknown8:28:02 AMPlexonCraftRelay live. Paper Connected. Host Connected8:28:02 AMTonimSMPRelay connecting. Paper Unknown. Host Unknown8:28:02 AMTonimSMPRelay live. Paper Connected. Host Connected8:28:03 AMTonimSMPRelay reconnecting. Paper Unknown. Host Unknown8:28:05 AMTonimSMPRelay live. Paper Connected. Host ConnectedClear session activity
+      at wait (file:///workspace/scratch/28b97b04a664/PlexonPanel-Dashboard/tests/dashboard-flow.test.mjs:111:14)
+      at async TestContext.<anonymous> (file:///workspace/scratch/28b97b04a664/PlexonPanel-Dashboard/tests/dashboard-flow.test.mjs:376:9)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async TestContext.<anonymous> (file:///workspace/scratch/28b97b04a664/PlexonPanel-Dashboard/tests/dashboard-flow.test.mjs:372:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests/dashboard-flow.test.mjs:388:13
+✖ a busy stop stays visible in lifecycle controls without delayed or automatic replay (7022.936474ms)
+  AssertionError [ERR_ASSERTION]: Timed out: stop control ready; page:  service stateunknownLast received in browser8:28:20 AMService sample captured2026-10-10T13:28:20.647ZDevice roleOwnerBound server6b739812-2367-4969-a27a-0918ac231b28CloseServerRefreshOnlineMinecraft, Host, and relay are connected.ServerHost service: unknown. Paper is connected.Refresh Host statusConnectionsPaper agentConnected5.0.0Host companionConnected5.0.0Server serviceunknownHost systemd lifecycle stateLifecycle controlsunknownHost lifecycle state is unavailable. Refresh Host status before issuing a lifecycle action.Start serverRefresh Host status first.Action unavailableRefresh Host status first.CloseStop serverRefresh Host status first.Action unavailableRefresh Host status first.CloseRestart serverRefresh Host status first.Action unavailableRefresh Host status first.CloseGraceful stop saves the world before shutting down. Start and restart can finish on the Host while Paper is still connecting.Runtime and version detailsSource / unitHost systemd / Paper runtime / state and runtime identityCaptured at2026-10-10T13:28:20.647ZLatest browser packet received at2026-10-10T13:28:20.650ZRuntime detailsHost serviceUnavailableHost service stateunknownHost service PIDUnavailableHost operating systemUnavailableHost architectureUnavailablePaper JavaUnavailablePaper operating systemUnavailablePaper architectureUnavailableMinecraft26.2Paper agent5.0.0Host agent5.0.0Dashboard6.0.0Protocol3Access is granted separately by each server. Operations use the current signed instance.NavigationPlexonPanelControl room 6.0.0FleetMonitorOverviewPerformanceOperatePlayersConsoleChatPluginsServerBackupsManageConfigurationAccessAuditSettingsKeyboard shortcutsGo to workspaceNavigate to a workspace or a paired server. Operations are reviewed in their workspace.Find workspace or serverGo to FleetGo to OverviewGo to PerformanceGo to PlayersGo to ConsoleGo to ChatGo to PluginsGo to ServerGo to BackupsGo to ConfigurationGo to AuditGo to AccessGo to SettingsPaired serversPlexonCraftTonimSMPKeyboard shortcutsNavigation only. Two-key shortcuts are ignored while typing or when a dialog is open.Find workspace or serverCtrl / ⌘ KShow shortcuts?Fleetg then gOverviewg then oPerformanceg then pPlayersg then lConsoleg then cChatg then hPluginsg then iServerg then sBackupsg then bConfigurationg then fAccessg then aAuditg then uSettingsg then tSession activityThe latest 50 metadata items observed in this tab. No commands, file contents or chat messages are retained here. This is not the server audit log.8:27:57 AMPlexonCraftRelay connecting. Paper Unknown. Host Unknown8:27:57 AMPlexonCraftRelay live. Paper Connected. Host Connected8:27:58 AMTonimSMPRelay connecting. Paper Unknown. Host Unknown8:27:58 AMTonimSMPRelay live. Paper Connected. Host Connected8:27:59 AMTonimSMPconsole history. HOST. SUCCESS. OK8:28:00 AMTonimSMPplayer ban. PAPER. SUCCESS. OK8:28:01 AMTonimSMPchat global send. PAPER. SUCCESS. OK8:28:01 AMTonimSMPplugin command reload. PAPER. SUCCESS. OK8:28:02 AMTonimSMPRelay live. Paper Connected. Host Disconnected8:28:02 AMTonimSMPRelay live. Paper Connected. Host Connected8:28:02 AMPlexonCraftRelay connecting. Paper Unknown. Host Unknown8:28:02 AMPlexonCraftRelay live. Paper Connected. Host Connected8:28:02 AMTonimSMPRelay connecting. Paper Unknown. Host Unknown8:28:02 AMTonimSMPRelay live. Paper Connected. Host Connected8:28:03 AMTonimSMPRelay reconnecting. Paper Unknown. Host Unknown8:28:05 AMTonimSMPRelay live. Paper Connected. Host ConnectedClear session activity
+      at wait (file:///workspace/scratch/28b97b04a664/PlexonPanel-Dashboard/tests/dashboard-flow.test.mjs:111:14)
+      at async TestContext.<anonymous> (file:///workspace/scratch/28b97b04a664/PlexonPanel-Dashboard/tests/dashboard-flow.test.mjs:391:7)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async TestContext.<anonymous> (file:///workspace/scratch/28b97b04a664/PlexonPanel-Dashboard/tests/dashboard-flow.test.mjs:388:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests/dashboard-flow.test.mjs:460:13
+✖ backup setup is instance-specific, unverified checks stay unknown and cached preflight cannot authorize a new job (8292.248388ms)
+  AssertionError [ERR_ASSERTION]: Timed out: fresh authoritative preflight; page: tomatic restart scheduleEnabledFrequencyFrequencyDaily — FrequencyDailyWeeklySelected weekdaysLocal timeTimezoneInitial player countdownInitial player countdown15 minutes. 15m / 1m / 30s / 15s / 5s notices — Initial player countdown30 minutes. 30m / 15m / 1m / 30s / 15s / 5s notices15 minutes. 15m / 1m / 30s / 15s / 5s notices10 minutes. 10m / 1m / 30s / 15s / 5s notices5 minutes. 5m / 1m / 30s / 15s / 5s noticesShutdown timeout. secondsStartup timeout. secondsManual full backupAutomatic backups are retired. Full backup creation is manually initiated through Fully Backup Now and executed by the always-on Host Companion.RetentionRetentionSingle current — RetentionSingle currentRotatingCanonical filenameRestart after backupRequiredMinecraft service recovery is mandatory after a manual full backup or safely degraded completion.Save settingsNot available right nowAction unavailableNot available right nowCloseDiscardNot available right nowAction unavailableNot available right nowCloseAccess is granted separately by each server. Operations use the current signed instance.NavigationPlexonPanelControl room 6.0.0FleetMonitorOverviewPerformanceOperatePlayersConsoleChatPluginsServerBackupsManageConfigurationAccessAuditSettingsKeyboard shortcutsGo to workspaceNavigate to a workspace or a paired server. Operations are reviewed in their workspace.Find workspace or serverGo to FleetGo to OverviewGo to PerformanceGo to PlayersGo to ConsoleGo to ChatGo to PluginsGo to ServerGo to BackupsGo to ConfigurationGo to AuditGo to AccessGo to SettingsPaired serversPlexonCraftTonimSMPKeyboard shortcutsNavigation only. Two-key shortcuts are ignored while typing or when a dialog is open.Find workspace or serverCtrl / ⌘ KShow shortcuts?Fleetg then gOverviewg then oPerformanceg then pPlayersg then lConsoleg then cChatg then hPluginsg then iServerg then sBackupsg then bConfigurationg then fAccessg then aAuditg then uSettingsg then tSession activityThe latest 50 metadata items observed in this tab. No commands, file contents or chat messages are retained here. This is not the server audit log.8:27:57 AMPlexonCraftRelay connecting. Paper Unknown. Host Unknown8:27:57 AMPlexonCraftRelay live. Paper Connected. Host Connected8:27:58 AMTonimSMPRelay connecting. Paper Unknown. Host Unknown8:27:58 AMTonimSMPRelay live. Paper Connected. Host Connected8:27:59 AMTonimSMPconsole history. HOST. SUCCESS. OK8:28:00 AMTonimSMPplayer ban. PAPER. SUCCESS. OK8:28:01 AMTonimSMPchat global send. PAPER. SUCCESS. OK8:28:01 AMTonimSMPplugin command reload. PAPER. SUCCESS. OK8:28:02 AMTonimSMPRelay live. Paper Connected. Host Disconnected8:28:02 AMTonimSMPRelay live. Paper Connected. Host Connected8:28:02 AMPlexonCraftRelay connecting. Paper Unknown. Host Unknown8:28:02 AMPlexonCraftRelay live. Paper Connected. Host Connected8:28:02 AMTonimSMPRelay connecting. Paper Unknown. Host Unknown8:28:02 AMTonimSMPRelay live. Paper Connected. Host Connected8:28:03 AMTonimSMPRelay reconnecting. Paper Unknown. Host Unknown8:28:05 AMTonimSMPRelay live. Paper Connected. Host Connected8:28:20 AMTonimSMPfiles read. PAPER. SUCCESS. OK8:28:21 AMTonimSMPfiles write. PAPER. SUCCESS. OK8:28:21 AMTonimSMPfiles write. PAPER. CONFLICT. STALE_FILE8:28:21 AMPlexonCraftRelay connecting. Paper Unknown. Host Unknown8:28:21 AMPlexonCraftRelay live. Paper Connected. Host Connected8:28:21 AMTonimSMPRelay connecting. Paper Unknown. Host Unknown8:28:21 AMTonimSMPRelay live. Paper Connected. Host ConnectedClear session activity
+      at wait (file:///workspace/scratch/28b97b04a664/PlexonPanel-Dashboard/tests/dashboard-flow.test.mjs:111:14)
+      at async TestContext.<anonymous> (file:///workspace/scratch/28b97b04a664/PlexonPanel-Dashboard/tests/dashboard-flow.test.mjs:474:7)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async TestContext.<anonymous> (file:///workspace/scratch/28b97b04a664/PlexonPanel-Dashboard/tests/dashboard-flow.test.mjs:460:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests/dashboard-flow.test.mjs:498:13
+✖ signed degraded job separates verification and retry from preflight-gated launch (8909.789515ms)
+  AssertionError [ERR_ASSERTION]: Timed out: preflight response; page:  15m / 1m / 30s / 15s / 5s notices10 minutes. 10m / 1m / 30s / 15s / 5s notices5 minutes. 5m / 1m / 30s / 15s / 5s noticesShutdown timeout. secondsStartup timeout. secondsManual full backupAutomatic backups are retired. Full backup creation is manually initiated through Fully Backup Now and executed by the always-on Host Companion.RetentionRetentionSingle current — RetentionSingle currentRotatingCanonical filenameRestart after backupRequiredMinecraft service recovery is mandatory after a manual full backup or safely degraded completion.Save settingsNot available right nowAction unavailableNot available right nowCloseDiscardNot available right nowAction unavailableNot available right nowCloseAccess is granted separately by each server. Operations use the current signed instance.NavigationPlexonPanelControl room 6.0.0FleetMonitorOverviewPerformanceOperatePlayersConsoleChatPluginsServerBackupsManageConfigurationAccessAuditSettingsKeyboard shortcutsGo to workspaceNavigate to a workspace or a paired server. Operations are reviewed in their workspace.Find workspace or serverGo to FleetGo to OverviewGo to PerformanceGo to PlayersGo to ConsoleGo to ChatGo to PluginsGo to ServerGo to BackupsGo to ConfigurationGo to AuditGo to AccessGo to SettingsPaired serversPlexonCraftTonimSMPKeyboard shortcutsNavigation only. Two-key shortcuts are ignored while typing or when a dialog is open.Find workspace or serverCtrl / ⌘ KShow shortcuts?Fleetg then gOverviewg then oPerformanceg then pPlayersg then lConsoleg then cChatg then hPluginsg then iServerg then sBackupsg then bConfigurationg then fAccessg then aAuditg then uSettingsg then tSession activityThe latest 50 metadata items observed in this tab. No commands, file contents or chat messages are retained here. This is not the server audit log.8:27:57 AMPlexonCraftRelay connecting. Paper Unknown. Host Unknown8:27:57 AMPlexonCraftRelay live. Paper Connected. Host Connected8:27:58 AMTonimSMPRelay connecting. Paper Unknown. Host Unknown8:27:58 AMTonimSMPRelay live. Paper Connected. Host Connected8:27:59 AMTonimSMPconsole history. HOST. SUCCESS. OK8:28:00 AMTonimSMPplayer ban. PAPER. SUCCESS. OK8:28:01 AMTonimSMPchat global send. PAPER. SUCCESS. OK8:28:01 AMTonimSMPplugin command reload. PAPER. SUCCESS. OK8:28:02 AMTonimSMPRelay live. Paper Connected. Host Disconnected8:28:02 AMTonimSMPRelay live. Paper Connected. Host Connected8:28:02 AMPlexonCraftRelay connecting. Paper Unknown. Host Unknown8:28:02 AMPlexonCraftRelay live. Paper Connected. Host Connected8:28:02 AMTonimSMPRelay connecting. Paper Unknown. Host Unknown8:28:02 AMTonimSMPRelay live. Paper Connected. Host Connected8:28:03 AMTonimSMPRelay reconnecting. Paper Unknown. Host Unknown8:28:05 AMTonimSMPRelay live. Paper Connected. Host Connected8:28:20 AMTonimSMPfiles read. PAPER. SUCCESS. OK8:28:21 AMTonimSMPfiles write. PAPER. SUCCESS. OK8:28:21 AMTonimSMPfiles write. PAPER. CONFLICT. STALE_FILE8:28:21 AMPlexonCraftRelay connecting. Paper Unknown. Host Unknown8:28:21 AMPlexonCraftRelay live. Paper Connected. Host Connected8:28:21 AMTonimSMPRelay connecting. Paper Unknown. Host Unknown8:28:21 AMTonimSMPRelay live. Paper Connected. Host Connected8:28:29 AMPlexonCraftRelay connecting. Paper Unknown. Host Unknown8:28:29 AMPlexonCraftRelay live. Paper Connected. Host Connected8:28:30 AMTonimSMPRelay connecting. Paper Unknown. Host Unknown8:28:30 AMTonimSMPRelay live. Paper Connected. Host Connected8:28:30 AMTonimSMPBackup phase. DEGRADEDClear session activity
+      at wait (file:///workspace/scratch/28b97b04a664/PlexonPanel-Dashboard/tests/dashboard-flow.test.mjs:111:14)
+      at async TestContext.<anonymous> (file:///workspace/scratch/28b97b04a664/PlexonPanel-Dashboard/tests/dashboard-flow.test.mjs:505:9)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async TestContext.<anonymous> (file:///workspace/scratch/28b97b04a664/PlexonPanel-Dashboard/tests/dashboard-flow.test.mjs:498:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests/dashboard-flow.test.mjs:527:13
+✖ cold backup review cancels without a command and confirms only the selected Host (8916.981902ms)
+  AssertionError [ERR_ASSERTION]: Timed out: backup ready for review; page:  Initial backup countdown30 minutes15 minutes10 minutes5 minutesProvider & diagnosticsReadyProviderRCLONERemotegdrive:plexonpanel/6b739812-2367-4969-a27a-0918ac231b28Runtime stateCONNECTEDLast testPassed during latest preflightLast remote verification—CredentialsHost-local onlyTest Google DriveLast full backupNoneLast verified—Size—Verification—Availability—Automatic backupsRetired — manual onlyPaper dependencyNone for the backup critical pathVerified backup history0 loadedVerification, retry-upload and retention controls remain available here. Direct server-tree restore is intentionally excluded from the stable Host contract so the always-on Host can keep the Minecraft tree read-only.No confirmed backupsInventory is shown only from confirmed Host data.Automatic restart scheduleHost timezoneNext restart—Restart-only maintenanceFull backupsManual onlyNo automatic full-backup scheduleRestart serverSupported maintenance settingsHost persistedAutomatic restart scheduleEnabledFrequencyFrequencyDaily — FrequencyDailyWeeklySelected weekdaysLocal timeTimezoneInitial player countdownInitial player countdown15 minutes. 15m / 1m / 30s / 15s / 5s notices — Initial player countdown30 minutes. 30m / 15m / 1m / 30s / 15s / 5s notices15 minutes. 15m / 1m / 30s / 15s / 5s notices10 minutes. 10m / 1m / 30s / 15s / 5s notices5 minutes. 5m / 1m / 30s / 15s / 5s noticesShutdown timeout. secondsStartup timeout. secondsManual full backupAutomatic backups are retired. Full backup creation is manually initiated through Fully Backup Now and executed by the always-on Host Companion.RetentionRetentionSingle current — RetentionSingle currentRotatingCanonical filenameRestart after backupRequiredMinecraft service recovery is mandatory after a manual full backup or safely degraded completion.Save settingsNot available right nowAction unavailableNot available right nowCloseDiscardNot available right nowAction unavailableNot available right nowCloseAccess is granted separately by each server. Operations use the current signed instance.NavigationPlexonPanelControl room 6.0.0FleetMonitorOverviewPerformanceOperatePlayersConsoleChatPluginsServerBackupsManageConfigurationAccessAuditSettingsKeyboard shortcutsGo to workspaceNavigate to a workspace or a paired server. Operations are reviewed in their workspace.Find workspace or serverGo to FleetGo to OverviewGo to PerformanceGo to PlayersGo to ConsoleGo to ChatGo to PluginsGo to ServerGo to BackupsGo to ConfigurationGo to AuditGo to AccessGo to SettingsPaired serversPlexonCraftTonimSMPKeyboard shortcutsNavigation only. Two-key shortcuts are ignored while typing or when a dialog is open.Find workspace or serverCtrl / ⌘ KShow shortcuts?Fleetg then gOverviewg then oPerformanceg then pPlayersg then lConsoleg then cChatg then hPluginsg then iServerg then sBackupsg then bConfigurationg then fAccessg then aAuditg then uSettingsg then tSession activityThe latest 50 metadata items observed in this tab. No commands, file contents or chat messages are retained here. This is not the server audit log.8:28:38 AMTonimSMPRelay connecting. Paper Unknown. Host Unknown8:28:38 AMTonimSMPRelay live. Paper Connected. Host Connected8:28:39 AMTonimSMPBackup phase. UPLOADING_REMOTE8:28:39 AMPlexonCraftRelay connecting. Paper Unknown. Host Unknown8:28:39 AMPlexonCraftRelay live. Paper Connected. Host Connected8:28:40 AMTonimSMPRelay connecting. Paper Unknown. Host Unknown8:28:40 AMTonimSMPRelay live. Paper Connected. Host ConnectedClear session activity
+      at wait (file:///workspace/scratch/28b97b04a664/PlexonPanel-Dashboard/tests/dashboard-flow.test.mjs:111:14)
+      at async TestContext.<anonymous> (file:///workspace/scratch/28b97b04a664/PlexonPanel-Dashboard/tests/dashboard-flow.test.mjs:531:7)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async TestContext.<anonymous> (file:///workspace/scratch/28b97b04a664/PlexonPanel-Dashboard/tests/dashboard-flow.test.mjs:527:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests/dashboard-flow.test.mjs:553:13
+✖ Retry Upload and scheduler save keep their target and wait for signed completion (7006.880084ms)
+  AssertionError [ERR_ASSERTION]: Timed out: retained upload retry; page:  Initial backup countdown30 minutes15 minutes10 minutes5 minutesProvider & diagnosticsReadyProviderRCLONERemotegdrive:plexonpanel/6b739812-2367-4969-a27a-0918ac231b28Runtime stateCONNECTEDLast testPassed during latest preflightLast remote verification—CredentialsHost-local onlyTest Google DriveLast full backupNoneLast verified—Size—Verification—Availability—Automatic backupsRetired — manual onlyPaper dependencyNone for the backup critical pathVerified backup history0 loadedVerification, retry-upload and retention controls remain available here. Direct server-tree restore is intentionally excluded from the stable Host contract so the always-on Host can keep the Minecraft tree read-only.No confirmed backupsInventory is shown only from confirmed Host data.Automatic restart scheduleHost timezoneNext restart—Restart-only maintenanceFull backupsManual onlyNo automatic full-backup scheduleRestart serverSupported maintenance settingsHost persistedAutomatic restart scheduleEnabledFrequencyFrequencyDaily — FrequencyDailyWeeklySelected weekdaysLocal timeTimezoneInitial player countdownInitial player countdown15 minutes. 15m / 1m / 30s / 15s / 5s notices — Initial player countdown30 minutes. 30m / 15m / 1m / 30s / 15s / 5s notices15 minutes. 15m / 1m / 30s / 15s / 5s notices10 minutes. 10m / 1m / 30s / 15s / 5s notices5 minutes. 5m / 1m / 30s / 15s / 5s noticesShutdown timeout. secondsStartup timeout. secondsManual full backupAutomatic backups are retired. Full backup creation is manually initiated through Fully Backup Now and executed by the always-on Host Companion.RetentionRetentionSingle current — RetentionSingle currentRotatingCanonical filenameRestart after backupRequiredMinecraft service recovery is mandatory after a manual full backup or safely degraded completion.Save settingsNot available right nowAction unavailableNot available right nowCloseDiscardNot available right nowAction unavailableNot available right nowCloseAccess is granted separately by each server. Operations use the current signed instance.NavigationPlexonPanelControl room 6.0.0FleetMonitorOverviewPerformanceOperatePlayersConsoleChatPluginsServerBackupsManageConfigurationAccessAuditSettingsKeyboard shortcutsGo to workspaceNavigate to a workspace or a paired server. Operations are reviewed in their workspace.Find workspace or serverGo to FleetGo to OverviewGo to PerformanceGo to PlayersGo to ConsoleGo to ChatGo to PluginsGo to ServerGo to BackupsGo to ConfigurationGo to AuditGo to AccessGo to SettingsPaired serversPlexonCraftTonimSMPKeyboard shortcutsNavigation only. Two-key shortcuts are ignored while typing or when a dialog is open.Find workspace or serverCtrl / ⌘ KShow shortcuts?Fleetg then gOverviewg then oPerformanceg then pPlayersg then lConsoleg then cChatg then hPluginsg then iServerg then sBackupsg then bConfigurationg then fAccessg then aAuditg then uSettingsg then tSession activityThe latest 50 metadata items observed in this tab. No commands, file contents or chat messages are retained here. This is not the server audit log.8:28:38 AMTonimSMPRelay connecting. Paper Unknown. Host Unknown8:28:38 AMTonimSMPRelay live. Paper Connected. Host Connected8:28:39 AMTonimSMPBackup phase. UPLOADING_REMOTE8:28:39 AMPlexonCraftRelay connecting. Paper Unknown. Host Unknown8:28:39 AMPlexonCraftRelay live. Paper Connected. Host Connected8:28:40 AMTonimSMPRelay connecting. Paper Unknown. Host Unknown8:28:40 AMTonimSMPRelay live. Paper Connected. Host ConnectedClear session activity
+      at wait (file:///workspace/scratch/28b97b04a664/PlexonPanel-Dashboard/tests/dashboard-flow.test.mjs:111:14)
+      at async TestContext.<anonymous> (file:///workspace/scratch/28b97b04a664/PlexonPanel-Dashboard/tests/dashboard-flow.test.mjs:555:38)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async TestContext.<anonymous> (file:///workspace/scratch/28b97b04a664/PlexonPanel-Dashboard/tests/dashboard-flow.test.mjs:553:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests/dashboard-flow.test.mjs:585:13
+✖ Settings clears selected-server chat and cache in memory and storage without an agent action (521.373598ms)
+  AssertionError [ERR_ASSERTION]: Cleared telemetry is not fabricated as healthy
+      at TestContext.<anonymous> (file:///workspace/scratch/28b97b04a664/PlexonPanel-Dashboard/tests/dashboard-flow.test.mjs:591:171)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async TestContext.<anonymous> (file:///workspace/scratch/28b97b04a664/PlexonPanel-Dashboard/tests/dashboard-flow.test.mjs:585:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 'online',
+    expected: 'online',
+    operator: 'notStrictEqual',
+    diff: 'simple'
+  }

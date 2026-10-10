@@ -1,0 +1,4253 @@
+{
+  "stage": "before",
+  "production": true,
+  "fontDelayMs": 1200,
+  "samples": [
+    {
+      "theme": "light",
+      "width": 390,
+      "repeat": 0,
+      "cls": 0.15323222538778095,
+      "shifts": [
+        {
+          "value": 0.08726204495093384,
+          "time": 383.69999999995343,
+          "recentInput": false,
+          "sources": [
+            {
+              "tag": "DL",
+              "classes": "fleet-metrics",
+              "previous": {
+                "x": 37,
+                "y": 657.359375,
+                "width": 316,
+                "height": 208,
+                "top": 657.359375,
+                "right": 353,
+                "bottom": 865.359375,
+                "left": 37
+              },
+              "current": {
+                "x": 37,
+                "y": 620.3125,
+                "width": 316,
+                "height": 181,
+                "top": 620.3125,
+                "right": 353,
+                "bottom": 801.3125,
+                "left": 37
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "fleet-reason",
+              "previous": {
+                "x": 36,
+                "y": 598.984375,
+                "width": 317,
+                "height": 38.375,
+                "top": 598.984375,
+                "right": 353,
+                "bottom": 637.359375,
+                "left": 36
+              },
+              "current": {
+                "x": 37,
+                "y": 564.484375,
+                "width": 316,
+                "height": 35.828125,
+                "top": 564.484375,
+                "right": 353,
+                "bottom": 600.3125,
+                "left": 37
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "fleet-source",
+              "previous": {
+                "x": 37,
+                "y": 885.359375,
+                "width": 316,
+                "height": 14.640625,
+                "top": 885.359375,
+                "right": 353,
+                "bottom": 900,
+                "left": 37
+              },
+              "current": {
+                "x": 37,
+                "y": 821.3125,
+                "width": 316,
+                "height": 16.5,
+                "top": 821.3125,
+                "right": 353,
+                "bottom": 837.8125,
+                "left": 37
+              }
+            },
+            {
+              "tag": "SPAN",
+              "classes": "fleet-status fleet-status-online",
+              "previous": {
+                "x": 37,
+                "y": 558.484375,
+                "width": 215,
+                "height": 24.5,
+                "top": 558.484375,
+                "right": 252,
+                "bottom": 582.984375,
+                "left": 37
+              },
+              "current": {
+                "x": 293,
+                "y": 498.984375,
+                "width": 60,
+                "height": 24.5,
+                "top": 498.984375,
+                "right": 353,
+                "bottom": 523.484375,
+                "left": 293
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "fleet-source",
+              "previous": {
+                "x": 0,
+                "y": 0,
+                "width": 0,
+                "height": 0,
+                "top": 0,
+                "right": 0,
+                "bottom": 0,
+                "left": 0
+              },
+              "current": {
+                "x": 37,
+                "y": 842.8125,
+                "width": 316,
+                "height": 16.5,
+                "top": 842.8125,
+                "right": 353,
+                "bottom": 859.3125,
+                "left": 37
+              }
+            }
+          ]
+        },
+        {
+          "value": 0.0659701804368471,
+          "time": 1224.0999999999767,
+          "recentInput": false,
+          "sources": [
+            {
+              "tag": "DIV",
+              "classes": "fleet-cards",
+              "previous": {
+                "x": 8,
+                "y": 471.984375,
+                "width": 374,
+                "height": 428.015625,
+                "top": 471.984375,
+                "right": 382,
+                "bottom": 900,
+                "left": 8
+              },
+              "current": {
+                "x": 8,
+                "y": 437.984375,
+                "width": 374,
+                "height": 462.015625,
+                "top": 437.984375,
+                "right": 382,
+                "bottom": 900,
+                "left": 8
+              }
+            },
+            {
+              "tag": "SPAN",
+              "classes": "",
+              "previous": {
+                "x": 37,
+                "y": 422.984375,
+                "width": 221,
+                "height": 18,
+                "top": 422.984375,
+                "right": 258,
+                "bottom": 440.984375,
+                "left": 37
+              },
+              "current": {
+                "x": 142,
+                "y": 384.484375,
+                "width": 197,
+                "height": 18,
+                "top": 384.484375,
+                "right": 339,
+                "bottom": 402.484375,
+                "left": 142
+              }
+            },
+            {
+              "tag": "BUTTON",
+              "classes": "ui-button",
+              "previous": {
+                "x": 203,
+                "y": 28,
+                "width": 171,
+                "height": 42,
+                "top": 28,
+                "right": 374,
+                "bottom": 70,
+                "left": 203
+              },
+              "current": {
+                "x": 228,
+                "y": 28,
+                "width": 146,
+                "height": 42,
+                "top": 28,
+                "right": 374,
+                "bottom": 70,
+                "left": 228
+              }
+            },
+            {
+              "tag": "BUTTON",
+              "classes": "",
+              "previous": {
+                "x": 0,
+                "y": 0,
+                "width": 0,
+                "height": 0,
+                "top": 0,
+                "right": 0,
+                "bottom": 0,
+                "left": 0
+              },
+              "current": {
+                "x": 37,
+                "y": 885.3125,
+                "width": 316,
+                "height": 14.6875,
+                "top": 885.3125,
+                "right": 353,
+                "bottom": 900,
+                "left": 37
+              }
+            },
+            {
+              "tag": "SPAN",
+              "classes": "",
+              "previous": {
+                "x": 171,
+                "y": 336.984375,
+                "width": 141,
+                "height": 27,
+                "top": 336.984375,
+                "right": 312,
+                "bottom": 363.984375,
+                "left": 171
+              },
+              "current": {
+                "x": 157,
+                "y": 336.984375,
+                "width": 124,
+                "height": 27,
+                "top": 336.984375,
+                "right": 281,
+                "bottom": 363.984375,
+                "left": 157
+              }
+            }
+          ]
+        }
+      ],
+      "fontsBefore": [
+        {
+          "family": "Plexon Hanken",
+          "status": "loading"
+        },
+        {
+          "family": "hankenLatin Fallback",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Hanken",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Commit Mono",
+          "status": "unloaded"
+        }
+      ],
+      "fontsAfter": [
+        {
+          "family": "Plexon Hanken",
+          "status": "loaded"
+        },
+        {
+          "family": "hankenLatin Fallback",
+          "status": "error"
+        },
+        {
+          "family": "Plexon Hanken",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Commit Mono",
+          "status": "unloaded"
+        }
+      ],
+      "stack": "\"Plexon Hanken\", \"hankenLatin Fallback\", Arial, sans-serif",
+      "fontResources": [
+        {
+          "url": "http://127.0.0.1:3400/_next/static/media/hanken_latin-s.p.3241148m1u9do.woff2",
+          "start": 10.199999999953434,
+          "end": 1219.0999999999767
+        }
+      ]
+    },
+    {
+      "theme": "light",
+      "width": 390,
+      "repeat": 1,
+      "cls": 0.15323222538778095,
+      "shifts": [
+        {
+          "value": 0.08726204495093384,
+          "time": 685.8000000000466,
+          "recentInput": false,
+          "sources": [
+            {
+              "tag": "DL",
+              "classes": "fleet-metrics",
+              "previous": {
+                "x": 37,
+                "y": 657.359375,
+                "width": 316,
+                "height": 208,
+                "top": 657.359375,
+                "right": 353,
+                "bottom": 865.359375,
+                "left": 37
+              },
+              "current": {
+                "x": 37,
+                "y": 620.3125,
+                "width": 316,
+                "height": 181,
+                "top": 620.3125,
+                "right": 353,
+                "bottom": 801.3125,
+                "left": 37
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "fleet-reason",
+              "previous": {
+                "x": 36,
+                "y": 598.984375,
+                "width": 317,
+                "height": 38.375,
+                "top": 598.984375,
+                "right": 353,
+                "bottom": 637.359375,
+                "left": 36
+              },
+              "current": {
+                "x": 37,
+                "y": 564.484375,
+                "width": 316,
+                "height": 35.828125,
+                "top": 564.484375,
+                "right": 353,
+                "bottom": 600.3125,
+                "left": 37
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "fleet-source",
+              "previous": {
+                "x": 37,
+                "y": 885.359375,
+                "width": 316,
+                "height": 14.640625,
+                "top": 885.359375,
+                "right": 353,
+                "bottom": 900,
+                "left": 37
+              },
+              "current": {
+                "x": 37,
+                "y": 821.3125,
+                "width": 316,
+                "height": 16.5,
+                "top": 821.3125,
+                "right": 353,
+                "bottom": 837.8125,
+                "left": 37
+              }
+            },
+            {
+              "tag": "SPAN",
+              "classes": "fleet-status fleet-status-online",
+              "previous": {
+                "x": 37,
+                "y": 558.484375,
+                "width": 215,
+                "height": 24.5,
+                "top": 558.484375,
+                "right": 252,
+                "bottom": 582.984375,
+                "left": 37
+              },
+              "current": {
+                "x": 293,
+                "y": 498.984375,
+                "width": 60,
+                "height": 24.5,
+                "top": 498.984375,
+                "right": 353,
+                "bottom": 523.484375,
+                "left": 293
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "fleet-source",
+              "previous": {
+                "x": 0,
+                "y": 0,
+                "width": 0,
+                "height": 0,
+                "top": 0,
+                "right": 0,
+                "bottom": 0,
+                "left": 0
+              },
+              "current": {
+                "x": 37,
+                "y": 842.8125,
+                "width": 316,
+                "height": 16.5,
+                "top": 842.8125,
+                "right": 353,
+                "bottom": 859.3125,
+                "left": 37
+              }
+            }
+          ]
+        },
+        {
+          "value": 0.0659701804368471,
+          "time": 1242.8000000000466,
+          "recentInput": false,
+          "sources": [
+            {
+              "tag": "DIV",
+              "classes": "fleet-cards",
+              "previous": {
+                "x": 8,
+                "y": 471.984375,
+                "width": 374,
+                "height": 428.015625,
+                "top": 471.984375,
+                "right": 382,
+                "bottom": 900,
+                "left": 8
+              },
+              "current": {
+                "x": 8,
+                "y": 437.984375,
+                "width": 374,
+                "height": 462.015625,
+                "top": 437.984375,
+                "right": 382,
+                "bottom": 900,
+                "left": 8
+              }
+            },
+            {
+              "tag": "SPAN",
+              "classes": "",
+              "previous": {
+                "x": 37,
+                "y": 422.984375,
+                "width": 221,
+                "height": 18,
+                "top": 422.984375,
+                "right": 258,
+                "bottom": 440.984375,
+                "left": 37
+              },
+              "current": {
+                "x": 142,
+                "y": 384.484375,
+                "width": 197,
+                "height": 18,
+                "top": 384.484375,
+                "right": 339,
+                "bottom": 402.484375,
+                "left": 142
+              }
+            },
+            {
+              "tag": "BUTTON",
+              "classes": "ui-button",
+              "previous": {
+                "x": 203,
+                "y": 28,
+                "width": 171,
+                "height": 42,
+                "top": 28,
+                "right": 374,
+                "bottom": 70,
+                "left": 203
+              },
+              "current": {
+                "x": 228,
+                "y": 28,
+                "width": 146,
+                "height": 42,
+                "top": 28,
+                "right": 374,
+                "bottom": 70,
+                "left": 228
+              }
+            },
+            {
+              "tag": "BUTTON",
+              "classes": "",
+              "previous": {
+                "x": 0,
+                "y": 0,
+                "width": 0,
+                "height": 0,
+                "top": 0,
+                "right": 0,
+                "bottom": 0,
+                "left": 0
+              },
+              "current": {
+                "x": 37,
+                "y": 885.3125,
+                "width": 316,
+                "height": 14.6875,
+                "top": 885.3125,
+                "right": 353,
+                "bottom": 900,
+                "left": 37
+              }
+            },
+            {
+              "tag": "SPAN",
+              "classes": "",
+              "previous": {
+                "x": 171,
+                "y": 336.984375,
+                "width": 141,
+                "height": 27,
+                "top": 336.984375,
+                "right": 312,
+                "bottom": 363.984375,
+                "left": 171
+              },
+              "current": {
+                "x": 157,
+                "y": 336.984375,
+                "width": 124,
+                "height": 27,
+                "top": 336.984375,
+                "right": 281,
+                "bottom": 363.984375,
+                "left": 157
+              }
+            }
+          ]
+        }
+      ],
+      "fontsBefore": [
+        {
+          "family": "Plexon Hanken",
+          "status": "loading"
+        },
+        {
+          "family": "hankenLatin Fallback",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Hanken",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Commit Mono",
+          "status": "unloaded"
+        }
+      ],
+      "fontsAfter": [
+        {
+          "family": "Plexon Hanken",
+          "status": "loaded"
+        },
+        {
+          "family": "hankenLatin Fallback",
+          "status": "error"
+        },
+        {
+          "family": "Plexon Hanken",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Commit Mono",
+          "status": "unloaded"
+        }
+      ],
+      "stack": "\"Plexon Hanken\", \"hankenLatin Fallback\", Arial, sans-serif",
+      "fontResources": [
+        {
+          "url": "http://127.0.0.1:3400/_next/static/media/hanken_latin-s.p.3241148m1u9do.woff2",
+          "start": 29.5,
+          "end": 1238.1999999999534
+        }
+      ]
+    },
+    {
+      "theme": "light",
+      "width": 390,
+      "repeat": 2,
+      "cls": 0.15323222538778095,
+      "shifts": [
+        {
+          "value": 0.08726204495093384,
+          "time": 992.4000000000233,
+          "recentInput": false,
+          "sources": [
+            {
+              "tag": "DL",
+              "classes": "fleet-metrics",
+              "previous": {
+                "x": 37,
+                "y": 657.359375,
+                "width": 316,
+                "height": 208,
+                "top": 657.359375,
+                "right": 353,
+                "bottom": 865.359375,
+                "left": 37
+              },
+              "current": {
+                "x": 37,
+                "y": 620.3125,
+                "width": 316,
+                "height": 181,
+                "top": 620.3125,
+                "right": 353,
+                "bottom": 801.3125,
+                "left": 37
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "fleet-reason",
+              "previous": {
+                "x": 36,
+                "y": 598.984375,
+                "width": 317,
+                "height": 38.375,
+                "top": 598.984375,
+                "right": 353,
+                "bottom": 637.359375,
+                "left": 36
+              },
+              "current": {
+                "x": 37,
+                "y": 564.484375,
+                "width": 316,
+                "height": 35.828125,
+                "top": 564.484375,
+                "right": 353,
+                "bottom": 600.3125,
+                "left": 37
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "fleet-source",
+              "previous": {
+                "x": 37,
+                "y": 885.359375,
+                "width": 316,
+                "height": 14.640625,
+                "top": 885.359375,
+                "right": 353,
+                "bottom": 900,
+                "left": 37
+              },
+              "current": {
+                "x": 37,
+                "y": 821.3125,
+                "width": 316,
+                "height": 16.5,
+                "top": 821.3125,
+                "right": 353,
+                "bottom": 837.8125,
+                "left": 37
+              }
+            },
+            {
+              "tag": "SPAN",
+              "classes": "fleet-status fleet-status-online",
+              "previous": {
+                "x": 37,
+                "y": 558.484375,
+                "width": 215,
+                "height": 24.5,
+                "top": 558.484375,
+                "right": 252,
+                "bottom": 582.984375,
+                "left": 37
+              },
+              "current": {
+                "x": 293,
+                "y": 498.984375,
+                "width": 60,
+                "height": 24.5,
+                "top": 498.984375,
+                "right": 353,
+                "bottom": 523.484375,
+                "left": 293
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "fleet-source",
+              "previous": {
+                "x": 0,
+                "y": 0,
+                "width": 0,
+                "height": 0,
+                "top": 0,
+                "right": 0,
+                "bottom": 0,
+                "left": 0
+              },
+              "current": {
+                "x": 37,
+                "y": 842.8125,
+                "width": 316,
+                "height": 16.5,
+                "top": 842.8125,
+                "right": 353,
+                "bottom": 859.3125,
+                "left": 37
+              }
+            }
+          ]
+        },
+        {
+          "value": 0.0659701804368471,
+          "time": 1238.8000000000466,
+          "recentInput": false,
+          "sources": [
+            {
+              "tag": "DIV",
+              "classes": "fleet-cards",
+              "previous": {
+                "x": 8,
+                "y": 471.984375,
+                "width": 374,
+                "height": 428.015625,
+                "top": 471.984375,
+                "right": 382,
+                "bottom": 900,
+                "left": 8
+              },
+              "current": {
+                "x": 8,
+                "y": 437.984375,
+                "width": 374,
+                "height": 462.015625,
+                "top": 437.984375,
+                "right": 382,
+                "bottom": 900,
+                "left": 8
+              }
+            },
+            {
+              "tag": "SPAN",
+              "classes": "",
+              "previous": {
+                "x": 37,
+                "y": 422.984375,
+                "width": 221,
+                "height": 18,
+                "top": 422.984375,
+                "right": 258,
+                "bottom": 440.984375,
+                "left": 37
+              },
+              "current": {
+                "x": 142,
+                "y": 384.484375,
+                "width": 197,
+                "height": 18,
+                "top": 384.484375,
+                "right": 339,
+                "bottom": 402.484375,
+                "left": 142
+              }
+            },
+            {
+              "tag": "BUTTON",
+              "classes": "ui-button",
+              "previous": {
+                "x": 203,
+                "y": 28,
+                "width": 171,
+                "height": 42,
+                "top": 28,
+                "right": 374,
+                "bottom": 70,
+                "left": 203
+              },
+              "current": {
+                "x": 228,
+                "y": 28,
+                "width": 146,
+                "height": 42,
+                "top": 28,
+                "right": 374,
+                "bottom": 70,
+                "left": 228
+              }
+            },
+            {
+              "tag": "BUTTON",
+              "classes": "",
+              "previous": {
+                "x": 0,
+                "y": 0,
+                "width": 0,
+                "height": 0,
+                "top": 0,
+                "right": 0,
+                "bottom": 0,
+                "left": 0
+              },
+              "current": {
+                "x": 37,
+                "y": 885.3125,
+                "width": 316,
+                "height": 14.6875,
+                "top": 885.3125,
+                "right": 353,
+                "bottom": 900,
+                "left": 37
+              }
+            },
+            {
+              "tag": "SPAN",
+              "classes": "",
+              "previous": {
+                "x": 171,
+                "y": 336.984375,
+                "width": 141,
+                "height": 27,
+                "top": 336.984375,
+                "right": 312,
+                "bottom": 363.984375,
+                "left": 171
+              },
+              "current": {
+                "x": 157,
+                "y": 336.984375,
+                "width": 124,
+                "height": 27,
+                "top": 336.984375,
+                "right": 281,
+                "bottom": 363.984375,
+                "left": 157
+              }
+            }
+          ]
+        }
+      ],
+      "fontsBefore": [
+        {
+          "family": "Plexon Hanken",
+          "status": "loading"
+        },
+        {
+          "family": "hankenLatin Fallback",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Hanken",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Commit Mono",
+          "status": "unloaded"
+        }
+      ],
+      "fontsAfter": [
+        {
+          "family": "Plexon Hanken",
+          "status": "loaded"
+        },
+        {
+          "family": "hankenLatin Fallback",
+          "status": "error"
+        },
+        {
+          "family": "Plexon Hanken",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Commit Mono",
+          "status": "unloaded"
+        }
+      ],
+      "stack": "\"Plexon Hanken\", \"hankenLatin Fallback\", Arial, sans-serif",
+      "fontResources": [
+        {
+          "url": "http://127.0.0.1:3400/_next/static/media/hanken_latin-s.p.3241148m1u9do.woff2",
+          "start": 18.599999999976717,
+          "end": 1233.2000000000698
+        }
+      ]
+    },
+    {
+      "theme": "light",
+      "width": 1280,
+      "repeat": 0,
+      "cls": 0.03909144694010416,
+      "shifts": [
+        {
+          "value": 0.015301751030815972,
+          "time": 294.5999999999767,
+          "recentInput": false,
+          "sources": [
+            {
+              "tag": "BUTTON",
+              "classes": "",
+              "previous": {
+                "x": 76.1875,
+                "y": 796.328125,
+                "width": 528.8125,
+                "height": 38,
+                "top": 796.328125,
+                "right": 605,
+                "bottom": 834.328125,
+                "left": 76.1875
+              },
+              "current": {
+                "x": 76.1875,
+                "y": 769.328125,
+                "width": 528.8125,
+                "height": 38,
+                "top": 769.328125,
+                "right": 605,
+                "bottom": 807.328125,
+                "left": 76.1875
+              }
+            },
+            {
+              "tag": "DIV",
+              "classes": "",
+              "previous": {
+                "x": 76.1875,
+                "y": 586.328125,
+                "width": 255.40625,
+                "height": 71,
+                "top": 586.328125,
+                "right": 331.59375,
+                "bottom": 657.328125,
+                "left": 76.1875
+              },
+              "current": {
+                "x": 76.1875,
+                "y": 559.328125,
+                "width": 255.40625,
+                "height": 71,
+                "top": 559.328125,
+                "right": 331.59375,
+                "bottom": 630.328125,
+                "left": 76.1875
+              }
+            },
+            {
+              "tag": "DIV",
+              "classes": "",
+              "previous": {
+                "x": 349.59375,
+                "y": 586.328125,
+                "width": 255.40625,
+                "height": 71,
+                "top": 586.328125,
+                "right": 605,
+                "bottom": 657.328125,
+                "left": 349.59375
+              },
+              "current": {
+                "x": 349.59375,
+                "y": 559.328125,
+                "width": 255.40625,
+                "height": 71,
+                "top": 559.328125,
+                "right": 605,
+                "bottom": 630.328125,
+                "left": 349.59375
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "fleet-source",
+              "previous": {
+                "x": 76.1875,
+                "y": 719.828125,
+                "width": 528.8125,
+                "height": 16.5,
+                "top": 719.828125,
+                "right": 605,
+                "bottom": 736.328125,
+                "left": 76.1875
+              },
+              "current": {
+                "x": 76.1875,
+                "y": 692.828125,
+                "width": 528.8125,
+                "height": 16.5,
+                "top": 692.828125,
+                "right": 605,
+                "bottom": 709.328125,
+                "left": 76.1875
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "fleet-source",
+              "previous": {
+                "x": 76.1875,
+                "y": 741.328125,
+                "width": 528.8125,
+                "height": 16.5,
+                "top": 741.328125,
+                "right": 605,
+                "bottom": 757.828125,
+                "left": 76.1875
+              },
+              "current": {
+                "x": 76.1875,
+                "y": 714.328125,
+                "width": 528.8125,
+                "height": 16.5,
+                "top": 714.328125,
+                "right": 605,
+                "bottom": 730.828125,
+                "left": 76.1875
+              }
+            }
+          ]
+        },
+        {
+          "value": 0.020753913031684026,
+          "time": 794.8000000000466,
+          "recentInput": false,
+          "sources": [
+            {
+              "tag": "DETAILS",
+              "classes": "fleet-node-details",
+              "previous": {
+                "x": 51.1875,
+                "y": 883.328125,
+                "width": 1177.625,
+                "height": 16.671875,
+                "top": 883.328125,
+                "right": 1228.8125,
+                "bottom": 900,
+                "left": 51.1875
+              },
+              "current": {
+                "x": 51.1875,
+                "y": 856.328125,
+                "width": 1177.625,
+                "height": 43.671875,
+                "top": 856.328125,
+                "right": 1228.8125,
+                "bottom": 900,
+                "left": 51.1875
+              }
+            },
+            {
+              "tag": "BUTTON",
+              "classes": "",
+              "previous": {
+                "x": 675,
+                "y": 796.328125,
+                "width": 528.8125,
+                "height": 38,
+                "top": 796.328125,
+                "right": 1203.8125,
+                "bottom": 834.328125,
+                "left": 675
+              },
+              "current": {
+                "x": 675,
+                "y": 769.328125,
+                "width": 528.8125,
+                "height": 38,
+                "top": 769.328125,
+                "right": 1203.8125,
+                "bottom": 807.328125,
+                "left": 675
+              }
+            },
+            {
+              "tag": "DIV",
+              "classes": "",
+              "previous": {
+                "x": 675,
+                "y": 586.328125,
+                "width": 255.40625,
+                "height": 71,
+                "top": 586.328125,
+                "right": 930.40625,
+                "bottom": 657.328125,
+                "left": 675
+              },
+              "current": {
+                "x": 675,
+                "y": 559.328125,
+                "width": 255.40625,
+                "height": 71,
+                "top": 559.328125,
+                "right": 930.40625,
+                "bottom": 630.328125,
+                "left": 675
+              }
+            },
+            {
+              "tag": "DIV",
+              "classes": "",
+              "previous": {
+                "x": 948.40625,
+                "y": 586.328125,
+                "width": 255.40625,
+                "height": 71,
+                "top": 586.328125,
+                "right": 1203.8125,
+                "bottom": 657.328125,
+                "left": 948.40625
+              },
+              "current": {
+                "x": 948.40625,
+                "y": 559.328125,
+                "width": 255.40625,
+                "height": 71,
+                "top": 559.328125,
+                "right": 1203.8125,
+                "bottom": 630.328125,
+                "left": 948.40625
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "fleet-source",
+              "previous": {
+                "x": 675,
+                "y": 741.328125,
+                "width": 528.8125,
+                "height": 16.5,
+                "top": 741.328125,
+                "right": 1203.8125,
+                "bottom": 757.828125,
+                "left": 675
+              },
+              "current": {
+                "x": 675,
+                "y": 714.328125,
+                "width": 528.8125,
+                "height": 16.5,
+                "top": 714.328125,
+                "right": 1203.8125,
+                "bottom": 730.828125,
+                "left": 675
+              }
+            }
+          ]
+        },
+        {
+          "value": 0.0030357828776041667,
+          "time": 1233.8000000000466,
+          "recentInput": false,
+          "sources": [
+            {
+              "previous": {
+                "x": 76.1875,
+                "y": 693.828125,
+                "width": 528.8125,
+                "height": 14,
+                "top": 693.828125,
+                "right": 605,
+                "bottom": 707.828125,
+                "left": 76.1875
+              },
+              "current": {
+                "x": 76.1875,
+                "y": 693.828125,
+                "width": 528.8125,
+                "height": 14,
+                "top": 693.828125,
+                "right": 605,
+                "bottom": 707.828125,
+                "left": 76.1875
+              }
+            },
+            {
+              "previous": {
+                "x": 76.1875,
+                "y": 672.328125,
+                "width": 528.8125,
+                "height": 14,
+                "top": 672.328125,
+                "right": 605,
+                "bottom": 686.328125,
+                "left": 76.1875
+              },
+              "current": {
+                "x": 76.1875,
+                "y": 672.328125,
+                "width": 528.8125,
+                "height": 14,
+                "top": 672.328125,
+                "right": 605,
+                "bottom": 686.328125,
+                "left": 76.1875
+              }
+            },
+            {
+              "previous": {
+                "x": 76.1875,
+                "y": 736.828125,
+                "width": 528.8125,
+                "height": 14,
+                "top": 736.828125,
+                "right": 605,
+                "bottom": 750.828125,
+                "left": 76.1875
+              },
+              "current": {
+                "x": 76.1875,
+                "y": 736.828125,
+                "width": 528.8125,
+                "height": 14,
+                "top": 736.828125,
+                "right": 605,
+                "bottom": 750.828125,
+                "left": 76.1875
+              }
+            },
+            {
+              "previous": {
+                "x": 675,
+                "y": 672.328125,
+                "width": 528.8125,
+                "height": 14,
+                "top": 672.328125,
+                "right": 1203.8125,
+                "bottom": 686.328125,
+                "left": 675
+              },
+              "current": {
+                "x": 675,
+                "y": 672.328125,
+                "width": 528.8125,
+                "height": 14,
+                "top": 672.328125,
+                "right": 1203.8125,
+                "bottom": 686.328125,
+                "left": 675
+              }
+            },
+            {
+              "previous": {
+                "x": 76.1875,
+                "y": 715.328125,
+                "width": 528.8125,
+                "height": 14,
+                "top": 715.328125,
+                "right": 605,
+                "bottom": 729.328125,
+                "left": 76.1875
+              },
+              "current": {
+                "x": 76.1875,
+                "y": 715.328125,
+                "width": 528.8125,
+                "height": 14,
+                "top": 715.328125,
+                "right": 605,
+                "bottom": 729.328125,
+                "left": 76.1875
+              }
+            }
+          ]
+        }
+      ],
+      "fontsBefore": [
+        {
+          "family": "Plexon Hanken",
+          "status": "loading"
+        },
+        {
+          "family": "hankenLatin Fallback",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Hanken",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Commit Mono",
+          "status": "unloaded"
+        }
+      ],
+      "fontsAfter": [
+        {
+          "family": "Plexon Hanken",
+          "status": "loaded"
+        },
+        {
+          "family": "hankenLatin Fallback",
+          "status": "error"
+        },
+        {
+          "family": "Plexon Hanken",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Commit Mono",
+          "status": "unloaded"
+        }
+      ],
+      "stack": "\"Plexon Hanken\", \"hankenLatin Fallback\", Arial, sans-serif",
+      "fontResources": [
+        {
+          "url": "http://127.0.0.1:3400/_next/static/media/hanken_latin-s.p.3241148m1u9do.woff2",
+          "start": 14.400000000023283,
+          "end": 1227.6999999999534
+        }
+      ]
+    },
+    {
+      "theme": "light",
+      "width": 1280,
+      "repeat": 1,
+      "cls": 0.03909144694010416,
+      "shifts": [
+        {
+          "value": 0.015301751030815972,
+          "time": 608.7000000000698,
+          "recentInput": false,
+          "sources": [
+            {
+              "tag": "BUTTON",
+              "classes": "",
+              "previous": {
+                "x": 76.1875,
+                "y": 796.328125,
+                "width": 528.8125,
+                "height": 38,
+                "top": 796.328125,
+                "right": 605,
+                "bottom": 834.328125,
+                "left": 76.1875
+              },
+              "current": {
+                "x": 76.1875,
+                "y": 769.328125,
+                "width": 528.8125,
+                "height": 38,
+                "top": 769.328125,
+                "right": 605,
+                "bottom": 807.328125,
+                "left": 76.1875
+              }
+            },
+            {
+              "tag": "DIV",
+              "classes": "",
+              "previous": {
+                "x": 76.1875,
+                "y": 586.328125,
+                "width": 255.40625,
+                "height": 71,
+                "top": 586.328125,
+                "right": 331.59375,
+                "bottom": 657.328125,
+                "left": 76.1875
+              },
+              "current": {
+                "x": 76.1875,
+                "y": 559.328125,
+                "width": 255.40625,
+                "height": 71,
+                "top": 559.328125,
+                "right": 331.59375,
+                "bottom": 630.328125,
+                "left": 76.1875
+              }
+            },
+            {
+              "tag": "DIV",
+              "classes": "",
+              "previous": {
+                "x": 349.59375,
+                "y": 586.328125,
+                "width": 255.40625,
+                "height": 71,
+                "top": 586.328125,
+                "right": 605,
+                "bottom": 657.328125,
+                "left": 349.59375
+              },
+              "current": {
+                "x": 349.59375,
+                "y": 559.328125,
+                "width": 255.40625,
+                "height": 71,
+                "top": 559.328125,
+                "right": 605,
+                "bottom": 630.328125,
+                "left": 349.59375
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "fleet-source",
+              "previous": {
+                "x": 76.1875,
+                "y": 719.828125,
+                "width": 528.8125,
+                "height": 16.5,
+                "top": 719.828125,
+                "right": 605,
+                "bottom": 736.328125,
+                "left": 76.1875
+              },
+              "current": {
+                "x": 76.1875,
+                "y": 692.828125,
+                "width": 528.8125,
+                "height": 16.5,
+                "top": 692.828125,
+                "right": 605,
+                "bottom": 709.328125,
+                "left": 76.1875
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "fleet-source",
+              "previous": {
+                "x": 76.1875,
+                "y": 741.328125,
+                "width": 528.8125,
+                "height": 16.5,
+                "top": 741.328125,
+                "right": 605,
+                "bottom": 757.828125,
+                "left": 76.1875
+              },
+              "current": {
+                "x": 76.1875,
+                "y": 714.328125,
+                "width": 528.8125,
+                "height": 16.5,
+                "top": 714.328125,
+                "right": 605,
+                "bottom": 730.828125,
+                "left": 76.1875
+              }
+            }
+          ]
+        },
+        {
+          "value": 0.020753913031684026,
+          "time": 1104.9000000000233,
+          "recentInput": false,
+          "sources": [
+            {
+              "tag": "DETAILS",
+              "classes": "fleet-node-details",
+              "previous": {
+                "x": 51.1875,
+                "y": 883.328125,
+                "width": 1177.625,
+                "height": 16.671875,
+                "top": 883.328125,
+                "right": 1228.8125,
+                "bottom": 900,
+                "left": 51.1875
+              },
+              "current": {
+                "x": 51.1875,
+                "y": 856.328125,
+                "width": 1177.625,
+                "height": 43.671875,
+                "top": 856.328125,
+                "right": 1228.8125,
+                "bottom": 900,
+                "left": 51.1875
+              }
+            },
+            {
+              "tag": "BUTTON",
+              "classes": "",
+              "previous": {
+                "x": 675,
+                "y": 796.328125,
+                "width": 528.8125,
+                "height": 38,
+                "top": 796.328125,
+                "right": 1203.8125,
+                "bottom": 834.328125,
+                "left": 675
+              },
+              "current": {
+                "x": 675,
+                "y": 769.328125,
+                "width": 528.8125,
+                "height": 38,
+                "top": 769.328125,
+                "right": 1203.8125,
+                "bottom": 807.328125,
+                "left": 675
+              }
+            },
+            {
+              "tag": "DIV",
+              "classes": "",
+              "previous": {
+                "x": 675,
+                "y": 586.328125,
+                "width": 255.40625,
+                "height": 71,
+                "top": 586.328125,
+                "right": 930.40625,
+                "bottom": 657.328125,
+                "left": 675
+              },
+              "current": {
+                "x": 675,
+                "y": 559.328125,
+                "width": 255.40625,
+                "height": 71,
+                "top": 559.328125,
+                "right": 930.40625,
+                "bottom": 630.328125,
+                "left": 675
+              }
+            },
+            {
+              "tag": "DIV",
+              "classes": "",
+              "previous": {
+                "x": 948.40625,
+                "y": 586.328125,
+                "width": 255.40625,
+                "height": 71,
+                "top": 586.328125,
+                "right": 1203.8125,
+                "bottom": 657.328125,
+                "left": 948.40625
+              },
+              "current": {
+                "x": 948.40625,
+                "y": 559.328125,
+                "width": 255.40625,
+                "height": 71,
+                "top": 559.328125,
+                "right": 1203.8125,
+                "bottom": 630.328125,
+                "left": 948.40625
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "fleet-source",
+              "previous": {
+                "x": 675,
+                "y": 741.328125,
+                "width": 528.8125,
+                "height": 16.5,
+                "top": 741.328125,
+                "right": 1203.8125,
+                "bottom": 757.828125,
+                "left": 675
+              },
+              "current": {
+                "x": 675,
+                "y": 714.328125,
+                "width": 528.8125,
+                "height": 16.5,
+                "top": 714.328125,
+                "right": 1203.8125,
+                "bottom": 730.828125,
+                "left": 675
+              }
+            }
+          ]
+        },
+        {
+          "value": 0.0030357828776041667,
+          "time": 1237.7000000000698,
+          "recentInput": false,
+          "sources": [
+            {
+              "previous": {
+                "x": 76.1875,
+                "y": 693.828125,
+                "width": 528.8125,
+                "height": 14,
+                "top": 693.828125,
+                "right": 605,
+                "bottom": 707.828125,
+                "left": 76.1875
+              },
+              "current": {
+                "x": 76.1875,
+                "y": 693.828125,
+                "width": 528.8125,
+                "height": 14,
+                "top": 693.828125,
+                "right": 605,
+                "bottom": 707.828125,
+                "left": 76.1875
+              }
+            },
+            {
+              "previous": {
+                "x": 76.1875,
+                "y": 672.328125,
+                "width": 528.8125,
+                "height": 14,
+                "top": 672.328125,
+                "right": 605,
+                "bottom": 686.328125,
+                "left": 76.1875
+              },
+              "current": {
+                "x": 76.1875,
+                "y": 672.328125,
+                "width": 528.8125,
+                "height": 14,
+                "top": 672.328125,
+                "right": 605,
+                "bottom": 686.328125,
+                "left": 76.1875
+              }
+            },
+            {
+              "previous": {
+                "x": 76.1875,
+                "y": 736.828125,
+                "width": 528.8125,
+                "height": 14,
+                "top": 736.828125,
+                "right": 605,
+                "bottom": 750.828125,
+                "left": 76.1875
+              },
+              "current": {
+                "x": 76.1875,
+                "y": 736.828125,
+                "width": 528.8125,
+                "height": 14,
+                "top": 736.828125,
+                "right": 605,
+                "bottom": 750.828125,
+                "left": 76.1875
+              }
+            },
+            {
+              "previous": {
+                "x": 675,
+                "y": 672.328125,
+                "width": 528.8125,
+                "height": 14,
+                "top": 672.328125,
+                "right": 1203.8125,
+                "bottom": 686.328125,
+                "left": 675
+              },
+              "current": {
+                "x": 675,
+                "y": 672.328125,
+                "width": 528.8125,
+                "height": 14,
+                "top": 672.328125,
+                "right": 1203.8125,
+                "bottom": 686.328125,
+                "left": 675
+              }
+            },
+            {
+              "previous": {
+                "x": 76.1875,
+                "y": 715.328125,
+                "width": 528.8125,
+                "height": 14,
+                "top": 715.328125,
+                "right": 605,
+                "bottom": 729.328125,
+                "left": 76.1875
+              },
+              "current": {
+                "x": 76.1875,
+                "y": 715.328125,
+                "width": 528.8125,
+                "height": 14,
+                "top": 715.328125,
+                "right": 605,
+                "bottom": 729.328125,
+                "left": 76.1875
+              }
+            }
+          ]
+        }
+      ],
+      "fontsBefore": [
+        {
+          "family": "Plexon Hanken",
+          "status": "loading"
+        },
+        {
+          "family": "hankenLatin Fallback",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Hanken",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Commit Mono",
+          "status": "unloaded"
+        }
+      ],
+      "fontsAfter": [
+        {
+          "family": "Plexon Hanken",
+          "status": "loaded"
+        },
+        {
+          "family": "hankenLatin Fallback",
+          "status": "error"
+        },
+        {
+          "family": "Plexon Hanken",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Commit Mono",
+          "status": "unloaded"
+        }
+      ],
+      "stack": "\"Plexon Hanken\", \"hankenLatin Fallback\", Arial, sans-serif",
+      "fontResources": [
+        {
+          "url": "http://127.0.0.1:3400/_next/static/media/hanken_latin-s.p.3241148m1u9do.woff2",
+          "start": 22.70000000006985,
+          "end": 1232.6000000000931
+        }
+      ]
+    },
+    {
+      "theme": "light",
+      "width": 1280,
+      "repeat": 2,
+      "cls": 0.036821765136718754,
+      "shifts": [
+        {
+          "value": 0.015301751030815972,
+          "time": 897.7000000000698,
+          "recentInput": false,
+          "sources": [
+            {
+              "tag": "BUTTON",
+              "classes": "",
+              "previous": {
+                "x": 76.1875,
+                "y": 796.328125,
+                "width": 528.8125,
+                "height": 38,
+                "top": 796.328125,
+                "right": 605,
+                "bottom": 834.328125,
+                "left": 76.1875
+              },
+              "current": {
+                "x": 76.1875,
+                "y": 769.328125,
+                "width": 528.8125,
+                "height": 38,
+                "top": 769.328125,
+                "right": 605,
+                "bottom": 807.328125,
+                "left": 76.1875
+              }
+            },
+            {
+              "tag": "DIV",
+              "classes": "",
+              "previous": {
+                "x": 76.1875,
+                "y": 586.328125,
+                "width": 255.40625,
+                "height": 71,
+                "top": 586.328125,
+                "right": 331.59375,
+                "bottom": 657.328125,
+                "left": 76.1875
+              },
+              "current": {
+                "x": 76.1875,
+                "y": 559.328125,
+                "width": 255.40625,
+                "height": 71,
+                "top": 559.328125,
+                "right": 331.59375,
+                "bottom": 630.328125,
+                "left": 76.1875
+              }
+            },
+            {
+              "tag": "DIV",
+              "classes": "",
+              "previous": {
+                "x": 349.59375,
+                "y": 586.328125,
+                "width": 255.40625,
+                "height": 71,
+                "top": 586.328125,
+                "right": 605,
+                "bottom": 657.328125,
+                "left": 349.59375
+              },
+              "current": {
+                "x": 349.59375,
+                "y": 559.328125,
+                "width": 255.40625,
+                "height": 71,
+                "top": 559.328125,
+                "right": 605,
+                "bottom": 630.328125,
+                "left": 349.59375
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "fleet-source",
+              "previous": {
+                "x": 76.1875,
+                "y": 719.828125,
+                "width": 528.8125,
+                "height": 16.5,
+                "top": 719.828125,
+                "right": 605,
+                "bottom": 736.328125,
+                "left": 76.1875
+              },
+              "current": {
+                "x": 76.1875,
+                "y": 692.828125,
+                "width": 528.8125,
+                "height": 16.5,
+                "top": 692.828125,
+                "right": 605,
+                "bottom": 709.328125,
+                "left": 76.1875
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "fleet-source",
+              "previous": {
+                "x": 76.1875,
+                "y": 741.328125,
+                "width": 528.8125,
+                "height": 16.5,
+                "top": 741.328125,
+                "right": 605,
+                "bottom": 757.828125,
+                "left": 76.1875
+              },
+              "current": {
+                "x": 76.1875,
+                "y": 714.328125,
+                "width": 528.8125,
+                "height": 16.5,
+                "top": 714.328125,
+                "right": 605,
+                "bottom": 730.828125,
+                "left": 76.1875
+              }
+            }
+          ]
+        },
+        {
+          "value": 0.020618277994791667,
+          "time": 1240.0999999999767,
+          "recentInput": false,
+          "sources": [
+            {
+              "tag": "DETAILS",
+              "classes": "fleet-node-details",
+              "previous": {
+                "x": 51.1875,
+                "y": 883.328125,
+                "width": 1177.625,
+                "height": 16.671875,
+                "top": 883.328125,
+                "right": 1228.8125,
+                "bottom": 900,
+                "left": 51.1875
+              },
+              "current": {
+                "x": 51.1875,
+                "y": 856.328125,
+                "width": 1177.625,
+                "height": 43.671875,
+                "top": 856.328125,
+                "right": 1228.8125,
+                "bottom": 900,
+                "left": 51.1875
+              }
+            },
+            {
+              "tag": "BUTTON",
+              "classes": "",
+              "previous": {
+                "x": 675,
+                "y": 796.328125,
+                "width": 528.8125,
+                "height": 38,
+                "top": 796.328125,
+                "right": 1203.8125,
+                "bottom": 834.328125,
+                "left": 675
+              },
+              "current": {
+                "x": 675,
+                "y": 769.328125,
+                "width": 528.8125,
+                "height": 38,
+                "top": 769.328125,
+                "right": 1203.8125,
+                "bottom": 807.328125,
+                "left": 675
+              }
+            },
+            {
+              "tag": "DIV",
+              "classes": "",
+              "previous": {
+                "x": 675,
+                "y": 586.328125,
+                "width": 255.40625,
+                "height": 71,
+                "top": 586.328125,
+                "right": 930.40625,
+                "bottom": 657.328125,
+                "left": 675
+              },
+              "current": {
+                "x": 675,
+                "y": 559.328125,
+                "width": 255.40625,
+                "height": 71,
+                "top": 559.328125,
+                "right": 930.40625,
+                "bottom": 630.328125,
+                "left": 675
+              }
+            },
+            {
+              "tag": "DIV",
+              "classes": "",
+              "previous": {
+                "x": 948.40625,
+                "y": 586.328125,
+                "width": 255.40625,
+                "height": 71,
+                "top": 586.328125,
+                "right": 1203.8125,
+                "bottom": 657.328125,
+                "left": 948.40625
+              },
+              "current": {
+                "x": 948.40625,
+                "y": 559.328125,
+                "width": 255.40625,
+                "height": 71,
+                "top": 559.328125,
+                "right": 1203.8125,
+                "bottom": 630.328125,
+                "left": 948.40625
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "fleet-source",
+              "previous": {
+                "x": 675,
+                "y": 719.828125,
+                "width": 528.8125,
+                "height": 16.5,
+                "top": 719.828125,
+                "right": 1203.8125,
+                "bottom": 736.328125,
+                "left": 675
+              },
+              "current": {
+                "x": 675,
+                "y": 692.828125,
+                "width": 528.8125,
+                "height": 16.5,
+                "top": 692.828125,
+                "right": 1203.8125,
+                "bottom": 709.328125,
+                "left": 675
+              }
+            }
+          ]
+        },
+        {
+          "value": 0.0009017361111111112,
+          "time": 1399.5999999999767,
+          "recentInput": false,
+          "sources": [
+            {
+              "previous": {
+                "x": 948.40625,
+                "y": 516.328125,
+                "width": 255.40625,
+                "height": 23,
+                "top": 516.328125,
+                "right": 1203.8125,
+                "bottom": 539.328125,
+                "left": 948.40625
+              },
+              "current": {
+                "x": 948.40625,
+                "y": 516.328125,
+                "width": 255.40625,
+                "height": 23,
+                "top": 516.328125,
+                "right": 1203.8125,
+                "bottom": 539.328125,
+                "left": 948.40625
+              }
+            },
+            {
+              "tag": "SPAN",
+              "classes": "fleet-status fleet-status-online",
+              "previous": {
+                "x": 1023.8125,
+                "y": 349,
+                "width": 180,
+                "height": 24.5,
+                "top": 349,
+                "right": 1203.8125,
+                "bottom": 373.5,
+                "left": 1023.8125
+              },
+              "current": {
+                "x": 1151.8125,
+                "y": 349,
+                "width": 52,
+                "height": 24.5,
+                "top": 349,
+                "right": 1203.8125,
+                "bottom": 373.5,
+                "left": 1151.8125
+              }
+            }
+          ]
+        }
+      ],
+      "fontsBefore": [
+        {
+          "family": "Plexon Hanken",
+          "status": "loading"
+        },
+        {
+          "family": "hankenLatin Fallback",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Hanken",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Commit Mono",
+          "status": "unloaded"
+        }
+      ],
+      "fontsAfter": [
+        {
+          "family": "Plexon Hanken",
+          "status": "loaded"
+        },
+        {
+          "family": "hankenLatin Fallback",
+          "status": "error"
+        },
+        {
+          "family": "Plexon Hanken",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Commit Mono",
+          "status": "unloaded"
+        }
+      ],
+      "stack": "\"Plexon Hanken\", \"hankenLatin Fallback\", Arial, sans-serif",
+      "fontResources": [
+        {
+          "url": "http://127.0.0.1:3400/_next/static/media/hanken_latin-s.p.3241148m1u9do.woff2",
+          "start": 20.599999999976717,
+          "end": 1232.5
+        }
+      ]
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "repeat": 0,
+      "cls": 0.08726204495093384,
+      "shifts": [
+        {
+          "value": 0.08726204495093384,
+          "time": 222.29999999993015,
+          "recentInput": false,
+          "sources": [
+            {
+              "tag": "DL",
+              "classes": "fleet-metrics",
+              "previous": {
+                "x": 37,
+                "y": 657.359375,
+                "width": 316,
+                "height": 208,
+                "top": 657.359375,
+                "right": 353,
+                "bottom": 865.359375,
+                "left": 37
+              },
+              "current": {
+                "x": 37,
+                "y": 620.3125,
+                "width": 316,
+                "height": 181,
+                "top": 620.3125,
+                "right": 353,
+                "bottom": 801.3125,
+                "left": 37
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "fleet-reason",
+              "previous": {
+                "x": 36,
+                "y": 598.984375,
+                "width": 317,
+                "height": 38.375,
+                "top": 598.984375,
+                "right": 353,
+                "bottom": 637.359375,
+                "left": 36
+              },
+              "current": {
+                "x": 37,
+                "y": 564.484375,
+                "width": 316,
+                "height": 35.828125,
+                "top": 564.484375,
+                "right": 353,
+                "bottom": 600.3125,
+                "left": 37
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "fleet-source",
+              "previous": {
+                "x": 37,
+                "y": 885.359375,
+                "width": 316,
+                "height": 14.640625,
+                "top": 885.359375,
+                "right": 353,
+                "bottom": 900,
+                "left": 37
+              },
+              "current": {
+                "x": 37,
+                "y": 821.3125,
+                "width": 316,
+                "height": 16.5,
+                "top": 821.3125,
+                "right": 353,
+                "bottom": 837.8125,
+                "left": 37
+              }
+            },
+            {
+              "tag": "SPAN",
+              "classes": "fleet-status fleet-status-online",
+              "previous": {
+                "x": 37,
+                "y": 558.484375,
+                "width": 215,
+                "height": 24.5,
+                "top": 558.484375,
+                "right": 252,
+                "bottom": 582.984375,
+                "left": 37
+              },
+              "current": {
+                "x": 293,
+                "y": 498.984375,
+                "width": 60,
+                "height": 24.5,
+                "top": 498.984375,
+                "right": 353,
+                "bottom": 523.484375,
+                "left": 293
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "fleet-source",
+              "previous": {
+                "x": 0,
+                "y": 0,
+                "width": 0,
+                "height": 0,
+                "top": 0,
+                "right": 0,
+                "bottom": 0,
+                "left": 0
+              },
+              "current": {
+                "x": 37,
+                "y": 842.8125,
+                "width": 316,
+                "height": 16.5,
+                "top": 842.8125,
+                "right": 353,
+                "bottom": 859.3125,
+                "left": 37
+              }
+            }
+          ]
+        },
+        {
+          "value": 0.06632882241215574,
+          "time": 1226.7999999999302,
+          "recentInput": false,
+          "sources": [
+            {
+              "tag": "DIV",
+              "classes": "fleet-cards",
+              "previous": {
+                "x": 7,
+                "y": 470.984375,
+                "width": 376,
+                "height": 429.015625,
+                "top": 470.984375,
+                "right": 383,
+                "bottom": 900,
+                "left": 7
+              },
+              "current": {
+                "x": 7,
+                "y": 436.984375,
+                "width": 376,
+                "height": 463.015625,
+                "top": 436.984375,
+                "right": 383,
+                "bottom": 900,
+                "left": 7
+              }
+            },
+            {
+              "tag": "SPAN",
+              "classes": "",
+              "previous": {
+                "x": 37,
+                "y": 422.984375,
+                "width": 221,
+                "height": 18,
+                "top": 422.984375,
+                "right": 258,
+                "bottom": 440.984375,
+                "left": 37
+              },
+              "current": {
+                "x": 142,
+                "y": 384.484375,
+                "width": 197,
+                "height": 18,
+                "top": 384.484375,
+                "right": 339,
+                "bottom": 402.484375,
+                "left": 142
+              }
+            },
+            {
+              "tag": "BUTTON",
+              "classes": "ui-button",
+              "previous": {
+                "x": 203,
+                "y": 28,
+                "width": 171,
+                "height": 42,
+                "top": 28,
+                "right": 374,
+                "bottom": 70,
+                "left": 203
+              },
+              "current": {
+                "x": 228,
+                "y": 28,
+                "width": 146,
+                "height": 42,
+                "top": 28,
+                "right": 374,
+                "bottom": 70,
+                "left": 228
+              }
+            },
+            {
+              "tag": "BUTTON",
+              "classes": "",
+              "previous": {
+                "x": 0,
+                "y": 0,
+                "width": 0,
+                "height": 0,
+                "top": 0,
+                "right": 0,
+                "bottom": 0,
+                "left": 0
+              },
+              "current": {
+                "x": 37,
+                "y": 885.3125,
+                "width": 316,
+                "height": 14.6875,
+                "top": 885.3125,
+                "right": 353,
+                "bottom": 900,
+                "left": 37
+              }
+            },
+            {
+              "tag": "SPAN",
+              "classes": "",
+              "previous": {
+                "x": 171,
+                "y": 336.984375,
+                "width": 141,
+                "height": 27,
+                "top": 336.984375,
+                "right": 312,
+                "bottom": 363.984375,
+                "left": 171
+              },
+              "current": {
+                "x": 157,
+                "y": 336.984375,
+                "width": 124,
+                "height": 27,
+                "top": 336.984375,
+                "right": 281,
+                "bottom": 363.984375,
+                "left": 157
+              }
+            }
+          ]
+        }
+      ],
+      "fontsBefore": [
+        {
+          "family": "Plexon Hanken",
+          "status": "loading"
+        },
+        {
+          "family": "hankenLatin Fallback",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Hanken",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Commit Mono",
+          "status": "unloaded"
+        }
+      ],
+      "fontsAfter": [
+        {
+          "family": "Plexon Hanken",
+          "status": "loaded"
+        },
+        {
+          "family": "hankenLatin Fallback",
+          "status": "error"
+        },
+        {
+          "family": "Plexon Hanken",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Commit Mono",
+          "status": "unloaded"
+        }
+      ],
+      "stack": "\"Plexon Hanken\", \"hankenLatin Fallback\", Arial, sans-serif",
+      "fontResources": [
+        {
+          "url": "http://127.0.0.1:3400/_next/static/media/hanken_latin-s.p.3241148m1u9do.woff2",
+          "start": 13.199999999953434,
+          "end": 1221.1999999999534
+        }
+      ]
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "repeat": 1,
+      "cls": 0.15359086736308958,
+      "shifts": [
+        {
+          "value": 0.08726204495093384,
+          "time": 494.4000000000233,
+          "recentInput": false,
+          "sources": [
+            {
+              "tag": "DL",
+              "classes": "fleet-metrics",
+              "previous": {
+                "x": 37,
+                "y": 657.359375,
+                "width": 316,
+                "height": 208,
+                "top": 657.359375,
+                "right": 353,
+                "bottom": 865.359375,
+                "left": 37
+              },
+              "current": {
+                "x": 37,
+                "y": 620.3125,
+                "width": 316,
+                "height": 181,
+                "top": 620.3125,
+                "right": 353,
+                "bottom": 801.3125,
+                "left": 37
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "fleet-reason",
+              "previous": {
+                "x": 36,
+                "y": 598.984375,
+                "width": 317,
+                "height": 38.375,
+                "top": 598.984375,
+                "right": 353,
+                "bottom": 637.359375,
+                "left": 36
+              },
+              "current": {
+                "x": 37,
+                "y": 564.484375,
+                "width": 316,
+                "height": 35.828125,
+                "top": 564.484375,
+                "right": 353,
+                "bottom": 600.3125,
+                "left": 37
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "fleet-source",
+              "previous": {
+                "x": 37,
+                "y": 885.359375,
+                "width": 316,
+                "height": 14.640625,
+                "top": 885.359375,
+                "right": 353,
+                "bottom": 900,
+                "left": 37
+              },
+              "current": {
+                "x": 37,
+                "y": 821.3125,
+                "width": 316,
+                "height": 16.5,
+                "top": 821.3125,
+                "right": 353,
+                "bottom": 837.8125,
+                "left": 37
+              }
+            },
+            {
+              "tag": "SPAN",
+              "classes": "fleet-status fleet-status-online",
+              "previous": {
+                "x": 37,
+                "y": 558.484375,
+                "width": 215,
+                "height": 24.5,
+                "top": 558.484375,
+                "right": 252,
+                "bottom": 582.984375,
+                "left": 37
+              },
+              "current": {
+                "x": 293,
+                "y": 498.984375,
+                "width": 60,
+                "height": 24.5,
+                "top": 498.984375,
+                "right": 353,
+                "bottom": 523.484375,
+                "left": 293
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "fleet-source",
+              "previous": {
+                "x": 0,
+                "y": 0,
+                "width": 0,
+                "height": 0,
+                "top": 0,
+                "right": 0,
+                "bottom": 0,
+                "left": 0
+              },
+              "current": {
+                "x": 37,
+                "y": 842.8125,
+                "width": 316,
+                "height": 16.5,
+                "top": 842.8125,
+                "right": 353,
+                "bottom": 859.3125,
+                "left": 37
+              }
+            }
+          ]
+        },
+        {
+          "value": 0.06632882241215574,
+          "time": 1231.5999999999767,
+          "recentInput": false,
+          "sources": [
+            {
+              "tag": "DIV",
+              "classes": "fleet-cards",
+              "previous": {
+                "x": 7,
+                "y": 470.984375,
+                "width": 376,
+                "height": 429.015625,
+                "top": 470.984375,
+                "right": 383,
+                "bottom": 900,
+                "left": 7
+              },
+              "current": {
+                "x": 7,
+                "y": 436.984375,
+                "width": 376,
+                "height": 463.015625,
+                "top": 436.984375,
+                "right": 383,
+                "bottom": 900,
+                "left": 7
+              }
+            },
+            {
+              "tag": "SPAN",
+              "classes": "",
+              "previous": {
+                "x": 37,
+                "y": 422.984375,
+                "width": 221,
+                "height": 18,
+                "top": 422.984375,
+                "right": 258,
+                "bottom": 440.984375,
+                "left": 37
+              },
+              "current": {
+                "x": 142,
+                "y": 384.484375,
+                "width": 197,
+                "height": 18,
+                "top": 384.484375,
+                "right": 339,
+                "bottom": 402.484375,
+                "left": 142
+              }
+            },
+            {
+              "tag": "BUTTON",
+              "classes": "ui-button",
+              "previous": {
+                "x": 203,
+                "y": 28,
+                "width": 171,
+                "height": 42,
+                "top": 28,
+                "right": 374,
+                "bottom": 70,
+                "left": 203
+              },
+              "current": {
+                "x": 228,
+                "y": 28,
+                "width": 146,
+                "height": 42,
+                "top": 28,
+                "right": 374,
+                "bottom": 70,
+                "left": 228
+              }
+            },
+            {
+              "tag": "BUTTON",
+              "classes": "",
+              "previous": {
+                "x": 0,
+                "y": 0,
+                "width": 0,
+                "height": 0,
+                "top": 0,
+                "right": 0,
+                "bottom": 0,
+                "left": 0
+              },
+              "current": {
+                "x": 37,
+                "y": 885.3125,
+                "width": 316,
+                "height": 14.6875,
+                "top": 885.3125,
+                "right": 353,
+                "bottom": 900,
+                "left": 37
+              }
+            },
+            {
+              "tag": "SPAN",
+              "classes": "",
+              "previous": {
+                "x": 171,
+                "y": 336.984375,
+                "width": 141,
+                "height": 27,
+                "top": 336.984375,
+                "right": 312,
+                "bottom": 363.984375,
+                "left": 171
+              },
+              "current": {
+                "x": 157,
+                "y": 336.984375,
+                "width": 124,
+                "height": 27,
+                "top": 336.984375,
+                "right": 281,
+                "bottom": 363.984375,
+                "left": 157
+              }
+            }
+          ]
+        }
+      ],
+      "fontsBefore": [
+        {
+          "family": "Plexon Hanken",
+          "status": "loading"
+        },
+        {
+          "family": "hankenLatin Fallback",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Hanken",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Commit Mono",
+          "status": "unloaded"
+        }
+      ],
+      "fontsAfter": [
+        {
+          "family": "Plexon Hanken",
+          "status": "loaded"
+        },
+        {
+          "family": "hankenLatin Fallback",
+          "status": "error"
+        },
+        {
+          "family": "Plexon Hanken",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Commit Mono",
+          "status": "unloaded"
+        }
+      ],
+      "stack": "\"Plexon Hanken\", \"hankenLatin Fallback\", Arial, sans-serif",
+      "fontResources": [
+        {
+          "url": "http://127.0.0.1:3400/_next/static/media/hanken_latin-s.p.3241148m1u9do.woff2",
+          "start": 13.599999999976717,
+          "end": 1226.0999999999767
+        }
+      ]
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "repeat": 2,
+      "cls": 0.15359086736308958,
+      "shifts": [
+        {
+          "value": 0.08726204495093384,
+          "time": 799.0999999999767,
+          "recentInput": false,
+          "sources": [
+            {
+              "tag": "DL",
+              "classes": "fleet-metrics",
+              "previous": {
+                "x": 37,
+                "y": 657.359375,
+                "width": 316,
+                "height": 208,
+                "top": 657.359375,
+                "right": 353,
+                "bottom": 865.359375,
+                "left": 37
+              },
+              "current": {
+                "x": 37,
+                "y": 620.3125,
+                "width": 316,
+                "height": 181,
+                "top": 620.3125,
+                "right": 353,
+                "bottom": 801.3125,
+                "left": 37
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "fleet-reason",
+              "previous": {
+                "x": 36,
+                "y": 598.984375,
+                "width": 317,
+                "height": 38.375,
+                "top": 598.984375,
+                "right": 353,
+                "bottom": 637.359375,
+                "left": 36
+              },
+              "current": {
+                "x": 37,
+                "y": 564.484375,
+                "width": 316,
+                "height": 35.828125,
+                "top": 564.484375,
+                "right": 353,
+                "bottom": 600.3125,
+                "left": 37
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "fleet-source",
+              "previous": {
+                "x": 37,
+                "y": 885.359375,
+                "width": 316,
+                "height": 14.640625,
+                "top": 885.359375,
+                "right": 353,
+                "bottom": 900,
+                "left": 37
+              },
+              "current": {
+                "x": 37,
+                "y": 821.3125,
+                "width": 316,
+                "height": 16.5,
+                "top": 821.3125,
+                "right": 353,
+                "bottom": 837.8125,
+                "left": 37
+              }
+            },
+            {
+              "tag": "SPAN",
+              "classes": "fleet-status fleet-status-online",
+              "previous": {
+                "x": 37,
+                "y": 558.484375,
+                "width": 215,
+                "height": 24.5,
+                "top": 558.484375,
+                "right": 252,
+                "bottom": 582.984375,
+                "left": 37
+              },
+              "current": {
+                "x": 293,
+                "y": 498.984375,
+                "width": 60,
+                "height": 24.5,
+                "top": 498.984375,
+                "right": 353,
+                "bottom": 523.484375,
+                "left": 293
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "fleet-source",
+              "previous": {
+                "x": 0,
+                "y": 0,
+                "width": 0,
+                "height": 0,
+                "top": 0,
+                "right": 0,
+                "bottom": 0,
+                "left": 0
+              },
+              "current": {
+                "x": 37,
+                "y": 842.8125,
+                "width": 316,
+                "height": 16.5,
+                "top": 842.8125,
+                "right": 353,
+                "bottom": 859.3125,
+                "left": 37
+              }
+            }
+          ]
+        },
+        {
+          "value": 0.06632882241215574,
+          "time": 1243.0999999999767,
+          "recentInput": false,
+          "sources": [
+            {
+              "tag": "DIV",
+              "classes": "fleet-cards",
+              "previous": {
+                "x": 7,
+                "y": 470.984375,
+                "width": 376,
+                "height": 429.015625,
+                "top": 470.984375,
+                "right": 383,
+                "bottom": 900,
+                "left": 7
+              },
+              "current": {
+                "x": 7,
+                "y": 436.984375,
+                "width": 376,
+                "height": 463.015625,
+                "top": 436.984375,
+                "right": 383,
+                "bottom": 900,
+                "left": 7
+              }
+            },
+            {
+              "tag": "SPAN",
+              "classes": "",
+              "previous": {
+                "x": 37,
+                "y": 422.984375,
+                "width": 221,
+                "height": 18,
+                "top": 422.984375,
+                "right": 258,
+                "bottom": 440.984375,
+                "left": 37
+              },
+              "current": {
+                "x": 142,
+                "y": 384.484375,
+                "width": 197,
+                "height": 18,
+                "top": 384.484375,
+                "right": 339,
+                "bottom": 402.484375,
+                "left": 142
+              }
+            },
+            {
+              "tag": "BUTTON",
+              "classes": "ui-button",
+              "previous": {
+                "x": 203,
+                "y": 28,
+                "width": 171,
+                "height": 42,
+                "top": 28,
+                "right": 374,
+                "bottom": 70,
+                "left": 203
+              },
+              "current": {
+                "x": 228,
+                "y": 28,
+                "width": 146,
+                "height": 42,
+                "top": 28,
+                "right": 374,
+                "bottom": 70,
+                "left": 228
+              }
+            },
+            {
+              "tag": "BUTTON",
+              "classes": "",
+              "previous": {
+                "x": 0,
+                "y": 0,
+                "width": 0,
+                "height": 0,
+                "top": 0,
+                "right": 0,
+                "bottom": 0,
+                "left": 0
+              },
+              "current": {
+                "x": 37,
+                "y": 885.3125,
+                "width": 316,
+                "height": 14.6875,
+                "top": 885.3125,
+                "right": 353,
+                "bottom": 900,
+                "left": 37
+              }
+            },
+            {
+              "tag": "SPAN",
+              "classes": "",
+              "previous": {
+                "x": 171,
+                "y": 336.984375,
+                "width": 141,
+                "height": 27,
+                "top": 336.984375,
+                "right": 312,
+                "bottom": 363.984375,
+                "left": 171
+              },
+              "current": {
+                "x": 157,
+                "y": 336.984375,
+                "width": 124,
+                "height": 27,
+                "top": 336.984375,
+                "right": 281,
+                "bottom": 363.984375,
+                "left": 157
+              }
+            }
+          ]
+        }
+      ],
+      "fontsBefore": [
+        {
+          "family": "Plexon Hanken",
+          "status": "loading"
+        },
+        {
+          "family": "hankenLatin Fallback",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Hanken",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Commit Mono",
+          "status": "unloaded"
+        }
+      ],
+      "fontsAfter": [
+        {
+          "family": "Plexon Hanken",
+          "status": "loaded"
+        },
+        {
+          "family": "hankenLatin Fallback",
+          "status": "error"
+        },
+        {
+          "family": "Plexon Hanken",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Commit Mono",
+          "status": "unloaded"
+        }
+      ],
+      "stack": "\"Plexon Hanken\", \"hankenLatin Fallback\", Arial, sans-serif",
+      "fontResources": [
+        {
+          "url": "http://127.0.0.1:3400/_next/static/media/hanken_latin-s.p.3241148m1u9do.woff2",
+          "start": 28.199999999953434,
+          "end": 1237.4000000000233
+        }
+      ]
+    },
+    {
+      "theme": "dark",
+      "width": 1280,
+      "repeat": 0,
+      "cls": 0.036821765136718754,
+      "shifts": [
+        {
+          "value": 0.015301751030815972,
+          "time": 1053.4000000000233,
+          "recentInput": false,
+          "sources": [
+            {
+              "tag": "BUTTON",
+              "classes": "",
+              "previous": {
+                "x": 76.1875,
+                "y": 796.328125,
+                "width": 528.8125,
+                "height": 38,
+                "top": 796.328125,
+                "right": 605,
+                "bottom": 834.328125,
+                "left": 76.1875
+              },
+              "current": {
+                "x": 76.1875,
+                "y": 769.328125,
+                "width": 528.8125,
+                "height": 38,
+                "top": 769.328125,
+                "right": 605,
+                "bottom": 807.328125,
+                "left": 76.1875
+              }
+            },
+            {
+              "tag": "DIV",
+              "classes": "",
+              "previous": {
+                "x": 76.1875,
+                "y": 586.328125,
+                "width": 255.40625,
+                "height": 71,
+                "top": 586.328125,
+                "right": 331.59375,
+                "bottom": 657.328125,
+                "left": 76.1875
+              },
+              "current": {
+                "x": 76.1875,
+                "y": 559.328125,
+                "width": 255.40625,
+                "height": 71,
+                "top": 559.328125,
+                "right": 331.59375,
+                "bottom": 630.328125,
+                "left": 76.1875
+              }
+            },
+            {
+              "tag": "DIV",
+              "classes": "",
+              "previous": {
+                "x": 349.59375,
+                "y": 586.328125,
+                "width": 255.40625,
+                "height": 71,
+                "top": 586.328125,
+                "right": 605,
+                "bottom": 657.328125,
+                "left": 349.59375
+              },
+              "current": {
+                "x": 349.59375,
+                "y": 559.328125,
+                "width": 255.40625,
+                "height": 71,
+                "top": 559.328125,
+                "right": 605,
+                "bottom": 630.328125,
+                "left": 349.59375
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "fleet-source",
+              "previous": {
+                "x": 76.1875,
+                "y": 719.828125,
+                "width": 528.8125,
+                "height": 16.5,
+                "top": 719.828125,
+                "right": 605,
+                "bottom": 736.328125,
+                "left": 76.1875
+              },
+              "current": {
+                "x": 76.1875,
+                "y": 692.828125,
+                "width": 528.8125,
+                "height": 16.5,
+                "top": 692.828125,
+                "right": 605,
+                "bottom": 709.328125,
+                "left": 76.1875
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "fleet-source",
+              "previous": {
+                "x": 76.1875,
+                "y": 741.328125,
+                "width": 528.8125,
+                "height": 16.5,
+                "top": 741.328125,
+                "right": 605,
+                "bottom": 757.828125,
+                "left": 76.1875
+              },
+              "current": {
+                "x": 76.1875,
+                "y": 714.328125,
+                "width": 528.8125,
+                "height": 16.5,
+                "top": 714.328125,
+                "right": 605,
+                "bottom": 730.828125,
+                "left": 76.1875
+              }
+            }
+          ]
+        },
+        {
+          "value": 0.020618277994791667,
+          "time": 1227.1999999999534,
+          "recentInput": false,
+          "sources": [
+            {
+              "tag": "DETAILS",
+              "classes": "fleet-node-details",
+              "previous": {
+                "x": 51.1875,
+                "y": 883.328125,
+                "width": 1177.625,
+                "height": 16.671875,
+                "top": 883.328125,
+                "right": 1228.8125,
+                "bottom": 900,
+                "left": 51.1875
+              },
+              "current": {
+                "x": 51.1875,
+                "y": 856.328125,
+                "width": 1177.625,
+                "height": 43.671875,
+                "top": 856.328125,
+                "right": 1228.8125,
+                "bottom": 900,
+                "left": 51.1875
+              }
+            },
+            {
+              "tag": "BUTTON",
+              "classes": "",
+              "previous": {
+                "x": 675,
+                "y": 796.328125,
+                "width": 528.8125,
+                "height": 38,
+                "top": 796.328125,
+                "right": 1203.8125,
+                "bottom": 834.328125,
+                "left": 675
+              },
+              "current": {
+                "x": 675,
+                "y": 769.328125,
+                "width": 528.8125,
+                "height": 38,
+                "top": 769.328125,
+                "right": 1203.8125,
+                "bottom": 807.328125,
+                "left": 675
+              }
+            },
+            {
+              "tag": "DIV",
+              "classes": "",
+              "previous": {
+                "x": 675,
+                "y": 586.328125,
+                "width": 255.40625,
+                "height": 71,
+                "top": 586.328125,
+                "right": 930.40625,
+                "bottom": 657.328125,
+                "left": 675
+              },
+              "current": {
+                "x": 675,
+                "y": 559.328125,
+                "width": 255.40625,
+                "height": 71,
+                "top": 559.328125,
+                "right": 930.40625,
+                "bottom": 630.328125,
+                "left": 675
+              }
+            },
+            {
+              "tag": "DIV",
+              "classes": "",
+              "previous": {
+                "x": 948.40625,
+                "y": 586.328125,
+                "width": 255.40625,
+                "height": 71,
+                "top": 586.328125,
+                "right": 1203.8125,
+                "bottom": 657.328125,
+                "left": 948.40625
+              },
+              "current": {
+                "x": 948.40625,
+                "y": 559.328125,
+                "width": 255.40625,
+                "height": 71,
+                "top": 559.328125,
+                "right": 1203.8125,
+                "bottom": 630.328125,
+                "left": 948.40625
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "fleet-source",
+              "previous": {
+                "x": 675,
+                "y": 719.828125,
+                "width": 528.8125,
+                "height": 16.5,
+                "top": 719.828125,
+                "right": 1203.8125,
+                "bottom": 736.328125,
+                "left": 675
+              },
+              "current": {
+                "x": 675,
+                "y": 692.828125,
+                "width": 528.8125,
+                "height": 16.5,
+                "top": 692.828125,
+                "right": 1203.8125,
+                "bottom": 709.328125,
+                "left": 675
+              }
+            }
+          ]
+        },
+        {
+          "value": 0.0009017361111111112,
+          "time": 1553,
+          "recentInput": false,
+          "sources": [
+            {
+              "previous": {
+                "x": 948.40625,
+                "y": 516.328125,
+                "width": 255.40625,
+                "height": 23,
+                "top": 516.328125,
+                "right": 1203.8125,
+                "bottom": 539.328125,
+                "left": 948.40625
+              },
+              "current": {
+                "x": 948.40625,
+                "y": 516.328125,
+                "width": 255.40625,
+                "height": 23,
+                "top": 516.328125,
+                "right": 1203.8125,
+                "bottom": 539.328125,
+                "left": 948.40625
+              }
+            },
+            {
+              "tag": "SPAN",
+              "classes": "fleet-status fleet-status-online",
+              "previous": {
+                "x": 1023.8125,
+                "y": 349,
+                "width": 180,
+                "height": 24.5,
+                "top": 349,
+                "right": 1203.8125,
+                "bottom": 373.5,
+                "left": 1023.8125
+              },
+              "current": {
+                "x": 1151.8125,
+                "y": 349,
+                "width": 52,
+                "height": 24.5,
+                "top": 349,
+                "right": 1203.8125,
+                "bottom": 373.5,
+                "left": 1151.8125
+              }
+            }
+          ]
+        }
+      ],
+      "fontsBefore": [
+        {
+          "family": "Plexon Hanken",
+          "status": "loading"
+        },
+        {
+          "family": "hankenLatin Fallback",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Hanken",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Commit Mono",
+          "status": "unloaded"
+        }
+      ],
+      "fontsAfter": [
+        {
+          "family": "Plexon Hanken",
+          "status": "loaded"
+        },
+        {
+          "family": "hankenLatin Fallback",
+          "status": "error"
+        },
+        {
+          "family": "Plexon Hanken",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Commit Mono",
+          "status": "unloaded"
+        }
+      ],
+      "stack": "\"Plexon Hanken\", \"hankenLatin Fallback\", Arial, sans-serif",
+      "fontResources": [
+        {
+          "url": "http://127.0.0.1:3400/_next/static/media/hanken_latin-s.p.3241148m1u9do.woff2",
+          "start": 12,
+          "end": 1221.4000000000233
+        }
+      ]
+    },
+    {
+      "theme": "dark",
+      "width": 1280,
+      "repeat": 1,
+      "cls": 0.03909144694010416,
+      "shifts": [
+        {
+          "value": 0.015301751030815972,
+          "time": 371.9000000000233,
+          "recentInput": false,
+          "sources": [
+            {
+              "tag": "BUTTON",
+              "classes": "",
+              "previous": {
+                "x": 76.1875,
+                "y": 796.328125,
+                "width": 528.8125,
+                "height": 38,
+                "top": 796.328125,
+                "right": 605,
+                "bottom": 834.328125,
+                "left": 76.1875
+              },
+              "current": {
+                "x": 76.1875,
+                "y": 769.328125,
+                "width": 528.8125,
+                "height": 38,
+                "top": 769.328125,
+                "right": 605,
+                "bottom": 807.328125,
+                "left": 76.1875
+              }
+            },
+            {
+              "tag": "DIV",
+              "classes": "",
+              "previous": {
+                "x": 76.1875,
+                "y": 586.328125,
+                "width": 255.40625,
+                "height": 71,
+                "top": 586.328125,
+                "right": 331.59375,
+                "bottom": 657.328125,
+                "left": 76.1875
+              },
+              "current": {
+                "x": 76.1875,
+                "y": 559.328125,
+                "width": 255.40625,
+                "height": 71,
+                "top": 559.328125,
+                "right": 331.59375,
+                "bottom": 630.328125,
+                "left": 76.1875
+              }
+            },
+            {
+              "tag": "DIV",
+              "classes": "",
+              "previous": {
+                "x": 349.59375,
+                "y": 586.328125,
+                "width": 255.40625,
+                "height": 71,
+                "top": 586.328125,
+                "right": 605,
+                "bottom": 657.328125,
+                "left": 349.59375
+              },
+              "current": {
+                "x": 349.59375,
+                "y": 559.328125,
+                "width": 255.40625,
+                "height": 71,
+                "top": 559.328125,
+                "right": 605,
+                "bottom": 630.328125,
+                "left": 349.59375
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "fleet-source",
+              "previous": {
+                "x": 76.1875,
+                "y": 719.828125,
+                "width": 528.8125,
+                "height": 16.5,
+                "top": 719.828125,
+                "right": 605,
+                "bottom": 736.328125,
+                "left": 76.1875
+              },
+              "current": {
+                "x": 76.1875,
+                "y": 692.828125,
+                "width": 528.8125,
+                "height": 16.5,
+                "top": 692.828125,
+                "right": 605,
+                "bottom": 709.328125,
+                "left": 76.1875
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "fleet-source",
+              "previous": {
+                "x": 76.1875,
+                "y": 741.328125,
+                "width": 528.8125,
+                "height": 16.5,
+                "top": 741.328125,
+                "right": 605,
+                "bottom": 757.828125,
+                "left": 76.1875
+              },
+              "current": {
+                "x": 76.1875,
+                "y": 714.328125,
+                "width": 528.8125,
+                "height": 16.5,
+                "top": 714.328125,
+                "right": 605,
+                "bottom": 730.828125,
+                "left": 76.1875
+              }
+            }
+          ]
+        },
+        {
+          "value": 0.020753913031684026,
+          "time": 886.7000000000698,
+          "recentInput": false,
+          "sources": [
+            {
+              "tag": "DETAILS",
+              "classes": "fleet-node-details",
+              "previous": {
+                "x": 51.1875,
+                "y": 883.328125,
+                "width": 1177.625,
+                "height": 16.671875,
+                "top": 883.328125,
+                "right": 1228.8125,
+                "bottom": 900,
+                "left": 51.1875
+              },
+              "current": {
+                "x": 51.1875,
+                "y": 856.328125,
+                "width": 1177.625,
+                "height": 43.671875,
+                "top": 856.328125,
+                "right": 1228.8125,
+                "bottom": 900,
+                "left": 51.1875
+              }
+            },
+            {
+              "tag": "BUTTON",
+              "classes": "",
+              "previous": {
+                "x": 675,
+                "y": 796.328125,
+                "width": 528.8125,
+                "height": 38,
+                "top": 796.328125,
+                "right": 1203.8125,
+                "bottom": 834.328125,
+                "left": 675
+              },
+              "current": {
+                "x": 675,
+                "y": 769.328125,
+                "width": 528.8125,
+                "height": 38,
+                "top": 769.328125,
+                "right": 1203.8125,
+                "bottom": 807.328125,
+                "left": 675
+              }
+            },
+            {
+              "tag": "DIV",
+              "classes": "",
+              "previous": {
+                "x": 675,
+                "y": 586.328125,
+                "width": 255.40625,
+                "height": 71,
+                "top": 586.328125,
+                "right": 930.40625,
+                "bottom": 657.328125,
+                "left": 675
+              },
+              "current": {
+                "x": 675,
+                "y": 559.328125,
+                "width": 255.40625,
+                "height": 71,
+                "top": 559.328125,
+                "right": 930.40625,
+                "bottom": 630.328125,
+                "left": 675
+              }
+            },
+            {
+              "tag": "DIV",
+              "classes": "",
+              "previous": {
+                "x": 948.40625,
+                "y": 586.328125,
+                "width": 255.40625,
+                "height": 71,
+                "top": 586.328125,
+                "right": 1203.8125,
+                "bottom": 657.328125,
+                "left": 948.40625
+              },
+              "current": {
+                "x": 948.40625,
+                "y": 559.328125,
+                "width": 255.40625,
+                "height": 71,
+                "top": 559.328125,
+                "right": 1203.8125,
+                "bottom": 630.328125,
+                "left": 948.40625
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "fleet-source",
+              "previous": {
+                "x": 675,
+                "y": 741.328125,
+                "width": 528.8125,
+                "height": 16.5,
+                "top": 741.328125,
+                "right": 1203.8125,
+                "bottom": 757.828125,
+                "left": 675
+              },
+              "current": {
+                "x": 675,
+                "y": 714.328125,
+                "width": 528.8125,
+                "height": 16.5,
+                "top": 714.328125,
+                "right": 1203.8125,
+                "bottom": 730.828125,
+                "left": 675
+              }
+            }
+          ]
+        },
+        {
+          "value": 0.0030357828776041667,
+          "time": 1246.4000000000233,
+          "recentInput": false,
+          "sources": [
+            {
+              "previous": {
+                "x": 76.1875,
+                "y": 693.828125,
+                "width": 528.8125,
+                "height": 14,
+                "top": 693.828125,
+                "right": 605,
+                "bottom": 707.828125,
+                "left": 76.1875
+              },
+              "current": {
+                "x": 76.1875,
+                "y": 693.828125,
+                "width": 528.8125,
+                "height": 14,
+                "top": 693.828125,
+                "right": 605,
+                "bottom": 707.828125,
+                "left": 76.1875
+              }
+            },
+            {
+              "previous": {
+                "x": 76.1875,
+                "y": 672.328125,
+                "width": 528.8125,
+                "height": 14,
+                "top": 672.328125,
+                "right": 605,
+                "bottom": 686.328125,
+                "left": 76.1875
+              },
+              "current": {
+                "x": 76.1875,
+                "y": 672.328125,
+                "width": 528.8125,
+                "height": 14,
+                "top": 672.328125,
+                "right": 605,
+                "bottom": 686.328125,
+                "left": 76.1875
+              }
+            },
+            {
+              "previous": {
+                "x": 76.1875,
+                "y": 736.828125,
+                "width": 528.8125,
+                "height": 14,
+                "top": 736.828125,
+                "right": 605,
+                "bottom": 750.828125,
+                "left": 76.1875
+              },
+              "current": {
+                "x": 76.1875,
+                "y": 736.828125,
+                "width": 528.8125,
+                "height": 14,
+                "top": 736.828125,
+                "right": 605,
+                "bottom": 750.828125,
+                "left": 76.1875
+              }
+            },
+            {
+              "previous": {
+                "x": 675,
+                "y": 672.328125,
+                "width": 528.8125,
+                "height": 14,
+                "top": 672.328125,
+                "right": 1203.8125,
+                "bottom": 686.328125,
+                "left": 675
+              },
+              "current": {
+                "x": 675,
+                "y": 672.328125,
+                "width": 528.8125,
+                "height": 14,
+                "top": 672.328125,
+                "right": 1203.8125,
+                "bottom": 686.328125,
+                "left": 675
+              }
+            },
+            {
+              "previous": {
+                "x": 76.1875,
+                "y": 715.328125,
+                "width": 528.8125,
+                "height": 14,
+                "top": 715.328125,
+                "right": 605,
+                "bottom": 729.328125,
+                "left": 76.1875
+              },
+              "current": {
+                "x": 76.1875,
+                "y": 715.328125,
+                "width": 528.8125,
+                "height": 14,
+                "top": 715.328125,
+                "right": 605,
+                "bottom": 729.328125,
+                "left": 76.1875
+              }
+            }
+          ]
+        }
+      ],
+      "fontsBefore": [
+        {
+          "family": "Plexon Hanken",
+          "status": "loading"
+        },
+        {
+          "family": "hankenLatin Fallback",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Hanken",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Commit Mono",
+          "status": "unloaded"
+        }
+      ],
+      "fontsAfter": [
+        {
+          "family": "Plexon Hanken",
+          "status": "loaded"
+        },
+        {
+          "family": "hankenLatin Fallback",
+          "status": "error"
+        },
+        {
+          "family": "Plexon Hanken",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Commit Mono",
+          "status": "unloaded"
+        }
+      ],
+      "stack": "\"Plexon Hanken\", \"hankenLatin Fallback\", Arial, sans-serif",
+      "fontResources": [
+        {
+          "url": "http://127.0.0.1:3400/_next/static/media/hanken_latin-s.p.3241148m1u9do.woff2",
+          "start": 26.70000000006985,
+          "end": 1240.0999999999767
+        }
+      ]
+    },
+    {
+      "theme": "dark",
+      "width": 1280,
+      "repeat": 2,
+      "cls": 0.03909144694010416,
+      "shifts": [
+        {
+          "value": 0.015301751030815972,
+          "time": 646.2999999999302,
+          "recentInput": false,
+          "sources": [
+            {
+              "tag": "BUTTON",
+              "classes": "",
+              "previous": {
+                "x": 76.1875,
+                "y": 796.328125,
+                "width": 528.8125,
+                "height": 38,
+                "top": 796.328125,
+                "right": 605,
+                "bottom": 834.328125,
+                "left": 76.1875
+              },
+              "current": {
+                "x": 76.1875,
+                "y": 769.328125,
+                "width": 528.8125,
+                "height": 38,
+                "top": 769.328125,
+                "right": 605,
+                "bottom": 807.328125,
+                "left": 76.1875
+              }
+            },
+            {
+              "tag": "DIV",
+              "classes": "",
+              "previous": {
+                "x": 76.1875,
+                "y": 586.328125,
+                "width": 255.40625,
+                "height": 71,
+                "top": 586.328125,
+                "right": 331.59375,
+                "bottom": 657.328125,
+                "left": 76.1875
+              },
+              "current": {
+                "x": 76.1875,
+                "y": 559.328125,
+                "width": 255.40625,
+                "height": 71,
+                "top": 559.328125,
+                "right": 331.59375,
+                "bottom": 630.328125,
+                "left": 76.1875
+              }
+            },
+            {
+              "tag": "DIV",
+              "classes": "",
+              "previous": {
+                "x": 349.59375,
+                "y": 586.328125,
+                "width": 255.40625,
+                "height": 71,
+                "top": 586.328125,
+                "right": 605,
+                "bottom": 657.328125,
+                "left": 349.59375
+              },
+              "current": {
+                "x": 349.59375,
+                "y": 559.328125,
+                "width": 255.40625,
+                "height": 71,
+                "top": 559.328125,
+                "right": 605,
+                "bottom": 630.328125,
+                "left": 349.59375
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "fleet-source",
+              "previous": {
+                "x": 76.1875,
+                "y": 719.828125,
+                "width": 528.8125,
+                "height": 16.5,
+                "top": 719.828125,
+                "right": 605,
+                "bottom": 736.328125,
+                "left": 76.1875
+              },
+              "current": {
+                "x": 76.1875,
+                "y": 692.828125,
+                "width": 528.8125,
+                "height": 16.5,
+                "top": 692.828125,
+                "right": 605,
+                "bottom": 709.328125,
+                "left": 76.1875
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "fleet-source",
+              "previous": {
+                "x": 76.1875,
+                "y": 741.328125,
+                "width": 528.8125,
+                "height": 16.5,
+                "top": 741.328125,
+                "right": 605,
+                "bottom": 757.828125,
+                "left": 76.1875
+              },
+              "current": {
+                "x": 76.1875,
+                "y": 714.328125,
+                "width": 528.8125,
+                "height": 16.5,
+                "top": 714.328125,
+                "right": 605,
+                "bottom": 730.828125,
+                "left": 76.1875
+              }
+            }
+          ]
+        },
+        {
+          "value": 0.020753913031684026,
+          "time": 1144,
+          "recentInput": false,
+          "sources": [
+            {
+              "tag": "DETAILS",
+              "classes": "fleet-node-details",
+              "previous": {
+                "x": 51.1875,
+                "y": 883.328125,
+                "width": 1177.625,
+                "height": 16.671875,
+                "top": 883.328125,
+                "right": 1228.8125,
+                "bottom": 900,
+                "left": 51.1875
+              },
+              "current": {
+                "x": 51.1875,
+                "y": 856.328125,
+                "width": 1177.625,
+                "height": 43.671875,
+                "top": 856.328125,
+                "right": 1228.8125,
+                "bottom": 900,
+                "left": 51.1875
+              }
+            },
+            {
+              "tag": "BUTTON",
+              "classes": "",
+              "previous": {
+                "x": 675,
+                "y": 796.328125,
+                "width": 528.8125,
+                "height": 38,
+                "top": 796.328125,
+                "right": 1203.8125,
+                "bottom": 834.328125,
+                "left": 675
+              },
+              "current": {
+                "x": 675,
+                "y": 769.328125,
+                "width": 528.8125,
+                "height": 38,
+                "top": 769.328125,
+                "right": 1203.8125,
+                "bottom": 807.328125,
+                "left": 675
+              }
+            },
+            {
+              "tag": "DIV",
+              "classes": "",
+              "previous": {
+                "x": 675,
+                "y": 586.328125,
+                "width": 255.40625,
+                "height": 71,
+                "top": 586.328125,
+                "right": 930.40625,
+                "bottom": 657.328125,
+                "left": 675
+              },
+              "current": {
+                "x": 675,
+                "y": 559.328125,
+                "width": 255.40625,
+                "height": 71,
+                "top": 559.328125,
+                "right": 930.40625,
+                "bottom": 630.328125,
+                "left": 675
+              }
+            },
+            {
+              "tag": "DIV",
+              "classes": "",
+              "previous": {
+                "x": 948.40625,
+                "y": 586.328125,
+                "width": 255.40625,
+                "height": 71,
+                "top": 586.328125,
+                "right": 1203.8125,
+                "bottom": 657.328125,
+                "left": 948.40625
+              },
+              "current": {
+                "x": 948.40625,
+                "y": 559.328125,
+                "width": 255.40625,
+                "height": 71,
+                "top": 559.328125,
+                "right": 1203.8125,
+                "bottom": 630.328125,
+                "left": 948.40625
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "fleet-source",
+              "previous": {
+                "x": 675,
+                "y": 741.328125,
+                "width": 528.8125,
+                "height": 16.5,
+                "top": 741.328125,
+                "right": 1203.8125,
+                "bottom": 757.828125,
+                "left": 675
+              },
+              "current": {
+                "x": 675,
+                "y": 714.328125,
+                "width": 528.8125,
+                "height": 16.5,
+                "top": 714.328125,
+                "right": 1203.8125,
+                "bottom": 730.828125,
+                "left": 675
+              }
+            }
+          ]
+        },
+        {
+          "value": 0.0030357828776041667,
+          "time": 1231.2999999999302,
+          "recentInput": false,
+          "sources": [
+            {
+              "previous": {
+                "x": 76.1875,
+                "y": 693.828125,
+                "width": 528.8125,
+                "height": 14,
+                "top": 693.828125,
+                "right": 605,
+                "bottom": 707.828125,
+                "left": 76.1875
+              },
+              "current": {
+                "x": 76.1875,
+                "y": 693.828125,
+                "width": 528.8125,
+                "height": 14,
+                "top": 693.828125,
+                "right": 605,
+                "bottom": 707.828125,
+                "left": 76.1875
+              }
+            },
+            {
+              "previous": {
+                "x": 76.1875,
+                "y": 672.328125,
+                "width": 528.8125,
+                "height": 14,
+                "top": 672.328125,
+                "right": 605,
+                "bottom": 686.328125,
+                "left": 76.1875
+              },
+              "current": {
+                "x": 76.1875,
+                "y": 672.328125,
+                "width": 528.8125,
+                "height": 14,
+                "top": 672.328125,
+                "right": 605,
+                "bottom": 686.328125,
+                "left": 76.1875
+              }
+            },
+            {
+              "previous": {
+                "x": 76.1875,
+                "y": 736.828125,
+                "width": 528.8125,
+                "height": 14,
+                "top": 736.828125,
+                "right": 605,
+                "bottom": 750.828125,
+                "left": 76.1875
+              },
+              "current": {
+                "x": 76.1875,
+                "y": 736.828125,
+                "width": 528.8125,
+                "height": 14,
+                "top": 736.828125,
+                "right": 605,
+                "bottom": 750.828125,
+                "left": 76.1875
+              }
+            },
+            {
+              "previous": {
+                "x": 675,
+                "y": 672.328125,
+                "width": 528.8125,
+                "height": 14,
+                "top": 672.328125,
+                "right": 1203.8125,
+                "bottom": 686.328125,
+                "left": 675
+              },
+              "current": {
+                "x": 675,
+                "y": 672.328125,
+                "width": 528.8125,
+                "height": 14,
+                "top": 672.328125,
+                "right": 1203.8125,
+                "bottom": 686.328125,
+                "left": 675
+              }
+            },
+            {
+              "previous": {
+                "x": 76.1875,
+                "y": 715.328125,
+                "width": 528.8125,
+                "height": 14,
+                "top": 715.328125,
+                "right": 605,
+                "bottom": 729.328125,
+                "left": 76.1875
+              },
+              "current": {
+                "x": 76.1875,
+                "y": 715.328125,
+                "width": 528.8125,
+                "height": 14,
+                "top": 715.328125,
+                "right": 605,
+                "bottom": 729.328125,
+                "left": 76.1875
+              }
+            }
+          ]
+        }
+      ],
+      "fontsBefore": [
+        {
+          "family": "Plexon Hanken",
+          "status": "loading"
+        },
+        {
+          "family": "hankenLatin Fallback",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Hanken",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Commit Mono",
+          "status": "unloaded"
+        }
+      ],
+      "fontsAfter": [
+        {
+          "family": "Plexon Hanken",
+          "status": "loaded"
+        },
+        {
+          "family": "hankenLatin Fallback",
+          "status": "error"
+        },
+        {
+          "family": "Plexon Hanken",
+          "status": "unloaded"
+        },
+        {
+          "family": "Plexon Commit Mono",
+          "status": "unloaded"
+        }
+      ],
+      "stack": "\"Plexon Hanken\", \"hankenLatin Fallback\", Arial, sans-serif",
+      "fontResources": [
+        {
+          "url": "http://127.0.0.1:3400/_next/static/media/hanken_latin-s.p.3241148m1u9do.woff2",
+          "start": 11.5,
+          "end": 1224.5999999999767
+        }
+      ]
+    }
+  ]
+}

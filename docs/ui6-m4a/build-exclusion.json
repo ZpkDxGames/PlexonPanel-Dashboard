@@ -1,0 +1,19 @@
+{
+  "buildId": "50gvVyic8Wy-k31o34A84",
+  "manifest": {
+    "/_global-error/page": "app/_global-error/page.js",
+    "/_not-found/page": "app/_not-found/page.js",
+    "/activity/page": "app/activity/page.js",
+    "/api/build/route": "app/api/build/route.js",
+    "/page": "app/page.js"
+  },
+  "inspectedFiles": 98,
+  "markers": [
+    "PLEXON_UI6_KITCHEN_SINK_DEV_ONLY",
+    "PLEXON_UI6_PULSE_FIXTURES_DEV_ONLY",
+    ".lab-section"
+  ],
+  "matches": [],
+  "automatedTest": "tests/ui-foundation-build.test.mjs; 3 tests passed, 0 failures/skips",
+  "status": "passed"
+}

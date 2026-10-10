@@ -1,0 +1,28 @@
+{"component":"PlexonPanelRelay","runtime":"standalone","event":"started","host":"127.0.0.1","port":8788,"storage":"coordination-only","version":"5.0.0","gitCommit":"unavailable","buildTimestamp":"unavailable","protocolVersion":3,"runtimeKind":"standalone"}
+Verify light: Overview
+Verify light: Performance
+Verify light: Players
+Verify light: Console
+Verify light: Chat
+Verify light: Plugins
+Verify light: Server
+Verify light: Backups
+Verify light: Configuration
+Verify light: Audit
+Verify light: Access
+Verify light: Settings
+Verify dark/125%: Overview
+Verify dark/125%: Performance
+Verify dark/125%: Players
+Verify dark/125%: Console
+Verify dark/125%: Chat
+Verify dark/125%: Plugins
+Verify dark/125%: Server
+Verify dark/125%: Backups
+Verify dark/125%: Configuration
+Verify dark/125%: Audit
+Verify dark/125%: Access
+Verify dark/125%: Settings
+{"views":162,"axeViolations":0,"soakMs":60010,"errors":0}
+{"component":"PlexonPanelRelay","runtime":"standalone","code":"PEER_DELIVERY_FAILED","serverId":"e5218b0e-3ca6-4e9e-98a6-2dbab42fe6b7","agentKind":"HOST","messageType":"paper.connection","error":"WebSocket send failed"}
+{"component":"PlexonPanelRelay","runtime":"standalone","code":"PEER_DELIVERY_FAILED","serverId":"f061799d-9553-482a-9d01-e11d55910bbd","agentKind":"HOST","messageType":"paper.connection","error":"WebSocket send failed"}

@@ -1,0 +1,300 @@
+{
+  "status": "failed",
+  "recordedAt": "2026-10-08T20:39:01.991Z",
+  "mode": "development",
+  "fixture": "Signed local agents for current state; synthetic source-provenance history in the real bounded browser cache. No live certification.",
+  "pages": [
+    {
+      "name": "empty-light-360",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "impact": "critical",
+          "tags": [
+            "cat.aria",
+            "wcag2a",
+            "wcag412",
+            "EN-301-549",
+            "EN-9.4.1.2",
+            "RGAAv4",
+            "RGAA-7.1.1"
+          ],
+          "description": "Ensure all ARIA attributes have valid values",
+          "help": "ARIA attributes must conform to valid values",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/aria-valid-attr-value?application=playwright",
+          "nodes": [
+            {
+              "any": [],
+              "all": [
+                {
+                  "id": "aria-valid-attr-value",
+                  "data": {
+                    "messageKey": "controlsWithinPopup",
+                    "needsReview": "aria-controls=\"_r_1_\""
+                  },
+                  "relatedNodes": [],
+                  "impact": "critical",
+                  "message": "Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_1_\""
+                }
+              ],
+              "none": [],
+              "impact": "critical",
+              "html": "<button type=\"button\" class=\"pp-button pp-button-secondary pp-floating-trigger\" role=\"combobox\" aria-label=\"PlexonCraft — Selected server\" aria-haspopup=\"listbox\" aria-expanded=\"false\" aria-controls=\"_r_1_\">",
+              "target": [
+                "button[aria-label=\"PlexonCraft — Selected server\"]"
+              ],
+              "failureSummary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_1_\""
+            },
+            {
+              "any": [],
+              "all": [
+                {
+                  "id": "aria-valid-attr-value",
+                  "data": {
+                    "messageKey": "controlsWithinPopup",
+                    "needsReview": "aria-controls=\"_r_3_\""
+                  },
+                  "relatedNodes": [],
+                  "impact": "critical",
+                  "message": "Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_3_\""
+                }
+              ],
+              "none": [],
+              "impact": "critical",
+              "html": "<button type=\"button\" class=\"pp-button pp-button-secondary pp-floating-trigger\" aria-label=\"Connection authority: Connecting, 1 of 4 healthy sources\" aria-haspopup=\"dialog\" aria-expanded=\"false\" aria-controls=\"_r_3_\">",
+              "target": [
+                "button[aria-controls=\"_r_3_\"]"
+              ],
+              "failureSummary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_3_\""
+            },
+            {
+              "any": [],
+              "all": [
+                {
+                  "id": "aria-valid-attr-value",
+                  "data": {
+                    "messageKey": "controlsWithinPopup",
+                    "needsReview": "aria-controls=\"_r_10_\""
+                  },
+                  "relatedNodes": [],
+                  "impact": "critical",
+                  "message": "Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_10_\""
+                }
+              ],
+              "none": [],
+              "impact": "critical",
+              "html": "<button type=\"button\" class=\"pp-button pp-button-secondary pp-floating-trigger\" role=\"combobox\" aria-label=\"30 min — Pulse window\" aria-haspopup=\"listbox\" aria-expanded=\"false\" aria-controls=\"_r_10_\">",
+              "target": [
+                "button[aria-label=\"30 min — Pulse window\"]"
+              ],
+              "failureSummary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_10_\""
+            },
+            {
+              "any": [],
+              "all": [
+                {
+                  "id": "aria-valid-attr-value",
+                  "data": {
+                    "messageKey": "controlsWithinPopup",
+                    "needsReview": "aria-controls=\"_r_13_\""
+                  },
+                  "relatedNodes": [],
+                  "impact": "critical",
+                  "message": "Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_13_\""
+                }
+              ],
+              "none": [],
+              "impact": "critical",
+              "html": "<button type=\"button\" class=\"pp-button pp-button-secondary pp-floating-trigger\" aria-haspopup=\"dialog\" aria-expanded=\"false\" aria-controls=\"_r_13_\">",
+              "target": [
+                "button[aria-controls=\"_r_13_\"]"
+              ],
+              "failureSummary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_13_\""
+            },
+            {
+              "any": [],
+              "all": [
+                {
+                  "id": "aria-valid-attr-value",
+                  "data": {
+                    "messageKey": "controlsWithinPopup",
+                    "needsReview": "aria-controls=\"_r_15_\""
+                  },
+                  "relatedNodes": [],
+                  "impact": "critical",
+                  "message": "Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_15_\""
+                }
+              ],
+              "none": [],
+              "impact": "critical",
+              "html": "<button type=\"button\" class=\"pp-button pp-button-secondary pp-floating-trigger\" aria-haspopup=\"dialog\" aria-expanded=\"false\" aria-controls=\"_r_15_\">",
+              "target": [
+                "button[aria-controls=\"_r_15_\"]"
+              ],
+              "failureSummary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_15_\""
+            },
+            {
+              "any": [],
+              "all": [
+                {
+                  "id": "aria-valid-attr-value",
+                  "data": {
+                    "messageKey": "controlsWithinPopup",
+                    "needsReview": "aria-controls=\"_r_17_\""
+                  },
+                  "relatedNodes": [],
+                  "impact": "critical",
+                  "message": "Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_17_\""
+                }
+              ],
+              "none": [],
+              "impact": "critical",
+              "html": "<button type=\"button\" class=\"pp-button pp-button-secondary pp-floating-trigger\" aria-haspopup=\"dialog\" aria-expanded=\"false\" aria-controls=\"_r_17_\">",
+              "target": [
+                "button[aria-controls=\"_r_17_\"]"
+              ],
+              "failureSummary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_17_\""
+            },
+            {
+              "any": [],
+              "all": [
+                {
+                  "id": "aria-valid-attr-value",
+                  "data": {
+                    "messageKey": "controlsWithinPopup",
+                    "needsReview": "aria-controls=\"_r_19_\""
+                  },
+                  "relatedNodes": [],
+                  "impact": "critical",
+                  "message": "Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_19_\""
+                }
+              ],
+              "none": [],
+              "impact": "critical",
+              "html": "<button type=\"button\" class=\"pp-button pp-button-secondary pp-floating-trigger\" aria-haspopup=\"dialog\" aria-expanded=\"false\" aria-controls=\"_r_19_\">",
+              "target": [
+                "button[aria-controls=\"_r_19_\"]"
+              ],
+              "failureSummary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_19_\""
+            },
+            {
+              "any": [],
+              "all": [
+                {
+                  "id": "aria-valid-attr-value",
+                  "data": {
+                    "messageKey": "controlsWithinPopup",
+                    "needsReview": "aria-controls=\"_r_1b_\""
+                  },
+                  "relatedNodes": [],
+                  "impact": "critical",
+                  "message": "Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_1b_\""
+                }
+              ],
+              "none": [],
+              "impact": "critical",
+              "html": "<button type=\"button\" class=\"pp-button pp-button-secondary pp-floating-trigger\" aria-haspopup=\"dialog\" aria-expanded=\"false\" aria-controls=\"_r_1b_\">",
+              "target": [
+                "button[aria-controls=\"_r_1b_\"]"
+              ],
+              "failureSummary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_1b_\""
+            },
+            {
+              "any": [],
+              "all": [
+                {
+                  "id": "aria-valid-attr-value",
+                  "data": {
+                    "messageKey": "controlsWithinPopup",
+                    "needsReview": "aria-controls=\"_r_1d_\""
+                  },
+                  "relatedNodes": [],
+                  "impact": "critical",
+                  "message": "Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_1d_\""
+                }
+              ],
+              "none": [],
+              "impact": "critical",
+              "html": "<button type=\"button\" class=\"pp-button pp-button-secondary pp-floating-trigger\" aria-haspopup=\"dialog\" aria-expanded=\"false\" aria-controls=\"_r_1d_\">",
+              "target": [
+                "button[aria-controls=\"_r_1d_\"]"
+              ],
+              "failureSummary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_1d_\""
+            }
+          ]
+        }
+      ],
+      "passes": 41,
+      "supplementalReviews": {
+        "controlledTargets": [
+          {
+            "id": "_r_1_",
+            "exists": true,
+            "expanded": "false",
+            "open": false
+          },
+          {
+            "id": "_r_3_",
+            "exists": true,
+            "expanded": "false",
+            "open": false
+          },
+          {
+            "id": "_r_10_",
+            "exists": true,
+            "expanded": "false",
+            "open": false
+          },
+          {
+            "id": "_r_13_",
+            "exists": true,
+            "expanded": "false",
+            "open": false
+          },
+          {
+            "id": "_r_15_",
+            "exists": true,
+            "expanded": "false",
+            "open": false
+          },
+          {
+            "id": "_r_17_",
+            "exists": true,
+            "expanded": "false",
+            "open": false
+          },
+          {
+            "id": "_r_19_",
+            "exists": true,
+            "expanded": "false",
+            "open": false
+          },
+          {
+            "id": "_r_1b_",
+            "exists": true,
+            "expanded": "false",
+            "open": false
+          },
+          {
+            "id": "_r_1d_",
+            "exists": true,
+            "expanded": "false",
+            "open": false
+          }
+        ]
+      }
+    }
+  ],
+  "screenshots": [
+    "empty-light-360",
+    "empty-light-390"
+  ],
+  "errors": [],
+  "keyboard": [],
+  "draw": [],
+  "cls": [],
+  "browser": "153.0.8010.0",
+  "smoke": "passed",
+  "failure": "AssertionError [ERR_ASSERTION]: Controlled target exists\n    at axe (file:///workspace/scratch/cd08a2b70c07/dashboard/scripts/verify-ui6-overview.mjs:50:436)\n    at async file:///workspace/scratch/cd08a2b70c07/dashboard/scripts/verify-ui6-overview.mjs:54:99"
+}

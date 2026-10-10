@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1770" height="1280" viewBox="0 0 1770 1280" role="img" aria-labelledby="title desc">
+<title id="title">Configuration desktop and mobile wireframes</title>
+<desc id="desc">Documentation layout only. Labels refer to actual supplied data and existing controls. No example values or simulated production states.</desc>
+<rect width="1770" height="1280" fill="#f3f5f4"/>
+<style>text{font-family:Arial,sans-serif;fill:#1b2227}.label{font-size:20px;font-weight:600}.body{font-size:16px}.note{font-size:15px;fill:#4a5963}</style>
+<text x="24" y="32" class="label">Configuration: desktop</text>
+<text x="1374" y="32" class="label">Configuration: mobile</text>
+<rect x="24" y="54" width="1298" height="72" rx="10" fill="#ffffff" stroke="#637883"/>
+<text x="40" y="82" class="label">Selected server and connection authority</text>
+<text x="40" y="109" class="body">Relay / Paper / Host separately; compact observed Pulse; navigation palette</text>
+<rect x="24" y="144" width="220" height="925" rx="10" fill="#ffffff" stroke="#637883"/>
+<text x="40" y="172" class="label">Navigation</text>
+<text x="40" y="199" class="body">Fleet; Monitor;</text>
+<text x="40" y="220" class="body">Operate; Manage. Local</text>
+<text x="40" y="241" class="body">navigation only.</text>
+<rect x="264" y="144" width="1058" height="80" rx="10" fill="#ffffff" stroke="#637883"/>
+<text x="280" y="172" class="label">Pinned target bar</text>
+<text x="280" y="199" class="body">Server, selected authority/root/path; writable/read-only; dirty state</text>
+<rect x="264" y="238" width="1058" height="330" rx="10" fill="#ffffff" stroke="#637883"/>
+<text x="280" y="266" class="label">File browser + editor</text>
+<rect x="276" y="306" width="302.2" height="246" rx="3" fill="#e8ecea" stroke="#d3dad7"/>
+<text x="286" y="334" style="font-size:16px">File list / search / folder</text>
+<text x="286" y="354" style="font-size:16px">navigation</text>
+<rect x="586.2" y="306" width="715.8" height="246" rx="3" fill="#e8ecea" stroke="#d3dad7"/>
+<text x="596.2" y="334" style="font-size:16px">Actual file editor / syntax preview</text>
+<rect x="264" y="582" width="1058" height="130" rx="10" fill="#ffffff" stroke="#637883"/>
+<text x="280" y="610" class="label">Review/save strip</text>
+<text x="280" y="637" class="body">Actual original/edited diff; save via existing bound action; conflict keeps draft</text>
+<rect x="264" y="726" width="1058" height="90" rx="10" fill="#ffffff" stroke="#637883"/>
+<text x="280" y="754" class="label">Scoped file operations</text>
+<text x="280" y="781" class="body">Create/upload/rename/delete/download+cancel as actually authorized</text>
+<rect x="1374" y="54" width="372" height="110" rx="10" fill="#ffffff" stroke="#637883"/>
+<text x="1390" y="82" class="label">Menu / server / search</text>
+<text x="1390" y="109" class="body">Authority text; palette; no bottom bar</text>
+<rect x="1374" y="184" width="372" height="210" rx="10" fill="#ffffff" stroke="#637883"/>
+<text x="1390" y="212" class="label">File browser</text>
+<text x="1390" y="239" class="body">Authority/root/path; search, bounded</text>
+<text x="1390" y="260" class="body">listing</text>
+<rect x="1374" y="408" width="372" height="285" rx="10" fill="#ffffff" stroke="#637883"/>
+<text x="1390" y="436" class="label">Selected editor</text>
+<text x="1390" y="463" class="body">Back to folder; dirty guard; mono content;</text>
+<text x="1390" y="484" class="body">syntax preview</text>
+<rect x="1374" y="707" width="372" height="150" rx="10" fill="#ffffff" stroke="#637883"/>
+<text x="1390" y="735" class="label">Review and save</text>
+<text x="1390" y="762" class="body">Actual diff sheet and existing bound save</text>
+<text x="1390" y="783" class="body">confirmation</text>
+<rect x="1374" y="871" width="372" height="107" rx="10" fill="#ffffff" stroke="#637883"/>
+<text x="1390" y="899" class="label">File actions</text>
+<text x="1390" y="926" class="body">Scoped menu, SHA-verified download</text>
+<text x="1390" y="947" class="body">progress/cancel</text>
+<text x="24" y="1238" class="note">Single content scroll; intentional table/log wells remain labelled. Desktop rail from1024px; tablet drawer; mobile targets44px.</text>
+</svg>

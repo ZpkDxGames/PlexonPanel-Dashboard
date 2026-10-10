@@ -1,4 +1,5 @@
-import { Badge, Panel, type ViewProps } from "./control-views";
+import type { ViewProps } from "./control-views";
+import { Badge, Panel } from "./ui/workspace";
 import { validInstanceKey } from "../lib/fleet-contract";
 
 export function BackupDestination({ state, remote, configured, restartRequired }: {
@@ -8,12 +9,12 @@ export function BackupDestination({ state, remote, configured, restartRequired }
   const candidate = state.ready?.server.instanceKey;
   const key = validInstanceKey(candidate) ? candidate : null;
   return <Panel title={`${name} backup destination`} aside={<Badge tone={configured ? "green" : "amber"}>{configured ? "Configured" : "Setup required"}</Badge>}>
-    <div className="backup-destination-grid">
-      <div><span className="workspace-kicker">LOCAL REPOSITORY</span><strong>{key ? `/var/backups/plexonpanel/instances/${key}` : "Waiting for signed instance identity"}</strong><small>Retained archives and recovery metadata for this server.</small></div>
-      <div><span className="workspace-kicker">GOOGLE DRIVE</span><strong>{configured ? remote || "Host-configured destination" : "Connect this server’s Drive folder"}</strong><small>{configured ? "The Host verifies uploads before replacing the current restore point." : "A Drive folder alone does not connect the running Host to Google Drive."}</small></div>
+    <div className="pp-data-grid">
+      <div className="pp-stack"><span className="pp-muted">Local repository</span><strong>{key ? `/var/backups/plexonpanel/instances/${key}` : "Waiting for signed instance identity"}</strong><small>Retained archives and recovery metadata for this server.</small></div>
+      <div className="pp-stack"><span className="pp-muted">Google Drive</span><strong>{configured ? remote || "Host-configured destination" : "Connect this server’s Drive folder"}</strong><small>{configured ? "The Host verifies uploads before replacing the current restore point." : "A Drive folder alone does not connect the running Host to Google Drive."}</small></div>
     </div>
-    {restartRequired && <p className="ui-alert" role="status">The Host configuration changed on disk. Restart only this server’s Host after reviewing any active maintenance job.</p>}
-    <details className="backup-setup-guide" open={!configured}>
+    {restartRequired && <p className="pp-notice" role="status">The Host configuration changed on disk. Restart only this server’s Host after reviewing any active maintenance job.</p>}
+    <details className="pp-disclosure" open={!configured}>
       <summary>{configured ? "Destination and recovery notes" : "How to connect Google Drive"}</summary>
       <ol>
         <li>Open the matching <strong>{name}</strong> folder in Drive and copy its folder ID from the address bar.</li>
@@ -21,8 +22,8 @@ export function BackupDestination({ state, remote, configured, restartRequired }
         <li>Set the protected Host destination to <code>gdrive:plexonpanel/{state.serverId}</code>. Each server keeps its own UUID namespace inside its existing folder.</li>
         <li>Restart only the affected Host, then use <strong>Test Google Drive</strong> and <strong>Refresh</strong>. A successful test verifies access; a completed backup separately verifies the archive.</li>
       </ol>
-      {key && <p className="ui-hint">Policy: <code>/etc/plexonpanel/instances/{key}/host-config.json</code>. Credentials and refreshed tokens stay on the VPS.</p>}
-      <p className="ui-hint">Files uploaded manually to Drive remain untouched. They appear in verified history only when managed and verified by this Host.</p>
+      {key && <p className="pp-muted">Policy: <code>/etc/plexonpanel/instances/{key}/host-config.json</code>. Credentials and refreshed tokens stay on the VPS.</p>}
+      <p className="pp-muted">Files uploaded manually to Drive remain untouched. They appear in verified history only when managed and verified by this Host.</p>
     </details>
   </Panel>;
 }

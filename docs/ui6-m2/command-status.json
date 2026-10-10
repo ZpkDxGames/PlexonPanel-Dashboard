@@ -1,0 +1,21 @@
+{
+  "command": "npm run check",
+  "exitCode": 0,
+  "testCounts": [
+    79,
+    201
+  ],
+  "passCounts": [
+    79,
+    201
+  ],
+  "failCounts": [
+    0,
+    0
+  ],
+  "skipCounts": [
+    0,
+    0
+  ],
+  "transcriptFormatting": "Terminal ANSI color codes removed; line endings normalized and trailing whitespace removed without changing recorded text."
+}

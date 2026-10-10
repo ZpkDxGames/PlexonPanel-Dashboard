@@ -2,7 +2,7 @@ import { execFileSync } from "node:child_process";
 import { appendFileSync, lstatSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { isDeepStrictEqual } from "node:util";
-import { deploymentDecision, RECEIPT_PATH } from "./coordinated-deployment-policy.mjs";
+import { dashboardPreviewDecision, deploymentDecision, DASHBOARD_PREVIEW_PATH, RECEIPT_PATH } from "./coordinated-deployment-policy.mjs";
 
 const root = resolve(import.meta.dirname, "..");
 const requireWorker = process.argv.includes("--require-worker");
@@ -11,11 +11,11 @@ let workerAllowed = false;
 try {
   const version = JSON.parse(readFileSync(resolve(root, "package.json"), "utf8")).version;
   let receipt = null, parent = null, changedPaths = null;
-  if (version === "5.0.0") {
-    receipt = JSON.parse(readFileSync(resolve(root, RECEIPT_PATH), "utf8"));
+  if (version === "5.0.0" || version === "6.0.0") {
+    receipt = JSON.parse(readFileSync(resolve(root, version === "6.0.0" ? DASHBOARD_PREVIEW_PATH : RECEIPT_PATH), "utf8"));
     // A VPS staging receipt never authorizes Worker publication, even in a shallow checkout.
     // Reject that target before reading activation ancestry; Dashboard checks still require it.
-    const workerTargetHeld = requireWorker && receipt.schemaVersion === 2;
+    const workerTargetHeld = requireWorker && (version === "6.0.0" || receipt.schemaVersion === 2);
     // No private data or provider credentials are read by this gate.
     if (receipt.state === "READY" && !workerTargetHeld) {
       const git = args => execFileSync("git", args, { cwd: root, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();
@@ -24,8 +24,10 @@ try {
       // Local unstaged changes cannot ride an accepted activation commit.
       const status = git(["status", "--porcelain", "--untracked-files=all"]);
       let equivalentVercelConfig = false;
-      if (status === "M vercel.json" && process.env.VERCEL === "1"
-          && process.env.VERCEL_ENV === "production" && process.env.VERCEL_GIT_COMMIT_REF === "main") {
+      const equivalentConfigAllowed = process.env.VERCEL === "1" && (version === "5.0.0"
+        ? process.env.VERCEL_ENV === "production" && process.env.VERCEL_GIT_COMMIT_REF === "main"
+        : process.env.VERCEL_ENV === "preview" && process.env.VERCEL_GIT_COMMIT_REF === "release/6.0.0");
+      if (status === "M vercel.json" && equivalentConfigAllowed) {
         const info = lstatSync(resolve(root, "vercel.json"));
         if (info.isFile() && !info.isSymbolicLink() && !(info.mode & 0o111)) {
           const original = JSON.parse(git(["show", "HEAD:vercel.json"]));
@@ -49,14 +51,20 @@ try {
       }
     }
   }
-  result = requireWorker && version === "5.0.0" && receipt?.schemaVersion === 2
+  result = version === "6.0.0"
+    ? requireWorker
+      ? { allowed: false, code: "WORKER_PUBLICATION_NOT_AUTHORIZED_FOR_DASHBOARD_RELEASE" }
+      : dashboardPreviewDecision({ version, receipt, parent, changedPaths,
+        environment: process.env.VERCEL === "1" ? process.env.VERCEL_ENV : null,
+        branch: process.env.VERCEL_GIT_COMMIT_REF })
+    : requireWorker && version === "5.0.0" && receipt?.schemaVersion === 2
     ? { allowed: false, code: "WORKER_PUBLICATION_NOT_AUTHORIZED_FOR_VPS_TARGET" }
     : deploymentDecision({ version, receipt, parent, changedPaths });
   if (version === "5.0.0" && process.env.VERCEL === "1"
       && (process.env.VERCEL_ENV !== "production" || process.env.VERCEL_GIT_COMMIT_REF !== "main"))
     result = { allowed: false, code: "FIVE_PREVIEW_DEPLOYMENT_HELD" };
   // Schema 2 authorizes a staged VPS migration; Worker publication is a separate target.
-  workerAllowed = result.allowed && (version === "4.0.0" || receipt?.schemaVersion === 1);
+  workerAllowed = result.allowed && (version === "4.0.0" || (version === "5.0.0" && receipt?.schemaVersion === 1));
 } catch { /* Fail closed without printing parser input or command output. */ }
 
 process.stdout.write(`${result.code}\n`);

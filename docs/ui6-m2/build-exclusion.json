@@ -1,0 +1,17 @@
+{
+  "productionBuildId": "rbN3c8WsxWLzOXFcxoN_d",
+  "appPathsManifest": {
+    "/_global-error/page": "app/_global-error/page.js",
+    "/_not-found/page": "app/_not-found/page.js",
+    "/activity/page": "app/activity/page.js",
+    "/api/build/route": "app/api/build/route.js",
+    "/page": "app/page.js"
+  },
+  "inspectedEmittedFiles": 88,
+  "marker": "PLEXON_UI6_KITCHEN_SINK_DEV_ONLY",
+  "markerMatches": 0,
+  "devCssMatches": 0,
+  "productionHttpStatus": 404,
+  "automatedTest": "tests/ui-foundation-build.test.mjs, executed in npm run check",
+  "status": "PASS"
+}

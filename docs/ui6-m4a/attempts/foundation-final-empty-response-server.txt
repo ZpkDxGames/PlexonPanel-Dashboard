@@ -1,0 +1,45 @@
+▲ Next.js 16.3.8 (Turbopack)
+- Local:         http://127.0.0.1:3400
+- Network:       http://127.0.0.1:3400
+✓ Ready in 871ms
+✓ Running next.config.ts took 78ms
+
+ GET /dev/kitchen-sink 200 in 2.4s (next.js: 2.3s, application-code: 191ms)
+ GET /dev/kitchen-sink 200 in 113ms (next.js: 8ms, application-code: 105ms)
+ GET /dev/kitchen-sink 200 in 60ms (next.js: 7ms, application-code: 53ms)
+ GET /dev/kitchen-sink 200 in 57ms (next.js: 9ms, application-code: 48ms)
+
+thread 'tokio-rt-worker' (101) panicked at turbopack/crates/turbo-persistence/src/static_sorted_file.rs:593:22:
+range end index 4186820206 out of range for slice of length 5335551
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+-----
+FATAL: An unexpected Turbopack error occurred. A panic log has been written to /tmp/next-panic-c996dd255dd6c2f179b1e66bacc10ab0.log.
+
+To help make Turbopack better, report this error by clicking here: https://bugs.nextjs.org/search?category=turbopack-error-report&title=Turbopack%20Error%3A%20range%20end%20index%204186820206%20out%20of%20range%20for%20slice%20of%20length%205335551&body=Turbopack%20version%3A%20%60b0fad0d4%60%0ANext.js%20version%3A%20%600.0.0%60%0A%0AError%20message%3A%0A%60%60%60%0Arange%20end%20index%204186820206%20out%20of%20range%20for%20slice%20of%20length%205335551%0A%60%60%60&labels=Turbopack,Turbopack%20Panic%20Backtrace
+-----
+
+
+thread 'tokio-rt-worker' (55) panicked at turbopack/crates/turbo-tasks-backend/src/backend/operation/mod.rs:292:17:
+Restore of Data for task TaskId 261 failed in another thread: restoring failed
+
+thread 'tokio-rt-worker' (55) panicked at turbopack/crates/turbo-tasks-backend/src/backend/operation/mod.rs:551:13:
+Restore failures:
+Failed to restore data for task TaskId 261: Failed to restore Data for TaskId 261
+
+Caused by:
+    0: Looking up task storage for TaskId 261 from database failed
+    1: Failed to read raw block 606 from 00000003.sst
+    2: block 606 header truncated in 00000003.sst
+
+turbo-tasks: an internal panic occurred outside the per-task panic boundary. This is a bug in turbo-tasks/Turbopack — please report it at https://github.com/vercel/next.js/discussions and include the panic message and stack trace above.
+
+Aborting.
+
+thread 'tokio-rt-worker' (101) panicked at turbopack/crates/turbo-tasks-backend/src/backend/operation/mod.rs:721:25:
+Failed to restore data for task TaskId 261: Failed to restore Data for TaskId 261
+
+Caused by:
+    0: Looking up task storage for TaskId 261 from database failed
+    1: Failed to read raw block 606 from 00000003.sst
+    2: block 606 header truncated in 00000003.sst

@@ -1,0 +1,28 @@
+{
+  "task": "stabilize",
+  "environment": "Chromium, signed local relay, simulated agents; no live-server certification",
+  "status": "passed",
+  "screenshots": [],
+  "axe": [],
+  "keyboard": [],
+  "errors": [],
+  "measurement": {
+    "width": 390,
+    "cpuThrottle": 4,
+    "displayUpdateRateMs": 500,
+    "windowMinutes": 5,
+    "retainedSeed": 7200,
+    "sourceCadence": {
+      "paperHealth": 2000,
+      "paperSystem": 5000,
+      "hostSystem": 250,
+      "service": 5000
+    },
+    "longTasksMs": [
+      61
+    ],
+    "worstLongTaskMs": 61,
+    "targetMs": 150,
+    "accepted": true
+  }
+}

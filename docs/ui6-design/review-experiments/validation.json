@@ -1,0 +1,17 @@
+{
+  "checkCommand": "npm run check",
+  "exitCode": 0,
+  "relayTests": 79,
+  "dashboardTests": 183,
+  "failed": 0,
+  "skipped": 0,
+  "prototypeMarkersAbsentFromProductionAppManifestAndJs": true,
+  "productionAppManifest": {
+    "/_global-error/page": "app/_global-error/page.js",
+    "/_not-found/page": "app/_not-found/page.js",
+    "/activity/page": "app/activity/page.js",
+    "/api/build/route": "app/api/build/route.js",
+    "/page": "app/page.js"
+  },
+  "fullKitchenSinkExclusionGate": "not executed; kitchen sink not built"
+}

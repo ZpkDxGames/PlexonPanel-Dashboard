@@ -1,0 +1,5 @@
+{
+  "sha256": "9d770bbee9d4bb3f1413ee8b7e0cf89ac5b3b9f7ef659e3f62c6558a71ba85b7",
+  "files": 177,
+  "scope": "app/components/lib/public/tests/scripts and dependency/config manifests; excludes generated build outputs and reports"
+}

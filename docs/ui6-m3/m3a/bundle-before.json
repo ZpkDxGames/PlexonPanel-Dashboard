@@ -1,0 +1,177 @@
+{
+  "stage": "before",
+  "buildId": "9Nv5Drh7Ew_i57f95Kzfp",
+  "method": "Actual root prerender script URLs; raw bytes and independently gzipped payloads. Entire static-JS set also shown; not all chunks are initial requests.",
+  "initial": [
+    {
+      "url": "/_next/static/chunks/0fedhuw4oz6vg.js",
+      "bytes": 34015,
+      "gzipBytes": 9033
+    },
+    {
+      "url": "/_next/static/chunks/3atolvvcmeloy.js",
+      "bytes": 227963,
+      "gzipBytes": 71335
+    },
+    {
+      "url": "/_next/static/chunks/0v0lnq0inw1__.js",
+      "bytes": 160871,
+      "gzipBytes": 43872
+    },
+    {
+      "url": "/_next/static/chunks/turbopack-2ulcv1ee8fzep.js",
+      "bytes": 9721,
+      "gzipBytes": 3844
+    },
+    {
+      "url": "/_next/static/chunks/2mgy75sp4wjo1.js",
+      "bytes": 27051,
+      "gzipBytes": 7760
+    },
+    {
+      "url": "/_next/static/chunks/25vsrb77nxhpz.js",
+      "bytes": 1124,
+      "gzipBytes": 397
+    },
+    {
+      "url": "/_next/static/chunks/0f_9zs9yue3dt.js",
+      "bytes": 76556,
+      "gzipBytes": 24639
+    },
+    {
+      "url": "/_next/static/chunks/0rwuah-hyyi64.js",
+      "bytes": 45459,
+      "gzipBytes": 14567
+    },
+    {
+      "url": "/_next/static/chunks/0cz1d0mv5g_q7.js",
+      "bytes": 112594,
+      "gzipBytes": 39627
+    },
+    {
+      "url": "/_next/static/chunks/0jvhpaew_uadu.js",
+      "bytes": 6557,
+      "gzipBytes": 2351
+    }
+  ],
+  "initialTotal": {
+    "bytes": 701911,
+    "gzipBytes": 217425
+  },
+  "allStaticJS": [
+    {
+      "file": "0_i-fkai8xk4e.js",
+      "bytes": 42122,
+      "gzipBytes": 12037
+    },
+    {
+      "file": "0cz1d0mv5g_q7.js",
+      "bytes": 112594,
+      "gzipBytes": 39627
+    },
+    {
+      "file": "0f_9zs9yue3dt.js",
+      "bytes": 76556,
+      "gzipBytes": 24639
+    },
+    {
+      "file": "0fedhuw4oz6vg.js",
+      "bytes": 34015,
+      "gzipBytes": 9033
+    },
+    {
+      "file": "0jvhpaew_uadu.js",
+      "bytes": 6557,
+      "gzipBytes": 2351
+    },
+    {
+      "file": "0rwuah-hyyi64.js",
+      "bytes": 45459,
+      "gzipBytes": 14567
+    },
+    {
+      "file": "0v0lnq0inw1__.js",
+      "bytes": 160871,
+      "gzipBytes": 43872
+    },
+    {
+      "file": "14ind9fxyytte.js",
+      "bytes": 12579,
+      "gzipBytes": 4617
+    },
+    {
+      "file": "16nj7o5wxm3v9.js",
+      "bytes": 16415,
+      "gzipBytes": 4426
+    },
+    {
+      "file": "1lpt4ibjq8i_6.js",
+      "bytes": 9459,
+      "gzipBytes": 3289
+    },
+    {
+      "file": "25vsrb77nxhpz.js",
+      "bytes": 1124,
+      "gzipBytes": 397
+    },
+    {
+      "file": "2bz59mtvrdiag.js",
+      "bytes": 12535,
+      "gzipBytes": 4617
+    },
+    {
+      "file": "2h6diep68mzx3.js",
+      "bytes": 14293,
+      "gzipBytes": 4219
+    },
+    {
+      "file": "2iqzym2-5jbd-.js",
+      "bytes": 10493,
+      "gzipBytes": 3509
+    },
+    {
+      "file": "2mgy75sp4wjo1.js",
+      "bytes": 27051,
+      "gzipBytes": 7760
+    },
+    {
+      "file": "2mk9sx9kr6l0j.js",
+      "bytes": 6299,
+      "gzipBytes": 2265
+    },
+    {
+      "file": "2r5zutz98g-cr.js",
+      "bytes": 24474,
+      "gzipBytes": 7402
+    },
+    {
+      "file": "3atolvvcmeloy.js",
+      "bytes": 227963,
+      "gzipBytes": 71335
+    },
+    {
+      "file": "3fntmmi971322.js",
+      "bytes": 14377,
+      "gzipBytes": 3661
+    },
+    {
+      "file": "3up_o1brfczwa.js",
+      "bytes": 22913,
+      "gzipBytes": 8384
+    },
+    {
+      "file": "43z9ek4ch9vuz.js",
+      "bytes": 7365,
+      "gzipBytes": 2472
+    },
+    {
+      "file": "turbopack-2ulcv1ee8fzep.js",
+      "bytes": 9721,
+      "gzipBytes": 3844
+    }
+  ],
+  "allStaticTotal": {
+    "bytes": 895235,
+    "gzipBytes": 278323
+  }
+}

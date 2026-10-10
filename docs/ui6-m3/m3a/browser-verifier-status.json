@@ -1,0 +1,11 @@
+{
+  "command": "node scripts/verify-ui-browser.mjs",
+  "exitCode": 0,
+  "cwd": "/workspace/scratch/cd08a2b70c07/ui6-m3a-verifier",
+  "outputIsolated": true,
+  "dependencyTree": "physical copy (Turbopack disallows outside-root symlink)",
+  "softwareWrapperFlags": [
+    "--disable-webgl",
+    "--disable-software-rasterizer"
+  ]
+}

@@ -1,0 +1,1392 @@
+{
+  "buildExecuted": false,
+  "recordedAt": "2026-10-08T15:20:57.553Z",
+  "samples": [
+    {
+      "theme": "light",
+      "width": 390,
+      "cacheDisabled": true,
+      "order": {
+        "timeOrigin": 1791472858392.9,
+        "shellMark": 131.79999999981374,
+        "frameVisible": true,
+        "workspacePresent": false,
+        "paint": [
+          {
+            "name": "first-paint",
+            "start": 56
+          },
+          {
+            "name": "first-contentful-paint",
+            "start": 56
+          }
+        ]
+      },
+      "stylesheetRequests": [
+        {
+          "url": "http://127.0.0.1:3430/_next/static/chunks/2qygp-ahd764z.css",
+          "start": 133.673095703125
+        }
+      ],
+      "workspaceRequestStart": 134.01904296875,
+      "shellCLS": 0.010397404241848688,
+      "shellAndLegacyFleetCLS": 0.08706407090851535,
+      "shifts": [
+        {
+          "time": 153.29999999981374,
+          "value": 0.010397404241848688,
+          "recentInput": false,
+          "sources": [
+            {
+              "tag": "FOOTER",
+              "classes": "shell-footer",
+              "previous": {
+                "x": 0,
+                "y": 440.90625,
+                "width": 390,
+                "height": 69.3125,
+                "top": 440.90625,
+                "right": 390,
+                "bottom": 510.21875,
+                "left": 0
+              },
+              "current": {
+                "x": 0,
+                "y": 382.90625,
+                "width": 390,
+                "height": 69.3125,
+                "top": 382.90625,
+                "right": 390,
+                "bottom": 452.21875,
+                "left": 0
+              }
+            },
+            {
+              "tag": "DIV",
+              "classes": "",
+              "previous": {
+                "x": 134,
+                "y": 182.28125,
+                "width": 146,
+                "height": 23.625,
+                "top": 182.28125,
+                "right": 280,
+                "bottom": 205.90625,
+                "left": 134
+              },
+              "current": {
+                "x": 146,
+                "y": 182.28125,
+                "width": 165,
+                "height": 23.625,
+                "top": 182.28125,
+                "right": 311,
+                "bottom": 205.90625,
+                "left": 146
+              }
+            },
+            {
+              "tag": "DIV",
+              "classes": "",
+              "previous": {
+                "x": 156,
+                "y": 150.65625,
+                "width": 112,
+                "height": 23.625,
+                "top": 150.65625,
+                "right": 268,
+                "bottom": 174.28125,
+                "left": 156
+              },
+              "current": {
+                "x": 153,
+                "y": 150.65625,
+                "width": 124,
+                "height": 23.625,
+                "top": 150.65625,
+                "right": 277,
+                "bottom": 174.28125,
+                "left": 153
+              }
+            }
+          ]
+        },
+        {
+          "time": 506.5,
+          "value": 0.07666666666666666,
+          "recentInput": false,
+          "sources": [
+            {
+              "tag": "FOOTER",
+              "classes": "shell-footer",
+              "previous": {
+                "x": 0,
+                "y": 382.90625,
+                "width": 390,
+                "height": 69.3125,
+                "top": 382.90625,
+                "right": 390,
+                "bottom": 452.21875,
+                "left": 0
+              },
+              "current": {
+                "x": 0,
+                "y": 0,
+                "width": 0,
+                "height": 0,
+                "top": 0,
+                "right": 0,
+                "bottom": 0,
+                "left": 0
+              }
+            }
+          ]
+        }
+      ],
+      "paint": [
+        {
+          "name": "first-paint",
+          "start": 56
+        },
+        {
+          "name": "first-contentful-paint",
+          "start": 56
+        }
+      ],
+      "resources": [
+        {
+          "url": "http://127.0.0.1:3430/_next/static/media/hanken_latin-s.p.3241148m1u9do.woff2",
+          "start": 10.5,
+          "end": 31.299999999813735,
+          "size": 35004
+        },
+        {
+          "url": "http://127.0.0.1:3430/_next/static/chunks/3450qyhportkm.js",
+          "start": 11,
+          "end": 41.60000000055879,
+          "size": 9330
+        },
+        {
+          "url": "http://127.0.0.1:3430/_next/static/chunks/turbopack-1m9e11ujie628.js",
+          "start": 11,
+          "end": 56.10000000055879,
+          "size": 4144
+        },
+        {
+          "url": "http://127.0.0.1:3430/_next/static/chunks/2lm6ee1ot3_cu.js",
+          "start": 11,
+          "end": 62,
+          "size": 71634
+        },
+        {
+          "url": "http://127.0.0.1:3430/_next/static/chunks/0v0lnq0inw1__.js",
+          "start": 11,
+          "end": 66.1000000005588,
+          "size": 44172
+        },
+        {
+          "url": "http://127.0.0.1:3430/_next/static/chunks/2bckgzjj93mtn.js",
+          "start": 11.100000000558794,
+          "end": 55.40000000037253,
+          "size": 718
+        },
+        {
+          "url": "http://127.0.0.1:3430/_next/static/chunks/2mgy75sp4wjo1.js",
+          "start": 11.100000000558794,
+          "end": 58,
+          "size": 8060
+        },
+        {
+          "url": "http://127.0.0.1:3430/_next/static/chunks/3g09ce-qqwg10.js",
+          "start": 11.100000000558794,
+          "end": 58.5,
+          "size": 14042
+        },
+        {
+          "url": "http://127.0.0.1:3430/_next/static/chunks/0ufx6omh8bzfk.js",
+          "start": 11.200000000186265,
+          "end": 69.5,
+          "size": 13547
+        },
+        {
+          "url": "http://127.0.0.1:3430/_next/static/chunks/3sw_wrxcy712x.js",
+          "start": 134.20000000018626,
+          "end": 469.1000000005588,
+          "size": 1725
+        },
+        {
+          "url": "http://127.0.0.1:3430/_next/static/chunks/2iqzym2-5jbd-.js",
+          "start": 473.1000000005588,
+          "end": 477.90000000037253,
+          "size": 3809
+        }
+      ],
+      "fontStack": "\"Plexon Hanken\", \"hankenLatin Fallback\", Arial, sans-serif"
+    },
+    {
+      "theme": "light",
+      "width": 1280,
+      "cacheDisabled": true,
+      "order": {
+        "timeOrigin": 1791472860167.6,
+        "shellMark": 105.20000000018626,
+        "frameVisible": true,
+        "workspacePresent": false,
+        "paint": [
+          {
+            "name": "first-paint",
+            "start": 48
+          },
+          {
+            "name": "first-contentful-paint",
+            "start": 48
+          }
+        ]
+      },
+      "stylesheetRequests": [
+        {
+          "url": "http://127.0.0.1:3430/_next/static/chunks/2qygp-ahd764z.css",
+          "start": 106.65673828125
+        }
+      ],
+      "workspaceRequestStart": 106.880126953125,
+      "shellCLS": 0.004639263237847222,
+      "shellAndLegacyFleetCLS": 0.03885251956515842,
+      "shifts": [
+        {
+          "time": 105.40000000037253,
+          "value": 0.0003383517795138889,
+          "recentInput": false,
+          "sources": [
+            {
+              "tag": "SPAN",
+              "classes": "pp-floating-owner",
+              "previous": {
+                "x": 786,
+                "y": 86.65625,
+                "width": 168,
+                "height": 32,
+                "top": 86.65625,
+                "right": 954,
+                "bottom": 118.65625,
+                "left": 786
+              },
+              "current": {
+                "x": 826,
+                "y": 86.65625,
+                "width": 168,
+                "height": 32,
+                "top": 86.65625,
+                "right": 994,
+                "bottom": 118.65625,
+                "left": 826
+              }
+            },
+            {
+              "tag": "DIV",
+              "classes": "",
+              "previous": {
+                "x": 626,
+                "y": 92.15625,
+                "width": 136,
+                "height": 21,
+                "top": 92.15625,
+                "right": 762,
+                "bottom": 113.15625,
+                "left": 626
+              },
+              "current": {
+                "x": 648,
+                "y": 92.15625,
+                "width": 155,
+                "height": 21,
+                "top": 92.15625,
+                "right": 803,
+                "bottom": 113.15625,
+                "left": 648
+              }
+            },
+            {
+              "tag": "DIV",
+              "classes": "",
+              "previous": {
+                "x": 507,
+                "y": 92.15625,
+                "width": 95,
+                "height": 21,
+                "top": 92.15625,
+                "right": 602,
+                "bottom": 113.15625,
+                "left": 507
+              },
+              "current": {
+                "x": 517,
+                "y": 92.15625,
+                "width": 107,
+                "height": 21,
+                "top": 92.15625,
+                "right": 624,
+                "bottom": 113.15625,
+                "left": 517
+              }
+            }
+          ]
+        },
+        {
+          "time": 127.30000000074506,
+          "value": 0.004300911458333333,
+          "recentInput": false,
+          "sources": [
+            {
+              "tag": "FOOTER",
+              "classes": "shell-footer",
+              "previous": {
+                "x": 208,
+                "y": 325.140625,
+                "width": 1072,
+                "height": 50.65625,
+                "top": 325.140625,
+                "right": 1280,
+                "bottom": 375.796875,
+                "left": 208
+              },
+              "current": {
+                "x": 208,
+                "y": 267.140625,
+                "width": 1072,
+                "height": 50.65625,
+                "top": 267.140625,
+                "right": 1280,
+                "bottom": 317.796875,
+                "left": 208
+              }
+            }
+          ]
+        },
+        {
+          "time": 467.30000000074506,
+          "value": 0.029692162577311196,
+          "recentInput": false,
+          "sources": [
+            {
+              "tag": "FOOTER",
+              "classes": "shell-footer",
+              "previous": {
+                "x": 208,
+                "y": 267.140625,
+                "width": 1072,
+                "height": 50.65625,
+                "top": 267.140625,
+                "right": 1280,
+                "bottom": 317.796875,
+                "left": 208
+              },
+              "current": {
+                "x": 0,
+                "y": 0,
+                "width": 0,
+                "height": 0,
+                "top": 0,
+                "right": 0,
+                "bottom": 0,
+                "left": 0
+              }
+            }
+          ]
+        },
+        {
+          "time": 489,
+          "value": 0.00452109375,
+          "recentInput": false,
+          "sources": [
+            {
+              "tag": "P",
+              "classes": "fleet-source",
+              "previous": {
+                "x": 779,
+                "y": 852.46875,
+                "width": 444,
+                "height": 16.5,
+                "top": 852.46875,
+                "right": 1223,
+                "bottom": 868.96875,
+                "left": 779
+              },
+              "current": {
+                "x": 779,
+                "y": 873.96875,
+                "width": 444,
+                "height": 16.5,
+                "top": 873.96875,
+                "right": 1223,
+                "bottom": 890.46875,
+                "left": 779
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "fleet-source",
+              "previous": {
+                "x": 265,
+                "y": 852.46875,
+                "width": 444,
+                "height": 16.5,
+                "top": 852.46875,
+                "right": 709,
+                "bottom": 868.96875,
+                "left": 265
+              },
+              "current": {
+                "x": 265,
+                "y": 873.96875,
+                "width": 444,
+                "height": 16.5,
+                "top": 873.96875,
+                "right": 709,
+                "bottom": 890.46875,
+                "left": 265
+              }
+            },
+            {
+              "tag": "BUTTON",
+              "classes": "",
+              "previous": {
+                "x": 265,
+                "y": 885.96875,
+                "width": 444,
+                "height": 14.03125,
+                "top": 885.96875,
+                "right": 709,
+                "bottom": 900,
+                "left": 265
+              },
+              "current": {
+                "x": 0,
+                "y": 0,
+                "width": 0,
+                "height": 0,
+                "top": 0,
+                "right": 0,
+                "bottom": 0,
+                "left": 0
+              }
+            },
+            {
+              "tag": "BUTTON",
+              "classes": "",
+              "previous": {
+                "x": 779,
+                "y": 885.96875,
+                "width": 444,
+                "height": 14.03125,
+                "top": 885.96875,
+                "right": 1223,
+                "bottom": 900,
+                "left": 779
+              },
+              "current": {
+                "x": 0,
+                "y": 0,
+                "width": 0,
+                "height": 0,
+                "top": 0,
+                "right": 0,
+                "bottom": 0,
+                "left": 0
+              }
+            },
+            {
+              "previous": {
+                "x": 496,
+                "y": 654.46875,
+                "width": 213,
+                "height": 23,
+                "top": 654.46875,
+                "right": 709,
+                "bottom": 677.46875,
+                "left": 496
+              },
+              "current": {
+                "x": 496,
+                "y": 654.46875,
+                "width": 213,
+                "height": 23,
+                "top": 654.46875,
+                "right": 709,
+                "bottom": 677.46875,
+                "left": 496
+              }
+            }
+          ]
+        }
+      ],
+      "paint": [
+        {
+          "name": "first-paint",
+          "start": 48
+        },
+        {
+          "name": "first-contentful-paint",
+          "start": 48
+        }
+      ],
+      "resources": [
+        {
+          "url": "http://127.0.0.1:3430/_next/static/media/hanken_latin-s.p.3241148m1u9do.woff2",
+          "start": 15.300000000745058,
+          "end": 27.600000000558794,
+          "size": 35004
+        },
+        {
+          "url": "http://127.0.0.1:3430/_next/static/chunks/3450qyhportkm.js",
+          "start": 15.800000000745058,
+          "end": 35.40000000037253,
+          "size": 9330
+        },
+        {
+          "url": "http://127.0.0.1:3430/_next/static/chunks/2lm6ee1ot3_cu.js",
+          "start": 15.800000000745058,
+          "end": 51.80000000074506,
+          "size": 71634
+        },
+        {
+          "url": "http://127.0.0.1:3430/_next/static/chunks/turbopack-1m9e11ujie628.js",
+          "start": 15.900000000372529,
+          "end": 47.10000000055879,
+          "size": 4144
+        },
+        {
+          "url": "http://127.0.0.1:3430/_next/static/chunks/0v0lnq0inw1__.js",
+          "start": 15.900000000372529,
+          "end": 52.10000000055879,
+          "size": 44172
+        },
+        {
+          "url": "http://127.0.0.1:3430/_next/static/chunks/2mgy75sp4wjo1.js",
+          "start": 16,
+          "end": 53.700000000186265,
+          "size": 8060
+        },
+        {
+          "url": "http://127.0.0.1:3430/_next/static/chunks/2bckgzjj93mtn.js",
+          "start": 16.100000000558794,
+          "end": 51.10000000055879,
+          "size": 718
+        },
+        {
+          "url": "http://127.0.0.1:3430/_next/static/chunks/3g09ce-qqwg10.js",
+          "start": 16.200000000186265,
+          "end": 53.200000000186265,
+          "size": 14042
+        },
+        {
+          "url": "http://127.0.0.1:3430/_next/static/chunks/0ufx6omh8bzfk.js",
+          "start": 16.200000000186265,
+          "end": 58.80000000074506,
+          "size": 13547
+        },
+        {
+          "url": "http://127.0.0.1:3430/_next/static/chunks/3sw_wrxcy712x.js",
+          "start": 106.90000000037253,
+          "end": 440.70000000018626,
+          "size": 1725
+        },
+        {
+          "url": "http://127.0.0.1:3430/_next/static/chunks/2iqzym2-5jbd-.js",
+          "start": 445.90000000037253,
+          "end": 449.1000000005588,
+          "size": 3809
+        }
+      ],
+      "fontStack": "\"Plexon Hanken\", \"hankenLatin Fallback\", Arial, sans-serif"
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "cacheDisabled": true,
+      "order": {
+        "timeOrigin": 1791472861890.1,
+        "shellMark": 103.20000000018626,
+        "frameVisible": true,
+        "workspacePresent": false,
+        "paint": [
+          {
+            "name": "first-paint",
+            "start": 52
+          },
+          {
+            "name": "first-contentful-paint",
+            "start": 52
+          }
+        ]
+      },
+      "stylesheetRequests": [
+        {
+          "url": "http://127.0.0.1:3430/_next/static/chunks/2qygp-ahd764z.css",
+          "start": 105.11083984375
+        }
+      ],
+      "workspaceRequestStart": 105.364013671875,
+      "shellCLS": 0.009363532763532764,
+      "shellAndLegacyFleetCLS": 0.08802212092434314,
+      "shifts": [
+        {
+          "time": 103.3999999994412,
+          "value": 0.0002697056030389364,
+          "recentInput": false,
+          "sources": [
+            {
+              "tag": "DIV",
+              "classes": "",
+              "previous": {
+                "x": 134,
+                "y": 182.28125,
+                "width": 146,
+                "height": 23.625,
+                "top": 182.28125,
+                "right": 280,
+                "bottom": 205.90625,
+                "left": 134
+              },
+              "current": {
+                "x": 146,
+                "y": 182.28125,
+                "width": 165,
+                "height": 23.625,
+                "top": 182.28125,
+                "right": 311,
+                "bottom": 205.90625,
+                "left": 146
+              }
+            },
+            {
+              "tag": "DIV",
+              "classes": "",
+              "previous": {
+                "x": 156,
+                "y": 150.65625,
+                "width": 112,
+                "height": 23.625,
+                "top": 150.65625,
+                "right": 268,
+                "bottom": 174.28125,
+                "left": 156
+              },
+              "current": {
+                "x": 153,
+                "y": 150.65625,
+                "width": 124,
+                "height": 23.625,
+                "top": 150.65625,
+                "right": 277,
+                "bottom": 174.28125,
+                "left": 153
+              }
+            }
+          ]
+        },
+        {
+          "time": 116.09999999962747,
+          "value": 0.009093827160493827,
+          "recentInput": false,
+          "sources": [
+            {
+              "tag": "FOOTER",
+              "classes": "shell-footer",
+              "previous": {
+                "x": 0,
+                "y": 440.90625,
+                "width": 390,
+                "height": 69.3125,
+                "top": 440.90625,
+                "right": 390,
+                "bottom": 510.21875,
+                "left": 0
+              },
+              "current": {
+                "x": 0,
+                "y": 382.90625,
+                "width": 390,
+                "height": 69.3125,
+                "top": 382.90625,
+                "right": 390,
+                "bottom": 452.21875,
+                "left": 0
+              }
+            }
+          ]
+        },
+        {
+          "time": 436.59999999962747,
+          "value": 0.07666666666666666,
+          "recentInput": false,
+          "sources": [
+            {
+              "tag": "FOOTER",
+              "classes": "shell-footer",
+              "previous": {
+                "x": 0,
+                "y": 382.90625,
+                "width": 390,
+                "height": 69.3125,
+                "top": 382.90625,
+                "right": 390,
+                "bottom": 452.21875,
+                "left": 0
+              },
+              "current": {
+                "x": 0,
+                "y": 0,
+                "width": 0,
+                "height": 0,
+                "top": 0,
+                "right": 0,
+                "bottom": 0,
+                "left": 0
+              }
+            }
+          ]
+        },
+        {
+          "time": 745.8999999994412,
+          "value": 0.001991921494143716,
+          "recentInput": false,
+          "sources": [
+            {
+              "tag": "SPAN",
+              "classes": "fleet-status fleet-status-online",
+              "previous": {
+                "x": 173,
+                "y": 728.890625,
+                "width": 180,
+                "height": 24.5,
+                "top": 728.890625,
+                "right": 353,
+                "bottom": 753.390625,
+                "left": 173
+              },
+              "current": {
+                "x": 301,
+                "y": 728.890625,
+                "width": 52,
+                "height": 24.5,
+                "top": 728.890625,
+                "right": 353,
+                "bottom": 753.390625,
+                "left": 301
+              }
+            },
+            {
+              "previous": {
+                "x": 204,
+                "y": 898.765625,
+                "width": 149,
+                "height": 1.234375,
+                "top": 898.765625,
+                "right": 353,
+                "bottom": 900,
+                "left": 204
+              },
+              "current": {
+                "x": 204,
+                "y": 896.21875,
+                "width": 149,
+                "height": 3.78125,
+                "top": 896.21875,
+                "right": 353,
+                "bottom": 900,
+                "left": 204
+              }
+            },
+            {
+              "previous": {
+                "x": 0,
+                "y": 0,
+                "width": 0,
+                "height": 0,
+                "top": 0,
+                "right": 0,
+                "bottom": 0,
+                "left": 0
+              },
+              "current": {
+                "x": 204,
+                "y": 896.21875,
+                "width": 149,
+                "height": 3.78125,
+                "top": 896.21875,
+                "right": 353,
+                "bottom": 900,
+                "left": 204
+              }
+            }
+          ]
+        }
+      ],
+      "paint": [
+        {
+          "name": "first-paint",
+          "start": 52
+        },
+        {
+          "name": "first-contentful-paint",
+          "start": 52
+        }
+      ],
+      "resources": [
+        {
+          "url": "http://127.0.0.1:3430/_next/static/media/hanken_latin-s.p.3241148m1u9do.woff2",
+          "start": 12.899999999441206,
+          "end": 21.09999999962747,
+          "size": 35004
+        },
+        {
+          "url": "http://127.0.0.1:3430/_next/static/chunks/3450qyhportkm.js",
+          "start": 13.299999999813735,
+          "end": 32.299999999813735,
+          "size": 9330
+        },
+        {
+          "url": "http://127.0.0.1:3430/_next/static/chunks/2lm6ee1ot3_cu.js",
+          "start": 13.299999999813735,
+          "end": 43.700000000186265,
+          "size": 71634
+        },
+        {
+          "url": "http://127.0.0.1:3430/_next/static/chunks/0v0lnq0inw1__.js",
+          "start": 13.399999999441206,
+          "end": 44.59999999962747,
+          "size": 44172
+        },
+        {
+          "url": "http://127.0.0.1:3430/_next/static/chunks/turbopack-1m9e11ujie628.js",
+          "start": 13.399999999441206,
+          "end": 45.5,
+          "size": 4144
+        },
+        {
+          "url": "http://127.0.0.1:3430/_next/static/chunks/2mgy75sp4wjo1.js",
+          "start": 13.5,
+          "end": 55,
+          "size": 8060
+        },
+        {
+          "url": "http://127.0.0.1:3430/_next/static/chunks/2bckgzjj93mtn.js",
+          "start": 13.599999999627471,
+          "end": 52.700000000186265,
+          "size": 718
+        },
+        {
+          "url": "http://127.0.0.1:3430/_next/static/chunks/3g09ce-qqwg10.js",
+          "start": 13.700000000186265,
+          "end": 55.299999999813735,
+          "size": 14042
+        },
+        {
+          "url": "http://127.0.0.1:3430/_next/static/chunks/0ufx6omh8bzfk.js",
+          "start": 13.700000000186265,
+          "end": 57.59999999962747,
+          "size": 13547
+        },
+        {
+          "url": "http://127.0.0.1:3430/_next/static/chunks/3sw_wrxcy712x.js",
+          "start": 105.29999999981374,
+          "end": 415,
+          "size": 1725
+        },
+        {
+          "url": "http://127.0.0.1:3430/_next/static/chunks/2iqzym2-5jbd-.js",
+          "start": 419.8999999994412,
+          "end": 422.8999999994412,
+          "size": 3809
+        }
+      ],
+      "fontStack": "\"Plexon Hanken\", \"hankenLatin Fallback\", Arial, sans-serif"
+    },
+    {
+      "theme": "dark",
+      "width": 1280,
+      "cacheDisabled": true,
+      "order": {
+        "timeOrigin": 1791472863595.5,
+        "shellMark": 160.59999999962747,
+        "frameVisible": true,
+        "workspacePresent": false,
+        "paint": [
+          {
+            "name": "first-paint",
+            "start": 104
+          },
+          {
+            "name": "first-contentful-paint",
+            "start": 104
+          }
+        ]
+      },
+      "stylesheetRequests": [
+        {
+          "url": "http://127.0.0.1:3430/_next/static/chunks/2qygp-ahd764z.css",
+          "start": 162.343017578125
+        }
+      ],
+      "workspaceRequestStart": 162.6201171875,
+      "shellCLS": 0.004791521538628472,
+      "shellAndLegacyFleetCLS": 0.03909698978000217,
+      "shifts": [
+        {
+          "time": 192,
+          "value": 0.004791521538628472,
+          "recentInput": false,
+          "sources": [
+            {
+              "tag": "FOOTER",
+              "classes": "shell-footer",
+              "previous": {
+                "x": 208,
+                "y": 325.140625,
+                "width": 1072,
+                "height": 50.65625,
+                "top": 325.140625,
+                "right": 1280,
+                "bottom": 375.796875,
+                "left": 208
+              },
+              "current": {
+                "x": 208,
+                "y": 267.140625,
+                "width": 1072,
+                "height": 50.65625,
+                "top": 267.140625,
+                "right": 1280,
+                "bottom": 317.796875,
+                "left": 208
+              }
+            },
+            {
+              "tag": "SPAN",
+              "classes": "pp-floating-owner",
+              "previous": {
+                "x": 786,
+                "y": 86.65625,
+                "width": 168,
+                "height": 32,
+                "top": 86.65625,
+                "right": 954,
+                "bottom": 118.65625,
+                "left": 786
+              },
+              "current": {
+                "x": 826,
+                "y": 86.65625,
+                "width": 168,
+                "height": 32,
+                "top": 86.65625,
+                "right": 994,
+                "bottom": 118.65625,
+                "left": 826
+              }
+            },
+            {
+              "tag": "DIV",
+              "classes": "",
+              "previous": {
+                "x": 626,
+                "y": 92.15625,
+                "width": 136,
+                "height": 21,
+                "top": 92.15625,
+                "right": 762,
+                "bottom": 113.15625,
+                "left": 626
+              },
+              "current": {
+                "x": 648,
+                "y": 92.15625,
+                "width": 155,
+                "height": 21,
+                "top": 92.15625,
+                "right": 803,
+                "bottom": 113.15625,
+                "left": 648
+              }
+            },
+            {
+              "tag": "DIV",
+              "classes": "",
+              "previous": {
+                "x": 507,
+                "y": 92.15625,
+                "width": 95,
+                "height": 21,
+                "top": 92.15625,
+                "right": 602,
+                "bottom": 113.15625,
+                "left": 507
+              },
+              "current": {
+                "x": 517,
+                "y": 92.15625,
+                "width": 107,
+                "height": 21,
+                "top": 92.15625,
+                "right": 624,
+                "bottom": 113.15625,
+                "left": 517
+              }
+            }
+          ]
+        },
+        {
+          "time": 544.5,
+          "value": 0.029692162577311196,
+          "recentInput": false,
+          "sources": [
+            {
+              "tag": "FOOTER",
+              "classes": "shell-footer",
+              "previous": {
+                "x": 208,
+                "y": 267.140625,
+                "width": 1072,
+                "height": 50.65625,
+                "top": 267.140625,
+                "right": 1280,
+                "bottom": 317.796875,
+                "left": 208
+              },
+              "current": {
+                "x": 0,
+                "y": 0,
+                "width": 0,
+                "height": 0,
+                "top": 0,
+                "right": 0,
+                "bottom": 0,
+                "left": 0
+              }
+            }
+          ]
+        },
+        {
+          "time": 560.9000000003725,
+          "value": 0.002981534830729167,
+          "recentInput": false,
+          "sources": [
+            {
+              "tag": "P",
+              "classes": "fleet-source",
+              "previous": {
+                "x": 265,
+                "y": 852.46875,
+                "width": 444,
+                "height": 16.5,
+                "top": 852.46875,
+                "right": 709,
+                "bottom": 868.96875,
+                "left": 265
+              },
+              "current": {
+                "x": 265,
+                "y": 873.96875,
+                "width": 444,
+                "height": 16.5,
+                "top": 873.96875,
+                "right": 709,
+                "bottom": 890.46875,
+                "left": 265
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "fleet-source",
+              "previous": {
+                "x": 779,
+                "y": 852.46875,
+                "width": 444,
+                "height": 16.5,
+                "top": 852.46875,
+                "right": 1223,
+                "bottom": 868.96875,
+                "left": 779
+              },
+              "current": {
+                "x": 779,
+                "y": 873.96875,
+                "width": 444,
+                "height": 16.5,
+                "top": 873.96875,
+                "right": 1223,
+                "bottom": 890.46875,
+                "left": 779
+              }
+            },
+            {
+              "tag": "BUTTON",
+              "classes": "",
+              "previous": {
+                "x": 265,
+                "y": 885.96875,
+                "width": 444,
+                "height": 14.03125,
+                "top": 885.96875,
+                "right": 709,
+                "bottom": 900,
+                "left": 265
+              },
+              "current": {
+                "x": 0,
+                "y": 0,
+                "width": 0,
+                "height": 0,
+                "top": 0,
+                "right": 0,
+                "bottom": 0,
+                "left": 0
+              }
+            },
+            {
+              "tag": "BUTTON",
+              "classes": "",
+              "previous": {
+                "x": 779,
+                "y": 885.96875,
+                "width": 444,
+                "height": 14.03125,
+                "top": 885.96875,
+                "right": 1223,
+                "bottom": 900,
+                "left": 779
+              },
+              "current": {
+                "x": 0,
+                "y": 0,
+                "width": 0,
+                "height": 0,
+                "top": 0,
+                "right": 0,
+                "bottom": 0,
+                "left": 0
+              }
+            },
+            {
+              "tag": "SPAN",
+              "classes": "fleet-status fleet-status-stale",
+              "previous": {
+                "x": 1146,
+                "y": 487.140625,
+                "width": 77,
+                "height": 24.5,
+                "top": 487.140625,
+                "right": 1223,
+                "bottom": 511.640625,
+                "left": 1146
+              },
+              "current": {
+                "x": 1043,
+                "y": 487.140625,
+                "width": 180,
+                "height": 24.5,
+                "top": 487.140625,
+                "right": 1223,
+                "bottom": 511.640625,
+                "left": 1043
+              }
+            }
+          ]
+        },
+        {
+          "time": 1040.7000000001863,
+          "value": 0.0008158854166666667,
+          "recentInput": false,
+          "sources": [
+            {
+              "previous": {
+                "x": 496,
+                "y": 654.46875,
+                "width": 213,
+                "height": 23,
+                "top": 654.46875,
+                "right": 709,
+                "bottom": 677.46875,
+                "left": 496
+              },
+              "current": {
+                "x": 496,
+                "y": 654.46875,
+                "width": 213,
+                "height": 23,
+                "top": 654.46875,
+                "right": 709,
+                "bottom": 677.46875,
+                "left": 496
+              }
+            },
+            {
+              "tag": "SPAN",
+              "classes": "fleet-status fleet-status-online",
+              "previous": {
+                "x": 529,
+                "y": 487.140625,
+                "width": 180,
+                "height": 24.5,
+                "top": 487.140625,
+                "right": 709,
+                "bottom": 511.640625,
+                "left": 529
+              },
+              "current": {
+                "x": 657,
+                "y": 487.140625,
+                "width": 52,
+                "height": 24.5,
+                "top": 487.140625,
+                "right": 709,
+                "bottom": 511.640625,
+                "left": 657
+              }
+            }
+          ]
+        },
+        {
+          "time": 1544,
+          "value": 0.0008158854166666667,
+          "recentInput": false,
+          "sources": [
+            {
+              "previous": {
+                "x": 1010,
+                "y": 654.46875,
+                "width": 213,
+                "height": 23,
+                "top": 654.46875,
+                "right": 1223,
+                "bottom": 677.46875,
+                "left": 1010
+              },
+              "current": {
+                "x": 1010,
+                "y": 654.46875,
+                "width": 213,
+                "height": 23,
+                "top": 654.46875,
+                "right": 1223,
+                "bottom": 677.46875,
+                "left": 1010
+              }
+            },
+            {
+              "tag": "SPAN",
+              "classes": "fleet-status fleet-status-online",
+              "previous": {
+                "x": 1043,
+                "y": 487.140625,
+                "width": 180,
+                "height": 24.5,
+                "top": 487.140625,
+                "right": 1223,
+                "bottom": 511.640625,
+                "left": 1043
+              },
+              "current": {
+                "x": 1171,
+                "y": 487.140625,
+                "width": 52,
+                "height": 24.5,
+                "top": 487.140625,
+                "right": 1223,
+                "bottom": 511.640625,
+                "left": 1171
+              }
+            }
+          ]
+        }
+      ],
+      "paint": [
+        {
+          "name": "first-paint",
+          "start": 104
+        },
+        {
+          "name": "first-contentful-paint",
+          "start": 104
+        }
+      ],
+      "resources": [
+        {
+          "url": "http://127.0.0.1:3430/_next/static/media/hanken_latin-s.p.3241148m1u9do.woff2",
+          "start": 47.59999999962747,
+          "end": 68.29999999981374,
+          "size": 35004
+        },
+        {
+          "url": "http://127.0.0.1:3430/_next/static/chunks/3450qyhportkm.js",
+          "start": 48.40000000037253,
+          "end": 80.90000000037253,
+          "size": 9330
+        },
+        {
+          "url": "http://127.0.0.1:3430/_next/static/chunks/turbopack-1m9e11ujie628.js",
+          "start": 48.5,
+          "end": 85.29999999981374,
+          "size": 4144
+        },
+        {
+          "url": "http://127.0.0.1:3430/_next/static/chunks/0v0lnq0inw1__.js",
+          "start": 48.5,
+          "end": 94.09999999962747,
+          "size": 44172
+        },
+        {
+          "url": "http://127.0.0.1:3430/_next/static/chunks/2lm6ee1ot3_cu.js",
+          "start": 48.5,
+          "end": 94.5,
+          "size": 71634
+        },
+        {
+          "url": "http://127.0.0.1:3430/_next/static/chunks/2mgy75sp4wjo1.js",
+          "start": 48.59999999962747,
+          "end": 92,
+          "size": 8060
+        },
+        {
+          "url": "http://127.0.0.1:3430/_next/static/chunks/2bckgzjj93mtn.js",
+          "start": 48.799999999813735,
+          "end": 107.29999999981374,
+          "size": 718
+        },
+        {
+          "url": "http://127.0.0.1:3430/_next/static/chunks/0ufx6omh8bzfk.js",
+          "start": 48.90000000037253,
+          "end": 107.40000000037253,
+          "size": 13547
+        },
+        {
+          "url": "http://127.0.0.1:3430/_next/static/chunks/3g09ce-qqwg10.js",
+          "start": 48.90000000037253,
+          "end": 107.59999999962747,
+          "size": 14042
+        },
+        {
+          "url": "http://127.0.0.1:3430/_next/static/chunks/3sw_wrxcy712x.js",
+          "start": 162.59999999962747,
+          "end": 511.09999999962747,
+          "size": 1725
+        },
+        {
+          "url": "http://127.0.0.1:3430/_next/static/chunks/2iqzym2-5jbd-.js",
+          "start": 515.7999999998137,
+          "end": 527.2000000001863,
+          "size": 3809
+        }
+      ],
+      "fontStack": "\"Plexon Hanken\", \"hankenLatin Fallback\", Arial, sans-serif"
+    }
+  ],
+  "errors": [],
+  "buildId": "R2qMbEzCng4u6Q6Fr8CAY",
+  "workspaceStyles": [
+    "/_next/static/chunks/2qygp-ahd764z.css"
+  ],
+  "workspaceOwnerUrl": "/_next/static/chunks/3sw_wrxcy712x.js",
+  "status": "passed"
+}

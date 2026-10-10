@@ -1,4 +1,5 @@
 export const RECEIPT_PATH = "docs/coordinated-deployment-5.0.0.json";
+export const DASHBOARD_PREVIEW_PATH = "docs/dashboard-preview-6.0.0.json";
 const SHA = /^[0-9a-f]{40}$/;
 const EVIDENCE = ["currentOperationalBackup", "offVpsIntegrity", "rollbackRehearsal", "operatorDeploymentReady"];
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
@@ -7,6 +8,28 @@ const EXCEPTION_STATUS = {
   offVpsIntegrity: "SKIPPED_OPERATOR_DECISION",
   rollbackRehearsal: "NOT_EXECUTED_OPERATOR_ACCEPTED",
 };
+
+export function dashboardPreviewDecision({ version, receipt, parent, changedPaths, environment, branch }) {
+  if (version !== "6.0.0") return { allowed: false, code: "UNSUPPORTED_DEPLOYMENT_VERSION" };
+  if (environment === "production") return { allowed: false, code: "SIX_PRODUCTION_CERTIFICATION_REQUIRED" };
+  if (environment !== "preview" || branch !== "release/6.0.0")
+    return { allowed: false, code: "SIX_PREVIEW_DEPLOYMENT_HELD" };
+  if (!receipt || receipt.schemaVersion !== 1 || receipt.version !== version || receipt.state !== "READY"
+      || receipt.target !== "dashboard-preview" || receipt.branch !== branch
+      || receipt.runtimeCertification !== "NOT_EXECUTED"
+      || receipt.operatorDecision?.approved !== true || receipt.operatorDecision.intent !== "DASHBOARD_PREVIEW"
+      || typeof receipt.operatorDecision.reason !== "string" || !receipt.operatorDecision.reason.trim()
+      || receipt.operatorDecision.reason.length > 500
+      || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/.test(receipt.operatorDecision.confirmedAt ?? "")
+      || !Number.isFinite(Date.parse(receipt.operatorDecision.confirmedAt)))
+    return { allowed: false, code: "SIX_PREVIEW_DEPLOYMENT_HELD" };
+  if (!SHA.test(receipt.acceptedDashboardSourceCommit ?? "") || !SHA.test(receipt.acceptedCoreSourceCommit ?? "")
+      || receipt.acceptedDashboardSourceCommit !== parent)
+    return { allowed: false, code: "ACCEPTED_SOURCE_MISMATCH" };
+  if (!Array.isArray(changedPaths) || changedPaths.length !== 1 || changedPaths[0] !== DASHBOARD_PREVIEW_PATH)
+    return { allowed: false, code: "ACTIVATION_COMMIT_CHANGED_SOURCE" };
+  return { allowed: true, code: "DASHBOARD_ONLY_SIX_PREVIEW_DEPLOYMENT" };
+}
 
 function operatorExceptionAccepted(receipt) {
   const decision = receipt.operatorDecision;

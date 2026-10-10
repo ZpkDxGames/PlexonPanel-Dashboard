@@ -1,0 +1,19 @@
+✔ receipt-aware classifier preserves skew values and expires stopped receipts (2.011703ms)
+✔ Overview, chart, compact Pulse and banner agree at +6 s (282.469277ms)
+✔ Overview, chart, compact Pulse and banner agree at +30 s (54.877935ms)
+✔ Overview, chart, compact Pulse and banner agree at +120 s (51.999376ms)
+✔ skew receipt clock advances at Display rate 0 (50.984065ms)
+✔ skew receipt clock advances at Display rate 500 (46.820107ms)
+✔ skew receipt clock advances at Display rate 2000 (57.766485ms)
+✔ new Paper session clears source receipts and accepts first captures with missing uptime (37.483071ms)
+✔ clock diagnostics separate Paper, Host, receipt and capture offsets without speculating (0.587796ms)
+✔ mounted Clocks disclosure copies only the already observed diagnostic values (39.069908ms)
+✔ memoized instruments disclose each actual Paper receipt and ignore unrelated Host traffic (68.631591ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1222.332279

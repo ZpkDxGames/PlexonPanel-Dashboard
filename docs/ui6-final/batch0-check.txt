@@ -1,0 +1,457 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> plexonpanel-dashboard@5.0.0 check
+> npm run scopes:check && npm run fleet:check && npm run lint && npm run typecheck && npm run relay:test && npm test
+
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> plexonpanel-dashboard@5.0.0 scopes:check
+> node scripts/generate-scope-contract.mjs --check
+
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> plexonpanel-dashboard@5.0.0 fleet:check
+> node scripts/generate-fleet-contract.mjs --check
+
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> plexonpanel-dashboard@5.0.0 lint
+> eslint . --ignore-pattern .next --ignore-pattern node_modules --ignore-pattern artifacts
+
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> plexonpanel-dashboard@5.0.0 typecheck
+> tsc --noEmit && npm run relay:build
+
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> plexonpanel-dashboard@5.0.0 relay:build
+> npm run relay:prepare && tsc -p relay/tsconfig.json
+
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> plexonpanel-dashboard@5.0.0 relay:prepare
+> npm run scopes:generate && npm run fleet:generate
+
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> plexonpanel-dashboard@5.0.0 scopes:generate
+> node scripts/generate-scope-contract.mjs
+
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> plexonpanel-dashboard@5.0.0 fleet:generate
+> node scripts/generate-fleet-contract.mjs
+
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> plexonpanel-dashboard@5.0.0 relay:test
+> npm run relay:build && node --test relay/tests/*.test.mjs
+
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> plexonpanel-dashboard@5.0.0 relay:build
+> npm run relay:prepare && tsc -p relay/tsconfig.json
+
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> plexonpanel-dashboard@5.0.0 relay:prepare
+> npm run scopes:generate && npm run fleet:generate
+
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> plexonpanel-dashboard@5.0.0 scopes:generate
+> node scripts/generate-scope-contract.mjs
+
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> plexonpanel-dashboard@5.0.0 fleet:generate
+> node scripts/generate-fleet-contract.mjs
+
+✔ Worker relay immediately reports failed Paper backup coordination (8.718885ms)
+✔ standalone relay immediately reports failed Paper backup coordination (4.497666ms)
+✔ relay build identity exposes only bounded non-secret metadata (5.601304ms)
+✔ Worker health advertises the deployed commit and runtime kind (7.736367ms)
+✔ Worker and standalone tolerate valid Host replay before console.source authority (12.938472ms)
+✔ Worker and standalone accept Host 3.4.0 empty replay snapshots as no-ops (9.891626ms)
+✔ console ordering tolerance does not remove 3.3 maintenance parity (7.496375ms)
+✔ console error and full scopes retain existing event filtering semantics (3.678211ms)
+✔ history actions preserve existing console scopes without adding privilege (0.225514ms)
+✔ Worker and standalone prefer Host with explicit Paper fallback and Paper-only execution (64.865018ms)
+✔ 3.4 adapters preserve the certified 3.3 relay cores as explicit source units (8.253803ms)
+{"component":"PlexonPanelRelay","runtime":"standalone","event":"started","host":"127.0.0.1","port":0,"storage":"coordination-only","version":"5.0.0","gitCommit":"unavailable","buildTimestamp":"unavailable","protocolVersion":3,"runtimeKind":"standalone"}
+{"component":"PlexonPanelRelay","runtime":"standalone","code":"PEER_DELIVERY_FAILED","serverId":"cdcae719-5ae9-4678-82d4-05d4885b0e01","agentKind":"HOST","messageType":"paper.connection","error":"WebSocket send failed"}
+{"component":"PlexonPanelRelay","runtime":"standalone","code":"PEER_DELIVERY_FAILED","serverId":"421304e8-2143-46a1-ad41-571a53747d7c","agentKind":"HOST","messageType":"paper.connection","error":"WebSocket send failed"}
+✔ actual standalone TCP fleet isolates two signed rooms, completions and credential revocation (241.759221ms)
+✔ node telemetry binds source role to authenticated kind and requires the declared node scope (2.754528ms)
+✔ service accounting is Host-only and binds the node and service metric contract (0.546907ms)
+✔ legacy Host node/service status remains readable while Paper cannot impersonate systemd (0.235204ms)
+✔ fleet controls require exact 5.0 association while legacy rooms remain compatible (0.432243ms)
+✔ generates matching protected relay bindings without printing them (310.599422ms)
+✔ Worker relay preserves 3.3 maintenance coordination in the 3.4 console release (11.022268ms)
+✔ Worker relay routes maintenance and provider actions to Host and keeps full restore Owner-only (1.890704ms)
+✔ standalone relay preserves 3.3 maintenance coordination in the 3.4 console release (2.427579ms)
+✔ standalone relay routes maintenance and provider actions to Host and keeps full restore Owner-only (4.284681ms)
+✔ standalone runtime identity reports the matched 5.0.0 build (4.999824ms)
+✔ Cloudflare room migration preserves storage while forcing the 3.5.0 class (5.896063ms)
+✔ Worker routes Owner backup.preflight to Host and returns only the private success result (25.002431ms)
+✔ standalone relay satisfies the same backup.preflight Host contract (29.905307ms)
+✔ standalone relay recognizes recovery and reports unknown actions separately (15.151497ms)
+✔ standalone relay mirrors Paper authorization to Host and enforces refresh direction (21.634077ms)
+✔ signs and verifies protocol v3 envelopes with Ed25519 (15.943836ms)
+✔ normalizes omitted nullable fields from 3.0.1 presence JOIN envelopes (5.269625ms)
+✔ issues scoped dashboard credentials and rejects expiry (7.46972ms)
+✔ pairing lookups are deterministic, peppered, and six-digit only (1.76294ms)
+✔ v2 claims and client-invented scopes are never upgraded implicitly (9.380718ms)
+✔ verifies the shared Java/TypeScript canonical vector (4.723222ms)
+{"component":"PlexonPanelRelay","code":"HOST_GRANT_CONFLICT","serverId":"1ad9a6ce-7d7d-4195-b083-2aaec8837c2a","agentKind":"HOST","messageType":"access.sync","sessionAgeMillis":5,"sequence":3}
+✔ Host stale generation is ignored without disconnecting transport (29.374163ms)
+✔ Host stale revision is ignored without rolling metadata backward (13.97514ms)
+✔ Host may confirm the same known grants at a newer revision (9.699426ms)
+{"component":"PlexonPanelRelay","code":"HOST_GRANT_CONFLICT","serverId":"eec353b4-5a9b-4e5d-a59c-5b688c363190","agentKind":"HOST","messageType":"access.sync","sessionAgeMillis":11,"sequence":4}
+✔ Host may publish a real local revocation but cannot restore it (16.540671ms)
+{"component":"PlexonPanelRelay","code":"HOST_GRANT_CONFLICT","serverId":"472878e5-8b87-4379-b6c8-a12b96484445","agentKind":"HOST","messageType":"access.sync","sessionAgeMillis":3,"sequence":3}
+✔ Host unknown grant is diagnosed and ignored without transport rejection (8.52499ms)
+{"component":"PlexonPanelRelay","code":"INVALID_IDENTITY","serverId":"35b386e6-7a97-4547-b1ba-89d01e01c128","agentKind":"HOST","messageType":"agent.hello","sessionAgeMillis":null,"sequence":null}
+{"component":"PlexonPanelRelay","code":"INVALID_IDENTITY","serverId":"35b386e6-7a97-4547-b1ba-89d01e01c128","agentKind":"PAPER","messageType":"agent.hello","sessionAgeMillis":null,"sequence":null}
+✔ Paper and pinned host authenticate independently; wrong server and host keys fail (68.115932ms)
+{"component":"PlexonPanelRelay","code":"SESSION_REPLAY","serverId":"e85c3593-96df-4afd-ab1a-e41018e7720b","agentKind":"PAPER","messageType":"telemetry.system","sessionAgeMillis":680,"sequence":602}
+✔ replay is rejected while a long transfer keeps its attachment bounded (685.847444ms)
+{"component":"PlexonPanelRelay","code":"SESSION_REPLAY","serverId":"274ce505-f96e-42ad-9394-ba55c58282a7","agentKind":"PAPER","messageType":"telemetry.system","sessionAgeMillis":3,"sequence":2}
+✔ old session packets are rejected after reconnect and hibernation (12.10372ms)
+{"component":"PlexonPanelRelay","code":"WRONG_SERVER","serverId":"abc5ed28-6ba1-4f98-92f6-e7b5a383628b","agentKind":"PAPER","messageType":"telemetry.system","sessionAgeMillis":2,"sequence":2}
+{"component":"PlexonPanelRelay","code":"INVALID_SIGNATURE","serverId":"7a70044e-6dda-474b-86a4-76307bd135f0","agentKind":"PAPER","messageType":"telemetry.system","sessionAgeMillis":1,"sequence":2}
+{"component":"PlexonPanelRelay","code":"PROTOCOL_MISMATCH","serverId":"c551c113-1616-48d1-be58-a12b1a4111a9","agentKind":"PAPER","messageType":"telemetry.system","sessionAgeMillis":5,"sequence":2}
+✔ wrong room, tampered signature and stale timestamp fail before routing (24.248304ms)
+✔ relay checks device scope, local capability and high-risk confirmation (7.855541ms)
+✔ recovery action is recognized, routed to Host and never conflated with scope denial (4.792623ms)
+✔ queued is not completed; results are private to the requesting device and survive hibernation (7.232844ms)
+✔ revocation closes the browser immediately and old generations cannot roll it back (30.068628ms)
+{"component":"PlexonPanelRelay","code":"HOST_GRANT_CONFLICT","serverId":"5186bf49-7a3f-4f99-92a4-5376ceb661ef","agentKind":"HOST","messageType":"access.sync","sessionAgeMillis":2,"sequence":3}
+✔ expiry alarms reject expired devices and a host cannot invent a grant (22.895725ms)
+{"component":"PlexonPanelRelay","code":"DASHBOARD_DELIVERY_FAILED","serverId":"7f4ed345-f54e-49e7-b333-06faf8448040","agentKind":null,"messageType":"server.event","sessionAgeMillis":null,"sequence":null}
+✔ broken Dashboard fan-out cannot disconnect an authenticated Paper agent (7.493155ms)
+{"component":"PlexonPanelRelay","code":"PEER_DELIVERY_FAILED","serverId":"2be3e577-0574-490e-88d9-1fb8c707e34d","agentKind":"HOST","messageType":"paper.connection","sessionAgeMillis":7,"sequence":2}
+✔ broken Host peer delivery cannot retroactively reject healthy Paper (11.257483ms)
+{"component":"PlexonPanelRelay","code":"PEER_DELIVERY_FAILED","serverId":"a82c522a-72e0-42f8-93fd-04cc3b58067e","agentKind":"PAPER","messageType":"access.authority.request","sessionAgeMillis":6,"sequence":2}
+✔ broken Paper peer delivery cannot retroactively reject healthy Host (9.806757ms)
+✔ client cannot exceed command, transfer, parameter or in-flight request limits (14.488592ms)
+✔ one-use pairing is consumed only after the locally selected grant is persisted (16.011452ms)
+✔ pairing rejects local revocation racing approval (9.440869ms)
+✔ events filter player addresses, locations, console levels and local capabilities (0.46917ms)
+{"component":"PlexonPanelRelay","code":"INVALID_EVENT","serverId":"d22db0a3-7749-407d-aa71-a514923aab1e","agentKind":"HOST","messageType":"players.presence","sessionAgeMillis":1,"sequence":3}
+{"component":"PlexonPanelRelay","code":"INVALID_EVENT","serverId":"afe4d476-feca-4607-a0b3-afd95f08f267","agentKind":"PAPER","messageType":"players.presence","sessionAgeMillis":2,"sequence":3}
+{"component":"PlexonPanelRelay","code":"INVALID_EVENT","serverId":"b0d9dcec-5b24-4cdd-be0b-b48c858aa7d4","agentKind":"PAPER","messageType":"players.presence","sessionAgeMillis":2,"sequence":3}
+✔ presence is Paper-only, validated, scope-filtered and never stored (23.292399ms)
+✔ history and snapshot actions enforce new scope, capability, fields and rate (15.917191ms)
+✔ directory rate limit, code expiry and internal route authentication are enforced (8.548892ms)
+✔ malformed claims fail closed without throwing (0.182811ms)
+✔ Paper access sync is mirrored to Host and Host can request a refresh (11.7254ms)
+{"component":"PlexonPanelRelay","code":"INVALID_EVENT","serverId":"69187032-e02b-4670-9d24-cc7a6e0c55da","agentKind":"PAPER","messageType":"access.authority.request","sessionAgeMillis":2,"sequence":4}
+{"component":"PlexonPanelRelay","code":"INVALID_EVENT","serverId":"5561164c-d162-4685-910b-ef897f400fcb","agentKind":"PAPER","messageType":"access.authority.sync","sessionAgeMillis":2,"sequence":3}
+✔ Paper cannot forge Host authorization control messages and access sync tolerates Host offline (10.726256ms)
+{"component":"PlexonPanelRelay","code":"FLEET_CONTRACT_REJECTED","serverId":"8d8670b3-0d64-4dd6-9556-aa320749fea9","agentKind":"HOST","messageType":"agent.hello","sessionAgeMillis":null,"sequence":null}
+{"component":"PlexonPanelRelay","code":"FLEET_CONTRACT_REJECTED","serverId":"8d8670b3-0d64-4dd6-9556-aa320749fea9","agentKind":"HOST","messageType":"agent.hello","sessionAgeMillis":null,"sequence":null}
+{"component":"PlexonPanelRelay","code":"FLEET_CONTRACT_REJECTED","serverId":"8d8670b3-0d64-4dd6-9556-aa320749fea9","agentKind":"HOST","messageType":"telemetry.system","sessionAgeMillis":3,"sequence":3}
+✔ signed fleet hello binds Paper and Host to the same node and exact instance (14.287635ms)
+{"component":"PlexonPanelRelay","code":"FLEET_CONTRACT_REJECTED","serverId":"998a2517-d0cb-4c07-afeb-e64080cbf925","agentKind":"PAPER","messageType":"service.status","sessionAgeMillis":7,"sequence":3}
+✔ signed service status uses Host authority and Paper cannot impersonate its systemd source (13.418705ms)
+{"component":"PlexonPanelRelay","code":"INVALID_ENVELOPE","serverId":"7fd2f446-588c-4ecd-9221-1d646f7b07e2","agentKind":"PAPER","messageType":"agent.challenge_response","sessionAgeMillis":null,"sequence":2}
+{"component":"PlexonPanelRelay","code":"FLEET_CONTRACT_REJECTED","serverId":"7fd2f446-588c-4ecd-9221-1d646f7b07e2","agentKind":"PAPER","messageType":"agent.hello","sessionAgeMillis":null,"sequence":null}
+✔ fleet identity cannot be downgraded or replaced by a simultaneous cloned session (28.432792ms)
+{"component":"PlexonPanelRelay","code":"FLEET_CONTRACT_REJECTED","serverId":"dfea7450-a0df-4c09-abb3-882f4e230a84","agentKind":"PAPER","messageType":"agent.hello","sessionAgeMillis":null,"sequence":null}
+{"component":"PlexonPanelRelay","code":"FLEET_CONTRACT_REJECTED","serverId":"ebecb88e-cee3-47d9-8573-b8c0cddec1d9","agentKind":"PAPER","messageType":"agent.hello","sessionAgeMillis":null,"sequence":null}
+{"component":"PlexonPanelRelay","code":"FLEET_CONTRACT_REJECTED","serverId":"a4a8f624-6aee-4b6e-a205-8253b9e9dfd5","agentKind":"PAPER","messageType":"agent.hello","sessionAgeMillis":null,"sequence":null}
+{"component":"PlexonPanelRelay","code":"INVALID_ENVELOPE","serverId":"f04334ff-5d92-40e2-9707-145c62dfe2ef","agentKind":"PAPER","messageType":"agent.hello","sessionAgeMillis":null,"sequence":null}
+{"component":"PlexonPanelRelay","code":"FLEET_CONTRACT_REJECTED","serverId":"c620a8f2-1ad9-406b-a328-15e12993bff7","agentKind":"PAPER","messageType":"agent.hello","sessionAgeMillis":null,"sequence":null}
+✔ unsupported, incomplete or substituted fleet contracts fail before challenge (15.776308ms)
+{"component":"PlexonPanelRelay","code":"FLEET_CONTRACT_REJECTED","serverId":"70c3e922-3da6-4512-a468-049f9605ab13","agentKind":"HOST","messageType":"agent.hello","sessionAgeMillis":null,"sequence":null}
+✔ 5.0 Paper cannot route service actions to a previously authenticated legacy Host (11.819066ms)
+✔ bound 5.0 Host can start its service after Paper disconnects without losing its immutable association (7.112544ms)
+✔ configuration is loopback-first and rejects wildcard origins (21.082664ms)
+✔ coordination store persists only bounded room metadata and rate limits pairing (15.070872ms)
+{"component":"PlexonPanelRelay","runtime":"standalone","event":"started","host":"127.0.0.1","port":0,"storage":"coordination-only","version":"5.0.0","gitCommit":"8b68f32423efb56eda1c535b7c3e36ea5a30a5e7","buildTimestamp":"2026-09-14T02:17:15.000Z","protocolVersion":3,"runtimeKind":"standalone"}
+✔ standalone health route is safe and advertises Protocol 3 build identity (46.883913ms)
+✔ fleet coordination persistence keeps shared and separate nodes isolated and rejects substitution (10.727014ms)
+✔ Step 5 rejects every retired Paper backup coordination message (3.010093ms)
+✔ Step 5 denylist remains narrow enough for normal Host events (0.567606ms)
+✔ health describes coordination-only storage (9.450601ms)
+✔ pairing rejects a non-allowlisted browser before lookup (1.319171ms)
+✔ pairing returns a bounded error for invalid JSON (1.403446ms)
+✔ dashboard session validation requires a credential (1.005625ms)
+✔ pairing issues a scoped credential only after the room consumes its challenge (23.500423ms)
+✔ pairing does not accept client-selected roles or scopes (2.263212ms)
+✔ chunked pairing payloads are bounded without Content-Length (1.024187ms)
+ℹ tests 79
+ℹ suites 0
+ℹ pass 79
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 10622.111484
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> plexonpanel-dashboard@5.0.0 test
+> node scripts/transpile-tests.mjs && node scripts/build-test.mjs && node --test --test-concurrency=1 tests/*.test.mjs
+
+▲ Next.js 16.3.8 (Turbopack)
+✓ Running next.config.ts took 29ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 4.4s
+  Running TypeScript ...
+  Finished TypeScript in 6.5s ...
+  Collecting page data using 6 workers ...
+  Generating static pages using 6 workers (0/4) ...
+  Generating static pages using 6 workers (1/4) 
+  Generating static pages using 6 workers (2/4) 
+  Generating static pages using 6 workers (3/4) 
+✓ Generating static pages using 6 workers (4/4) in 532ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ○ /activity
+└ ƒ /api/build
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
+✔ verified legacy session payload keeps signed claims without requiring deviceId (2.858857ms)
+✔ an explicit session action-contract mismatch still fails closed (0.799007ms)
+✔ invalid signed session contract reports the safe field without deleting credentials (0.39327ms)
+✔ relay SCOPE_DENIED preserves boundary, action, scope, agent and request ID (2.235201ms)
+✔ relay UNKNOWN_ACTION is distinct from a missing device scope (0.468274ms)
+✔ Host lifecycle completion survives Paper presence and session changes without replay (3.830742ms)
+✔ Host session or signed grant replacement rejects its pending lifecycle command (0.680275ms)
+✔ confirmation captured for Server A cannot send on Server B after an asynchronous switch (0.377788ms)
+✔ a confirmation cannot survive agent or grant replacement on the same Dashboard socket (0.819088ms)
+✔ action completion must match the original server, socket, action and source authority (0.715985ms)
+✔ legacy relay rejection without a server field is accepted only from its original bound socket (0.607856ms)
+✔ relay queue acknowledgement never reports an operation completed (1.464158ms)
+✔ file conflicts reject with structured status so unsaved edits can be retained (0.779947ms)
+✔ disconnect rejects uncertain completion and never replays the command (0.669904ms)
+✔ a stale socket cannot unbind the current authorized connection (0.378121ms)
+✔ legacy browser archive remains read-only, isolated and unverified (2.277073ms)
+✔ display cadence cannot persist live presence to the legacy archive (6.66949ms)
+✔ server-side filters use bounded Paper parameters and opaque cursors (0.371126ms)
+✔ a live duplicate is replaced by the journal record; pages never mix (10.272095ms)
+✔ live filters reject malformed rows and do not invent a leave (0.246786ms)
+✔ normalizes dashed and undashed UUIDs to lowercase hex (1.058893ms)
+✔ uses MCHeads when deployment does not configure an avatar template (0.756663ms)
+✔ accepts one HTTPS uuid template and derives exact CSP origin (0.535008ms)
+✔ allows development HTTP only on loopback (0.288002ms)
+✔ rejects malformed, repeated, secret-bearing, fragment, and unsafe templates (0.392766ms)
+✔ rejects unsupported sizes and malformed UUIDs without producing a request URL (0.160274ms)
+✔ applied texture wins, offline UUID uses the real account name, online UUID remains stable (0.459567ms)
+✔ a missing Drive provider does not invent storage or source failures (0.997459ms)
+✔ new successful Drive preflight supersedes an older degraded provider snapshot (0.295437ms)
+✔ later provider failures and pending refreshes cannot reuse a successful Drive preflight (0.138876ms)
+✔ only the failing preflight stage is marked failed (0.143597ms)
+✔ refresh and unclassified failure do not promote cached success to current readiness (0.18365ms)
+✔ 3.5 promotes Fully Backup Now with selectable durable countdowns (8.659555ms)
+✔ Host preflight is authoritative and gates Fully Backup Now (2.19234ms)
+✔ durable Host job reconstructs the active timeline after refresh (2.359117ms)
+✔ truthful progress and verification details do not invent an ETA (1.826002ms)
+✔ degraded and recovery-required states block or recover safely (2.682278ms)
+✔ automatic backups stay retired while restart-only scheduling remains supported (1.664366ms)
+✔ stable backup history exposes read-only-safe Host operations (0.984984ms)
+✔ safe failures remain structured and browser boundary retains provider secrecy (2.092375ms)
+✔ destructive maintenance actions remain capability-gated at browser and relay boundaries (1.711388ms)
+✔ responsive Step 8 backup layout avoids global scaling and styles the confirmation surface (1.500015ms)
+✔ provider view keeps latest test and last remote verification as distinct Host-authoritative fields (5.047899ms)
+✔ removing background A atomically preserves selected B and B's credential/cache (16.464221ms)
+✔ a slow earlier selection cannot overwrite a newer selection in browser storage (20.776196ms)
+✔ server labels are presentation metadata, persist independently and are removed only with their server (8.35398ms)
+✔ series statistics preserve zero as a real value (2.103813ms)
+✔ empty and all-null series stay unavailable (0.247137ms)
+✔ gap segmentation never connects across missing samples (0.238275ms)
+✔ high-frequency SVG thinning stays bounded and preserves local extrema (4.245502ms)
+✔ percentage, capacity and adaptive domains are stable and truthful (0.251275ms)
+✔ nearest selection clamps naturally to first/last available value (0.643888ms)
+✔ window filtering uses the newest sample as the browser-local tail (0.997005ms)
+✔ SVG paths create separate subpaths and close area fills at the baseline (0.796347ms)
+✔ a fresh Host confirmation distinguishes stopped Minecraft from Host and relay loss (2.685738ms)
+✔ cached, expired, missing and inconsistent signals cannot fabricate stopped status (0.261658ms)
+✔ service transitions, failure and running process without plugin are distinct (0.828105ms)
+✔ compatibility, revocation, stale telemetry and subscription limits remain explicit (0.311898ms)
+✔ connection summaries expose readable status and retry controls without color dependence (10.831357ms)
+✔ console history actions reuse the existing least-privilege view scopes (1.00675ms)
+✔ console UI queries Host explicitly and discloses journald retention (5.288027ms)
+✔ relay adapters expose explicit Host, Paper fallback, and unavailable authority states (2.300104ms)
+✔ CPU zero is a real sample and Paper process metrics never masquerade as Host metrics (1.49546ms)
+✔ Host telemetry owns machine CPU and memory while Paper remains independently unavailable (0.230725ms)
+✔ telemetry history uses trusted source capture timestamps at sub-second cadence (0.82431ms)
+✔ same captured instant replaces rather than duplicates a chart sample (0.659178ms)
+✔ unrelated telemetry snapshots do not duplicate performance history (0.401027ms)
+✔ high-frequency telemetry history remains strictly bounded (6.006407ms)
+✔ cross-server and incompatible-ready events cannot contaminate the workspace (0.169979ms)
+✔ inventory pagination never combines snapshots or appends a missing first page (0.314743ms)
+✔ presence deltas are idempotent and an old session cannot remove a reconnect (0.452341ms)
+✔ a complete snapshot replays only deltas newer than its capture (9.327197ms)
+✔ console and cache remain bounded and exclude players, files and action results (21.764472ms)
+✔ console journal identifiers and short cross-source transitions suppress duplicates (0.379085ms)
+✔ UI actions require the intersection of exact scopes and local capabilities (0.425659ms)
+✔ operator exceptions distinguish staged deployment from executed evidence (2.496031ms)
+✔ incomplete, unapproved and overbroad operator exceptions fail closed (0.918529ms)
+✔ five is held until exact accepted source and executed coordination evidence (0.225581ms)
+✔ committed receipt cannot authorize unrelated fixture ancestry (0.357424ms)
+✔ Vercel ignore and explicit build exit conventions agree for the current receipt (227.807161ms)
+✔ actual activation ancestry, dirty source, preview hold and Vercel exit codes (4250.149204ms)
+✔ Cloudflare deployment consumes the Worker-specific authorization (0.718627ms)
+✔ preserves a valid idle CPU sample (1.643403ms)
+✔ rounds and clamps valid CPU samples (0.214626ms)
+✔ marks missing and negative CPU samples unavailable (0.128128ms)
+✔ prefers a host CPU sample over the Paper process sample (0.21861ms)
+✔ falls back to Paper process CPU when host CPU is unavailable (0.169793ms)
+✔ reports unavailable only when both CPU samples are unavailable (0.12369ms)
+✔ creates the one-variable Vercel import without Firebase credentials (94.078475ms)
+✔ rejects non-HTTPS relay URLs and accidental overwrites (299.382503ms)
+✔ custom select supports arrows, disabled options, typeahead, Enter, Escape, Tab and outside dismissal (302.125525ms)
+✔ custom dropdown belongs to its dialog and unmount removes the portaled menu (26.884251ms)
+✔ player heads use applied textures and reset load/failure state when the identity changes (29.890778ms)
+✔ active service disables Start and allows stop/restart (1.000757ms)
+✔ inactive service allows only Start (0.145958ms)
+✔ transitioning and unknown service states block lifecycle actions (0.202041ms)
+✔ failed service permits recovery Start but not stop/restart (0.19841ms)
+✔ missing Host service state stays unknown regardless of Paper connectivity (0.174884ms)
+✔ known action codes map to safe actionable guidance (0.661511ms)
+✔ unknown action codes retain the sanitized agent message (0.329304ms)
+✔ lifecycle busy explains rejection without suggesting a deferred stop (0.291711ms)
+✔ safe diagnostics identify Dashboard 5.0.0 without changing protocol 3 (0.977041ms)
+✔ live actions are bound to the exact signed socket grant (9.609112ms)
+✔ preconfirmed maintenance actions are sent once with confirmation (3.91949ms)
+✔ Dashboard 5.0.0 exposes the active manual-only Backups workspace (8.576966ms)
+✔ Backups workspace is wired only to supported Host manual maintenance actions (1.828394ms)
+✔ Dashboard and relay expose identical maintenance/provider scopes (2.008747ms)
+✔ legacy backup.create scope remains compatibility-only and is not an active dashboard action (6.280591ms)
+✔ retired Paper coordination protocol cannot return (1.013188ms)
+✔ Dashboard 5.0.0 keeps protocol hooks compatible with a selected-server Configuration workspace (1.325888ms)
+✔ Dashboard visible version metadata matches package 5.0.0 (3.434526ms)
+✔ Dashboard 5.0.0 responsive architecture does not globally scale the interface (1.839769ms)
+✔ Step 8 Backups workspace has responsive production layout (2.360712ms)
+✔ Dashboard 5.0.0 display update rate exposes every supported browser cadence (1.984059ms)
+✔ foundation is global and the current workspace skin stays out of the development gallery (4.017291ms)
+{"component":"PlexonPanelRelay","runtime":"standalone","event":"started","host":"127.0.0.1","port":0,"storage":"coordination-only","version":"5.0.0","gitCommit":"unavailable","buildTimestamp":"unavailable","protocolVersion":3,"runtimeKind":"standalone"}
+▶ mounted Dashboard selects and operates independent signed instances without stale transitions
+  ✔ opening selector shows live named cards and remembers the selected server (872.029665ms)
+  ✔ every mounted palette destination navigates without an operation, including server choices (717.803126ms)
+  ✔ switch resets data and confirmation before a second signed workspace becomes live (347.704196ms)
+  ✔ rapid A to B to A dropdown switches establish a fresh live command channel (926.184638ms)
+  ✔ a delayed session grant for an abandoned selection cannot replace the current socket (1055.282383ms)
+  ✔ reload returns to the selector while preserving selection and independent page history (1928.289958ms)
+  ✔ confirmation binds the original server, action and command parameters even if the form changes (173.242104ms)
+  ✔ same-server target generation replacement cancels confirmation before dispatch (289.375275ms)
+  ✔ a completion from an abandoned server is never displayed in the selected workspace (1588.867795ms)
+  ✔ reported grant expansion cannot expand the verified signed grant or dispatch (2957.680991ms)
+  ✔ mounted navigation-only palette and lifecycle controls preserve unknown Host service state (227.657691ms)
+{"component":"PlexonPanelRelay","runtime":"standalone","code":"PROTOCOL_REJECTED","serverId":"b00b3bd3-a128-4b83-a3d1-bfef3d53402a","agentKind":"PAPER","messageType":"telemetry.server","error":"Agent authentication required"}
+  ✔ lifecycle commands complete across real signed Paper disconnect and reconnect events (8344.951025ms)
+  ✔ a busy stop stays visible in lifecycle controls without delayed or automatic replay (196.661017ms)
+  ✔ Owner configuration uses Paper editing, reviews changes and preserves conflicts and unsaved work (302.40504ms)
+  ✔ backup setup is instance-specific, unverified checks stay unknown and cached preflight cannot authorize a new job (8155.886413ms)
+  ✔ signed upload progress is shown for the active Host job and ignored for other jobs (873.805314ms)
+  ✔ cold backup review cancels without a command and confirms only the selected Host (2233.643641ms)
+  ✔ Host-confirmed stop, agent disconnect and relay disconnect are different UI states (390.515863ms)
+{"component":"PlexonPanelRelay","runtime":"standalone","code":"PEER_DELIVERY_FAILED","serverId":"3d25f3ca-fd0a-4240-94af-fd883bc37191","agentKind":"HOST","messageType":"paper.connection","error":"WebSocket send failed"}
+{"component":"PlexonPanelRelay","runtime":"standalone","code":"PEER_DELIVERY_FAILED","serverId":"b00b3bd3-a128-4b83-a3d1-bfef3d53402a","agentKind":"HOST","messageType":"paper.connection","error":"WebSocket send failed"}
+  ✔ revoking one paired server keeps the other available and selectable (365.514706ms)
+✔ mounted Dashboard selects and operates independent signed instances without stale transitions (32227.979449ms)
+✔ device permissions use the intersection of signed and reported scopes (2.314178ms)
+✔ matching signed and reported grants remain fully available (0.499229ms)
+✔ device or role disagreements fail closed (0.199431ms)
+✔ active dashboard and access views consume the reconciled signed grant (11.457971ms)
+✔ critical and operational state bypasses the presentation throttle (0.826578ms)
+✔ telemetry and bounded inventory remain presentation-throttled (0.496126ms)
+✔ display rate labels distinguish realtime from bounded cadence (0.207018ms)
+✔ five build verification requires coordinated version, protocol, action and fleet contracts (6.673128ms)
+✔ fleet fixtures cover two servers on one node and independent nodes in both runtimes (2.734723ms)
+✔ renaming keeps routing identities and exact systemd target unchanged (0.217189ms)
+✔ same server on a substituted node is a different target (0.721529ms)
+✔ unit injection, invalid identifiers and control characters fail without echoing input (0.61075ms)
+✔ fleet feed reuses sessions, rejects cross-room events, and keeps credentials out of published snapshots (9.86274ms)
+✔ one revoked background server does not revoke another, and a changed credential starts a new session (5.09888ms)
+✔ subscription limit counts the selected socket and ignores a late grant after unsubscription (1.022994ms)
+✔ shared node totals use one fresh Host sample, separate nodes stay separate, stale and Paper data stay unavailable (1.638687ms)
+✔ cards distinguish service one-core CPU from node CPU and do not fabricate stale or missing metrics (1.203612ms)
+✔ Host replacement clears old metrics and ignores delayed old-session events (0.235162ms)
+✔ fleet rendering exposes selected-server navigation and unavailable metrics without credentials (28.60526ms)
+✔ mixed-version fleet hides service/node totals and blocks Host controls (0.340411ms)
+✔ selector remembers labels while connections are unavailable and distinguishes them from browser device names (2.067354ms)
+✔ a relay socket that never supplies an authenticated ready cannot remain connecting indefinitely (4.337237ms)
+✔ 250ms Host updates cannot manufacture Paper samples or inflate observed p95 (1.667324ms)
+✔ actual source gaps break paths, future clocks are rejected and null is never a zero (0.219483ms)
+✔ window coverage does not bridge missing captures and labels nearest-rank p95 as sampled (0.226902ms)
+✔ systemd CPU stays above 100% with explicit one-core units in scoped exports (0.979101ms)
+✔ service history only accepts authenticated Host cgroup resources; no wire change (0.775912ms)
+✔ default five-second Paper JVM captures form continuous observed coverage (0.282702ms)
+✔ Overview real zero stays a real reading and all six existing instruments remain (220.326698ms)
+✔ unknown and stale values never borrow zero or unrelated traffic freshness (64.993144ms)
+✔ service CPU never borrows Host node CPU or Paper process CPU when cgroup provenance is absent (37.993979ms)
+✔ Host offline leaves fresh Paper metrics available while service values remain unknown (32.029391ms)
+✔ recent player activity is presented by the Players workspace (6.990596ms)
+✔ Overview uses a brief observed activity summary without hidden legacy cards (3.769912ms)
+✔ the 3.x Activity modal queries Paper and suppresses the duplicate History tab (3.313097ms)
+✔ backup.preflight is authorized by the canonical backup.view contract (1.36345ms)
+✔ browser and relay scope modules are generated from one checked-in manifest (5.87834ms)
+✔ renders the PlexonPanel dashboard shell (606.917294ms)
+✔ does not expose the removed server-side session API (24.709309ms)
+✔ session tray copies only canonical metadata, never operation content or unknown error text (2.127875ms)
+✔ session tray retains repeated completions and bounds the latest 50 items (0.5289ms)
+✔ connection and validated backup-phase snapshots deduplicate, but real changes remain (1.201532ms)
+✔ sample freshness rejects missing, expired, future and disconnected samples consistently (1.870067ms)
+✔ fresh Host traffic cannot label missing Minecraft samples as live or fabricate server metrics (8.979627ms)
+✔ old captures stay stale after replay and switching instances cannot reuse another server's freshness (0.981457ms)
+✔ ready waits for the first current-session sample once, without extending the outage on repeated ready packets (1.676019ms)
+✔ older captures cannot replace current telemetry or service state; role and session boundaries remain enforced (0.783528ms)
+✔ packet receipts prevent timer/skew flicker, one clock serves all indicators, and foregrounding reveals real loss (179.914894ms)
+✔ raw selection uses the minimum actual spacing, including the exact 2px boundary (1.801931ms)
+✔ summary buckets are half-open and the exact right endpoint is retained (1.013577ms)
+✔ TPS thresholds retain real zero and expose unknown independently (0.251723ms)
+✔ null metrics never become zero and one metric cannot supply the other (0.296738ms)
+✔ gaps and unobserved time remain separate even inside an occupied summary bucket (0.388171ms)
+✔ gap tolerance equality follows the existing report adapter and no interval is invented (0.179192ms)
+✔ out-of-order captures are sorted, exact duplicates replace, and input is not mutated (0.272286ms)
+✔ future, invalid and outside-window captures stay in diagnostics and never become live marks (0.241922ms)
+✔ empty and single observations have unknown time and zero fabricated coverage (0.345765ms)
+✔ 8192 retained captures remain exact while raster-facing output is pixel-bounded at mobile and desktop (20.712592ms)
+✔ fractional and tiny plot widths still have bounded buckets and hatch columns (0.625987ms)
+✔ invalid model geometry is rejected instead of fabricated (0.693245ms)
+✔ Pulse uses only source captures, preserves null and zero, deduplicates and sorts (1.68777ms)
+✔ Host repeats do not manufacture Paper captures or merge CPU meanings (0.827533ms)
+✔ exact capture lookup retains endpoints and deterministically chooses the earlier equidistant capture (0.311651ms)
+✔ mounted Pulse keeps exact lens/table parity and never rasterizes for age ticks or Host-only repeats (1697.917199ms)
+✔ Host receipts and age ticks never advance the shared Pulse frame or admit a future Paper capture (1.670005ms)
+✔ a new capture and an instance switch get a new browser-time frame; no extra clock/store is created (0.875397ms)
+✔ actual production manifest and emitted chunks exclude the development kitchen sink (52.037456ms)
+✔ production emits joined Hanken subset faces and a non-preloaded Commit Mono face (4.553123ms)
+✔ foundation components use palette tokens and vendored font licenses are present (12.956662ms)
+✔ UI preferences use provider-aware safe defaults (1.030195ms)
+✔ strict parsing drops unknown and corrupt preference values (0.411705ms)
+✔ invalid display update rates migrate to the balanced default (0.265806ms)
+✔ oversized or invalid stored JSON falls back safely (0.782964ms)
+✔ legacy density and chart window migrate without touching other keys (0.365616ms)
+✔ saved schema mirrors temporary legacy compatibility keys (0.594795ms)
+✔ system resolution honors reduced motion as a safety floor (0.225786ms)
+✔ OS theme and cyan defaults apply only when the v1 key is absent (0.38352ms)
+✔ all saved accents and complete existing preference values survive additive loading (0.836958ms)
+✔ before-paint preference initializer matches the runtime parser for absent and saved keys (20.336025ms)
+✔ production initial root scripts exclude the workspace owner and Fleet rendering payload (26.897354ms)
+✔ read-only console and chat omit execution controls (12.213565ms)
+✔ host and file routes show explicit unavailable states without privileged controls (6.661439ms)
+✔ uploaded-looking log content and plugin names remain escaped text (47.010212ms)
+✔ 3.0 activity history opens in place instead of navigating away (7.375308ms)
+✔ Players distinguishes missing scope, local policy and older agents (10.859463ms)
+✔ offline history detail is read-only and exposes no player actions (2.659481ms)
+✔ ordered visible history uses logarithmic bounds and preserves nulls and source provenance (8.784532ms)
+ℹ tests 222
+ℹ suites 0
+ℹ pass 222
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 58467.140524

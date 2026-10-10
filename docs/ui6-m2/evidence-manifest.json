@@ -1,0 +1,152 @@
+[
+  {
+    "file": "build-exclusion.json",
+    "bytes": 567,
+    "sha256": "a1716d22159154ca87f4814818ddc58fcc18312f3b90b0f7206c1dcacfa82924"
+  },
+  {
+    "file": "check.txt",
+    "bytes": 37411,
+    "sha256": "07b3042bf071bf9d3f5df086c8906c4a054fb22638632cc14a3b83986651b5a8"
+  },
+  {
+    "file": "command-status.json",
+    "bytes": 352,
+    "sha256": "fe268d1e742832adc90a05d459ab7cfab95052d77ef369d8a5e93c9e1b250c37"
+  },
+  {
+    "file": "contrast.json",
+    "bytes": 32373,
+    "sha256": "2279476c47327549536cdd2816a1ac91f247770ca56c8c1585a1f511e3b4486c"
+  },
+  {
+    "file": "development-server.txt",
+    "bytes": 3212,
+    "sha256": "aa8b6a0415a624c5a2389e62c41ccc7c82d2d26c15d427fc16adfe13261f28c4"
+  },
+  {
+    "file": "dialog-dark-1280.png",
+    "bytes": 77843,
+    "sha256": "151916dd6b6aefda84b4655dd9780c2ffd3ab043ef7a10d53f8b7433cd4372f6"
+  },
+  {
+    "file": "dialog-dark-390.png",
+    "bytes": 51991,
+    "sha256": "f50ca0df0c9ded94d77a76e842d4b8373b629b87fa723201621c7a5245934e53"
+  },
+  {
+    "file": "dialog-light-1280.png",
+    "bytes": 79499,
+    "sha256": "aeaeaf9c566580ffa12a270f16089996e8b3aff4d80764edaeb99b01fa90160f"
+  },
+  {
+    "file": "dialog-light-390.png",
+    "bytes": 51425,
+    "sha256": "473ce282cfa6b5bc0ca1839b92fff9d3475b324f9b915a8b3d8b473a481d1fed"
+  },
+  {
+    "file": "kitchen-dark-1280.png",
+    "bytes": 295301,
+    "sha256": "f091124b3e3f7fc5cb3a04fb432b718a6db6bf88d9859a1706f7bf3352761c66"
+  },
+  {
+    "file": "kitchen-dark-390.png",
+    "bytes": 336306,
+    "sha256": "d166a17bfce597f9484cec6bb39e0172ff6184c286d0666d1e4a0a421d9549a8"
+  },
+  {
+    "file": "kitchen-forced-colors-390.png",
+    "bytes": 275948,
+    "sha256": "e60b473771bc85c74622fc616d5d4117041db1adad932c85751c4e56ee608d9d"
+  },
+  {
+    "file": "kitchen-light-1280.png",
+    "bytes": 294012,
+    "sha256": "383bee902081efa7426476a59140e90966e652b790803b616b6184b5411f4e12"
+  },
+  {
+    "file": "kitchen-light-390.png",
+    "bytes": 330730,
+    "sha256": "7618acdbee525d609ed1c67a7dfa7a3bad405983232c0474aa7628cb22837368"
+  },
+  {
+    "file": "kitchen-text-200-390.png",
+    "bytes": 839546,
+    "sha256": "7673bfe9e84ecbc77c65560465c23eec8bd4548ff5d92605ba115f30801bf124"
+  },
+  {
+    "file": "kitchen-verification.json",
+    "bytes": 137979,
+    "sha256": "d893aa08573e3093c698f0f6984530dba4850027a913b6f99fc77cc736bb62b0"
+  },
+  {
+    "file": "menu-dark-1280.png",
+    "bytes": 78893,
+    "sha256": "cbd4a8d609555fa3e0e39b8b7adbe42386324b965b1316c5e9df5d33f37f3135"
+  },
+  {
+    "file": "menu-dark-390.png",
+    "bytes": 57867,
+    "sha256": "a023d37a76f8d54091aa520a6cf0f63d997c32d76c7d3ecc1723563e9ecf0511"
+  },
+  {
+    "file": "menu-light-1280.png",
+    "bytes": 79288,
+    "sha256": "eb8e6fae2a78fb67577b0978e7267f19abd4a4064e4030f42b04707cac30c0a8"
+  },
+  {
+    "file": "menu-light-390.png",
+    "bytes": 56429,
+    "sha256": "6a5b80606bacaa4039a820a111948f19aa3a6bd42443708b322f4e77cb4d6cdd"
+  },
+  {
+    "file": "popover-dark-1280.png",
+    "bytes": 79001,
+    "sha256": "fdb7bfa63216c2863689e5e611119a987b9f48173bc966952a6be716b8ab4270"
+  },
+  {
+    "file": "popover-dark-390.png",
+    "bytes": 57473,
+    "sha256": "84681e52f844c7b2a074fd1e19dbb90097df4110af6a379f44ccc1d0eaea1f6d"
+  },
+  {
+    "file": "popover-light-1280.png",
+    "bytes": 79102,
+    "sha256": "5e1b317609d5675803cf8e6477fab66dd81dcec1765224115f34d7c74f5bff62"
+  },
+  {
+    "file": "popover-light-390.png",
+    "bytes": 55867,
+    "sha256": "7f75e57d18b404cd05031fc37211d77d0756792ebc75e521f4546496700184c7"
+  },
+  {
+    "file": "production-font-trace.json",
+    "bytes": 3677,
+    "sha256": "52f87abd4c70a11b179c08b0bd5e1d44b7c488c89ba0448ad46dd29390bcfbc2"
+  },
+  {
+    "file": "production-server.txt",
+    "bytes": 153,
+    "sha256": "2145ac6ffe83af43306281c1eb07208bd2d85051f0ec0de10e055621b839dbdb"
+  },
+  {
+    "file": "select-dark-1280.png",
+    "bytes": 71140,
+    "sha256": "4d50acd496bf65588ea49750e45d591f5f296db26ac563a1ea434d04f94b2be2"
+  },
+  {
+    "file": "select-dark-390.png",
+    "bytes": 43359,
+    "sha256": "a1474794df6c17dc068c3d00cdf531f34f7eaaf18924cd5c8a24eea3699b54c5"
+  },
+  {
+    "file": "select-light-1280.png",
+    "bytes": 71738,
+    "sha256": "c54ab5f9b159162b748c42c512e69485c9cde1ab356e03b4ce8a16b57f7ee133"
+  },
+  {
+    "file": "select-light-390.png",
+    "bytes": 42063,
+    "sha256": "73cec699afb929c1bf7ef7c964771424941a475f5dcd07cec9656c20d2403eb4"
+  }
+]

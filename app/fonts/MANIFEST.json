@@ -1,0 +1,41 @@
+{
+  "fonts": [
+    {
+      "file": "hanken-latin.woff2",
+      "bytes": 34704,
+      "sha256": "e9201eddf1d41d0b62253295d869ce3cf65768f7102b797f02c7f8c876b4a9d5",
+      "distribution": "@fontsource version 5.3.0; not upstream font version"
+    },
+    {
+      "file": "hanken-latin-ext.woff2",
+      "bytes": 19588,
+      "sha256": "768af2923e0ab1549f1dfba0a5c8ea749c4c01f01d8e77ffaf7fcd12f57a0a24",
+      "distribution": "@fontsource version 5.3.0; not upstream font version"
+    },
+    {
+      "file": "commit-mono-400.woff2",
+      "bytes": 48128,
+      "sha256": "86132abb57fc615f2ab900cde4cd9d5796e9791daf1f85d79fc933aa50b3b15c",
+      "distribution": "@fontsource version 5.3.0; not upstream font version"
+    },
+    {
+      "file": "HANKEN-OFL.txt",
+      "bytes": 4530,
+      "sha256": "f45f60ca871850c58d8dc9c973bd6fcad40c137e9d037172b961e8ca68c87ef7",
+      "distribution": "@fontsource version 5.3.0; not upstream font version"
+    },
+    {
+      "file": "COMMIT-MONO-OFL.txt",
+      "bytes": 4300,
+      "sha256": "bcdeec3e64649bf9929f5b9c0d0df06ba1f1d000b48534574a71b0afcfc2fcbe",
+      "distribution": "@fontsource version 5.3.0; not upstream font version"
+    }
+  ],
+  "coverage": "Verified precomposed Portuguese/English corpus; optional Latin-extended on demand; system fallback for other scripts. No universal script coverage claim.",
+  "sourcePackages": {
+    "hanken": "@fontsource-variable/hanken-grotesk 5.3.0, wght normal Latin and Latin-extended",
+    "commitMono": "@fontsource/commit-mono 5.3.0, Latin normal 400"
+  },
+  "integration": "next/font/local emits the shared range-qualified families. Font tokens reference those literal emitted families because Turbopack generated variable/class family names do not honor a custom font-family declaration. Only the Hanken Latin source is preloaded.",
+  "licenseFormatting": "License line endings normalized to LF and trailing whitespace removed; all license text and copyright notices unchanged."
+}

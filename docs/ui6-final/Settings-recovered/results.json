@@ -1,0 +1,21 @@
+{
+  "task": "Settings",
+  "environment": "Chromium, signed local relay, simulated agents; no live-server certification",
+  "status": "passed",
+  "screenshots": [
+    "settings-light-390.png",
+    "settings-light-1280.png",
+    "settings-dark-390.png",
+    "settings-dark-1280.png"
+  ],
+  "axe": [
+    {
+      "workspace": "Settings",
+      "violations": []
+    }
+  ],
+  "keyboard": [
+    "Theme keyboard selector; local cache control reachable; clear not executed"
+  ],
+  "errors": []
+}

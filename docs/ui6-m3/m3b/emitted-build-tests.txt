@@ -1,0 +1,12 @@
+✔ actual production manifest and emitted chunks exclude the development kitchen sink (62.137804ms)
+✔ production emits joined Hanken subset faces and a non-preloaded Commit Mono face (3.785609ms)
+✔ foundation components use palette tokens and vendored font licenses are present (4.878159ms)
+✔ production initial root scripts exclude the workspace owner and Fleet rendering payload (32.602518ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 281.431896

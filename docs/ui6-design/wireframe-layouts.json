@@ -1,0 +1,672 @@
+[
+  {
+    "name": "Fleet",
+    "desktop": [
+      [
+        "Paired instances",
+        "Pair another server; each open target uses its own grant",
+        100
+      ],
+      [
+        "Instance instruments",
+        "Name | Paper and Host | supplied TPS/MSPT | players | service CPU/RAM | mini Pulse",
+        230
+      ],
+      [
+        "Shared infrastructure",
+        "One row per real node: supplied Host CPU, memory and instances",
+        130
+      ]
+    ],
+    "mobile": [
+      [
+        "Your servers",
+        "Pair another server",
+        90
+      ],
+      [
+        "Each paired instance",
+        "Name, separate authority, supplied tick health and players, mini Pulse, Open",
+        320
+      ],
+      [
+        "Shared infrastructure",
+        "One disclosure per real node; no repeated totals",
+        140
+      ]
+    ]
+  },
+  {
+    "name": "Overview",
+    "desktop": [
+      [
+        "Tick Pulse",
+        "Observed window; real Paper captures, capture age, gaps, Inspect samples",
+        130
+      ],
+      [
+        "Tick health + online players",
+        "TPS and MSPT lead; online player count opens roster",
+        155
+      ],
+      [
+        "Runtime instruments",
+        "JVM heap | service CPU (% one core) | service RAM",
+        120
+      ],
+      [
+        "Recent activity + worlds",
+        "Real join/leave observations; supplied world counts; authorized history",
+        130
+      ],
+      [
+        "Tick history + source details",
+        "Existing TPS/MSPT charts and table in disclosure; safe diagnostics",
+        115
+      ]
+    ],
+    "mobile": [
+      [
+        "Tick Pulse",
+        "Window, gap/freshness text and Inspect samples",
+        145
+      ],
+      [
+        "Tick health",
+        "TPS and MSPT as one linked instrument pair",
+        155
+      ],
+      [
+        "Players online",
+        "Count and roster destination",
+        90
+      ],
+      [
+        "Runtime instruments",
+        "Heap, service CPU and service RAM; labelled source",
+        180
+      ],
+      [
+        "Activity and worlds",
+        "Real supplied rows; authorized history",
+        160
+      ],
+      [
+        "Tick history / source details",
+        "TPS/MSPT charts, table and safe diagnostics disclosure",
+        95
+      ]
+    ]
+  },
+  {
+    "name": "Performance",
+    "desktop": [
+      [
+        "Observed report controls",
+        "1/5/15/30min; local pause; Export CSV/JSON; real sample coverage",
+        85
+      ],
+      [
+        "Tick pair",
+        "TPS + MSPT; independent points and shared timestamp inspection",
+        155
+      ],
+      [
+        "Machine and Paper process",
+        "Host CPU + Paper process CPU separately; Host memory + JVM heap",
+        220
+      ],
+      [
+        "Players and service resources",
+        "Players + service CPU + service RAM: all nine charts retained",
+        155
+      ],
+      [
+        "Report table and details",
+        "Sample count, observed coverage, sample p95; GC remains in export",
+        90
+      ]
+    ],
+    "mobile": [
+      [
+        "Report controls",
+        "Window, local pause and export; coverage",
+        100
+      ],
+      [
+        "Nine source-labelled charts",
+        "TPS, MSPT, Host CPU, Paper CPU, Host memory, heap, players, service CPU/RAM",
+        510
+      ],
+      [
+        "Inspect observed samples",
+        "Bounded table, real statistics and safe diagnostics",
+        160
+      ]
+    ]
+  },
+  {
+    "name": "Players",
+    "desktop": [
+      [
+        "Roster toolbar",
+        "Search loaded players; world; sort; scoped snapshot refresh",
+        75
+      ],
+      [
+        "Live roster",
+        "Name/head, supplied world/ping/session; whole row opens drawer",
+        245
+      ],
+      [
+        "Recent activity",
+        "Real session join/leave; scoped Paper journal entry",
+        120
+      ],
+      [
+        "Player drawer",
+        "Details | Actions | Moderation; all13 gates; bound dangerous action",
+        150
+      ]
+    ],
+    "mobile": [
+      [
+        "Roster controls",
+        "Search, world, sort and snapshot refresh",
+        105
+      ],
+      [
+        "Player rows",
+        "Whole44px target; supplied name, world, ping, session; table preference survives",
+        260
+      ],
+      [
+        "Recent activity",
+        "Supplied observations; authorized retained history",
+        150
+      ],
+      [
+        "Player detail sheet",
+        "Tabs, scope/supply-safe fields, all13 gated actions, bound confirm",
+        250
+      ]
+    ]
+  },
+  {
+    "name": "Console",
+    "desktop": [
+      [
+        "Local toolbar",
+        "Loaded-line search, level; Host source; filters and display disclosure",
+        75
+      ],
+      [
+        "Authoritative log well",
+        "Host replay or signed live-only Paper fallback; invocation boundaries; copy",
+        360
+      ],
+      [
+        "Paper command composer",
+        "Scope/capability/connection gate; existing bound confirmation; no optimistic success",
+        130
+      ],
+      [
+        "Local read status",
+        "Paused/new lines or capture source; load older retained Host history",
+        65
+      ]
+    ],
+    "mobile": [
+      [
+        "Console controls",
+        "Source consequence, search; filters/display disclosure",
+        105
+      ],
+      [
+        "Log well",
+        "Timestamp column, plain text; intentional horizontal code scroll; local pause",
+        390
+      ],
+      [
+        "Sticky Paper composer",
+        "IME-safe, safe-area inset; why unavailable; bound confirmation",
+        115
+      ],
+      [
+        "Local status / older history",
+        "Unseen count and Host-scoped replay",
+        80
+      ]
+    ]
+  },
+  {
+    "name": "Chat",
+    "desktop": [
+      [
+        "Local read controls",
+        "Search; pause; follow tail; clear local display",
+        70
+      ],
+      [
+        "Message stream",
+        "Supplied sender/head, content, exact timestamp disclosure; bounded200",
+        320
+      ],
+      [
+        "Paper composer",
+        "Plain text; scoped MiniMessage; device identity; signed send result",
+        120
+      ],
+      [
+        "Cache disclosure",
+        "Local bounded cache100; Settings data/privacy clear control",
+        70
+      ]
+    ],
+    "mobile": [
+      [
+        "Chat controls",
+        "Search; local read menu",
+        85
+      ],
+      [
+        "Message stream",
+        "Text-first rows, supplied sender/head and time",
+        350
+      ],
+      [
+        "Composer",
+        "Paper-only,\u22642000 chars; optional authorized MiniMessage",
+        145
+      ],
+      [
+        "Local cache notice",
+        "Settings > data & privacy",
+        75
+      ]
+    ]
+  },
+  {
+    "name": "Plugins",
+    "desktop": [
+      [
+        "Inventory toolbar",
+        "Search, enabled state, sort; pushed snapshot age",
+        75
+      ],
+      [
+        "Inventory rows",
+        "Name, version, supplied state/author; open metadata drawer",
+        280
+      ],
+      [
+        "Details drawer",
+        "Authors/dependencies/website if supplied; configured reload gate and bound confirm",
+        160
+      ]
+    ],
+    "mobile": [
+      [
+        "Inventory controls",
+        "Search and state; sort; received snapshot disclosure",
+        105
+      ],
+      [
+        "Plugin rows",
+        "Name/version/state; tap opens details",
+        300
+      ],
+      [
+        "Plugin detail sheet",
+        "Supplied metadata and existing configured reload only",
+        210
+      ]
+    ]
+  },
+  {
+    "name": "Server",
+    "desktop": [
+      [
+        "Host service instrument",
+        "Actual state/unit/PID when supplied; Paper connection separate",
+        140
+      ],
+      [
+        "Lifecycle operation strip",
+        "Start / graceful stop / restart; Host stable-state gates, why disabled",
+        115
+      ],
+      [
+        "Observed pending operation",
+        "Requested / executing / waiting for Paper / signed result; not invented service history",
+        140
+      ],
+      [
+        "Runtime disclosure",
+        "Supplied OS/arch/JVM/versions; scoped status refresh",
+        90
+      ]
+    ],
+    "mobile": [
+      [
+        "Host service state",
+        "Unknown remains unknown; supplied unit/PID; Paper connection separate",
+        165
+      ],
+      [
+        "Lifecycle actions",
+        "44px targets; gated start/stop/restart; bound effect confirmation",
+        190
+      ],
+      [
+        "Pending operation/result",
+        "Signed result, BUSY/error persists; no inferred service timeline",
+        170
+      ],
+      [
+        "Runtime / refresh",
+        "Supplied details only",
+        85
+      ]
+    ]
+  },
+  {
+    "name": "Backups",
+    "desktop": [
+      [
+        "Readiness + backup initiation",
+        "Host/device/service/RCON/storage/recovery; reasons; Fully Backup Now",
+        145
+      ],
+      [
+        "Durable current operation",
+        "Real15 phase keys + outcomes; selected countdown; one progress/counter region",
+        210
+      ],
+      [
+        "Verification + retained backup rows",
+        "Provider test time distinct from verified remote time; verify/retry/delete existing gates",
+        140
+      ],
+      [
+        "Restart schedule disclosure",
+        "Daily/weekly/weekdays, countdown/timeouts; cannot create backup",
+        95
+      ],
+      [
+        "Destination / retention / safe failure",
+        "Supplied destination; actual retention fields; safe diagnostic/runbook",
+        90
+      ]
+    ],
+    "mobile": [
+      [
+        "Backup readiness",
+        "Known checks plus unknown; Fully Backup Now; countdown then bound confirm",
+        210
+      ],
+      [
+        "Durable operation",
+        "Real current phase and one progress display; absent counters: not supplied",
+        235
+      ],
+      [
+        "Provider / backup rows",
+        "Distinct times; scoped verify/Retry Upload/delete",
+        180
+      ],
+      [
+        "Scheduler and retention",
+        "Separate disclosures; bounded drafts",
+        130
+      ],
+      [
+        "Destination / failure details",
+        "No credentials; safe diagnostic",
+        100
+      ]
+    ]
+  },
+  {
+    "name": "Configuration",
+    "desktop": [
+      [
+        "Pinned target bar",
+        "Server, selected authority/root/path; writable/read-only; dirty state",
+        80
+      ],
+      [
+        "File browser + editor",
+        "Folders/list/search/pagination | editable content and syntax preview",
+        330
+      ],
+      [
+        "Review/save strip",
+        "Actual original/edited diff; save via existing bound action; conflict keeps draft",
+        130
+      ],
+      [
+        "Scoped file operations",
+        "Create/upload/rename/delete/download+cancel as actually authorized",
+        90
+      ]
+    ],
+    "mobile": [
+      [
+        "File browser",
+        "Authority/root/path; search, bounded listing",
+        210
+      ],
+      [
+        "Selected editor",
+        "Back to folder; dirty guard; mono content; syntax preview",
+        285
+      ],
+      [
+        "Review and save",
+        "Actual diff sheet and existing bound save confirmation",
+        150
+      ],
+      [
+        "File actions",
+        "Scoped menu, SHA-verified download progress/cancel",
+        100
+      ]
+    ]
+  },
+  {
+    "name": "Audit",
+    "desktop": [
+      [
+        "Query controls",
+        "Paper/Host source; actor/action/outcome/date query; search loaded page",
+        105
+      ],
+      [
+        "Actual event timeline",
+        "Supplied timestamp, actor, action, target, result; safe expanded detail",
+        315
+      ],
+      [
+        "Bounded table / pagination",
+        "50 records; previous/next; request ID/agent-redacted JSON copy",
+        105
+      ]
+    ],
+    "mobile": [
+      [
+        "Audit query controls",
+        "Source and loaded-page search; filters disclosure",
+        140
+      ],
+      [
+        "Event rows",
+        "Time/actor/action/target/result; expandable safe details",
+        325
+      ],
+      [
+        "Pagination / table",
+        "50 rows; copy requestID/redactedJSON; table alternative",
+        105
+      ]
+    ]
+  },
+  {
+    "name": "Access",
+    "desktop": [
+      [
+        "This immutable device",
+        "Stacked name/role/expiry/connection; pair/forget separate local actions",
+        130
+      ],
+      [
+        "Effective permission model",
+        "Token scope \u2229 ready scope \u2229 connected compatible agent \u2229 capability; policy unknown unless disclosed",
+        180
+      ],
+      [
+        "Paired device list",
+        "Search/role/refresh; metadata detail; revoke others with bound confirm",
+        225
+      ],
+      [
+        "Re-pair / active scope notes",
+        "Files and Backups active; old grants do not acquire new scopes",
+        80
+      ]
+    ],
+    "mobile": [
+      [
+        "This device",
+        "Readable stacked key/value metadata; no per-character wrapping",
+        180
+      ],
+      [
+        "Effective access",
+        "Known intersection; actual denial/unknown policy; no grant mutation",
+        220
+      ],
+      [
+        "Other paired devices",
+        "Search/role; details and bound revoke; no self-revoke",
+        230
+      ],
+      [
+        "Re-pair note",
+        "Active Files/Backups; newly issued scopes require re-pair",
+        100
+      ]
+    ]
+  },
+  {
+    "name": "Settings",
+    "desktop": [
+      [
+        "Appearance + preview",
+        "Theme/accent/contrast/density/text/motion; saved values survive",
+        180
+      ],
+      [
+        "Charts / Players",
+        "All existing chart/head/UUID/mobile-row/cadence preferences",
+        230
+      ],
+      [
+        "Data & privacy",
+        "Clear local chat cache100; local telemetry/cache copy; legacy cleanup link",
+        135
+      ],
+      [
+        "Connection / About",
+        "Reconnect; safe diagnostics; real build/version/protocol and relay hostname",
+        115
+      ]
+    ],
+    "mobile": [
+      [
+        "Appearance",
+        "Live token preview; saved preference enums untouched",
+        240
+      ],
+      [
+        "Charts / Players",
+        "Existing fieldsets in disclosures; all current controls retained",
+        280
+      ],
+      [
+        "Data & privacy",
+        "Clear local chat cache; bounded old archive cleanup",
+        155
+      ],
+      [
+        "About / connection",
+        "Real build metadata, relay hostname, reconnect, safe diagnostics",
+        145
+      ]
+    ]
+  },
+  {
+    "name": "Pairing",
+    "desktop": [
+      [
+        "Pair this browser",
+        "Device name; one-time code input; signed local approval; busy/error",
+        285
+      ],
+      [
+        "Trust explanation",
+        "Local operator grants role; signedProtocol3; saved-server open/cancel",
+        130
+      ]
+    ],
+    "mobile": [
+      [
+        "Pair this browser",
+        "Task first; name/code inputs; real approval pending/error",
+        310
+      ],
+      [
+        "Signed local access",
+        "Brief approval explanation; saved instances and cancel",
+        150
+      ]
+    ]
+  },
+  {
+    "name": "Legacy archive",
+    "desktop": [
+      [
+        "Unverified local archive",
+        "Back to Settings; old browser-only records; never Paper journal",
+        100
+      ],
+      [
+        "Local filters + old rows",
+        "Stored server, player/UUID, event type and sort; bounded5000 old records",
+        260
+      ],
+      [
+        "Clear legacy archive",
+        "Local-only native confirmation; no new writes, no server deletion",
+        100
+      ]
+    ],
+    "mobile": [
+      [
+        "Old local archive",
+        "Unverified; return to Settings",
+        140
+      ],
+      [
+        "Local filters / records",
+        "Stored server, player/UUID, type, sort; no new collection",
+        300
+      ],
+      [
+        "Clear old archive",
+        "Native local confirmation; only this browser old entries",
+        120
+      ]
+    ]
+  }
+]

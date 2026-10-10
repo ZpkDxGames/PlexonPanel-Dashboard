@@ -1,17 +1,17 @@
 "use client";
 
-import { Select } from "../components/select";
+import { ActionButton as NewActionButton, Badge as NewBadge, Button, DisabledReason, Empty as NewEmpty, PageHeader, Panel as NewPanel, SourceFacts } from "./ui/workspace";
+import { PlayerHead } from "../components/player-head";
+import { useUiPreferences } from "../components/ui-preferences-provider";
 
+import { Select } from "./ui/workspace";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
-  ActionButton,
-  Badge,
-  Empty,
-  Panel,
   duration,
   time,
   type ViewProps,
 } from "./control-views";
+import { Dialog, Disclosure, Table } from "./ui/primitives";
 import { str, type JsonMap } from "../lib/control-state";
 
 type PluginSort = "name" | "version";
@@ -40,31 +40,9 @@ export function HistoryPlayerDrawer({
   entries: JsonMap[];
   close: () => void;
 }) {
-  const ref = useRef<HTMLDialogElement>(null);
-  useEffect(() => {
-    const dialog = ref.current;
-    if (dialog && !dialog.open) dialog.showModal();
-    return () => {
-      if (dialog?.open) dialog.close();
-    };
-  }, []);
   return (
-    <dialog
-      className="ui-drawer workspace-player-drawer"
-      ref={ref}
-      onCancel={close}
-      aria-labelledby="history-player-title"
-    >
-      <div className="ui-panel-head">
-        <div>
-          <small>Presence observation · read only</small>
-          <h2 id="history-player-title">{str(entry.name)}</h2>
-        </div>
-        <button className="ui-button" onClick={close} aria-label="Close history details">
-          ×
-        </button>
-      </div>
-      <dl className="ui-details workspace-drawer-section">
+    <Dialog open onClose={close} title={str(entry.name)} description="Read-only presence observation from the loaded Paper journal.">
+      <dl className="pp-facts">
         {[
           ["UUID", str(entry.uuid, "Unknown")],
           ["State", str(entry.state, "Unknown")],
@@ -91,9 +69,9 @@ export function HistoryPlayerDrawer({
           </div>
         ))}
       </dl>
-      <div className="workspace-drawer-section">
+      <div className="pp-stack">
         <h3>Loaded observations for this player</h3>
-        <ul className="workspace-session-list">
+        <ul className="pp-list">
           {entries.slice(0, 12).map((item) => (
             <li key={str(item.eventId)}>
               <strong>{item.state === "JOINED" ? "Joined" : "Left"}</strong>
@@ -104,16 +82,19 @@ export function HistoryPlayerDrawer({
             </li>
           ))}
         </ul>
-        <p className="ui-hint">
+        <p className="pp-muted">
           Offline history rows expose no player actions. Only observations in
           the currently loaded bounded result are shown here.
         </p>
       </div>
-    </dialog>
+    </Dialog>
   );
 }
 
 export function ChatView(props: ViewProps) {
+  const { preferences } = useUiPreferences();
+  const composer = useRef<HTMLTextAreaElement>(null);
+  const [sending,setSending]=useState(false);
   const [message, setMessage] = useState("");
   const [search, setSearch] = useState("");
   const [paused, setPaused] = useState<JsonMap[] | null>(null);
@@ -145,9 +126,10 @@ export function ChatView(props: ViewProps) {
     );
 
   return (
-    <>
-      <div className="workspace-filter-toolbar">
-        <label className="ui-search">
+    <div className="pp-workspace" data-ui6-workspace="Chat">
+      <PageHeader title="Global messages" description={props.connected&&props.state.ready?.agents.paper?`${messages.length} loaded messages from Paper.`:'Paper is disconnected. Loaded messages remain local.'} primary={<Button variant="primary" disabled={!props.can('chat.global.send')} disabledReason="Sending is disabled for this device or by local policy." onClick={()=>{composer.current?.focus();composer.current?.scrollIntoView({block:'center'});}}>Compose message</Button>}/>
+      <div className="pp-toolbar">
+        <label className="pp-field">
           Search chat
           <input
             value={search}
@@ -155,57 +137,55 @@ export function ChatView(props: ViewProps) {
             placeholder="Player or message"
           />
         </label>
-        <button
-          className="ui-button"
+        <details className="pp-disclosure"><summary>More</summary><div className="pp-stack">
+        <Button
           onClick={() => setPaused(paused ? null : [...props.state.chat])}
         >
           {paused ? "Resume view" : "Pause view"}
-        </button>
-        <button
-          className="ui-button"
+        </Button>
+        <Button
+
           aria-pressed={followTail}
           onClick={() => setFollowTail(!followTail)}
         >
           Follow tail {followTail ? "on" : "off"}
-        </button>
-        <button className="ui-button" onClick={() => setClearAt(Date.now())}>
+        </Button>
+        <Button  onClick={() => setClearAt(Date.now())}>
           Clear local view
-        </button>
-        <Badge>{messages.length} messages</Badge>
-        {plexonChatsActive && <Badge tone="cyan">PlexonChats</Badge>}
+        </Button>
+        </div></details>
+        <NewBadge>{messages.length} {messages.length===1?"message":"messages"}</NewBadge>
+        {plexonChatsActive && <NewBadge tone="cyan">PlexonChats</NewBadge>}
       </div>
 
-      <Panel
+      <NewPanel
         title="Global chat"
         aside={
           paused ? (
-            <Badge tone="amber">View paused</Badge>
+            <NewBadge tone="amber">View paused</NewBadge>
           ) : (
-            <Badge tone={props.connected ? "green" : "quiet"}>
-              {props.connected ? "Live channel" : "Disconnected"}
-            </Badge>
+            <NewBadge tone={props.connected&&props.state.ready?.agents.paper ? "green" : "quiet"}>
+              {props.connected&&props.state.ready?.agents.paper ? "Paper live" : "Disconnected"}
+            </NewBadge>
           )
         }
       >
-        <div className="ui-chat workspace-chat" ref={viewport}>
+        <div className="pp-message-list" ref={viewport} role="region" aria-label="Loaded global chat messages" tabIndex={0}>
           {messages.length ? (
             messages.map((item, index) => (
               <div
-                className="ui-chat-message"
+                className={`pp-list-row pp-message${preferences.liveRowHighlight?" pp-new-row":""}`}
+                data-grouped={index>0&&messages[index-1].playerName===item.playerName&&messages[index-1].playerUuid===item.playerUuid} tabIndex={0}
                 key={`${item.messageId}-${index}`}
               >
-                <span className="ui-avatar" aria-hidden>
-                  {str(item.playerName).slice(0, 2).toUpperCase()}
-                </span>
-                <div>
-                  <strong>
-                    {str(item.playerName, "System")}{" "}
-                    <small>{time(item.capturedAt)}</small>
-                  </strong>
+                <PlayerHead uuid={str(item.playerUuid,'')} name={str(item.playerName,'System')} size={32}/>
+                <div className="pp-row-details">
+                  {!(index>0&&messages[index-1].playerName===item.playerName&&messages[index-1].playerUuid===item.playerUuid)&&<strong>{str(item.playerName,'System')}</strong>}
+                  <time className="pp-message-time" dateTime={str(item.capturedAt,'')} title={str(item.capturedAt,'')}>{time(item.capturedAt)}</time>
                   <p>{str(item.content)}</p>
                 </div>
-                <button
-                  className="ui-button"
+                <Button
+
                   aria-label="Copy chat message"
                   onClick={() =>
                     void navigator.clipboard
@@ -214,31 +194,33 @@ export function ChatView(props: ViewProps) {
                   }
                 >
                   Copy
-                </button>
+                </Button>
               </div>
             ))
           ) : (
-            <Empty title={search ? "No matching chat messages" : "No global chat messages yet"}>
+            <NewEmpty title={search ? "No matching chat messages" : "No global chat messages yet"}>
               Vanilla and supported integration messages appear only when the
               local policy provides them.
-            </Empty>
+            </NewEmpty>
           )}
         </div>
 
+        <Disclosure title="Chat source and timing"><SourceFacts source="Paper chat" unit="messages" receivedAt={props.state.updatedAt}/><p className="pp-muted">Hover or focus a message for its supplied capture time. Individual received-at timestamps are not retained.</p></Disclosure>
         {props.can("chat.global.send") ? (
           <form
-            className="ui-form ui-pad"
+            className="pp-form"
             onSubmit={(event) => {
               event.preventDefault();
+              setSending(true);
               void props
                 .run("chat.global.send", { message, miniMessage: mini })
                 .then(() => setMessage(""))
-                .catch(() => {});
+                .catch(() => {}).finally(()=>setSending(false));
             }}
           >
             <label>
               Message as {props.state.ready?.device.name}
-              <textarea
+              <textarea ref={composer}
                 value={message}
                 onChange={(event) => setMessage(event.target.value)}
                 maxLength={2000}
@@ -246,14 +228,14 @@ export function ChatView(props: ViewProps) {
                 required
               />
             </label>
-            <div className="ui-actions">
+            <div className="pp-row">
               {props.state.ready?.device.scopes.includes(
                 "chat.send.minimessage",
               ) &&
                 props.state.ready.server.capabilities[
                   "chat.send.minimessage"
                 ] && (
-                  <label className="ui-check">
+                  <label className="pp-check">
                     <input
                       type="checkbox"
                       checked={mini}
@@ -262,21 +244,19 @@ export function ChatView(props: ViewProps) {
                     MiniMessage
                   </label>
                 )}
-              <button
-                className="ui-button primary"
+              <Button
+                type="submit" busy={sending} disabledReason="Write a message before sending."
                 disabled={!message.trim()}
               >
-                Send to global chat
-              </button>
+                {sending?"Waiting for signed result…":"Send to global chat"}
+              </Button>
             </div>
           </form>
         ) : (
-          <p className="ui-hint ui-pad">
-            Sending is disabled for this device or by local policy.
-          </p>
+          <DisabledReason reason="Sending is disabled for this device or by local policy."/>
         )}
-      </Panel>
-    </>
+      </NewPanel>
+    </div>
   );
 }
 
@@ -308,9 +288,10 @@ export function PluginsView(props: ViewProps) {
   const plugin = props.state.plugins.find((item) => item.name === selected);
 
   return (
-    <>
-      <div className="workspace-filter-toolbar">
-        <label className="ui-search">
+    <div className="pp-workspace" data-ui6-workspace="Plugins">
+      <PageHeader title="Paper plugins" description={props.connected&&props.state.ready?.agents.paper?`${props.state.plugins.length} installed plugins in the latest Paper snapshot.`:'Paper is disconnected. Inventory is unavailable.'} primary={<Button variant="primary" onClick={()=>props.notice('Plugin inventory is pushed by the Paper agent; the latest received snapshot is displayed.')}>Refresh latest</Button>}/>
+      <div className="pp-toolbar">
+        <label className="pp-field">
           Search plugins
           <input
             value={search}
@@ -318,9 +299,7 @@ export function PluginsView(props: ViewProps) {
             placeholder="Name or description"
           />
         </label>
-        <label>
-          State
-          <Select aria-label="State"
+        <Select aria-label="State"
             value={status}
             onValueChange={(selectedValue) => setStatus(selectedValue)}
           >
@@ -328,80 +307,29 @@ export function PluginsView(props: ViewProps) {
             <option value="ENABLED">Enabled</option>
             <option value="DISABLED">Disabled</option>
           </Select>
-        </label>
-        <label>
-          Sort
-          <Select aria-label="Sort"
+        <Select aria-label="Sort"
             value={sort}
             onValueChange={(selectedValue) => setSort(selectedValue as PluginSort)}
           >
             <option value="name">Name</option>
             <option value="version">Version</option>
           </Select>
-        </label>
-        <Badge>{props.state.plugins.length} installed</Badge>
-        <button
-          className="ui-button"
-          onClick={() =>
-            props.notice(
-              "Plugin inventory is pushed by the Paper agent; the latest received snapshot is displayed.",
-            )
-          }
-        >
-          Refresh
-        </button>
+        <NewBadge>{props.state.plugins.length} installed</NewBadge>
+
       </div>
 
-      <Panel title="Plugin inventory" aside={<Badge>{plugins.length} shown</Badge>}>
+      <NewPanel title="Plugin inventory" aside={<NewBadge>{plugins.length} shown</NewBadge>}>
         {plugins.length ? (
-          <div className="ui-table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Plugin</th>
-                  <th>Version</th>
-                  <th>State</th>
-                  <th>Authors</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {plugins.map((item) => (
-                  <tr key={str(item.name)}>
-                    <td>
-                      <strong>{str(item.name)}</strong>
-                      {typeof item.description === "string" && (
-                        <small className="workspace-table-description">
-                          {item.description}
-                        </small>
-                      )}
-                    </td>
-                    <td>{str(item.version)}</td>
-                    <td>
-                      <Badge tone={item.enabled ? "green" : "quiet"}>
-                        {item.enabled ? "Enabled" : "Disabled"}
-                      </Badge>
-                    </td>
-                    <td>
-                      {Array.isArray(item.authors) && item.authors.length
-                        ? item.authors.join(", ")
-                        : "Not declared"}
-                    </td>
-                    <td>
-                      <button
-                        className="ui-button"
-                        onClick={() => setSelected(str(item.name))}
-                      >
-                        Details
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <Table caption="Latest Paper plugin inventory" rows={plugins} rowKey={item=>str(item.name)} columns={[
+            {key:'name',label:'Plugin',rowHeader:true,render:item=><><strong>{str(item.name)}</strong>{typeof item.description==='string'&&<small>{item.description}</small>}</>},
+            {key:'version',label:'Version',render:item=>str(item.version)},
+            {key:'state',label:'State',render:item=><NewBadge tone={item.enabled===true?'green':item.enabled===false?'quiet':'amber'}>{item.enabled===true?'Enabled':item.enabled===false?'Disabled':'Unknown'}</NewBadge>},
+            {key:'authors',label:'Authors',render:item=>Array.isArray(item.authors)&&item.authors.length?item.authors.join(', '):'Not declared'},
+            {key:'actions',label:'Actions',render:item=><Button onClick={()=>setSelected(str(item.name))}>Details</Button>},
+          ]}/>
+
         ) : (
-          <Empty
+          <NewEmpty
             title={
               search || status !== "ALL"
                 ? "No plugins match these filters"
@@ -409,8 +337,9 @@ export function PluginsView(props: ViewProps) {
             }
           />
         )}
-      </Panel>
+      </NewPanel>
 
+      <Disclosure title="Inventory source and timing"><SourceFacts source="Paper plugin snapshot" unit="installed plugins" receivedAt={props.state.updatedAt}/><p className="pp-muted">Snapshot capture timestamps are not retained by this view.</p></Disclosure>
       {plugin && (
         <PluginDialog21
           {...props}
@@ -418,11 +347,11 @@ export function PluginsView(props: ViewProps) {
           close={() => setSelected(null)}
         />
       )}
-      <p className="ui-hint">
+      <p className="pp-muted">
         Generic Bukkit/Paper reload is intentionally unsupported. Dedicated
         reload commands remain controlled by local plugin policy.
       </p>
-    </>
+    </div>
   );
 }
 
@@ -431,39 +360,17 @@ function PluginDialog21({
   close,
   ...props
 }: ViewProps & { plugin: JsonMap; close: () => void }) {
-  const ref = useRef<HTMLDialogElement>(null);
-  useEffect(() => {
-    const dialog = ref.current;
-    if (dialog && !dialog.open) dialog.showModal();
-    return () => {
-      if (dialog?.open) dialog.close();
-    };
-  }, []);
   return (
-    <dialog
-      className="ui-drawer workspace-player-drawer"
-      ref={ref}
-      onCancel={close}
-      aria-labelledby="plugin-title"
-    >
-      <div className="ui-panel-head">
-        <div>
-          <small>Plugin details</small>
-          <h2 id="plugin-title">{str(plugin.name)}</h2>
-        </div>
-        <button className="ui-button" onClick={close} aria-label="Close plugin details">
-          ×
-        </button>
-      </div>
-      <div className="workspace-drawer-section">
-        <div className="ui-actions">
-          <Badge tone={plugin.enabled ? "green" : "quiet"}>
-            {plugin.enabled ? "Enabled" : "Disabled"}
-          </Badge>
-          <Badge>{str(plugin.version)}</Badge>
+    <Dialog open onClose={close} title={str(plugin.name)} description="Details from the latest Paper inventory.">
+      <div className="pp-stack">
+        <div className="pp-row">
+          <NewBadge tone={plugin.enabled===true ? "green" : "quiet"}>
+            {plugin.enabled===true ? "Enabled" : plugin.enabled===false ? "Disabled" : "Unknown"}
+          </NewBadge>
+          <NewBadge>{str(plugin.version)}</NewBadge>
         </div>
         <p>{str(plugin.description, "No description provided by this plugin.")}</p>
-        <dl className="ui-details">
+        <dl className="pp-facts">
           <div>
             <dt>Authors</dt>
             <dd>
@@ -491,12 +398,12 @@ function PluginDialog21({
           </div>
           <div>
             <dt>Data folder</dt>
-            <dd>plugins/{str(plugin.name)}</dd>
+            <dd><code>plugins/{str(plugin.name)}</code></dd>
           </div>
         </dl>
-        <div className="ui-actions">
+        <div className="pp-row">
           {props.can("plugin.command.reload") && (
-            <ActionButton
+            <NewActionButton
               onClick={() =>
                 props.run("plugin.command.reload", {
                   plugin: plugin.name,
@@ -505,12 +412,12 @@ function PluginDialog21({
               }
             >
               Run configured reload
-            </ActionButton>
+            </NewActionButton>
           )}
           {typeof plugin.website === "string" &&
             /^https:\/\//.test(plugin.website) && (
               <a
-                className="ui-button"
+
                 href={plugin.website}
                 target="_blank"
                 rel="noreferrer"
@@ -519,11 +426,11 @@ function PluginDialog21({
               </a>
             )}
         </div>
-        <p className="ui-hint">
+        <p className="pp-muted">
           Use the Files workspace for configuration access when its root and
           current device scope permit it.
         </p>
       </div>
-    </dialog>
+    </Dialog>
   );
 }

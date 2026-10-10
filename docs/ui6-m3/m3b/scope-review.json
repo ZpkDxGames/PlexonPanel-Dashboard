@@ -1,0 +1,29 @@
+{
+  "status": "passed",
+  "recordedAt": "2026-10-08T15:38:00.769Z",
+  "base": "9a8877c",
+  "branch": "release/6.0.0",
+  "main": "c59b2f7508d738e1adae860db9fa7a6d0a3193c2",
+  "protectedPaths": [
+    "protocol",
+    "relay",
+    "lib/data-source.ts",
+    "lib/control-state.ts",
+    "lib/fleet-feed.ts",
+    "lib/browser-store.ts",
+    "lib/scopes.ts",
+    "lib/fleet-contract.ts",
+    "lib/tick-pulse-model.ts",
+    "package.json",
+    "package-lock.json",
+    "scripts/verify-ui-browser.mjs",
+    "scripts/support/fleet-fixture.mjs",
+    "docs/ui-evidence"
+  ],
+  "changedProtectedPaths": [],
+  "newShellRawHexCount": 0,
+  "push": "not executed; unauthorized",
+  "tags": "not executed",
+  "deployment": "not executed",
+  "M4": "not started"
+}

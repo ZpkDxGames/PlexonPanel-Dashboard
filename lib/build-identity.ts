@@ -14,7 +14,7 @@ export interface BuildIdentity {
 export interface ControlPlaneBuilds {
   dashboard: BuildIdentity | null;
   relay: BuildIdentity | null;
-  status: "MATCHED" | "MISMATCH" | "UNVERIFIED";
+  status: "MATCHED" | "COMPATIBLE" | "MISMATCH" | "UNVERIFIED";
   message: string;
 }
 
@@ -88,6 +88,13 @@ export async function loadControlPlaneBuilds(): Promise<ControlPlaneBuilds> {
       status: "UNVERIFIED",
       message: "Control-plane build identity is unavailable. Do not treat this deployment as fully verified.",
     };
+  }
+  if (dashboardBuild?.version === "6.0.0") {
+    const compatible = (relayBuild?.version === "5.0.0" || relayBuild?.version === "6.0.0") && [dashboardBuild, relayBuild].every(build =>
+      build?.protocolVersion === 3 && build.actionContract === ACTION_CONTRACT_ID && build.fleetContract === FLEET_CONTRACT_ID);
+    const matched = compatible && dashboardBuild.version === relayBuild?.version && dashboardCommit === relayCommit;
+    return { dashboard: dashboardBuild, relay: relayBuild, status: !compatible ? "MISMATCH" : matched ? "MATCHED" : "COMPATIBLE",
+      message: !compatible ? "Dashboard and relay component contracts are incompatible." : matched ? "Dashboard and relay report the same accepted revision." : `Dashboard 6.0.0 and relay report compatible Protocol 3 action and fleet contracts. ${dashboardCommit === relayCommit ? "Their component versions differ; both report the same revision." : "Their component revisions differ."}` };
   }
   const five = dashboardBuild?.version.startsWith("5.") || relayBuild?.version.startsWith("5.");
   const contractMatches = !five || [dashboardBuild, relayBuild].every(build =>

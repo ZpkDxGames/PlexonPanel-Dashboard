@@ -1,0 +1,5732 @@
+{
+  "status": "passed",
+  "recordedAt": "2026-10-08T21:26:16.239Z",
+  "mode": "production",
+  "fixture": "Signed local agents for current state; synthetic source-provenance history in the real bounded browser cache. No live certification.",
+  "pages": [
+    {
+      "name": "production-pointer-lens-390",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "tags": [
+            "cat.color",
+            "wcag2aa",
+            "wcag143",
+            "TTv5",
+            "TT13.c",
+            "EN-301-549",
+            "EN-9.1.4.3",
+            "ACT",
+            "RGAAv4",
+            "RGAA-3.2.1"
+          ],
+          "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/color-contrast?application=playwright",
+          "nodes": [
+            {
+              "any": [
+                {
+                  "id": "color-contrast",
+                  "data": {
+                    "messageKey": "nonBmp"
+                  },
+                  "relatedNodes": [],
+                  "impact": "serious",
+                  "message": "Element content contains only non-text characters"
+                }
+              ],
+              "all": [],
+              "none": [],
+              "impact": "serious",
+              "html": "<button type=\"button\" aria-pressed=\"false\">●<span>12 ms</span></button>",
+              "target": [
+                ".pulse-lens-strip > button:nth-child(1)"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "any": [
+                {
+                  "id": "color-contrast",
+                  "data": {
+                    "messageKey": "nonBmp"
+                  },
+                  "relatedNodes": [],
+                  "impact": "serious",
+                  "message": "Element content contains only non-text characters"
+                }
+              ],
+              "all": [],
+              "none": [],
+              "impact": "serious",
+              "html": "<button type=\"button\" aria-pressed=\"false\">●<span>12 ms</span></button>",
+              "target": [
+                ".pulse-lens-strip > button:nth-child(2)"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "any": [
+                {
+                  "id": "color-contrast",
+                  "data": {
+                    "messageKey": "nonBmp"
+                  },
+                  "relatedNodes": [],
+                  "impact": "serious",
+                  "message": "Element content contains only non-text characters"
+                }
+              ],
+              "all": [],
+              "none": [],
+              "impact": "serious",
+              "html": "<button type=\"button\" aria-pressed=\"false\">●<span>12 ms</span></button>",
+              "target": [
+                ".pulse-lens-strip > button:nth-child(3)"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "any": [
+                {
+                  "id": "color-contrast",
+                  "data": {
+                    "messageKey": "nonBmp"
+                  },
+                  "relatedNodes": [],
+                  "impact": "serious",
+                  "message": "Element content contains only non-text characters"
+                }
+              ],
+              "all": [],
+              "none": [],
+              "impact": "serious",
+              "html": "<button type=\"button\" aria-pressed=\"false\">●<span>12 ms</span></button>",
+              "target": [
+                ".pulse-lens-strip > button:nth-child(4)"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "any": [
+                {
+                  "id": "color-contrast",
+                  "data": {
+                    "messageKey": "nonBmp"
+                  },
+                  "relatedNodes": [],
+                  "impact": "serious",
+                  "message": "Element content contains only non-text characters"
+                }
+              ],
+              "all": [],
+              "none": [],
+              "impact": "serious",
+              "html": "<button type=\"button\" aria-pressed=\"false\">●<span>12 ms</span></button>",
+              "target": [
+                ".pulse-lens-strip > button:nth-child(5)"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "any": [
+                {
+                  "id": "color-contrast",
+                  "data": {
+                    "messageKey": "nonBmp"
+                  },
+                  "relatedNodes": [],
+                  "impact": "serious",
+                  "message": "Element content contains only non-text characters"
+                }
+              ],
+              "all": [],
+              "none": [],
+              "impact": "serious",
+              "html": "<button type=\"button\" aria-pressed=\"true\">●<span>12 ms</span></button>",
+              "target": [
+                ".pulse-lens-strip > button:nth-child(6)"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "any": [
+                {
+                  "id": "color-contrast",
+                  "data": {
+                    "messageKey": "nonBmp"
+                  },
+                  "relatedNodes": [],
+                  "impact": "serious",
+                  "message": "Element content contains only non-text characters"
+                }
+              ],
+              "all": [],
+              "none": [],
+              "impact": "serious",
+              "html": "<button type=\"button\" aria-pressed=\"false\">●<span>12 ms</span></button>",
+              "target": [
+                ".pulse-lens-strip > button:nth-child(7)"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element content contains only non-text characters"
+            },
+            {
+              "any": [
+                {
+                  "id": "color-contrast",
+                  "data": {
+                    "contrastRatio": 0,
+                    "fontSize": "11.8pt (15.75px)",
+                    "fontWeight": "bold",
+                    "messageKey": "elmPartiallyObscured",
+                    "expectedContrastRatio": "4.5:1"
+                  },
+                  "relatedNodes": [
+                    {
+                      "html": "<dialog class=\"pp-dialog deepslate pulse-lens\" aria-labelledby=\"_r_e_-title\" aria-describedby=\"_r_e_-description\" open=\"\">",
+                      "target": [
+                        "dialog[aria-labelledby=\"_r_e_-title\"]"
+                      ]
+                    }
+                  ],
+                  "impact": "serious",
+                  "message": "Element's background color could not be determined because it's partially obscured by another element"
+                }
+              ],
+              "all": [],
+              "none": [],
+              "impact": "serious",
+              "html": "<th scope=\"col\">MSPT</th>",
+              "target": [
+                ".pulse-table > table > thead > tr > th[scope=\"col\"]:nth-child(3)"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined because it's partially obscured by another element"
+            },
+            {
+              "any": [
+                {
+                  "id": "color-contrast",
+                  "data": {
+                    "contrastRatio": 0,
+                    "fontSize": "11.8pt (15.75px)",
+                    "fontWeight": "normal",
+                    "messageKey": "elmPartiallyObscured",
+                    "expectedContrastRatio": "4.5:1"
+                  },
+                  "relatedNodes": [
+                    {
+                      "html": "<dialog class=\"pp-dialog deepslate pulse-lens\" aria-labelledby=\"_r_e_-title\" aria-describedby=\"_r_e_-description\" open=\"\">",
+                      "target": [
+                        "dialog[aria-labelledby=\"_r_e_-title\"]"
+                      ]
+                    }
+                  ],
+                  "impact": "serious",
+                  "message": "Element's background color could not be determined because it's partially obscured by another element"
+                }
+              ],
+              "all": [],
+              "none": [],
+              "impact": "serious",
+              "html": "<td>12 ms</td>",
+              "target": [
+                ".pulse-table > table > tbody > tr:nth-child(1) > td:nth-child(3)"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined because it's partially obscured by another element"
+            },
+            {
+              "any": [
+                {
+                  "id": "color-contrast",
+                  "data": {
+                    "contrastRatio": 0,
+                    "fontSize": "11.8pt (15.75px)",
+                    "fontWeight": "normal",
+                    "messageKey": "elmPartiallyObscured",
+                    "expectedContrastRatio": "4.5:1"
+                  },
+                  "relatedNodes": [
+                    {
+                      "html": "<dialog class=\"pp-dialog deepslate pulse-lens\" aria-labelledby=\"_r_e_-title\" aria-describedby=\"_r_e_-description\" open=\"\">",
+                      "target": [
+                        "dialog[aria-labelledby=\"_r_e_-title\"]"
+                      ]
+                    }
+                  ],
+                  "impact": "serious",
+                  "message": "Element's background color could not be determined because it's partially obscured by another element"
+                }
+              ],
+              "all": [],
+              "none": [],
+              "impact": "serious",
+              "html": "<td>12 ms</td>",
+              "target": [
+                "tr:nth-child(2) > td:nth-child(3)"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element's background color could not be determined because it's partially obscured by another element"
+            }
+          ]
+        }
+      ],
+      "passes": 30,
+      "supplementalReviews": {
+        "controlledTargets": [
+          {
+            "id": "_r_1_",
+            "exists": true,
+            "expanded": "false",
+            "open": false
+          },
+          {
+            "id": "_r_3_",
+            "exists": true,
+            "expanded": "false",
+            "open": false
+          },
+          {
+            "id": "_r_d_",
+            "exists": true,
+            "expanded": "false",
+            "open": false
+          },
+          {
+            "id": "_r_g_",
+            "exists": true,
+            "expanded": "false",
+            "open": false
+          },
+          {
+            "id": "_r_i_",
+            "exists": true,
+            "expanded": "false",
+            "open": false
+          },
+          {
+            "id": "_r_k_",
+            "exists": true,
+            "expanded": "false",
+            "open": false
+          },
+          {
+            "id": "_r_m_",
+            "exists": true,
+            "expanded": "false",
+            "open": false
+          },
+          {
+            "id": "_r_o_",
+            "exists": true,
+            "expanded": "false",
+            "open": false
+          },
+          {
+            "id": "_r_q_",
+            "exists": true,
+            "expanded": "false",
+            "open": false
+          }
+        ],
+        "contrastReviews": [
+          {
+            "target": [
+              ".pulse-lens-strip > button:nth-child(1)"
+            ],
+            "foreground": "rgb(230, 236, 239)",
+            "background": "rgb(22, 27, 31)",
+            "tag": "BUTTON",
+            "ratio": 14.544943235887036,
+            "status": "passed"
+          },
+          {
+            "target": [
+              ".pulse-lens-strip > button:nth-child(2)"
+            ],
+            "foreground": "rgb(230, 236, 239)",
+            "background": "rgb(22, 27, 31)",
+            "tag": "BUTTON",
+            "ratio": 14.544943235887036,
+            "status": "passed"
+          },
+          {
+            "target": [
+              ".pulse-lens-strip > button:nth-child(3)"
+            ],
+            "foreground": "rgb(230, 236, 239)",
+            "background": "rgb(22, 27, 31)",
+            "tag": "BUTTON",
+            "ratio": 14.544943235887036,
+            "status": "passed"
+          },
+          {
+            "target": [
+              ".pulse-lens-strip > button:nth-child(4)"
+            ],
+            "foreground": "rgb(230, 236, 239)",
+            "background": "rgb(22, 27, 31)",
+            "tag": "BUTTON",
+            "ratio": 14.544943235887036,
+            "status": "passed"
+          },
+          {
+            "target": [
+              ".pulse-lens-strip > button:nth-child(5)"
+            ],
+            "foreground": "rgb(230, 236, 239)",
+            "background": "rgb(22, 27, 31)",
+            "tag": "BUTTON",
+            "ratio": 14.544943235887036,
+            "status": "passed"
+          },
+          {
+            "target": [
+              ".pulse-lens-strip > button:nth-child(6)"
+            ],
+            "foreground": "rgb(230, 236, 239)",
+            "background": "rgb(22, 27, 31)",
+            "tag": "BUTTON",
+            "ratio": 14.544943235887036,
+            "status": "passed"
+          },
+          {
+            "target": [
+              ".pulse-lens-strip > button:nth-child(7)"
+            ],
+            "foreground": "rgb(230, 236, 239)",
+            "background": "rgb(22, 27, 31)",
+            "tag": "BUTTON",
+            "ratio": 14.544943235887036,
+            "status": "passed"
+          },
+          {
+            "target": [
+              ".pulse-table > table > thead > tr > th[scope=\"col\"]:nth-child(3)"
+            ],
+            "foreground": "rgb(230, 236, 239)",
+            "background": "rgb(43, 53, 61)",
+            "tag": "DIALOG",
+            "ratio": 10.485749518395044,
+            "status": "passed"
+          },
+          {
+            "target": [
+              ".pulse-table > table > tbody > tr:nth-child(1) > td:nth-child(3)"
+            ],
+            "foreground": "rgb(230, 236, 239)",
+            "background": "rgb(43, 53, 61)",
+            "tag": "DIALOG",
+            "ratio": 10.485749518395044,
+            "status": "passed"
+          },
+          {
+            "target": [
+              "tr:nth-child(2) > td:nth-child(3)"
+            ],
+            "foreground": "rgb(230, 236, 239)",
+            "background": "rgb(43, 53, 61)",
+            "tag": "DIALOG",
+            "ratio": 10.485749518395044,
+            "status": "passed"
+          }
+        ]
+      }
+    },
+    {
+      "name": "production-healthy-light-390",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "impact": "critical",
+          "tags": [
+            "cat.aria",
+            "wcag2a",
+            "wcag412",
+            "EN-301-549",
+            "EN-9.4.1.2",
+            "RGAAv4",
+            "RGAA-7.1.1"
+          ],
+          "description": "Ensure all ARIA attributes have valid values",
+          "help": "ARIA attributes must conform to valid values",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/aria-valid-attr-value?application=playwright",
+          "nodes": [
+            {
+              "any": [],
+              "all": [
+                {
+                  "id": "aria-valid-attr-value",
+                  "data": {
+                    "messageKey": "controlsWithinPopup",
+                    "needsReview": "aria-controls=\"_r_1_\""
+                  },
+                  "relatedNodes": [],
+                  "impact": "critical",
+                  "message": "Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_1_\""
+                }
+              ],
+              "none": [],
+              "impact": "critical",
+              "html": "<button type=\"button\" class=\"pp-button pp-button-secondary pp-floating-trigger\" role=\"combobox\" aria-label=\"PlexonCraft — Selected server\" aria-haspopup=\"listbox\" aria-expanded=\"false\" aria-controls=\"_r_1_\">",
+              "target": [
+                "button[aria-label=\"PlexonCraft — Selected server\"]"
+              ],
+              "failureSummary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_1_\""
+            },
+            {
+              "any": [],
+              "all": [
+                {
+                  "id": "aria-valid-attr-value",
+                  "data": {
+                    "messageKey": "controlsWithinPopup",
+                    "needsReview": "aria-controls=\"_r_3_\""
+                  },
+                  "relatedNodes": [],
+                  "impact": "critical",
+                  "message": "Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_3_\""
+                }
+              ],
+              "none": [],
+              "impact": "critical",
+              "html": "<button type=\"button\" class=\"pp-button pp-button-secondary pp-floating-trigger\" aria-label=\"Connection authority: Online, 4 of 4 healthy sources\" aria-haspopup=\"dialog\" aria-expanded=\"false\" aria-controls=\"_r_3_\">",
+              "target": [
+                "button[aria-controls=\"_r_3_\"]"
+              ],
+              "failureSummary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_3_\""
+            },
+            {
+              "any": [],
+              "all": [
+                {
+                  "id": "aria-valid-attr-value",
+                  "data": {
+                    "messageKey": "controlsWithinPopup",
+                    "needsReview": "aria-controls=\"_r_f_\""
+                  },
+                  "relatedNodes": [],
+                  "impact": "critical",
+                  "message": "Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_f_\""
+                }
+              ],
+              "none": [],
+              "impact": "critical",
+              "html": "<button type=\"button\" class=\"pp-button pp-button-secondary pp-floating-trigger\" role=\"combobox\" aria-label=\"30 min — Pulse window\" aria-haspopup=\"listbox\" aria-expanded=\"false\" aria-controls=\"_r_f_\">",
+              "target": [
+                "button[aria-label=\"30 min — Pulse window\"]"
+              ],
+              "failureSummary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_f_\""
+            },
+            {
+              "any": [],
+              "all": [
+                {
+                  "id": "aria-valid-attr-value",
+                  "data": {
+                    "messageKey": "controlsWithinPopup",
+                    "needsReview": "aria-controls=\"_r_i_\""
+                  },
+                  "relatedNodes": [],
+                  "impact": "critical",
+                  "message": "Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_i_\""
+                }
+              ],
+              "none": [],
+              "impact": "critical",
+              "html": "<button type=\"button\" class=\"pp-button pp-button-secondary pp-floating-trigger\" aria-haspopup=\"dialog\" aria-expanded=\"false\" aria-controls=\"_r_i_\">",
+              "target": [
+                "button[aria-controls=\"_r_i_\"]"
+              ],
+              "failureSummary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_i_\""
+            },
+            {
+              "any": [],
+              "all": [
+                {
+                  "id": "aria-valid-attr-value",
+                  "data": {
+                    "messageKey": "controlsWithinPopup",
+                    "needsReview": "aria-controls=\"_r_k_\""
+                  },
+                  "relatedNodes": [],
+                  "impact": "critical",
+                  "message": "Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_k_\""
+                }
+              ],
+              "none": [],
+              "impact": "critical",
+              "html": "<button type=\"button\" class=\"pp-button pp-button-secondary pp-floating-trigger\" aria-haspopup=\"dialog\" aria-expanded=\"false\" aria-controls=\"_r_k_\">",
+              "target": [
+                "button[aria-controls=\"_r_k_\"]"
+              ],
+              "failureSummary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_k_\""
+            },
+            {
+              "any": [],
+              "all": [
+                {
+                  "id": "aria-valid-attr-value",
+                  "data": {
+                    "messageKey": "controlsWithinPopup",
+                    "needsReview": "aria-controls=\"_r_m_\""
+                  },
+                  "relatedNodes": [],
+                  "impact": "critical",
+                  "message": "Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_m_\""
+                }
+              ],
+              "none": [],
+              "impact": "critical",
+              "html": "<button type=\"button\" class=\"pp-button pp-button-secondary pp-floating-trigger\" aria-haspopup=\"dialog\" aria-expanded=\"false\" aria-controls=\"_r_m_\">",
+              "target": [
+                "button[aria-controls=\"_r_m_\"]"
+              ],
+              "failureSummary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_m_\""
+            },
+            {
+              "any": [],
+              "all": [
+                {
+                  "id": "aria-valid-attr-value",
+                  "data": {
+                    "messageKey": "controlsWithinPopup",
+                    "needsReview": "aria-controls=\"_r_o_\""
+                  },
+                  "relatedNodes": [],
+                  "impact": "critical",
+                  "message": "Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_o_\""
+                }
+              ],
+              "none": [],
+              "impact": "critical",
+              "html": "<button type=\"button\" class=\"pp-button pp-button-secondary pp-floating-trigger\" aria-haspopup=\"dialog\" aria-expanded=\"false\" aria-controls=\"_r_o_\">",
+              "target": [
+                "button[aria-controls=\"_r_o_\"]"
+              ],
+              "failureSummary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_o_\""
+            },
+            {
+              "any": [],
+              "all": [
+                {
+                  "id": "aria-valid-attr-value",
+                  "data": {
+                    "messageKey": "controlsWithinPopup",
+                    "needsReview": "aria-controls=\"_r_q_\""
+                  },
+                  "relatedNodes": [],
+                  "impact": "critical",
+                  "message": "Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_q_\""
+                }
+              ],
+              "none": [],
+              "impact": "critical",
+              "html": "<button type=\"button\" class=\"pp-button pp-button-secondary pp-floating-trigger\" aria-haspopup=\"dialog\" aria-expanded=\"false\" aria-controls=\"_r_q_\">",
+              "target": [
+                "button[aria-controls=\"_r_q_\"]"
+              ],
+              "failureSummary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_q_\""
+            },
+            {
+              "any": [],
+              "all": [
+                {
+                  "id": "aria-valid-attr-value",
+                  "data": {
+                    "messageKey": "controlsWithinPopup",
+                    "needsReview": "aria-controls=\"_r_s_\""
+                  },
+                  "relatedNodes": [],
+                  "impact": "critical",
+                  "message": "Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_s_\""
+                }
+              ],
+              "none": [],
+              "impact": "critical",
+              "html": "<button type=\"button\" class=\"pp-button pp-button-secondary pp-floating-trigger\" aria-haspopup=\"dialog\" aria-expanded=\"false\" aria-controls=\"_r_s_\">",
+              "target": [
+                "button[aria-controls=\"_r_s_\"]"
+              ],
+              "failureSummary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_s_\""
+            }
+          ]
+        }
+      ],
+      "passes": 46,
+      "supplementalReviews": {
+        "controlledTargets": [
+          {
+            "id": "_r_1_",
+            "exists": true,
+            "expanded": "false",
+            "open": false
+          },
+          {
+            "id": "_r_3_",
+            "exists": true,
+            "expanded": "false",
+            "open": false
+          },
+          {
+            "id": "_r_f_",
+            "exists": true,
+            "expanded": "false",
+            "open": false
+          },
+          {
+            "id": "_r_i_",
+            "exists": true,
+            "expanded": "false",
+            "open": false
+          },
+          {
+            "id": "_r_k_",
+            "exists": true,
+            "expanded": "false",
+            "open": false
+          },
+          {
+            "id": "_r_m_",
+            "exists": true,
+            "expanded": "false",
+            "open": false
+          },
+          {
+            "id": "_r_o_",
+            "exists": true,
+            "expanded": "false",
+            "open": false
+          },
+          {
+            "id": "_r_q_",
+            "exists": true,
+            "expanded": "false",
+            "open": false
+          },
+          {
+            "id": "_r_s_",
+            "exists": true,
+            "expanded": "false",
+            "open": false
+          }
+        ],
+        "contrastReviews": []
+      }
+    },
+    {
+      "name": "production-healthy-light-1280",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "impact": "critical",
+          "tags": [
+            "cat.aria",
+            "wcag2a",
+            "wcag412",
+            "EN-301-549",
+            "EN-9.4.1.2",
+            "RGAAv4",
+            "RGAA-7.1.1"
+          ],
+          "description": "Ensure all ARIA attributes have valid values",
+          "help": "ARIA attributes must conform to valid values",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/aria-valid-attr-value?application=playwright",
+          "nodes": [
+            {
+              "any": [],
+              "all": [
+                {
+                  "id": "aria-valid-attr-value",
+                  "data": {
+                    "messageKey": "controlsWithinPopup",
+                    "needsReview": "aria-controls=\"_r_1_\""
+                  },
+                  "relatedNodes": [],
+                  "impact": "critical",
+                  "message": "Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_1_\""
+                }
+              ],
+              "none": [],
+              "impact": "critical",
+              "html": "<button type=\"button\" class=\"pp-button pp-button-secondary pp-floating-trigger\" role=\"combobox\" aria-label=\"PlexonCraft — Selected server\" aria-haspopup=\"listbox\" aria-expanded=\"false\" aria-controls=\"_r_1_\">",
+              "target": [
+                "button[aria-label=\"PlexonCraft — Selected server\"]"
+              ],
+              "failureSummary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_1_\""
+            },
+            {
+              "any": [],
+              "all": [
+                {
+                  "id": "aria-valid-attr-value",
+                  "data": {
+                    "messageKey": "controlsWithinPopup",
+                    "needsReview": "aria-controls=\"_r_3_\""
+                  },
+                  "relatedNodes": [],
+                  "impact": "critical",
+                  "message": "Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_3_\""
+                }
+              ],
+              "none": [],
+              "impact": "critical",
+              "html": "<button type=\"button\" class=\"pp-button pp-button-secondary pp-floating-trigger\" aria-label=\"Connection authority: Online, 4 of 4 healthy sources\" aria-haspopup=\"dialog\" aria-expanded=\"false\" aria-controls=\"_r_3_\">",
+              "target": [
+                "button[aria-controls=\"_r_3_\"]"
+              ],
+              "failureSummary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_3_\""
+            },
+            {
+              "any": [],
+              "all": [
+                {
+                  "id": "aria-valid-attr-value",
+                  "data": {
+                    "messageKey": "controlsWithinPopup",
+                    "needsReview": "aria-controls=\"_r_h_\""
+                  },
+                  "relatedNodes": [],
+                  "impact": "critical",
+                  "message": "Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_h_\""
+                }
+              ],
+              "none": [],
+              "impact": "critical",
+              "html": "<button type=\"button\" class=\"pp-button pp-button-secondary pp-floating-trigger\" role=\"combobox\" aria-label=\"30 min — Pulse window\" aria-haspopup=\"listbox\" aria-expanded=\"false\" aria-controls=\"_r_h_\">",
+              "target": [
+                "button[aria-label=\"30 min — Pulse window\"]"
+              ],
+              "failureSummary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_h_\""
+            },
+            {
+              "any": [],
+              "all": [
+                {
+                  "id": "aria-valid-attr-value",
+                  "data": {
+                    "messageKey": "controlsWithinPopup",
+                    "needsReview": "aria-controls=\"_r_k_\""
+                  },
+                  "relatedNodes": [],
+                  "impact": "critical",
+                  "message": "Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_k_\""
+                }
+              ],
+              "none": [],
+              "impact": "critical",
+              "html": "<button type=\"button\" class=\"pp-button pp-button-secondary pp-floating-trigger\" aria-haspopup=\"dialog\" aria-expanded=\"false\" aria-controls=\"_r_k_\">",
+              "target": [
+                "button[aria-controls=\"_r_k_\"]"
+              ],
+              "failureSummary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_k_\""
+            },
+            {
+              "any": [],
+              "all": [
+                {
+                  "id": "aria-valid-attr-value",
+                  "data": {
+                    "messageKey": "controlsWithinPopup",
+                    "needsReview": "aria-controls=\"_r_m_\""
+                  },
+                  "relatedNodes": [],
+                  "impact": "critical",
+                  "message": "Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_m_\""
+                }
+              ],
+              "none": [],
+              "impact": "critical",
+              "html": "<button type=\"button\" class=\"pp-button pp-button-secondary pp-floating-trigger\" aria-haspopup=\"dialog\" aria-expanded=\"false\" aria-controls=\"_r_m_\">",
+              "target": [
+                "button[aria-controls=\"_r_m_\"]"
+              ],
+              "failureSummary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_m_\""
+            },
+            {
+              "any": [],
+              "all": [
+                {
+                  "id": "aria-valid-attr-value",
+                  "data": {
+                    "messageKey": "controlsWithinPopup",
+                    "needsReview": "aria-controls=\"_r_o_\""
+                  },
+                  "relatedNodes": [],
+                  "impact": "critical",
+                  "message": "Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_o_\""
+                }
+              ],
+              "none": [],
+              "impact": "critical",
+              "html": "<button type=\"button\" class=\"pp-button pp-button-secondary pp-floating-trigger\" aria-haspopup=\"dialog\" aria-expanded=\"false\" aria-controls=\"_r_o_\">",
+              "target": [
+                "button[aria-controls=\"_r_o_\"]"
+              ],
+              "failureSummary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_o_\""
+            },
+            {
+              "any": [],
+              "all": [
+                {
+                  "id": "aria-valid-attr-value",
+                  "data": {
+                    "messageKey": "controlsWithinPopup",
+                    "needsReview": "aria-controls=\"_r_q_\""
+                  },
+                  "relatedNodes": [],
+                  "impact": "critical",
+                  "message": "Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_q_\""
+                }
+              ],
+              "none": [],
+              "impact": "critical",
+              "html": "<button type=\"button\" class=\"pp-button pp-button-secondary pp-floating-trigger\" aria-haspopup=\"dialog\" aria-expanded=\"false\" aria-controls=\"_r_q_\">",
+              "target": [
+                "button[aria-controls=\"_r_q_\"]"
+              ],
+              "failureSummary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_q_\""
+            },
+            {
+              "any": [],
+              "all": [
+                {
+                  "id": "aria-valid-attr-value",
+                  "data": {
+                    "messageKey": "controlsWithinPopup",
+                    "needsReview": "aria-controls=\"_r_s_\""
+                  },
+                  "relatedNodes": [],
+                  "impact": "critical",
+                  "message": "Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_s_\""
+                }
+              ],
+              "none": [],
+              "impact": "critical",
+              "html": "<button type=\"button\" class=\"pp-button pp-button-secondary pp-floating-trigger\" aria-haspopup=\"dialog\" aria-expanded=\"false\" aria-controls=\"_r_s_\">",
+              "target": [
+                "button[aria-controls=\"_r_s_\"]"
+              ],
+              "failureSummary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_s_\""
+            },
+            {
+              "any": [],
+              "all": [
+                {
+                  "id": "aria-valid-attr-value",
+                  "data": {
+                    "messageKey": "controlsWithinPopup",
+                    "needsReview": "aria-controls=\"_r_u_\""
+                  },
+                  "relatedNodes": [],
+                  "impact": "critical",
+                  "message": "Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_u_\""
+                }
+              ],
+              "none": [],
+              "impact": "critical",
+              "html": "<button type=\"button\" class=\"pp-button pp-button-secondary pp-floating-trigger\" aria-haspopup=\"dialog\" aria-expanded=\"false\" aria-controls=\"_r_u_\">",
+              "target": [
+                "button[aria-controls=\"_r_u_\"]"
+              ],
+              "failureSummary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_u_\""
+            }
+          ]
+        }
+      ],
+      "passes": 47,
+      "supplementalReviews": {
+        "controlledTargets": [
+          {
+            "id": "_r_1_",
+            "exists": true,
+            "expanded": "false",
+            "open": false
+          },
+          {
+            "id": "_r_3_",
+            "exists": true,
+            "expanded": "false",
+            "open": false
+          },
+          {
+            "id": "_r_h_",
+            "exists": true,
+            "expanded": "false",
+            "open": false
+          },
+          {
+            "id": "_r_k_",
+            "exists": true,
+            "expanded": "false",
+            "open": false
+          },
+          {
+            "id": "_r_m_",
+            "exists": true,
+            "expanded": "false",
+            "open": false
+          },
+          {
+            "id": "_r_o_",
+            "exists": true,
+            "expanded": "false",
+            "open": false
+          },
+          {
+            "id": "_r_q_",
+            "exists": true,
+            "expanded": "false",
+            "open": false
+          },
+          {
+            "id": "_r_s_",
+            "exists": true,
+            "expanded": "false",
+            "open": false
+          },
+          {
+            "id": "_r_u_",
+            "exists": true,
+            "expanded": "false",
+            "open": false
+          }
+        ],
+        "contrastReviews": []
+      }
+    },
+    {
+      "name": "production-healthy-dark-390",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "impact": "critical",
+          "tags": [
+            "cat.aria",
+            "wcag2a",
+            "wcag412",
+            "EN-301-549",
+            "EN-9.4.1.2",
+            "RGAAv4",
+            "RGAA-7.1.1"
+          ],
+          "description": "Ensure all ARIA attributes have valid values",
+          "help": "ARIA attributes must conform to valid values",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/aria-valid-attr-value?application=playwright",
+          "nodes": [
+            {
+              "any": [],
+              "all": [
+                {
+                  "id": "aria-valid-attr-value",
+                  "data": {
+                    "messageKey": "controlsWithinPopup",
+                    "needsReview": "aria-controls=\"_r_1_\""
+                  },
+                  "relatedNodes": [],
+                  "impact": "critical",
+                  "message": "Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_1_\""
+                }
+              ],
+              "none": [],
+              "impact": "critical",
+              "html": "<button type=\"button\" class=\"pp-button pp-button-secondary pp-floating-trigger\" role=\"combobox\" aria-label=\"PlexonCraft — Selected server\" aria-haspopup=\"listbox\" aria-expanded=\"false\" aria-controls=\"_r_1_\">",
+              "target": [
+                "button[aria-label=\"PlexonCraft — Selected server\"]"
+              ],
+              "failureSummary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_1_\""
+            },
+            {
+              "any": [],
+              "all": [
+                {
+                  "id": "aria-valid-attr-value",
+                  "data": {
+                    "messageKey": "controlsWithinPopup",
+                    "needsReview": "aria-controls=\"_r_3_\""
+                  },
+                  "relatedNodes": [],
+                  "impact": "critical",
+                  "message": "Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_3_\""
+                }
+              ],
+              "none": [],
+              "impact": "critical",
+              "html": "<button type=\"button\" class=\"pp-button pp-button-secondary pp-floating-trigger\" aria-label=\"Connection authority: Online, 4 of 4 healthy sources\" aria-haspopup=\"dialog\" aria-expanded=\"false\" aria-controls=\"_r_3_\">",
+              "target": [
+                "button[aria-controls=\"_r_3_\"]"
+              ],
+              "failureSummary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_3_\""
+            },
+            {
+              "any": [],
+              "all": [
+                {
+                  "id": "aria-valid-attr-value",
+                  "data": {
+                    "messageKey": "controlsWithinPopup",
+                    "needsReview": "aria-controls=\"_r_f_\""
+                  },
+                  "relatedNodes": [],
+                  "impact": "critical",
+                  "message": "Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_f_\""
+                }
+              ],
+              "none": [],
+              "impact": "critical",
+              "html": "<button type=\"button\" class=\"pp-button pp-button-secondary pp-floating-trigger\" role=\"combobox\" aria-label=\"30 min — Pulse window\" aria-haspopup=\"listbox\" aria-expanded=\"false\" aria-controls=\"_r_f_\">",
+              "target": [
+                "button[aria-label=\"30 min — Pulse window\"]"
+              ],
+              "failureSummary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_f_\""
+            },
+            {
+              "any": [],
+              "all": [
+                {
+                  "id": "aria-valid-attr-value",
+                  "data": {
+                    "messageKey": "controlsWithinPopup",
+                    "needsReview": "aria-controls=\"_r_i_\""
+                  },
+                  "relatedNodes": [],
+                  "impact": "critical",
+                  "message": "Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_i_\""
+                }
+              ],
+              "none": [],
+              "impact": "critical",
+              "html": "<button type=\"button\" class=\"pp-button pp-button-secondary pp-floating-trigger\" aria-haspopup=\"dialog\" aria-expanded=\"false\" aria-controls=\"_r_i_\">",
+              "target": [
+                "button[aria-controls=\"_r_i_\"]"
+              ],
+              "failureSummary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_i_\""
+            },
+            {
+              "any": [],
+              "all": [
+                {
+                  "id": "aria-valid-attr-value",
+                  "data": {
+                    "messageKey": "controlsWithinPopup",
+                    "needsReview": "aria-controls=\"_r_k_\""
+                  },
+                  "relatedNodes": [],
+                  "impact": "critical",
+                  "message": "Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_k_\""
+                }
+              ],
+              "none": [],
+              "impact": "critical",
+              "html": "<button type=\"button\" class=\"pp-button pp-button-secondary pp-floating-trigger\" aria-haspopup=\"dialog\" aria-expanded=\"false\" aria-controls=\"_r_k_\">",
+              "target": [
+                "button[aria-controls=\"_r_k_\"]"
+              ],
+              "failureSummary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_k_\""
+            },
+            {
+              "any": [],
+              "all": [
+                {
+                  "id": "aria-valid-attr-value",
+                  "data": {
+                    "messageKey": "controlsWithinPopup",
+                    "needsReview": "aria-controls=\"_r_m_\""
+                  },
+                  "relatedNodes": [],
+                  "impact": "critical",
+                  "message": "Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_m_\""
+                }
+              ],
+              "none": [],
+              "impact": "critical",
+              "html": "<button type=\"button\" class=\"pp-button pp-button-secondary pp-floating-trigger\" aria-haspopup=\"dialog\" aria-expanded=\"false\" aria-controls=\"_r_m_\">",
+              "target": [
+                "button[aria-controls=\"_r_m_\"]"
+              ],
+              "failureSummary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_m_\""
+            },
+            {
+              "any": [],
+              "all": [
+                {
+                  "id": "aria-valid-attr-value",
+                  "data": {
+                    "messageKey": "controlsWithinPopup",
+                    "needsReview": "aria-controls=\"_r_o_\""
+                  },
+                  "relatedNodes": [],
+                  "impact": "critical",
+                  "message": "Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_o_\""
+                }
+              ],
+              "none": [],
+              "impact": "critical",
+              "html": "<button type=\"button\" class=\"pp-button pp-button-secondary pp-floating-trigger\" aria-haspopup=\"dialog\" aria-expanded=\"false\" aria-controls=\"_r_o_\">",
+              "target": [
+                "button[aria-controls=\"_r_o_\"]"
+              ],
+              "failureSummary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_o_\""
+            },
+            {
+              "any": [],
+              "all": [
+                {
+                  "id": "aria-valid-attr-value",
+                  "data": {
+                    "messageKey": "controlsWithinPopup",
+                    "needsReview": "aria-controls=\"_r_q_\""
+                  },
+                  "relatedNodes": [],
+                  "impact": "critical",
+                  "message": "Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_q_\""
+                }
+              ],
+              "none": [],
+              "impact": "critical",
+              "html": "<button type=\"button\" class=\"pp-button pp-button-secondary pp-floating-trigger\" aria-haspopup=\"dialog\" aria-expanded=\"false\" aria-controls=\"_r_q_\">",
+              "target": [
+                "button[aria-controls=\"_r_q_\"]"
+              ],
+              "failureSummary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_q_\""
+            },
+            {
+              "any": [],
+              "all": [
+                {
+                  "id": "aria-valid-attr-value",
+                  "data": {
+                    "messageKey": "controlsWithinPopup",
+                    "needsReview": "aria-controls=\"_r_s_\""
+                  },
+                  "relatedNodes": [],
+                  "impact": "critical",
+                  "message": "Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_s_\""
+                }
+              ],
+              "none": [],
+              "impact": "critical",
+              "html": "<button type=\"button\" class=\"pp-button pp-button-secondary pp-floating-trigger\" aria-haspopup=\"dialog\" aria-expanded=\"false\" aria-controls=\"_r_s_\">",
+              "target": [
+                "button[aria-controls=\"_r_s_\"]"
+              ],
+              "failureSummary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_s_\""
+            }
+          ]
+        }
+      ],
+      "passes": 46,
+      "supplementalReviews": {
+        "controlledTargets": [
+          {
+            "id": "_r_1_",
+            "exists": true,
+            "expanded": "false",
+            "open": false
+          },
+          {
+            "id": "_r_3_",
+            "exists": true,
+            "expanded": "false",
+            "open": false
+          },
+          {
+            "id": "_r_f_",
+            "exists": true,
+            "expanded": "false",
+            "open": false
+          },
+          {
+            "id": "_r_i_",
+            "exists": true,
+            "expanded": "false",
+            "open": false
+          },
+          {
+            "id": "_r_k_",
+            "exists": true,
+            "expanded": "false",
+            "open": false
+          },
+          {
+            "id": "_r_m_",
+            "exists": true,
+            "expanded": "false",
+            "open": false
+          },
+          {
+            "id": "_r_o_",
+            "exists": true,
+            "expanded": "false",
+            "open": false
+          },
+          {
+            "id": "_r_q_",
+            "exists": true,
+            "expanded": "false",
+            "open": false
+          },
+          {
+            "id": "_r_s_",
+            "exists": true,
+            "expanded": "false",
+            "open": false
+          }
+        ],
+        "contrastReviews": []
+      }
+    },
+    {
+      "name": "production-healthy-dark-1280",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-valid-attr-value",
+          "impact": "critical",
+          "tags": [
+            "cat.aria",
+            "wcag2a",
+            "wcag412",
+            "EN-301-549",
+            "EN-9.4.1.2",
+            "RGAAv4",
+            "RGAA-7.1.1"
+          ],
+          "description": "Ensure all ARIA attributes have valid values",
+          "help": "ARIA attributes must conform to valid values",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/aria-valid-attr-value?application=playwright",
+          "nodes": [
+            {
+              "any": [],
+              "all": [
+                {
+                  "id": "aria-valid-attr-value",
+                  "data": {
+                    "messageKey": "controlsWithinPopup",
+                    "needsReview": "aria-controls=\"_r_1_\""
+                  },
+                  "relatedNodes": [],
+                  "impact": "critical",
+                  "message": "Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_1_\""
+                }
+              ],
+              "none": [],
+              "impact": "critical",
+              "html": "<button type=\"button\" class=\"pp-button pp-button-secondary pp-floating-trigger\" role=\"combobox\" aria-label=\"PlexonCraft — Selected server\" aria-haspopup=\"listbox\" aria-expanded=\"false\" aria-controls=\"_r_1_\">",
+              "target": [
+                "button[aria-label=\"PlexonCraft — Selected server\"]"
+              ],
+              "failureSummary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_1_\""
+            },
+            {
+              "any": [],
+              "all": [
+                {
+                  "id": "aria-valid-attr-value",
+                  "data": {
+                    "messageKey": "controlsWithinPopup",
+                    "needsReview": "aria-controls=\"_r_3_\""
+                  },
+                  "relatedNodes": [],
+                  "impact": "critical",
+                  "message": "Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_3_\""
+                }
+              ],
+              "none": [],
+              "impact": "critical",
+              "html": "<button type=\"button\" class=\"pp-button pp-button-secondary pp-floating-trigger\" aria-label=\"Connection authority: Online, 4 of 4 healthy sources\" aria-haspopup=\"dialog\" aria-expanded=\"false\" aria-controls=\"_r_3_\">",
+              "target": [
+                "button[aria-controls=\"_r_3_\"]"
+              ],
+              "failureSummary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_3_\""
+            },
+            {
+              "any": [],
+              "all": [
+                {
+                  "id": "aria-valid-attr-value",
+                  "data": {
+                    "messageKey": "controlsWithinPopup",
+                    "needsReview": "aria-controls=\"_r_11_\""
+                  },
+                  "relatedNodes": [],
+                  "impact": "critical",
+                  "message": "Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_11_\""
+                }
+              ],
+              "none": [],
+              "impact": "critical",
+              "html": "<button type=\"button\" class=\"pp-button pp-button-secondary pp-floating-trigger\" role=\"combobox\" aria-label=\"30 min — Pulse window\" aria-haspopup=\"listbox\" aria-expanded=\"false\" aria-controls=\"_r_11_\">",
+              "target": [
+                "button[aria-label=\"30 min — Pulse window\"]"
+              ],
+              "failureSummary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_11_\""
+            },
+            {
+              "any": [],
+              "all": [
+                {
+                  "id": "aria-valid-attr-value",
+                  "data": {
+                    "messageKey": "controlsWithinPopup",
+                    "needsReview": "aria-controls=\"_r_14_\""
+                  },
+                  "relatedNodes": [],
+                  "impact": "critical",
+                  "message": "Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_14_\""
+                }
+              ],
+              "none": [],
+              "impact": "critical",
+              "html": "<button type=\"button\" class=\"pp-button pp-button-secondary pp-floating-trigger\" aria-haspopup=\"dialog\" aria-expanded=\"false\" aria-controls=\"_r_14_\">",
+              "target": [
+                "button[aria-controls=\"_r_14_\"]"
+              ],
+              "failureSummary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_14_\""
+            },
+            {
+              "any": [],
+              "all": [
+                {
+                  "id": "aria-valid-attr-value",
+                  "data": {
+                    "messageKey": "controlsWithinPopup",
+                    "needsReview": "aria-controls=\"_r_16_\""
+                  },
+                  "relatedNodes": [],
+                  "impact": "critical",
+                  "message": "Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_16_\""
+                }
+              ],
+              "none": [],
+              "impact": "critical",
+              "html": "<button type=\"button\" class=\"pp-button pp-button-secondary pp-floating-trigger\" aria-haspopup=\"dialog\" aria-expanded=\"false\" aria-controls=\"_r_16_\">",
+              "target": [
+                "button[aria-controls=\"_r_16_\"]"
+              ],
+              "failureSummary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_16_\""
+            },
+            {
+              "any": [],
+              "all": [
+                {
+                  "id": "aria-valid-attr-value",
+                  "data": {
+                    "messageKey": "controlsWithinPopup",
+                    "needsReview": "aria-controls=\"_r_18_\""
+                  },
+                  "relatedNodes": [],
+                  "impact": "critical",
+                  "message": "Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_18_\""
+                }
+              ],
+              "none": [],
+              "impact": "critical",
+              "html": "<button type=\"button\" class=\"pp-button pp-button-secondary pp-floating-trigger\" aria-haspopup=\"dialog\" aria-expanded=\"false\" aria-controls=\"_r_18_\">",
+              "target": [
+                "button[aria-controls=\"_r_18_\"]"
+              ],
+              "failureSummary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_18_\""
+            },
+            {
+              "any": [],
+              "all": [
+                {
+                  "id": "aria-valid-attr-value",
+                  "data": {
+                    "messageKey": "controlsWithinPopup",
+                    "needsReview": "aria-controls=\"_r_1a_\""
+                  },
+                  "relatedNodes": [],
+                  "impact": "critical",
+                  "message": "Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_1a_\""
+                }
+              ],
+              "none": [],
+              "impact": "critical",
+              "html": "<button type=\"button\" class=\"pp-button pp-button-secondary pp-floating-trigger\" aria-haspopup=\"dialog\" aria-expanded=\"false\" aria-controls=\"_r_1a_\">",
+              "target": [
+                "button[aria-controls=\"_r_1a_\"]"
+              ],
+              "failureSummary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_1a_\""
+            },
+            {
+              "any": [],
+              "all": [
+                {
+                  "id": "aria-valid-attr-value",
+                  "data": {
+                    "messageKey": "controlsWithinPopup",
+                    "needsReview": "aria-controls=\"_r_1c_\""
+                  },
+                  "relatedNodes": [],
+                  "impact": "critical",
+                  "message": "Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_1c_\""
+                }
+              ],
+              "none": [],
+              "impact": "critical",
+              "html": "<button type=\"button\" class=\"pp-button pp-button-secondary pp-floating-trigger\" aria-haspopup=\"dialog\" aria-expanded=\"false\" aria-controls=\"_r_1c_\">",
+              "target": [
+                "button[aria-controls=\"_r_1c_\"]"
+              ],
+              "failureSummary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_1c_\""
+            },
+            {
+              "any": [],
+              "all": [
+                {
+                  "id": "aria-valid-attr-value",
+                  "data": {
+                    "messageKey": "controlsWithinPopup",
+                    "needsReview": "aria-controls=\"_r_1e_\""
+                  },
+                  "relatedNodes": [],
+                  "impact": "critical",
+                  "message": "Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_1e_\""
+                }
+              ],
+              "none": [],
+              "impact": "critical",
+              "html": "<button type=\"button\" class=\"pp-button pp-button-secondary pp-floating-trigger\" aria-haspopup=\"dialog\" aria-expanded=\"false\" aria-controls=\"_r_1e_\">",
+              "target": [
+                "button[aria-controls=\"_r_1e_\"]"
+              ],
+              "failureSummary": "Fix all of the following:\n  Unable to determine if aria-controls referenced ID exists on the page while using aria-haspopup: aria-controls=\"_r_1e_\""
+            }
+          ]
+        }
+      ],
+      "passes": 47,
+      "supplementalReviews": {
+        "controlledTargets": [
+          {
+            "id": "_r_1_",
+            "exists": true,
+            "expanded": "false",
+            "open": false
+          },
+          {
+            "id": "_r_3_",
+            "exists": true,
+            "expanded": "false",
+            "open": false
+          },
+          {
+            "id": "_r_11_",
+            "exists": true,
+            "expanded": "false",
+            "open": false
+          },
+          {
+            "id": "_r_14_",
+            "exists": true,
+            "expanded": "false",
+            "open": false
+          },
+          {
+            "id": "_r_16_",
+            "exists": true,
+            "expanded": "false",
+            "open": false
+          },
+          {
+            "id": "_r_18_",
+            "exists": true,
+            "expanded": "false",
+            "open": false
+          },
+          {
+            "id": "_r_1a_",
+            "exists": true,
+            "expanded": "false",
+            "open": false
+          },
+          {
+            "id": "_r_1c_",
+            "exists": true,
+            "expanded": "false",
+            "open": false
+          },
+          {
+            "id": "_r_1e_",
+            "exists": true,
+            "expanded": "false",
+            "open": false
+          }
+        ],
+        "contrastReviews": []
+      }
+    }
+  ],
+  "screenshots": [],
+  "errors": [],
+  "keyboard": [
+    {
+      "homeEndArrowsEnterEscape": "passed",
+      "exactTableParity": "passed",
+      "focusRestore": "passed"
+    }
+  ],
+  "draw": [
+    {
+      "width": 390,
+      "cpuThrottle": 4,
+      "measurement": "Canvas2D command submission; CDP Paint/RasterTask trace measures whole-page rendering, not exclusive Pulse attribution.",
+      "measures": [
+        {
+          "duration": 7.299999998882413,
+          "width": 358,
+          "height": 34,
+          "mode": "summarized",
+          "captures": 5974,
+          "compact": true
+        },
+        {
+          "duration": 3.299999998882413,
+          "width": 358,
+          "height": 124,
+          "mode": "summarized",
+          "captures": 5974,
+          "compact": false
+        },
+        {
+          "duration": 5.799999998882413,
+          "width": 358,
+          "height": 34,
+          "mode": "summarized",
+          "captures": 5973,
+          "compact": true
+        },
+        {
+          "duration": 3.100000001490116,
+          "width": 358,
+          "height": 124,
+          "mode": "summarized",
+          "captures": 5973,
+          "compact": false
+        },
+        {
+          "duration": 6.799999998882413,
+          "width": 358,
+          "height": 34,
+          "mode": "summarized",
+          "captures": 5972,
+          "compact": true
+        },
+        {
+          "duration": 2.600000001490116,
+          "width": 358,
+          "height": 124,
+          "mode": "summarized",
+          "captures": 5972,
+          "compact": false
+        },
+        {
+          "duration": 0.5,
+          "width": 358,
+          "height": 34,
+          "mode": "summarized",
+          "captures": 5970,
+          "compact": true
+        },
+        {
+          "duration": 0.40000000037252903,
+          "width": 358,
+          "height": 124,
+          "mode": "summarized",
+          "captures": 5970,
+          "compact": false
+        },
+        {
+          "duration": 9,
+          "width": 358,
+          "height": 34,
+          "mode": "summarized",
+          "captures": 5969,
+          "compact": true
+        },
+        {
+          "duration": 3.900000000372529,
+          "width": 358,
+          "height": 124,
+          "mode": "summarized",
+          "captures": 5969,
+          "compact": false
+        },
+        {
+          "duration": 0.5,
+          "width": 358,
+          "height": 34,
+          "mode": "summarized",
+          "captures": 5968,
+          "compact": true
+        },
+        {
+          "duration": 0.30000000074505806,
+          "width": 358,
+          "height": 124,
+          "mode": "summarized",
+          "captures": 5968,
+          "compact": false
+        },
+        {
+          "duration": 0.599999999627471,
+          "width": 358,
+          "height": 34,
+          "mode": "summarized",
+          "captures": 5966,
+          "compact": true
+        },
+        {
+          "duration": 1.099999999627471,
+          "width": 358,
+          "height": 124,
+          "mode": "summarized",
+          "captures": 5966,
+          "compact": false
+        },
+        {
+          "duration": 3.699999999254942,
+          "width": 358,
+          "height": 34,
+          "mode": "summarized",
+          "captures": 5965,
+          "compact": true
+        },
+        {
+          "duration": 2.900000000372529,
+          "width": 358,
+          "height": 124,
+          "mode": "summarized",
+          "captures": 5965,
+          "compact": false
+        },
+        {
+          "duration": 5.400000000372529,
+          "width": 358,
+          "height": 34,
+          "mode": "summarized",
+          "captures": 5964,
+          "compact": true
+        },
+        {
+          "duration": 4.400000000372529,
+          "width": 358,
+          "height": 124,
+          "mode": "summarized",
+          "captures": 5964,
+          "compact": false
+        },
+        {
+          "duration": 3.799999998882413,
+          "width": 358,
+          "height": 34,
+          "mode": "summarized",
+          "captures": 5963,
+          "compact": true
+        },
+        {
+          "duration": 2.099999999627471,
+          "width": 358,
+          "height": 124,
+          "mode": "summarized",
+          "captures": 5963,
+          "compact": false
+        },
+        {
+          "duration": 3.799999998882413,
+          "width": 358,
+          "height": 34,
+          "mode": "summarized",
+          "captures": 5960,
+          "compact": true
+        },
+        {
+          "duration": 2.100000001490116,
+          "width": 358,
+          "height": 124,
+          "mode": "summarized",
+          "captures": 5960,
+          "compact": false
+        },
+        {
+          "duration": 3.200000001117587,
+          "width": 358,
+          "height": 34,
+          "mode": "summarized",
+          "captures": 5960,
+          "compact": true
+        },
+        {
+          "duration": 1.400000000372529,
+          "width": 358,
+          "height": 124,
+          "mode": "summarized",
+          "captures": 5960,
+          "compact": false
+        }
+      ],
+      "untraced": {
+        "longTasks": [
+          {
+            "start": 13342.800000000745,
+            "duration": 51
+          },
+          {
+            "start": 14000.699999999255,
+            "duration": 62
+          },
+          {
+            "start": 14661.599999999627,
+            "duration": 53
+          },
+          {
+            "start": 15189.400000000373,
+            "duration": 120
+          },
+          {
+            "start": 15352.900000000373,
+            "duration": 394
+          },
+          {
+            "start": 15831.400000000373,
+            "duration": 118
+          },
+          {
+            "start": 17783.400000000373,
+            "duration": 113
+          },
+          {
+            "start": 17922.5,
+            "duration": 50
+          },
+          {
+            "start": 18379,
+            "duration": 64
+          },
+          {
+            "start": 19084.900000000373,
+            "duration": 78
+          },
+          {
+            "start": 19277.300000000745,
+            "duration": 56
+          },
+          {
+            "start": 19423.699999999255,
+            "duration": 57
+          },
+          {
+            "start": 19511.699999999255,
+            "duration": 104
+          },
+          {
+            "start": 19684.400000000373,
+            "duration": 113
+          },
+          {
+            "start": 19931,
+            "duration": 54
+          }
+        ],
+        "measures": [
+          {
+            "duration": 3.700000001117587,
+            "width": 358,
+            "height": 34,
+            "mode": "summarized",
+            "captures": 5958,
+            "compact": true
+          },
+          {
+            "duration": 0.5,
+            "width": 358,
+            "height": 124,
+            "mode": "summarized",
+            "captures": 5958,
+            "compact": false
+          },
+          {
+            "duration": 3.300000000745058,
+            "width": 358,
+            "height": 34,
+            "mode": "summarized",
+            "captures": 5957,
+            "compact": true
+          },
+          {
+            "duration": 2.800000000745058,
+            "width": 358,
+            "height": 124,
+            "mode": "summarized",
+            "captures": 5957,
+            "compact": false
+          },
+          {
+            "duration": 2.100000001490116,
+            "width": 358,
+            "height": 34,
+            "mode": "summarized",
+            "captures": 5955,
+            "compact": true
+          },
+          {
+            "duration": 2.699999999254942,
+            "width": 358,
+            "height": 124,
+            "mode": "summarized",
+            "captures": 5955,
+            "compact": false
+          },
+          {
+            "duration": 4.900000000372529,
+            "width": 358,
+            "height": 34,
+            "mode": "summarized",
+            "captures": 5954,
+            "compact": true
+          },
+          {
+            "duration": 5.400000000372529,
+            "width": 358,
+            "height": 124,
+            "mode": "summarized",
+            "captures": 5954,
+            "compact": false
+          },
+          {
+            "duration": 0.5,
+            "width": 358,
+            "height": 34,
+            "mode": "summarized",
+            "captures": 5953,
+            "compact": true
+          },
+          {
+            "duration": 0.40000000037252903,
+            "width": 358,
+            "height": 124,
+            "mode": "summarized",
+            "captures": 5953,
+            "compact": false
+          },
+          {
+            "duration": 8.699999999254942,
+            "width": 358,
+            "height": 34,
+            "mode": "summarized",
+            "captures": 5950,
+            "compact": true
+          },
+          {
+            "duration": 2.399999998509884,
+            "width": 358,
+            "height": 124,
+            "mode": "summarized",
+            "captures": 5950,
+            "compact": false
+          },
+          {
+            "duration": 2.699999999254942,
+            "width": 358,
+            "height": 34,
+            "mode": "summarized",
+            "captures": 5949,
+            "compact": true
+          },
+          {
+            "duration": 1.400000000372529,
+            "width": 358,
+            "height": 124,
+            "mode": "summarized",
+            "captures": 5949,
+            "compact": false
+          },
+          {
+            "duration": 2.299999998882413,
+            "width": 358,
+            "height": 34,
+            "mode": "summarized",
+            "captures": 5947,
+            "compact": true
+          },
+          {
+            "duration": 1.699999999254942,
+            "width": 358,
+            "height": 124,
+            "mode": "summarized",
+            "captures": 5947,
+            "compact": false
+          },
+          {
+            "duration": 2.899999998509884,
+            "width": 358,
+            "height": 34,
+            "mode": "summarized",
+            "captures": 5946,
+            "compact": true
+          },
+          {
+            "duration": 0.900000000372529,
+            "width": 358,
+            "height": 124,
+            "mode": "summarized",
+            "captures": 5946,
+            "compact": false
+          },
+          {
+            "duration": 2.300000000745058,
+            "width": 358,
+            "height": 34,
+            "mode": "summarized",
+            "captures": 5945,
+            "compact": true
+          },
+          {
+            "duration": 2.5,
+            "width": 358,
+            "height": 124,
+            "mode": "summarized",
+            "captures": 5945,
+            "compact": false
+          },
+          {
+            "duration": 16.59999999962747,
+            "width": 358,
+            "height": 34,
+            "mode": "summarized",
+            "captures": 5944,
+            "compact": true
+          },
+          {
+            "duration": 20.09999999962747,
+            "width": 358,
+            "height": 124,
+            "mode": "summarized",
+            "captures": 5944,
+            "compact": false
+          },
+          {
+            "duration": 4.799999998882413,
+            "width": 358,
+            "height": 34,
+            "mode": "summarized",
+            "captures": 5942,
+            "compact": true
+          },
+          {
+            "duration": 2.700000001117587,
+            "width": 358,
+            "height": 124,
+            "mode": "summarized",
+            "captures": 5942,
+            "compact": false
+          }
+        ]
+      },
+      "paintAndRaster": [
+        {
+          "name": "Paint",
+          "durationMs": 3.716
+        },
+        {
+          "name": "Paint",
+          "durationMs": 3.058
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.813
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.457
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.369
+        },
+        {
+          "name": "Paint",
+          "durationMs": 2.978
+        },
+        {
+          "name": "Paint",
+          "durationMs": 2.84
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.39
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.304
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.233
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.114
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.122
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.057
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.176
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 1.114
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 1.033
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 1.063
+        },
+        {
+          "name": "Paint",
+          "durationMs": 2.823
+        },
+        {
+          "name": "Paint",
+          "durationMs": 2.789
+        },
+        {
+          "name": "Paint",
+          "durationMs": 1.864
+        },
+        {
+          "name": "Paint",
+          "durationMs": 1.837
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.124
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.104
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.162
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.027
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.939
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.146
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.168
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.073
+        },
+        {
+          "name": "Paint",
+          "durationMs": 4.684
+        },
+        {
+          "name": "Paint",
+          "durationMs": 4.654
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.072
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.302
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.525
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.011
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.011
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.179
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.22
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.383
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.1
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.053
+        },
+        {
+          "name": "Paint",
+          "durationMs": 2.754
+        },
+        {
+          "name": "Paint",
+          "durationMs": 1.5
+        },
+        {
+          "name": "Paint",
+          "durationMs": 2.25
+        },
+        {
+          "name": "Paint",
+          "durationMs": 2.225
+        },
+        {
+          "name": "Paint",
+          "durationMs": 3.206
+        },
+        {
+          "name": "Paint",
+          "durationMs": 3.18
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.095
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.27
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.218
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.017
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.012
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.213
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.055
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.3
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.076
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.04
+        },
+        {
+          "name": "Paint",
+          "durationMs": 3.294
+        },
+        {
+          "name": "Paint",
+          "durationMs": 3.266
+        },
+        {
+          "name": "Paint",
+          "durationMs": 4.157
+        },
+        {
+          "name": "Paint",
+          "durationMs": 4.126
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.283
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.399
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 1.402
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.011
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.012
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.01
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.216
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.739
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.082
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.325
+        },
+        {
+          "name": "Paint",
+          "durationMs": 1.725
+        },
+        {
+          "name": "Paint",
+          "durationMs": 1.677
+        },
+        {
+          "name": "Paint",
+          "durationMs": 2.529
+        },
+        {
+          "name": "Paint",
+          "durationMs": 2.503
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.098
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.008
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.046
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.007
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.33
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.079
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.406
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.05
+        },
+        {
+          "name": "Paint",
+          "durationMs": 3.763
+        },
+        {
+          "name": "Paint",
+          "durationMs": 3.674
+        },
+        {
+          "name": "Paint",
+          "durationMs": 10.926
+        },
+        {
+          "name": "Paint",
+          "durationMs": 7.172
+        },
+        {
+          "name": "Paint",
+          "durationMs": 5.931
+        },
+        {
+          "name": "Paint",
+          "durationMs": 4.983
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.125
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.108
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 1.795
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.012
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.019
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.015
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.167
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.095
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.123
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.047
+        },
+        {
+          "name": "Paint",
+          "durationMs": 2.212
+        },
+        {
+          "name": "Paint",
+          "durationMs": 2.101
+        },
+        {
+          "name": "Paint",
+          "durationMs": 3.057
+        },
+        {
+          "name": "Paint",
+          "durationMs": 3.028
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.248
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.288
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.218
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.014
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.018
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.015
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.17
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.16
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.219
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.091
+        },
+        {
+          "name": "Paint",
+          "durationMs": 3.823
+        },
+        {
+          "name": "Paint",
+          "durationMs": 3.739
+        },
+        {
+          "name": "Paint",
+          "durationMs": 5.736
+        },
+        {
+          "name": "Paint",
+          "durationMs": 5.708
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.107
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.029
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.01
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.23
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.103
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.194
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.407
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.084
+        },
+        {
+          "name": "Paint",
+          "durationMs": 8.023
+        },
+        {
+          "name": "Paint",
+          "durationMs": 7.923
+        },
+        {
+          "name": "Paint",
+          "durationMs": 3.347
+        },
+        {
+          "name": "Paint",
+          "durationMs": 2.339
+        },
+        {
+          "name": "Paint",
+          "durationMs": 6.605
+        },
+        {
+          "name": "Paint",
+          "durationMs": 6.571
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.108
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.094
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.031
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.097
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.015
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.032
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.228
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.144
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.096
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.055
+        },
+        {
+          "name": "Paint",
+          "durationMs": 4.924
+        },
+        {
+          "name": "Paint",
+          "durationMs": 4.885
+        },
+        {
+          "name": "Paint",
+          "durationMs": 3.777
+        },
+        {
+          "name": "Paint",
+          "durationMs": 2.742
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.775
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.122
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.133
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.011
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.013
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.011
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.178
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.174
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.091
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.048
+        },
+        {
+          "name": "Paint",
+          "durationMs": 3.672
+        },
+        {
+          "name": "Paint",
+          "durationMs": 3.643
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.249
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 1.35
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.08
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.351
+        },
+        {
+          "name": "Paint",
+          "durationMs": 1.92
+        },
+        {
+          "name": "Paint",
+          "durationMs": 1.892
+        },
+        {
+          "name": "Paint",
+          "durationMs": 2.176
+        },
+        {
+          "name": "Paint",
+          "durationMs": 2.14
+        }
+      ]
+    },
+    {
+      "width": 1920,
+      "cpuThrottle": 4,
+      "measurement": "Canvas2D command submission; CDP Paint/RasterTask trace measures whole-page rendering, not exclusive Pulse attribution.",
+      "measures": [
+        {
+          "duration": 8,
+          "width": 1008,
+          "height": 34,
+          "mode": "summarized",
+          "captures": 5955,
+          "compact": true
+        },
+        {
+          "duration": 26,
+          "width": 1648,
+          "height": 124,
+          "mode": "summarized",
+          "captures": 5955,
+          "compact": false
+        },
+        {
+          "duration": 7.899999998509884,
+          "width": 1008,
+          "height": 34,
+          "mode": "summarized",
+          "captures": 5954,
+          "compact": true
+        },
+        {
+          "duration": 12.699999999254942,
+          "width": 1648,
+          "height": 124,
+          "mode": "summarized",
+          "captures": 5954,
+          "compact": false
+        },
+        {
+          "duration": 8,
+          "width": 1008,
+          "height": 34,
+          "mode": "summarized",
+          "captures": 5953,
+          "compact": true
+        },
+        {
+          "duration": 10.699999999254942,
+          "width": 1648,
+          "height": 124,
+          "mode": "summarized",
+          "captures": 5953,
+          "compact": false
+        },
+        {
+          "duration": 1.300000000745058,
+          "width": 1008,
+          "height": 34,
+          "mode": "summarized",
+          "captures": 5952,
+          "compact": true
+        },
+        {
+          "duration": 4.699999999254942,
+          "width": 1648,
+          "height": 124,
+          "mode": "summarized",
+          "captures": 5952,
+          "compact": false
+        },
+        {
+          "duration": 7.699999999254942,
+          "width": 1008,
+          "height": 34,
+          "mode": "summarized",
+          "captures": 5950,
+          "compact": true
+        },
+        {
+          "duration": 9.700000001117587,
+          "width": 1648,
+          "height": 124,
+          "mode": "summarized",
+          "captures": 5950,
+          "compact": false
+        },
+        {
+          "duration": 5.800000000745058,
+          "width": 1008,
+          "height": 34,
+          "mode": "summarized",
+          "captures": 5949,
+          "compact": true
+        },
+        {
+          "duration": 15.299999998882413,
+          "width": 1648,
+          "height": 124,
+          "mode": "summarized",
+          "captures": 5949,
+          "compact": false
+        },
+        {
+          "duration": 10.699999999254942,
+          "width": 1008,
+          "height": 34,
+          "mode": "summarized",
+          "captures": 5948,
+          "compact": true
+        },
+        {
+          "duration": 17.100000001490116,
+          "width": 1648,
+          "height": 124,
+          "mode": "summarized",
+          "captures": 5948,
+          "compact": false
+        },
+        {
+          "duration": 6.700000001117587,
+          "width": 1008,
+          "height": 34,
+          "mode": "summarized",
+          "captures": 5946,
+          "compact": true
+        },
+        {
+          "duration": 11.700000001117587,
+          "width": 1648,
+          "height": 124,
+          "mode": "summarized",
+          "captures": 5946,
+          "compact": false
+        },
+        {
+          "duration": 9.599999999627471,
+          "width": 1008,
+          "height": 34,
+          "mode": "summarized",
+          "captures": 5945,
+          "compact": true
+        },
+        {
+          "duration": 19.59999999962747,
+          "width": 1648,
+          "height": 124,
+          "mode": "summarized",
+          "captures": 5945,
+          "compact": false
+        },
+        {
+          "duration": 25.200000001117587,
+          "width": 1008,
+          "height": 34,
+          "mode": "summarized",
+          "captures": 5944,
+          "compact": true
+        },
+        {
+          "duration": 10.5,
+          "width": 1648,
+          "height": 124,
+          "mode": "summarized",
+          "captures": 5944,
+          "compact": false
+        },
+        {
+          "duration": 8.900000000372529,
+          "width": 1008,
+          "height": 34,
+          "mode": "summarized",
+          "captures": 5942,
+          "compact": true
+        },
+        {
+          "duration": 23.299999998882413,
+          "width": 1648,
+          "height": 124,
+          "mode": "summarized",
+          "captures": 5942,
+          "compact": false
+        },
+        {
+          "duration": 10.5,
+          "width": 1008,
+          "height": 34,
+          "mode": "summarized",
+          "captures": 5940,
+          "compact": true
+        },
+        {
+          "duration": 18.40000000037253,
+          "width": 1648,
+          "height": 124,
+          "mode": "summarized",
+          "captures": 5940,
+          "compact": false
+        }
+      ],
+      "untraced": {
+        "longTasks": [
+          {
+            "start": 13789.799999998882,
+            "duration": 70
+          },
+          {
+            "start": 14458.39999999851,
+            "duration": 59
+          },
+          {
+            "start": 15142.699999999255,
+            "duration": 69
+          },
+          {
+            "start": 15795.699999999255,
+            "duration": 90
+          },
+          {
+            "start": 16335.699999999255,
+            "duration": 87
+          },
+          {
+            "start": 16544.699999999255,
+            "duration": 178
+          },
+          {
+            "start": 16723.199999999255,
+            "duration": 284
+          },
+          {
+            "start": 17062.199999999255,
+            "duration": 88
+          },
+          {
+            "start": 17229.699999999255,
+            "duration": 58
+          },
+          {
+            "start": 17791.199999999255,
+            "duration": 78
+          },
+          {
+            "start": 18311.5,
+            "duration": 59
+          },
+          {
+            "start": 18371.39999999851,
+            "duration": 142
+          },
+          {
+            "start": 18632.699999999255,
+            "duration": 235
+          },
+          {
+            "start": 19127.199999999255,
+            "duration": 93
+          },
+          {
+            "start": 19788,
+            "duration": 59
+          },
+          {
+            "start": 20318.699999999255,
+            "duration": 66
+          },
+          {
+            "start": 20396.39999999851,
+            "duration": 69
+          },
+          {
+            "start": 20554.099999999627,
+            "duration": 167
+          },
+          {
+            "start": 20866.39999999851,
+            "duration": 51
+          }
+        ],
+        "measures": [
+          {
+            "duration": 4.200000001117587,
+            "width": 1008,
+            "height": 34,
+            "mode": "summarized",
+            "captures": 5935,
+            "compact": true
+          },
+          {
+            "duration": 1.900000000372529,
+            "width": 1648,
+            "height": 124,
+            "mode": "summarized",
+            "captures": 5935,
+            "compact": false
+          },
+          {
+            "duration": 5.800000000745058,
+            "width": 1008,
+            "height": 34,
+            "mode": "summarized",
+            "captures": 5934,
+            "compact": true
+          },
+          {
+            "duration": 9.199999999254942,
+            "width": 1648,
+            "height": 124,
+            "mode": "summarized",
+            "captures": 5934,
+            "compact": false
+          },
+          {
+            "duration": 8.599999999627471,
+            "width": 1008,
+            "height": 34,
+            "mode": "summarized",
+            "captures": 5933,
+            "compact": true
+          },
+          {
+            "duration": 9.400000000372529,
+            "width": 1648,
+            "height": 124,
+            "mode": "summarized",
+            "captures": 5933,
+            "compact": false
+          },
+          {
+            "duration": 8.5,
+            "width": 1008,
+            "height": 34,
+            "mode": "summarized",
+            "captures": 5931,
+            "compact": true
+          },
+          {
+            "duration": 12.5,
+            "width": 1648,
+            "height": 124,
+            "mode": "summarized",
+            "captures": 5931,
+            "compact": false
+          },
+          {
+            "duration": 48,
+            "width": 1008,
+            "height": 34,
+            "mode": "summarized",
+            "captures": 5930,
+            "compact": true
+          },
+          {
+            "duration": 13.5,
+            "width": 1648,
+            "height": 124,
+            "mode": "summarized",
+            "captures": 5930,
+            "compact": false
+          },
+          {
+            "duration": 10.300000000745058,
+            "width": 1008,
+            "height": 34,
+            "mode": "summarized",
+            "captures": 5929,
+            "compact": true
+          },
+          {
+            "duration": 21.600000001490116,
+            "width": 1648,
+            "height": 124,
+            "mode": "summarized",
+            "captures": 5929,
+            "compact": false
+          },
+          {
+            "duration": 8.800000000745058,
+            "width": 1008,
+            "height": 34,
+            "mode": "summarized",
+            "captures": 5928,
+            "compact": true
+          },
+          {
+            "duration": 8.800000000745058,
+            "width": 1648,
+            "height": 124,
+            "mode": "summarized",
+            "captures": 5928,
+            "compact": false
+          },
+          {
+            "duration": 10.400000000372529,
+            "width": 1008,
+            "height": 34,
+            "mode": "summarized",
+            "captures": 5926,
+            "compact": true
+          },
+          {
+            "duration": 27.799999998882413,
+            "width": 1648,
+            "height": 124,
+            "mode": "summarized",
+            "captures": 5926,
+            "compact": false
+          },
+          {
+            "duration": 9.300000000745058,
+            "width": 1008,
+            "height": 34,
+            "mode": "summarized",
+            "captures": 5925,
+            "compact": true
+          },
+          {
+            "duration": 7.900000000372529,
+            "width": 1648,
+            "height": 124,
+            "mode": "summarized",
+            "captures": 5925,
+            "compact": false
+          },
+          {
+            "duration": 6.200000001117587,
+            "width": 1008,
+            "height": 34,
+            "mode": "summarized",
+            "captures": 5924,
+            "compact": true
+          },
+          {
+            "duration": 8.5,
+            "width": 1648,
+            "height": 124,
+            "mode": "summarized",
+            "captures": 5924,
+            "compact": false
+          },
+          {
+            "duration": 9.699999999254942,
+            "width": 1008,
+            "height": 34,
+            "mode": "summarized",
+            "captures": 5923,
+            "compact": true
+          },
+          {
+            "duration": 33.59999999962747,
+            "width": 1648,
+            "height": 124,
+            "mode": "summarized",
+            "captures": 5923,
+            "compact": false
+          },
+          {
+            "duration": 3.099999999627471,
+            "width": 1008,
+            "height": 34,
+            "mode": "summarized",
+            "captures": 5921,
+            "compact": true
+          },
+          {
+            "duration": 5.100000001490116,
+            "width": 1648,
+            "height": 124,
+            "mode": "summarized",
+            "captures": 5921,
+            "compact": false
+          }
+        ]
+      },
+      "paintAndRaster": [
+        {
+          "name": "Paint",
+          "durationMs": 5.351
+        },
+        {
+          "name": "Paint",
+          "durationMs": 3.467
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.267
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.146
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.179
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.797
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.117
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.309
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.036
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.123
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.092
+        },
+        {
+          "name": "Paint",
+          "durationMs": 3.498
+        },
+        {
+          "name": "Paint",
+          "durationMs": 3.471
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.609
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.051
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.082
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.04
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.01
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.03
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.12
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.023
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.125
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.232
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.082
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.114
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.261
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.026
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.264
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.168
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.094
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.086
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.04
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.215
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.069
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.078
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.075
+        },
+        {
+          "name": "Paint",
+          "durationMs": 3.976
+        },
+        {
+          "name": "Paint",
+          "durationMs": 3.007
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.112
+        },
+        {
+          "name": "Paint",
+          "durationMs": 9.973
+        },
+        {
+          "name": "Paint",
+          "durationMs": 9.888
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.415
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.2
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.101
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.293
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.089
+        },
+        {
+          "name": "Paint",
+          "durationMs": 6.565
+        },
+        {
+          "name": "Paint",
+          "durationMs": 6.535
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.16
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.198
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.017
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.108
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 1.027
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.203
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.286
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.092
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.078
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.196
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.104
+        },
+        {
+          "name": "Paint",
+          "durationMs": 3.091
+        },
+        {
+          "name": "Paint",
+          "durationMs": 3.059
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.394
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.135
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.154
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.101
+        },
+        {
+          "name": "Paint",
+          "durationMs": 7.033
+        },
+        {
+          "name": "Paint",
+          "durationMs": 6.516
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.103
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.123
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.082
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.017
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.012
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.093
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.124
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.109
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.485
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.127
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.097
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.152
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.15
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.089
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.085
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.138
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.112
+        },
+        {
+          "name": "Paint",
+          "durationMs": 7.718
+        },
+        {
+          "name": "Paint",
+          "durationMs": 7.675
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.209
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.304
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.105
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.063
+        },
+        {
+          "name": "Paint",
+          "durationMs": 6.005
+        },
+        {
+          "name": "Paint",
+          "durationMs": 5.97
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.08
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.178
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.186
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.017
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.013
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.032
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.063
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.022
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.106
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.124
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.025
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.107
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 1.998
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.052
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.058
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 1.752
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.359
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.054
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.084
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.107
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 1.934
+        },
+        {
+          "name": "Paint",
+          "durationMs": 2.581
+        },
+        {
+          "name": "Paint",
+          "durationMs": 2.553
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.202
+        },
+        {
+          "name": "Paint",
+          "durationMs": 4.098
+        },
+        {
+          "name": "Paint",
+          "durationMs": 4.071
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.265
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.246
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.278
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.138
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.143
+        },
+        {
+          "name": "Paint",
+          "durationMs": 3.196
+        },
+        {
+          "name": "Paint",
+          "durationMs": 3.166
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.185
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.125
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.088
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.445
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.194
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.221
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.442
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.45
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.168
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.231
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.083
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.052
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.308
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.162
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.056
+        },
+        {
+          "name": "Paint",
+          "durationMs": 5.174
+        },
+        {
+          "name": "Paint",
+          "durationMs": 5.138
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.134
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.149
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.213
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.019
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.015
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.032
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.065
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.024
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.164
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.174
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.139
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.689
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.089
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.078
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.078
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.198
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.18
+        },
+        {
+          "name": "Paint",
+          "durationMs": 2.853
+        },
+        {
+          "name": "Paint",
+          "durationMs": 2.151
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.194
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.255
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.305
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.214
+        },
+        {
+          "name": "Paint",
+          "durationMs": 30.702
+        },
+        {
+          "name": "Paint",
+          "durationMs": 30.667
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.526
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.093
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.57
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.167
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.045
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.037
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.1
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.022
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 4.023
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.342
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.109
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.248
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.41
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.157
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.078
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.15
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.16
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.146
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.059
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.184
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.064
+        },
+        {
+          "name": "Paint",
+          "durationMs": 2.429
+        },
+        {
+          "name": "Paint",
+          "durationMs": 2.394
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.184
+        },
+        {
+          "name": "Paint",
+          "durationMs": 3.026
+        },
+        {
+          "name": "Paint",
+          "durationMs": 2.994
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.181
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.123
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.144
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.104
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.194
+        },
+        {
+          "name": "Paint",
+          "durationMs": 4.659
+        },
+        {
+          "name": "Paint",
+          "durationMs": 4.237
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.229
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.21
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 1.029
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.131
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.218
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.612
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.108
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.074
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.069
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.222
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.097
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.087
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.057
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.511
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.226
+        },
+        {
+          "name": "Paint",
+          "durationMs": 15.311
+        },
+        {
+          "name": "Paint",
+          "durationMs": 15.22
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.149
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.347
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.25
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.306
+        },
+        {
+          "name": "Paint",
+          "durationMs": 5.723
+        },
+        {
+          "name": "Paint",
+          "durationMs": 4.93
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.101
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.137
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.06
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.114
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.014
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.034
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.067
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.026
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.119
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.138
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.112
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.146
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.188
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.071
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.072
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.126
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.116
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.048
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.052
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.066
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.054
+        },
+        {
+          "name": "Paint",
+          "durationMs": 10.218
+        },
+        {
+          "name": "Paint",
+          "durationMs": 8.662
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.072
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.05
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.102
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.019
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.038
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.041
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.077
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.03
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.115
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.146
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.052
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.195
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.098
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.06
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.175
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 2.138
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 1.471
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.068
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.054
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.21
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.076
+        },
+        {
+          "name": "Paint",
+          "durationMs": 5.694
+        },
+        {
+          "name": "Paint",
+          "durationMs": 5.655
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.196
+        },
+        {
+          "name": "Paint",
+          "durationMs": 17.824
+        },
+        {
+          "name": "Paint",
+          "durationMs": 12.527
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.191
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.149
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.155
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.222
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.493
+        },
+        {
+          "name": "Paint",
+          "durationMs": 2.538
+        },
+        {
+          "name": "Paint",
+          "durationMs": 2.506
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.16
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.09
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.14
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.018
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.011
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.045
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.078
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.04
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.257
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.266
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.205
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 1.743
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.586
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.064
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.131
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 1.95
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.146
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.07
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.058
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.09
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 1.053
+        },
+        {
+          "name": "Paint",
+          "durationMs": 8.649
+        },
+        {
+          "name": "Paint",
+          "durationMs": 8.62
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.044
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.07
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.173
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.017
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.037
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.03
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.075
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.449
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.115
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.198
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.027
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.431
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.177
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.082
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.164
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.157
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.057
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.913
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.123
+        },
+        {
+          "name": "Paint",
+          "durationMs": 4.414
+        },
+        {
+          "name": "Paint",
+          "durationMs": 4.382
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.119
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.338
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.059
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.098
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.103
+        },
+        {
+          "name": "Paint",
+          "durationMs": 2.915
+        },
+        {
+          "name": "Paint",
+          "durationMs": 2.849
+        },
+        {
+          "name": "RasterTask",
+          "durationMs": 0.351
+        }
+      ]
+    }
+  ],
+  "cls": [
+    {
+      "theme": "light",
+      "width": 390,
+      "fontDelayMs": 1200,
+      "includesHydrationAndSyntheticServerSelection": true,
+      "cls": 0.04382377651155429,
+      "shifts": [
+        {
+          "value": 0.039951883507439064,
+          "time": 1285.5,
+          "recentInput": false,
+          "sources": [
+            {
+              "tag": "DIV",
+              "classes": "fleet-cards",
+              "previous": {
+                "x": 8,
+                "y": 752.640625,
+                "width": 374,
+                "height": 147.359375,
+                "top": 752.640625,
+                "right": 382,
+                "bottom": 900,
+                "left": 8
+              },
+              "current": {
+                "x": 8,
+                "y": 718.640625,
+                "width": 374,
+                "height": 181.359375,
+                "top": 718.640625,
+                "right": 382,
+                "bottom": 900,
+                "left": 8
+              }
+            },
+            {
+              "tag": "DL",
+              "classes": "fleet-metrics",
+              "previous": {
+                "x": 0,
+                "y": 0,
+                "width": 0,
+                "height": 0,
+                "top": 0,
+                "right": 0,
+                "bottom": 0,
+                "left": 0
+              },
+              "current": {
+                "x": 37,
+                "y": 869.515625,
+                "width": 316,
+                "height": 30.484375,
+                "top": 869.515625,
+                "right": 353,
+                "bottom": 900,
+                "left": 37
+              }
+            },
+            {
+              "tag": "SPAN",
+              "classes": "",
+              "previous": {
+                "x": 37,
+                "y": 703.640625,
+                "width": 221,
+                "height": 18,
+                "top": 703.640625,
+                "right": 258,
+                "bottom": 721.640625,
+                "left": 37
+              },
+              "current": {
+                "x": 142,
+                "y": 665.140625,
+                "width": 197,
+                "height": 18,
+                "top": 665.140625,
+                "right": 339,
+                "bottom": 683.140625,
+                "left": 142
+              }
+            },
+            {
+              "tag": "BUTTON",
+              "classes": "pp-button pp-button-quiet",
+              "previous": {
+                "x": 259,
+                "y": 315.65625,
+                "width": 115,
+                "height": 44,
+                "top": 315.65625,
+                "right": 374,
+                "bottom": 359.65625,
+                "left": 259
+              },
+              "current": {
+                "x": 264,
+                "y": 315.65625,
+                "width": 110,
+                "height": 44,
+                "top": 315.65625,
+                "right": 374,
+                "bottom": 359.65625,
+                "left": 264
+              }
+            },
+            {
+              "tag": "SPAN",
+              "classes": "",
+              "previous": {
+                "x": 171,
+                "y": 617.640625,
+                "width": 141,
+                "height": 27,
+                "top": 617.640625,
+                "right": 312,
+                "bottom": 644.640625,
+                "left": 171
+              },
+              "current": {
+                "x": 157,
+                "y": 617.640625,
+                "width": 124,
+                "height": 27,
+                "top": 617.640625,
+                "right": 281,
+                "bottom": 644.640625,
+                "left": 157
+              }
+            }
+          ]
+        },
+        {
+          "value": 0.0038718930041152263,
+          "time": 1904.4000000003725,
+          "recentInput": false,
+          "sources": [
+            {
+              "previous": {
+                "x": 16,
+                "y": 832.125,
+                "width": 358,
+                "height": 16,
+                "top": 832.125,
+                "right": 374,
+                "bottom": 848.125,
+                "left": 16
+              },
+              "current": {
+                "x": 16,
+                "y": 832.125,
+                "width": 358,
+                "height": 16,
+                "top": 832.125,
+                "right": 374,
+                "bottom": 848.125,
+                "left": 16
+              }
+            },
+            {
+              "previous": {
+                "x": 16,
+                "y": 850.78125,
+                "width": 358,
+                "height": 16,
+                "top": 850.78125,
+                "right": 374,
+                "bottom": 866.78125,
+                "left": 16
+              },
+              "current": {
+                "x": 16,
+                "y": 850.78125,
+                "width": 358,
+                "height": 16,
+                "top": 850.78125,
+                "right": 374,
+                "bottom": 866.78125,
+                "left": 16
+              }
+            },
+            {
+              "tag": "SPAN",
+              "classes": "",
+              "previous": {
+                "x": 100,
+                "y": 163.328125,
+                "width": 64,
+                "height": 18.65625,
+                "top": 163.328125,
+                "right": 164,
+                "bottom": 181.984375,
+                "left": 100
+              },
+              "current": {
+                "x": 73,
+                "y": 163.328125,
+                "width": 64,
+                "height": 18.65625,
+                "top": 163.328125,
+                "right": 137,
+                "bottom": 181.984375,
+                "left": 73
+              }
+            },
+            {
+              "tag": "svg",
+              "classes": {},
+              "previous": {
+                "x": 172,
+                "y": 164.65625,
+                "width": 16,
+                "height": 16,
+                "top": 164.65625,
+                "right": 188,
+                "bottom": 180.65625,
+                "left": 172
+              },
+              "current": {
+                "x": 145,
+                "y": 164.65625,
+                "width": 16,
+                "height": 16,
+                "top": 164.65625,
+                "right": 161,
+                "bottom": 180.65625,
+                "left": 145
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "theme": "light",
+      "width": 1280,
+      "fontDelayMs": 1200,
+      "includesHydrationAndSyntheticServerSelection": true,
+      "cls": 0.022451226128472224,
+      "shifts": [
+        {
+          "value": 0.0003832763671875,
+          "time": 375.90000000037253,
+          "recentInput": false,
+          "sources": [
+            {
+              "tag": "SPAN",
+              "classes": "pp-floating-owner",
+              "previous": {
+                "x": 831,
+                "y": 104,
+                "width": 177,
+                "height": 32,
+                "top": 104,
+                "right": 1008,
+                "bottom": 136,
+                "left": 831
+              },
+              "current": {
+                "x": 867,
+                "y": 104,
+                "width": 177,
+                "height": 32,
+                "top": 104,
+                "right": 1044,
+                "bottom": 136,
+                "left": 867
+              }
+            },
+            {
+              "tag": "DIV",
+              "classes": "",
+              "previous": {
+                "x": 658,
+                "y": 109.5,
+                "width": 149,
+                "height": 21,
+                "top": 109.5,
+                "right": 807,
+                "bottom": 130.5,
+                "left": 658
+              },
+              "current": {
+                "x": 678,
+                "y": 109.5,
+                "width": 166,
+                "height": 21,
+                "top": 109.5,
+                "right": 844,
+                "bottom": 130.5,
+                "left": 678
+              }
+            },
+            {
+              "tag": "DIV",
+              "classes": "",
+              "previous": {
+                "x": 392,
+                "y": 109.5,
+                "width": 113,
+                "height": 21,
+                "top": 109.5,
+                "right": 505,
+                "bottom": 130.5,
+                "left": 392
+              },
+              "current": {
+                "x": 388,
+                "y": 109.5,
+                "width": 125,
+                "height": 21,
+                "top": 109.5,
+                "right": 513,
+                "bottom": 130.5,
+                "left": 388
+              }
+            },
+            {
+              "tag": "DIV",
+              "classes": "",
+              "previous": {
+                "x": 529,
+                "y": 109.5,
+                "width": 105,
+                "height": 21,
+                "top": 109.5,
+                "right": 634,
+                "bottom": 130.5,
+                "left": 529
+              },
+              "current": {
+                "x": 537,
+                "y": 109.5,
+                "width": 117,
+                "height": 21,
+                "top": 109.5,
+                "right": 654,
+                "bottom": 130.5,
+                "left": 537
+              }
+            }
+          ]
+        },
+        {
+          "value": 0.0011614067925347221,
+          "time": 851.4000000003725,
+          "recentInput": false,
+          "sources": [
+            {
+              "previous": {
+                "x": 779,
+                "y": 854.8125,
+                "width": 444,
+                "height": 13,
+                "top": 854.8125,
+                "right": 1223,
+                "bottom": 867.8125,
+                "left": 779
+              },
+              "current": {
+                "x": 779,
+                "y": 857.359375,
+                "width": 444,
+                "height": 13,
+                "top": 857.359375,
+                "right": 1223,
+                "bottom": 870.359375,
+                "left": 779
+              }
+            },
+            {
+              "tag": "SPAN",
+              "classes": "fleet-status fleet-status-stale",
+              "previous": {
+                "x": 1132,
+                "y": 504.484375,
+                "width": 91,
+                "height": 24.5,
+                "top": 504.484375,
+                "right": 1223,
+                "bottom": 528.984375,
+                "left": 1132
+              },
+              "current": {
+                "x": 1008,
+                "y": 504.484375,
+                "width": 215,
+                "height": 24.5,
+                "top": 504.484375,
+                "right": 1223,
+                "bottom": 528.984375,
+                "left": 1008
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "fleet-source",
+              "previous": {
+                "x": 779,
+                "y": 896.8125,
+                "width": 444,
+                "height": 3.1875,
+                "top": 896.8125,
+                "right": 1223,
+                "bottom": 900,
+                "left": 779
+              },
+              "current": {
+                "x": 0,
+                "y": 0,
+                "width": 0,
+                "height": 0,
+                "top": 0,
+                "right": 0,
+                "bottom": 0,
+                "left": 0
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "fleet-source",
+              "previous": {
+                "x": 265,
+                "y": 899.359375,
+                "width": 444,
+                "height": 0.640625,
+                "top": 899.359375,
+                "right": 709,
+                "bottom": 900,
+                "left": 265
+              },
+              "current": {
+                "x": 0,
+                "y": 0,
+                "width": 0,
+                "height": 0,
+                "top": 0,
+                "right": 0,
+                "bottom": 0,
+                "left": 0
+              }
+            }
+          ]
+        },
+        {
+          "value": 0.02012998046875,
+          "time": 1336,
+          "recentInput": false,
+          "sources": [
+            {
+              "tag": "DIV",
+              "classes": "",
+              "previous": {
+                "x": 1010,
+                "y": 744.359375,
+                "width": 213,
+                "height": 71,
+                "top": 744.359375,
+                "right": 1223,
+                "bottom": 815.359375,
+                "left": 1010
+              },
+              "current": {
+                "x": 1010,
+                "y": 714.8125,
+                "width": 213,
+                "height": 71,
+                "top": 714.8125,
+                "right": 1223,
+                "bottom": 785.8125,
+                "left": 1010
+              }
+            },
+            {
+              "tag": "DIV",
+              "classes": "",
+              "previous": {
+                "x": 265,
+                "y": 744.359375,
+                "width": 213,
+                "height": 71,
+                "top": 744.359375,
+                "right": 478,
+                "bottom": 815.359375,
+                "left": 265
+              },
+              "current": {
+                "x": 265,
+                "y": 714.8125,
+                "width": 213,
+                "height": 71,
+                "top": 714.8125,
+                "right": 478,
+                "bottom": 785.8125,
+                "left": 265
+              }
+            },
+            {
+              "tag": "DIV",
+              "classes": "",
+              "previous": {
+                "x": 779,
+                "y": 744.359375,
+                "width": 213,
+                "height": 71,
+                "top": 744.359375,
+                "right": 992,
+                "bottom": 815.359375,
+                "left": 779
+              },
+              "current": {
+                "x": 779,
+                "y": 714.8125,
+                "width": 213,
+                "height": 71,
+                "top": 714.8125,
+                "right": 992,
+                "bottom": 785.8125,
+                "left": 779
+              }
+            },
+            {
+              "tag": "DIV",
+              "classes": "",
+              "previous": {
+                "x": 496,
+                "y": 744.359375,
+                "width": 213,
+                "height": 71,
+                "top": 744.359375,
+                "right": 709,
+                "bottom": 815.359375,
+                "left": 496
+              },
+              "current": {
+                "x": 496,
+                "y": 714.8125,
+                "width": 213,
+                "height": 71,
+                "top": 714.8125,
+                "right": 709,
+                "bottom": 785.8125,
+                "left": 496
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "fleet-source",
+              "previous": {
+                "x": 265,
+                "y": 856.359375,
+                "width": 444,
+                "height": 16.5,
+                "top": 856.359375,
+                "right": 709,
+                "bottom": 872.859375,
+                "left": 265
+              },
+              "current": {
+                "x": 265,
+                "y": 826.8125,
+                "width": 444,
+                "height": 16.5,
+                "top": 826.8125,
+                "right": 709,
+                "bottom": 843.3125,
+                "left": 265
+              }
+            }
+          ]
+        },
+        {
+          "value": 0.0007765625,
+          "time": 2235.199999999255,
+          "recentInput": false,
+          "sources": [
+            {
+              "previous": {
+                "x": 240,
+                "y": 580.453125,
+                "width": 1008,
+                "height": 16,
+                "top": 580.453125,
+                "right": 1248,
+                "bottom": 596.453125,
+                "left": 240
+              },
+              "current": {
+                "x": 240,
+                "y": 580.453125,
+                "width": 1008,
+                "height": 16,
+                "top": 580.453125,
+                "right": 1248,
+                "bottom": 596.453125,
+                "left": 240
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "fontDelayMs": 1200,
+      "includesHydrationAndSyntheticServerSelection": true,
+      "cls": 0.04404635327635328,
+      "shifts": [
+        {
+          "value": 0.040174460272238054,
+          "time": 1301.0999999996275,
+          "recentInput": false,
+          "sources": [
+            {
+              "tag": "DIV",
+              "classes": "fleet-cards",
+              "previous": {
+                "x": 7,
+                "y": 751.640625,
+                "width": 376,
+                "height": 148.359375,
+                "top": 751.640625,
+                "right": 383,
+                "bottom": 900,
+                "left": 7
+              },
+              "current": {
+                "x": 7,
+                "y": 717.640625,
+                "width": 376,
+                "height": 182.359375,
+                "top": 717.640625,
+                "right": 383,
+                "bottom": 900,
+                "left": 7
+              }
+            },
+            {
+              "tag": "DL",
+              "classes": "fleet-metrics",
+              "previous": {
+                "x": 0,
+                "y": 0,
+                "width": 0,
+                "height": 0,
+                "top": 0,
+                "right": 0,
+                "bottom": 0,
+                "left": 0
+              },
+              "current": {
+                "x": 37,
+                "y": 869.515625,
+                "width": 316,
+                "height": 30.484375,
+                "top": 869.515625,
+                "right": 353,
+                "bottom": 900,
+                "left": 37
+              }
+            },
+            {
+              "tag": "SPAN",
+              "classes": "",
+              "previous": {
+                "x": 37,
+                "y": 703.640625,
+                "width": 221,
+                "height": 18,
+                "top": 703.640625,
+                "right": 258,
+                "bottom": 721.640625,
+                "left": 37
+              },
+              "current": {
+                "x": 142,
+                "y": 665.140625,
+                "width": 197,
+                "height": 18,
+                "top": 665.140625,
+                "right": 339,
+                "bottom": 683.140625,
+                "left": 142
+              }
+            },
+            {
+              "tag": "BUTTON",
+              "classes": "pp-button pp-button-quiet",
+              "previous": {
+                "x": 259,
+                "y": 315.65625,
+                "width": 115,
+                "height": 44,
+                "top": 315.65625,
+                "right": 374,
+                "bottom": 359.65625,
+                "left": 259
+              },
+              "current": {
+                "x": 264,
+                "y": 315.65625,
+                "width": 110,
+                "height": 44,
+                "top": 315.65625,
+                "right": 374,
+                "bottom": 359.65625,
+                "left": 264
+              }
+            },
+            {
+              "tag": "SPAN",
+              "classes": "",
+              "previous": {
+                "x": 171,
+                "y": 617.640625,
+                "width": 141,
+                "height": 27,
+                "top": 617.640625,
+                "right": 312,
+                "bottom": 644.640625,
+                "left": 171
+              },
+              "current": {
+                "x": 157,
+                "y": 617.640625,
+                "width": 124,
+                "height": 27,
+                "top": 617.640625,
+                "right": 281,
+                "bottom": 644.640625,
+                "left": 157
+              }
+            }
+          ]
+        },
+        {
+          "value": 0.0038718930041152263,
+          "time": 2256,
+          "recentInput": false,
+          "sources": [
+            {
+              "previous": {
+                "x": 16,
+                "y": 832.125,
+                "width": 358,
+                "height": 16,
+                "top": 832.125,
+                "right": 374,
+                "bottom": 848.125,
+                "left": 16
+              },
+              "current": {
+                "x": 16,
+                "y": 832.125,
+                "width": 358,
+                "height": 16,
+                "top": 832.125,
+                "right": 374,
+                "bottom": 848.125,
+                "left": 16
+              }
+            },
+            {
+              "previous": {
+                "x": 16,
+                "y": 850.78125,
+                "width": 358,
+                "height": 16,
+                "top": 850.78125,
+                "right": 374,
+                "bottom": 866.78125,
+                "left": 16
+              },
+              "current": {
+                "x": 16,
+                "y": 850.78125,
+                "width": 358,
+                "height": 16,
+                "top": 850.78125,
+                "right": 374,
+                "bottom": 866.78125,
+                "left": 16
+              }
+            },
+            {
+              "tag": "SPAN",
+              "classes": "",
+              "previous": {
+                "x": 100,
+                "y": 163.328125,
+                "width": 64,
+                "height": 18.65625,
+                "top": 163.328125,
+                "right": 164,
+                "bottom": 181.984375,
+                "left": 100
+              },
+              "current": {
+                "x": 73,
+                "y": 163.328125,
+                "width": 64,
+                "height": 18.65625,
+                "top": 163.328125,
+                "right": 137,
+                "bottom": 181.984375,
+                "left": 73
+              }
+            },
+            {
+              "tag": "svg",
+              "classes": {},
+              "previous": {
+                "x": 172,
+                "y": 164.65625,
+                "width": 16,
+                "height": 16,
+                "top": 164.65625,
+                "right": 188,
+                "bottom": 180.65625,
+                "left": 172
+              },
+              "current": {
+                "x": 145,
+                "y": 164.65625,
+                "width": 16,
+                "height": 16,
+                "top": 164.65625,
+                "right": 161,
+                "bottom": 180.65625,
+                "left": 145
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "theme": "dark",
+      "width": 1280,
+      "fontDelayMs": 1200,
+      "includesHydrationAndSyntheticServerSelection": true,
+      "cls": 0.021674663628472222,
+      "shifts": [
+        {
+          "value": 0.0003832763671875,
+          "time": 630.6999999992549,
+          "recentInput": false,
+          "sources": [
+            {
+              "tag": "SPAN",
+              "classes": "pp-floating-owner",
+              "previous": {
+                "x": 831,
+                "y": 104,
+                "width": 177,
+                "height": 32,
+                "top": 104,
+                "right": 1008,
+                "bottom": 136,
+                "left": 831
+              },
+              "current": {
+                "x": 867,
+                "y": 104,
+                "width": 177,
+                "height": 32,
+                "top": 104,
+                "right": 1044,
+                "bottom": 136,
+                "left": 867
+              }
+            },
+            {
+              "tag": "DIV",
+              "classes": "",
+              "previous": {
+                "x": 658,
+                "y": 109.5,
+                "width": 149,
+                "height": 21,
+                "top": 109.5,
+                "right": 807,
+                "bottom": 130.5,
+                "left": 658
+              },
+              "current": {
+                "x": 678,
+                "y": 109.5,
+                "width": 166,
+                "height": 21,
+                "top": 109.5,
+                "right": 844,
+                "bottom": 130.5,
+                "left": 678
+              }
+            },
+            {
+              "tag": "DIV",
+              "classes": "",
+              "previous": {
+                "x": 392,
+                "y": 109.5,
+                "width": 113,
+                "height": 21,
+                "top": 109.5,
+                "right": 505,
+                "bottom": 130.5,
+                "left": 392
+              },
+              "current": {
+                "x": 388,
+                "y": 109.5,
+                "width": 125,
+                "height": 21,
+                "top": 109.5,
+                "right": 513,
+                "bottom": 130.5,
+                "left": 388
+              }
+            },
+            {
+              "tag": "DIV",
+              "classes": "",
+              "previous": {
+                "x": 529,
+                "y": 109.5,
+                "width": 105,
+                "height": 21,
+                "top": 109.5,
+                "right": 634,
+                "bottom": 130.5,
+                "left": 529
+              },
+              "current": {
+                "x": 537,
+                "y": 109.5,
+                "width": 117,
+                "height": 21,
+                "top": 109.5,
+                "right": 654,
+                "bottom": 130.5,
+                "left": 537
+              }
+            }
+          ]
+        },
+        {
+          "value": 0.0011614067925347221,
+          "time": 1136.4000000003725,
+          "recentInput": false,
+          "sources": [
+            {
+              "previous": {
+                "x": 779,
+                "y": 854.8125,
+                "width": 444,
+                "height": 13,
+                "top": 854.8125,
+                "right": 1223,
+                "bottom": 867.8125,
+                "left": 779
+              },
+              "current": {
+                "x": 779,
+                "y": 857.359375,
+                "width": 444,
+                "height": 13,
+                "top": 857.359375,
+                "right": 1223,
+                "bottom": 870.359375,
+                "left": 779
+              }
+            },
+            {
+              "tag": "SPAN",
+              "classes": "fleet-status fleet-status-stale",
+              "previous": {
+                "x": 1132,
+                "y": 504.484375,
+                "width": 91,
+                "height": 24.5,
+                "top": 504.484375,
+                "right": 1223,
+                "bottom": 528.984375,
+                "left": 1132
+              },
+              "current": {
+                "x": 1008,
+                "y": 504.484375,
+                "width": 215,
+                "height": 24.5,
+                "top": 504.484375,
+                "right": 1223,
+                "bottom": 528.984375,
+                "left": 1008
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "fleet-source",
+              "previous": {
+                "x": 779,
+                "y": 896.8125,
+                "width": 444,
+                "height": 3.1875,
+                "top": 896.8125,
+                "right": 1223,
+                "bottom": 900,
+                "left": 779
+              },
+              "current": {
+                "x": 0,
+                "y": 0,
+                "width": 0,
+                "height": 0,
+                "top": 0,
+                "right": 0,
+                "bottom": 0,
+                "left": 0
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "fleet-source",
+              "previous": {
+                "x": 265,
+                "y": 899.359375,
+                "width": 444,
+                "height": 0.640625,
+                "top": 899.359375,
+                "right": 709,
+                "bottom": 900,
+                "left": 265
+              },
+              "current": {
+                "x": 0,
+                "y": 0,
+                "width": 0,
+                "height": 0,
+                "top": 0,
+                "right": 0,
+                "bottom": 0,
+                "left": 0
+              }
+            }
+          ]
+        },
+        {
+          "value": 0.02012998046875,
+          "time": 1312.199999999255,
+          "recentInput": false,
+          "sources": [
+            {
+              "tag": "DIV",
+              "classes": "",
+              "previous": {
+                "x": 1010,
+                "y": 744.359375,
+                "width": 213,
+                "height": 71,
+                "top": 744.359375,
+                "right": 1223,
+                "bottom": 815.359375,
+                "left": 1010
+              },
+              "current": {
+                "x": 1010,
+                "y": 714.8125,
+                "width": 213,
+                "height": 71,
+                "top": 714.8125,
+                "right": 1223,
+                "bottom": 785.8125,
+                "left": 1010
+              }
+            },
+            {
+              "tag": "DIV",
+              "classes": "",
+              "previous": {
+                "x": 265,
+                "y": 744.359375,
+                "width": 213,
+                "height": 71,
+                "top": 744.359375,
+                "right": 478,
+                "bottom": 815.359375,
+                "left": 265
+              },
+              "current": {
+                "x": 265,
+                "y": 714.8125,
+                "width": 213,
+                "height": 71,
+                "top": 714.8125,
+                "right": 478,
+                "bottom": 785.8125,
+                "left": 265
+              }
+            },
+            {
+              "tag": "DIV",
+              "classes": "",
+              "previous": {
+                "x": 779,
+                "y": 744.359375,
+                "width": 213,
+                "height": 71,
+                "top": 744.359375,
+                "right": 992,
+                "bottom": 815.359375,
+                "left": 779
+              },
+              "current": {
+                "x": 779,
+                "y": 714.8125,
+                "width": 213,
+                "height": 71,
+                "top": 714.8125,
+                "right": 992,
+                "bottom": 785.8125,
+                "left": 779
+              }
+            },
+            {
+              "tag": "DIV",
+              "classes": "",
+              "previous": {
+                "x": 496,
+                "y": 744.359375,
+                "width": 213,
+                "height": 71,
+                "top": 744.359375,
+                "right": 709,
+                "bottom": 815.359375,
+                "left": 496
+              },
+              "current": {
+                "x": 496,
+                "y": 714.8125,
+                "width": 213,
+                "height": 71,
+                "top": 714.8125,
+                "right": 709,
+                "bottom": 785.8125,
+                "left": 496
+              }
+            },
+            {
+              "tag": "P",
+              "classes": "fleet-source",
+              "previous": {
+                "x": 265,
+                "y": 856.359375,
+                "width": 444,
+                "height": 16.5,
+                "top": 856.359375,
+                "right": 709,
+                "bottom": 872.859375,
+                "left": 265
+              },
+              "current": {
+                "x": 265,
+                "y": 826.8125,
+                "width": 444,
+                "height": 16.5,
+                "top": 826.8125,
+                "right": 709,
+                "bottom": 843.3125,
+                "left": 265
+              }
+            }
+          ]
+        },
+        {
+          "value": 0.0007765625,
+          "time": 2360.699999999255,
+          "recentInput": false,
+          "sources": [
+            {
+              "previous": {
+                "x": 240,
+                "y": 580.453125,
+                "width": 1008,
+                "height": 16,
+                "top": 580.453125,
+                "right": 1248,
+                "bottom": 596.453125,
+                "left": 240
+              },
+              "current": {
+                "x": 240,
+                "y": 580.453125,
+                "width": 1008,
+                "height": 16,
+                "top": 580.453125,
+                "right": 1248,
+                "bottom": 596.453125,
+                "left": 240
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "browser": "153.0.8010.0",
+  "smoke": "passed",
+  "pointer": {
+    "tooltipLensTableParity": "passed",
+    "inspectionWithoutRaster": "passed"
+  },
+  "idleClock": {
+    "before": 10,
+    "after": 10,
+    "waitMs": 2400,
+    "status": "passed"
+  },
+  "retainedCharts": {
+    "keyboardOpenClose": "passed",
+    "mountedOnlyWhileOpen": "passed",
+    "chartCount": 2
+  },
+  "reducedMotion": {
+    "media": "reduce",
+    "preference": "off",
+    "canvasAnimations": [
+      "none",
+      "none"
+    ],
+    "status": "passed"
+  }
+}

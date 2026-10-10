@@ -1,0 +1,13 @@
+{
+  "name": "check",
+  "command": "npm run check",
+  "env": {},
+  "startedAt": "2026-10-08T21:53:08.547Z",
+  "finishedAt": "2026-10-08T21:55:50.101Z",
+  "exitCode": 0,
+  "result": "passed",
+  "relayTests": 79,
+  "dashboardTests": 221,
+  "failures": 0,
+  "skipped": 0
+}

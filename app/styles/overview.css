@@ -1,0 +1,46 @@
+@layer workspaces {
+.overview-workspace { display: grid; gap: var(--ds-space-7); font-variant-numeric: tabular-nums; }
+.overview-instruments { display: grid; grid-template-columns: minmax(0,3fr) minmax(0,2fr); border-top: var(--ds-line) solid var(--ds-boundary); }
+.instrument { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1.4fr) minmax(0,1fr); align-items: center; gap: var(--ds-space-4); padding: var(--ds-space-5) var(--ds-space-4); border-bottom: var(--ds-line) solid var(--ds-border-quiet); min-width: 0; }
+.instrument-primary { background: var(--ds-surface); }
+.instrument-presence { grid-column: 1 / -1; grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,2fr); }
+.instrument-resource { grid-column: 1 / -1; grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,2fr); padding-block: var(--ds-space-3); }
+.instrument-label h3 { font-size: var(--ds-type-body); margin: 0 0 var(--ds-space-1); }
+.instrument-label > span { color: var(--ds-muted); font-size: var(--ds-type-small); }
+.instrument-reading { min-width: 0; }
+.instrument-reading > strong { display: block; font-size: var(--ds-type-heading); line-height: var(--ds-leading-heading); min-height: var(--ds-space-7); white-space: nowrap; }
+.instrument-primary .instrument-reading > strong { font-size: var(--ds-type-display); min-height: var(--ds-space-8); }
+.instrument-reading small { display: block; font-size: var(--ds-type-small); color: var(--ds-muted); }
+.instrument-provenance { grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; gap: var(--ds-space-2); font-size: var(--ds-type-small); color: var(--ds-muted); }
+.instrument-provenance .pp-button { min-height: var(--ds-row); font-size: var(--ds-type-small); }
+.overview-identity { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,2fr); gap: var(--ds-space-6); padding-block: var(--ds-space-4); border-block: var(--ds-line) solid var(--ds-border-quiet); }
+.overview-identity > div { display: grid; align-content: start; gap: var(--ds-space-2); }
+.overview-identity > div > span { color: var(--ds-muted); }
+.overview-identity code { overflow-wrap: anywhere; }
+.overview-identity dl { display: grid; gap: var(--ds-space-2); margin: 0; }
+.overview-identity dl > div { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,2fr); gap: var(--ds-space-3); }
+.overview-identity dt { color: var(--ds-muted); }
+.overview-identity dd { margin: 0; overflow-wrap: anywhere; }
+.overview-details { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1.2fr); gap: var(--ds-space-6); }
+.overview-presence { list-style: none; margin: 0; padding: 0; }
+.overview-presence li { display: grid; gap: var(--ds-space-1); padding-block: var(--ds-space-3); border-bottom: var(--ds-line) solid var(--ds-border-quiet); }
+.overview-presence span, .overview-presence time { color: var(--ds-muted); }
+.overview-worlds { overflow: auto; }
+.overview-worlds table { border-collapse: collapse; width: 100%; }
+.overview-worlds th, .overview-worlds td { text-align: left; padding: var(--ds-space-3); border-bottom: var(--ds-line) solid var(--ds-border-quiet); }
+.overview-attention { border-block: var(--ds-line) solid var(--ds-boundary); padding-block: var(--ds-space-3); }
+.overview-attention h2 { font-size: var(--ds-type-subhead); margin: 0 0 var(--ds-space-3); }
+.overview-attention > div { display: flex; align-items: center; flex-wrap: wrap; gap: var(--ds-space-3); }
+.overview-attention > div > span:not(.pp-badge) { flex: 1; }
+@media (max-width: 1023px) { .overview-details { grid-template-columns: minmax(0,1fr); } }
+@media (max-width: 767px) {
+ .overview-workspace { gap: var(--ds-space-5); }
+ .overview-instruments { grid-template-columns: minmax(0,1fr); }
+ .instrument, .instrument-resource, .instrument-presence { grid-column: auto; grid-template-columns: minmax(0,1fr) minmax(0,1.2fr); padding-inline: var(--ds-space-2); gap: var(--ds-space-3); }
+ .instrument .instrument-sparkline { grid-column: 1 / -1; height: var(--ds-space-7); }
+ .instrument-reading { text-align: right; }
+ .instrument-provenance .pp-button { min-height: var(--ds-touch); }
+ .overview-identity { grid-template-columns: minmax(0,1fr); }
+ .overview-identity dl > div { grid-template-columns: minmax(0,1fr) minmax(0,1.5fr); }
+}
+}

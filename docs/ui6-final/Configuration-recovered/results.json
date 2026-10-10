@@ -1,0 +1,21 @@
+{
+  "task": "Configuration",
+  "environment": "Chromium, signed local relay, simulated agents; no live-server certification",
+  "status": "passed",
+  "screenshots": [
+    "configuration-light-390.png",
+    "configuration-light-1280.png",
+    "configuration-dark-390.png",
+    "configuration-dark-1280.png"
+  ],
+  "axe": [
+    {
+      "workspace": "Configuration",
+      "violations": []
+    }
+  ],
+  "keyboard": [
+    "File edit, diff and bound save reached with keyboard; cancel keeps edits; write not executed"
+  ],
+  "errors": []
+}

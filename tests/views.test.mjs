@@ -21,12 +21,12 @@ const props = {
   notice: () => {},
   connected: false,
 };
-test("read-only console and chat omit execution controls", () => {
+test("read-only console and chat do not enable execution controls", () => {
   const console = renderToStaticMarkup(React.createElement(ConsoleView, props)),
     chat = renderToStaticMarkup(React.createElement(ChatView, props));
-  assert.ok(!console.includes('aria-label="Console command"'));
+  assert.match(console, /<input[^>]*disabled=""[^>]*aria-label="Console command"|<input[^>]*aria-label="Console command"[^>]*disabled=""/);
   assert.ok(!chat.includes('type="submit"'));
-  assert.match(console, /Read-only console/);
+  assert.match(console, /Paper is offline|Read-only console/);
 });
 test("host and file routes show explicit unavailable states without privileged controls", () => {
   for (const view of [FilesView, BackupsView, ServerView]) {
@@ -128,7 +128,7 @@ test("offline history detail is read-only and exposes no player actions", () => 
       close: () => {},
     }),
   );
-  assert.match(html, /read only/i);
+  assert.match(html, /read[- ]only/i);
   assert.match(html, /Unknown/);
   assert.doesNotMatch(html, />Heal<|>Kick<|>Teleport<|>Ban</);
 });
