@@ -8,10 +8,8 @@ export type ServiceState =
 
 export type LifecycleAction = "start" | "stop" | "restart";
 
-export function normalizeServiceState(
-  value: unknown,
-  paperOnline: boolean,
-): ServiceState {
+/** Normalize only Host service state; Paper presence cannot supply a missing value. */
+export function normalizeServiceState(value: unknown): ServiceState {
   const state = typeof value === "string" ? value.toLowerCase() : "";
   if (state === "active" || state === "running") return "active";
   if (state === "inactive" || state === "stopped" || state === "dead")
@@ -20,7 +18,7 @@ export function normalizeServiceState(
   if (state === "deactivating" || state === "stopping")
     return "deactivating";
   if (state === "failed") return "failed";
-  return paperOnline ? "active" : "unknown";
+  return "unknown";
 }
 
 export function lifecycleActionAllowed(

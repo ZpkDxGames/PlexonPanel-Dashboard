@@ -73,10 +73,7 @@ test("device or role disagreements fail closed", () => {
 });
 
 test("active dashboard and access views consume the reconciled signed grant", async () => {
-  const dashboard = await readFile(
-    new URL("../app/dashboard.tsx", import.meta.url),
-    "utf8",
-  );
+  const dashboard = (await Promise.all(["app/dashboard.tsx", "app/use-dashboard-session.ts", "app/use-signed-operations.ts", "app/shell.tsx", "app/workspaces.tsx"].map(path => readFile(new URL(`../${path}`, import.meta.url), "utf8")))).join("\n");
   const access = await readFile(
     new URL("../app/governance-views.tsx", import.meta.url),
     "utf8",

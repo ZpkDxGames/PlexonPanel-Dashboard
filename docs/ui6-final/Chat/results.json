@@ -1,0 +1,21 @@
+{
+  "task": "Chat",
+  "environment": "Chromium, signed local relay, simulated agents; no live-server certification",
+  "status": "passed",
+  "screenshots": [
+    "chat-light-390.png",
+    "chat-light-1280.png",
+    "chat-dark-390.png",
+    "chat-dark-1280.png"
+  ],
+  "axe": [
+    {
+      "workspace": "Chat",
+      "violations": []
+    }
+  ],
+  "keyboard": [
+    "Compose, draft and reach gated Send by keyboard; send not executed"
+  ],
+  "errors": []
+}

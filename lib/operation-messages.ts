@@ -81,7 +81,7 @@ function diagnosticSuffix(error: ActionError): string {
   if (agent) parts.push(`Agent: ${agent}`);
   if (contract) parts.push(`Contract: ${contract.slice(7, 19)}`);
   if (/^[0-9a-f-]{36}$/i.test(error.requestId)) parts.push(`Request: ${error.requestId}`);
-  return parts.length ? ` Diagnostic: ${parts.join(" · ")}.` : "";
+  return parts.length ? ` Diagnostic: ${parts.join(". ")}.` : "";
 }
 
 export function operationMessage(error: unknown): OperationMessage {
@@ -111,4 +111,9 @@ export function operationMessage(error: unknown): OperationMessage {
 export function operationText(error: unknown): string {
   const mapped = operationMessage(error);
   return `${mapped.title}: ${mapped.detail}`;
+}
+
+export function actionLabel(action: string): string {
+  const labels: Record<string,string> = {"server.start": "Start server", "server.stop": "Stop server", "server.restart": "Restart server", "chat.global.send": "Send to global chat", "files.write": "Save reviewed changes", "maintenance.settings.update": "Save settings", "maintenance.full-backup.create": "Fully Backup Now", "backup.full.retry-upload": "Retry Upload", "devices.revoke": "Revoke device", "console.execute": "Run command", "plugin.command.reload": "Run configured reload", "player.ban": "Ban player", "player.kill": "Kill player", "player.op": "Grant operator", "player.deop": "Remove operator"};
+  return labels[action] ?? action.replaceAll(".", " ");
 }

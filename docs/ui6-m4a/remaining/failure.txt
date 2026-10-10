@@ -1,0 +1,105 @@
+Skip to workspace
+Selected server
+PlexonCraft
+— Selected server
+Pulse
+Raw 0 captures / 30 min
+MSPT marks; 50 ms tick budget. 2026-10-08T20:09:13.045Z to 2026-10-08T20:39:13.045Z. Waiting for Minecraft telemetry. Missing time is hatched. Enter opens the exact capture lens.
+30-minute window 2026-10-08T20:09:13.045Z to 2026-10-08T20:39:13.045Z. Arrow keys select a capture; Enter opens the exact lens.
+Connecting
+1/4 healthy
+Overview
+Refresh
+Waiting for Minecraft telemetry
+
+The Paper agent is connected. Waiting for its first sample from this session.
+
+Tick Pulse
+Raw
+0 captures / 30 min
+Pulse window
+30 min
+— Pulse window
+Inspect captures
+MSPT marks; 50 ms tick budget. 2026-10-08T20:09:13.045Z to 2026-10-08T20:39:13.045Z. waiting for telemetry. Missing time is hatched. Enter opens the exact capture lens.
+5:09:13 PM
+0–100 ms / 50 ms budget
+5:39:13 PM
+
+● Healthy ≥19 TPS
+▲ Degraded ≥15
+× Critical <15
+○ Unknown
+Crosshatch: gap / vertical hatch: unknown time
+
+Each mark is one capture; unknown MSPT is outlined. A filled mark at the ceiling means MSPT exceeds 100 ms; inspect its exact value. Arrow keys inspect exact captures; Enter opens the lens. Window ends at 5:39:13 PM; waiting for telemetry. Last browser receipt 5:39:13 PM.
+
+No trusted tick captures
+
+Waiting for signed Paper health. Empty time is unknown, not zero.
+
+Server instruments
+TPS
+Paper health
+—
+ticks/s / 20 target
+waiting for telemetry
+TPS source
+MSPT
+Paper health
+—
+50 ms tick budget
+waiting for telemetry
+MSPT source
+Online players
+Paper health
+—
+Unknown slots
+waiting for telemetry
+Online players source
+JVM heap
+Paper JVM
+—
+Unknown capacity
+waiting for telemetry
+JVM heap source
+Service CPU
+Host / systemd cgroup
+—
+100% = one core
+waiting for telemetry
+Service CPU source
+Service RAM
+Host / systemd cgroup
+—
+Minecraft cgroup / separate from heap
+waiting for telemetry
+Service RAM source
+Selected instance
+plexoncraft
+44648c06-40e8-4e6b-8029-30df30e613f1
+Host service
+unknown / waiting for telemetry
+Service uptime
+Not supplied
+Paper uptime
+—
+Minecraft version
+26.2
+Paper agent version
+5.0.0
+Recent presence activity
+View history
+No recent presence activity
+
+Authorized Paper join and leave observations appear here.
+
+World activity
+No world rows
+Waiting for world telemetry
+
+Fresh Paper health and supplied world rows are required. World capture time is not retained in this view.
+
+Tick history charts
+Source details and safe diagnostics
+Access is granted separately by each server. Operations use the current signed instance.

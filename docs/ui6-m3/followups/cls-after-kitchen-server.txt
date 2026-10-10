@@ -1,0 +1,31 @@
+▲ Next.js 16.3.8 (Turbopack)
+- Local:         http://127.0.0.1:3400
+- Network:       http://127.0.0.1:3400
+✓ Ready in 281ms
+✓ Running next.config.ts took 29ms
+
+ GET / 200 in 508ms (next.js: 354ms, application-code: 155ms)
+ GET / 200 in 29ms (next.js: 4ms, application-code: 24ms)
+ GET /dev/kitchen-sink 200 in 341ms (next.js: 278ms, application-code: 63ms)
+ GET / 200 in 23ms (next.js: 2ms, application-code: 20ms)
+ GET /dev/kitchen-sink 200 in 74ms (next.js: 2ms, application-code: 72ms)
+ GET / 200 in 21ms (next.js: 2ms, application-code: 19ms)
+ GET /dev/kitchen-sink 200 in 45ms (next.js: 1.9ms, application-code: 43ms)
+ GET / 200 in 41ms (next.js: 5ms, application-code: 36ms)
+ GET /dev/kitchen-sink 200 in 69ms (next.js: 3ms, application-code: 67ms)
+ GET / 200 in 24ms (next.js: 2ms, application-code: 22ms)
+ GET /dev/kitchen-sink 200 in 40ms (next.js: 1.9ms, application-code: 38ms)
+ GET / 200 in 20ms (next.js: 3ms, application-code: 18ms)
+ GET /dev/kitchen-sink 200 in 48ms (next.js: 1.7ms, application-code: 46ms)
+ GET / 200 in 23ms (next.js: 3ms, application-code: 20ms)
+ GET /dev/kitchen-sink 200 in 76ms (next.js: 2ms, application-code: 73ms)
+ GET / 200 in 26ms (next.js: 5ms, application-code: 21ms)
+ GET /dev/kitchen-sink 200 in 45ms (next.js: 1.4ms, application-code: 43ms)
+ GET / 200 in 23ms (next.js: 2.0ms, application-code: 21ms)
+ GET /dev/kitchen-sink 200 in 53ms (next.js: 3ms, application-code: 50ms)
+ GET / 200 in 21ms (next.js: 1.8ms, application-code: 19ms)
+ GET /dev/kitchen-sink 200 in 51ms (next.js: 1.8ms, application-code: 49ms)
+ GET / 200 in 22ms (next.js: 1.8ms, application-code: 21ms)
+ GET /dev/kitchen-sink 200 in 47ms (next.js: 3ms, application-code: 45ms)
+ GET / 200 in 22ms (next.js: 2ms, application-code: 20ms)
+ GET /dev/kitchen-sink 200 in 45ms (next.js: 2ms, application-code: 43ms)

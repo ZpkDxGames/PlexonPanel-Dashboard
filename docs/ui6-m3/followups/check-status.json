@@ -1,0 +1,12 @@
+{
+  "command": "npm run check",
+  "exitCode": 0,
+  "tests": [
+    79,
+    201
+  ],
+  "fail": [
+    0,
+    0
+  ]
+}

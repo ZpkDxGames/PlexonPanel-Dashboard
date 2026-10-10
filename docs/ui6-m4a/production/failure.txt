@@ -1,0 +1,100 @@
+Skip to workspace
+Selected server
+PlexonCraft
+— Selected server
+Pulse
+Raw 69 captures / 30 min
+MSPT marks; 50 ms tick budget. 2026-10-08T20:42:57.929Z to 2026-10-08T21:12:57.929Z. Online. Missing time is hatched. Enter opens the exact capture lens.
+30-minute window 2026-10-08T20:42:57.929Z to 2026-10-08T21:12:57.929Z. Arrow keys select a capture; Enter opens the exact lens.
+Online
+4/4 healthy
+Overview
+Refresh
+Online
+
+Minecraft, Host, and relay are connected.
+
+Tick Pulse
+Raw
+69 captures / 30 min
+Pulse window
+30 min
+— Pulse window
+Inspect captures
+MSPT marks; 50 ms tick budget. 2026-10-08T20:42:57.929Z to 2026-10-08T21:12:57.929Z. live / 5s. Missing time is hatched. Enter opens the exact capture lens.
+5:42:57 PM
+0–100 ms / 50 ms budget
+6:12:57 PM
+
+● Healthy ≥19 TPS
+▲ Degraded ≥15
+× Critical <15
+○ Unknown
+Crosshatch: gap / vertical hatch: unknown time
+
+Each mark is one capture; unknown MSPT is outlined. A filled mark at the ceiling means MSPT exceeds 100 ms; inspect its exact value. Arrow keys inspect exact captures; Enter opens the lens. Window ends at 6:12:57 PM; live / 5s. Last browser receipt 6:12:57 PM.
+
+Server instruments
+TPS
+Paper health
+20.00
+ticks/s / 20 target
+live / 5s
+TPS source
+MSPT
+Paper health
+12.00 ms
+50 ms tick budget
+live / 5s
+MSPT source
+Online players
+Paper health
+3
+20 slots
+live / 5s
+Online players source
+JVM heap
+Paper JVM
+1.9 GiB
+5.6 GiB capacity
+live / 5s
+JVM heap source
+Service CPU
+Host / systemd cgroup
+150.0%
+100% = one core
+live / 5s
+Service CPU source
+Service RAM
+Host / systemd cgroup
+3.7 GiB
+Minecraft cgroup / separate from heap
+live / 5s
+Service RAM source
+Selected instance
+plexoncraft
+ac70d942-95ce-4a24-8c29-1b433221e9b2
+Host service
+active / live / 5s
+Service uptime
+Not supplied
+Paper uptime
+2h 0m
+Minecraft version
+26.2
+Paper agent version
+5.0.0
+Recent presence activity
+View history
+No recent presence activity
+
+Authorized Paper join and leave observations appear here.
+
+World activity
+1 world
+Paper world activity; capture time unavailable
+World	Players	Chunks	Entities
+Survival	3	420	128
+Tick history charts
+Source details and safe diagnostics
+Access is granted separately by each server. Operations use the current signed instance.

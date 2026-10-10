@@ -1,0 +1,144 @@
+✖ receipt-aware classifier preserves skew values and expires stopped receipts (1.136644ms)
+✖ Overview, chart, compact Pulse and banner agree at +6 s (201.013682ms)
+✖ Overview, chart, compact Pulse and banner agree at +30 s (47.049535ms)
+✖ Overview, chart, compact Pulse and banner agree at +120 s (42.247845ms)
+✖ skew receipt clock advances at Display rate 0 (34.279913ms)
+✖ skew receipt clock advances at Display rate 500 (33.07128ms)
+✖ skew receipt clock advances at Display rate 2000 (34.128905ms)
+✖ new Paper session clears source receipts and accepts first captures with missing uptime (30.065629ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 0
+ℹ fail 8
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 931.920734
+
+✖ failing tests:
+
+test at tests/clock-skew.test.mjs:47:1
+✖ receipt-aware classifier preserves skew values and expires stopped receipts (1.136644ms)
+  TypeError: classifyTelemetry is not a function
+      at TestContext.<anonymous> (file:///workspace/scratch/28b97b04a664/PlexonPanel-Dashboard/tests/clock-skew.test.mjs:51:16)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17)
+
+test at tests/clock-skew.test.mjs:58:33
+✖ Overview, chart, compact Pulse and banner agree at +6 s (201.013682ms)
+  AssertionError [ERR_ASSERTION]: Expected "actual" to be strictly unequal to: '—'
+      at file:///workspace/scratch/28b97b04a664/PlexonPanel-Dashboard/tests/clock-skew.test.mjs:61:61
+      at async mounted (file:///workspace/scratch/28b97b04a664/PlexonPanel-Dashboard/tests/clock-skew.test.mjs:45:7)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '—',
+    expected: '—',
+    operator: 'notStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests/clock-skew.test.mjs:58:33
+✖ Overview, chart, compact Pulse and banner agree at +30 s (47.049535ms)
+  AssertionError [ERR_ASSERTION]: Expected "actual" to be strictly unequal to: '—'
+      at file:///workspace/scratch/28b97b04a664/PlexonPanel-Dashboard/tests/clock-skew.test.mjs:61:61
+      at async mounted (file:///workspace/scratch/28b97b04a664/PlexonPanel-Dashboard/tests/clock-skew.test.mjs:45:7)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '—',
+    expected: '—',
+    operator: 'notStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests/clock-skew.test.mjs:58:33
+✖ Overview, chart, compact Pulse and banner agree at +120 s (42.247845ms)
+  AssertionError [ERR_ASSERTION]: Expected "actual" to be strictly unequal to: '—'
+      at file:///workspace/scratch/28b97b04a664/PlexonPanel-Dashboard/tests/clock-skew.test.mjs:61:61
+      at async mounted (file:///workspace/scratch/28b97b04a664/PlexonPanel-Dashboard/tests/clock-skew.test.mjs:45:7)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '—',
+    expected: '—',
+    operator: 'notStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests/clock-skew.test.mjs:67:32
+✖ skew receipt clock advances at Display rate 0 (34.279913ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /delayed.*clock skew/. Input:
+  
+  'TPSPaper health20.00ticks/s / 20 targetlive / 0sTPS sourceTPS freshnessSourcePaper healthUnitticks/sCaptured2026-10-10T00:57:29.287ZLatest browser receipt2026-10-10T00:57:17.287Z (any packet)Per-capture receipt is not supplied. Unknown and stale values are unavailable; history retains observed values and gaps.Close'
+  
+      at file:///workspace/scratch/28b97b04a664/PlexonPanel-Dashboard/tests/clock-skew.test.mjs:69:27
+      at async mounted (file:///workspace/scratch/28b97b04a664/PlexonPanel-Dashboard/tests/clock-skew.test.mjs:45:7)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'TPSPaper health20.00ticks/s / 20 targetlive / 0sTPS sourceTPS freshnessSourcePaper healthUnitticks/sCaptured2026-10-10T00:57:29.287ZLatest browser receipt2026-10-10T00:57:17.287Z (any packet)Per-capture receipt is not supplied. Unknown and stale values are unavailable; history retains observed values and gaps.Close',
+    expected: /delayed.*clock skew/,
+    operator: 'match',
+    diff: 'simple'
+  }
+
+test at tests/clock-skew.test.mjs:67:32
+✖ skew receipt clock advances at Display rate 500 (33.07128ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /delayed.*clock skew/. Input:
+  
+  'TPSPaper health20.00ticks/s / 20 targetlive / 0sTPS sourceTPS freshnessSourcePaper healthUnitticks/sCaptured2026-10-10T00:57:40.287ZLatest browser receipt2026-10-10T00:57:28.287Z (any packet)Per-capture receipt is not supplied. Unknown and stale values are unavailable; history retains observed values and gaps.Close'
+  
+      at file:///workspace/scratch/28b97b04a664/PlexonPanel-Dashboard/tests/clock-skew.test.mjs:69:27
+      at async mounted (file:///workspace/scratch/28b97b04a664/PlexonPanel-Dashboard/tests/clock-skew.test.mjs:45:7)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'TPSPaper health20.00ticks/s / 20 targetlive / 0sTPS sourceTPS freshnessSourcePaper healthUnitticks/sCaptured2026-10-10T00:57:40.287ZLatest browser receipt2026-10-10T00:57:28.287Z (any packet)Per-capture receipt is not supplied. Unknown and stale values are unavailable; history retains observed values and gaps.Close',
+    expected: /delayed.*clock skew/,
+    operator: 'match',
+    diff: 'simple'
+  }
+
+test at tests/clock-skew.test.mjs:67:32
+✖ skew receipt clock advances at Display rate 2000 (34.128905ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /delayed.*clock skew/. Input:
+  
+  'TPSPaper health20.00ticks/s / 20 targetlive / 0sTPS sourceTPS freshnessSourcePaper healthUnitticks/sCaptured2026-10-10T00:57:51.287ZLatest browser receipt2026-10-10T00:57:39.287Z (any packet)Per-capture receipt is not supplied. Unknown and stale values are unavailable; history retains observed values and gaps.Close'
+  
+      at file:///workspace/scratch/28b97b04a664/PlexonPanel-Dashboard/tests/clock-skew.test.mjs:69:27
+      at async mounted (file:///workspace/scratch/28b97b04a664/PlexonPanel-Dashboard/tests/clock-skew.test.mjs:45:7)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'TPSPaper health20.00ticks/s / 20 targetlive / 0sTPS sourceTPS freshnessSourcePaper healthUnitticks/sCaptured2026-10-10T00:57:51.287ZLatest browser receipt2026-10-10T00:57:39.287Z (any packet)Per-capture receipt is not supplied. Unknown and stale values are unavailable; history retains observed values and gaps.Close',
+    expected: /delayed.*clock skew/,
+    operator: 'match',
+    diff: 'simple'
+  }
+
+test at tests/clock-skew.test.mjs:72:1
+✖ new Paper session clears source receipts and accepts first captures with missing uptime (30.065629ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /Paper uptimeNot supplied/. Input:
+  
+  'Selected instanceIdentity unavailablefixture-serverHost serviceactive / live / 0sService uptimeNot suppliedPaper uptime—Minecraft version—Paper agent version—'
+  
+      at file:///workspace/scratch/28b97b04a664/PlexonPanel-Dashboard/tests/clock-skew.test.mjs:73:339
+      at async mounted (file:///workspace/scratch/28b97b04a664/PlexonPanel-Dashboard/tests/clock-skew.test.mjs:45:7)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'Selected instanceIdentity unavailablefixture-serverHost serviceactive / live / 0sService uptimeNot suppliedPaper uptime—Minecraft version—Paper agent version—',
+    expected: /Paper uptimeNot supplied/,
+    operator: 'match',
+    diff: 'simple'
+  }

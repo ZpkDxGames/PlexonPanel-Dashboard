@@ -91,9 +91,10 @@ export async function createFleetFixture({ port = 0, origin = "http://127.0.0.1:
   }
   async function telemetry() {
     for (const room of rooms) {
+      if (room.suppressTelemetry) continue;
       const capturedAt = new Date(Date.now() - (room.captureOffsetMs ?? 0)).toISOString();
       await room.paper?.send("telemetry.server", { capturedAt, serverName: room.name, onlinePlayers: room.players, maximumPlayers: 20,
-        tps: [20, 20, 20], averageTickMillis: room === rooms[0] ? 12 : 18 });
+        sourceIntervalMillis: room.sourceIntervalMillis ?? 2000, tps: [room.tickTps === undefined ? 20 : room.tickTps, 20, 20], averageTickMillis: room.tickMspt === undefined ? room === rooms[0] ? 12 : 18 : room.tickMspt });
       await room.host.send("telemetry.system", { capturedAt, nodeId: room.nodeId, metricScope: "NODE", processRole: "HOST",
         hostCpuPercent: 35, physicalMemoryUsedBytes: 8e9, physicalMemoryTotalBytes: 24e9, diskUsedBytes: 39e9, diskTotalBytes: 145e9 });
       await room.host.send("service.status", { nodeId: room.nodeId, state: room.serviceState, minecraftReady: room.serviceState === "active", mainPid: 100,

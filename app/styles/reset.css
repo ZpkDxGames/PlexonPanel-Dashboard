@@ -1,0 +1,6 @@
+@layer reset {
+  .deepslate *, .deepslate *::before, .deepslate *::after { box-sizing: border-box; }
+  .deepslate :where(h1, h2, h3, p, ul, ol, figure) { margin: 0; }
+  .deepslate :where(button, input, select, textarea) { font: inherit; }
+  .deepslate button { cursor: pointer; }
+}

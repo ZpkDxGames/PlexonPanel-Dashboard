@@ -1,0 +1,47 @@
+✔ a fresh Host confirmation distinguishes stopped Minecraft from Host and relay loss (1.339786ms)
+✔ cached, expired, missing and inconsistent signals cannot fabricate stopped status (0.199243ms)
+✔ service transitions, failure and running process without plugin are distinct (0.444807ms)
+✔ compatibility, revocation, stale telemetry and subscription limits remain explicit (0.16832ms)
+✔ connection summaries expose readable status and retry controls without color dependence (6.332339ms)
+✔ active service disables Start and allows stop/restart (0.824246ms)
+✔ inactive service allows only Start (0.12009ms)
+✔ transitioning and unknown service states block lifecycle actions (0.1421ms)
+✔ failed service permits recovery Start but not stop/restart (0.094713ms)
+✔ missing Host service state stays unknown regardless of Paper connectivity (0.118325ms)
+✔ known action codes map to safe actionable guidance (0.656187ms)
+✔ unknown action codes retain the sanitized agent message (0.143045ms)
+✔ lifecycle busy explains rejection without suggesting a deferred stop (0.181121ms)
+✔ safe diagnostics identify Dashboard 5.0.0 without changing protocol 3 (0.720672ms)
+✔ live actions are bound to the exact signed socket grant (7.084292ms)
+✔ preconfirmed maintenance actions are sent once with confirmation (1.88656ms)
+{"component":"PlexonPanelRelay","runtime":"standalone","event":"started","host":"127.0.0.1","port":0,"storage":"coordination-only","version":"5.0.0","gitCommit":"unavailable","buildTimestamp":"unavailable","protocolVersion":3,"runtimeKind":"standalone"}
+▶ mounted Dashboard selects and operates independent signed instances without stale transitions
+  ✔ opening selector shows live named cards and remembers the selected server (911.239124ms)
+  ✔ switch resets data and confirmation before a second signed workspace becomes live (1048.556911ms)
+  ✔ rapid A to B to A dropdown switches establish a fresh live command channel (942.896771ms)
+  ✔ a delayed session grant for an abandoned selection cannot replace the current socket (1055.927928ms)
+  ✔ reload returns to the selector while preserving selection and independent page history (1949.040748ms)
+  ✔ confirmation binds the original server, action and command parameters even if the form changes (96.580544ms)
+  ✔ same-server target generation replacement cancels confirmation before dispatch (91.525152ms)
+  ✔ a completion from an abandoned server is never displayed in the selected workspace (1809.650336ms)
+  ✔ reported grant expansion cannot expand the verified signed grant or dispatch (2997.778547ms)
+  ✔ mounted palette and lifecycle controls cannot use Paper presence as missing Host service state (91.834923ms)
+  ✔ lifecycle commands complete across real signed Paper disconnect and reconnect events (8067.202505ms)
+  ✔ a busy stop stays visible in lifecycle controls without delayed or automatic replay (99.807302ms)
+  ✔ Owner configuration uses Paper editing, reviews changes and preserves conflicts and unsaved work (206.044116ms)
+  ✔ backup setup is instance-specific, unverified checks stay unknown and cached preflight cannot authorize a new job (7600.910252ms)
+  ✔ signed upload progress is shown for the active Host job and ignored for other jobs (742.348908ms)
+  ✔ cold backup review cancels without a command and confirms only the selected Host (1359.169905ms)
+  ✔ Host-confirmed stop, agent disconnect and relay disconnect are different UI states (224.008243ms)
+{"component":"PlexonPanelRelay","runtime":"standalone","code":"PEER_DELIVERY_FAILED","serverId":"8839a621-cfd4-41b9-8aec-965e7e96e8b8","agentKind":"HOST","messageType":"paper.connection","error":"WebSocket send failed"}
+{"component":"PlexonPanelRelay","runtime":"standalone","code":"PEER_DELIVERY_FAILED","serverId":"9aabe7b7-d198-43ff-8d15-8eef4fde2cac","agentKind":"HOST","messageType":"paper.connection","error":"WebSocket send failed"}
+  ✔ revoking one paired server keeps the other available and selectable (685.946534ms)
+✔ mounted Dashboard selects and operates independent signed instances without stale transitions (30185.914219ms)
+ℹ tests 35
+ℹ suites 0
+ℹ pass 35
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 41022.358219

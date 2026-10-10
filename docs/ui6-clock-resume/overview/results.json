@@ -1,0 +1,95 @@
+{
+  "task": "Overview",
+  "environment": "Chromium, signed local relay, simulated agents; no live-server certification",
+  "status": "passed",
+  "screenshots": [
+    "overview-healthy-light-390.png",
+    "overview-healthy-light-1280.png",
+    "overview-healthy-dark-390.png",
+    "overview-healthy-dark-1280.png",
+    "overview-skew-light-390.png",
+    "overview-skew-light-1280.png",
+    "overview-skew-dark-390.png",
+    "overview-skew-dark-1280.png",
+    "overview-stopped-light-390.png",
+    "overview-stopped-light-1280.png",
+    "overview-stopped-dark-390.png",
+    "overview-stopped-dark-1280.png"
+  ],
+  "axe": [
+    {
+      "state": "healthy",
+      "theme": "light",
+      "width": 390,
+      "violations": []
+    },
+    {
+      "state": "healthy",
+      "theme": "light",
+      "width": 1280,
+      "violations": []
+    },
+    {
+      "state": "healthy",
+      "theme": "dark",
+      "width": 390,
+      "violations": []
+    },
+    {
+      "state": "healthy",
+      "theme": "dark",
+      "width": 1280,
+      "violations": []
+    },
+    {
+      "state": "skew",
+      "theme": "light",
+      "width": 390,
+      "violations": []
+    },
+    {
+      "state": "skew",
+      "theme": "light",
+      "width": 1280,
+      "violations": []
+    },
+    {
+      "state": "skew",
+      "theme": "dark",
+      "width": 390,
+      "violations": []
+    },
+    {
+      "state": "skew",
+      "theme": "dark",
+      "width": 1280,
+      "violations": []
+    },
+    {
+      "state": "stopped",
+      "theme": "light",
+      "width": 390,
+      "violations": []
+    },
+    {
+      "state": "stopped",
+      "theme": "light",
+      "width": 1280,
+      "violations": []
+    },
+    {
+      "state": "stopped",
+      "theme": "dark",
+      "width": 390,
+      "violations": []
+    },
+    {
+      "state": "stopped",
+      "theme": "dark",
+      "width": 1280,
+      "violations": []
+    }
+  ],
+  "keyboard": [],
+  "errors": []
+}

@@ -1,0 +1,60 @@
+▲ Next.js 16.3.8 (Turbopack)
+- Local:         http://127.0.0.1:3400
+- Network:       http://127.0.0.1:3400
+✓ Ready in 260ms
+✓ Running next.config.ts took 29ms
+
+ GET /dev/kitchen-sink 200 in 670ms (next.js: 497ms, application-code: 173ms)
+ GET /dev/kitchen-sink 200 in 57ms (next.js: 4ms, application-code: 53ms)
+ GET /dev/kitchen-sink 200 in 59ms (next.js: 3ms, application-code: 56ms)
+ GET /dev/kitchen-sink 200 in 52ms (next.js: 5ms, application-code: 47ms)
+ GET /dev/kitchen-sink 200 in 57ms (next.js: 4ms, application-code: 52ms)
+ GET /dev/kitchen-sink 200 in 68ms (next.js: 3ms, application-code: 64ms)
+ GET /dev/kitchen-sink 200 in 60ms (next.js: 3ms, application-code: 57ms)
+ GET /dev/kitchen-sink 200 in 65ms (next.js: 3ms, application-code: 62ms)
+[browser] A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <LoadingBoundary name="kitchen-sink/" loading={null}>
+      <HTTPAccessFallbackBoundary notFound={undefined} forbidden={undefined} unauthorized={undefined}>
+        <RedirectBoundary>
+          <RedirectErrorBoundary router={{...}}>
+            <InnerLayoutRouter url="/dev/kitch..." tree={[...]} params={{}} cacheNode={{rsc:{...}, ...}} ...>
+              <SegmentViewNode type="page" pagePath="dev/kitche...">
+                <SegmentTrieNode>
+                <DevelopmentKitchenSink>
+                  <KitchenSink>
+                    <div className="deepslate lab" data-development-only="PLEXON_UI6...">
+                      <header>
+                      <aside>
+                      <main>
+                      <Dialog open={false} onClose={function onClose} title="Dialog spe..." description="A fixture ..." ...>
+                        <dialog ref={{current:null}} className="pp-dialog ..." aria-labelledby="_R_iatpesn..." ...>
+                          <header>
+                          <p>
+                          <div className="pp-stack">
+                            <Field label="Dialog field" placeholder="Focus rema...">
+                              <div className="pp-field">
+                                <label>
+                                <input
+                                  placeholder="Focus remains in this dialog"
+                                  id="_R_niatpesnelb_"
+                                  aria-invalid={undefined}
+                                  aria-describedby={undefined}
+-                                 style={{caret-color:"transparent"}}
+                                >
+                            ...
+                          ...
+                      ...
+              ...
+            ...

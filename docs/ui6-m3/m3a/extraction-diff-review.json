@@ -1,0 +1,64 @@
+{
+  "status": "PASS",
+  "base": "40d159a",
+  "jsxRoots": 21,
+  "jsxSHA256": "bf4060e32b329ff8cb4adee4a78bda95b1622d1cb86c53b1adcb38061ad31392",
+  "styles": [
+    {
+      "path": "app/_development/kitchen-sink.css",
+      "sha256": "daa73a63da7cb2c8405f555e3344facdb4dcfb5c3b3ec66e142fba61d552203b"
+    },
+    {
+      "path": "app/activity/activity.module.css",
+      "sha256": "38f8eaa35a2d31537acf8d06cfb0c1d23ee3c4d46e8fe09f9ba491bbf243f53b"
+    },
+    {
+      "path": "app/dashboard.css",
+      "sha256": "5fefa8e4a450546cb1d4b60505da73fd2381886391407bc9aa8cfd573bf62880"
+    },
+    {
+      "path": "app/styles/base.css",
+      "sha256": "89ed4e360ee6f3ea8568e9461acafa0fe7800a334c2ccc60d76833c05ecba307"
+    },
+    {
+      "path": "app/styles/foundation.css",
+      "sha256": "acc56c3d393e9c354c70fc8703cc7325fcc1c29b42548f78b37510a81e3d712a"
+    },
+    {
+      "path": "app/styles/primitives.css",
+      "sha256": "d081a6a83bbcd787beb8200e8228eab17ec110ef4e2b9d94051985cea191040b"
+    },
+    {
+      "path": "app/styles/reset.css",
+      "sha256": "f63f778164e9fb951e15df11bb758a46f7a2202944625d0101cfab016cdc1243"
+    },
+    {
+      "path": "app/styles/tokens.css",
+      "sha256": "bd180924a122d1f42f8b3188c6d494b55474b576deb276f3e6347dfd76cdc485"
+    },
+    {
+      "path": "app/styles/utilities.css",
+      "sha256": "be93c3f3effe6409665943ff7c37f850ba90b013b5c79e0a01907b51fafc0b82"
+    },
+    {
+      "path": "components/select.module.css",
+      "sha256": "fd12a783b103374ed33b95e50b7df64667827ae45d01fd6ab24fa2fc5bb6df35"
+    },
+    {
+      "path": "docs/ui6-design/review-experiments/specimen.css",
+      "sha256": "40dfb5a3bc8348782dc8e083286a42994d4d06cd821a98e838c532ca764a0918"
+    }
+  ],
+  "browserScriptSHA256": "721fa412994c2670920c5d73c4ffa816a66cf6958f9dc4de2d9f28e9fa54b6f0",
+  "protectedPaths": [
+    "protocol",
+    "relay",
+    "lib/data-source.ts",
+    "lib/control-state.ts",
+    "lib/fleet-feed.ts",
+    "lib/browser-store.ts",
+    "package.json",
+    "package-lock.json",
+    "docs/ui-evidence/after"
+  ]
+}

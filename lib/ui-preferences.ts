@@ -171,8 +171,9 @@ export function loadUiPreferences(
 ): UiPreferencesV1 {
   const defaults = createDefaultUiPreferences(playerHeadsAvailable);
   const raw = storage.getItem(UI_PREFERENCES_KEY);
-  const parsed = parseUiPreferencesText(raw, defaults);
-  if (raw) return parsed;
+  // A present key (even empty, malformed or partial) keeps the legacy fallbacks.
+  if (raw !== null) return parseUiPreferencesText(raw, defaults);
+  const parsed: UiPreferencesV1 = { ...defaults, theme: "system", accent: "cyan" };
 
   const legacyDensity = storage.getItem("plexonpanel-density");
   const legacyWindow = Number(storage.getItem("plexonpanel-performance-window"));

@@ -1,0 +1,81 @@
+✔ lib: future Paper captures at 6, 30 and 120 seconds reject independently of Host traffic (3.558855ms)
+✔ lib: a new Paper session retires old captures and accepts first captures without uptime (1.131667ms)
+✖ mounted Overview: 6s future capture has one consistent clock-mismatch presentation (574.530906ms)
+✖ mounted Overview: 30s future capture has one consistent clock-mismatch presentation (168.479729ms)
+✖ mounted Overview: 120s future capture has one consistent clock-mismatch presentation (124.048199ms)
+✔ mounted Overview: restart first captures stay live with missing uptime (89.394977ms)
+✔ mounted Overview: one-second freshness clock remains subscribed with Display update rate 0 (127.481657ms)
+✔ mounted Overview: one-second freshness clock remains subscribed with Display update rate 500 (124.5029ms)
+✔ mounted Overview: one-second freshness clock remains subscribed with Display update rate 2000 (146.313903ms)
+✖ mounted memoized Overview: unchanged capture reveals true latest browser receivedAt (111.515973ms)
+✔ mounted Backups: replay degraded remote-verification failure with pass and fail preflight (233.460039ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 7
+ℹ fail 4
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2784.47231
+
+✖ failing tests:
+
+test at docs/ui6-regression/paper-regression.test.mjs:53:33
+✖ mounted Overview: 6s future capture has one consistent clock-mismatch presentation (574.530906ms)
+  AssertionError [ERR_ASSERTION]: A clock-mismatched capture must not simultaneously claim zero sample age
+      at file:///workspace/scratch/6bc52e5f96f6/dashboard/docs/ui6-regression/paper-regression.test.mjs:59:10
+      at async mounted (file:///workspace/scratch/6bc52e5f96f6/dashboard/docs/ui6-regression/paper-regression.test.mjs:45:7)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at docs/ui6-regression/paper-regression.test.mjs:53:33
+✖ mounted Overview: 30s future capture has one consistent clock-mismatch presentation (168.479729ms)
+  AssertionError [ERR_ASSERTION]: A clock-mismatched capture must not simultaneously claim zero sample age
+      at file:///workspace/scratch/6bc52e5f96f6/dashboard/docs/ui6-regression/paper-regression.test.mjs:59:10
+      at async mounted (file:///workspace/scratch/6bc52e5f96f6/dashboard/docs/ui6-regression/paper-regression.test.mjs:45:7)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at docs/ui6-regression/paper-regression.test.mjs:53:33
+✖ mounted Overview: 120s future capture has one consistent clock-mismatch presentation (124.048199ms)
+  AssertionError [ERR_ASSERTION]: A clock-mismatched capture must not simultaneously claim zero sample age
+      at file:///workspace/scratch/6bc52e5f96f6/dashboard/docs/ui6-regression/paper-regression.test.mjs:59:10
+      at async mounted (file:///workspace/scratch/6bc52e5f96f6/dashboard/docs/ui6-regression/paper-regression.test.mjs:45:7)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at docs/ui6-regression/paper-regression.test.mjs:65:1
+✖ mounted memoized Overview: unchanged capture reveals true latest browser receivedAt (111.515973ms)
+  AssertionError [ERR_ASSERTION]: Memoization must not retain the previous browser receipt
+      at file:///workspace/scratch/6bc52e5f96f6/dashboard/docs/ui6-regression/paper-regression.test.mjs:70:90
+      at async mounted (file:///workspace/scratch/6bc52e5f96f6/dashboard/docs/ui6-regression/paper-regression.test.mjs:45:7)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

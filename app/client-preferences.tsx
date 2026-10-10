@@ -1,7 +1,7 @@
 "use client";
 
-import { Select } from "../components/select";
-import { Badge, Panel } from "./control-views";
+import { Select } from "./ui/workspace";
+import { Badge, Panel, Button } from "./ui/workspace";
 import { useUiPreferences } from "../components/ui-preferences-provider";
 import { displayRateLabel } from "../lib/display-cadence";
 
@@ -19,9 +19,9 @@ function SelectField<T extends string | number>({
   hint?: string;
 }) {
   return (
-    <label className="display-field">
+    <label className="pp-field">
       <span>{label}</span>
-      <Select aria-label=""
+      <Select aria-label={label}
         value={String(value)}
         onValueChange={(selectedValue) => {
           const next = options.find(
@@ -55,7 +55,7 @@ function ToggleField({
   disabled?: boolean;
 }) {
   return (
-    <label className="display-field display-check">
+    <label className="pp-check">
       <span>
         <span>{label}</span>
         {hint && <small>{hint}</small>}
@@ -85,8 +85,9 @@ export function ClientPreferences() {
         title="Interface preferences"
         aside={<Badge tone="cyan">Browser-local</Badge>}
       >
-        <div className="display-preference-grid view-settings-grid">
-          <section className="display-preference-group">
+        <section className="pp-record" aria-label="Appearance preview"><h3>Live appearance preview</h3><p>This example follows your saved theme, accent, density, text and motion choices.</p><div className="pp-row"><Badge tone="green">Example ready</Badge><Button>Example control</Button></div></section>
+        <div className="pp-data-grid">
+          <section className="pp-stack">
             <h3>Appearance</h3>
             <SelectField
               label="Theme"
@@ -124,7 +125,7 @@ export function ClientPreferences() {
             />
           </section>
 
-          <section className="display-preference-group">
+          <section className="pp-stack">
             <h3>Layout</h3>
             <SelectField
               label="Density"
@@ -149,7 +150,7 @@ export function ClientPreferences() {
             />
           </section>
 
-          <section className="display-preference-group">
+          <section className="pp-stack">
             <h3>Motion</h3>
             <SelectField
               label="Motion profile"
@@ -175,7 +176,7 @@ export function ClientPreferences() {
             />
           </section>
 
-          <section className="display-preference-group">
+          <section className="pp-stack">
             <h3>Performance charts</h3>
             <SelectField
               label="Default window"
@@ -223,7 +224,7 @@ export function ClientPreferences() {
             />
           </section>
 
-          <section className="display-preference-group">
+          <section className="pp-stack">
             <h3>Players</h3>
             <ToggleField
               label="Player skin heads"
@@ -271,17 +272,17 @@ export function ClientPreferences() {
             />
           </section>
 
-          <section className="display-preference-group view-browser-data-group">
+          <section className="pp-stack">
             <h3>Browser data behavior</h3>
             <SelectField
               label="Display update rate"
               value={preferences.displayUpdateRateMs}
               options={[
                 { value: 0, label: "Realtime" },
-                { value: 250, label: "Fast · 250 ms" },
-                { value: 500, label: "Balanced · 500 ms" },
-                { value: 1000, label: "Relaxed · 1 second" },
-                { value: 2000, label: "Low activity · 2 seconds" },
+                { value: 250, label: "Fast, 250 ms" },
+                { value: 500, label: "Balanced, 500 ms" },
+                { value: 1000, label: "Relaxed, 1 second" },
+                { value: 2000, label: "Low activity, 2 seconds" },
               ]}
               onChange={(value) => updatePreference("displayUpdateRateMs", value)}
               hint="Controls how often accepted live telemetry is painted to this browser. Paper and Host publish fast source telemetry where supported; critical connection, authorization, lifecycle and action state is always applied immediately."
@@ -292,11 +293,11 @@ export function ClientPreferences() {
           </section>
         </div>
 
-        <div className="display-settings-actions">
-          <button className="ui-button" onClick={resetPreferences}>
+        <div className="pp-row">
+          <Button className="" onClick={resetPreferences}>
             Reset visual preferences
-          </button>
-          <span className="ui-hint">
+          </Button>
+          <span className="pp-muted">
             This changes presentation only. It does not forget credentials,
             revoke this device, change Paper/Host policy or clear server data.
           </span>

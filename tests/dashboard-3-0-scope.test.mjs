@@ -3,12 +3,13 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
 async function source(path) {
+  if (path === "app/dashboard.tsx") return (await Promise.all([path, "app/use-dashboard-session.ts", "app/use-signed-operations.ts", "lib/workspace-navigation.ts", "app/shell.tsx", "app/workspaces.tsx"].map(file => readFile(new URL(`../${file}`, import.meta.url), "utf8")))).join("\n");
   return readFile(new URL(`../${path}`, import.meta.url), "utf8");
 }
 
 const ACTIVE_BACKUPS_VIEW = "app/backups-view.tsx";
 
-test("Dashboard 5.0.0 exposes the active manual-only Backups workspace", async () => {
+test("Dashboard 6.0.0 exposes the active manual-only Backups workspace", async () => {
   const dashboard = await source("app/dashboard.tsx");
   const backups = await source(ACTIVE_BACKUPS_VIEW);
 
@@ -103,14 +104,14 @@ test("retired Paper coordination protocol cannot return", async () => {
   assert.equal(protocol.includes("RETIRED_COORDINATION_TYPES.has(envelope.type)"), true);
 });
 
-test("Dashboard 5.0.0 keeps protocol hooks compatible with a selected-server Configuration workspace", async () => {
+test("Dashboard 6.0.0 keeps protocol hooks compatible with a selected-server Configuration workspace", async () => {
   const dashboard = await source("app/dashboard.tsx");
   assert.equal(dashboard.includes('action.startsWith("backup.")'), true);
   assert.equal(dashboard.includes('action.startsWith("files.")'), true);
   assert.ok(dashboard.includes('case "Configuration"'));
 });
 
-test("Dashboard visible version metadata matches package 5.0.0", async () => {
+test("Dashboard visible version metadata matches package 6.0.0", async () => {
   const dashboard = await source("app/dashboard.tsx");
   const settings = await source("app/settings-view.tsx");
   const server = await source("app/server-view.tsx");
@@ -118,36 +119,28 @@ test("Dashboard visible version metadata matches package 5.0.0", async () => {
   const packageJson = JSON.parse(await source("package.json"));
   const version = versionSource.match(/DASHBOARD_VERSION = "([^"]+)"/)?.[1];
   assert.equal(version, packageJson.version);
-  assert.equal(version, "5.0.0");
+  assert.equal(version, "6.0.0");
   assert.equal(dashboard.includes("DASHBOARD_VERSION"), true);
   assert.equal(settings.includes("DASHBOARD_LABEL"), true);
   assert.equal(server.includes("DASHBOARD_VERSION"), true);
 });
 
-test("Dashboard 5.0.0 responsive architecture does not globally scale the interface", async () => {
-  const css = await source("app/dashboard.css");
+test("Dashboard 6.0.0 responsive architecture does not globally scale the interface", async () => {
+  const css = await source("app/ui/workspace.css");
   assert.equal(/\bzoom\s*:/.test(css), false);
   assert.doesNotMatch(css, /\.workspace-shell\s*\{[^}]*transform\s*:\s*scale\s*\(/);
-  assert.equal(css.includes(".workspace-sidebar.mobile-open"), true);
-  assert.equal(css.includes("@media (max-width: 800px)"), true);
-  assert.equal(css.includes("100dvh"), true);
+  const shell = await source("app/styles/shell.css");
+  assert.ok(shell.includes("@media (max-width: 1023px)"));
+  assert.equal(css.includes("@media(max-width:767px)"), true);
+  assert.ok(shell.includes("100dvh"));
 });
 
-test("Step 8 Backups workspace has responsive production layout", async () => {
-  const css = await source("app/dashboard.css");
-  for (const selector of [
-    ".view-backup-columns",
-    ".view-backup-metrics",
-    ".view-settings-grid",
-    ".backup-readiness-grid",
-    ".backup-phase-list",
-    ".backup-ui-primary-panel",
-    ".backup-ui-modal",
-  ]) assert.equal(css.includes(selector), true, `missing ${selector}`);
-  assert.equal(css.includes("@media (max-width: 800px)"), true);
+test("Backups production layout uses the shared responsive workspace grid",async()=>{
+  const css=await source('app/ui/workspace.css');
+  for(const selector of ['.pp-data-grid','.pp-stat-grid','.pp-phase-list'])assert.ok(css.includes(selector));
 });
 
-test("Dashboard 5.0.0 display update rate exposes every supported browser cadence", async () => {
+test("Dashboard 6.0.0 display update rate exposes every supported browser cadence", async () => {
   const settings = await source("app/client-preferences.tsx");
   const preferences = await source("lib/ui-preferences.ts");
   for (const value of [0, 250, 500, 1000, 2000]) {
@@ -158,12 +151,18 @@ test("Dashboard 5.0.0 display update rate exposes every supported browser cadenc
   assert.equal(settings.includes("critical connection, authorization, lifecycle and action state is always applied immediately"), true);
 });
 
-test("production loads one canonical global stylesheet without legacy overlap", async () => {
+test("foundation is global and the current workspace skin stays out of the development gallery", async () => {
   const layout = await source("app/layout.tsx");
-  assert.deepEqual([...layout.matchAll(/import "(\.\/[^"\n]+\.css)"/g)].map(m => m[1]), ["./dashboard.css"]);
-  const css = await source("app/dashboard.css");
+  assert.deepEqual([...layout.matchAll(/import "(\.\/[^"\n]+\.css)"/g)].map(m => m[1]), ["./styles/foundation.css"]);
+  assert.doesNotMatch(await source("app/page.tsx"), /legacy-workspaces\.css/);
+  assert.doesNotMatch(await source("app/workspaces.tsx"), /legacy-workspaces\.css/);
+  assert.doesNotMatch(await source("app/activity/page.tsx"), /legacy-workspaces\.css/);
+  const gallery = await source("app/dev/kitchen-sink/page.dev.tsx");
+  assert.doesNotMatch(gallery, /dashboard\.css/);
+  assert.match(await source("app/styles/foundation.css"), /@layer reset, tokens, base, primitives, workspaces, utilities;/);
+  const css = await source("app/ui/workspace.css");
   assert.doesNotMatch(css, /(?:--cr|\.cr(?:\d+)?-)/);
   assert.doesNotMatch(css, /backdrop-filter:\s*blur/);
-  assert.ok(css.includes(".client-preferences-dialog"));
-  assert.ok(css.includes(".configuration-workspace"));
+  assert.ok(css.includes(".pp-field"));
+  assert.ok(css.includes(".pp-file-split"));
 });

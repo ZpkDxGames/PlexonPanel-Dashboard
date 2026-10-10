@@ -1,11 +1,11 @@
 import { record, type ControlState } from "./control-state";
 import { fresh } from "./fleet-model";
 import { normalizeServiceState } from "./lifecycle-state";
-import { capturedAtMillis, TELEMETRY_STALE_MS } from "./telemetry-freshness";
+import { capturedAtMillis, TELEMETRY_STALE_MS, classifyTelemetry } from "./telemetry-freshness";
 
 export type ConnectionPhase = "loading" | "unpaired" | "connecting" | "live" | "reconnecting" | "revoked" | "limited";
 export interface ConnectionState {
-  kind: "connecting" | "relay-unavailable" | "access-required" | "limited" | "host-disconnected" | "stopped" | "starting" | "stopping" | "failed" | "paper-disconnected" | "incompatible" | "stale" | "online";
+  kind: "connecting" | "relay-unavailable" | "access-required" | "limited" | "host-disconnected" | "stopped" | "starting" | "stopping" | "failed" | "paper-disconnected" | "incompatible" | "stale" | "online" | "skew";
   label: string;
   detail: string;
   relay: string;
@@ -32,8 +32,8 @@ export function connectionState(state: ControlState, phase: ConnectionPhase, now
     detail: paper ? "Minecraft is connected. Host service controls and backups are unavailable." : "The relay is connected. Host is disconnected; the Minecraft process state is unknown." };
   if (state.ready.server.hostTargetCompatible === false || state.ready.server.paperTargetCompatible === false)
     return { ...result, kind: "incompatible", label: "Agent compatibility issue", detail: "Agent versions or instance bindings do not match. Affected commands remain disabled." };
-  const serviceFresh = fresh(record(state.service.resources).capturedAt, now);
-  const service = serviceFresh ? normalizeServiceState(state.service.state, false) : "unknown";
+  const serviceFresh = fresh(record(state.service.resources).capturedAt, now,state.receipts?.service);
+  const service = serviceFresh ? normalizeServiceState(state.service.state) : "unknown";
   if (!paper && service === "inactive") return { ...result, kind: "stopped", label: "Minecraft stopped", minecraft: "Stopped",
     detail: "Host is connected and confirms that this Minecraft service is stopped." };
   if (service === "activating" || service === "deactivating") {
@@ -50,7 +50,9 @@ export function connectionState(state: ControlState, phase: ConnectionPhase, now
       now >= state.paperConnectedAt && now - state.paperConnectedAt <= TELEMETRY_STALE_MS)
     return { ...result, label: "Waiting for Minecraft telemetry",
       detail: "The Paper agent is connected. Waiting for its first sample from this session." };
-  if (!fresh(state.server.capturedAt, now)) return { ...result, kind: "stale", label: "Minecraft telemetry unavailable",
+  const health=classifyTelemetry({capturedAt:state.server.capturedAt,receivedAt:state.receipts?.paperHealth,connected:paper,now});
+  if (!health.usable) return { ...result, kind: "stale", label: "Minecraft telemetry unavailable",
     detail: "Agents are connected, but Minecraft telemetry is missing, older than 30 seconds, or has an inconsistent clock. Host telemetry and backups are independent." };
+  if(health.skewAheadMs>5000)return {...result,kind:"skew",label:`Paper clock skew +${Math.round(health.skewAheadMs/1000)} s`,detail:`Paper's clock is about ${Math.round(health.skewAheadMs/1000)} s ahead of this browser. Values are the latest received samples. Check time synchronization on the server and on this computer.`};
   return { ...result, kind: "online", label: "Online", detail: "Minecraft, Host, and relay are connected." };
 }

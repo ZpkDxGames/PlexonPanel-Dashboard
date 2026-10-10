@@ -13,7 +13,7 @@ test("3.5 promotes Fully Backup Now with selectable durable countdowns", async (
   for (const text of [
     "Fully Backup Now",
     "Confirm Fully Backup Now",
-    "Destructive maintenance confirmation",
+    '<Dialog open title="Fully Backup Now"',
     "Initial player countdown",
     "30 minutes",
     "15 minutes",
@@ -56,7 +56,7 @@ test("Host preflight is authoritative and gates Fully Backup Now", async () => {
   ]) assert.equal(view.includes(marker), true, `preflight gate missing ${marker}`);
 
   assert.equal(view.includes('props.can("maintenance.full-backup.create", "HOST")'), true);
-  assert.equal(view.includes("Paper is informative only"), true);
+  assert.equal(view.includes("Manual full backups run on the Host."), true);
   assert.equal(view.includes("Paper dependency"), true);
 });
 
@@ -113,7 +113,7 @@ test("truthful progress and verification details do not invent an ETA", async ()
     "remoteBackupVerified",
     "Error code",
     "Safe message",
-    "No live byte counter reported for this phase",
+    "Not supplied",
     "Creating ZIP archive",
     "Uploading ZIP to Google Drive",
     "Removing temporary VPS ZIP",
@@ -126,7 +126,7 @@ test("degraded and recovery-required states block or recover safely", async () =
   const view = await source(BACKUPS_VIEW);
   assert.equal(view.includes('operationPhase === "DEGRADED"'), true);
   assert.equal(view.includes('operationPhase === "RECOVERY_REQUIRED"'), true);
-  assert.equal(view.includes("Local backup verified; off-site copy is not current."), true);
+  assert.equal(view.includes("Local backup verified. Off-site copy not current."), true);
   assert.equal(view.includes("Retry Upload does not stop Minecraft again."), true);
   assert.equal(view.includes('runOperation("backup.full.retry-upload"'), true);
   assert.equal(view.includes("Verify & resolve recovery"), true);
@@ -170,7 +170,7 @@ test("stable backup history exposes read-only-safe Host operations", async () =>
   assert.equal(view.includes("Direct server-tree restore is intentionally excluded"), true);
   assert.equal(view.includes("Minecraft tree read-only"), true);
   assert.equal(view.includes("VPS temp released"), true);
-  assert.equal(view.includes("Google Drive · VPS temporary ZIP released"), true);
+  assert.equal(view.includes("Google Drive. VPS temporary ZIP released"), true);
 });
 
 test("safe failures remain structured and browser boundary retains provider secrecy", async () => {
@@ -209,24 +209,11 @@ test("destructive maintenance actions remain capability-gated at browser and rel
   }
 });
 
-test("responsive Step 8 backup layout avoids global scaling and styles the confirmation surface", async () => {
-  const css = await source("app/dashboard.css");
-  for (const selector of [
-    ".backup-readiness-grid",
-    ".backup-phase-list",
-    ".backup-ui-primary-panel",
-    "dialog::backdrop",
-    ".backup-ui-confirm-grid",
-    ".backup-ui-recovery",
-    ".backup-ui-degraded",
-    ".backup-hero",
-    ".backup-countdown-grid",
-    ".backup-countdown-option",
-    ".backup-live-progress",
-    ".backup-weekday-picker",
-  ]) assert.equal(css.includes(selector), true, `missing responsive selector ${selector}`);
-  assert.equal(css.includes("@media (max-width: 800px)"), true);
-  assert.equal(css.includes("@media (max-width: 540px)"), true);
-  assert.equal(/\bzoom\s*:/.test(css), false);
-  assert.equal(/transform\s*:\s*scale\s*\(/.test(css), false);
+test("Backups uses shared responsive panels and the common confirmation surface",async()=>{
+  const css=await source('app/ui/workspace.css');
+  const view=await source(BACKUPS_VIEW);
+  for(const selector of ['.pp-data-grid','.pp-phase-list','.pp-table','.pp-form'])assert.ok(css.includes(selector));
+  assert.ok(view.includes('<Dialog open title="Fully Backup Now"'));
+  assert.ok(view.includes('data-cards="true"'));
+  assert.ok(!/\bzoom\s*:/.test(css));assert.ok(!/transform\s*:\s*scale\s*\(/.test(css));
 });

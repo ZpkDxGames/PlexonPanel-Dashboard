@@ -1,0 +1,20 @@
+@layer base {
+  body { margin: 0; font-family: var(--ds-font-ui); background: var(--ds-canvas); color: var(--ds-text); }
+  .deepslate {
+    color-scheme: var(--ds-color-scheme);
+    background: var(--ds-canvas); color: var(--ds-text);
+    font: var(--ds-weight-body) var(--ds-type-body)/var(--ds-leading-body) var(--ds-font-ui);
+  }
+  .deepslate :where(h1, h2, h3) { font-weight: var(--ds-weight-heading); line-height: var(--ds-leading-heading); }
+  .deepslate h1 { font-size: var(--ds-type-display); }
+  .deepslate h2 { font-size: var(--ds-type-heading); }
+  .deepslate h3 { font-size: var(--ds-type-subhead); }
+  .deepslate :where(button, input, select, textarea, a, summary, [tabindex]):focus-visible {
+    outline: var(--ds-focus-width) solid var(--ds-accent); outline-offset: var(--ds-focus-offset);
+  }
+  .deepslate code, .deepslate pre, .pp-identifier { font-family: var(--ds-font-mono); font-weight: var(--ds-weight-body); }
+  .deepslate :where(button, input, select, textarea):disabled { cursor: not-allowed; }
+  @media (max-width: 48rem) { .deepslate { font-size: var(--ds-type-mobile); } }
+  [data-plexon-text-scale="112.5"] { font-size: 112.5%; }
+  [data-plexon-text-scale="125"] { font-size: 125%; }
+}

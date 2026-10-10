@@ -1,0 +1,21 @@
+{
+  "task": "Audit",
+  "environment": "Chromium, signed local relay, simulated agents; no live-server certification",
+  "status": "passed",
+  "screenshots": [
+    "audit-light-390.png",
+    "audit-light-1280.png",
+    "audit-dark-390.png",
+    "audit-dark-1280.png"
+  ],
+  "axe": [
+    {
+      "workspace": "Audit",
+      "violations": []
+    }
+  ],
+  "keyboard": [
+    "Audit local search and table alternative with Enter"
+  ],
+  "errors": []
+}

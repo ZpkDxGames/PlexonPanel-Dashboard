@@ -1,0 +1,197 @@
+{
+  "stage": "after",
+  "buildId": "R2qMbEzCng4u6Q6Fr8CAY",
+  "method": "Actual root prerender script URLs; raw bytes and independently gzipped payloads. Entire static-JS set also shown; not all chunks are initial requests.",
+  "initial": [
+    {
+      "url": "/_next/static/chunks/3450qyhportkm.js",
+      "bytes": 34015,
+      "gzipBytes": 9030
+    },
+    {
+      "url": "/_next/static/chunks/2lm6ee1ot3_cu.js",
+      "bytes": 227963,
+      "gzipBytes": 71334
+    },
+    {
+      "url": "/_next/static/chunks/0v0lnq0inw1__.js",
+      "bytes": 160871,
+      "gzipBytes": 43872
+    },
+    {
+      "url": "/_next/static/chunks/turbopack-1m9e11ujie628.js",
+      "bytes": 9721,
+      "gzipBytes": 3844
+    },
+    {
+      "url": "/_next/static/chunks/2mgy75sp4wjo1.js",
+      "bytes": 27051,
+      "gzipBytes": 7760
+    },
+    {
+      "url": "/_next/static/chunks/2bckgzjj93mtn.js",
+      "bytes": 418,
+      "gzipBytes": 256
+    },
+    {
+      "url": "/_next/static/chunks/3g09ce-qqwg10.js",
+      "bytes": 40535,
+      "gzipBytes": 13742
+    },
+    {
+      "url": "/_next/static/chunks/0ufx6omh8bzfk.js",
+      "bytes": 39238,
+      "gzipBytes": 13247
+    },
+    {
+      "url": "/_next/static/chunks/0cz1d0mv5g_q7.js",
+      "bytes": 112594,
+      "gzipBytes": 39627
+    },
+    {
+      "url": "/_next/static/chunks/0jvhpaew_uadu.js",
+      "bytes": 6557,
+      "gzipBytes": 2351
+    }
+  ],
+  "initialTotal": {
+    "bytes": 658963,
+    "gzipBytes": 205063
+  },
+  "allStaticJS": [
+    {
+      "file": "05hthe9jwtvna.js",
+      "bytes": 15282,
+      "gzipBytes": 5530
+    },
+    {
+      "file": "0ch5oeg0f8hlp.js",
+      "bytes": 42204,
+      "gzipBytes": 12073
+    },
+    {
+      "file": "0cz1d0mv5g_q7.js",
+      "bytes": 112594,
+      "gzipBytes": 39627
+    },
+    {
+      "file": "0dozo7bfq3nqo.js",
+      "bytes": 7362,
+      "gzipBytes": 3052
+    },
+    {
+      "file": "0jvhpaew_uadu.js",
+      "bytes": 6557,
+      "gzipBytes": 2351
+    },
+    {
+      "file": "0m3oo6pllwfvz.js",
+      "bytes": 22935,
+      "gzipBytes": 8402
+    },
+    {
+      "file": "0ufx6omh8bzfk.js",
+      "bytes": 39238,
+      "gzipBytes": 13247
+    },
+    {
+      "file": "0v0lnq0inw1__.js",
+      "bytes": 160871,
+      "gzipBytes": 43872
+    },
+    {
+      "file": "14_z472lio2kd.js",
+      "bytes": 14613,
+      "gzipBytes": 5192
+    },
+    {
+      "file": "1b3tqucp0ptfq.js",
+      "bytes": 38288,
+      "gzipBytes": 12794
+    },
+    {
+      "file": "1r_s8igz47t-_.js",
+      "bytes": 18435,
+      "gzipBytes": 5960
+    },
+    {
+      "file": "2-adhaeckliw5.js",
+      "bytes": 23663,
+      "gzipBytes": 7003
+    },
+    {
+      "file": "2av_0riy60n44.js",
+      "bytes": 52685,
+      "gzipBytes": 14617
+    },
+    {
+      "file": "2bckgzjj93mtn.js",
+      "bytes": 418,
+      "gzipBytes": 256
+    },
+    {
+      "file": "2harknxj13dks.js",
+      "bytes": 21533,
+      "gzipBytes": 6903
+    },
+    {
+      "file": "2iqzym2-5jbd-.js",
+      "bytes": 10493,
+      "gzipBytes": 3509
+    },
+    {
+      "file": "2lm6ee1ot3_cu.js",
+      "bytes": 227963,
+      "gzipBytes": 71334
+    },
+    {
+      "file": "2mgy75sp4wjo1.js",
+      "bytes": 27051,
+      "gzipBytes": 7760
+    },
+    {
+      "file": "2x7drl_o7k8dp.js",
+      "bytes": 25418,
+      "gzipBytes": 8683
+    },
+    {
+      "file": "3450qyhportkm.js",
+      "bytes": 34015,
+      "gzipBytes": 9030
+    },
+    {
+      "file": "39vvjvvnktlov.js",
+      "bytes": 9046,
+      "gzipBytes": 3176
+    },
+    {
+      "file": "3fntmmi971322.js",
+      "bytes": 14377,
+      "gzipBytes": 3661
+    },
+    {
+      "file": "3g09ce-qqwg10.js",
+      "bytes": 40535,
+      "gzipBytes": 13742
+    },
+    {
+      "file": "3sw_wrxcy712x.js",
+      "bytes": 4273,
+      "gzipBytes": 1425
+    },
+    {
+      "file": "40afb4u1eu6pc.js",
+      "bytes": 19827,
+      "gzipBytes": 7160
+    },
+    {
+      "file": "turbopack-1m9e11ujie628.js",
+      "bytes": 9721,
+      "gzipBytes": 3844
+    }
+  ],
+  "allStaticTotal": {
+    "bytes": 999397,
+    "gzipBytes": 314203
+  }
+}

@@ -1,6 +1,7 @@
 "use client";
 
-import { Select } from "../components/select";
+import { Button, Select } from "./ui/workspace";
+import { Dialog } from "./ui/primitives";
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { sendDashboardAction } from "../lib/data-source";
@@ -29,7 +30,6 @@ export function ActivityHistoryModal({
   open: boolean;
   onClose: () => void;
 }) {
-  const dialogRef = useRef<HTMLDialogElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
   const generation = useRef(0);
   const pending = useRef(false);
@@ -61,10 +61,6 @@ export function ActivityHistoryModal({
   const entries = activityPage(current?.entries ?? [], live, Boolean(current && current.index === 0));
 
   useEffect(() => {
-    const dialog = dialogRef.current;
-    if (!dialog) return;
-    if (open && !dialog.open) dialog.showModal();
-    if (!open && dialog.open) dialog.close();
     if (open) {
       const timer = window.setTimeout(() => searchRef.current?.focus(), 0);
       return () => window.clearTimeout(timer);
@@ -168,26 +164,12 @@ export function ActivityHistoryModal({
         : "";
 
   return (
-    <dialog
-      ref={dialogRef}
-      className="view-activity-dialog"
-      aria-labelledby="view-activity-dialog-title"
-      onCancel={(event) => { event.preventDefault(); onClose(); }}
-      onClick={(event) => { if (event.target === event.currentTarget) onClose(); }}
-    >
-      <div className="view-activity-modal-shell">
-        <header className="view-activity-modal-head">
-          <div>
-            <span>Control Room / Players</span>
-            <h2 id="view-activity-dialog-title">Player activity</h2>
-            <p>Paper&apos;s local presence journal is the history source. Opening this view keeps the live dashboard session connected.</p>
-          </div>
-          <button type="button" className="view-activity-close" onClick={onClose} aria-label="Close activity history">×</button>
-        </header>
-        <section className="view-activity-modal-controls" aria-label="Activity history filters">
-          <input ref={searchRef} type="search" maxLength={64} placeholder="Player name or UUID"
+    <Dialog open={open} onClose={onClose} title="Player activity" description="Paper's local presence journal is the retained history source.">
+      <div className="pp-workspace">
+        <section className="pp-toolbar" aria-label="Activity history filters">
+          <label>Search player activity<input ref={searchRef} type="search" maxLength={64} placeholder="Player name or UUID"
             aria-label="Search player activity" value={filters.query}
-            onChange={(event) => setFilters((value) => ({ ...value, query: event.target.value }))} />
+            onChange={(event) => setFilters((value) => ({ ...value, query: event.target.value }))} /></label>
           <Select aria-label="Filter activity type" value={filters.status}
             onValueChange={(selectedValue) => setFilters((value) => ({ ...value, status: selectedValue as ActivityFilters["status"] }))}>
             <option value="ALL">All activity</option><option value="ONLINE">Joins</option><option value="OFFLINE">Leaves</option>
@@ -197,35 +179,35 @@ export function ActivityHistoryModal({
           <label>To <input type="date" value={filters.to}
             onChange={(event) => setFilters((value) => ({ ...value, to: event.target.value }))} /></label>
         </section>
-        <div className="view-activity-modal-scroll" aria-live="polite">
-          {unavailable && <div className="view-activity-modal-empty">{unavailable}</div>}
-          {!unavailable && error && <p role="alert" className="workspace-bounded">{error}</p>}
-          {!unavailable && busy && !current && <div className="view-activity-modal-empty">Querying Paper history…</div>}
-          {!unavailable && !busy && !current && !error && <div className="view-activity-modal-empty">Waiting for Paper history…</div>}
+        <div className="pp-scroll-region" aria-live="polite">
+          {unavailable && <div className="pp-notice">{unavailable}</div>}
+          {!unavailable && error && <p role="alert" className="pp-notice">{error}</p>}
+          {!unavailable && busy && !current && <div className="pp-notice">Querying Paper history…</div>}
+          {!unavailable && !busy && !current && !error && <div className="pp-notice">Waiting for Paper history…</div>}
           {!unavailable && current && (
             <>
-              <p className="workspace-bounded" role="status">
-                Page {current.index + 1} · {current.entries.length} journal records
-                {current.capturedAt ? ` · queried ${time(current.capturedAt)}` : ""}.
+              <p className="pp-notice" role="status">
+                Page {current.index + 1} / {current.entries.length} journal records
+                {current.capturedAt ? ` / queried ${time(current.capturedAt)}` : ""}.
                 {current.bounded && " Scan or retention limits may omit older observations."}
                 {" "}Live rows are transient until they appear in the journal.
               </p>
               {entries.length ? (
-                <section className="view-activity-modal-groups" aria-label="Paper player activity">
-                  <article className="view-activity-modal-group">
+                <section className="pp-list" aria-label="Paper player activity">
+                  <article className="pp-stack">
                     <header><strong>Newest first</strong><span>{entries.length} shown</span></header>
                     <div>
                       {entries.map((item) => (
-                        <div className="view-activity-modal-row" key={item.eventId}>
-                          <span className="view-activity-initial" aria-hidden>{item.name.slice(0, 1).toUpperCase()}</span>
-                          <div className="view-activity-modal-identity">
+                        <div className="pp-list-row" key={item.eventId}>
+                          <span className="pp-initial" aria-hidden>{item.name.slice(0, 1).toUpperCase()}</span>
+                          <div className="pp-row-details">
                             <strong>{item.name}</strong><small>{item.uuid}</small>
                             {item.termination === "UNKNOWN_DISCONNECT" && <small>Disconnect time unknown</small>}
                             {item.state === "LEFT" && item.sessionDurationMillis !== null && <small>Session {duration(item.sessionDurationMillis)}</small>}
                           </div>
-                          <div className="view-activity-modal-meta">
+                          <div className="pp-stack">
                             <span data-state={item.state}>{item.state === "JOINED" ? "Joined" : "Left"}</span>
-                            <small>{item.durable ? "Paper journal" : "Live · pending"}</small>
+                            <small>{item.durable ? "Paper journal" : "Live / pending"}</small>
                             <time dateTime={item.observedAt} title={item.observedAt}>{time(item.observedAt)}</time>
                           </div>
                         </div>
@@ -233,26 +215,26 @@ export function ActivityHistoryModal({
                     </div>
                   </article>
                 </section>
-              ) : <div className="view-activity-modal-empty">No matching journal observations are retained in this bounded page.</div>}
-              <div className="view-activity-load-more">
-                <button type="button" disabled={busy || current.index === 0}
-                  onClick={() => void navigate(current.index - 1, cursors[current.index - 1])}>Newer page</button>
-                <button type="button" disabled={busy || !current.nextCursor || current.index >= MAX_ACTIVITY_PAGES - 1}
+              ) : <div className="pp-notice">No matching journal observations are retained in this bounded page.</div>}
+              <div className="pp-row">
+                <Button type="button" disabled={busy || current.index === 0}
+                  onClick={() => void navigate(current.index - 1, cursors[current.index - 1])}>Newer page</Button>
+                <Button type="button" disabled={busy || !current.nextCursor || current.index >= MAX_ACTIVITY_PAGES - 1}
                   onClick={() => void navigate(current.index + 1, current.nextCursor)}>
                   {busy ? "Loading…" : "Older page"}
-                </button>
+                </Button>
               </div>
             </>
           )}
           {unavailable && live.length > 0 && (
-            <p className="workspace-bounded">There are {live.length} recent live presence events in this tab only. They are not a historical record.</p>
+            <p className="pp-notice">There are {live.length} recent live presence events in this tab only. They are not a historical record.</p>
           )}
         </div>
-        <footer className="view-activity-modal-foot">
+        <footer className="pp-muted">
           <span>Times use your device time zone. Pages contain at most {ACTIVITY_PAGE_SIZE} journal records; this view caps navigation at {MAX_ACTIVITY_PAGES} pages.</span>
           <span>Retention and scan limits are set locally on Paper.</span>
         </footer>
       </div>
-    </dialog>
+    </Dialog>
   );
 }

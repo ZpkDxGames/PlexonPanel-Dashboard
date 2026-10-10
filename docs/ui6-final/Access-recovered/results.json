@@ -1,0 +1,21 @@
+{
+  "task": "Access",
+  "environment": "Chromium, signed local relay, simulated agents; no live-server certification",
+  "status": "passed",
+  "screenshots": [
+    "access-light-390.png",
+    "access-light-1280.png",
+    "access-dark-390.png",
+    "access-dark-1280.png"
+  ],
+  "axe": [
+    {
+      "workspace": "Access",
+      "violations": []
+    }
+  ],
+  "keyboard": [
+    "Device detail with Enter; Escape restores focus; revoke not executed"
+  ],
+  "errors": []
+}

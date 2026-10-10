@@ -1,6 +1,6 @@
 "use client";
 
-import { Select } from "../../components/select";
+import { Select, Button, Badge } from "../ui/workspace";
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
@@ -120,11 +120,11 @@ export default function ActivityPage() {
   const uniquePlayers = new Set(events.map((event) => event.uuid)).size;
 
   return (
-    <main className={styles.page}>
+    <main className={`deepslate ${styles.page}`}>
       <div className={styles.shell}>
         <header className={styles.header}>
           <div>
-            <span className={styles.eyebrow}>Control Room / Activity</span>
+            <span>Browser archive</span>
             <h1>Legacy browser activity archive</h1>
             <p>
               These older, browser-captured entries are partial and unverified. They are not
@@ -133,15 +133,14 @@ export default function ActivityPage() {
             </p>
           </div>
           <Link className={styles.back} href="/">
-            ← Back to dashboard
+            Back to dashboard
           </Link>
         </header>
 
         {servers.length > 1 && (
           <label>
-            <span className={styles.eyebrow}>Stored server</span>
+            <span>Stored server</span>
             <Select aria-label="Stored server"
-              className={styles.serverSelect}
               value={serverId}
               onValueChange={(selectedValue) => updateServer(selectedValue)}
             >
@@ -198,7 +197,8 @@ export default function ActivityPage() {
             <option value="NEWEST">Newest first</option>
             <option value="OLDEST">Oldest first</option>
           </Select>
-          <button
+          <Button
+            variant="danger"
             type="button"
             className={styles.danger}
             disabled={!serverId || events.length === 0}
@@ -213,7 +213,7 @@ export default function ActivityPage() {
             }}
           >
             Clear legacy archive
-          </button>
+          </Button>
         </section>
 
         {!serverId ? (
@@ -227,7 +227,7 @@ export default function ActivityPage() {
               <article className={styles.group} key={label}>
                 <header className={styles.groupHeader}>
                   <strong>{label}</strong>
-                  <span>{group.length.toLocaleString()} events</span>
+                  <span>{group.length.toLocaleString()} {group.length === 1 ? "event" : "events"}</span>
                 </header>
                 <div className={styles.list}>
                   {group.map((event) => (
@@ -243,9 +243,7 @@ export default function ActivityPage() {
                         <small>{event.uuid}</small>
                       </div>
                       <div className={styles.meta}>
-                        <span className={styles.badge} data-state={event.state}>
-                          {event.state === "JOINED" ? "JOINED" : "LEFT"}
-                        </span>
+                        <Badge tone={event.state === "JOINED" ? "green" : "quiet"}>{event.state === "JOINED" ? "Joined" : "Left"}</Badge>
                         <time dateTime={event.observedAt}>{eventTime(event)}</time>
                       </div>
                     </div>

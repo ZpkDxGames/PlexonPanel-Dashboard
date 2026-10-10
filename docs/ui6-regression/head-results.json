@@ -1,0 +1,149 @@
+{
+  "version": "6.0",
+  "skew": [
+    {
+      "seconds": 6,
+      "tiles": [
+        {
+          "field": "tps",
+          "reading": "—",
+          "clockMismatch": true
+        },
+        {
+          "field": "mspt",
+          "reading": "—",
+          "clockMismatch": true
+        },
+        {
+          "field": "players",
+          "reading": "—",
+          "clockMismatch": true
+        },
+        {
+          "field": "heap",
+          "reading": "—",
+          "clockMismatch": true
+        }
+      ],
+      "banner": "Minecraft telemetry unavailable",
+      "hostCpu": "150.0%",
+      "chartAge": "Last sample 0.0s ago",
+      "headerPulse": "TickPulse mounted with stale connection status; full shell not executed"
+    },
+    {
+      "seconds": 30,
+      "tiles": [
+        {
+          "field": "tps",
+          "reading": "—",
+          "clockMismatch": true
+        },
+        {
+          "field": "mspt",
+          "reading": "—",
+          "clockMismatch": true
+        },
+        {
+          "field": "players",
+          "reading": "—",
+          "clockMismatch": true
+        },
+        {
+          "field": "heap",
+          "reading": "—",
+          "clockMismatch": true
+        }
+      ],
+      "banner": "Minecraft telemetry unavailable",
+      "hostCpu": "150.0%",
+      "chartAge": "Last sample 0.0s ago",
+      "headerPulse": "TickPulse mounted with stale connection status; full shell not executed"
+    },
+    {
+      "seconds": 120,
+      "tiles": [
+        {
+          "field": "tps",
+          "reading": "—",
+          "clockMismatch": true
+        },
+        {
+          "field": "mspt",
+          "reading": "—",
+          "clockMismatch": true
+        },
+        {
+          "field": "players",
+          "reading": "—",
+          "clockMismatch": true
+        },
+        {
+          "field": "heap",
+          "reading": "—",
+          "clockMismatch": true
+        }
+      ],
+      "banner": "Minecraft telemetry unavailable",
+      "hostCpu": "150.0%",
+      "chartAge": "Last sample 0.0s ago",
+      "headerPulse": "TickPulse mounted with stale connection status; full shell not executed"
+    }
+  ],
+  "restart": {
+    "tps": "20.00",
+    "heap": "953.7 MiB",
+    "uptimeSupplied": false
+  },
+  "backup": [
+    {
+      "preflight": "pass",
+      "phase": "Degraded — retry upload available",
+      "errorCode": "REMOTE_VERIFY_FAILED",
+      "localVerification": "Verified",
+      "remoteVerification": "Not current — retryable",
+      "phaseShown": true,
+      "errorShown": true,
+      "localVerified": true,
+      "launchLabel": "Review & start backup",
+      "launchDisabled": false,
+      "retryVisible": true,
+      "retryDisabled": false
+    },
+    {
+      "preflight": "fail",
+      "phase": "Degraded — retry upload available",
+      "errorCode": "REMOTE_VERIFY_FAILED",
+      "localVerification": "Verified",
+      "remoteVerification": "Not current — retryable",
+      "phaseShown": true,
+      "errorShown": true,
+      "localVerified": true,
+      "launchLabel": "Review & start backup",
+      "launchDisabled": true,
+      "retryVisible": true,
+      "retryDisabled": false
+    }
+  ],
+  "clock": [
+    {
+      "displayRateMs": 0,
+      "clockSubscribers": "one shared interval",
+      "agedWithoutParentRender": true
+    },
+    {
+      "displayRateMs": 500,
+      "clockSubscribers": "one shared interval",
+      "agedWithoutParentRender": true
+    },
+    {
+      "displayRateMs": 2000,
+      "clockSubscribers": "one shared interval",
+      "agedWithoutParentRender": true
+    }
+  ],
+  "receipt": {
+    "initialReceivedAt": 1791559291728,
+    "trueReceivedAt": 1791559291828,
+    "rendered": "2026-10-09T15:21:31.728Z (any packet)"
+  }
+}

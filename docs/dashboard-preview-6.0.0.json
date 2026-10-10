@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "version": "6.0.0",
+  "state": "HOLD",
+  "target": "dashboard-preview",
+  "branch": "release/6.0.0",
+  "acceptedDashboardSourceCommit": "13410f765fab920c4ff46a1c4e9fc1f80d095d04",
+  "acceptedCoreSourceCommit": "fb3c5444715179425183aec6d1f1fbe140211753",
+  "runtimeCertification": "NOT_EXECUTED",
+  "operatorDecision": {
+    "approved": true,
+    "intent": "DASHBOARD_PREVIEW",
+    "confirmedAt": "2026-10-10T14:47:42Z",
+    "reason": "The operator authorized release publication, a preview deployment and certification. This receipt authorizes only a Dashboard preview; production and Worker publication remain held until live certification is complete."
+  }
+}
