@@ -34,10 +34,10 @@ export function makeFixture(mode = "healthy", now = Date.now()): ControlState {
     consoleAuthority: mode === "offline" ? "UNAVAILABLE" : "HOST",
     server: {
       fingerprint: "fixture",
-      serverName: "Survival · São Paulo",
+      serverName: "TonimSMP",
       pluginVersion: "5.0.0",
       hostVersion: "5.0.0",
-      minecraftVersion: "1.21.8",
+      minecraftVersion: "26.3",
       capabilities: caps,
       paperCapabilities: caps,
       hostCapabilities: caps,
@@ -57,6 +57,8 @@ export function makeFixture(mode = "healthy", now = Date.now()): ControlState {
     onlinePlayers: 24,
     maxPlayers: 80,
     serverName: state.ready.server.serverName,
+    motd: '§bTonimSMP §7| §aSurvival §e26.3 §7· Welcome home!',
+    uptimeMillis: 3 * 86400000 + 14 * 3600000 + 22 * 60000,
   };
   state.system =
     mode === "partial"
@@ -127,9 +129,13 @@ export function makeFixture(mode = "healthy", now = Date.now()): ControlState {
   state.console = Array.from({ length: 90 }, (_, i) => ({
     id: `line-${i}`,
     capturedAt: new Date(now - (90 - i) * 1700).toISOString(),
-    level: i === 74 ? "WARN" : "INFO",
+    level: i === 74 ? "WARN" : i === 85 ? 'ERROR' : "INFO",
     content:
-      i === 74
+      i === 85 ? '[WorldGuard] Task execution failed for plugin WorldGuard v7.0.12'
+      : i === 86 ? '\tat com.sk89q.worldguard.WorldGuard.tick(WorldGuard.java:42)'
+      : i === 87 ? 'Caused by: java.lang.IllegalStateException: World not ready'
+      : i === 88 ? '\tat java.base/java.lang.Thread.run(Thread.java:1)'
+      : i === 74
         ? "Can't keep up! Running 1241ms or 24 ticks behind"
         : i === 8
           ? "\u001b[33m[Server thread/WARN]\u001b[0m Chunk save exceeded the target window"
@@ -139,6 +145,9 @@ export function makeFixture(mode = "healthy", now = Date.now()): ControlState {
           ? "<aqua><bold>[PlexonPanel]</bold></aqua> <gray>Host journal stream attached</gray>"
         : i % 9 === 0
           ? "[Server] Saved the game"
+          : i % 7 === 0 ? `${["AntônioNeto", "LumaCraft", "EnderScout"][i % 3]} joined the game`
+          : i % 6 === 0 ? `<${["AntônioNeto", "LumaCraft", "EnderScout"][i % 3]}> Anyone up for the nether hub?`
+          : i % 5 === 0 ? 'LumaCraft left the game'
           : `[Server] ${["AntônioNeto", "LumaCraft", "EnderScout"][i % 3]} issued server command: /home`,
     source: "HOST",
   }));
@@ -155,14 +164,14 @@ export function makeFixture(mode = "healthy", now = Date.now()): ControlState {
     },
   ];
   state.history = Array.from({ length: 300 }, (_, i) => {
-    const lag = i > 170 && i < 195;
+    const lag = i === 30 || i === 220;
     return {
       at: now - (299 - i) * 3000,
       tps:
         i === 140
           ? null
           : lag
-            ? 16.8 + Math.sin(i) * 0.5
+            ? 18.4
             : 19.85 + Math.sin(i / 8) * 0.12,
       mspt:
         i === 140
@@ -184,6 +193,7 @@ export function makeFixture(mode = "healthy", now = Date.now()): ControlState {
       },
     };
   });
+  if(mode==='idle'){state.server={...state.server,tps:[20,20,20],averageTickMillis:.2,onlinePlayers:0};state.system={...state.system,processCpuPercent:.4,jvmHeapUsedBytes:1.1*2**30};state.players=[];state.console=state.console.filter((_,i)=>i<5);state.chat=[];state.history=state.history.map(s=>({...s,tps:20,mspt:.2,players:0,processCpu:.4,heap:1.1*2**30}));}
   if (mode === "stopped" || mode === "offline") {
     state.server = {};
     state.system = {};
