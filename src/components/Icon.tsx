@@ -1,6 +1,16 @@
 import type { SVGProps } from "react";
 
 const paths: Record<string, string[]> = {
+  globe: ['M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20','M2 12h20','M12 2c5 6 5 14 0 20-5-6-5-14 0-20'],
+  folder: ['M2 7V5a2 2 0 0 1 2-2h5l3 4h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2Z'],
+  plugin: ['M8 3h3v5a3 3 0 1 0 6 0V3h4v7h-4a3 3 0 1 0 0 6h4v5H3v-5h4a3 3 0 1 0 0-6H3V3Z'],
+  logs: ['M6 3h12v18H6Z','M9 7h6M9 11h6M9 15h4'],
+  moon: ['M21 12A9 9 0 1 1 12 3a6 6 0 0 0 9 9'],
+  bell: ['M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9','M10 21h4'],
+  cpu: ['M4 4h16v16H4Z','M9 9h6v6H9Z','M9 2v2M15 2v2M9 20v2M15 20v2M2 9h2M2 15h2M20 9h2M20 15h2'],
+  memory: ['M3 5h18v14H3Z','M7 9v5M11 9v5M15 9v5M19 9v5','M7 19v3M11 19v3M15 19v3'],
+  play: ['M6 3 20 12 6 21Z'], stop: ['M5 5h14v14H5Z'], restart: ['M21 8V3M21 8h-5','M21 8a9 9 0 1 0 0 8'],
+  copy: ['M8 8h14v14H8Z','M4 16H2V2h14v2'], send: ['M22 2 15 22 11 13 2 9Z','M22 2 11 13'],
   fleet: ["M4 6.5h16v11H4z", "M8 17.5v2M16 17.5v2", "M7 10h.01M10 10h7"],
   overview: ["M4 13h6V4H4z", "M14 20h6V11h-6z", "M4 20h6v-3H4z", "M14 7h6V4h-6z"],
   performance: ["M3 17l4-5 4 2 5-8 5 3", "M3 21h18"],

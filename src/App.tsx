@@ -16,6 +16,11 @@ const views: Record<RouteName, React.LazyExoticComponent<React.ComponentType>> =
   Backups: lazy(() => import("./routes/Backups")),
   Access: lazy(() => import("./routes/Access")),
   Settings: lazy(() => import("./routes/Settings")),
+  Worlds: lazy(() => import('./routes/Worlds')),
+  Files: lazy(() => import('./routes/Files')),
+  Schedules: lazy(() => import('./routes/Schedules')),
+  Plugins: lazy(() => import('./routes/Plugins')),
+  Logs: lazy(() => import('./routes/Logs')),
 };
 const Styleguide = lazy(() => import('./routes/Styleguide'));
 
@@ -34,6 +39,7 @@ export default function App() {
     document.documentElement.dataset.density = prefs.density;
     document.documentElement.dataset.reduceMotion = String(prefs.reduceMotion);
   }, [prefs]);
+  useEffect(() => {const media=matchMedia('(prefers-color-scheme: dark)');const update=()=>{if(prefs.theme==='system')document.documentElement.dataset.theme=media.matches?'dark':'light';};media.addEventListener('change',update);return()=>media.removeEventListener('change',update);},[prefs.theme]);
   useEffect(() => {
     const update = () => setRoute(routeFromHash());
     addEventListener("hashchange", update);

@@ -1,4 +1,4 @@
-export const routes = ["Fleet", "Overview", "Performance", "Players", "Console", "Backups", "Access", "Settings"] as const;
+export const routes = ["Overview", "Console", "Players", "Performance", "Worlds", "Files", "Backups", "Schedules", "Plugins", "Logs", "Fleet", "Access", "Settings"] as const;
 export type RouteName = (typeof routes)[number];
 
 export const routeLabels: Record<RouteName, string> = {
@@ -6,10 +6,11 @@ export const routeLabels: Record<RouteName, string> = {
   Overview: "Overview",
   Performance: "Performance",
   Players: "Players",
-  Console: "Console & chat",
+  Console: "Console",
   Backups: "Backups",
   Access: "Access & audit",
   Settings: "Settings",
+  Worlds: "Worlds", Files: "Files", Schedules: "Schedules", Plugins: "Plugins", Logs: "Logs",
 };
 
 export function routeFromHash(): RouteName {
