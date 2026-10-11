@@ -15,6 +15,7 @@ import { reconcileDeviceGrant } from "./device-grant";
 import { MAXIMUM_FLEET_CONNECTIONS } from "./fleet-contract";
 import { ACTION_CONTRACT_ID } from "./scopes";
 import { RelayConfigurationError } from "./relay-config";
+import { deadlineDelay } from "./deadline";
 
 export type FleetPhase =
   | "connecting"
@@ -202,14 +203,10 @@ export class FleetFeed {
           socket.close(4008, "Relay handshake timed out");
       }, LIVE_CONNECTION_TIMEOUT_MS);
       const checkExpiry = () => {
-        const remaining = Date.parse(grant.expiresAt) - Date.now();
         if (!current()) return;
-        if (!Number.isFinite(remaining) || remaining <= 0) this.revoke(entry);
-        else
-          entry.expiry = setTimeout(
-            checkExpiry,
-            Math.min(2_147_483_647, remaining),
-          );
+        const delay = deadlineDelay(grant.expiresAt);
+        if (delay === null) this.revoke(entry);
+        else entry.expiry = setTimeout(checkExpiry, delay);
       };
       checkExpiry();
       socket.onopen = () => {

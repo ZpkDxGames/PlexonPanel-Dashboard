@@ -35,6 +35,7 @@ import {
 import { FleetFeed, type FleetSnapshot } from "./fleet-feed";
 import { classifyTelemetry } from "./telemetry-freshness";
 import { browserRelayConfiguration, saveRelayPreference, RelayConfigurationError, type RelayConfiguration } from "./relay-config";
+import { deadlineDelay } from "./deadline";
 export type Kind = "HOST" | "PAPER";
 export function connectionPhaseLabel(phase: string): string {
   return ({"configuration-required": "Configure relay", "storage-error": "Browser storage blocked", revoked: "Pairing revoked or expired", incompatible: "Incompatible relay session", unpaired: "Not paired", pairing: "Pairing browser", connecting: "Connecting", reconnecting: "Reconnecting", live: "Relay connected"} as Record<string, string>)[phase] ?? phase;
@@ -152,15 +153,19 @@ async function connect(credential: RelayCredential, revision: number) {
       sequence === connection &&
       socket === candidate;
     let incompatible = false;
+    let expired = false;
     handshake = setTimeout(() => {
       if (current()) candidate.close(4008, "Handshake timeout");
     }, 15000);
-    expiry = setTimeout(
-      () => {
-        if (current()) candidate.close(4008, "Grant expired");
-      },
-      Math.max(1, Date.parse(grant.expiresAt) - Date.now()),
-    );
+    const checkExpiry = () => {
+      if (!current()) return;
+      const delay = deadlineDelay(grant.expiresAt);
+      if (delay === null) {
+        expired = true;
+        candidate.close(4003, "Grant expired");
+      } else expiry = setTimeout(checkExpiry, delay);
+    };
+    checkExpiry();
     candidate.onopen = () => {
       if (!current()) {
         candidate.close();
@@ -259,9 +264,20 @@ async function connect(credential: RelayCredential, revision: number) {
       if (!current()) return;
       socket = null;
       raw = { ...raw, ready: null, players: [], receipts: undefined };
-      publish({ state: raw, phase: "reconnecting", grant: null });
+      const closeReason = event.reason.trim();
+      publish({
+        state: raw,
+        phase: "reconnecting",
+        grant: null,
+        error:
+          closeReason || snapshot.error
+            ? closeReason
+              ? `Relay closed the live connection (${event.code}): ${closeReason}.`
+              : snapshot.error
+            : `Relay WebSocket closed before telemetry was ready (code ${event.code || 1006}).`,
+      });
       if (incompatible) { publish({phase: "incompatible"}); return; }
-      if (event.code === 4003) {
+      if (expired || event.code === 4003) {
         publish({
           phase: "revoked",
           error: "Device revoked or expired. Pair again.",

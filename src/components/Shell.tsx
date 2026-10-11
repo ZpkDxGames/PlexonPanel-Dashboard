@@ -4,7 +4,7 @@ import { Icon } from "./Icon";
 import { navigate, routeLabels, routes, type RouteName } from "../router";
 import { useSession, useNow } from "../hooks";
 import { classifyTelemetry } from "../adapter/telemetry-freshness";
-import { connectionPhaseLabel } from "../adapter/session";
+import { connectionPhaseLabel, session } from "../adapter/session";
 import { preferences, usePreferences } from "../store/preferences";
 
 const navIcon: Record<RouteName, string> = { Fleet: "fleet", Overview: "overview", Performance: "performance", Players: "players", Console: "console", Backups: "backups", Access: "access", Settings: "settings" };
@@ -16,7 +16,7 @@ export function Shell({ route, children }: { route: RouteName; children: ReactNo
   const [drawer, setDrawer] = useState(false);
   const [palette, setPalette] = useState(false);
   const prefs = usePreferences();
-  const name = String(snap.state.ready?.server.serverName ?? snap.labels[snap.state.serverId] ?? "No server selected");
+  const name = String(snap.state.ready?.server.serverName ?? snap.labels[snap.state.serverId] ?? (snap.state.serverId || "No server selected"));
   const freshness = useMemo(() => classifyTelemetry({ capturedAt: snap.state.server.capturedAt, receivedAt: snap.state.receipts?.paperHealth, connected: snap.phase === "live", now }), [snap.state.server.capturedAt, snap.state.receipts?.paperHealth, snap.phase, now]);
   const skew = freshness.skewAheadMs > 5000;
 
@@ -51,6 +51,7 @@ export function Shell({ route, children }: { route: RouteName; children: ReactNo
     <main className="workspace" id="main-content">
       {snap.fixture && <div className="fixture-banner">Development fixture · synthetic data · all dispatches are blocked</div>}
       <div className="workspace-heading"><div><span className="eyebrow">{name}</span><h1>{routeLabels[route]}</h1></div><div className="workspace-meta"><span>Paper <b>{freshness.label}</b></span><span>Host <b>{snap.state.ready?.agents.host ? "available" : "offline"}</b></span></div></div>
+      {snap.error && snap.phase !== "live" && <div className="connection-notice" role="alert"><div><strong>{connectionPhaseLabel(snap.phase)}</strong><span>{snap.error}</span></div><button onClick={() => session.reconnect()}>Retry now</button></div>}
       <AnimatePresence mode="wait"><motion.div key={route} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.18 }}>{children}</motion.div></AnimatePresence>
     </main>
     <AnimatePresence>{drawer && <><motion.button className="scrim" aria-label="Close navigation" onClick={() => setDrawer(false)} initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} /><motion.aside className="mobile-drawer" initial={{x:-280}} animate={{x:0}} exit={{x:-280}}><div className="brand"><span className="brand-mark">P</span><span className="brand-copy"><strong>PlexonPanel</strong><small>Command center</small></span></div>{nav}</motion.aside></>}</AnimatePresence>

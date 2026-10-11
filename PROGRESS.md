@@ -33,14 +33,18 @@ Updated: 2026-10-11 UTC
 - First-run validation: 41/41 tests pass, production build passes, and initial-route gzip is 127,032 bytes against the 184,320-byte budget.
 - First-run production rollout: GitHub `main` commit `9e04c59ac494ad80252ee9d56ae351133aab77f0` deployed successfully as Vercel production `dpl_BJsiLH2s7cAVT4ZaW1ThQUsiN1ww`.
 - Rendered first-run verification: the 2.8-second splash and zero-pairing gate were inspected at 1363 × 936, had no document overflow or application-origin console error, and the form state transitioned correctly without submitting a synthetic pairing. The production relay returned a valid 204 CORS preflight for the claim endpoint.
+- Live pairing diagnosis: the production screenshot confirms the one-time claim succeeded and persisted server `d3705fae-c1ae-4226-9de7-fd5efc68469f`, but the selected connection returned to `reconnecting` before `dashboard.ready` or telemetry.
+- Selected-session expiry fix: long-lived grants are now checked in bounded timer stages. A 30-day grant previously exceeded the browser's signed 32-bit timer ceiling and could close the WebSocket immediately; the passive fleet path already bounded this delay.
+- Connection recovery UX: pre-live socket close codes/reasons are retained and displayed globally with a retry control, and a selected server ID remains visible before its first ready payload.
+- Hotfix validation: 43/43 tests pass and the production build passes. The new regression test verifies a 30-day grant schedules at the 2,147,483,647 ms ceiling instead of overflowing.
 
 ## In progress
 
-- Fresh TonimSMP browser pairing and authenticated live acceptance.
+- Staged deployment, rendered inspection and production rollout of the selected-session expiry fix.
 
 ## Next
 
-1. Generate a fresh TonimSMP server-local code and pair a least-privilege browser device.
+1. Verify the existing stored TonimSMP pairing reaches `dashboard.ready` after the frontend hotfix.
 2. Run authenticated Paper/Host telemetry and action acceptance checks.
 
 ## Decisions
@@ -55,8 +59,9 @@ Updated: 2026-10-11 UTC
 - Node is pinned to the Vercel-supported `24.x` major so a future Node major cannot silently change the build.
 - Zero valid credentials is a top-level product state, not an empty Fleet page. The operational shell is withheld until a pairing exists; adding subsequent servers remains available from Settings.
 - The splash has a 2.8-second minimum but also waits for browser-storage initialization, preventing an incorrect onboarding flash on returning paired browsers.
+- Absolute grant expiry timers are bounded and rescheduled because browser timer delays cannot exceed 2,147,483,647 ms; this preserves long-lived grants without changing relay or plugin contracts.
 
 ## Open questions
 
-- A fresh TonimSMP pairing is required because its previous server-side pairing was disconnected. The code must be generated server-side after the CSP deployment.
+- Final authenticated acceptance still depends on the user's browser-held credential; no access token is copied into diagnostics or source control.
 
