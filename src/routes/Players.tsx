@@ -45,7 +45,7 @@ export default function Players() {
     </div>
     <div className="players-layout">
       <Panel eyebrow="Paper roster" title="Online players" action={<span className="subtle">UUID-bound actions</span>}>
-        <div className="roster" role="list">{players.length ? players.map((player) => <button role="listitem" className={`player-row ${active?.uuid === player.uuid ? "selected" : ""}`} key={player.uuid} onClick={() => setSelected(player.uuid)}>
+        <div className="roster" aria-label="Player roster">{players.length ? players.map((player) => <button aria-pressed={active?.uuid === player.uuid} className={`player-row ${active?.uuid === player.uuid ? "selected" : ""}`} key={player.uuid} onClick={() => setSelected(player.uuid)}>
           <PlayerHead uuid={player.uuid} name={player.name} /><span className="player-identity"><strong>{player.name}</strong><small>{player.uuid}</small></span><span><b>{player.world}</b><small>{duration(player.onlineMs)} online</small></span><span className="ping">{player.ping === null ? "—" : `${player.ping} ms`}</span>
         </button>) : <div className="inline-empty"><strong>No matching players</strong><span>{snap.state.ready?.agents.paper ? "Adjust the search or filters." : "Waiting for the Paper roster."}</span></div>}</div>
       </Panel>

@@ -8,6 +8,7 @@ export function Splash() {
         <p>Loading local pairings and secure connection settings.</p>
       </div>
       <div className="splash-progress" aria-hidden="true"><i /></div>
+      <div className="splash-meta" aria-hidden="true"><span>Local browser authority</span><span>Protocol 3</span></div>
     </div>
   </main>;
 }

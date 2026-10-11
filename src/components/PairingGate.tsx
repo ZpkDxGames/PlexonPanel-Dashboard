@@ -13,6 +13,7 @@ export function PairingGate() {
         <span className="eyebrow">First connection</span>
         <h1 id="pairing-title">Bring your server into view.</h1>
         <p>Pair this browser with one Minecraft server to unlock live telemetry, operational controls and audit-aware workflows.</p>
+        <div className="pairing-capabilities" aria-label="Connection capabilities"><span>Live telemetry</span><span>Signed operations</span><span>Audit visibility</span></div>
         <ol className="pairing-steps">
           <li><span>1</span><div><strong>Create a fresh code</strong><small>Use the PlexonPanel pairing flow on your server. Codes are single-use and short-lived.</small></div></li>
           <li><span>2</span><div><strong>Name this browser</strong><small>Choose a device name you will recognize later in Access &amp; Audit.</small></div></li>

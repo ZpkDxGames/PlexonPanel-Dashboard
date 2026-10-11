@@ -25,8 +25,8 @@ export function ActionReview({ prepared, onClose }: { prepared: Prepared | null;
     catch (cause) { setError(cause instanceof Error ? cause.message : "Operation failed."); }
     finally { setBusy(false); }
   };
-  return <dialog className="review-dialog" ref={dialog} aria-labelledby="action-review-title" onCancel={(event) => { event.preventDefault(); if (!busy) onClose(); }}>
-    <div className="review-head"><span className="eyebrow">Bound operation</span><h2 id="action-review-title">Review before dispatch</h2><p>The result must come from the selected agent. Relay acceptance is not completion.</p></div>
+  return <dialog className={strong ? "review-dialog strong-review" : "review-dialog"} ref={dialog} aria-labelledby="action-review-title" onCancel={(event) => { event.preventDefault(); if (!busy) onClose(); }}>
+    <div className="review-head"><div className="review-kicker"><span className="eyebrow">Bound operation</span><span className={strong ? "review-risk danger" : "review-risk"}>{strong ? "Typed confirmation" : "Explicit confirmation"}</span></div><h2 id="action-review-title">Review before dispatch</h2><p>The result must come from the selected agent. Relay acceptance is not completion.</p></div>
     <dl className="review-target"><dt>Server</dt><dd>{prepared.name}</dd><dt>Agent</dt><dd>{prepared.kind}</dd><dt>Action</dt><dd><code>{prepared.action}</code></dd>{prepared.subject && <><dt>Subject</dt><dd>{prepared.subject}</dd></>}</dl>
     <pre className="parameter-preview">{JSON.stringify(prepared.parameters, null, 2)}</pre>
     {strong && <label className="field">Type <strong>{confirmText}</strong> to confirm<input value={typed} onChange={(event) => setTyped(event.target.value)} autoComplete="off" /></label>}
