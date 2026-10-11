@@ -16,5 +16,5 @@ export function Status({ tone = "neutral", children }: { tone?: "neutral" | "suc
 }
 
 export function Notice({ tone = "neutral", title, children }: { tone?: "neutral" | "warning" | "error" | "success"; title: string; children: ReactNode }) {
-  return <div className={`notice ${tone}`}><strong>{title}</strong><span>{children}</span></div>;
+  return <div className={`notice ${tone}`} role={tone === "error" ? "alert" : "status"}><strong>{title}</strong><span>{children}</span></div>;
 }

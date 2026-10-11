@@ -35,12 +35,17 @@ The binding document includes Configuration/files, but the user's latest instruc
 ## Data truth
 
 - Production starts empty and waits for authenticated service data.
+- Application entry is stateful: an initialization flag prevents credential-storage races, a 2.8-second minimum splash covers local startup, and an initialized browser with zero valid credentials is routed to the dedicated pairing gate instead of the operational shell.
 - Credentials remain only in IndexedDB `plexonpanel-browser-v3` / `workspace`; local storage contains non-secret preferences only.
 - Relay precedence: saved browser origin → `VITE_PLEXON_RELAY_URL` → legacy `NEXT_PUBLIC_PLEXON_RELAY_URL` at build time → valid stored-pairing origin.
 - Paper/Host capture and receipt clocks remain independent. Live ≤10 seconds, delayed >10 seconds and stale >30 seconds. A capture more than 5 seconds ahead expires by receipt time.
 - The former page-wide yellow skew warning is replaced with a compact status disclosure. Raw offset remains available in source diagnostics and affected metric provenance; values are never timestamp-rewritten.
 - Missing, zero, empty, stale, disconnected and denied are distinct states.
 - Retention bounds remain: telemetry 8,192 points/35 minutes, console 2,500 lines, roster 512, worlds 64.
+
+## Pairing entry flow
+
+The first-run form collects only a recognizable device name and the server-issued one-time code when `VITE_PLEXON_RELAY_URL` is present. If the public relay variable is absent, the same form exposes a recoverable HTTPS-origin field. It calls the existing protocol-3 claim endpoint, rejects cross-relay WebSocket credentials, persists the accepted credential in IndexedDB, requests a fresh signed grant, and only then enters the operational connection lifecycle. Existing paired users retain the Settings workflow for adding another server.
 
 ## Runtime dependencies
 

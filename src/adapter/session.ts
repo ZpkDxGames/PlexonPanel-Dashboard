@@ -40,6 +40,7 @@ export function connectionPhaseLabel(phase: string): string {
   return ({"configuration-required": "Configure relay", "storage-error": "Browser storage blocked", revoked: "Pairing revoked or expired", incompatible: "Incompatible relay session", unpaired: "Not paired", pairing: "Pairing browser", connecting: "Connecting", reconnecting: "Reconnecting", live: "Relay connected"} as Record<string, string>)[phase] ?? phase;
 }
 export type SessionSnapshot = {
+  initialized: boolean;
   state: ControlState;
   phase: string;
   error: string;
@@ -63,6 +64,7 @@ export type Prepared = {
 };
 const listeners = new Set<() => void>();
 let snapshot: SessionSnapshot = {
+  initialized: false,
   state: emptyControlState(""),
   phase: "unpaired",
   error: "",
@@ -309,6 +311,8 @@ export const session = {
     else if (!relay.error) configureRelay(relay.origin);
     } catch (error) {
       publish({phase: "storage-error", grant: null, error: error instanceof Error ? error.message : "Browser pairing storage is unavailable."});
+    } finally {
+      publish({initialized: true});
     }
   },
   async select(id: string) {
@@ -515,6 +519,7 @@ export const session = {
     raw = state;
     fixtureAction = action;
     publish({
+      initialized: true,
       fixture: name,
       state,
       revision: snapshot.revision + 1,

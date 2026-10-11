@@ -55,6 +55,7 @@ test("stored protocol 3 pairing reconnects, receives telemetry, completes a boun
   };
   try {
     await session.start(); await until(() => session.getSnapshot().phase === "live");
+    assert.equal(session.getSnapshot().initialized, true);
     assert.equal(session.getSnapshot().relay.source, "pairing");
     const socket = Socket.all.at(-1)!;
     assert.equal(socket.url, credential.websocketUrl);

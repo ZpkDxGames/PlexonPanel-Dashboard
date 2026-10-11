@@ -6,7 +6,9 @@ import App from "./App";
 import "./styles.css";
 import { session } from "./adapter/session";
 
-async function start() {
+createRoot(document.getElementById("root")!).render(<StrictMode><App /></StrictMode>);
+
+async function initialize() {
   if (import.meta.env.DEV) {
     const mode = new URL(location.href).searchParams.get("fixture");
     if (mode && ["healthy", "skew", "stale", "partial", "stopped", "offline", "denied"].includes(mode)) {
@@ -15,7 +17,6 @@ async function start() {
       session.installFixture(mode, makeFixture(mode), fixtureAction);
     } else await session.start();
   } else await session.start();
-  createRoot(document.getElementById("root")!).render(<StrictMode><App /></StrictMode>);
 }
 
-void start();
+void initialize();

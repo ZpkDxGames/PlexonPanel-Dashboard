@@ -21,12 +21,6 @@ export function Shell({ route, children }: { route: RouteName; children: ReactNo
   const skew = freshness.skewAheadMs > 5000;
 
   useEffect(() => {
-    const resolved = prefs.theme === "system" ? (matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark") : prefs.theme;
-    document.documentElement.dataset.theme = resolved;
-    document.documentElement.dataset.density = prefs.density;
-    document.documentElement.dataset.reduceMotion = String(prefs.reduceMotion);
-  }, [prefs]);
-  useEffect(() => {
     const key = (event: KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") { event.preventDefault(); setPalette(true); }
       if (event.key === "Escape") { setPalette(false); setDrawer(false); }

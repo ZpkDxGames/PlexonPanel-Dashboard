@@ -28,15 +28,19 @@ Updated: 2026-10-11 UTC
 - Phase 10 deployment and report: the owner-private Site was published, a separate temporary Vercel QA preview was deployed, and Overview, Performance, Players, Console, Chat, Plugins, Backups, Access and Settings were inspected in the rendered browser. No inspected route overflowed horizontally and no application-origin console warning or error was observed.
 - Production relay boundary diagnosis: the standalone relay is healthy on protocol 3, allows the production dashboard origin, and reports two rooms with live agents. The dashboard CSP was corrected to allow exactly `https://tonimserver.ddns.net` and `wss://tonimserver.ddns.net`.
 - Production CSP rollout: GitHub `main` commit `8afe81d2d7887de2f0b5d1ab581d5d7458736a32` deployed successfully to Vercel as `dpl_CtGDpg8UZwPyppeFhaZQx5bSrDvK`. The live response header contains both exact relay origins, and the rendered Settings workspace reports the same commit and deployment relay URL with no application-origin console errors.
+- Pairing UX review: the protocol-3 claim, same-relay WebSocket validation, IndexedDB credential persistence and signed-session transition are retained; dedicated contract coverage now exercises both accepted and cross-relay responses.
+- First-run experience: application startup now renders immediately into an initialization-aware 2.8-second splash, then routes browsers with no valid pairing to a focused device-name and one-time-code page. Existing paired users proceed to the dashboard; fixture routes remain available for development verification.
+- First-run validation: 41/41 tests pass, production build passes, and initial-route gzip is 127,032 bytes against the 184,320-byte budget.
 
 ## In progress
 
-- Fresh TonimSMP browser pairing and authenticated live acceptance.
+- Production rollout and rendered inspection of the first-run pairing experience.
 
 ## Next
 
-1. Generate a fresh TonimSMP server-local code and pair a least-privilege browser device.
-2. Run authenticated Paper/Host telemetry and action acceptance checks.
+1. Inspect the deployed splash and pairing gate at desktop and mobile sizes.
+2. Generate a fresh TonimSMP server-local code and pair a least-privilege browser device.
+3. Run authenticated Paper/Host telemetry and action acceptance checks.
 
 ## Decisions
 
@@ -48,6 +52,8 @@ Updated: 2026-10-11 UTC
 - Production data is empty until a real session supplies it. Development fixtures are labeled and dispatch-disabled.
 - The production CSP permits only self plus the verified relay origins `https://tonimserver.ddns.net` and `wss://tonimserver.ddns.net`; broad network wildcards are not accepted.
 - Node is pinned to the Vercel-supported `24.x` major so a future Node major cannot silently change the build.
+- Zero valid credentials is a top-level product state, not an empty Fleet page. The operational shell is withheld until a pairing exists; adding subsequent servers remains available from Settings.
+- The splash has a 2.8-second minimum but also waits for browser-storage initialization, preventing an incorrect onboarding flash on returning paired browsers.
 
 ## Open questions
 
