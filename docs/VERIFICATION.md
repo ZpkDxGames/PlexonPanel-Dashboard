@@ -6,7 +6,7 @@ Date: 2026-10-11 UTC
 
 - `npm run check`: 43 tests passed, 0 failed. Covers safe scheduling for 30-day grants, pairing claim persistence and cross-relay rejection, first-run routing, grant reconciliation, bound actions, relay mismatch/repair, reducer bounds and gaps, skew freshness, maintenance validation, player/permission command validation, text formatting and the virtual 30-minute soak.
 - `npm run build`: passed with TypeScript checking and Vite production output. Vite reported non-fatal module-directive warnings from Motion dependencies.
-- `npm run test:perf`: passed; initial-route JS 127,032 gzip bytes against a 184,320-byte budget.
+- `npm run test:perf`: passed; initial-route JS 127,234 gzip bytes against a 184,320-byte budget.
 - `npm audit --omit=dev --audit-level=high`: passed; 0 vulnerabilities.
 - Static source scan for `dangerouslySetInnerHTML`, direct `innerHTML`, `eval`, `new Function` and browser console logging: no matches under `src/`.
 - Owner-private Site publish: succeeded at `https://plexonpanel-command-center.newpond128.chatgpt.site` (deployment `appgdep_6acb0fb2682481918b27ee7a534aed4f`).

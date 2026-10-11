@@ -30,7 +30,7 @@ Date: 2026-10-11 UTC
 
 - `npm run check`: 43 passed, 0 failed.
 - `npm run build`: passed; Motion dependency module-directive warnings were non-fatal.
-- `npm run test:perf`: passed; initial-route JavaScript 127,032 gzip bytes, budget 184,320 bytes.
+- `npm run test:perf`: passed; initial-route JavaScript 127,234 gzip bytes, budget 184,320 bytes.
 - `npm audit --omit=dev --audit-level=high`: passed; 0 vulnerabilities.
 - Unsafe HTML/evaluation source scan: no matches under `src/`.
 - `npm run test:browser`: not executed to completion because the Chromium download returned an invalid zero-byte archive.
