@@ -11,10 +11,12 @@ function source(provider: string, uuid: string) {
 
 export function PlayerHead({ uuid, name, large = false }: { uuid: string; name: string; large?: boolean }) {
   const { skinProvider } = usePreferences();
-  const [failed, setFailed] = useState(false);
-  const unverified = skinProvider === "disabled" || failed || name.startsWith(".");
+  const [failedSource, setFailedSource] = useState("");
+  const validUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(uuid) && !/^0{8}-0{4}-4000-8000-0{12}$/.test(uuid);
+  const url = validUuid ? source(skinProvider, uuid) : "";
+  const unverified = skinProvider === "disabled" || failedSource === url || !validUuid || name.startsWith(".");
   return <span className={`player-head ${large ? "large" : ""}`} title={unverified ? "Default head · skin unverified" : `${name} skin via ${skinProvider}`}>
-    {!unverified && <img src={source(skinProvider, uuid)} alt="" loading="lazy" referrerPolicy="no-referrer" onError={() => setFailed(true)} />}
+    {!unverified && <img src={url} alt="" loading="lazy" referrerPolicy="no-referrer" onError={() => setFailedSource(url)} />}
     {unverified && <span aria-hidden="true">{name.slice(0, 1).toUpperCase()}</span>}
     <span className="sr-only">{unverified ? "Skin unverified" : `${name} skin head`}</span>
   </span>;

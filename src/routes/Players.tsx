@@ -6,10 +6,11 @@ import { Button, Notice, Panel, Status } from "../components/ui";
 import { ActionReview } from "../features/ActionReview";
 import { playerCommand, permissionCommand } from "../lib/playerCommands";
 import { useSession } from "../hooks";
+import { PlayerActionForm, type PlayerActionDraft } from "../components/PlayerActionForm";
 
 type Player = { uuid: string; name: string; world: string; ping: number | null; onlineMs: number | null; raw: JsonMap };
 const actions = [
-  ["Message", "player.message"], ["Kick", "player.kick"], ["Ban", "player.ban"], ["Whitelist", "player.whitelist.add"],
+  ["Message", "player.message"], ["Kick", "player.kick"], ["Ban", "player.ban"], ["Whitelist", "player.whitelist.add"], ["Unban", "player.unban"], ["Remove whitelist", "player.whitelist.remove"],
   ["Gamemode", "player.gamemode"], ["Heal", "player.heal"], ["Feed", "player.feed"], ["Kill", "player.kill"], ["OP", "player.op"], ["De-op", "player.deop"],
 ] as const;
 
@@ -28,6 +29,7 @@ export default function Players() {
   const [commandTemplate, setCommandTemplate] = useState("tell {player} Hello from the console");
   const [node, setNode] = useState("essentials.fly");
   const [builderError, setBuilderError] = useState("");
+  const [draft, setDraft] = useState<PlayerActionDraft | null>(null);
   const players = useMemo<Player[]>(() => snap.state.players.map((raw) => ({
     uuid: str(raw.uuid, ""), name: str(raw.name, "Unknown"), world: str(raw.world, "Unknown"),
     ping: number(raw.ping), onlineMs: number(raw.onlineDurationMillis), raw,
@@ -52,13 +54,13 @@ export default function Players() {
       <aside className="player-detail">{active ? <>
         <div className="player-profile"><PlayerHead uuid={active.uuid} name={active.name} large /><div><span className="eyebrow">Selected player</span><h2>{active.name}</h2><button className="copy-id" onClick={() => void navigator.clipboard.writeText(active.uuid)}>Copy UUID</button></div></div>
         <dl className="identity-facts"><dt>Status</dt><dd>Online</dd><dt>World</dt><dd>{active.world}</dd><dt>Ping</dt><dd>{active.ping === null ? "Unknown" : `${active.ping} ms`}</dd><dt>Session</dt><dd>{duration(active.onlineMs)}</dd></dl>
-        <section><span className="eyebrow">Typed actions</span><div className="action-grid">{actions.map(([label, action]) => { const reason = session.reason(action, "PAPER"); return <Button key={action} variant={action === "player.ban" || action === "player.kill" ? "danger" : "secondary"} disabled={Boolean(reason)} title={reason} onClick={() => prepare(action, { playerId: active.uuid, ...(action === "player.message" ? { message: "" } : {}) })}>{label}</Button>; })}</div></section>
+        <section><span className="eyebrow">Player actions</span><div className="action-grid">{actions.map(([label, action]) => { const reason = session.reason(action, "PAPER"); return <Button key={action} variant={action === "player.ban" || action === "player.kill" ? "danger" : "secondary"} disabled={Boolean(reason)} title={reason} onClick={() => { if (["player.message", "player.kick", "player.ban", "player.gamemode"].includes(action)) setDraft({action, label, uuid: active.uuid, name: active.name, revision: snap.revision}); else prepare(action, {playerId: active.uuid}); }}>{label}</Button>; })}</div></section>
         <section className="player-command"><span className="eyebrow">Allowed command</span><label className="field">Template<input value={commandTemplate} onChange={(e) => setCommandTemplate(e.target.value)} /></label><code>{commandTemplate.replaceAll("{player}", active.name).replaceAll("{uuid}", active.uuid)}</code><Button onClick={runTemplate} disabled={Boolean(session.reason("console.execute", "PAPER"))}>Review command</Button></section>
-        <section className="player-command"><span className="eyebrow">Permission tier B</span><p className="subtle">Uses a typed LuckPerms command only when the server’s allowed-command policy accepts it. The agent result is authoritative.</p><label className="field">Permission node<input value={node} onChange={(e) => setNode(e.target.value)} /></label><div className="button-row"><Button onClick={() => runPermission("set")}>Review grant</Button><Button onClick={() => runPermission("unset")}>Review removal</Button></div></section>
-        <Notice title="Tier C unavailable">First-class effective permission trees require the proposed <code>permissions.*</code> backend contract.</Notice>
+        <section className="player-command"><span className="eyebrow">Permissions</span><p className="subtle">Review an allowed LuckPerms command for this player. The server decides whether it can run.</p><label className="field">Permission node<input value={node} onChange={(e) => setNode(e.target.value)} /></label><div className="button-row"><Button disabled={Boolean(session.reason("console.execute", "PAPER"))} title={session.reason("console.execute", "PAPER")} onClick={() => runPermission("set")}>Review grant</Button><Button disabled={Boolean(session.reason("console.execute", "PAPER"))} title={session.reason("console.execute", "PAPER")} onClick={() => runPermission("unset")}>Review removal</Button></div></section>
         {builderError && <Notice tone="error" title="Cannot prepare action">{builderError}</Notice>}
       </> : <div className="inline-empty"><strong>No player selected</strong><span>Select an online player to inspect available actions.</span></div>}</aside>
     </div>
     <ActionReview prepared={prepared} onClose={() => setPrepared(null)} />
+    {draft && <PlayerActionForm key={`${draft.revision}:${draft.uuid}:${draft.action}`} draft={draft} reason={draft.revision !== snap.revision ? "The server connection changed. Close and select the player again." : session.reason(draft.action, "PAPER")} onClose={() => setDraft(null)} onReview={(parameters) => { prepare(draft.action, parameters); setDraft(null); }}/> }
   </>;
 }

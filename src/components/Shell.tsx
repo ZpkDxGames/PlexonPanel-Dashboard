@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { Icon } from "./Icon";
 import { navigate, routeLabels, routes, type RouteName } from "../router";
@@ -6,6 +6,8 @@ import { useSession, useNow } from "../hooks";
 import { classifyTelemetry } from "../adapter/telemetry-freshness";
 import { connectionPhaseLabel, session } from "../adapter/session";
 import { preferences, usePreferences } from "../store/preferences";
+import { TelemetryStatus } from "./TelemetryStatus";
+import { WorkspacePalette } from "./WorkspacePalette";
 
 const navIcon: Record<RouteName, string> = { Fleet: "fleet", Overview: "overview", Performance: "performance", Players: "players", Console: "console", Backups: "backups", Access: "access", Settings: "settings" };
 const routeDescriptions: Record<RouteName, string> = {
@@ -26,8 +28,16 @@ export function Shell({ route, children }: { route: RouteName; children: ReactNo
   const [drawer, setDrawer] = useState(false);
   const [palette, setPalette] = useState(false);
   const prefs = usePreferences();
+  const drawerDialog = useRef<HTMLDialogElement>(null);
+  useEffect(() => {
+    if (!drawer) return;
+    const previous = document.activeElement as HTMLElement | null;
+    const element = drawerDialog.current;
+    element?.showModal();
+    return () => { element?.close(); previous?.focus(); };
+  }, [drawer]);
   const name = String(snap.state.ready?.server.serverName ?? snap.labels[snap.state.serverId] ?? (snap.state.serverId || "No server selected"));
-  const freshness = useMemo(() => classifyTelemetry({ capturedAt: snap.state.server.capturedAt, receivedAt: snap.state.receipts?.paperHealth, connected: snap.phase === "live", now }), [snap.state.server.capturedAt, snap.state.receipts?.paperHealth, snap.phase, now]);
+  const freshness = useMemo(() => classifyTelemetry({ capturedAt: snap.state.server.capturedAt, receivedAt: snap.state.receipts?.paperHealth, connected: snap.phase === "live" && Boolean(snap.state.ready?.agents.paper), now }), [snap.state.server.capturedAt, snap.state.receipts?.paperHealth, snap.phase, snap.state.ready?.agents.paper, now]);
   const skew = freshness.skewAheadMs > 5000;
 
   useEffect(() => {
@@ -39,7 +49,7 @@ export function Shell({ route, children }: { route: RouteName; children: ReactNo
     return () => removeEventListener("keydown", key);
   }, []);
 
-  const nav = <nav className="primary-nav" aria-label="Primary navigation"><span className="nav-section-label">Workspace</span>{routes.map((item) => <button className={route === item ? "nav-link active" : "nav-link"} data-route={item} key={item} onClick={() => { navigate(item); setDrawer(false); }} aria-current={route === item ? "page" : undefined} title={collapsed ? routeLabels[item] : undefined}><Icon name={navIcon[item]} /><span>{routeLabels[item]}</span></button>)}</nav>;
+  const nav = <nav className="primary-nav" aria-label="Primary navigation"><span className="nav-section-label">Workspace</span>{routes.map((item) => <button className={route === item ? "nav-link active" : "nav-link"} data-route={item} key={item} onClick={() => { navigate(item); setDrawer(false); }} aria-current={route === item ? "page" : undefined} aria-label={routeLabels[item]} title={collapsed ? routeLabels[item] : undefined}><Icon name={navIcon[item]} /><span>{routeLabels[item]}</span></button>)}</nav>;
 
   return <div className={collapsed ? "app-shell rail" : "app-shell"}>
     <a className="skip-link" href="#main-content">Skip to workspace</a>
@@ -54,18 +64,19 @@ export function Shell({ route, children }: { route: RouteName; children: ReactNo
       <div className="context-actions">
         <button className="command-trigger" onClick={() => setPalette(true)}><Icon name="search" /><span>Jump to workspace</span><kbd>⌘K</kbd></button>
         {skew ? <button className="source-chip attention" title={`${Math.round(freshness.skewAheadMs / 1000)} seconds ahead. Freshness expires by receipt time.`} onClick={() => navigate("Settings")}><Icon name="clock" /><span>Clock offset</span><strong>+{Math.round(freshness.skewAheadMs / 1000)}s</strong></button> : <span className={`source-chip ${freshness.kind}`}><i />{freshness.label}</span>}
-        <button className="icon-button" onClick={() => preferences.update({theme: prefs.theme === "dark" ? "light" : "dark"})} aria-label="Toggle theme"><Icon name="sun" /></button>
+        <button className="icon-button" onClick={() => preferences.update({theme: document.documentElement.dataset.theme === "dark" ? "light" : "dark"})} aria-label="Toggle theme" title={`Theme: ${prefs.theme}`}><Icon name="sun" /></button>
         <span className={`connection-dot ${snap.phase === "live" ? "live" : ""}`} title={connectionPhaseLabel(snap.phase)} role="status" aria-label={`Connection: ${connectionPhaseLabel(snap.phase)}`} />
       </div>
     </header>
     <main className="workspace" id="main-content">
       {snap.fixture && <div className="fixture-banner">Development fixture · synthetic data · all dispatches are blocked</div>}
-      <div className="workspace-heading"><div className="workspace-title"><span className="eyebrow">{name}</span><h1>{routeLabels[route]}</h1><p>{routeDescriptions[route]}</p></div><div className="workspace-meta"><span>Paper <b>{freshness.label}</b></span><span>Host <b>{snap.state.ready?.agents.host ? "available" : "offline"}</b></span></div></div>
+      <div className="workspace-heading"><div className="workspace-title"><span className="eyebrow">{name}</span><h1>{routeLabels[route]}</h1><p>{routeDescriptions[route]}</p></div><div className="workspace-meta"><span>Paper <b>{freshness.label}</b></span><span>Host <b>{snap.state.ready?.agents.host ? "connected" : "offline"}</b></span></div></div>
+      <TelemetryStatus />
       {snap.error && snap.phase !== "live" && <div className="connection-notice" role="alert"><div><strong>{connectionPhaseLabel(snap.phase)}</strong><span>{snap.error}</span></div><button onClick={() => session.reconnect()}>Retry now</button></div>}
       <AnimatePresence mode="wait"><motion.div key={route} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.18 }}>{children}</motion.div></AnimatePresence>
     </main>
-    <AnimatePresence>{drawer && <><motion.button className="scrim" aria-label="Close navigation" onClick={() => setDrawer(false)} initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} /><motion.aside className="mobile-drawer" aria-label="Mobile navigation" initial={{x:-280}} animate={{x:0}} exit={{x:-280}}><div className="drawer-head"><div className="brand"><span className="brand-mark">P</span><span className="brand-copy"><strong>PlexonPanel</strong><small>Command center</small></span></div><button className="icon-button drawer-close" onClick={() => setDrawer(false)} aria-label="Close navigation"><Icon name="chevron" /></button></div>{nav}<span className="sidebar-protocol"><i />Protocol 3</span></motion.aside></>}</AnimatePresence>
-    <AnimatePresence>{palette && <motion.div className="palette-wrap" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} onMouseDown={() => setPalette(false)}><motion.div className="palette" role="dialog" aria-modal="true" aria-label="Workspace palette" onMouseDown={(event) => event.stopPropagation()} initial={{scale:.98,y:-10}} animate={{scale:1,y:0}}><div className="palette-input"><Icon name="search" /><input autoFocus placeholder="Choose a workspace…" aria-label="Choose a workspace" readOnly /></div><div className="palette-caption"><span>Workspace shortcuts</span><kbd>Esc</kbd></div><div className="palette-results">{routes.map((item) => <button key={item} onClick={() => {navigate(item);setPalette(false);}}><Icon name={navIcon[item]} /><span><strong>{routeLabels[item]}</strong><small>{routeDescriptions[item]}</small></span><em>Open</em></button>)}</div></motion.div></motion.div>}</AnimatePresence>
+    <AnimatePresence>{drawer && <><motion.button className="scrim" aria-label="Close navigation" onClick={() => setDrawer(false)} initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} /><motion.dialog ref={drawerDialog} className="mobile-drawer" aria-label="Mobile navigation" onCancel={(event) => { event.preventDefault(); setDrawer(false); }} initial={{x:-280}} animate={{x:0}} exit={{x:-280}}><div className="drawer-head"><div className="brand"><span className="brand-mark">P</span><span className="brand-copy"><strong>PlexonPanel</strong><small>Command center</small></span></div><button className="icon-button drawer-close" onClick={() => setDrawer(false)} aria-label="Close navigation"><Icon name="chevron" /></button></div>{nav}<span className="sidebar-protocol"><i />Protocol 3</span></motion.dialog></>}</AnimatePresence>
+    {palette && <WorkspacePalette onClose={() => setPalette(false)} />}
     <nav className="bottom-nav" aria-label="Primary mobile navigation">{(["Overview", "Performance", "Players", "Console"] as RouteName[]).map((item) => <button key={item} onClick={() => navigate(item)} className={route === item ? "active" : ""}><Icon name={navIcon[item]} /><span>{routeLabels[item].replace(" & chat", "")}</span></button>)}</nav>
   </div>;
 }

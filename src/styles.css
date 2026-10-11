@@ -3522,3 +3522,111 @@ tbody tr:last-child td {
     transition-duration: .001ms !important;
   }
 }
+
+/* Audited operational refinements: preserve the existing visual system. */
+:root { --text-3: #8e99ab; }
+:root[data-theme="light"] { --text-3: #626d7e; --chart-paper: #087c70; --chart-warn: #a45908; --chart-info: #286ab3; --chart-violet: #7851b0; }
+.telemetry-status { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin:-6px 0 22px; padding:11px 0; border-top:1px solid var(--line-soft); border-bottom:1px solid var(--line-soft); }
+.telemetry-caption { color:var(--text-3); font-size:11px; margin-right:4px; }
+.telemetry-source { display:inline-flex; align-items:center; flex-wrap:wrap; gap:6px; padding:4px 9px; color:var(--text-2); font-size:11px; border:1px solid var(--line); border-radius:6px; background:var(--surface); }
+.telemetry-source i { width:6px; height:6px; border-radius:50%; background:var(--text-3); }
+.telemetry-source strong { font-weight:650; }
+.telemetry-source.live i { background:var(--success); box-shadow:0 0 0 3px color-mix(in srgb,var(--success) 9%,transparent); }
+.telemetry-source.delayed i,.telemetry-source.skew i { background:var(--warning); }
+.telemetry-source.stale i { background:var(--error); }
+.telemetry-source.stale { border-color:color-mix(in srgb,var(--error) 32%,var(--line)); }
+.telemetry-details { margin-left:auto; background:transparent; border:0; color:var(--accent-strong); cursor:pointer; min-height:32px; padding:0 6px; font-size:11px; }
+.overview-grid { grid-template-columns:repeat(12,minmax(0,1fr)); }
+.tick-panel { grid-column:span 8; }
+.evidence-panel { grid-column:span 4; }
+.overview-grid > .panel:nth-child(n+3) { grid-column:span 6; }
+.kpi { min-height:152px; padding-bottom:12px; }
+.kpi small { font-size:10px; }
+.kpi.is-historical::after,.kpi.is-historical .kpi-label i { background:var(--text-3); }
+.sparkline { width:100%; height:27px; margin-top:13px; color:var(--accent-strong); opacity:.72; }
+.sparkline.is-historical { color:var(--text-3); opacity:.45; }
+.sparkline-placeholder { height:27px; margin-top:13px; border-bottom:1px dashed var(--line); }
+.chart-frame { position:relative; min-width:0; }
+.time-series { display:block; min-height:0; overflow:hidden; font-size:10px; touch-action:pan-y; }
+.chart-legend button { min-height:32px; font-size:11px; }
+.chart-legend button small { color:var(--text-3); font-size:9px; margin-left:3px; }
+.chart-line { animation:none; stroke-width:2; }
+.chart-frame { animation:chart-enter 400ms var(--ease) both; }
+.chart-selection { fill:color-mix(in srgb,var(--accent) 16%,transparent); stroke:var(--accent); stroke-width:1; }
+.chart-empty { position:absolute; inset:38px 30px 36px 62px; display:flex; justify-content:center; align-items:center; flex-direction:column; gap:5px; pointer-events:none; background:color-mix(in srgb,var(--surface) 88%,transparent); }
+.chart-empty strong { font-size:13px; color:var(--text-2); }
+.chart-empty span { font-size:11px; color:var(--text-3); }
+.chart-tooltip { top:26px; right:12px; z-index:2; min-width:0; max-width:calc(100% - 30px); font-size:11px; }
+.chart-tooltip > span small { grid-column:2 / -1; color:var(--text-3); font-size:10px; }
+.chart-readings { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; padding:4px 5px 13px; }
+.chart-readings > div { display:grid; gap:3px; min-width:0; }
+.chart-readings > div > span { display:flex; align-items:center; gap:6px; font-size:11px; color:var(--text-2); }
+.chart-readings i { width:6px; height:6px; border-radius:2px; }
+.chart-readings strong { font:550 15px "JetBrains Mono Variable",monospace; }
+.chart-readings small,.sample-table-note { color:var(--text-3); font-size:10px; }
+.sample-table-note { padding:0 10px; }
+.chart-provenance { font-size:10px; }
+.chart-provenance span { overflow-wrap:anywhere; }
+.chart-hint { padding:0 20px 15px; margin:0; font-size:11px; color:var(--text-3); }
+.performance-controls { display:flex; gap:8px; margin-left:auto; }
+.performance-summary { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin-bottom:16px; }
+.performance-summary > div { padding:16px 20px; border:1px solid var(--line); border-radius:var(--r-panel); background:var(--surface); display:grid; gap:5px; }
+.performance-summary span,.performance-summary small { color:var(--text-2); font-size:11px; }
+.performance-summary strong { font:550 24px "JetBrains Mono Variable",monospace; letter-spacing:-.04em; }
+.performance-summary small { color:var(--text-3); font-size:10px; }
+.palette-dialog { width:min(580px,calc(100vw - 28px)); max-height:80dvh; margin:14vh auto auto; padding:0; color:var(--text); animation:chart-enter 160ms var(--ease); }
+.palette-dialog::backdrop,.mobile-drawer::backdrop { background:rgb(0 0 0 / .55); backdrop-filter:blur(5px); }
+.palette-close { background:var(--raised); border:1px solid var(--line-strong); border-radius:4px; padding:3px 6px; color:var(--text-2); cursor:pointer; font-size:10px; }
+.palette-results button.is-highlighted { background:var(--raised); box-shadow:inset 2px 0 var(--accent); }
+.player-action-fields { display:grid; gap:16px; padding:18px 23px; }
+.player-action-fields > code { color:var(--text-3); overflow-wrap:anywhere; font-size:11px; }
+.player-action-dialog .review-head p { font-size:12px; }
+.action-unavailable,.action-gate-note { color:var(--warning); font-size:11px; }
+.terminal-follow { color:var(--accent-strong); }
+.console-empty { min-height:220px; display:grid; place-content:center; text-align:center; color:var(--text-2); gap:6px; }
+.console-empty strong { font-size:14px; }
+.console-empty span { font-size:12px; }
+.mobile-drawer { color:var(--text); margin:0; border:0; max-height:100dvh; height:100dvh; }
+.mobile-drawer:not([open]) { display:none; }
+html[data-page-hidden="true"] *, html[data-page-hidden="true"] *::before, html[data-page-hidden="true"] *::after { animation-play-state:paused !important; }
+@media (max-width:1199px) {
+ .overview-grid .tick-panel { grid-column:span 12; }
+ .overview-grid .evidence-panel { grid-column:span 12; }
+ .evidence-panel .evidence-list { grid-template-columns:repeat(4,minmax(0,1fr)); }
+ .evidence-panel .evidence-list > div { border-bottom:0; padding:14px 16px; border-right:1px solid var(--line); }
+ .workspace-meta { display:none; }
+}
+@media (max-width:767px) {
+ .telemetry-status { gap:6px; margin-bottom:18px; }
+ .telemetry-caption { width:100%; }
+ .telemetry-details { margin-left:0; }
+ .telemetry-source { font-size:10px; }
+ .overview-grid > .panel:nth-child(n+3) { grid-column:span 12; }
+ .evidence-panel .evidence-list { grid-template-columns:repeat(2,minmax(0,1fr)); }
+ .evidence-panel .evidence-list > div { border-bottom:1px solid var(--line); }
+ .performance-summary { gap:8px; grid-template-columns:1fr; }
+ .performance-summary > div { grid-template-columns:1fr auto; padding:12px 15px; align-items:center; }
+ .performance-summary small { grid-column:1 / -1; }
+ .performance-summary strong { font-size:19px; }
+ .performance-toolbar { flex-wrap:wrap; }
+ .performance-controls { margin-left:0; width:100%; }
+ .chart-block { padding-inline:8px; }
+ .chart-tooltip { right:6px; max-width:calc(100% - 14px); }
+ .chart-readings { gap:8px; }
+ .chart-readings strong { font-size:13px; }
+ .chart-readings small { font-size:9px; }
+ .chart-legend button { min-height:36px; }
+ .telemetry-details,.palette-results button { min-height:44px; }
+}
+.terminal-follow-row { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:8px 16px; background:var(--terminal); color:#aeb7c5; font-size:11px; border-top:1px solid var(--line); }
+.terminal-follow-row button { padding:5px 9px; border:1px solid #394354; border-radius:5px; background:#151a24; color:#aaa9ff; cursor:pointer; font-size:11px; }
+.terminal-follow-row button:disabled { opacity:.55; cursor:default; }
+.command-composer input { min-width:0; width:100%; background:transparent; color:#e9edf5; border:0; font:12px "JetBrains Mono Variable",monospace; }
+.fleet-toolbar { display:flex; align-items:center; flex-wrap:wrap; gap:10px; padding:14px 18px; border-bottom:1px solid var(--line); }
+.fleet-toolbar input { min-width:180px; flex:1; min-height:38px; padding:0 12px; color:var(--text); background:var(--surface-2); border:1px solid var(--line-strong); border-radius:var(--r-control); }
+.fleet-instances table { min-width:700px; }
+.fleet-instances td:first-child { min-width:210px; }
+.fleet-instances td small,.fleet-instances td code { display:block; margin-top:3px; color:var(--text-3); font-size:10px; }
+.fleet-instances .selected-instance { background:color-mix(in srgb,var(--accent) 5%,var(--surface)); }
+.job-evidence { display:flex; align-items:center; flex-wrap:wrap; gap:8px 18px; padding:0 18px 18px; color:var(--text-2); font-size:11px; }
+.job-evidence code { color:var(--text); font-size:10px; }
