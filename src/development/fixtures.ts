@@ -57,7 +57,7 @@ export function makeFixture(mode = "healthy", now = Date.now()): ControlState {
     onlinePlayers: 24,
     maxPlayers: 80,
     serverName: state.ready.server.serverName,
-    motd: '§bTonimSMP §7| §aSurvival §e26.3 §7· Welcome home!',
+    motd: "§bTonimSMP §7| §aSurvival §e26.3 §7· Welcome home!",
     uptimeMillis: 3 * 86400000 + 14 * 3600000 + 22 * 60000,
   };
   state.system =
@@ -129,26 +129,33 @@ export function makeFixture(mode = "healthy", now = Date.now()): ControlState {
   state.console = Array.from({ length: 90 }, (_, i) => ({
     id: `line-${i}`,
     capturedAt: new Date(now - (90 - i) * 1700).toISOString(),
-    level: i === 74 ? "WARN" : i === 85 ? 'ERROR' : "INFO",
+    level: i === 74 ? "WARN" : i === 85 ? "ERROR" : "INFO",
     content:
-      i === 85 ? '[WorldGuard] Task execution failed for plugin WorldGuard v7.0.12'
-      : i === 86 ? '\tat com.sk89q.worldguard.WorldGuard.tick(WorldGuard.java:42)'
-      : i === 87 ? 'Caused by: java.lang.IllegalStateException: World not ready'
-      : i === 88 ? '\tat java.base/java.lang.Thread.run(Thread.java:1)'
-      : i === 74
-        ? "Can't keep up! Running 1241ms or 24 ticks behind"
-        : i === 8
-          ? "\u001b[33m[Server thread/WARN]\u001b[0m Chunk save exceeded the target window"
-        : i === 16
-          ? "§a[Paper] §fWorld §bworld_nether §freloaded in §l842 ms"
-        : i === 24
-          ? "<aqua><bold>[PlexonPanel]</bold></aqua> <gray>Host journal stream attached</gray>"
-        : i % 9 === 0
-          ? "[Server] Saved the game"
-          : i % 7 === 0 ? `${["AntônioNeto", "LumaCraft", "EnderScout"][i % 3]} joined the game`
-          : i % 6 === 0 ? `<${["AntônioNeto", "LumaCraft", "EnderScout"][i % 3]}> Anyone up for the nether hub?`
-          : i % 5 === 0 ? 'LumaCraft left the game'
-          : `[Server] ${["AntônioNeto", "LumaCraft", "EnderScout"][i % 3]} issued server command: /home`,
+      i === 85
+        ? "[WorldGuard] Task execution failed for plugin WorldGuard v7.0.12"
+        : i === 86
+          ? "\tat com.sk89q.worldguard.WorldGuard.tick(WorldGuard.java:42)"
+          : i === 87
+            ? "Caused by: java.lang.IllegalStateException: World not ready"
+            : i === 88
+              ? "\tat java.base/java.lang.Thread.run(Thread.java:1)"
+              : i === 74
+                ? "Can't keep up! Running 1241ms or 24 ticks behind"
+                : i === 8
+                  ? "\u001b[33m[Server thread/WARN]\u001b[0m Chunk save exceeded the target window"
+                  : i === 16
+                    ? "§a[Paper] §fWorld §bworld_nether §freloaded in §l842 ms"
+                    : i === 24
+                      ? "<aqua><bold>[PlexonPanel]</bold></aqua> <gray>Host journal stream attached</gray>"
+                      : i % 9 === 0
+                        ? "[Server] Saved the game"
+                        : i % 7 === 0
+                          ? `${["AntônioNeto", "LumaCraft", "EnderScout"][i % 3]} joined the game`
+                          : i % 6 === 0
+                            ? `<${["AntônioNeto", "LumaCraft", "EnderScout"][i % 3]}> Anyone up for the nether hub?`
+                            : i % 5 === 0
+                              ? "LumaCraft left the game"
+                              : `[Server] ${["AntônioNeto", "LumaCraft", "EnderScout"][i % 3]} issued server command: /home`,
     source: "HOST",
   }));
   state.chat = [
@@ -167,12 +174,7 @@ export function makeFixture(mode = "healthy", now = Date.now()): ControlState {
     const lag = i === 30 || i === 220;
     return {
       at: now - (299 - i) * 3000,
-      tps:
-        i === 140
-          ? null
-          : lag
-            ? 18.4
-            : 19.85 + Math.sin(i / 8) * 0.12,
+      tps: i === 140 ? null : lag ? 18.4 : 19.85 + Math.sin(i / 8) * 0.12,
       mspt:
         i === 140
           ? null
@@ -183,7 +185,7 @@ export function makeFixture(mode = "healthy", now = Date.now()): ControlState {
       processCpu: 40 + Math.sin(i / 13) * 12,
       heap: (3 + Math.sin(i / 20) * 0.5) * 2 ** 30,
       memory: 7.8 * 2 ** 30,
-      players: 20 + (i % 6),
+      players: 20 + Math.min(4, Math.floor(i / 60)),
       gc: 1200 + i,
       sources: {
         paperHealth: now - (299 - i) * 3000,
@@ -193,7 +195,30 @@ export function makeFixture(mode = "healthy", now = Date.now()): ControlState {
       },
     };
   });
-  if(mode==='idle'){state.server={...state.server,tps:[20,20,20],averageTickMillis:.2,onlinePlayers:0};state.system={...state.system,processCpuPercent:.4,jvmHeapUsedBytes:1.1*2**30};state.players=[];state.console=state.console.filter((_,i)=>i<5);state.chat=[];state.history=state.history.map(s=>({...s,tps:20,mspt:.2,players:0,processCpu:.4,heap:1.1*2**30}));}
+  if (mode === "idle") {
+    state.server = {
+      ...state.server,
+      tps: [20, 20, 20],
+      averageTickMillis: 0.2,
+      onlinePlayers: 0,
+    };
+    state.system = {
+      ...state.system,
+      processCpuPercent: 0.4,
+      jvmHeapUsedBytes: 1.1 * 2 ** 30,
+    };
+    state.players = [];
+    state.console = state.console.filter((_, i) => i < 5);
+    state.chat = [];
+    state.history = state.history.map((s) => ({
+      ...s,
+      tps: 20,
+      mspt: 0.2,
+      players: 0,
+      processCpu: 0.4,
+      heap: 1.1 * 2 ** 30,
+    }));
+  }
   if (mode === "stopped" || mode === "offline") {
     state.server = {};
     state.system = {};
@@ -205,7 +230,9 @@ let content = "view-distance: 8\nsimulation-distance: 6\nmax-players: 80\n";
 let hash = "fixture-v1";
 export const actionLog: { action: string; parameters: JsonMap }[] = [];
 let fixtureMode = "healthy";
-export function setFixtureMode(value: string) { fixtureMode = value; }
+export function setFixtureMode(value: string) {
+  fixtureMode = value;
+}
 export async function fixtureAction(
   action: string,
   parameters: JsonMap,
@@ -229,7 +256,45 @@ export async function fixtureAction(
       },
       commandChannel: { enabled: true },
     };
-  if (action === 'maintenance.settings.get' || action === 'maintenance.settings.update') data = { settings: parameters.settings ?? { schemaVersion: 1, timezone: 'America/Sao_Paulo', restart: { schedule: { enabled: false, type: 'DAILY', weekdays: [], time: '04:00' }, warningSeconds: [900,300,60,30,10], stopTimeoutSeconds: 180, startupTimeoutSeconds: 180 }, fullRestorePoint: { retentionMode: 'SINGLE_CURRENT', retentionCount: 1, restartAfter: true, canonicalFilename: 'PlexonCraft-Latest.zip', uploadTimeoutSeconds: 1800, verificationMode: 'SIZE_AND_HASH_WHEN_AVAILABLE', maximumBytes: 1099511627776, excludes: ['logs','crash-reports','cache','.cache','plugins/PlexonPanel/audit','plugins/PlexonPanel/identity','plugins/spark/tmp'] } } };
+  if (
+    action === "maintenance.settings.get" ||
+    action === "maintenance.settings.update"
+  )
+    data = {
+      settings: parameters.settings ?? {
+        schemaVersion: 1,
+        timezone: "America/Sao_Paulo",
+        restart: {
+          schedule: {
+            enabled: false,
+            type: "DAILY",
+            weekdays: [],
+            time: "04:00",
+          },
+          warningSeconds: [900, 300, 60, 30, 10],
+          stopTimeoutSeconds: 180,
+          startupTimeoutSeconds: 180,
+        },
+        fullRestorePoint: {
+          retentionMode: "SINGLE_CURRENT",
+          retentionCount: 1,
+          restartAfter: true,
+          canonicalFilename: "PlexonCraft-Latest.zip",
+          uploadTimeoutSeconds: 1800,
+          verificationMode: "SIZE_AND_HASH_WHEN_AVAILABLE",
+          maximumBytes: 1099511627776,
+          excludes: [
+            "logs",
+            "crash-reports",
+            "cache",
+            ".cache",
+            "plugins/PlexonPanel/audit",
+            "plugins/PlexonPanel/identity",
+            "plugins/spark/tmp",
+          ],
+        },
+      },
+    };
   if (action === "backup.preflight")
     data = {
       hostAuthenticated: true,
@@ -304,7 +369,18 @@ export async function fixtureAction(
         "Saved. Application state not supplied; restart may be required.",
     };
   }
-  if (action === "players.history.list") data = { entries: [{ name: "LumaCraft", state: "JOINED", observedAt: "2026-10-10T18:31:04Z" }], hasMore: false, historyEnabled: true };
+  if (action === "players.history.list")
+    data = {
+      entries: [
+        {
+          name: "LumaCraft",
+          state: "JOINED",
+          observedAt: "2026-10-10T18:31:04Z",
+        },
+      ],
+      hasMore: false,
+      historyEnabled: true,
+    };
   if (action === "devices.list")
     data = {
       devices: [

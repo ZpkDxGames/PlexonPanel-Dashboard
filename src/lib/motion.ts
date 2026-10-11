@@ -1,4 +1,42 @@
-import {useEffect,useRef,useState} from 'react';
-export function prefersReducedMotion(){return matchMedia('(prefers-reduced-motion: reduce)').matches||document.documentElement.dataset.reduceMotion==='true';}
-export function useTween(value:number|null,duration=600){const [shown,setShown]=useState(value??0),previous=useRef(value??0);useEffect(()=>{if(value===null)return;if(prefersReducedMotion()){setShown(value);previous.current=value;return;}const from=previous.current,start=performance.now();let frame=0;const tick=(at:number)=>{const t=Math.min(1,(at-start)/duration),next=from+(value-from)*(1-(1-t)**4);setShown(next);previous.current=next;if(t<1)frame=requestAnimationFrame(tick);};frame=requestAnimationFrame(tick);return()=>cancelAnimationFrame(frame);},[value,duration]);return value===null?null:shown;}
-export function fadeUp(element:HTMLElement){if(!prefersReducedMotion())return element.animate([{opacity:0,transform:'translateY(8px)'},{opacity:1,transform:'none'}],{duration:350,easing:'cubic-bezier(.16,1,.3,1)'});}
+import { useEffect, useRef, useState } from "react";
+export function prefersReducedMotion() {
+  return (
+    matchMedia("(prefers-reduced-motion: reduce)").matches ||
+    document.documentElement.dataset.reduceMotion === "true"
+  );
+}
+export function useTween(value: number | null, duration = 600) {
+  const [shown, setShown] = useState(value ?? 0),
+    previous = useRef(value ?? 0);
+  useEffect(() => {
+    if (value === null) return;
+    if (prefersReducedMotion()) {
+      setShown(value);
+      previous.current = value;
+      return;
+    }
+    const from = previous.current,
+      start = performance.now();
+    let frame = 0;
+    const tick = (at: number) => {
+      const t = Math.min(1, (at - start) / duration),
+        next = from + (value - from) * (1 - (1 - t) ** 4);
+      setShown(next);
+      previous.current = next;
+      if (t < 1) frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [value, duration]);
+  return value === null ? null : shown;
+}
+export function fadeUp(element: HTMLElement) {
+  if (!prefersReducedMotion())
+    return element.animate(
+      [
+        { opacity: 0, transform: "translateY(8px)" },
+        { opacity: 1, transform: "none" },
+      ],
+      { duration: 350, easing: "cubic-bezier(.16,1,.3,1)" },
+    );
+}

@@ -7,7 +7,8 @@ writeFileSync(
   "dist/build.json",
   JSON.stringify(
     {
-      dashboard: "PlexonPanel Command Center",
+      dashboard: "PlexonPanel 6.0.0",
+      version: "6.0.0",
       commit,
       builtAt: new Date().toISOString(),
       protocolVersion: 3,

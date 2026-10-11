@@ -6,7 +6,14 @@
     <meta name="theme-color" content="#0b0f14" />
     <meta name="description" content="PlexonPanel server operations console" />
     <title>PlexonPanel · Server panel</title>
-    <script src="/theme-init.js"></script>
+    <script>/* CSP-compatible, synchronous theme selection before React and before first paint. */
+try {
+  const saved = JSON.parse(localStorage.getItem('plexon:preferences') || '{}');
+  const requested = saved.theme || 'system';
+  document.documentElement.dataset.theme = requested === 'system'
+    ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+    : requested === 'dark' ? 'dark' : 'light';
+} catch { document.documentElement.dataset.theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'; }</script>
   </head>
   <body>
     <div id="root"></div>

@@ -1,0 +1,2 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {readFileSync} from 'node:fs';
+test('demo and styleguide entry imports are compile-time gated',()=>{const entry=readFileSync('src/main.tsx','utf8');assert.match(entry,/if \(import\.meta\.env\.DEV\)/);assert.ok(entry.indexOf('if (import.meta.env.DEV)')<entry.indexOf('import("./development/fixtures")'));const app=readFileSync('src/App.tsx','utf8');assert.match(app,/const Styleguide = import\.meta\.env\.DEV/);});

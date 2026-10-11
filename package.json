@@ -1,6 +1,7 @@
 {
   "name": "plexonpanel-command-center",
   "private": true,
+  "version": "6.0.0",
   "type": "module",
   "engines": {
     "node": "24.x"
@@ -10,11 +11,13 @@
     "build": "tsc --noEmit && vite build && node scripts/identity.mjs",
     "check": "tsc --noEmit && node --import tsx --test tests/*.test.ts",
     "test:browser": "node scripts/browser-check.mjs",
-    "test:perf": "node scripts/performance.mjs"
+    "test:perf": "node scripts/performance.mjs",
+    "test:revamp": "node scripts/revamp-interactions.mjs",
+    "test:visual": "node scripts/revamp-capture.mjs --axe"
   },
   "dependencies": {
     "@fontsource-variable/jetbrains-mono": "5.2.8",
-    "@fontsource-variable/plus-jakarta-sans": "^5.3.0",
+    "@fontsource-variable/plus-jakarta-sans": "5.3.0",
     "motion": "14.1.0",
     "react": "19.3.0",
     "react-dom": "19.3.0"
