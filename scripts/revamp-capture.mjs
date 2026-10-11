@@ -24,7 +24,7 @@ const routes = routeArg
       "Access",
     ];
 const out = baseline ? "docs/revamp/before" : "docs/revamp/after";
-const port = baseline ? 4180 : 4173;
+const port = baseline ? 4180 : 4205;
 const cwd = baseline ? process.env.PLEXON_BASELINE_DIR : process.cwd();
 const server = spawn("npm", ["run", "dev", "--", "--port", String(port)], {
   cwd,
@@ -100,11 +100,24 @@ try {
         await page.evaluate(() => document.fonts.ready);
         for (const route of routes) {
           await page.close();
-          page=await context.newPage();
-          await page.setViewportSize({width,height:width<500?844:900});
-          page.on("pageerror",e=>errors.push(e.message));
-          await page.addInitScript(()=>{localStorage.setItem("plexon:preferences",JSON.stringify({theme:new URL(location.href).searchParams.get("theme"),skinProvider:"disabled"}));});
-          await page.goto(`http://127.0.0.1:${port}/?fixture=${mode}&theme=${theme}#${route}`);
+          page = await context.newPage();
+          await page.setViewportSize({
+            width,
+            height: width < 500 ? 844 : 900,
+          });
+          page.on("pageerror", (e) => errors.push(e.message));
+          await page.addInitScript(() => {
+            localStorage.setItem(
+              "plexon:preferences",
+              JSON.stringify({
+                theme: new URL(location.href).searchParams.get("theme"),
+                skinProvider: "disabled",
+              }),
+            );
+          });
+          await page.goto(
+            `http://127.0.0.1:${port}/?fixture=${mode}&theme=${theme}#${route}`,
+          );
           await page.locator(".workspace").waitFor();
           errors = [];
           await page.evaluate((r) => (location.hash = r), route);
@@ -113,7 +126,12 @@ try {
           else await page.locator(".workspace h1").first().waitFor();
           await page.waitForTimeout(800);
           const file = `${out}/${route}-${theme}-${width}${baseline ? "" : "-" + mode}.png`;
-          await page.screenshot({ path: file, fullPage: true, animations: "disabled", timeout:15000 });
+          await page.screenshot({
+            path: file,
+            fullPage: true,
+            animations: "disabled",
+            timeout: 15000,
+          });
           const overflow = await page.evaluate(() => ({
             page: document.documentElement.scrollWidth > innerWidth,
             overs: Array.from(document.querySelectorAll("*"))

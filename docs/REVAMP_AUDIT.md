@@ -93,3 +93,11 @@ Overview → Console → Players → Performance → Worlds; manage: Files → B
 ## Baseline and verification
 
 Before screenshots: docs/revamp/before, eight existing routes × light/dark × 1440/390. Final matrix: each new page × light/dark × busy/idle/offline × 1440/390, plus 360/768/1280/1920 responsiveness and accessibility checks. Real backend authority is not available to local fixtures; fixture interaction results and production bundle/auth contract verification will be reported separately from live server certification.
+
+## Final implementation decisions
+
+- The theme bootstrap moved from a separate blocking file to one hash-pinned inline script. Vercel CSP allowlists only its exact SHA-256; a unit test and build inspection compare the bytes. This keeps prepaint theme selection and removes an extra blocking request without unrestricted inline script permission.
+- The minimum splash is now 250ms (storage initialization still gates entry). Pairing/auth behavior and credential persistence remain unchanged.
+- CPU/heap availability and CPU-chart Live state use independent JVM capture/receipt freshness, while TPS uses Paper health. Fresh Paper samples cannot make a stale system capture fresh.
+- Source review of Core confirms files parameters, 24 KiB text bounds, server-root path joining and hash conflict checks. Writable file operations may use Paper when Host is read-only and Paper advertises signed authority.
+- Screenshots use the original supplied palette. Component text inks were strengthened only where automated AA checks found insufficient contrast; categorical hues were unchanged.

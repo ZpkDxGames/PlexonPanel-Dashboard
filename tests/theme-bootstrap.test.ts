@@ -1,0 +1,2 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {readFileSync} from 'node:fs';import {createHash} from 'node:crypto';
+test('theme initializer is the exact script allowlisted in production CSP',()=>{const html=readFileSync('index.html','utf8');const body=html.split('<script>')[1]?.split('</script>')[0];assert.ok(body);const hash=createHash('sha256').update(body).digest('base64');assert.ok(readFileSync('vercel.json','utf8').includes(`sha256-${hash}`));});

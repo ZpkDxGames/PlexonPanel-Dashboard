@@ -1,3 +1,5 @@
+import { classifyTelemetry } from "../adapter/telemetry-freshness";
+import { Segmented } from "../components/Segmented";
 import { copy } from "../i18n/en";
 import { useMemo, useState } from "react";
 import { useSession, useNow } from "../hooks";
@@ -37,13 +39,20 @@ export default function Overview() {
   );
   const online = Boolean(state.ready?.agents.paper),
     fresh = paper.usable;
+  const systemFresh = classifyTelemetry({
+    capturedAt: state.system.capturedAt,
+    receivedAt: state.receipts?.paperSystem,
+    connected: Boolean(state.ready?.agents.paper),
+    now,
+  }).usable;
+  const metricLive = selected === "processCpu" ? systemFresh : fresh;
   const tps = fresh
       ? number(Array.isArray(state.server.tps) ? state.server.tps[0] : null)
       : null,
-    cpu = fresh ? number(state.system.processCpuPercent) : null,
+    cpu = systemFresh ? number(state.system.processCpuPercent) : null,
     players = online ? number(state.server.onlinePlayers) : null,
     max = number(state.server.maximumPlayers ?? state.server.maxPlayers),
-    heap = fresh ? number(state.system.jvmHeapUsedBytes) : null,
+    heap = systemFresh ? number(state.system.jvmHeapUsedBytes) : null,
     heapMax = number(state.system.jvmHeapMaximumBytes);
   const heapPct = heap !== null && heapMax ? (heap / heapMax) * 100 : null;
   const uptime = number(state.server.uptimeMillis ?? state.system.uptimeMillis);
@@ -239,7 +248,7 @@ export default function Overview() {
           decimals={1}
           color="var(--c4)"
           icon="cpu"
-          context={fresh ? "JVM process" : "Waiting for data"}
+          context={systemFresh ? "JVM process" : "Waiting for data"}
           values={samples.map((s) => s.processCpu)}
         />
         <Kpi
@@ -275,13 +284,13 @@ export default function Overview() {
             className="c-8 hero overview-hero"
           >
             <div className="head-tools">
-              {fresh && online && (
+              {metricLive && online && (
                 <span className="live">
                   <i />
                   {copy.live_65c82}
                 </span>
               )}
-              <div className="segmented" aria-label={copy.metric_b2bb7}>
+              <Segmented label={copy.metric_b2bb7} value={selected}>
                 {(["tps", "mspt", "processCpu"] as MetricKey[]).map((k) => (
                   <button
                     key={k}
@@ -292,8 +301,8 @@ export default function Overview() {
                     {k === "tps" ? "TPS" : k === "mspt" ? "MSPT" : "CPU"}
                   </button>
                 ))}
-              </div>
-              <div className="segmented" aria-label={copy.range_a16c5}>
+              </Segmented>
+              <Segmented label={copy.range_a16c5} value={minutes}>
                 {[1, 5, 15].map((m) => (
                   <button
                     key={m}
@@ -305,7 +314,7 @@ export default function Overview() {
                     {copy._min_f4e8a}
                   </button>
                 ))}
-              </div>
+              </Segmented>
             </div>
             <div className="stats-row">
               {[
@@ -329,7 +338,7 @@ export default function Overview() {
             <TimeSeries
               title={metricName}
               samples={samples}
-              live={online && fresh}
+              live={online && metricLive}
               threshold={key === "tps" ? 18 : key === "mspt" ? 50 : undefined}
               series={[{ key, label: metricName, unit: metricUnit, color }]}
             />

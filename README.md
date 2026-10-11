@@ -30,3 +30,12 @@ npm run test:browser
 Create a separate Vercel project, set `VITE_PLEXON_RELAY_URL`, and add that exact HTTPS and WSS relay origin to `connect-src` in `vercel.json`. Add the new dashboard HTTPS origin to the relay allowlist. Do not promote over the existing production project until live acceptance is complete.
 
 See `docs/MIGRATION_ROLLBACK.md` for rollout and pairing steps.
+
+## 6.0.0 visual revamp
+
+Use Node 24: `npm ci`, `npm run dev`, `npm run check`, `npm run build`.
+Design review: `http://127.0.0.1:4173/?demo=1` (`&idle=1`, `&offline=1`, `#Console`). The UI theme control persists its choice. Demo and `#Styleguide` run only in development/verification builds; production uses the existing paired relay.
+
+QA: `npm run test:visual`, `npm run test:revamp` (install Chromium using Playwright, or set `PLEXON_CHROMIUM`). Vercel remains a static Vite build from `dist`, with the existing relay configuration and CSP. A preview origin requires relay allowlisting.
+
+[Audit](docs/REVAMP_AUDIT.md) · [Design system and page/chart extension](docs/DESIGN_SYSTEM.md) · [Scored review](docs/REVAMP_REVIEW.md) · [Final report](docs/REVAMP_REPORT.md).

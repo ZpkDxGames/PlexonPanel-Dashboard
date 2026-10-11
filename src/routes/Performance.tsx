@@ -1,3 +1,4 @@
+import { Segmented } from "../components/Segmented";
 import { copy } from "../i18n/en";
 import { useMemo, useState } from "react";
 import { useSession } from "../hooks";
@@ -37,7 +38,7 @@ export default function Performance() {
   return (
     <CrosshairGroup>
       <div className="performance-toolbar">
-        <div className="segmented" aria-label={copy.time_range_22cd3}>
+        <Segmented label={copy.time_range_22cd3} value={minutes}>
           {[5, 15, 35].map((m) => (
             <button
               key={m}
@@ -49,7 +50,7 @@ export default function Performance() {
               {copy._min_f4e8a}
             </button>
           ))}
-        </div>
+        </Segmented>
         <span>{copy.up_to_35_minutes_retained_gaps_stay_vi_5d7df}</span>
       </div>
       <div className="performance-grid">
@@ -202,6 +203,7 @@ export default function Performance() {
           eyebrow={copy.chunks_and_entities_reported_by_paper_657fb}
           className="wide-panel"
         >
+          <p className="table-scroll-hint">Swipe to see every world metric →</p>
           <div className="table-region" tabIndex={0}>
             <table>
               <thead>

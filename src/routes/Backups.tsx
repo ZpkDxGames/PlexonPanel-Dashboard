@@ -66,8 +66,14 @@ export default function Backups() {
           </span>
           <h2>
             {phase === "IDLE"
-              ? "Ready for a restore point"
-              : phase === "DEGRADED" ? "Offsite copy needs attention" : phase.replaceAll("_", " ").toLowerCase()}
+              ? !snap.state.ready?.agents.host
+                ? "Connect your server to manage backups"
+                : ready
+                  ? "Ready for a restore point"
+                  : "Checking backup readiness"
+              : phase === "DEGRADED"
+                ? "Offsite copy needs attention"
+                : phase.replaceAll("_", " ").toLowerCase()}
           </h2>
           <p>{copy.check_both_local_and_offsite_copies_yo_41379}</p>
         </div>

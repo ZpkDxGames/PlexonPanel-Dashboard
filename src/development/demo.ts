@@ -5,7 +5,7 @@ export function startDemo(mode: string) {
   const timer = setInterval(() => {
     if (document.hidden) return;
     const snap = session.getSnapshot();
-    if (!snap.fixture) return;
+    if (!snap.fixture || snap.fixture !== mode) return;
     const capturedAt = new Date().toISOString();
     const idle = mode === "idle";
     const skew =
