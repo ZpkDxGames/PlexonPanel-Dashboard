@@ -31,16 +31,17 @@ Updated: 2026-10-11 UTC
 - Pairing UX review: the protocol-3 claim, same-relay WebSocket validation, IndexedDB credential persistence and signed-session transition are retained; dedicated contract coverage now exercises both accepted and cross-relay responses.
 - First-run experience: application startup now renders immediately into an initialization-aware 2.8-second splash, then routes browsers with no valid pairing to a focused device-name and one-time-code page. Existing paired users proceed to the dashboard; fixture routes remain available for development verification.
 - First-run validation: 41/41 tests pass, production build passes, and initial-route gzip is 127,032 bytes against the 184,320-byte budget.
+- First-run production rollout: GitHub `main` commit `9e04c59ac494ad80252ee9d56ae351133aab77f0` deployed successfully as Vercel production `dpl_BJsiLH2s7cAVT4ZaW1ThQUsiN1ww`.
+- Rendered first-run verification: the 2.8-second splash and zero-pairing gate were inspected at 1363 × 936, had no document overflow or application-origin console error, and the form state transitioned correctly without submitting a synthetic pairing. The production relay returned a valid 204 CORS preflight for the claim endpoint.
 
 ## In progress
 
-- Production rollout and rendered inspection of the first-run pairing experience.
+- Fresh TonimSMP browser pairing and authenticated live acceptance.
 
 ## Next
 
-1. Inspect the deployed splash and pairing gate at desktop and mobile sizes.
-2. Generate a fresh TonimSMP server-local code and pair a least-privilege browser device.
-3. Run authenticated Paper/Host telemetry and action acceptance checks.
+1. Generate a fresh TonimSMP server-local code and pair a least-privilege browser device.
+2. Run authenticated Paper/Host telemetry and action acceptance checks.
 
 ## Decisions
 

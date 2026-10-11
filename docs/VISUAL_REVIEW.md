@@ -20,6 +20,8 @@ The Overview and Performance workspaces were inspected in a deployed Chromium br
 | Backups | dark | degraded remote verification | Local/offsite verification remain separate; phase failure and retry path are visible without presenting a false success |
 | Access & audit | dark | two-device fixture | Role, scope count, self-revoke guard and effective grants are visible; audit records remain below the authority summary |
 | Settings | dark | unconfigured relay | Relay boundary, pairing, preferences, privacy disclosure and exact build identity are separated into clear cards |
+| Startup splash | dark | production initialization | Focused brand state appears immediately with clear loading language and a restrained progress treatment |
+| First pairing | dark | zero stored credentials | Operational shell is replaced by a focused device-name/code workflow; relay boundary and least-privilege guidance are visible without competing navigation |
 
 ## Corrections and observations
 
@@ -30,9 +32,10 @@ The Overview and Performance workspaces were inspected in a deployed Chromium br
 - The synthetic fixture ages naturally because it is a fixed snapshot; delayed/stale labels observed after waiting are expected and demonstrate the receipt-aware freshness states.
 - Light theme activation was confirmed from the root theme attribute and computed canvas/surface colours, then visually inspected after repaint.
 - Browser console inspection found no application-origin warning or error. Four errors came from the remote browser inspection extension and are not dashboard runtime errors.
+- The production first-pairing page filled the 1363 × 936 viewport without horizontal or vertical document overflow (`scrollWidth` and `innerWidth` both 1363; `scrollHeight` and `innerHeight` both 936). Its action remained disabled with empty inputs and enabled after both test values were present; no pairing request was submitted.
 
 ## Not executed
 
 - A true mobile-viewport screenshot was not executed because the available deployed-browser surface does not expose viewport resizing.
 - Safari and Firefox visual inspection were not executed.
-- Real relay telemetry visual inspection was not executed because the new preview origin, relay URL and least-privilege pairing have not been provisioned.
+- Real relay telemetry visual inspection was not executed because TonimSMP still requires a fresh least-privilege browser pairing.
