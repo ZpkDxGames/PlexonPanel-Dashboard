@@ -26,6 +26,7 @@ Updated: 2026-10-11 UTC
 - Phase 9 documentation: design system, capability matrix, backend contracts, verification, performance, architecture, visual review, README and migration/rollback notes are present.
 - Security check: production dependency audit reports 0 vulnerabilities; unsafe rendering/evaluation source scan reports no matches.
 - Phase 10 deployment and report: the owner-private Site was published, a separate temporary Vercel QA preview was deployed, and Overview, Performance, Players, Console, Chat, Plugins, Backups, Access and Settings were inspected in the rendered browser. No inspected route overflowed horizontally and no application-origin console warning or error was observed.
+- Production relay boundary diagnosis: the standalone relay is healthy on protocol 3, allows the production dashboard origin, and reports two rooms with live agents. The dashboard CSP was corrected to allow exactly `https://tonimserver.ddns.net` and `wss://tonimserver.ddns.net`.
 
 ## In progress
 
@@ -33,9 +34,9 @@ Updated: 2026-10-11 UTC
 
 ## Next
 
-1. Add the final preview HTTPS origin to the relay allowlist and its matching WSS origin to `connect-src`.
-2. Set `VITE_PLEXON_RELAY_URL`, deploy, then generate a fresh server-local code and pair a least-privilege device.
-3. Run the live acceptance checks listed in `docs/VERIFICATION.md`; promote only after an explicit decision.
+1. Deploy the CSP correction to production.
+2. Generate a fresh TonimSMP server-local code and pair a least-privilege browser device.
+3. Run authenticated Paper/Host telemetry and action acceptance checks.
 
 ## Decisions
 
@@ -45,10 +46,10 @@ Updated: 2026-10-11 UTC
 - The user explicitly removed the Configuration/files workspace. File editing remains available from the operator's own PC; the new navigation will not expose file mutation controls.
 - Clock skew remains visible but becomes a compact source-health detail. It will not use a page-wide yellow warning when current samples are still usable.
 - Production data is empty until a real session supplies it. Development fixtures are labeled and dispatch-disabled.
-- The checked-in CSP defaults `connect-src` to self only. The final Vercel target must add only the exact configured relay HTTPS and WSS origins when `VITE_PLEXON_RELAY_URL` is supplied; broad network wildcards are not accepted.
+- The production CSP permits only self plus the verified relay origins `https://tonimserver.ddns.net` and `wss://tonimserver.ddns.net`; broad network wildcards are not accepted.
 - Node is pinned to the Vercel-supported `24.x` major so a future Node major cannot silently change the build.
 
 ## Open questions
 
-- None blocking the replacement candidate. Live relay origin, new-origin allowlisting and a fresh least-privilege pairing remain deployment acceptance inputs.
+- A fresh TonimSMP pairing is required because its previous server-side pairing was disconnected. The code must be generated server-side after the CSP deployment.
 

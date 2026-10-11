@@ -14,11 +14,12 @@ Date: 2026-10-11 UTC
 - Deployed Chromium visual inspection at 1363 × 936: Overview disconnected/healthy/skew, Performance dark/light, Players, Console, Chat, Plugins, Backups, Access and Settings; details in `VISUAL_REVIEW.md`.
 - Deployed route overflow check: 0 horizontal pixels on every later-inspected operational route.
 - Deployed browser console: 0 application-origin warnings/errors. Four extension-origin metadata errors were observed from the remote inspection extension and excluded from the application result.
+- Production relay boundary check: `https://tonimserver.ddns.net/healthz` returned HTTP 200, protocol 3, standalone relay 5.0.0, two rooms, one Paper connection and two Host connections. The relay returned the exact production dashboard origin in CORS and rejected an unauthenticated dashboard WebSocket upgrade with the expected protocol-3 authentication error.
 
 ## Not executed
 
 - `npm run test:browser`: not executed to completion. The Playwright Chromium executable was absent; `npx playwright install chromium` received an invalid zero-byte archive from the permitted network path. Therefore automated 1440/390 journeys, axe results and screenshots are not claimed.
-- Live relay CORS, pairing, Cloudflare-protected relay, real Paper/Host telemetry and real action dispatch: not executed because no relay origin/new-origin allowlist/pairing was supplied.
+- Authenticated dashboard pairing, per-room Paper/Host telemetry and real action dispatch: not executed. The relay and CORS boundary are verified, but TonimSMP requires a fresh server-generated pairing code after deployment.
 - Backup download hash/save, restore and recovery resolution: not executed.
 - Physical phone, Safari, Firefox and screen-reader verification: not executed.
 - LCP, INP, browser long-task and 60-fps console profiling: not executed.
