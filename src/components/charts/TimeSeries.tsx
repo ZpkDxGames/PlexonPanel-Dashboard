@@ -27,7 +27,7 @@ export function TimeSeries({ samples, series, yMin = 0, yMax, threshold, title, 
   const minAt = window?.from ?? (first === last ? first - 5000 : first), maxAt = window?.to ?? (first === last ? last + 5000 : last);
   const dual = series.some((item) => item.axis === "right"), plotLeft = 62, plotRight = width - (dual ? 64 : 20), plotTop = 30, plotBottom = height - 34;
   const left = projected.filter((item) => item.axis !== "right"), right = projected.filter((item) => item.axis === "right");
-  const maximum = (items: typeof projected, fixed?: number) => fixed ?? items.find((item) => item.max !== undefined)?.max ?? axisMaximum(items.flatMap((item) => item.points.filter((p) => p.value !== null).map((p) => p.value!)), threshold ?? 1);
+  const maximum = (items: typeof projected, fixed?: number) => fixed ?? items.find((item) => item.max !== undefined)?.max ?? axisMaximum(items.flatMap((item) => item.points.filter((p) => p.value !== null).map((p) => p.value!)), threshold === undefined ? 1 : threshold * 2);
   const leftMax = maximum(left, yMax), rightMax = maximum(right);
   const x = (at: number) => plotLeft + (at - minAt) / Math.max(1, maxAt - minAt) * (plotRight - plotLeft);
   const y = (value: number, axis?: string) => plotBottom - (value - yMin) / Math.max(1, (axis === "right" ? rightMax : leftMax) - yMin) * (plotBottom - plotTop);

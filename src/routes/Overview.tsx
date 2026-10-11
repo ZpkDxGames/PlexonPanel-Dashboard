@@ -48,7 +48,7 @@ export default function Overview() {
         <div><span>Service</span><strong>{str(state.service.state, "Unknown")}</strong><small>Host · {host.label}</small></div>
         <div><span>Data coverage</span><strong>{state.history.length}</strong><small>Retained observations · source clocks differ</small></div>
       </div></Panel>
-      <Panel eyebrow="Resources" title="CPU sources"><TimeSeries title="CPU utilization" source="Paper JVM + Host" height={210} samples={state.history} yMax={100} series={cpuSeries} /></Panel>
+      <Panel eyebrow="Resources" title="CPU sources"><TimeSeries title="CPU utilization" source="Paper JVM + Host" height={210} samples={state.history} series={cpuSeries} /></Panel>
       <Panel eyebrow="Resources" title="Memory sources"><TimeSeries title="Memory utilization" source="Paper JVM + Host" height={210} samples={state.history} series={memorySeries} /></Panel>
     </div></CrosshairGroup>
     <div className="lower-grid">
