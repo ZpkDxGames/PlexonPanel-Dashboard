@@ -1,14 +1,14 @@
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 
 export function Panel({ title, eyebrow, action, children, className = "" }: { title?: string; eyebrow?: string; action?: ReactNode; children: ReactNode; className?: string }) {
-  return <section className={`panel ${className}`}>
-    {(title || eyebrow || action) && <header className="panel-header"><div>{eyebrow && <span className="eyebrow">{eyebrow}</span>}{title && <h2>{title}</h2>}</div>{action}</header>}
+  return <section className={`card panel ${className}`}>
+    {(title || eyebrow || action) && <header className="card-head panel-header"><div>{title && <h2>{title}</h2>}{eyebrow && <p className="sub">{eyebrow}</p>}</div>{action}</header>}
     {children}
   </section>;
 }
 
 export function Button({ variant = "secondary", ...props }: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: "primary" | "secondary" | "danger" | "quiet" }) {
-  return <button {...props} className={`button ${variant} ${props.className ?? ""}`} />;
+  return <button {...props} className={`btn button ${variant} ${props.className ?? ""}`} />;
 }
 
 export function Status({ tone = "neutral", children }: { tone?: "neutral" | "success" | "warning" | "error" | "info"; children: ReactNode }) {

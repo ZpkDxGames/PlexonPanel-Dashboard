@@ -1,0 +1,122 @@
+
+/* ============================== TOKENS ============================== */
+:root {
+  --font-ui: "Plus Jakarta Sans", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --font-pixel: "Silkscreen", "Press Start 2P", monospace;
+
+  --canvas:
+    radial-gradient(1100px 700px at 6% -10%, #dde1ff 0%, transparent 62%),
+    radial-gradient(900px 620px at 100% 2%, #cde6ff 0%, transparent 58%),
+    radial-gradient(900px 640px at 55% 112%, #e5dbff 0%, transparent 62%),
+    #eef0fc;
+  --surface: rgba(255, 255, 255, .68);
+  --surface-solid: #ffffff;
+  --surface-raise: rgba(255, 255, 255, .92);
+  --sunken: rgba(226, 231, 252, .62);
+  --line: rgba(70, 82, 180, .14);
+  --line-strong: rgba(70, 82, 180, .26);
+  --t1: #0f1535;
+  --t2: #474f78;
+  --t3: #656d94;
+
+  --primary: #4a3fe0;
+  --primary-ink: #ffffff;
+  --primary-soft: rgba(74, 63, 224, .10);
+  --primary-line: rgba(74, 63, 224, .28);
+
+  /* Categorical slots (validated: see skill). Same hues stepped per theme. */
+  --c1: #4a3fe0; --c2: #0d9488; --c3: #ea580c; --c4: #0284c7; --c5: #c026a3;
+  --c1-soft: #b9b4ff;
+
+  /* Status (reserved: never used as a series color) */
+  --ok: #15803d;  --ok-bg: rgba(22, 163, 74, .12);
+  --warn: #a15c07; --warn-bg: rgba(245, 158, 11, .16);
+  --bad: #c62828; --bad-bg: rgba(239, 68, 68, .12);
+
+  --sidebar: linear-gradient(180deg, #121d52 0%, #0c1440 100%);
+  --sidebar-t: #a9b2e6;
+  --sidebar-t-strong: #ffffff;
+  --sidebar-hover: rgba(255, 255, 255, .07);
+
+  --tip-bg: #1d1a6b; --tip-t: #ffffff;
+  --term-bg: #0d1237; --term-line: rgba(255, 255, 255, .07); --term-t: #d7dcff; --term-dim: #7f89c4;
+
+  --shadow: 0 1px 2px rgba(25, 30, 90, .05), 0 10px 30px rgba(25, 30, 90, .08);
+  --shadow-hover: 0 2px 4px rgba(25, 30, 90, .06), 0 18px 44px rgba(25, 30, 90, .14);
+  --blur: saturate(170%) blur(18px);
+  --r-sm: 10px; --r-md: 16px; --r-lg: 24px;
+  --ease: cubic-bezier(.16, 1, .3, 1);
+}
+[data-theme="dark"] {
+  --canvas:
+    radial-gradient(1100px 700px at 6% -10%, #1b2268 0%, transparent 62%),
+    radial-gradient(900px 620px at 100% 2%, #0f3157 0%, transparent 58%),
+    radial-gradient(900px 640px at 55% 112%, #261a5c 0%, transparent 62%),
+    #080d26;
+  --surface: rgba(24, 31, 78, .58);
+  --surface-solid: #141a4a;
+  --surface-raise: rgba(34, 43, 102, .88);
+  --sunken: rgba(8, 12, 40, .5);
+  --line: rgba(160, 172, 255, .14);
+  --line-strong: rgba(160, 172, 255, .28);
+  --t1: #f1f3ff;
+  --t2: #b9c0ec;
+  --t3: #8e97c8;
+
+  --primary: #7b78f2;
+  --primary-ink: #0b0f33;
+  --primary-soft: rgba(123, 120, 242, .18);
+  --primary-line: rgba(123, 120, 242, .42);
+
+  --c1: #7b78f2; --c2: #19a89a; --c3: #d9632a; --c4: #2f95d6; --c5: #cf46a9;
+  --c1-soft: #3a3a8f;
+
+  --ok: #4ade80;  --ok-bg: rgba(74, 222, 128, .13);
+  --warn: #fbbf24; --warn-bg: rgba(251, 191, 36, .14);
+  --bad: #ff7a7a; --bad-bg: rgba(255, 99, 99, .14);
+
+  --sidebar: linear-gradient(180deg, #0a1033 0%, #060a24 100%);
+  --tip-bg: #e9e8ff; --tip-t: #15124f;
+  --term-bg: #070b24; --term-line: rgba(255, 255, 255, .06);
+  --shadow: 0 1px 2px rgba(0, 0, 0, .35), 0 12px 34px rgba(0, 0, 0, .35);
+  --shadow-hover: 0 2px 4px rgba(0, 0, 0, .4), 0 22px 50px rgba(0, 0, 0, .5);
+}
+
+
+:root {
+  --ref-0: #0d1440;
+  --ref-1: #151b4d;
+  --ref-2: #15803d;
+  --ref-3: #1b1b1f;
+  --ref-4: #1d2a73;
+  --ref-5: #34d399;
+  --ref-6: #38bdf8;
+  --ref-7: #4a3fe0;
+  --ref-8: #6c63ff;
+  --ref-9: #6ee7a0;
+  --ref-10: #6f66ff;
+  --ref-11: #7882c2;
+  --ref-12: #7dd3fc;
+  --ref-13: #8b7dff;
+  --ref-14: #a7f3d0;
+  --ref-15: #aaa;
+  --ref-16: #b9a8ff;
+  --ref-17: #c8bbff;
+  --ref-18: #dcd8ff;
+  --ref-19: #fb923c;
+  --ref-20: #fbbf24;
+  --ref-21: #fcd34d;
+  --ref-22: #fdba74;
+  --ref-23: #fde68a;
+  --ref-24: #ff6b6b;
+  --ref-25: #ff7a7a;
+  --ref-26: #ff8f8f;
+  --ref-27: #ff9a9a;
+  --ref-28: #ffb4b4;
+  --ref-29: #fff;
+}
+
+:root { --duration-press:120ms; --duration-hover:220ms; --duration-slide:350ms; --duration-count:600ms; --text:var(--t1); --text-2:var(--t2); --text-3:var(--t3); --accent:var(--primary); --accent-strong:var(--primary); --accent-ink:var(--primary-ink); --success:var(--ok); --warning:var(--warn); --error:var(--bad); --info:var(--c4); --surface-2:var(--sunken); --raised:var(--surface-raise); --overlay:var(--surface-solid); --shadow-1:var(--shadow); --shadow-2:var(--shadow-hover); --r-control:var(--r-sm); --r-panel:var(--r-lg); --space-4:16px; --space-5:24px; --space-6:32px; --side-width:252px; --topbar-height:70px; --pixel-grass:var(--ref-0); color-scheme:light; }
+[data-theme="dark"] {color-scheme:dark;}
+:root {--block-top:#5fd07f;--block-left:#3f9d57;--block-right:#2f7f45;--earth-left:#8a5a38;--earth-right:#6a4228;--nav-active:#4a3fe0;--nav-shadow:0 10px 24px rgba(74,63,224,.45);--overlay-scrim:rgba(8,10,40,.5);}

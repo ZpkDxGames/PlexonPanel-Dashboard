@@ -1,8 +1,10 @@
-import "@fontsource-variable/manrope/index.css";
+import "@fontsource-variable/plus-jakarta-sans/index.css";
 import "@fontsource-variable/jetbrains-mono/index.css";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";
+import "./styles/tokens.css";
+import "./styles/reference.css";
 import "./styles.css";
 import { session } from "./adapter/session";
 

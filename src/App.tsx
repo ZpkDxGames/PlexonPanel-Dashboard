@@ -17,6 +17,7 @@ const views: Record<RouteName, React.LazyExoticComponent<React.ComponentType>> =
   Access: lazy(() => import("./routes/Access")),
   Settings: lazy(() => import("./routes/Settings")),
 };
+const Styleguide = lazy(() => import('./routes/Styleguide'));
 
 export default function App() {
   const snap = useSession();
@@ -39,6 +40,7 @@ export default function App() {
     return () => removeEventListener("hashchange", update);
   }, []);
   const experience = entryExperience(snap, minimumSplashElapsed);
+  if (location.hash === '#Styleguide' && import.meta.env.DEV) return <main className="workspace boot"><Suspense fallback={<div className="route-skeleton"/>}><Styleguide/></Suspense></main>;
   if (experience === "splash") return <Splash />;
   if (experience === "pairing") return <PairingGate />;
   const View = views[route];

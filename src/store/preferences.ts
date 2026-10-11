@@ -8,7 +8,7 @@ export type Preferences = {
   skinProvider: "proxy" | "crafatar" | "mc-heads" | "minotar" | "disabled";
 };
 
-const defaults: Preferences = { theme: "dark", density: "comfortable", reduceMotion: false, timezone: "browser", skinProvider: "crafatar" };
+const defaults: Preferences = { theme: "system", density: "comfortable", reduceMotion: false, timezone: "browser", skinProvider: "crafatar" };
 let value = read();
 const listeners = new Set<() => void>();
 
