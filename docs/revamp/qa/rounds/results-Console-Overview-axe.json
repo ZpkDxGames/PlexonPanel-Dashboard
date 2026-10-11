@@ -1,0 +1,1178 @@
+[
+  {
+    "route": "Console",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 1440,
+    "file": "docs/revamp/after/Console-light-1440-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": [
+      {
+        "id": "aria-required-children",
+        "impact": "critical",
+        "nodes": [
+          {
+            "target": [
+              ".workspace-tabs"
+            ],
+            "summary": "Fix any of the following:\n  Element has children which are not allowed: button"
+          }
+        ]
+      },
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              "div:nth-child(2) > .nav-link[title=\"Overview\"] > span"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.31 (foreground color: #a9b2e6, background color: #4a3fe0, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".fchip:nth-child(3) > em"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.51 (foreground color: #6870a5, background color: #171b3f, font size: 8.6pt (11.5px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".fchip:nth-child(4) > em"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.51 (foreground color: #6870a5, background color: #171b3f, font size: 8.6pt (11.5px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".trace-btn"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.08 (foreground color: #7f89c4, background color: #302948, font size: 8.6pt (11.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "route": "Overview",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 1440,
+    "file": "docs/revamp/after/Overview-light-1440-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": [
+      {
+        "id": "aria-prohibited-attr",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              ".gauge"
+            ],
+            "summary": "Fix all of the following:\n  aria-label attribute cannot be used on a div with no valid role attribute."
+          }
+        ]
+      },
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              ".trace-btn"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.08 (foreground color: #7f89c4, background color: #302948, font size: 8.6pt (11.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".next-row.next-button:nth-child(1) > div > small"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.36 (foreground color: #656d94, background color: #ebeefd, font size: 9.4pt (12.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".next-row.next-button:nth-child(2) > div > small"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.36 (foreground color: #656d94, background color: #ebeefd, font size: 9.4pt (12.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "route": "Console",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 390,
+    "file": "docs/revamp/after/Console-light-390-healthy.png",
+    "overflow": false,
+    "overs": [
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ],
+    "errors": [],
+    "violations": [
+      {
+        "id": "aria-required-children",
+        "impact": "critical",
+        "nodes": [
+          {
+            "target": [
+              ".workspace-tabs"
+            ],
+            "summary": "Fix any of the following:\n  Element has children which are not allowed: button"
+          }
+        ]
+      },
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              ".fchip:nth-child(3) > em"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.51 (foreground color: #6870a5, background color: #171b3f, font size: 8.6pt (11.5px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".fchip:nth-child(4) > em"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.51 (foreground color: #6870a5, background color: #171b3f, font size: 8.6pt (11.5px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".trace-btn"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.08 (foreground color: #7f89c4, background color: #302948, font size: 8.6pt (11.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "route": "Overview",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 390,
+    "file": "docs/revamp/after/Overview-light-390-healthy.png",
+    "overflow": false,
+    "overs": [
+      "card kpi",
+      "kpi-top",
+      "kpi-label",
+      "",
+      "kpi-main",
+      "kpi-value num",
+      "kpi-unit",
+      "kpi-foot"
+    ],
+    "errors": [],
+    "violations": [
+      {
+        "id": "aria-prohibited-attr",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              ".gauge"
+            ],
+            "summary": "Fix all of the following:\n  aria-label attribute cannot be used on a div with no valid role attribute."
+          }
+        ]
+      },
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              "div[aria-label=\"Range\"] > button:nth-child(1)"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.36 (foreground color: #656d94, background color: #ebeefd, font size: 9.8pt (13px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              "div[aria-label=\"Range\"] > button:nth-child(3)"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.36 (foreground color: #656d94, background color: #ebeefd, font size: 9.8pt (13px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".trace-btn"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.08 (foreground color: #7f89c4, background color: #302948, font size: 8.6pt (11.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".next-row.next-button:nth-child(1) > div > small"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.36 (foreground color: #656d94, background color: #ebeefd, font size: 9.4pt (12.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".next-row.next-button:nth-child(2) > div > small"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.36 (foreground color: #656d94, background color: #ebeefd, font size: 9.4pt (12.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "route": "Console",
+    "theme": "light",
+    "mode": "idle",
+    "width": 1440,
+    "file": "docs/revamp/after/Console-light-1440-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": [
+      {
+        "id": "aria-required-children",
+        "impact": "critical",
+        "nodes": [
+          {
+            "target": [
+              ".workspace-tabs"
+            ],
+            "summary": "Fix any of the following:\n  Element has children which are not allowed: button"
+          }
+        ]
+      },
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              "div:nth-child(2) > .nav-link[title=\"Overview\"] > span"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.31 (foreground color: #a9b2e6, background color: #4a3fe0, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "route": "Overview",
+    "theme": "light",
+    "mode": "idle",
+    "width": 1440,
+    "file": "docs/revamp/after/Overview-light-1440-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": [
+      {
+        "id": "aria-prohibited-attr",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              ".gauge"
+            ],
+            "summary": "Fix all of the following:\n  aria-label attribute cannot be used on a div with no valid role attribute."
+          }
+        ]
+      },
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              ".next-row.next-button:nth-child(1) > div > small"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.36 (foreground color: #656d94, background color: #ebeefd, font size: 9.4pt (12.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".next-row.next-button:nth-child(2) > div > small"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.36 (foreground color: #656d94, background color: #ebeefd, font size: 9.4pt (12.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "route": "Console",
+    "theme": "light",
+    "mode": "idle",
+    "width": 390,
+    "file": "docs/revamp/after/Console-light-390-idle.png",
+    "overflow": false,
+    "overs": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "errors": [],
+    "violations": [
+      {
+        "id": "aria-required-children",
+        "impact": "critical",
+        "nodes": [
+          {
+            "target": [
+              ".workspace-tabs"
+            ],
+            "summary": "Fix any of the following:\n  Element has children which are not allowed: button"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "route": "Overview",
+    "theme": "light",
+    "mode": "idle",
+    "width": 390,
+    "file": "docs/revamp/after/Overview-light-390-idle.png",
+    "overflow": false,
+    "overs": [
+      "card kpi",
+      "kpi-top",
+      "kpi-label",
+      "",
+      "kpi-main",
+      "kpi-value num",
+      "kpi-unit",
+      "kpi-foot"
+    ],
+    "errors": [],
+    "violations": [
+      {
+        "id": "aria-prohibited-attr",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              ".gauge"
+            ],
+            "summary": "Fix all of the following:\n  aria-label attribute cannot be used on a div with no valid role attribute."
+          }
+        ]
+      },
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              "div[aria-label=\"Range\"] > button:nth-child(1)"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.36 (foreground color: #656d94, background color: #ebeefd, font size: 9.8pt (13px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              "div[aria-label=\"Range\"] > button:nth-child(3)"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.36 (foreground color: #656d94, background color: #ebeefd, font size: 9.8pt (13px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".next-row.next-button:nth-child(1) > div > small"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.36 (foreground color: #656d94, background color: #ebeefd, font size: 9.4pt (12.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".next-row.next-button:nth-child(2) > div > small"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.36 (foreground color: #656d94, background color: #ebeefd, font size: 9.4pt (12.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "route": "Console",
+    "theme": "light",
+    "mode": "offline",
+    "width": 1440,
+    "file": "docs/revamp/after/Console-light-1440-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": [
+      {
+        "id": "aria-required-children",
+        "impact": "critical",
+        "nodes": [
+          {
+            "target": [
+              ".workspace-tabs"
+            ],
+            "summary": "Fix any of the following:\n  Element has children which are not allowed: button"
+          }
+        ]
+      },
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              "div:nth-child(2) > .nav-link[title=\"Overview\"] > span"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.31 (foreground color: #a9b2e6, background color: #4a3fe0, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".fchip:nth-child(3) > em"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.51 (foreground color: #6870a5, background color: #171b3f, font size: 8.6pt (11.5px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".fchip:nth-child(4) > em"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.51 (foreground color: #6870a5, background color: #171b3f, font size: 8.6pt (11.5px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".trace-btn"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.08 (foreground color: #7f89c4, background color: #302948, font size: 8.6pt (11.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "route": "Overview",
+    "theme": "light",
+    "mode": "offline",
+    "width": 1440,
+    "file": "docs/revamp/after/Overview-light-1440-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": [
+      {
+        "id": "aria-prohibited-attr",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              ".gauge"
+            ],
+            "summary": "Fix all of the following:\n  aria-label attribute cannot be used on a div with no valid role attribute."
+          }
+        ]
+      },
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              ".trace-btn"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.08 (foreground color: #7f89c4, background color: #302948, font size: 8.6pt (11.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".next-row.next-button:nth-child(1) > div > small"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.36 (foreground color: #656d94, background color: #ebeefd, font size: 9.4pt (12.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".next-row.next-button:nth-child(2) > div > small"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.36 (foreground color: #656d94, background color: #ebeefd, font size: 9.4pt (12.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "route": "Console",
+    "theme": "light",
+    "mode": "offline",
+    "width": 390,
+    "file": "docs/revamp/after/Console-light-390-offline.png",
+    "overflow": false,
+    "overs": [
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ],
+    "errors": [],
+    "violations": [
+      {
+        "id": "aria-required-children",
+        "impact": "critical",
+        "nodes": [
+          {
+            "target": [
+              ".workspace-tabs"
+            ],
+            "summary": "Fix any of the following:\n  Element has children which are not allowed: button"
+          }
+        ]
+      },
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              ".fchip:nth-child(3) > em"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.51 (foreground color: #6870a5, background color: #171b3f, font size: 8.6pt (11.5px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".fchip:nth-child(4) > em"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.51 (foreground color: #6870a5, background color: #171b3f, font size: 8.6pt (11.5px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".trace-btn"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.08 (foreground color: #7f89c4, background color: #302948, font size: 8.6pt (11.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "route": "Overview",
+    "theme": "light",
+    "mode": "offline",
+    "width": 390,
+    "file": "docs/revamp/after/Overview-light-390-offline.png",
+    "overflow": false,
+    "overs": [
+      "card kpi",
+      "kpi-top",
+      "kpi-label",
+      "",
+      "kpi-main",
+      "kpi-unit",
+      "kpi-foot",
+      "delta "
+    ],
+    "errors": [],
+    "violations": [
+      {
+        "id": "aria-prohibited-attr",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              ".gauge"
+            ],
+            "summary": "Fix all of the following:\n  aria-label attribute cannot be used on a div with no valid role attribute."
+          }
+        ]
+      },
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              ".trace-btn"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.08 (foreground color: #7f89c4, background color: #302948, font size: 8.6pt (11.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".next-row.next-button:nth-child(1) > div > small"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.36 (foreground color: #656d94, background color: #ebeefd, font size: 9.4pt (12.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".next-row.next-button:nth-child(2) > div > small"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.36 (foreground color: #656d94, background color: #ebeefd, font size: 9.4pt (12.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "route": "Console",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 1440,
+    "file": "docs/revamp/after/Console-dark-1440-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": [
+      {
+        "id": "aria-required-children",
+        "impact": "critical",
+        "nodes": [
+          {
+            "target": [
+              ".workspace-tabs"
+            ],
+            "summary": "Fix any of the following:\n  Element has children which are not allowed: button"
+          }
+        ]
+      },
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              "div:nth-child(2) > .nav-link[title=\"Overview\"] > span"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.31 (foreground color: #a9b2e6, background color: #4a3fe0, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".fchip:nth-child(3) > em"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.72 (foreground color: #666fa1, background color: #11152d, font size: 8.6pt (11.5px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".fchip:nth-child(4) > em"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.72 (foreground color: #666fa1, background color: #11152d, font size: 8.6pt (11.5px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".trace-btn"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.48 (foreground color: #7f89c4, background color: #2b2338, font size: 8.6pt (11.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "route": "Overview",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 1440,
+    "file": "docs/revamp/after/Overview-dark-1440-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": [
+      {
+        "id": "aria-prohibited-attr",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              ".gauge"
+            ],
+            "summary": "Fix all of the following:\n  aria-label attribute cannot be used on a div with no valid role attribute."
+          }
+        ]
+      },
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              "a[href$=\"#Console\"]"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 2.01 (foreground color: #3a3a8f, background color: #070b24, font size: 9.8pt (13px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".trace-btn"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.48 (foreground color: #7f89c4, background color: #2b2338, font size: 8.6pt (11.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "route": "Console",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 390,
+    "file": "docs/revamp/after/Console-dark-390-healthy.png",
+    "overflow": false,
+    "overs": [
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ],
+    "errors": [],
+    "violations": [
+      {
+        "id": "aria-required-children",
+        "impact": "critical",
+        "nodes": [
+          {
+            "target": [
+              ".workspace-tabs"
+            ],
+            "summary": "Fix any of the following:\n  Element has children which are not allowed: button"
+          }
+        ]
+      },
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              ".fchip:nth-child(3) > em"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.72 (foreground color: #666fa1, background color: #11152d, font size: 8.6pt (11.5px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".fchip:nth-child(4) > em"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.72 (foreground color: #666fa1, background color: #11152d, font size: 8.6pt (11.5px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".trace-btn"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.48 (foreground color: #7f89c4, background color: #2b2338, font size: 8.6pt (11.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "route": "Overview",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 390,
+    "file": "docs/revamp/after/Overview-dark-390-healthy.png",
+    "overflow": false,
+    "overs": [
+      "card kpi",
+      "kpi-top",
+      "kpi-label",
+      "",
+      "kpi-main",
+      "kpi-value num",
+      "kpi-unit",
+      "kpi-foot"
+    ],
+    "errors": [],
+    "violations": [
+      {
+        "id": "aria-prohibited-attr",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              ".gauge"
+            ],
+            "summary": "Fix all of the following:\n  aria-label attribute cannot be used on a div with no valid role attribute."
+          }
+        ]
+      },
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              "div[aria-label=\"Range\"] > .active"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.79 (foreground color: #7b78f2, background color: #1f2860, font size: 9.8pt (13px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              "a[href$=\"#Console\"]"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 2.01 (foreground color: #3a3a8f, background color: #070b24, font size: 9.8pt (13px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".trace-btn"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.48 (foreground color: #7f89c4, background color: #2b2338, font size: 8.6pt (11.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "route": "Console",
+    "theme": "dark",
+    "mode": "idle",
+    "width": 1440,
+    "file": "docs/revamp/after/Console-dark-1440-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": [
+      {
+        "id": "aria-required-children",
+        "impact": "critical",
+        "nodes": [
+          {
+            "target": [
+              ".workspace-tabs"
+            ],
+            "summary": "Fix any of the following:\n  Element has children which are not allowed: button"
+          }
+        ]
+      },
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              "div:nth-child(2) > .nav-link[title=\"Overview\"] > span"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.31 (foreground color: #a9b2e6, background color: #4a3fe0, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "route": "Overview",
+    "theme": "dark",
+    "mode": "idle",
+    "width": 1440,
+    "file": "docs/revamp/after/Overview-dark-1440-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": [
+      {
+        "id": "aria-prohibited-attr",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              ".gauge"
+            ],
+            "summary": "Fix all of the following:\n  aria-label attribute cannot be used on a div with no valid role attribute."
+          }
+        ]
+      },
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              "a[href$=\"#Console\"]"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 2.01 (foreground color: #3a3a8f, background color: #070b24, font size: 9.8pt (13px), font weight: bold). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "route": "Console",
+    "theme": "dark",
+    "mode": "idle",
+    "width": 390,
+    "file": "docs/revamp/after/Console-dark-390-idle.png",
+    "overflow": false,
+    "overs": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "errors": [],
+    "violations": [
+      {
+        "id": "aria-required-children",
+        "impact": "critical",
+        "nodes": [
+          {
+            "target": [
+              ".workspace-tabs"
+            ],
+            "summary": "Fix any of the following:\n  Element has children which are not allowed: button"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "route": "Overview",
+    "theme": "dark",
+    "mode": "idle",
+    "width": 390,
+    "file": "docs/revamp/after/Overview-dark-390-idle.png",
+    "overflow": false,
+    "overs": [
+      "card kpi",
+      "kpi-top",
+      "kpi-label",
+      "",
+      "kpi-main",
+      "kpi-value num",
+      "kpi-unit",
+      "kpi-foot"
+    ],
+    "errors": [],
+    "violations": [
+      {
+        "id": "aria-prohibited-attr",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              ".gauge"
+            ],
+            "summary": "Fix all of the following:\n  aria-label attribute cannot be used on a div with no valid role attribute."
+          }
+        ]
+      },
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              "div[aria-label=\"Range\"] > .active"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.79 (foreground color: #7b78f2, background color: #1f2860, font size: 9.8pt (13px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              "a[href$=\"#Console\"]"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 2.01 (foreground color: #3a3a8f, background color: #070b24, font size: 9.8pt (13px), font weight: bold). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "route": "Console",
+    "theme": "dark",
+    "mode": "offline",
+    "width": 1440,
+    "file": "docs/revamp/after/Console-dark-1440-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": [
+      {
+        "id": "aria-required-children",
+        "impact": "critical",
+        "nodes": [
+          {
+            "target": [
+              ".workspace-tabs"
+            ],
+            "summary": "Fix any of the following:\n  Element has children which are not allowed: button"
+          }
+        ]
+      },
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              "div:nth-child(2) > .nav-link[title=\"Overview\"] > span"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.31 (foreground color: #a9b2e6, background color: #4a3fe0, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".fchip:nth-child(3) > em"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.72 (foreground color: #666fa1, background color: #11152d, font size: 8.6pt (11.5px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".fchip:nth-child(4) > em"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.72 (foreground color: #666fa1, background color: #11152d, font size: 8.6pt (11.5px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".trace-btn"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.48 (foreground color: #7f89c4, background color: #2b2338, font size: 8.6pt (11.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "route": "Overview",
+    "theme": "dark",
+    "mode": "offline",
+    "width": 1440,
+    "file": "docs/revamp/after/Overview-dark-1440-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": [
+      {
+        "id": "aria-prohibited-attr",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              ".gauge"
+            ],
+            "summary": "Fix all of the following:\n  aria-label attribute cannot be used on a div with no valid role attribute."
+          }
+        ]
+      },
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              "a[href$=\"#Console\"]"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 2.01 (foreground color: #3a3a8f, background color: #070b24, font size: 9.8pt (13px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".trace-btn"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.48 (foreground color: #7f89c4, background color: #2b2338, font size: 8.6pt (11.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "route": "Console",
+    "theme": "dark",
+    "mode": "offline",
+    "width": 390,
+    "file": "docs/revamp/after/Console-dark-390-offline.png",
+    "overflow": false,
+    "overs": [
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ],
+    "errors": [],
+    "violations": [
+      {
+        "id": "aria-required-children",
+        "impact": "critical",
+        "nodes": [
+          {
+            "target": [
+              ".workspace-tabs"
+            ],
+            "summary": "Fix any of the following:\n  Element has children which are not allowed: button"
+          }
+        ]
+      },
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              ".fchip:nth-child(3) > em"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.72 (foreground color: #666fa1, background color: #11152d, font size: 8.6pt (11.5px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".fchip:nth-child(4) > em"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.72 (foreground color: #666fa1, background color: #11152d, font size: 8.6pt (11.5px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".trace-btn"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.48 (foreground color: #7f89c4, background color: #2b2338, font size: 8.6pt (11.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "route": "Overview",
+    "theme": "dark",
+    "mode": "offline",
+    "width": 390,
+    "file": "docs/revamp/after/Overview-dark-390-offline.png",
+    "overflow": false,
+    "overs": [
+      "card kpi",
+      "kpi-top",
+      "kpi-label",
+      "",
+      "kpi-main",
+      "kpi-unit",
+      "kpi-foot",
+      "delta "
+    ],
+    "errors": [],
+    "violations": [
+      {
+        "id": "aria-prohibited-attr",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              ".gauge"
+            ],
+            "summary": "Fix all of the following:\n  aria-label attribute cannot be used on a div with no valid role attribute."
+          }
+        ]
+      },
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              "a[href$=\"#Console\"]"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 2.01 (foreground color: #3a3a8f, background color: #070b24, font size: 9.8pt (13px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".trace-btn"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.48 (foreground color: #7f89c4, background color: #2b2338, font size: 8.6pt (11.5px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  }
+]

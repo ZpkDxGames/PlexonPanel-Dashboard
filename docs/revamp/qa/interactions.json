@@ -1,0 +1,97 @@
+[
+  {
+    "name": "Palette filters and Enter navigates",
+    "pass": true,
+    "detail": "Worlds route rendered"
+  },
+  {
+    "name": "Console search filters",
+    "pass": true,
+    "detail": "One WorldGuard entry"
+  },
+  {
+    "name": "Trace expands",
+    "pass": true,
+    "detail": "Grouped trace visible"
+  },
+  {
+    "name": "Autocomplete fills command",
+    "pass": true,
+    "detail": "Tab completion"
+  },
+  {
+    "name": "Danger command requires typed confirmation",
+    "pass": true,
+    "detail": "Typed target confirmation present"
+  },
+  {
+    "name": "Cancel receives initial dialog focus",
+    "pass": true,
+    "detail": "Destructive action is not focused"
+  },
+  {
+    "name": "Unsaved navigation guard retains draft",
+    "pass": true,
+    "detail": "Canceled navigation preserved text"
+  },
+  {
+    "name": "Untrusted Overview is inert",
+    "pass": true,
+    "detail": "<img src=x onerror=window.__xss=1>"
+  },
+  {
+    "name": "Untrusted Console is inert",
+    "pass": true,
+    "detail": "<img src=x onerror=window.__xss=1>"
+  },
+  {
+    "name": "Untrusted Players is inert",
+    "pass": true,
+    "detail": "<img src=x onerror=window.__xss=1>"
+  },
+  {
+    "name": "Untrusted Plugins is inert",
+    "pass": true,
+    "detail": "<img src=x onerror=window.__xss=1>"
+  },
+  {
+    "name": "100k log burst stays bounded",
+    "pass": true,
+    "detail": "{\"retained\":2500,\"domRows\":17,\"elapsed\":645.5}"
+  },
+  {
+    "name": "Segmented thumb slides between metrics",
+    "pass": true,
+    "detail": "{\"beforeThumb\":\"matrix(1, 0, 0, 1, 4, 0)\",\"movingThumb\":\"matrix(1, 0, 0, 1, 57, 0)\"}"
+  },
+  {
+    "name": "KPI values tween to real measurements",
+    "pass": true,
+    "detail": "{\"intermediate\":\"19.50\",\"final\":\"18.70\",\"flow\":true}"
+  },
+  {
+    "name": "Live chart flows between samples",
+    "pass": true,
+    "detail": "Live SVG wrapper animation observed"
+  },
+  {
+    "name": "JVM tiles use their own source freshness",
+    "pass": true,
+    "detail": "Fresh Paper TPS does not make stale system values fresh"
+  },
+  {
+    "name": "Reduced motion disables looping animations",
+    "pass": true,
+    "detail": "0"
+  },
+  {
+    "name": "Theme toggle persists",
+    "pass": true,
+    "detail": "Stored dark preference"
+  },
+  {
+    "name": "Demo contacts no live relay",
+    "pass": true,
+    "detail": "[]"
+  }
+]

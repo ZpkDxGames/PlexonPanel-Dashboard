@@ -1,0 +1,188 @@
+[
+  {
+    "route": "Overview",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 1440,
+    "file": "docs/revamp/after/Overview-light-1440-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Overview",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 390,
+    "file": "docs/revamp/after/Overview-light-390-healthy.png",
+    "overflow": false,
+    "overs": [
+      "card kpi",
+      "kpi-top",
+      "kpi-label",
+      "",
+      "kpi-main",
+      "kpi-value num",
+      "kpi-unit",
+      "kpi-foot"
+    ],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Overview",
+    "theme": "light",
+    "mode": "idle",
+    "width": 1440,
+    "file": "docs/revamp/after/Overview-light-1440-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Overview",
+    "theme": "light",
+    "mode": "idle",
+    "width": 390,
+    "file": "docs/revamp/after/Overview-light-390-idle.png",
+    "overflow": false,
+    "overs": [
+      "card kpi",
+      "kpi-top",
+      "kpi-label",
+      "",
+      "kpi-main",
+      "kpi-value num",
+      "kpi-unit",
+      "kpi-foot"
+    ],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Overview",
+    "theme": "light",
+    "mode": "offline",
+    "width": 1440,
+    "file": "docs/revamp/after/Overview-light-1440-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Overview",
+    "theme": "light",
+    "mode": "offline",
+    "width": 390,
+    "file": "docs/revamp/after/Overview-light-390-offline.png",
+    "overflow": false,
+    "overs": [
+      "card kpi",
+      "kpi-top",
+      "kpi-label",
+      "",
+      "kpi-main",
+      "kpi-unit",
+      "kpi-foot",
+      "delta "
+    ],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Overview",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 1440,
+    "file": "docs/revamp/after/Overview-dark-1440-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Overview",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 390,
+    "file": "docs/revamp/after/Overview-dark-390-healthy.png",
+    "overflow": false,
+    "overs": [
+      "card kpi",
+      "kpi-top",
+      "kpi-label",
+      "",
+      "kpi-main",
+      "kpi-value num",
+      "kpi-unit",
+      "kpi-foot"
+    ],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Overview",
+    "theme": "dark",
+    "mode": "idle",
+    "width": 1440,
+    "file": "docs/revamp/after/Overview-dark-1440-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Overview",
+    "theme": "dark",
+    "mode": "idle",
+    "width": 390,
+    "file": "docs/revamp/after/Overview-dark-390-idle.png",
+    "overflow": false,
+    "overs": [
+      "card kpi",
+      "kpi-top",
+      "kpi-label",
+      "",
+      "kpi-main",
+      "kpi-value num",
+      "kpi-unit",
+      "kpi-foot"
+    ],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Overview",
+    "theme": "dark",
+    "mode": "offline",
+    "width": 1440,
+    "file": "docs/revamp/after/Overview-dark-1440-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Overview",
+    "theme": "dark",
+    "mode": "offline",
+    "width": 390,
+    "file": "docs/revamp/after/Overview-dark-390-offline.png",
+    "overflow": false,
+    "overs": [
+      "card kpi",
+      "kpi-top",
+      "kpi-label",
+      "",
+      "kpi-main",
+      "kpi-unit",
+      "kpi-foot",
+      "delta "
+    ],
+    "errors": [],
+    "violations": []
+  }
+]

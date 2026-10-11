@@ -1,0 +1,46 @@
+[
+  {
+    "route": "Overview",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 1440,
+    "file": "docs/revamp/after/Overview-light-1440-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Console",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 1440,
+    "file": "docs/revamp/after/Console-light-1440-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Overview",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 1440,
+    "file": "docs/revamp/after/Overview-dark-1440-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Console",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 1440,
+    "file": "docs/revamp/after/Console-dark-1440-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  }
+]

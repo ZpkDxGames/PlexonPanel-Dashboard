@@ -166,14 +166,18 @@ try {
     JSON.stringify(burst),
   );
   await p.evaluate(() => (location.hash = "Overview"));
-  await p.waitForTimeout(800);
+  await p.waitForFunction(() => {
+    const thumb = document.querySelector('.segmented .thumb');
+    return thumb && thumb.getBoundingClientRect().width > 0;
+  });
+  await p.waitForTimeout(500);
   const beforeThumb = await p
     .locator(".segmented")
     .first()
     .locator(".thumb")
     .evaluate((el) => getComputedStyle(el).transform);
   await p.getByRole("button", { name: "MSPT", exact: true }).click();
-  await p.waitForTimeout(120);
+  await p.waitForTimeout(450);
   const movingThumb = await p
     .locator(".segmented")
     .first()
@@ -182,7 +186,7 @@ try {
   check(
     "Segmented thumb slides between metrics",
     beforeThumb !== movingThumb,
-    "Transform changes during transition",
+    JSON.stringify({ beforeThumb, movingThumb }),
   );
   await p.getByRole("button", { name: "TPS", exact: true }).click();
   await p.mouse.move(0, 0);

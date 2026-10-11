@@ -11,9 +11,9 @@ Thirteen lazy routes: Overview, Console/Chat, Players, Performance, Files, Backu
 - TypeScript and 52 unit/contract tests pass: pairing/reconnect, signed action generation, freshness, bounded history, safe formatting, log grouping, domains, formats, schedule preview.
 - Vite production build passes; initial JS ~96 KiB gzipped, below the 180 KiB budget. Demo/styleguide are absent from production output.
 - Built theme script matches the allowlisted CSP SHA-256; relay origins/security headers remain preserved.
-- 156 screenshot/axe cases, plus responsive checks. Final machine evidence: [visual-matrix.json](revamp/qa/visual-matrix.json).
-- Browser: palette/search, traces, autocomplete, safe confirmation focus, dirty-draft navigation, inert injected HTML, themes and no demo relay requests.
-- 100,000-line burst: 2,500 retained, 17 DOM rows, ~720ms total stress time. This is not a physical-device 60fps certificate.
+- 156 screenshot/axe cases, plus 130 additional responsive captures. Final machine evidence: [visual-matrix.json](revamp/qa/visual-matrix.json).
+- All 19 browser checks pass: palette/search, traces, autocomplete, safe confirmation focus, dirty-draft navigation, inert injected HTML, source freshness, motion, themes and no demo relay requests.
+- 100,000-line burst: 2,500 retained, 17 DOM rows, ~420ms total stress time in the final run. This is not a physical-device 60fps certificate.
 - Reduced motion: zero running animations. Numeric, thumb and live-chart movement receive separate behavior checks.
 - Lighthouse standard mobile pairing entry: 99 Performance / 100 Accessibility / 100 Best Practices, LCP 1.96s, CLS 0.017. Desktop thresholds with the same default throttle: 83/100/100; retained in the evidence.
 

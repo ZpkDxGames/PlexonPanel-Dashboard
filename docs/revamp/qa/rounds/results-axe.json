@@ -1,0 +1,1892 @@
+[
+  {
+    "route": "Overview",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 1440,
+    "file": "docs/revamp/after/Overview-light-1440-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              ".live"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.23 (foreground color: #15803d, background color: #def0e9, font size: 9.4pt (12.5px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              "div[aria-label=\"Metric\"] > button:nth-child(2)"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.36 (foreground color: #656d94, background color: #ebeefd, font size: 9.8pt (13px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              "div[aria-label=\"Metric\"] > button:nth-child(3)"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.36 (foreground color: #656d94, background color: #ebeefd, font size: 9.8pt (13px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              "div[aria-label=\"Range\"] > button:nth-child(1)"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.36 (foreground color: #656d94, background color: #ebeefd, font size: 9.8pt (13px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              "div[aria-label=\"Range\"] > button:nth-child(3)"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.36 (foreground color: #656d94, background color: #ebeefd, font size: 9.8pt (13px), font weight: bold). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "route": "Console",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 1440,
+    "file": "docs/revamp/after/Console-light-1440-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Players",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 1440,
+    "file": "docs/revamp/after/Players-light-1440-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Performance",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 1440,
+    "file": "docs/revamp/after/Performance-light-1440-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Files",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 1440,
+    "file": "docs/revamp/after/Files-light-1440-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Backups",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 1440,
+    "file": "docs/revamp/after/Backups-light-1440-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Settings",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 1440,
+    "file": "docs/revamp/after/Settings-light-1440-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Plugins",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 1440,
+    "file": "docs/revamp/after/Plugins-light-1440-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Worlds",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 1440,
+    "file": "docs/revamp/after/Worlds-light-1440-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Schedules",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 1440,
+    "file": "docs/revamp/after/Schedules-light-1440-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Logs",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 1440,
+    "file": "docs/revamp/after/Logs-light-1440-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Fleet",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 1440,
+    "file": "docs/revamp/after/Fleet-light-1440-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Access",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 1440,
+    "file": "docs/revamp/after/Access-light-1440-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Overview",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 390,
+    "file": "docs/revamp/after/Overview-light-390-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              ".live"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.23 (foreground color: #15803d, background color: #def0e9, font size: 9.4pt (12.5px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              "div[aria-label=\"Metric\"] > button:nth-child(2)"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.36 (foreground color: #656d94, background color: #ebeefd, font size: 9.8pt (13px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              "div[aria-label=\"Metric\"] > button:nth-child(3)"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.36 (foreground color: #656d94, background color: #ebeefd, font size: 9.8pt (13px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              "div[aria-label=\"Range\"] > button:nth-child(1)"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.36 (foreground color: #656d94, background color: #ebeefd, font size: 9.8pt (13px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              "div[aria-label=\"Range\"] > button:nth-child(3)"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.36 (foreground color: #656d94, background color: #ebeefd, font size: 9.8pt (13px), font weight: bold). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "route": "Console",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 390,
+    "file": "docs/revamp/after/Console-light-390-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Players",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 390,
+    "file": "docs/revamp/after/Players-light-390-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Performance",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 390,
+    "file": "docs/revamp/after/Performance-light-390-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Files",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 390,
+    "file": "docs/revamp/after/Files-light-390-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Backups",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 390,
+    "file": "docs/revamp/after/Backups-light-390-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Settings",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 390,
+    "file": "docs/revamp/after/Settings-light-390-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Plugins",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 390,
+    "file": "docs/revamp/after/Plugins-light-390-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Worlds",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 390,
+    "file": "docs/revamp/after/Worlds-light-390-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Schedules",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 390,
+    "file": "docs/revamp/after/Schedules-light-390-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Logs",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 390,
+    "file": "docs/revamp/after/Logs-light-390-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Fleet",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 390,
+    "file": "docs/revamp/after/Fleet-light-390-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Access",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 390,
+    "file": "docs/revamp/after/Access-light-390-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Overview",
+    "theme": "light",
+    "mode": "idle",
+    "width": 1440,
+    "file": "docs/revamp/after/Overview-light-1440-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              ".live"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.23 (foreground color: #15803d, background color: #def0e9, font size: 9.4pt (12.5px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              "div[aria-label=\"Metric\"] > button:nth-child(2)"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.36 (foreground color: #656d94, background color: #ebeefd, font size: 9.8pt (13px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              "div[aria-label=\"Metric\"] > button:nth-child(3)"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.36 (foreground color: #656d94, background color: #ebeefd, font size: 9.8pt (13px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              "div[aria-label=\"Range\"] > button:nth-child(1)"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.36 (foreground color: #656d94, background color: #ebeefd, font size: 9.8pt (13px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              "div[aria-label=\"Range\"] > button:nth-child(3)"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.36 (foreground color: #656d94, background color: #ebeefd, font size: 9.8pt (13px), font weight: bold). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "route": "Console",
+    "theme": "light",
+    "mode": "idle",
+    "width": 1440,
+    "file": "docs/revamp/after/Console-light-1440-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Players",
+    "theme": "light",
+    "mode": "idle",
+    "width": 1440,
+    "file": "docs/revamp/after/Players-light-1440-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Performance",
+    "theme": "light",
+    "mode": "idle",
+    "width": 1440,
+    "file": "docs/revamp/after/Performance-light-1440-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Files",
+    "theme": "light",
+    "mode": "idle",
+    "width": 1440,
+    "file": "docs/revamp/after/Files-light-1440-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Backups",
+    "theme": "light",
+    "mode": "idle",
+    "width": 1440,
+    "file": "docs/revamp/after/Backups-light-1440-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Settings",
+    "theme": "light",
+    "mode": "idle",
+    "width": 1440,
+    "file": "docs/revamp/after/Settings-light-1440-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Plugins",
+    "theme": "light",
+    "mode": "idle",
+    "width": 1440,
+    "file": "docs/revamp/after/Plugins-light-1440-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Worlds",
+    "theme": "light",
+    "mode": "idle",
+    "width": 1440,
+    "file": "docs/revamp/after/Worlds-light-1440-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Schedules",
+    "theme": "light",
+    "mode": "idle",
+    "width": 1440,
+    "file": "docs/revamp/after/Schedules-light-1440-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Logs",
+    "theme": "light",
+    "mode": "idle",
+    "width": 1440,
+    "file": "docs/revamp/after/Logs-light-1440-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Fleet",
+    "theme": "light",
+    "mode": "idle",
+    "width": 1440,
+    "file": "docs/revamp/after/Fleet-light-1440-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Access",
+    "theme": "light",
+    "mode": "idle",
+    "width": 1440,
+    "file": "docs/revamp/after/Access-light-1440-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Overview",
+    "theme": "light",
+    "mode": "idle",
+    "width": 390,
+    "file": "docs/revamp/after/Overview-light-390-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              ".live"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.23 (foreground color: #15803d, background color: #def0e9, font size: 9.4pt (12.5px), font weight: bold). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "route": "Console",
+    "theme": "light",
+    "mode": "idle",
+    "width": 390,
+    "file": "docs/revamp/after/Console-light-390-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Players",
+    "theme": "light",
+    "mode": "idle",
+    "width": 390,
+    "file": "docs/revamp/after/Players-light-390-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Performance",
+    "theme": "light",
+    "mode": "idle",
+    "width": 390,
+    "file": "docs/revamp/after/Performance-light-390-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Files",
+    "theme": "light",
+    "mode": "idle",
+    "width": 390,
+    "file": "docs/revamp/after/Files-light-390-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Backups",
+    "theme": "light",
+    "mode": "idle",
+    "width": 390,
+    "file": "docs/revamp/after/Backups-light-390-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Settings",
+    "theme": "light",
+    "mode": "idle",
+    "width": 390,
+    "file": "docs/revamp/after/Settings-light-390-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Plugins",
+    "theme": "light",
+    "mode": "idle",
+    "width": 390,
+    "file": "docs/revamp/after/Plugins-light-390-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Worlds",
+    "theme": "light",
+    "mode": "idle",
+    "width": 390,
+    "file": "docs/revamp/after/Worlds-light-390-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Schedules",
+    "theme": "light",
+    "mode": "idle",
+    "width": 390,
+    "file": "docs/revamp/after/Schedules-light-390-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Logs",
+    "theme": "light",
+    "mode": "idle",
+    "width": 390,
+    "file": "docs/revamp/after/Logs-light-390-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Fleet",
+    "theme": "light",
+    "mode": "idle",
+    "width": 390,
+    "file": "docs/revamp/after/Fleet-light-390-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Access",
+    "theme": "light",
+    "mode": "idle",
+    "width": 390,
+    "file": "docs/revamp/after/Access-light-390-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Overview",
+    "theme": "light",
+    "mode": "offline",
+    "width": 1440,
+    "file": "docs/revamp/after/Overview-light-1440-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Console",
+    "theme": "light",
+    "mode": "offline",
+    "width": 1440,
+    "file": "docs/revamp/after/Console-light-1440-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Players",
+    "theme": "light",
+    "mode": "offline",
+    "width": 1440,
+    "file": "docs/revamp/after/Players-light-1440-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Performance",
+    "theme": "light",
+    "mode": "offline",
+    "width": 1440,
+    "file": "docs/revamp/after/Performance-light-1440-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Files",
+    "theme": "light",
+    "mode": "offline",
+    "width": 1440,
+    "file": "docs/revamp/after/Files-light-1440-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Backups",
+    "theme": "light",
+    "mode": "offline",
+    "width": 1440,
+    "file": "docs/revamp/after/Backups-light-1440-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Settings",
+    "theme": "light",
+    "mode": "offline",
+    "width": 1440,
+    "file": "docs/revamp/after/Settings-light-1440-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Plugins",
+    "theme": "light",
+    "mode": "offline",
+    "width": 1440,
+    "file": "docs/revamp/after/Plugins-light-1440-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Worlds",
+    "theme": "light",
+    "mode": "offline",
+    "width": 1440,
+    "file": "docs/revamp/after/Worlds-light-1440-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Schedules",
+    "theme": "light",
+    "mode": "offline",
+    "width": 1440,
+    "file": "docs/revamp/after/Schedules-light-1440-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Logs",
+    "theme": "light",
+    "mode": "offline",
+    "width": 1440,
+    "file": "docs/revamp/after/Logs-light-1440-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Fleet",
+    "theme": "light",
+    "mode": "offline",
+    "width": 1440,
+    "file": "docs/revamp/after/Fleet-light-1440-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Access",
+    "theme": "light",
+    "mode": "offline",
+    "width": 1440,
+    "file": "docs/revamp/after/Access-light-1440-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Overview",
+    "theme": "light",
+    "mode": "offline",
+    "width": 390,
+    "file": "docs/revamp/after/Overview-light-390-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Console",
+    "theme": "light",
+    "mode": "offline",
+    "width": 390,
+    "file": "docs/revamp/after/Console-light-390-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Players",
+    "theme": "light",
+    "mode": "offline",
+    "width": 390,
+    "file": "docs/revamp/after/Players-light-390-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Performance",
+    "theme": "light",
+    "mode": "offline",
+    "width": 390,
+    "file": "docs/revamp/after/Performance-light-390-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Files",
+    "theme": "light",
+    "mode": "offline",
+    "width": 390,
+    "file": "docs/revamp/after/Files-light-390-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Backups",
+    "theme": "light",
+    "mode": "offline",
+    "width": 390,
+    "file": "docs/revamp/after/Backups-light-390-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Settings",
+    "theme": "light",
+    "mode": "offline",
+    "width": 390,
+    "file": "docs/revamp/after/Settings-light-390-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Plugins",
+    "theme": "light",
+    "mode": "offline",
+    "width": 390,
+    "file": "docs/revamp/after/Plugins-light-390-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Worlds",
+    "theme": "light",
+    "mode": "offline",
+    "width": 390,
+    "file": "docs/revamp/after/Worlds-light-390-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Schedules",
+    "theme": "light",
+    "mode": "offline",
+    "width": 390,
+    "file": "docs/revamp/after/Schedules-light-390-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Logs",
+    "theme": "light",
+    "mode": "offline",
+    "width": 390,
+    "file": "docs/revamp/after/Logs-light-390-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Fleet",
+    "theme": "light",
+    "mode": "offline",
+    "width": 390,
+    "file": "docs/revamp/after/Fleet-light-390-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Access",
+    "theme": "light",
+    "mode": "offline",
+    "width": 390,
+    "file": "docs/revamp/after/Access-light-390-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Overview",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 1440,
+    "file": "docs/revamp/after/Overview-dark-1440-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              "div[aria-label=\"Metric\"] > .active"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.79 (foreground color: #7b78f2, background color: #1f2860, font size: 9.8pt (13px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              "div[aria-label=\"Range\"] > .active"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.79 (foreground color: #7b78f2, background color: #1f2860, font size: 9.8pt (13px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              "a[href$=\"#Console\"]"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 2.01 (foreground color: #3a3a8f, background color: #070b24, font size: 9.8pt (13px), font weight: bold). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "route": "Console",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 1440,
+    "file": "docs/revamp/after/Console-dark-1440-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Players",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 1440,
+    "file": "docs/revamp/after/Players-dark-1440-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Performance",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 1440,
+    "file": "docs/revamp/after/Performance-dark-1440-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Files",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 1440,
+    "file": "docs/revamp/after/Files-dark-1440-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Backups",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 1440,
+    "file": "docs/revamp/after/Backups-dark-1440-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Settings",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 1440,
+    "file": "docs/revamp/after/Settings-dark-1440-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Plugins",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 1440,
+    "file": "docs/revamp/after/Plugins-dark-1440-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Worlds",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 1440,
+    "file": "docs/revamp/after/Worlds-dark-1440-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Schedules",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 1440,
+    "file": "docs/revamp/after/Schedules-dark-1440-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Logs",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 1440,
+    "file": "docs/revamp/after/Logs-dark-1440-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Fleet",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 1440,
+    "file": "docs/revamp/after/Fleet-dark-1440-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Access",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 1440,
+    "file": "docs/revamp/after/Access-dark-1440-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Overview",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 390,
+    "file": "docs/revamp/after/Overview-dark-390-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              "div[aria-label=\"Metric\"] > .active"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.79 (foreground color: #7b78f2, background color: #1f2860, font size: 9.8pt (13px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              "div[aria-label=\"Range\"] > .active"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.79 (foreground color: #7b78f2, background color: #1f2860, font size: 9.8pt (13px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              "a[href$=\"#Console\"]"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 2.01 (foreground color: #3a3a8f, background color: #070b24, font size: 9.8pt (13px), font weight: bold). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "route": "Console",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 390,
+    "file": "docs/revamp/after/Console-dark-390-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Players",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 390,
+    "file": "docs/revamp/after/Players-dark-390-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Performance",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 390,
+    "file": "docs/revamp/after/Performance-dark-390-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Files",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 390,
+    "file": "docs/revamp/after/Files-dark-390-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Backups",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 390,
+    "file": "docs/revamp/after/Backups-dark-390-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Settings",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 390,
+    "file": "docs/revamp/after/Settings-dark-390-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Plugins",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 390,
+    "file": "docs/revamp/after/Plugins-dark-390-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Worlds",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 390,
+    "file": "docs/revamp/after/Worlds-dark-390-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Schedules",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 390,
+    "file": "docs/revamp/after/Schedules-dark-390-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Logs",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 390,
+    "file": "docs/revamp/after/Logs-dark-390-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Fleet",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 390,
+    "file": "docs/revamp/after/Fleet-dark-390-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Access",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 390,
+    "file": "docs/revamp/after/Access-dark-390-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Overview",
+    "theme": "dark",
+    "mode": "idle",
+    "width": 1440,
+    "file": "docs/revamp/after/Overview-dark-1440-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Console",
+    "theme": "dark",
+    "mode": "idle",
+    "width": 1440,
+    "file": "docs/revamp/after/Console-dark-1440-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Players",
+    "theme": "dark",
+    "mode": "idle",
+    "width": 1440,
+    "file": "docs/revamp/after/Players-dark-1440-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Performance",
+    "theme": "dark",
+    "mode": "idle",
+    "width": 1440,
+    "file": "docs/revamp/after/Performance-dark-1440-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Files",
+    "theme": "dark",
+    "mode": "idle",
+    "width": 1440,
+    "file": "docs/revamp/after/Files-dark-1440-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Backups",
+    "theme": "dark",
+    "mode": "idle",
+    "width": 1440,
+    "file": "docs/revamp/after/Backups-dark-1440-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Settings",
+    "theme": "dark",
+    "mode": "idle",
+    "width": 1440,
+    "file": "docs/revamp/after/Settings-dark-1440-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Plugins",
+    "theme": "dark",
+    "mode": "idle",
+    "width": 1440,
+    "file": "docs/revamp/after/Plugins-dark-1440-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Worlds",
+    "theme": "dark",
+    "mode": "idle",
+    "width": 1440,
+    "file": "docs/revamp/after/Worlds-dark-1440-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Schedules",
+    "theme": "dark",
+    "mode": "idle",
+    "width": 1440,
+    "file": "docs/revamp/after/Schedules-dark-1440-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Logs",
+    "theme": "dark",
+    "mode": "idle",
+    "width": 1440,
+    "file": "docs/revamp/after/Logs-dark-1440-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Fleet",
+    "theme": "dark",
+    "mode": "idle",
+    "width": 1440,
+    "file": "docs/revamp/after/Fleet-dark-1440-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Access",
+    "theme": "dark",
+    "mode": "idle",
+    "width": 1440,
+    "file": "docs/revamp/after/Access-dark-1440-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Overview",
+    "theme": "dark",
+    "mode": "idle",
+    "width": 390,
+    "file": "docs/revamp/after/Overview-dark-390-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Console",
+    "theme": "dark",
+    "mode": "idle",
+    "width": 390,
+    "file": "docs/revamp/after/Console-dark-390-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Players",
+    "theme": "dark",
+    "mode": "idle",
+    "width": 390,
+    "file": "docs/revamp/after/Players-dark-390-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Performance",
+    "theme": "dark",
+    "mode": "idle",
+    "width": 390,
+    "file": "docs/revamp/after/Performance-dark-390-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Files",
+    "theme": "dark",
+    "mode": "idle",
+    "width": 390,
+    "file": "docs/revamp/after/Files-dark-390-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Backups",
+    "theme": "dark",
+    "mode": "idle",
+    "width": 390,
+    "file": "docs/revamp/after/Backups-dark-390-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Settings",
+    "theme": "dark",
+    "mode": "idle",
+    "width": 390,
+    "file": "docs/revamp/after/Settings-dark-390-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Plugins",
+    "theme": "dark",
+    "mode": "idle",
+    "width": 390,
+    "file": "docs/revamp/after/Plugins-dark-390-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Worlds",
+    "theme": "dark",
+    "mode": "idle",
+    "width": 390,
+    "file": "docs/revamp/after/Worlds-dark-390-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Schedules",
+    "theme": "dark",
+    "mode": "idle",
+    "width": 390,
+    "file": "docs/revamp/after/Schedules-dark-390-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Logs",
+    "theme": "dark",
+    "mode": "idle",
+    "width": 390,
+    "file": "docs/revamp/after/Logs-dark-390-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Fleet",
+    "theme": "dark",
+    "mode": "idle",
+    "width": 390,
+    "file": "docs/revamp/after/Fleet-dark-390-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Access",
+    "theme": "dark",
+    "mode": "idle",
+    "width": 390,
+    "file": "docs/revamp/after/Access-dark-390-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Overview",
+    "theme": "dark",
+    "mode": "offline",
+    "width": 1440,
+    "file": "docs/revamp/after/Overview-dark-1440-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Console",
+    "theme": "dark",
+    "mode": "offline",
+    "width": 1440,
+    "file": "docs/revamp/after/Console-dark-1440-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Players",
+    "theme": "dark",
+    "mode": "offline",
+    "width": 1440,
+    "file": "docs/revamp/after/Players-dark-1440-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Performance",
+    "theme": "dark",
+    "mode": "offline",
+    "width": 1440,
+    "file": "docs/revamp/after/Performance-dark-1440-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Files",
+    "theme": "dark",
+    "mode": "offline",
+    "width": 1440,
+    "file": "docs/revamp/after/Files-dark-1440-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Backups",
+    "theme": "dark",
+    "mode": "offline",
+    "width": 1440,
+    "file": "docs/revamp/after/Backups-dark-1440-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Settings",
+    "theme": "dark",
+    "mode": "offline",
+    "width": 1440,
+    "file": "docs/revamp/after/Settings-dark-1440-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Plugins",
+    "theme": "dark",
+    "mode": "offline",
+    "width": 1440,
+    "file": "docs/revamp/after/Plugins-dark-1440-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Worlds",
+    "theme": "dark",
+    "mode": "offline",
+    "width": 1440,
+    "file": "docs/revamp/after/Worlds-dark-1440-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Schedules",
+    "theme": "dark",
+    "mode": "offline",
+    "width": 1440,
+    "file": "docs/revamp/after/Schedules-dark-1440-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Logs",
+    "theme": "dark",
+    "mode": "offline",
+    "width": 1440,
+    "file": "docs/revamp/after/Logs-dark-1440-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Fleet",
+    "theme": "dark",
+    "mode": "offline",
+    "width": 1440,
+    "file": "docs/revamp/after/Fleet-dark-1440-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Access",
+    "theme": "dark",
+    "mode": "offline",
+    "width": 1440,
+    "file": "docs/revamp/after/Access-dark-1440-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Overview",
+    "theme": "dark",
+    "mode": "offline",
+    "width": 390,
+    "file": "docs/revamp/after/Overview-dark-390-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Console",
+    "theme": "dark",
+    "mode": "offline",
+    "width": 390,
+    "file": "docs/revamp/after/Console-dark-390-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Players",
+    "theme": "dark",
+    "mode": "offline",
+    "width": 390,
+    "file": "docs/revamp/after/Players-dark-390-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Performance",
+    "theme": "dark",
+    "mode": "offline",
+    "width": 390,
+    "file": "docs/revamp/after/Performance-dark-390-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Files",
+    "theme": "dark",
+    "mode": "offline",
+    "width": 390,
+    "file": "docs/revamp/after/Files-dark-390-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Backups",
+    "theme": "dark",
+    "mode": "offline",
+    "width": 390,
+    "file": "docs/revamp/after/Backups-dark-390-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Settings",
+    "theme": "dark",
+    "mode": "offline",
+    "width": 390,
+    "file": "docs/revamp/after/Settings-dark-390-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Plugins",
+    "theme": "dark",
+    "mode": "offline",
+    "width": 390,
+    "file": "docs/revamp/after/Plugins-dark-390-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Worlds",
+    "theme": "dark",
+    "mode": "offline",
+    "width": 390,
+    "file": "docs/revamp/after/Worlds-dark-390-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Schedules",
+    "theme": "dark",
+    "mode": "offline",
+    "width": 390,
+    "file": "docs/revamp/after/Schedules-dark-390-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Logs",
+    "theme": "dark",
+    "mode": "offline",
+    "width": 390,
+    "file": "docs/revamp/after/Logs-dark-390-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Fleet",
+    "theme": "dark",
+    "mode": "offline",
+    "width": 390,
+    "file": "docs/revamp/after/Fleet-dark-390-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Access",
+    "theme": "dark",
+    "mode": "offline",
+    "width": 390,
+    "file": "docs/revamp/after/Access-dark-390-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  }
+]

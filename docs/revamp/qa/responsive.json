@@ -1,0 +1,1302 @@
+[
+  {
+    "route": "Overview",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 360,
+    "file": "docs/revamp/after/Overview-light-360-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Console",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 360,
+    "file": "docs/revamp/after/Console-light-360-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Players",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 360,
+    "file": "docs/revamp/after/Players-light-360-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Performance",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 360,
+    "file": "docs/revamp/after/Performance-light-360-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Files",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 360,
+    "file": "docs/revamp/after/Files-light-360-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Backups",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 360,
+    "file": "docs/revamp/after/Backups-light-360-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Settings",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 360,
+    "file": "docs/revamp/after/Settings-light-360-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Plugins",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 360,
+    "file": "docs/revamp/after/Plugins-light-360-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Worlds",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 360,
+    "file": "docs/revamp/after/Worlds-light-360-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Schedules",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 360,
+    "file": "docs/revamp/after/Schedules-light-360-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Logs",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 360,
+    "file": "docs/revamp/after/Logs-light-360-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Fleet",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 360,
+    "file": "docs/revamp/after/Fleet-light-360-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Access",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 360,
+    "file": "docs/revamp/after/Access-light-360-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Overview",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 768,
+    "file": "docs/revamp/after/Overview-light-768-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Console",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 768,
+    "file": "docs/revamp/after/Console-light-768-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Players",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 768,
+    "file": "docs/revamp/after/Players-light-768-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Performance",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 768,
+    "file": "docs/revamp/after/Performance-light-768-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Files",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 768,
+    "file": "docs/revamp/after/Files-light-768-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Backups",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 768,
+    "file": "docs/revamp/after/Backups-light-768-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Settings",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 768,
+    "file": "docs/revamp/after/Settings-light-768-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Plugins",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 768,
+    "file": "docs/revamp/after/Plugins-light-768-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Worlds",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 768,
+    "file": "docs/revamp/after/Worlds-light-768-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Schedules",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 768,
+    "file": "docs/revamp/after/Schedules-light-768-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Logs",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 768,
+    "file": "docs/revamp/after/Logs-light-768-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Fleet",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 768,
+    "file": "docs/revamp/after/Fleet-light-768-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Access",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 768,
+    "file": "docs/revamp/after/Access-light-768-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Overview",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 1280,
+    "file": "docs/revamp/after/Overview-light-1280-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Console",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 1280,
+    "file": "docs/revamp/after/Console-light-1280-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Players",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 1280,
+    "file": "docs/revamp/after/Players-light-1280-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Performance",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 1280,
+    "file": "docs/revamp/after/Performance-light-1280-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Files",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 1280,
+    "file": "docs/revamp/after/Files-light-1280-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Backups",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 1280,
+    "file": "docs/revamp/after/Backups-light-1280-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Settings",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 1280,
+    "file": "docs/revamp/after/Settings-light-1280-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Plugins",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 1280,
+    "file": "docs/revamp/after/Plugins-light-1280-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Worlds",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 1280,
+    "file": "docs/revamp/after/Worlds-light-1280-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Schedules",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 1280,
+    "file": "docs/revamp/after/Schedules-light-1280-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Logs",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 1280,
+    "file": "docs/revamp/after/Logs-light-1280-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Fleet",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 1280,
+    "file": "docs/revamp/after/Fleet-light-1280-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Access",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 1280,
+    "file": "docs/revamp/after/Access-light-1280-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Overview",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 1920,
+    "file": "docs/revamp/after/Overview-light-1920-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Console",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 1920,
+    "file": "docs/revamp/after/Console-light-1920-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Players",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 1920,
+    "file": "docs/revamp/after/Players-light-1920-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Performance",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 1920,
+    "file": "docs/revamp/after/Performance-light-1920-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Files",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 1920,
+    "file": "docs/revamp/after/Files-light-1920-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Backups",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 1920,
+    "file": "docs/revamp/after/Backups-light-1920-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Settings",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 1920,
+    "file": "docs/revamp/after/Settings-light-1920-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Plugins",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 1920,
+    "file": "docs/revamp/after/Plugins-light-1920-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Worlds",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 1920,
+    "file": "docs/revamp/after/Worlds-light-1920-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Schedules",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 1920,
+    "file": "docs/revamp/after/Schedules-light-1920-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Logs",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 1920,
+    "file": "docs/revamp/after/Logs-light-1920-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Fleet",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 1920,
+    "file": "docs/revamp/after/Fleet-light-1920-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Access",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 1920,
+    "file": "docs/revamp/after/Access-light-1920-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Overview",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 2560,
+    "file": "docs/revamp/after/Overview-light-2560-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Console",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 2560,
+    "file": "docs/revamp/after/Console-light-2560-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Players",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 2560,
+    "file": "docs/revamp/after/Players-light-2560-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Performance",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 2560,
+    "file": "docs/revamp/after/Performance-light-2560-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Files",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 2560,
+    "file": "docs/revamp/after/Files-light-2560-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Backups",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 2560,
+    "file": "docs/revamp/after/Backups-light-2560-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Settings",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 2560,
+    "file": "docs/revamp/after/Settings-light-2560-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Plugins",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 2560,
+    "file": "docs/revamp/after/Plugins-light-2560-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Worlds",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 2560,
+    "file": "docs/revamp/after/Worlds-light-2560-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Schedules",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 2560,
+    "file": "docs/revamp/after/Schedules-light-2560-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Logs",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 2560,
+    "file": "docs/revamp/after/Logs-light-2560-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Fleet",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 2560,
+    "file": "docs/revamp/after/Fleet-light-2560-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Access",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 2560,
+    "file": "docs/revamp/after/Access-light-2560-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Overview",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 360,
+    "file": "docs/revamp/after/Overview-dark-360-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Console",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 360,
+    "file": "docs/revamp/after/Console-dark-360-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Players",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 360,
+    "file": "docs/revamp/after/Players-dark-360-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Performance",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 360,
+    "file": "docs/revamp/after/Performance-dark-360-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Files",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 360,
+    "file": "docs/revamp/after/Files-dark-360-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Backups",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 360,
+    "file": "docs/revamp/after/Backups-dark-360-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Settings",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 360,
+    "file": "docs/revamp/after/Settings-dark-360-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Plugins",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 360,
+    "file": "docs/revamp/after/Plugins-dark-360-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Worlds",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 360,
+    "file": "docs/revamp/after/Worlds-dark-360-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Schedules",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 360,
+    "file": "docs/revamp/after/Schedules-dark-360-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Logs",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 360,
+    "file": "docs/revamp/after/Logs-dark-360-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Fleet",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 360,
+    "file": "docs/revamp/after/Fleet-dark-360-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Access",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 360,
+    "file": "docs/revamp/after/Access-dark-360-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Overview",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 768,
+    "file": "docs/revamp/after/Overview-dark-768-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Console",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 768,
+    "file": "docs/revamp/after/Console-dark-768-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Players",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 768,
+    "file": "docs/revamp/after/Players-dark-768-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Performance",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 768,
+    "file": "docs/revamp/after/Performance-dark-768-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Files",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 768,
+    "file": "docs/revamp/after/Files-dark-768-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Backups",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 768,
+    "file": "docs/revamp/after/Backups-dark-768-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Settings",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 768,
+    "file": "docs/revamp/after/Settings-dark-768-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Plugins",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 768,
+    "file": "docs/revamp/after/Plugins-dark-768-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Worlds",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 768,
+    "file": "docs/revamp/after/Worlds-dark-768-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Schedules",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 768,
+    "file": "docs/revamp/after/Schedules-dark-768-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Logs",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 768,
+    "file": "docs/revamp/after/Logs-dark-768-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Fleet",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 768,
+    "file": "docs/revamp/after/Fleet-dark-768-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Access",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 768,
+    "file": "docs/revamp/after/Access-dark-768-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Overview",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 1280,
+    "file": "docs/revamp/after/Overview-dark-1280-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Console",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 1280,
+    "file": "docs/revamp/after/Console-dark-1280-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Players",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 1280,
+    "file": "docs/revamp/after/Players-dark-1280-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Performance",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 1280,
+    "file": "docs/revamp/after/Performance-dark-1280-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Files",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 1280,
+    "file": "docs/revamp/after/Files-dark-1280-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Backups",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 1280,
+    "file": "docs/revamp/after/Backups-dark-1280-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Settings",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 1280,
+    "file": "docs/revamp/after/Settings-dark-1280-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Plugins",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 1280,
+    "file": "docs/revamp/after/Plugins-dark-1280-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Worlds",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 1280,
+    "file": "docs/revamp/after/Worlds-dark-1280-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Schedules",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 1280,
+    "file": "docs/revamp/after/Schedules-dark-1280-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Logs",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 1280,
+    "file": "docs/revamp/after/Logs-dark-1280-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Fleet",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 1280,
+    "file": "docs/revamp/after/Fleet-dark-1280-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Access",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 1280,
+    "file": "docs/revamp/after/Access-dark-1280-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Overview",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 1920,
+    "file": "docs/revamp/after/Overview-dark-1920-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Console",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 1920,
+    "file": "docs/revamp/after/Console-dark-1920-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Players",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 1920,
+    "file": "docs/revamp/after/Players-dark-1920-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Performance",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 1920,
+    "file": "docs/revamp/after/Performance-dark-1920-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Files",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 1920,
+    "file": "docs/revamp/after/Files-dark-1920-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Backups",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 1920,
+    "file": "docs/revamp/after/Backups-dark-1920-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Settings",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 1920,
+    "file": "docs/revamp/after/Settings-dark-1920-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Plugins",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 1920,
+    "file": "docs/revamp/after/Plugins-dark-1920-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Worlds",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 1920,
+    "file": "docs/revamp/after/Worlds-dark-1920-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Schedules",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 1920,
+    "file": "docs/revamp/after/Schedules-dark-1920-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Logs",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 1920,
+    "file": "docs/revamp/after/Logs-dark-1920-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Fleet",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 1920,
+    "file": "docs/revamp/after/Fleet-dark-1920-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Access",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 1920,
+    "file": "docs/revamp/after/Access-dark-1920-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Overview",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 2560,
+    "file": "docs/revamp/after/Overview-dark-2560-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Console",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 2560,
+    "file": "docs/revamp/after/Console-dark-2560-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Players",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 2560,
+    "file": "docs/revamp/after/Players-dark-2560-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Performance",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 2560,
+    "file": "docs/revamp/after/Performance-dark-2560-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Files",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 2560,
+    "file": "docs/revamp/after/Files-dark-2560-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Backups",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 2560,
+    "file": "docs/revamp/after/Backups-dark-2560-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Settings",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 2560,
+    "file": "docs/revamp/after/Settings-dark-2560-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Plugins",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 2560,
+    "file": "docs/revamp/after/Plugins-dark-2560-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Worlds",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 2560,
+    "file": "docs/revamp/after/Worlds-dark-2560-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Schedules",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 2560,
+    "file": "docs/revamp/after/Schedules-dark-2560-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Logs",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 2560,
+    "file": "docs/revamp/after/Logs-dark-2560-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Fleet",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 2560,
+    "file": "docs/revamp/after/Fleet-dark-2560-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Access",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 2560,
+    "file": "docs/revamp/after/Access-dark-2560-healthy.png",
+    "overflow": false,
+    "errors": [],
+    "violations": []
+  }
+]

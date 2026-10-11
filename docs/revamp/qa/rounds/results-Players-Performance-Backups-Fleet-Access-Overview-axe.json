@@ -1,0 +1,648 @@
+[
+  {
+    "route": "Players",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 1440,
+    "file": "docs/revamp/after/Players-light-1440-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": [
+      {
+        "id": "landmark-unique",
+        "impact": "moderate",
+        "nodes": [
+          {
+            "target": [
+              ".sidebar"
+            ],
+            "summary": "Fix any of the following:\n  The landmark must have a unique aria-label, aria-labelledby, or title to make landmarks distinguishable"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "route": "Performance",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 1440,
+    "file": "docs/revamp/after/Performance-light-1440-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              "th:nth-child(1)"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.36 (foreground color: #656d94, background color: #ebeefd, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              "th:nth-child(2)"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.36 (foreground color: #656d94, background color: #ebeefd, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              "th:nth-child(3)"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.36 (foreground color: #656d94, background color: #ebeefd, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              "th:nth-child(4)"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.36 (foreground color: #656d94, background color: #ebeefd, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "route": "Backups",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 1440,
+    "file": "docs/revamp/after/Backups-light-1440-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": [
+      {
+        "id": "scrollable-region-focusable",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              ".phase-timeline"
+            ],
+            "summary": "Fix any of the following:\n  Element should have focusable content\n  Element should be focusable"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "route": "Fleet",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 1440,
+    "file": "docs/revamp/after/Fleet-light-1440-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": [
+      {
+        "id": "landmark-unique",
+        "impact": "moderate",
+        "nodes": [
+          {
+            "target": [
+              ".sidebar"
+            ],
+            "summary": "Fix any of the following:\n  The landmark must have a unique aria-label, aria-labelledby, or title to make landmarks distinguishable"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "route": "Access",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 1440,
+    "file": "docs/revamp/after/Access-light-1440-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              "td:nth-child(5) > .success.status"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.23 (foreground color: #15803d, background color: #def0e9, font size: 9.8pt (13px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".warning.status"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.44 (foreground color: #a15c07, background color: #f9ecd7, font size: 9.8pt (13px), font weight: bold). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "route": "Overview",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 1440,
+    "file": "docs/revamp/after/Overview-light-1440-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Players",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 390,
+    "file": "docs/revamp/after/Players-light-390-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Performance",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 390,
+    "file": "docs/revamp/after/Performance-light-390-healthy.png",
+    "overflow": false,
+    "overs": [
+      "ok",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ],
+    "errors": [],
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              "th:nth-child(1)"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.36 (foreground color: #656d94, background color: #ebeefd, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              "th:nth-child(2)"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.36 (foreground color: #656d94, background color: #ebeefd, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "route": "Backups",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 390,
+    "file": "docs/revamp/after/Backups-light-390-healthy.png",
+    "overflow": false,
+    "overs": [
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ],
+    "errors": [],
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              "th:nth-child(1)"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.36 (foreground color: #656d94, background color: #ebeefd, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              "th:nth-child(2)"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.36 (foreground color: #656d94, background color: #ebeefd, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      },
+      {
+        "id": "scrollable-region-focusable",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              ".phase-timeline"
+            ],
+            "summary": "Fix any of the following:\n  Element should have focusable content\n  Element should be focusable"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "route": "Fleet",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 390,
+    "file": "docs/revamp/after/Fleet-light-390-healthy.png",
+    "overflow": false,
+    "overs": [
+      "fleet-row fleet-head",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "fleet-row",
+      "status success"
+    ],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Access",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 390,
+    "file": "docs/revamp/after/Access-light-390-healthy.png",
+    "overflow": false,
+    "overs": [
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ],
+    "errors": [],
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              "th:nth-child(1)"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.36 (foreground color: #656d94, background color: #ebeefd, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              "th:nth-child(2)"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.36 (foreground color: #656d94, background color: #ebeefd, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              "th:nth-child(3)"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.36 (foreground color: #656d94, background color: #ebeefd, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      },
+      {
+        "id": "scrollable-region-focusable",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              ".scope-view > div"
+            ],
+            "summary": "Fix any of the following:\n  Element should have focusable content\n  Element should be focusable"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "route": "Overview",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 390,
+    "file": "docs/revamp/after/Overview-light-390-healthy.png",
+    "overflow": false,
+    "overs": [
+      "card kpi",
+      "kpi-top",
+      "kpi-label",
+      "",
+      "kpi-main",
+      "kpi-value num",
+      "kpi-unit",
+      "kpi-foot"
+    ],
+    "errors": [],
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              "div[aria-label=\"Range\"] > button:nth-child(1)"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.36 (foreground color: #656d94, background color: #ebeefd, font size: 9.8pt (13px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              "div[aria-label=\"Range\"] > button:nth-child(3)"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.36 (foreground color: #656d94, background color: #ebeefd, font size: 9.8pt (13px), font weight: bold). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "route": "Players",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 1440,
+    "file": "docs/revamp/after/Players-dark-1440-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": [
+      {
+        "id": "landmark-unique",
+        "impact": "moderate",
+        "nodes": [
+          {
+            "target": [
+              ".sidebar"
+            ],
+            "summary": "Fix any of the following:\n  The landmark must have a unique aria-label, aria-labelledby, or title to make landmarks distinguishable"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "route": "Performance",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 1440,
+    "file": "docs/revamp/after/Performance-dark-1440-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Backups",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 1440,
+    "file": "docs/revamp/after/Backups-dark-1440-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": [
+      {
+        "id": "scrollable-region-focusable",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              ".phase-timeline"
+            ],
+            "summary": "Fix any of the following:\n  Element should have focusable content\n  Element should be focusable"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "route": "Fleet",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 1440,
+    "file": "docs/revamp/after/Fleet-dark-1440-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": [
+      {
+        "id": "landmark-unique",
+        "impact": "moderate",
+        "nodes": [
+          {
+            "target": [
+              ".sidebar"
+            ],
+            "summary": "Fix any of the following:\n  The landmark must have a unique aria-label, aria-labelledby, or title to make landmarks distinguishable"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "route": "Access",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 1440,
+    "file": "docs/revamp/after/Access-dark-1440-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Overview",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 1440,
+    "file": "docs/revamp/after/Overview-dark-1440-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              "a[href$=\"#Console\"]"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 2.01 (foreground color: #3a3a8f, background color: #070b24, font size: 9.8pt (13px), font weight: bold). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "route": "Players",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 390,
+    "file": "docs/revamp/after/Players-dark-390-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Performance",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 390,
+    "file": "docs/revamp/after/Performance-dark-390-healthy.png",
+    "overflow": false,
+    "overs": [
+      "ok",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Backups",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 390,
+    "file": "docs/revamp/after/Backups-dark-390-healthy.png",
+    "overflow": false,
+    "overs": [
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ],
+    "errors": [],
+    "violations": [
+      {
+        "id": "scrollable-region-focusable",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              ".phase-timeline"
+            ],
+            "summary": "Fix any of the following:\n  Element should have focusable content\n  Element should be focusable"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "route": "Fleet",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 390,
+    "file": "docs/revamp/after/Fleet-dark-390-healthy.png",
+    "overflow": false,
+    "overs": [
+      "fleet-row fleet-head",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "fleet-row",
+      "status success"
+    ],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Access",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 390,
+    "file": "docs/revamp/after/Access-dark-390-healthy.png",
+    "overflow": false,
+    "overs": [
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ],
+    "errors": [],
+    "violations": [
+      {
+        "id": "scrollable-region-focusable",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              ".scope-view > div"
+            ],
+            "summary": "Fix any of the following:\n  Element should have focusable content\n  Element should be focusable"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "route": "Overview",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 390,
+    "file": "docs/revamp/after/Overview-dark-390-healthy.png",
+    "overflow": false,
+    "overs": [
+      "card kpi",
+      "kpi-top",
+      "kpi-label",
+      "",
+      "kpi-main",
+      "kpi-value num",
+      "kpi-unit",
+      "kpi-foot"
+    ],
+    "errors": [],
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": [
+          {
+            "target": [
+              "div[aria-label=\"Range\"] > .active"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.79 (foreground color: #7b78f2, background color: #1f2860, font size: 9.8pt (13px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              "a[href$=\"#Console\"]"
+            ],
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 2.01 (foreground color: #3a3a8f, background color: #070b24, font size: 9.8pt (13px), font weight: bold). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ]
+  }
+]
