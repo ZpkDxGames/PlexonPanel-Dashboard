@@ -1,0 +1,624 @@
+import {
+  clearBrowserWorkspace,
+  loadRelayCredential,
+  saveRelayCredential,
+  type RelayCredential,
+} from "./browser-store";
+import { ACTION_CONTRACT_ID, ACTION_SCOPES, validScopes } from "./scopes";
+import { normalizeRelayOrigin, RelayConfigurationError } from "./relay-config";
+
+export interface LiveConnectionGrant {
+  serverId: string;
+  deviceId: string;
+  actionContract: string;
+  role: string;
+  scopes: string[];
+  token: string;
+  websocketUrl: string;
+  expiresAt: string;
+}
+
+export interface ActionObservation {
+  requestId: string;
+  action: string;
+  phase: "dispatched" | "acknowledged" | "succeeded" | "failed" | "unknown";
+  message: string;
+}
+let actionObserver: ((event: ActionObservation) => void) | undefined;
+export function setActionObserver(
+  observer: (event: ActionObservation) => void,
+) {
+  actionObserver = observer;
+}
+interface LiveSessionResponse {
+  ok: boolean;
+  protocolVersion: number;
+  actionContract?: string;
+  serverId: string;
+  deviceId?: string;
+  role: string;
+  scopes: string[];
+  expiresAt: string;
+}
+
+export interface ActionCompletion {
+  requestId: string;
+  action: string;
+  status: string;
+  code: string;
+  message: string;
+  data: Record<string, unknown>;
+}
+
+interface PairingResponse extends RelayCredential {
+  ok: boolean;
+  fingerprint: string;
+}
+
+type SessionCredential = Pick<
+  RelayCredential,
+  "serverId" | "deviceId" | "accessToken" | "websocketUrl"
+>;
+
+let activeSocket: WebSocket | null = null;
+type AgentKind = "PAPER" | "HOST";
+export interface ActionBindingContext {
+  authorization: string;
+  PAPER: string;
+  HOST: string;
+}
+let activeBinding: {
+  serverId: string;
+  generation: string;
+  context: string | ActionBindingContext;
+  authorities: Record<AgentKind, string>;
+} | null = null;
+export interface ActionTarget {
+  readonly serverId: string;
+  readonly generation: string;
+  readonly agentKind?: AgentKind;
+}
+
+function bindingGeneration(kind?: AgentKind): string | undefined {
+  return kind ? activeBinding?.authorities[kind] : activeBinding?.generation;
+}
+
+export function captureActionTarget(
+  expectedServerId: string,
+  agentKind?: AgentKind,
+): ActionTarget {
+  if (
+    !activeSocket ||
+    !activeBinding ||
+    activeBinding.serverId !== expectedServerId
+  )
+    throw new Error(
+      "The selected server connection changed. Review the target and try again.",
+    );
+  return Object.freeze({
+    serverId: activeBinding.serverId,
+    generation: bindingGeneration(agentKind)!,
+    agentKind,
+  });
+}
+const pendingActions = new Map<
+  string,
+  {
+    resolve: (value: ActionCompletion) => void;
+    reject: (reason: Error) => void;
+    timer: ReturnType<typeof setTimeout>;
+    action: string;
+    socket: WebSocket;
+    serverId: string;
+    generation: string;
+    agentKind?: "PAPER" | "HOST";
+  }
+>();
+
+async function readJson<T>(response: Response): Promise<T> {
+  let body: T & { error?: string };
+  try {
+    body = (await response.json()) as T & { error?: string };
+  } catch {
+    throw new DashboardRequestError(
+      "The relay returned an invalid response",
+      response.status,
+    );
+  }
+  if (!response.ok)
+    throw new DashboardRequestError(
+      body.error ?? "Dashboard request failed",
+      response.status,
+    );
+  return body;
+}
+
+export function liveConnectionGrantFromSession(
+  value: unknown,
+  credential: SessionCredential,
+  now = Date.now(),
+): LiveConnectionGrant {
+  const session =
+    value && typeof value === "object" && !Array.isArray(value)
+      ? (value as Record<string, unknown>)
+      : {};
+  const deviceId =
+    session.deviceId === undefined ? credential.deviceId : session.deviceId;
+  const expiresAt =
+    typeof session.expiresAt === "string"
+      ? Date.parse(session.expiresAt)
+      : Number.NaN;
+  const actionContract =
+    session.actionContract === undefined
+      ? ACTION_CONTRACT_ID
+      : session.actionContract;
+  const invalidField =
+    session.ok !== true
+      ? "ok"
+      : session.protocolVersion !== 3
+        ? "protocolVersion"
+        : actionContract !== ACTION_CONTRACT_ID
+          ? "actionContract"
+          : session.serverId !== credential.serverId
+            ? "serverId"
+            : typeof deviceId !== "string" || !deviceId
+              ? "deviceId"
+              : session.deviceId !== undefined &&
+                  session.deviceId !== credential.deviceId
+                ? "deviceId"
+                : typeof session.role !== "string" ||
+                    !/^[A-Za-z][A-Za-z0-9_-]{0,31}$/.test(session.role)
+                  ? "role"
+                  : !validScopes(session.scopes)
+                    ? "scopes"
+                    : !Number.isFinite(expiresAt) || expiresAt <= now
+                      ? "expiresAt"
+                      : "";
+
+  if (invalidField) {
+    throw new DashboardRequestError(
+      `The relay returned an invalid signed session grant (${invalidField}). Refresh after the relay deployment completes.`,
+      502,
+    );
+  }
+
+  return {
+    serverId: session.serverId as string,
+    deviceId: deviceId as string,
+    actionContract: actionContract as string,
+    role: session.role as string,
+    scopes: session.scopes as string[],
+    token: credential.accessToken,
+    websocketUrl: credential.websocketUrl,
+    expiresAt: session.expiresAt as string,
+  };
+}
+
+let configuredRelayOrigin = "";
+export function configureRelay(origin: string): void {
+  configuredRelayOrigin = normalizeRelayOrigin(origin);
+}
+function relayHttpUrl(): URL {
+  return new URL(normalizeRelayOrigin(configuredRelayOrigin));
+}
+
+export async function pairDashboardServer(
+  code: string,
+  name = "Browser device",
+): Promise<{ serverId: string }> {
+  const url = new URL("v1/pairings/claim", relayHttpUrl());
+  const result = await readJson<PairingResponse>(
+    await fetch(url, {
+      method: "POST",
+      mode: "cors",
+      cache: "no-store",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({ code, name }),
+    }),
+  );
+  const websocket = new URL(result.websocketUrl);
+  const relay = relayHttpUrl();
+  const expectedProtocol = relay.protocol === "https:" ? "wss:" : "ws:";
+  if (
+    websocket.protocol !== expectedProtocol ||
+    websocket.host !== relay.host ||
+    websocket.pathname !== "/v1/dashboard" ||
+    websocket.username ||
+    websocket.password ||
+    websocket.search ||
+    websocket.hash
+  ) {
+    throw new Error("The relay returned an unsafe WebSocket URL.");
+  }
+  await saveRelayCredential({
+    protocolVersion: result.protocolVersion,
+    name: result.name,
+    role: result.role,
+    scopes: result.scopes,
+    serverId: result.serverId,
+    deviceId: result.deviceId,
+    accessToken: result.accessToken,
+    websocketUrl: websocket.toString(),
+    expiresAt: result.expiresAt,
+  });
+  return { serverId: result.serverId };
+}
+
+export const LIVE_CONNECTION_TIMEOUT_MS = 10_000;
+
+export async function requestLiveConnection(
+  selectedCredential?: RelayCredential,
+): Promise<LiveConnectionGrant> {
+  const credential = selectedCredential ?? (await loadRelayCredential());
+  if (!credential)
+    throw new DashboardRequestError(
+      "This browser is not paired with a server",
+      401,
+    );
+  const websocket = new URL(credential.websocketUrl);
+  const relay = relayHttpUrl();
+  if (
+    websocket.protocol !== (relay.protocol === "https:" ? "wss:" : "ws:") ||
+    websocket.host !== relay.host ||
+    websocket.pathname !== "/v1/dashboard" ||
+    websocket.username ||
+    websocket.password ||
+    websocket.search ||
+    websocket.hash
+  ) {
+    throw new RelayConfigurationError(
+      "This pairing belongs to a different relay or has an invalid endpoint. Correct the relay in connection settings or pair again. The stored pairing was retained.",
+    );
+  }
+  const sessionUrl = new URL("v1/dashboard/session", relayHttpUrl());
+  const session = await readJson<LiveSessionResponse>(
+    await fetch(sessionUrl, {
+      method: "GET",
+      mode: "cors",
+      cache: "no-store",
+      signal: AbortSignal.timeout(LIVE_CONNECTION_TIMEOUT_MS),
+      headers: {
+        Authorization: `Bearer ${credential.accessToken}`,
+        Accept: "application/json",
+      },
+    }),
+  );
+  return liveConnectionGrantFromSession(session, {
+    serverId: credential.serverId,
+    deviceId: credential.deviceId,
+    accessToken: credential.accessToken,
+    websocketUrl: websocket.toString(),
+  });
+}
+
+export function bindLiveSocket(
+  socket: WebSocket | null,
+  serverId = "",
+  context: string | ActionBindingContext = "",
+): boolean {
+  const previous = activeBinding;
+  const authorization = (value: string | ActionBindingContext | undefined) =>
+    typeof value === "string" ? value : value?.authorization;
+  const changed =
+    activeSocket !== socket ||
+    previous?.serverId !== serverId ||
+    typeof previous?.context !== typeof context ||
+    authorization(previous?.context) !== authorization(context);
+  const changedAuthorities = new Set<AgentKind>();
+  for (const kind of ["PAPER", "HOST"] as const)
+    if (
+      changed ||
+      (typeof previous?.context === "object" &&
+        typeof context === "object" &&
+        previous.context[kind] !== context[kind])
+    )
+      changedAuthorities.add(kind);
+  // Lifecycle operations deliberately change Paper presence. Only the authority executing
+  // the request (or the browser's signed authorization) can invalidate its completion.
+  if (activeSocket)
+    rejectPendingActions(
+      "The connection changed before completion was observed. Check the local audit; this request will not be resent.",
+      (pending) =>
+        changed ||
+        (pending.agentKind
+          ? changedAuthorities.has(pending.agentKind)
+          : changedAuthorities.size > 0),
+    );
+  activeSocket = socket;
+  if (!socket) activeBinding = null;
+  else
+    activeBinding = {
+      serverId,
+      context,
+      generation:
+        changed || changedAuthorities.size
+          ? crypto.randomUUID()
+          : previous!.generation,
+      authorities: {
+        PAPER: changedAuthorities.has("PAPER")
+          ? crypto.randomUUID()
+          : previous!.authorities.PAPER,
+        HOST: changedAuthorities.has("HOST")
+          ? crypto.randomUUID()
+          : previous!.authorities.HOST,
+      },
+    };
+  return changed || changedAuthorities.size > 0;
+}
+
+export function unbindLiveSocket(socket: WebSocket): boolean {
+  if (activeSocket !== socket) return false;
+  activeSocket = null;
+  activeBinding = null;
+  rejectPendingActions(
+    "The connection closed before completion was observed. Check the local audit; this request will not be resent.",
+  );
+  return true;
+}
+
+function rejectionBoundary(
+  relayRejected: boolean,
+  code: string,
+  agentKind?: "PAPER" | "HOST",
+): string | undefined {
+  if (relayRejected) {
+    if (code === "UNKNOWN_ACTION") return "RELAY_ACTION_CONTRACT";
+    if (code === "SCOPE_DENIED") return "RELAY_SCOPE";
+    if (code === "CAPABILITY_DISABLED") return "RELAY_CAPABILITY";
+    if (code === "HOST_OFFLINE" || code === "PAPER_OFFLINE")
+      return "RELAY_ROUTING";
+    return undefined;
+  }
+  if (code === "SCOPE_DENIED")
+    return agentKind === "HOST" ? "HOST_SCOPE" : "PAPER_SCOPE";
+  if (code === "CAPABILITY_DISABLED" && agentKind === "HOST")
+    return "HOST_CAPABILITY";
+  if (code === "OPERATION_FAILED" && agentKind === "HOST")
+    return "HOST_EXECUTION";
+  return undefined;
+}
+
+export function handleRelayControlMessage(
+  message: Record<string, unknown>,
+  sourceSocket?: WebSocket,
+): boolean {
+  if (message.type === "dashboard.action_queued") {
+    const id = typeof message.requestId === "string" ? message.requestId : "";
+    const pending = pendingActions.get(id);
+    if (
+      pending &&
+      (!sourceSocket || sourceSocket === pending.socket) &&
+      pending.socket === activeSocket &&
+      pending.generation === bindingGeneration(pending.agentKind) &&
+      (!message.serverId || message.serverId === pending.serverId)
+    )
+      actionObserver?.({
+        requestId: id,
+        action: pending.action,
+        phase: "acknowledged",
+        message: "Relay queued the request. Agent completion is not yet known.",
+      });
+    return true;
+  }
+  const result =
+    message.type === "server.event" && message.eventType === "action.result"
+      ? (message.body as Record<string, unknown>)
+      : message;
+  if (message.type !== "dashboard.action_rejected" && result === message)
+    return false;
+  const requestId =
+    typeof result.requestId === "string" ? result.requestId : "";
+  const pending = pendingActions.get(requestId);
+  if (!pending) return true;
+  if (
+    (sourceSocket && sourceSocket !== pending.socket) ||
+    pending.generation !== bindingGeneration(pending.agentKind) ||
+    pending.socket !== activeSocket ||
+    (message.serverId !== undefined && message.serverId !== pending.serverId) ||
+    (pending.serverId &&
+      message.serverId === undefined &&
+      sourceSocket !== pending.socket) ||
+    (result.action !== undefined && result.action !== pending.action) ||
+    (pending.agentKind &&
+      message.agentKind !== undefined &&
+      message.agentKind !== pending.agentKind)
+  )
+    return true;
+  clearTimeout(pending.timer);
+  pendingActions.delete(requestId);
+  if (result.status === "SUCCESS") {
+    actionObserver?.({
+      requestId,
+      action: pending.action,
+      phase: "succeeded",
+      message: "Agent result received. Inspect the result code and job status.",
+    });
+    pending.resolve(result as unknown as ActionCompletion);
+  } else {
+    actionObserver?.({
+      requestId,
+      action: pending.action,
+      phase: "failed",
+      message: String(
+        result.message ?? result.code ?? "Agent rejected the operation.",
+      ),
+    });
+    const code = String(result.code ?? "FAILED");
+    const action =
+      typeof result.action === "string" ? result.action : pending.action;
+    const agentKind =
+      result.agentKind === "HOST" || result.agentKind === "PAPER"
+        ? result.agentKind
+        : message.agentKind === "HOST" || message.agentKind === "PAPER"
+          ? message.agentKind
+          : pending.agentKind;
+    const data =
+      result.data !== null &&
+      typeof result.data === "object" &&
+      !Array.isArray(result.data)
+        ? { ...(result.data as Record<string, unknown>) }
+        : {};
+    const boundary = rejectionBoundary(
+      message.type === "dashboard.action_rejected",
+      code,
+      agentKind,
+    );
+    if (boundary) data.rejectionBoundary = boundary;
+    const requiredScope = ACTION_SCOPES[action];
+    if (requiredScope && code !== "UNKNOWN_ACTION")
+      data.requiredScope = requiredScope;
+    if (agentKind) data.agentKind = agentKind;
+    data.runtimeKind =
+      message.type === "dashboard.action_rejected"
+        ? "relay"
+        : (agentKind?.toLowerCase() ?? "agent");
+    pending.reject(
+      new ActionError(
+        typeof result.message === "string"
+          ? result.message
+          : typeof result.error === "string"
+            ? result.error
+            : "The operation was denied.",
+        code,
+        String(result.status ?? "DENIED"),
+        requestId,
+        action,
+        data,
+      ),
+    );
+  }
+  return true;
+}
+export class ActionError extends Error {
+  constructor(
+    message: string,
+    readonly code: string,
+    readonly status: string,
+    readonly requestId = "",
+    readonly action = "",
+    readonly data: Record<string, unknown> = {},
+  ) {
+    super(message);
+  }
+}
+export async function sendDashboardAction(
+  action: string,
+  parameters: Record<string, unknown>,
+  agentKind?: "PAPER" | "HOST",
+  expectedTarget?: ActionTarget,
+): Promise<ActionCompletion> {
+  const socket = activeSocket;
+  const binding = activeBinding;
+  if (
+    expectedTarget &&
+    (!binding ||
+      expectedTarget.serverId !== binding.serverId ||
+      expectedTarget.generation !==
+        bindingGeneration(expectedTarget.agentKind) ||
+      (expectedTarget.agentKind && expectedTarget.agentKind !== agentKind))
+  )
+    throw new Error(
+      "The confirmed server connection changed. Review the target and confirm again.",
+    );
+  if (!socket || !binding || socket.readyState !== WebSocket.OPEN)
+    throw new Error("The relay is not connected.");
+  if (!/^[a-z][a-z0-9_.-]{0,63}$/.test(action) || pendingActions.size >= 32)
+    throw new Error("Request limit reached.");
+  const requestId = crypto.randomUUID();
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(
+      () => {
+        pendingActions.delete(requestId);
+        actionObserver?.({
+          requestId,
+          action,
+          phase: "unknown",
+          message:
+            "Completion was not observed. Check the agent audit before retrying.",
+        });
+        reject(
+          new Error(
+            "Completion was not observed. Check the local audit before retrying.",
+          ),
+        );
+      },
+      action.startsWith("backup.") || action.startsWith("server.")
+        ? 15 * 60000
+        : 45000,
+    );
+    pendingActions.set(requestId, {
+      resolve,
+      reject,
+      timer,
+      action,
+      agentKind,
+      socket,
+      serverId: binding.serverId,
+      generation: bindingGeneration(agentKind)!,
+    });
+    try {
+      actionObserver?.({
+        requestId,
+        action,
+        phase: "dispatched",
+        message: "Request dispatched. Waiting for relay and agent results.",
+      });
+      socket.send(
+        JSON.stringify({
+          type: "dashboard.action",
+          requestId,
+          action,
+          parameters,
+          ...(agentKind ? { agentKind } : {}),
+        }),
+      );
+    } catch (error) {
+      clearTimeout(timer);
+      pendingActions.delete(requestId);
+      reject(error);
+    }
+  });
+}
+
+export async function logoutDashboard(serverId?: string): Promise<void> {
+  const socket = activeSocket;
+  const targetId = serverId ?? activeBinding?.serverId;
+  activeSocket = null;
+  activeBinding = null;
+  rejectPendingActions(
+    "This browser credential was removed before the action completed.",
+  );
+  if (socket && socket.readyState < WebSocket.CLOSING)
+    socket.close(1000, "Dashboard device signed out");
+  await clearBrowserWorkspace(targetId);
+}
+
+export class DashboardRequestError extends Error {
+  constructor(
+    message: string,
+    readonly status: number,
+  ) {
+    super(message);
+  }
+}
+
+function rejectPendingActions(
+  message: string,
+  matches: (pending: { agentKind?: AgentKind }) => boolean = () => true,
+): void {
+  for (const [id, pending] of pendingActions) {
+    if (!matches(pending)) continue;
+    clearTimeout(pending.timer);
+    actionObserver?.({
+      requestId: id,
+      action: pending.action,
+      phase: "unknown",
+      message,
+    });
+    pending.reject(new Error(message));
+    pendingActions.delete(id);
+  }
+}

@@ -1,65 +1,31 @@
 {
-  "name": "plexonpanel-dashboard",
-  "version": "6.0.0",
+  "name": "plexonpanel-command-center",
   "private": true,
-  "engines": {
-    "node": ">=22.13.0"
-  },
+  "type": "module",
+  "engines": { "node": "24.x" },
   "scripts": {
-    "dev": "node scripts/dev.mjs",
-    "scopes:generate": "node scripts/generate-scope-contract.mjs",
-    "scopes:check": "node scripts/generate-scope-contract.mjs --check",
-    "build": "npm run scopes:generate && npm run fleet:generate && next build",
-    "start": "next start",
-    "relay:prepare": "npm run scopes:generate && npm run fleet:generate",
-    "relay:build": "npm run relay:prepare && tsc -p relay/tsconfig.json",
-    "relay:keygen": "node relay/scripts/generate-secrets.mjs",
-    "relay:dev": "npm run relay:worker:dev",
-    "relay:deploy": "npm run relay:worker:deploy",
-    "relay:worker:dev": "npm run relay:prepare && wrangler dev --config relay/wrangler.jsonc",
-    "relay:worker:deploy": "node scripts/coordinated-deployment.mjs --require-worker && npm run relay:prepare && wrangler deploy --config relay/wrangler.jsonc",
-    "relay:standalone:dev": "npm run relay:build && node --watch relay/dist/standalone/server.js",
-    "relay:standalone:start": "node relay/dist/standalone/server.js",
-    "relay:standalone:smoke": "npm run relay:build && node relay/tests/standalone-smoke.mjs",
-    "relay:standalone:package": "npm run relay:build && node relay/scripts/package-standalone.mjs",
-    "release:manifest": "node scripts/package-release.mjs",
-    "relay:test": "npm run relay:build && node --test relay/tests/*.test.mjs",
-    "env:vercel": "node scripts/create-vercel-env.mjs",
-    "test": "node scripts/transpile-tests.mjs && node scripts/build-test.mjs && node --test --test-concurrency=1 tests/*.test.mjs",
-    "lint": "eslint . --ignore-pattern .next --ignore-pattern node_modules --ignore-pattern artifacts",
-    "check": "npm run scopes:check && npm run fleet:check && npm run lint && npm run typecheck && npm run relay:test && npm test",
-    "typecheck": "tsc --noEmit && npm run relay:build",
-    "relay:smoke": "npm run relay:build && node scripts/relay-smoke.mjs",
-    "fleet:generate": "node scripts/generate-fleet-contract.mjs",
-    "fleet:check": "node scripts/generate-fleet-contract.mjs --check",
-    "test:browser": "npm run relay:build && node scripts/verify-ui-browser.mjs"
+    "dev": "vite --host 127.0.0.1 --port 4173",
+    "build": "tsc --noEmit && vite build && node scripts/identity.mjs",
+    "check": "tsc --noEmit && node --import tsx --test tests/*.test.ts",
+    "test:browser": "node scripts/browser-check.mjs",
+    "test:perf": "node scripts/performance.mjs"
   },
   "dependencies": {
-    "next": "16.3.8",
-    "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "@fontsource-variable/jetbrains-mono": "5.2.8",
+    "@fontsource-variable/manrope": "5.2.8",
+    "motion": "14.1.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",
     "@playwright/test": "1.64.0",
-    "@types/node": "22.19.19",
-    "@types/react": "19.2.14",
-    "@types/react-dom": "19.2.3",
-    "eslint": "9.39.4",
-    "eslint-config-next": "16.3.8",
+    "@types/node": "26.6.5",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
     "fake-indexeddb": "6.2.5",
-    "jsdom": "29.1.1",
-    "miniflare": "5.20260911.0-alpha",
-    "typescript": "5.9.3",
-    "wrangler": "4.131.1",
-    "ws": "8.21.0"
-  },
-  "type": "module",
-  "displayName": "PlexonPanel Dashboard",
-  "overrides": {
-    "sharp": "0.35.5",
-    "undici": "7.29.1",
-    "brace-expansion@^1.0.0": "1.1.21",
-    "brace-expansion@^5.0.0": "5.0.12"
+    "tsx": "4.23.15",
+    "typescript": "7.0.2",
+    "vite": "8.3.4"
   }
 }
