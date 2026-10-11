@@ -27,16 +27,16 @@ Updated: 2026-10-11 UTC
 - Security check: production dependency audit reports 0 vulnerabilities; unsafe rendering/evaluation source scan reports no matches.
 - Phase 10 deployment and report: the owner-private Site was published, a separate temporary Vercel QA preview was deployed, and Overview, Performance, Players, Console, Chat, Plugins, Backups, Access and Settings were inspected in the rendered browser. No inspected route overflowed horizontally and no application-origin console warning or error was observed.
 - Production relay boundary diagnosis: the standalone relay is healthy on protocol 3, allows the production dashboard origin, and reports two rooms with live agents. The dashboard CSP was corrected to allow exactly `https://tonimserver.ddns.net` and `wss://tonimserver.ddns.net`.
+- Production CSP rollout: GitHub `main` commit `8afe81d2d7887de2f0b5d1ab581d5d7458736a32` deployed successfully to Vercel as `dpl_CtGDpg8UZwPyppeFhaZQx5bSrDvK`. The live response header contains both exact relay origins, and the rendered Settings workspace reports the same commit and deployment relay URL with no application-origin console errors.
 
 ## In progress
 
-- None.
+- Fresh TonimSMP browser pairing and authenticated live acceptance.
 
 ## Next
 
-1. Deploy the CSP correction to production.
-2. Generate a fresh TonimSMP server-local code and pair a least-privilege browser device.
-3. Run authenticated Paper/Host telemetry and action acceptance checks.
+1. Generate a fresh TonimSMP server-local code and pair a least-privilege browser device.
+2. Run authenticated Paper/Host telemetry and action acceptance checks.
 
 ## Decisions
 

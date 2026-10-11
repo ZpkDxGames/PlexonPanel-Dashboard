@@ -15,6 +15,7 @@ Date: 2026-10-11 UTC
 - Deployed route overflow check: 0 horizontal pixels on every later-inspected operational route.
 - Deployed browser console: 0 application-origin warnings/errors. Four extension-origin metadata errors were observed from the remote inspection extension and excluded from the application result.
 - Production relay boundary check: `https://tonimserver.ddns.net/healthz` returned HTTP 200, protocol 3, standalone relay 5.0.0, two rooms, one Paper connection and two Host connections. The relay returned the exact production dashboard origin in CORS and rejected an unauthenticated dashboard WebSocket upgrade with the expected protocol-3 authentication error.
+- Production CSP fix: GitHub `main` commit `8afe81d2d7887de2f0b5d1ab581d5d7458736a32` deployed to Vercel as `dpl_CtGDpg8UZwPyppeFhaZQx5bSrDvK` with status `READY`. The live response contains `connect-src 'self' https://tonimserver.ddns.net wss://tonimserver.ddns.net`; the rendered Settings workspace reports the same commit and relay origin, has no horizontal overflow, and produced no application-origin console warnings or errors.
 
 ## Not executed
 
