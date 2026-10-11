@@ -1,0 +1,2 @@
+import type {MaintenanceSettings} from '../adapter/maintenance';
+export function schedulePreview(s:MaintenanceSettings){const r=s.restart.schedule;if(!r.enabled)return 'Automatic restart is off';if(!/^([01]\d|2[0-3]):[0-5]\d$/.test(r.time))return 'Choose a valid time';const days=r.type==='DAILY'?'Every day':r.weekdays.map(d=>d[0]+d.slice(1).toLowerCase()).join(', ');return `${days} at ${r.time} · ${s.timezone}`;}

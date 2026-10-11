@@ -1,2 +1,1 @@
-import {Panel} from '../components/ui';
-export default function Logs(){return <Panel title="Logs"><div className="inline-empty"><strong>Waiting for server data</strong><span>Available capabilities appear after the server connects.</span></div></Panel>;}
+import {ConsoleView} from '../components/ConsoleView';import {Panel,Button} from '../components/ui';export default function Logs(){return <><Panel title="Session history" eyebrow="Search and export the retained server output" action={<Button onClick={()=>location.hash='Files'}>Browse log files</Button>}><p className="subtle">The current browser retains up to 2,500 lines. Rotated logs can be opened from Files when the server allows them.</p></Panel><ConsoleView readOnly/></>;}
