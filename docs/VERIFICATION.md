@@ -31,5 +31,6 @@ Date: 2026-10-11 UTC
 - Backup download hash/save, restore and recovery resolution: not executed.
 - Physical phone, Safari, Firefox and screen-reader verification: not executed.
 - LCP, INP, browser long-task and 60-fps console profiling: not executed.
+- Vercel runtime error-log scan and drain inventory: not executed; the connected Vercel account returned HTTP 403 for both team-scoped endpoints. Deployment/build status and public-page checks were still executed.
 
 Production fixture exclusion is structurally enforced by the `import.meta.env.DEV` dynamic import and was confirmed by the absence of a fixture chunk in normal production output. A separate verification build deliberately includes fixtures and labels them in-product.

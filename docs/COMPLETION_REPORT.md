@@ -46,6 +46,7 @@ Inspected Overview, Performance, Players, Console, Chat, Plugins, Backups, Acces
 - Live relay health and pairing-endpoint CORS preflight: executed. Authenticated pairing, telemetry and action dispatch: not executed.
 - Backup download hash/save, restore and recovery resolution: not executed.
 - LCP, INP, browser long-task and sustained 60-fps console profiling: not executed.
+- Vercel runtime error-log scan and drain inventory: not executed; team-scoped endpoints returned HTTP 403 for the connected account.
 
 ## Known limitations
 

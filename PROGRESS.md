@@ -67,4 +67,5 @@ Updated: 2026-10-11 UTC
 ## Open questions
 
 - Final authenticated acceptance still depends on the user's browser-held credential; no access token is copied into diagnostics or source control.
+- Vercel runtime-log and drain endpoints are not authorized for the connected account (HTTP 403); post-deploy checks therefore use deployment state, public build identity, headers and rendered inspection.
 
