@@ -16,7 +16,7 @@ Date: 2026-10-11 UTC
 
 | Area | Status | Evidence or boundary |
 | --- | --- | --- |
-| Pairing and connection state | Browser claim contract, cross-relay rejection, production CORS preflight and rendered zero-pairing state verified | Final claim with a fresh TonimSMP code remains not executed |
+| Pairing and connection state | Real TonimSMP claim reached the dashboard; contract, cross-relay rejection, production CORS and long-grant timer regression are verified | Post-hotfix authenticated `dashboard.ready` acceptance remains not executed |
 | Telemetry and freshness | Verified with contract tests and fixtures | Authenticated live relay acceptance remains not executed |
 | Player roster, skins and UUID-bound actions | Verified with fixtures and unit tests | Skin proxy is optional; direct providers disclose IP/UUID |
 | Console formatting and bounded stream | Verified with golden/adversarial tests and rendered inspection | Live high-volume profiling remains not executed |
@@ -28,7 +28,7 @@ Date: 2026-10-11 UTC
 
 ## Commands and results
 
-- `npm run check`: 41 passed, 0 failed.
+- `npm run check`: 43 passed, 0 failed.
 - `npm run build`: passed; Motion dependency module-directive warnings were non-fatal.
 - `npm run test:perf`: passed; initial-route JavaScript 127,032 gzip bytes, budget 184,320 bytes.
 - `npm audit --omit=dev --audit-level=high`: passed; 0 vulnerabilities.
@@ -50,20 +50,21 @@ Inspected Overview, Performance, Players, Console, Chat, Plugins, Backups, Acces
 ## Known limitations
 
 - `VITE_PLEXON_RELAY_URL` is set to the public relay origin in Vercel; the checked-in CSP allows only the exact relay HTTPS and WSS origins.
-- A fresh TonimSMP one-time code is still required before the browser can perform authenticated live acceptance.
+- The TonimSMP pairing credential remains browser-local; final authenticated acceptance requires the user's paired browser to reload the hotfix.
 - A fixture snapshot naturally becomes delayed and stale while an inspection session remains open.
 
 ## Exact integration next steps
 
-1. Generate a new TonimSMP server-local one-time pairing code and pair a least-privilege monitoring device from the production first-run page.
-2. Run live read-only Paper/Host telemetry acceptance, then scoped action tests, backup preflight and recovery drills.
+1. Hard-refresh the production dashboard and verify the existing TonimSMP browser pairing reaches `dashboard.ready` and receives Paper/Host telemetry.
+2. Run scoped action tests, backup preflight and recovery drills.
 3. Use `MIGRATION_ROLLBACK.md` and Vercel deployment history if rollback is required.
 
 ## Source identity
 
-- Local implementation commit: `26e783dc6b8242d79843c0c24bbd821f89fb569a`.
-- GitHub production commit: `9e04c59ac494ad80252ee9d56ae351133aab77f0`.
-- Vercel production deployment: `dpl_BJsiLH2s7cAVT4ZaW1ThQUsiN1ww`.
+- Local implementation commit: `f5f408fe42bf96e377f9b358503fd4a0862b8d7b`.
+- GitHub implementation commit: `889a3cc35384cd5b931800979cc6fc31083451bc`.
+- Vercel production deployment: `dpl_HvrfBDf1nqykyTWnMg5mLA6p8Axr`.
 - Reference Dashboard production commit: `d19f94f8e0092bf7ab802be0977959a5c65b7641`.
 - Reference Core commit: `09deffc568e36828b4cb56c91f576b7f8524122c`.
-- `/build.json` in the inspected production deployment reports GitHub commit `9e04c59ac494ad80252ee9d56ae351133aab77f0` and protocol version 3.
+- `/build.json` in the inspected production deployment reports GitHub commit `889a3cc35384cd5b931800979cc6fc31083451bc` and protocol version 3.
+- The final documentation-only release commit containing this updated report is identified in the handoff response and its Vercel `/build.json`.

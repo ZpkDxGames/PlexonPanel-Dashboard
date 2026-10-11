@@ -37,14 +37,16 @@ Updated: 2026-10-11 UTC
 - Selected-session expiry fix: long-lived grants are now checked in bounded timer stages. A 30-day grant previously exceeded the browser's signed 32-bit timer ceiling and could close the WebSocket immediately; the passive fleet path already bounded this delay.
 - Connection recovery UX: pre-live socket close codes/reasons are retained and displayed globally with a retry control, and a selected server ID remains visible before its first ready payload.
 - Hotfix validation: 43/43 tests pass and the production build passes. The new regression test verifies a 30-day grant schedules at the 2,147,483,647 ms ceiling instead of overflowing.
+- Hotfix rollout: GitHub `main` commit `889a3cc35384cd5b931800979cc6fc31083451bc` deployed successfully to Vercel production as `dpl_HvrfBDf1nqykyTWnMg5mLA6p8Axr`; `/build.json` reports the same commit and protocol 3.
+- Post-rollout inspection: the public production splash and first-pairing screen rendered correctly at 1363 × 936, the live CSP retained the exact relay HTTPS/WSS origins, and relay health reported protocol 3 with one Paper and two Host connections.
 
 ## In progress
 
-- Staged deployment, rendered inspection and production rollout of the selected-session expiry fix.
+- Authenticated acceptance from the user's existing browser-held TonimSMP pairing after a hard refresh.
 
 ## Next
 
-1. Verify the existing stored TonimSMP pairing reaches `dashboard.ready` after the frontend hotfix.
+1. Hard-refresh the production dashboard and verify the stored TonimSMP pairing reaches `dashboard.ready`.
 2. Run authenticated Paper/Host telemetry and action acceptance checks.
 
 ## Decisions

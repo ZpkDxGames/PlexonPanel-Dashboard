@@ -4,7 +4,7 @@ Date: 2026-10-11 UTC
 
 ## Executed
 
-- `npm run check`: 41 tests passed, 0 failed. Covers pairing claim persistence and cross-relay rejection, first-run routing, grant reconciliation, bound actions, relay mismatch/repair, reducer bounds and gaps, skew freshness, maintenance validation, player/permission command validation, text formatting and the virtual 30-minute soak.
+- `npm run check`: 43 tests passed, 0 failed. Covers safe scheduling for 30-day grants, pairing claim persistence and cross-relay rejection, first-run routing, grant reconciliation, bound actions, relay mismatch/repair, reducer bounds and gaps, skew freshness, maintenance validation, player/permission command validation, text formatting and the virtual 30-minute soak.
 - `npm run build`: passed with TypeScript checking and Vite production output. Vite reported non-fatal module-directive warnings from Motion dependencies.
 - `npm run test:perf`: passed; initial-route JS 127,032 gzip bytes against a 184,320-byte budget.
 - `npm audit --omit=dev --audit-level=high`: passed; 0 vulnerabilities.
@@ -20,11 +20,14 @@ Date: 2026-10-11 UTC
 - First-run rendered inspection at 1363 × 936: the initialization splash appeared immediately, remained for the 2.8-second minimum, and transitioned to the dedicated pairing gate because the inspection browser had zero valid pairings. The gate showed the production relay, required device name and one-time code, enabled its action only after both were present, and had zero horizontal overflow.
 - Production pairing preflight: `OPTIONS https://tonimserver.ddns.net/v1/pairings/claim` with origin `https://plexon-panel-dashboard.vercel.app` returned HTTP 204 with exact `access-control-allow-origin`, `POST` and `Content-Type` permission. Relay health simultaneously reported protocol 3, two rooms, one Paper agent and two Host agents.
 - First-run browser console: 0 application-origin warnings/errors. Two extension-origin metadata errors were observed from the remote inspection extension and excluded from the application result.
+- Long-grant hotfix preview: GitHub branch `hotfix/long-grant-reconnect` commit `889a3cc35384cd5b931800979cc6fc31083451bc` built `READY` as Vercel preview `dpl_73acd6gcpWEHuAt3gjZRxjwwe9of`. Visual access was not executed because the preview was protected by Vercel SSO and the connected account could not mint a temporary browser bypass.
+- Long-grant production rollout: the same GitHub commit deployed `READY` as Vercel production `dpl_HvrfBDf1nqykyTWnMg5mLA6p8Axr`. `/build.json` reports the exact commit and protocol 3; the public response retained the exact relay CSP. The 1363 × 936 splash and zero-pairing page rendered without visible regression.
+- Post-rollout relay health: HTTP 200, protocol 3, two rooms, one Paper and two Host agents. Dashboard count was zero before the user's paired browser reloaded the hotfix.
 
 ## Not executed
 
 - `npm run test:browser`: not executed to completion. The Playwright Chromium executable was absent; `npx playwright install chromium` received an invalid zero-byte archive from the permitted network path. Therefore automated 1440/390 journeys, axe results and screenshots are not claimed.
-- Authenticated dashboard pairing, per-room Paper/Host telemetry and real action dispatch: not executed. The relay, claim endpoint preflight and browser-side credential contract are verified, but TonimSMP requires a fresh server-generated one-time pairing code.
+- The real TonimSMP claim succeeded before the hotfix, but post-hotfix authenticated `dashboard.ready`, per-room Paper/Host telemetry and real action dispatch are not executed because the credential exists only in the user's browser.
 - Backup download hash/save, restore and recovery resolution: not executed.
 - Physical phone, Safari, Firefox and screen-reader verification: not executed.
 - LCP, INP, browser long-task and 60-fps console profiling: not executed.
