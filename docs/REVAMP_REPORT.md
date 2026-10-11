@@ -21,7 +21,7 @@ Thirteen lazy routes: Overview, Console/Chat, Players, Performance, Files, Backu
 
 Node 24: `npm ci`, `npm run dev`; open `http://127.0.0.1:4173/?demo=1`. Add `&idle=1` or `&offline=1`; choose theme in the UI. Existing fixture flags remain development-only. `npm run build` produces the normal Vercel Vite `dist`. Reproduce with `npm run test:visual` and `npm run test:revamp`; install Playwright Chromium or set `PLEXON_CHROMIUM`.
 
-Branch: `revamp/6.0.0`, separate phase commits. Main is not merged/promoted. Connected Vercel account returned no teams, so no new deployment/live server action is certified. A preview needs the relay’s exact origin allowlist and a browser-held pairing; no credential is copied into source/docs.
+Branch: `revamp/6.0.0`, separate phase commits. Main is not merged/promoted. GitHub’s Vercel check reports successful deployment of verified UI commit `cc87a13660b436a531dfa5862abfa036f14f2f73`: [deployment](https://vercel.com/zpkdxgames-projects/plexon-panel-dashboard/536xmmZrxY1CaFkjX89ZaLrYUBp1). Direct deployment inspection returned a team-scope 403; no authenticated CLI fallback is available. The hosted runtime and live server actions remain unverified. A preview needs the relay’s exact origin allowlist and a browser-held pairing; no credential is copied into source/docs.
 
 ## Parity and limitations
 

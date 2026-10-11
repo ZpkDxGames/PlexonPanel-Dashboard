@@ -1,0 +1,12 @@
+{
+  "branch": "revamp/6.0.0",
+  "verifiedUiCommit": "cc87a13660b436a531dfa5862abfa036f14f2f73",
+  "verifiedTree": "1e76bf177b84ee4ebdc3e393635eb2d89f3cd52a",
+  "remoteTreeMatchesLocal": true,
+  "vercelGitHubStatus": "success",
+  "deployment": "https://vercel.com/zpkdxgames-projects/plexon-panel-dashboard/536xmmZrxY1CaFkjX89ZaLrYUBp1",
+  "directDeploymentInspection": "403: connected account lacks zpkdxgames-projects scope",
+  "authenticatedCliFallbackAvailable": false,
+  "hostedRuntimeVerified": false,
+  "liveServerActionsVerified": false
+}
