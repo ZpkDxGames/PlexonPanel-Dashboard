@@ -1,6 +1,5 @@
 import { Select } from "../components/Select";
-import { copy } from "../i18n/en";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   number,
   record,
@@ -9,86 +8,369 @@ import {
   type JsonMap,
 } from "../adapter/control-state";
 import { session, type Prepared } from "../adapter/session";
+import { formatDateTime } from "../lib/time";
 import { ActionReview } from "../features/ActionReview";
 import { Button, Notice, Panel, Status } from "../components/ui";
-import { useSession } from "../hooks";
+import { useNow, useSession } from "../hooks";
+import {
+  BACKUP_TIMELINE,
+  backupHealth,
+  backupReady,
+  backupRecoveryRequired,
+  durationLabel,
+  effectiveBackupPhase,
+  effectiveBackupProgress,
+  healthCopy,
+  isTerminalBackupPhase,
+  phaseLabel,
+  retryUploadAvailable,
+  stepState,
+} from "../lib/backup-model";
+
 function size(value: unknown) {
   const n = number(value);
   return n === null ? "Unknown" : `${(n / 2 ** 30).toFixed(2)} GiB`;
 }
+
+function percent(value: number) {
+  return `${Math.max(0, Math.min(100, Math.round(value)))}%`;
+}
+
+function speed(value: unknown) {
+  const n = number(value);
+  if (n === null || n <= 0) return "";
+  const units = ["B/s", "KiB/s", "MiB/s", "GiB/s"];
+  let amount = n;
+  let index = 0;
+  while (amount >= 1024 && index < units.length - 1) {
+    amount /= 1024;
+    index++;
+  }
+  return `${amount.toFixed(index ? 1 : 0)} ${units[index]}`;
+}
+
+type Readiness = {
+  label: string;
+  state: "ready" | "warning" | "blocked" | "unknown";
+  detail: string;
+};
+
+function readinessTone(state: Readiness["state"]) {
+  return state === "ready"
+    ? "success"
+    : state === "warning"
+      ? "warning"
+      : state === "blocked"
+        ? "error"
+        : "neutral";
+}
+
 export default function Backups() {
   const snap = useSession();
+  const now = useNow();
   const [preflight, setPreflight] = useState<JsonMap>({});
-  const [operation, setOperation] = useState<JsonMap>({});
+  const [maintenance, setMaintenance] = useState<JsonMap>({});
   const [backups, setBackups] = useState<JsonMap[]>([]);
-  const [error, setError] = useState("");
+  const [errors, setErrors] = useState<string[]>([]);
   const [prepared, setPrepared] = useState<Prepared | null>(null);
   const [countdown, setCountdown] = useState(300);
+  const [refreshing, setRefreshing] = useState(false);
+
   const refresh = async () => {
-    setError("");
-    try {
-      const [p, s, l] = await Promise.all([
-        session.query("backup.preflight", {}, "HOST"),
-        session.query("maintenance.status", {}, "HOST"),
-        session.query("backup.full.list", {}, "HOST"),
-      ]);
-      setPreflight(record(p.data));
-      setOperation(record(record(s.data).currentOperation));
-      setBackups(records(record(l.data).backups));
-    } catch (cause) {
-      setError(
-        cause instanceof Error ? cause.message : "Backup status unavailable.",
+    if (snap.phase !== "live") return;
+    setRefreshing(true);
+    const [preflightResult, statusResult, listResult] = await Promise.allSettled([
+      session.query("backup.preflight", {}, "HOST"),
+      session.query("maintenance.status", {}, "HOST"),
+      session.query("backup.full.list", {}, "HOST"),
+    ]);
+
+    const nextErrors: string[] = [];
+    if (preflightResult.status === "fulfilled")
+      setPreflight(record(preflightResult.value.data));
+    else
+      nextErrors.push(
+        preflightResult.reason instanceof Error
+          ? preflightResult.reason.message
+          : "Backup preflight unavailable.",
       );
-    }
+
+    if (statusResult.status === "fulfilled")
+      setMaintenance(record(statusResult.value.data));
+    else
+      nextErrors.push(
+        statusResult.reason instanceof Error
+          ? statusResult.reason.message
+          : "Maintenance status unavailable.",
+      );
+
+    if (listResult.status === "fulfilled")
+      setBackups(records(record(listResult.value.data).backups));
+    else
+      nextErrors.push(
+        listResult.reason instanceof Error
+          ? listResult.reason.message
+          : "Backup inventory unavailable.",
+      );
+
+    setErrors(nextErrors);
+    setRefreshing(false);
   };
+
   useEffect(() => {
-    if (snap.phase === "live") void refresh();
-  }, [snap.phase, snap.revision]);
+    if (snap.phase !== "live") return;
+    void refresh();
+  }, [snap.phase, snap.revision, snap.state.ready?.server.hostSession]);
+
+  const durableOperation = record(maintenance.currentOperation);
+  const phasePush = record(snap.state.maintenancePhase);
+  const operation = useMemo(() => {
+    if (
+      str(phasePush.jobId) &&
+      (!str(durableOperation.jobId) ||
+        str(phasePush.jobId) === str(durableOperation.jobId))
+    )
+      return { ...durableOperation, ...phasePush };
+    return durableOperation;
+  }, [durableOperation, phasePush]);
+
+  const progress = snap.state.backupProgress;
+  const operationBackup = backups.find(
+    (backup) => str(backup.backupId) === str(operation.backupId),
+  );
+  const resolvedAfterRetry =
+    str(operation.phase) === "DEGRADED" && operationBackup?.offsite === true;
+  const effectiveOperation = resolvedAfterRetry
+    ? {
+        ...operation,
+        phase: "COMPLETED",
+        result: "SUCCESS",
+        errorCode: "",
+        errorMessage: "",
+        remoteBackupVerified: true,
+        progressPercent: 100,
+      }
+    : operation;
+  const displayProgress = resolvedAfterRetry ? null : progress;
+  const operationKind = str(effectiveOperation.kind);
+  const isBackupJob =
+    !operationKind || operationKind === "FULL_RESTORE_POINT";
+  const phase = isBackupJob
+    ? effectiveBackupPhase(effectiveOperation, displayProgress)
+    : "IDLE";
+  const progressPercent = isBackupJob
+    ? effectiveBackupProgress(effectiveOperation, displayProgress)
+    : 0;
+  const recovery = backupRecoveryRequired(
+    preflight,
+    maintenance,
+    effectiveOperation,
+  );
+  const ready = backupReady(preflight, maintenance, effectiveOperation);
+  const hostLive = Boolean(snap.state.ready?.agents.host);
+  const healthOperation = isBackupJob
+    ? effectiveOperation
+    : { ...effectiveOperation, phase: "IDLE" };
+  const health = backupHealth({
+    hostLive,
+    ready,
+    recovery,
+    operation: healthOperation,
+  });
+  const copy = healthCopy(health);
+  const operationActive =
+    isBackupJob &&
+    phase !== "IDLE" &&
+    !isTerminalBackupPhase(str(effectiveOperation.phase, phase));
+
+  useEffect(() => {
+    if (snap.phase !== "live") return;
+    const delay = operationActive || recovery ? 3_500 : 15_000;
+    const timer = window.setInterval(() => void refresh(), delay);
+    return () => window.clearInterval(timer);
+  }, [snap.phase, operationActive, recovery, snap.state.ready?.server.hostSession]);
+
   const prepare = (action: string, parameters: JsonMap) => {
+    setErrors([]);
     try {
       setPrepared(session.prepare(action, parameters, "HOST"));
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Action unavailable.");
+      setErrors([
+        cause instanceof Error ? cause.message : "Action unavailable.",
+      ]);
     }
   };
-  const ready =
-    preflight.hostAuthenticated === true &&
-    preflight.operationBusy === false &&
-    preflight.recoveryRequired === false &&
-    preflight.backupRootWritable === true &&
-    preflight.commandChannelConfigured === true;
-  const phase = str(operation.phase, "IDLE");
+
+  const provider = record(maintenance.provider);
+  const latestBackup = backups[0];
+  const localCount = backups.filter((backup) => backup.local === true).length;
+  const offsiteCount = backups.filter((backup) => backup.offsite === true).length;
+  const verifiedCount = backups.filter(
+    (backup) =>
+      str(backup.verification).startsWith("VERIFIED") ||
+      str(backup.result).startsWith("SUCCESS"),
+  ).length;
+  const retryAvailable =
+    !resolvedAfterRetry &&
+    (retryUploadAvailable(operation) ||
+      (operationBackup?.local === true && operationBackup?.offsite !== true));
+  const countdownRemaining = number(maintenance.countdownRemainingSeconds);
+  const progressSpeed = speed(displayProgress?.bytesPerSecond);
+  const liveBytes = number(displayProgress?.bytesUploaded ?? displayProgress?.bytes);
+  const liveTotal = number(displayProgress?.totalBytes);
+
+  const readiness: Readiness[] = [
+    {
+      label: "Host authority",
+      state: preflight.hostAuthenticated === true ? "ready" : "blocked",
+      detail:
+        preflight.hostAuthenticated === true
+          ? "The Host session is authenticated."
+          : "A live authenticated Host session is required.",
+    },
+    {
+      label: "Operation lock",
+      state:
+        preflight.operationBusy === false
+          ? "ready"
+          : preflight.operationBusy === true
+            ? "blocked"
+            : "unknown",
+      detail:
+        preflight.operationBusy === false
+          ? "No conflicting destructive operation is running."
+          : preflight.operationBusy === true
+            ? "Another Host maintenance operation owns the lock."
+            : "Lock state has not been reported.",
+    },
+    {
+      label: "Recovery gate",
+      state: recovery ? "blocked" : "ready",
+      detail: recovery
+        ? "A durable recovery condition must be resolved before another backup."
+        : "No backup or maintenance recovery gate is active.",
+    },
+    {
+      label: "Backup storage",
+      state:
+        preflight.backupRootWritable === true
+          ? "ready"
+          : preflight.backupRootWritable === false
+            ? "blocked"
+            : "unknown",
+      detail:
+        preflight.backupRootWritable === true
+          ? "Host backup storage is writable."
+          : "The configured backup root is not confirmed writable.",
+    },
+    {
+      label: "Command channel",
+      state:
+        preflight.commandChannelConfigured === true
+          ? "ready"
+          : preflight.commandChannelConfigured === false
+            ? "blocked"
+            : "unknown",
+      detail:
+        preflight.commandChannelConfigured === true
+          ? "Host-local RCON can perform warnings, final save and readiness checks."
+          : "The fixed Host command channel is not available.",
+    },
+    {
+      label: "Host configuration",
+      state:
+        preflight.hostConfigRestartRequired === true
+          ? "warning"
+          : preflight.hostConfigRestartRequired === false
+            ? "ready"
+            : "unknown",
+      detail:
+        preflight.hostConfigRestartRequired === true
+          ? "Host configuration changed on disk; restart Host before a new backup."
+          : "The loaded Host configuration matches the current file.",
+    },
+  ];
+
+  const healthTone =
+    health === "ready"
+      ? "success"
+      : health === "running"
+        ? "info"
+        : health === "degraded" || health === "recovery" || health === "blocked"
+          ? "warning"
+          : health === "failed"
+            ? "error"
+            : "neutral";
+
+  const recommendedAction =
+    health === "recovery"
+      ? maintenance.jobRecoveryRequired === true
+        ? "Verify Minecraft is running and healthy, then review recovery resolution."
+        : "Follow the Host restore-recovery procedure before new destructive work."
+      : health === "degraded"
+        ? retryAvailable
+          ? "Retry the offsite upload using the existing verified local archive."
+          : "Inspect the remote verification failure and preserve the verified local copy."
+        : health === "failed"
+          ? "Refresh preflight and review the failure before creating another restore point."
+          : health === "blocked"
+            ? "Resolve the blocked readiness checks below."
+            : health === "running"
+              ? `Keep the Host online while ${phaseLabel(phase).toLowerCase()} finishes.`
+              : backups.length
+                ? "Create a new restore point when you are ready."
+                : "Create the first verified restore point for this server.";
+
   return (
     <>
-      <div className="backup-hero">
-        <div>
-          <span className="eyebrow">
-            {copy.worlds_and_server_contents_1b591}
-          </span>
-          <h2>
-            {phase === "IDLE"
-              ? !snap.state.ready?.agents.host
-                ? "Connect your server to manage backups"
-                : ready
-                  ? "Ready for a restore point"
-                  : "Checking backup readiness"
-              : phase === "DEGRADED"
-                ? "Offsite copy needs attention"
-                : phase.replaceAll("_", " ").toLowerCase()}
-          </h2>
-          <p>{copy.check_both_local_and_offsite_copies_yo_41379}</p>
+      <section className="backup-control-hero" data-health={health}>
+        <div className="backup-health-copy">
+          <div className="backup-health-line">
+            <Status tone={healthTone}>{phaseLabel(health)}</Status>
+            <span>Host-authoritative manual full backup</span>
+          </div>
+          <h2>{copy.title}</h2>
+          <p>{copy.description}</p>
+          <div className="backup-recommendation">
+            <strong>Recommended next action</strong>
+            <span>{recommendedAction}</span>
+          </div>
         </div>
+
+        <div className="backup-summary-grid" aria-label="Backup summary">
+          <div>
+            <span>Last restore point</span>
+            <strong>
+              {latestBackup ? formatDateTime(latestBackup.timestamp) : "None yet"}
+            </strong>
+          </div>
+          <div>
+            <span>Verified inventory</span>
+            <strong>
+              {verifiedCount} / {backups.length || 0}
+            </strong>
+          </div>
+          <div>
+            <span>Local copies</span>
+            <strong>{localCount}</strong>
+          </div>
+          <div>
+            <span>Offsite copies</span>
+            <strong>{offsiteCount}</strong>
+          </div>
+        </div>
+
         <div className="backup-create">
           <label className="field">
-            {copy.player_warning_306a0}
+            Player warning
             <Select
               value={countdown}
               onChange={(e) => setCountdown(Number(e.target.value))}
+              disabled={operationActive}
             >
               {[300, 600, 900, 1800].map((n) => (
                 <option value={n} key={n}>
-                  {n / 60}
-                  {copy._minutes_ae098}
+                  {n / 60} minutes
                 </option>
               ))}
             </Select>
@@ -97,11 +379,12 @@ export default function Backups() {
             variant="primary"
             disabled={
               !ready ||
+              operationActive ||
               Boolean(session.reason("maintenance.full-backup.create", "HOST"))
             }
             title={
               !ready
-                ? "A successful preflight with every required boolean true is required."
+                ? "Host preflight must be healthy and recovery must be clear."
                 : session.reason("maintenance.full-backup.create", "HOST")
             }
             onClick={() =>
@@ -110,187 +393,327 @@ export default function Backups() {
               })
             }
           >
-            {copy.review_new_backup_abb68}
+            Review new backup
           </Button>
-        </div>
-      </div>
-      <div className="operations-grid">
-        <Panel
-          eyebrow={copy.current_job_ee633}
-          title={copy.phase_timeline_b68da}
-          action={
-            <Status
-              tone={
-                phase === "DEGRADED"
-                  ? "warning"
-                  : phase === "IDLE"
-                    ? "neutral"
-                    : "info"
+          {retryAvailable && (
+            <Button
+              onClick={() =>
+                prepare("backup.full.retry-upload", {
+                  backupId: str(operation.backupId),
+                })
               }
             >
-              {phase === "DEGRADED"
-                ? "Needs attention"
-                : phase.replaceAll("_", " ").toLowerCase()}
+              Retry offsite upload
+            </Button>
+          )}
+          {maintenance.jobRecoveryRequired === true && (
+            <Button
+              variant="danger"
+              onClick={() => prepare("maintenance.recovery.resolve", {})}
+            >
+              Review recovery resolution
+            </Button>
+          )}
+        </div>
+      </section>
+
+      <div className="backup-operations-grid">
+        <Panel
+          eyebrow="Current Host job"
+          title="Backup timeline"
+          className="backup-timeline-panel"
+          action={
+            <Status tone={healthTone}>
+              {phase === "IDLE" ? "No active job" : phaseLabel(phase)}
             </Status>
           }
         >
-          <p className="table-scroll-hint">
-            {copy.swipe_to_see_every_backup_step_3b3ee}
-          </p>
-          <div
-            className="phase-timeline"
-            tabIndex={0}
-            aria-label={copy.backup_steps_2dd67}
-          >
-            {[
-              "PREFLIGHT",
-              "COUNTDOWN",
-              "ARCHIVE",
-              "LOCAL_VERIFY",
-              "UPLOAD",
-              "REMOTE_VERIFY",
-              "COMPLETE",
-            ].map((item) => (
-              <div className={item === phase ? "current" : ""} key={item}>
-                <i />
-                <span>{item.replaceAll("_", " ")}</span>
-              </div>
-            ))}
+          {!isBackupJob && operationKind && (
+            <Notice tone="warning" title="Another Host maintenance job is active">
+              {phaseLabel(operationKind)} is currently in the
+              {" "}{phaseLabel(str(effectiveOperation.phase, "QUEUED"))} phase.
+              Backup creation remains blocked until that Host-owned job finishes.
+            </Notice>
+          )}
+
+          <div className="backup-job-meta">
+            <div>
+              <span>Job</span>
+              <strong>{str(operation.jobId, "No active job")}</strong>
+            </div>
+            <div>
+              <span>Elapsed</span>
+              <strong>
+                {str(operation.startedAt)
+                  ? durationLabel(
+                      operation.startedAt,
+                      operation.completedAt,
+                      now,
+                    )
+                  : "—"}
+              </strong>
+            </div>
+            <div>
+              <span>Progress</span>
+              <strong>{phase === "IDLE" ? "—" : percent(progressPercent)}</strong>
+            </div>
+            <div>
+              <span>Backup ID</span>
+              <strong>{str(operation.backupId, str(progress?.backupId, "—"))}</strong>
+            </div>
           </div>
-          {Boolean(operation.message) && (
+
+          {phase !== "IDLE" && (
+            <div className="backup-progress-track" aria-label="Backup job progress">
+              <i style={{ width: `${progressPercent}%` }} />
+            </div>
+          )}
+
+          <div className="backup-stepper" aria-label="Backup phases">
+            {BACKUP_TIMELINE.map((step, index) => {
+              const state = stepState(step, phase, progressPercent, operation);
+              return (
+                <div className="backup-step" data-state={state} key={step.key}>
+                  <div className="backup-step-marker">
+                    <i>{state === "done" ? "✓" : index + 1}</i>
+                    {index < BACKUP_TIMELINE.length - 1 && <span />}
+                  </div>
+                  <div>
+                    <strong>{step.label}</strong>
+                    <small>{step.detail}</small>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {(phase !== "IDLE" || operationActive) && (
+            <div className="backup-live-detail">
+              <div>
+                <span>Current phase</span>
+                <strong>{phaseLabel(phase)}</strong>
+              </div>
+              {countdownRemaining !== null && phase === "COUNTDOWN" && (
+                <div>
+                  <span>Countdown remaining</span>
+                  <strong>{Math.ceil(countdownRemaining / 60)} min</strong>
+                </div>
+              )}
+              {liveBytes !== null && liveTotal !== null && liveTotal > 0 && (
+                <div>
+                  <span>Transferred</span>
+                  <strong>
+                    {size(liveBytes)} / {size(liveTotal)}
+                  </strong>
+                </div>
+              )}
+              {progressSpeed && (
+                <div>
+                  <span>Transfer rate</span>
+                  <strong>{progressSpeed}</strong>
+                </div>
+              )}
+            </div>
+          )}
+
+          {resolvedAfterRetry && (
+            <Notice tone="success" title="Offsite verification recovered">
+              The original backup job completed degraded, but a later Retry Upload
+              verified the same restore point offsite. No additional server shutdown
+              was required.
+            </Notice>
+          )}
+
+          {!resolvedAfterRetry &&
+            Boolean(operation.errorCode || operation.errorMessage) && (
             <Notice
-              tone={operation.retryable ? "warning" : "neutral"}
-              title={
-                operation.errorCode === "REMOTE_VERIFY_FAILED"
-                  ? "Offsite copy needs verification"
-                  : str(operation.errorCode, "Backup status")
+              tone={
+                health === "degraded" || health === "recovery"
+                  ? "warning"
+                  : "error"
               }
+              title={str(operation.errorCode, "Backup status")}
             >
-              {str(operation.message)}
+              {str(
+                operation.errorMessage,
+                "The Host reported a backup condition that requires review.",
+              )}
             </Notice>
           )}
         </Panel>
+
         <Panel
-          eyebrow={copy.before_you_begin_b4738}
-          title={copy.backup_readiness_702cf}
-        >
-          <dl className="gate-list">
-            <dt>{copy.host_authenticated_1a7b1}</dt>
-            <dd>
-              {preflight.hostAuthenticated === true ? "Ready" : "Unavailable"}
-            </dd>
-            <dt>{copy.no_active_operation_e4534}</dt>
-            <dd>
-              {preflight.operationBusy === false
-                ? "Ready"
-                : preflight.operationBusy === true
-                  ? "Busy"
-                  : "Unavailable"}
-            </dd>
-            <dt>{copy.recovery_clear_3908e}</dt>
-            <dd>
-              {preflight.recoveryRequired === false
-                ? "Ready"
-                : preflight.recoveryRequired === true
-                  ? "Needs recovery"
-                  : "Unavailable"}
-            </dd>
-            <dt>{copy.backup_root_writable_8a516}</dt>
-            <dd>
-              {preflight.backupRootWritable === true ? "Ready" : "Unavailable"}
-            </dd>
-            <dt>{copy.command_channel_036ff}</dt>
-            <dd>
-              {preflight.commandChannelConfigured === true
-                ? "Ready"
-                : "Unavailable"}
-            </dd>
-          </dl>
-          <div className="panel-actions">
-            <Button onClick={() => void refresh()}>
-              {copy.refresh_status_ade15}
+          eyebrow="Before another backup"
+          title="Backup readiness"
+          action={
+            <Button onClick={() => void refresh()} disabled={refreshing}>
+              {refreshing ? "Refreshing…" : "Refresh status"}
             </Button>
-            {operation.retryable === true && (
-              <Button
-                onClick={() =>
-                  prepare("backup.full.retry-upload", {
-                    backupId: str(operation.backupId),
-                  })
-                }
-              >
-                {copy.review_upload_retry_fb0e5}
-              </Button>
-            )}
+          }
+        >
+          <div className="backup-readiness-list">
+            {readiness.map((item) => (
+              <div className="backup-readiness-row" key={item.label}>
+                <i data-state={item.state} />
+                <div>
+                  <strong>{item.label}</strong>
+                  <span>{item.detail}</span>
+                </div>
+                <Status tone={readinessTone(item.state)}>
+                  {item.state === "ready"
+                    ? "Ready"
+                    : item.state === "warning"
+                      ? "Attention"
+                      : item.state === "blocked"
+                        ? "Blocked"
+                        : "Unknown"}
+                </Status>
+              </div>
+            ))}
+          </div>
+
+          <div className="backup-provider-card">
+            <div>
+              <span>Offsite provider</span>
+              <strong>{str(provider.provider, "Unknown")}</strong>
+            </div>
+            <div>
+              <span>Provider state</span>
+              <strong>{str(provider.status, "Unknown")}</strong>
+            </div>
+            <div>
+              <span>Last verified remote</span>
+              <strong>
+                {str(provider.lastSuccessfulVerificationAt)
+                  ? formatDateTime(provider.lastSuccessfulVerificationAt)
+                  : "No verified remote yet"}
+              </strong>
+            </div>
           </div>
         </Panel>
       </div>
+
       <Panel
-        eyebrow={copy.retained_archives_63b7e}
-        title={copy.backup_inventory_8610b}
+        eyebrow="Retained restore points"
+        title="Backup inventory"
+        className="backup-inventory-panel"
         action={
-          <span className="subtle">{copy.local_and_offsite_copies_12bdf}</span>
+          <span className="subtle">
+            {backups.length} restore point{backups.length === 1 ? "" : "s"}
+          </span>
         }
       >
-        <p className="table-scroll-hint">
-          {copy.swipe_to_see_archive_actions_7a2fb}
-        </p>
+        <div className="backup-inventory-summary">
+          <span>
+            <b>{localCount}</b> local
+          </span>
+          <span>
+            <b>{offsiteCount}</b> offsite
+          </span>
+          <span>
+            <b>{verifiedCount}</b> verified
+          </span>
+        </div>
+        <p className="table-scroll-hint">Swipe to see archive actions →</p>
         <div className="backup-table table-region" tabIndex={0}>
           <table>
             <thead>
               <tr>
-                <th>{copy.archive_2621c}</th>
-                <th>{copy.created_accf4}</th>
-                <th>{copy.size_b7152}</th>
-                <th>{copy.local_dc99d}</th>
-                <th>{copy.offsite_47511}</th>
-                <th>{copy.actions_c3cd6}</th>
+                <th>Archive</th>
+                <th>Created</th>
+                <th>Size</th>
+                <th>Local</th>
+                <th>Offsite</th>
+                <th>Verification</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               {backups.length ? (
-                backups.map((backup) => (
-                  <tr key={str(backup.backupId)}>
-                    <td>
-                      <strong>{str(backup.filename)}</strong>
-                      <small>{str(backup.backupId)}</small>
-                    </td>
-                    <td>{str(backup.timestamp)}</td>
-                    <td>{size(backup.archiveBytes)}</td>
-                    <td>
-                      {backup.local === true ? "Verified" : "Unavailable"}
-                    </td>
-                    <td>
-                      {backup.offsite === true ? "Verified" : "Not verified"}
-                    </td>
-                    <td>
-                      <div className="button-row">
-                        <Button
-                          onClick={() =>
-                            prepare("backup.full.verify", {
-                              backupId: str(backup.backupId),
-                            })
+                backups.map((backup) => {
+                  const local = backup.local === true;
+                  const offsite = backup.offsite === true;
+                  const verification = str(backup.verification, "Unknown");
+                  return (
+                    <tr key={str(backup.backupId)}>
+                      <td>
+                        <strong>{str(backup.filename, "Restore point")}</strong>
+                        <small>{str(backup.backupId)}</small>
+                      </td>
+                      <td>{formatDateTime(backup.timestamp)}</td>
+                      <td>{size(backup.archiveBytes)}</td>
+                      <td>
+                        <Status tone={local ? "success" : "neutral"}>
+                          {local ? "Available" : "Released"}
+                        </Status>
+                      </td>
+                      <td>
+                        <Status
+                          tone={
+                            offsite
+                              ? "success"
+                              : local
+                                ? "warning"
+                                : "neutral"
                           }
                         >
-                          {copy.verify_dda6a}
-                        </Button>
-                        <Button
-                          variant="danger"
-                          onClick={() =>
-                            prepare("backup.full.delete", {
-                              backupId: str(backup.backupId),
-                            })
-                          }
-                        >
-                          {copy.delete_f6fdb}
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
+                          {offsite ? "Verified" : "Not verified"}
+                        </Status>
+                      </td>
+                      <td>
+                        <code>{verification}</code>
+                        {Boolean(backup.errorCode) && (
+                          <small>{str(backup.errorCode)}</small>
+                        )}
+                      </td>
+                      <td>
+                        <div className="button-row">
+                          <Button
+                            onClick={() =>
+                              prepare("backup.full.verify", {
+                                backupId: str(backup.backupId),
+                              })
+                            }
+                          >
+                            Verify
+                          </Button>
+                          {local && !offsite && (
+                            <Button
+                              onClick={() =>
+                                prepare("backup.full.retry-upload", {
+                                  backupId: str(backup.backupId),
+                                })
+                              }
+                            >
+                              Retry upload
+                            </Button>
+                          )}
+                          <Button
+                            variant="danger"
+                            onClick={() =>
+                              prepare("backup.full.delete", {
+                                backupId: str(backup.backupId),
+                              })
+                            }
+                          >
+                            Delete
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
               ) : (
                 <tr>
-                  <td colSpan={6}>
-                    {copy.no_backups_yet_create_a_restore_point_ff32d}
+                  <td colSpan={7}>
+                    <div className="backup-empty-state">
+                      <strong>No restore points yet</strong>
+                      <span>
+                        {ready
+                          ? "Host preflight is healthy. Create the first verified backup when ready."
+                          : "Resolve the readiness checks before creating the first restore point."}
+                      </span>
+                    </div>
                   </td>
                 </tr>
               )}
@@ -298,14 +721,20 @@ export default function Backups() {
           </table>
         </div>
       </Panel>
-      {error && (
+
+      {errors.length > 0 && (
         <div className="page-notice">
-          <Notice tone="error" title={copy.backup_data_unavailable_1a499}>
-            {error}
+          <Notice tone="warning" title="Partial backup data">
+            {errors.join(" ")}
           </Notice>
         </div>
       )}
-      <ActionReview prepared={prepared} onClose={() => setPrepared(null)} />
+
+      <ActionReview
+        prepared={prepared}
+        onClose={() => setPrepared(null)}
+        onComplete={() => void refresh()}
+      />
     </>
   );
 }

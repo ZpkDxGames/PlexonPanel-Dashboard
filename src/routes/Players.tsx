@@ -7,7 +7,8 @@ import { PlayerHead } from "../components/PlayerHead";
 import { Button, Notice, Panel, Status } from "../components/ui";
 import { ActionReview } from "../features/ActionReview";
 import { playerCommand, permissionCommand } from "../lib/playerCommands";
-import { useSession } from "../hooks";
+import { usePlayerSnapshotRefresh, useSession } from "../hooks";
+import { playerPingMillis } from "../lib/player-telemetry";
 type Player = {
   uuid: string;
   name: string;
@@ -56,7 +57,7 @@ export default function Players() {
           uuid: str(raw.uuid, ""),
           name: str(raw.name, "Unknown"),
           world: str(raw.world, "Unknown"),
-          ping: number(raw.ping),
+          ping: playerPingMillis(raw),
           onlineMs: number(raw.onlineDurationMillis),
           raw,
         }))
@@ -74,6 +75,7 @@ export default function Players() {
   const worlds = [
     ...new Set(snap.state.players.map((p) => str(p.world, "Unknown"))),
   ];
+  usePlayerSnapshotRefresh();
   const prepare = (action: string, parameters: JsonMap) => {
     setBuilderError("");
     try {

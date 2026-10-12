@@ -28,8 +28,40 @@ class Socket {
   receive(message: unknown) {this.onmessage?.({data: JSON.stringify(message)});}
   close(code = 1000) {this.readyState = 3; queueMicrotask(() => this.onclose?.({code}));}
   send(text: string) {
-    const request = JSON.parse(text); this.sent.push(request);
-    if (request.type === "dashboard.action") queueMicrotask(() => this.receive({type: "server.event", serverId: credential.serverId, agentKind: request.agentKind, eventType: "action.result", body: {requestId: request.requestId, action: request.action, status: "SUCCESS", code: "OK", message: "Synthetic contract response", data: {lines: []}}}));
+    const request = JSON.parse(text);
+    this.sent.push(request);
+    if (request.type === "dashboard.action") {
+      const data =
+        request.action === "console.history"
+          ? {
+              lines: [
+                {
+                  capturedAt: new Date().toISOString(),
+                  level: "INFO",
+                  source: "HOST_JOURNAL",
+                  content: "latest host journal line",
+                  journalCursor: "s=latest;i=1",
+                },
+              ],
+            }
+          : { lines: [] };
+      queueMicrotask(() =>
+        this.receive({
+          type: "server.event",
+          serverId: credential.serverId,
+          agentKind: request.agentKind,
+          eventType: "action.result",
+          body: {
+            requestId: request.requestId,
+            action: request.action,
+            status: "SUCCESS",
+            code: "OK",
+            message: "Synthetic contract response",
+            data,
+          },
+        }),
+      );
+    }
   }
 }
 async function until(check: () => boolean) {
@@ -60,9 +92,20 @@ test("stored protocol 3 pairing reconnects, receives telemetry, completes a boun
     const socket = Socket.all.at(-1)!;
     assert.equal(socket.url, credential.websocketUrl);
     assert.deepEqual(socket.protocols, ["plexonpanel-v3", `auth.${credential.accessToken}`]);
+    await until(() =>
+      socket.sent.some(
+        (message) =>
+          message.type === "gateway.snapshot_request" &&
+          message.serverId === credential.serverId,
+      ),
+    );
     socket.receive({type: "server.event", serverId: credential.serverId, agentKind: "PAPER", agentSession: "fixture-paper", eventType: "telemetry.server", body: {capturedAt: new Date().toISOString(), tps: [17.25], onlinePlayers: 4}});
     await until(() => {const tps = session.getSnapshot().state.server.tps; return Array.isArray(tps) && tps[0] === 17.25;});
-    assert.equal((await session.query("console.history", {limit: 10}, "HOST")).status, "SUCCESS");
+    await until(
+      () =>
+        session.getSnapshot().state.console.at(-1)?.content ===
+        "latest host journal line",
+    );
     await session.setRelayOrigin("https://wrong.integration.test");
     await until(() => session.getSnapshot().phase === "configuration-required");
     assert.equal((await loadRelayCredential())?.serverId, credential.serverId);

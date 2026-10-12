@@ -3,6 +3,7 @@ import {
   applyControlMessage,
   emptyControlState,
   record,
+  records,
   compatibleActionTarget,
   type ControlState,
   type JsonMap,
@@ -272,6 +273,19 @@ async function connect(credential: RelayCredential, revision: number) {
           return;
         }
         receive(message);
+        if (message.type === "dashboard.ready") {
+          // A fresh browser session explicitly asks both bound agents for their
+          // current snapshots. This avoids depending on relay-room replay age
+          // for Paper telemetry, roster/plugin/world inventories or Host state.
+          if (candidate.readyState === WebSocket.OPEN)
+            candidate.send(
+              JSON.stringify({
+                type: "gateway.snapshot_request",
+                serverId: credential.serverId,
+              }),
+            );
+          void session.refreshConsoleHistory(100);
+        }
       } catch {
         publish({
           error: "Invalid relay message. No data from this packet was used.",
@@ -634,6 +648,52 @@ export const session = {
       return await response;
     } finally {
       if (queries.get(key) === response) queries.delete(key);
+    }
+  },
+  async refreshConsoleHistory(limit = 100) {
+    const ready = raw.ready;
+    if (
+      !ready ||
+      snapshot.phase !== "live" ||
+      !ready.agents.host ||
+      ready.consoleAuthority !== "HOST" ||
+      this.reason("console.history", "HOST")
+    )
+      return 0;
+
+    const revision = snapshot.revision;
+    const serverId = raw.serverId;
+    const hostSession = ready.server.hostSession;
+    const safeLimit = Math.max(1, Math.min(100, Math.trunc(limit) || 100));
+
+    try {
+      const result = await this.query(
+        "console.history",
+        { limit: safeLimit },
+        "HOST",
+      );
+      if (
+        result.status !== "SUCCESS" ||
+        revision !== snapshot.revision ||
+        serverId !== raw.serverId
+      )
+        return 0;
+
+      const lines = records(record(result.data).lines, safeLimit);
+      if (!lines.length) return 0;
+
+      raw = applyControlMessage(raw, {
+        type: "server.event",
+        serverId,
+        agentKind: "HOST",
+        ...(hostSession ? { agentSession: hostSession } : {}),
+        eventType: "console.lines",
+        body: { lines },
+      });
+      flush();
+      return lines.length;
+    } catch {
+      return 0;
     }
   },
   installFixture(

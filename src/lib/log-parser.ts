@@ -1,5 +1,6 @@
 import { str, type JsonMap } from "../adapter/control-state";
 import { parseTextFormat, plainText } from "./textFormat";
+import { formatTime } from "./time";
 export type LogKind =
   | "info"
   | "join"
@@ -47,20 +48,20 @@ export function parseLog(line: JsonMap, index = 0): LogEntry {
     time = "",
     source = str(line.source, "Server thread"),
     level = str(line.level, "INFO").toUpperCase();
+  const captured = formatTime(line.capturedAt ?? line.receivedAt, {
+    seconds: true,
+  });
   if (modern) {
-    time = modern[1];
+    time = captured !== "—" ? captured : modern[1];
     source = modern[2];
     level = modern[3];
     message = modern[4];
   } else if (legacy) {
-    time = legacy[1];
+    time = captured !== "—" ? captured : legacy[1];
     level = legacy[2];
     message = legacy[3];
   } else {
-    const stamp = Date.parse(str(line.capturedAt ?? line.receivedAt, ""));
-    time = Number.isFinite(stamp)
-      ? new Date(stamp).toLocaleTimeString([], { hour12: false })
-      : "—";
+    time = captured;
   }
   const prefix = message.match(/^\[([^\]]{1,32})\]\s*(.*)$/);
   if (prefix) {

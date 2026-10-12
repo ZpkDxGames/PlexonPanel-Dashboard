@@ -117,7 +117,7 @@ export function makeFixture(mode = "healthy", now = Date.now()): ControlState {
         "MarinaMC",
       ][i % 6] + (i > 5 ? i : ""),
     world: ["world", "world_nether", "world_the_end"][i % 3],
-    ping: 22 + i * 7,
+    pingMillis: 22 + i * 7,
     health: 20,
     onlineDurationMillis: 1000 * (500 + i * 86),
   }));

@@ -4,7 +4,7 @@ import { chromium } from "@playwright/test";
 
 const port = 4216;
 const base = `http://127.0.0.1:${port}`;
-const out = "docs/revamp/6.5.0";
+const out = "docs/revamp/6.5.1";
 const routes = [
   "Overview",
   "Console",
@@ -37,7 +37,7 @@ const landmarks = {
   Backups: ".backup-create",
   Schedules: ".schedule-hero",
   Logs: ".event-list",
-  Fleet: ".fleet-layout",
+  Fleet: ".fleet-gate",
   Access: ".access-grid",
   Settings: ".settings-grid",
 };
@@ -126,6 +126,7 @@ try {
               const el = /** @type {HTMLElement} */ (node);
               const rect = el.getBoundingClientRect();
               if (
+                el.classList.contains("sr-only") ||
                 rect.width < 1 ||
                 rect.height < 1 ||
                 rect.bottom <= 0 ||
@@ -225,10 +226,11 @@ try {
         });
       }
       if (route === "Access" && viewport.width === 1577) {
+        const accessText =
+          (await page.locator(".access-summary-grid").textContent()) ?? "";
         results.at(-1).ownerFullControl =
-          (await page.locator(".scope-view").textContent())?.includes(
-            "Full control · 54 permissions",
-          ) ?? false;
+          accessText.includes("54") &&
+          accessText.includes("canonical full-control role");
       }
     }
   }
@@ -262,6 +264,19 @@ try {
         cases: results.length,
         failures: failures.length,
         runtimeErrors,
+        failureDetails: failures.map((failure) => ({
+          route: failure.route,
+          viewport: failure.viewport,
+          documentOverflow: failure.documentOverflow,
+          titleOverlap: failure.titleOverlap,
+          cutControls: failure.cutControls,
+          clippedText: failure.clippedText,
+          chartHover: failure.chartHover.filter(
+            (chart) => !chart.crosshair || !chart.tooltipInside,
+          ),
+          ownerCommandEnabled: failure.ownerCommandEnabled,
+          ownerFullControl: failure.ownerFullControl,
+        })),
       },
       null,
       2,

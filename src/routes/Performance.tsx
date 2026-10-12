@@ -1,25 +1,29 @@
 import { HostTelemetry } from "../components/HostTelemetry";
 import { Segmented } from "../components/Segmented";
 import { copy } from "../i18n/en";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useSession } from "../hooks";
 import { TimeSeries } from "../components/charts/TimeSeries";
+import { FocusedMetricPanel } from "../components/FocusedMetricPanel";
 import { Panel, Status } from "../components/ui";
 import { sampleStats, windowStart } from "../lib/chart";
 import { number, str } from "../adapter/control-state";
 import { entityDensity } from "../store/selectors";
+import { preferences, usePreferences } from "../store/preferences";
+import { chartWindowLabel, formatTime } from "../lib/time";
 export default function Performance() {
   const { state } = useSession();
-  const [minutes, setMinutes] = useState(15);
+  const prefs = usePreferences();
+  const windowMs = prefs.chartWindowMs;
   const samples = useMemo(
     () =>
       state.history.slice(
         windowStart(
           state.history,
-          (state.history.at(-1)?.at ?? Date.now()) - minutes * 60000,
+          (state.history.at(-1)?.at ?? Date.now()) - windowMs,
         ),
       ),
-    [state.history, minutes],
+    [state.history, windowMs],
   );
   const spikes = samples.filter((s) => s.mspt !== null && s.mspt > 50);
   const gcRate = useMemo(() => {
@@ -39,20 +43,34 @@ export default function Performance() {
   return (
     <>
       <div className="performance-toolbar">
-        <Segmented label={copy.time_range_22cd3} value={minutes}>
-          {[5, 15, 35].map((m) => (
+        <Segmented label={copy.time_range_22cd3} value={windowMs}>
+          {([
+            [30_000, "30s"],
+            [60_000, "1min"],
+            [300_000, "5min"],
+            [600_000, "10min"],
+          ] as const).map(([value, label]) => (
             <button
-              key={m}
-              onClick={() => setMinutes(m)}
-              className={m === minutes ? "active" : ""}
-              aria-pressed={m === minutes}
+              key={value}
+              onClick={() =>
+                preferences.update({
+                  chartWindowMs: value as
+                    | 30_000
+                    | 60_000
+                    | 300_000
+                    | 600_000,
+                })
+              }
+              className={value === windowMs ? "active" : ""}
+              aria-pressed={value === windowMs}
             >
-              {m}
-              {copy._min_f4e8a}
+              {label}
             </button>
           ))}
         </Segmented>
-        <span>{copy.up_to_35_minutes_retained_gaps_stay_vi_5d7df}</span>
+        <span>
+          {chartWindowLabel(windowMs)} live window · 35 min retained · São Paulo time
+        </span>
       </div>
       <div className="performance-grid">
         <Panel
@@ -76,7 +94,7 @@ export default function Performance() {
         >
           <TimeSeries
             samples={samples}
-            windowMs={minutes * 60_000}
+            windowMs={windowMs}
             title={copy.tick_rate_528a7}
             threshold={18}
             live={live}
@@ -95,7 +113,7 @@ export default function Performance() {
         >
           <TimeSeries
             samples={samples}
-            windowMs={minutes * 60_000}
+            windowMs={windowMs}
             title={copy.mean_tick_duration_c262d}
             threshold={50}
             live={live}
@@ -109,62 +127,74 @@ export default function Performance() {
             ]}
           />
         </Panel>
-        <Panel
+        <FocusedMetricPanel
           title={copy.cpu_load_01bd8}
-          eyebrow={copy.jvm_process_and_host_utilization_8cbd1}
-        >
-          <TimeSeries
-            samples={samples}
-            windowMs={minutes * 60_000}
-            height={240}
-            title={copy.cpu_utilization_241cc}
-            live={Boolean(state.ready?.agents.host || live)}
-            series={[
-              {
-                key: "processCpu",
-                label: "JVM process",
-                unit: "%",
-                color: "var(--c4)",
-              },
-              { key: "hostCpu", label: "Host", unit: "%", color: "var(--c5)" },
-              {
-                key: "serviceCpu",
-                label: "Minecraft service · % of one core",
-                unit: "%",
-                color: "var(--c1)",
-              },
-            ]}
-            source="Paper + Host"
-          />
-        </Panel>
-        <Panel
+          eyebrow="Inspect one CPU authority at a time, or compare them."
+          samples={samples}
+          windowMs={windowMs}
+          live={Boolean(state.ready?.agents.host || live)}
+          defaultMetric="serviceCpu"
+          options={[
+            {
+              key: "serviceCpu",
+              shortLabel: "Minecraft",
+              label: "Minecraft service · % of one core",
+              unit: "%",
+              color: "var(--c1)",
+              source: "Host service",
+            },
+            {
+              key: "processCpu",
+              shortLabel: "JVM",
+              label: "JVM process",
+              unit: "%",
+              color: "var(--c4)",
+              source: "Paper JVM",
+            },
+            {
+              key: "hostCpu",
+              shortLabel: "Host",
+              label: "Host utilization",
+              unit: "%",
+              color: "var(--c5)",
+              source: "Host",
+            },
+          ]}
+        />
+        <FocusedMetricPanel
           title={copy.memory_89c8a}
-          eyebrow={copy.jvm_heap_and_physical_host_memory_08742}
-        >
-          <TimeSeries
-            samples={samples}
-            windowMs={minutes * 60_000}
-            height={240}
-            title={copy.memory_usage_530f6}
-            live={Boolean(state.ready?.agents.host || live)}
-            series={[
-              { key: "heap", label: "Heap", unit: "bytes", color: "var(--c3)" },
-              {
-                key: "memory",
-                label: "Host memory",
-                unit: "bytes",
-                color: "var(--c1)",
-              },
-              {
-                key: "serviceMemory",
-                label: "Minecraft service",
-                unit: "bytes",
-                color: "var(--c4)",
-              },
-            ]}
-            source="Paper + Host"
-          />
-        </Panel>
+          eyebrow="Separate heap, Minecraft service and physical Host memory."
+          samples={samples}
+          windowMs={windowMs}
+          live={Boolean(state.ready?.agents.host || live)}
+          defaultMetric="serviceMemory"
+          options={[
+            {
+              key: "serviceMemory",
+              shortLabel: "Minecraft",
+              label: "Minecraft service memory",
+              unit: "bytes",
+              color: "var(--c4)",
+              source: "Host service",
+            },
+            {
+              key: "heap",
+              shortLabel: "Heap",
+              label: "JVM heap used",
+              unit: "bytes",
+              color: "var(--c3)",
+              source: "Paper JVM",
+            },
+            {
+              key: "memory",
+              shortLabel: "Host",
+              label: "Physical Host memory used",
+              unit: "bytes",
+              color: "var(--c1)",
+              source: "Host",
+            },
+          ]}
+        />
         <Panel
           title={copy.slow_ticks_832c6}
           eyebrow={copy.mean_samples_above_the_50_ms_budget_2526c}
@@ -177,7 +207,7 @@ export default function Performance() {
               <i
                 key={s.at}
                 className={s.mspt === null ? "gap" : s.mspt > 50 ? "hot" : "ok"}
-                title={`${new Date(s.at).toLocaleTimeString()} · ${s.mspt ?? "—"} ms`}
+                title={`${formatTime(s.at, { seconds: true })} · ${s.mspt ?? "—"} ms`}
               />
             ))}
           </div>
@@ -188,7 +218,7 @@ export default function Performance() {
                 .reverse()
                 .map((s) => (
                   <div key={s.at}>
-                    <time>{new Date(s.at).toLocaleTimeString()}</time>
+                    <time>{formatTime(s.at, { seconds: true })}</time>
                     <strong>
                       {s.mspt!.toFixed(1)}
                       {copy._ms_c980f}

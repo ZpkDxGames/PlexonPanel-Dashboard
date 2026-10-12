@@ -14,6 +14,7 @@ import { resolveActionAuthority } from "../src/adapter/authority";
 import { reconcileDeviceGrant } from "../src/adapter/device-grant";
 import {
   applyControlMessage,
+  compatibleActionTarget,
   emptyControlState,
   number,
 } from "../src/adapter/control-state";
@@ -58,6 +59,20 @@ test("grant validation enforces server, protocol, device, expiry and scope ident
     assert.throws(() =>
       liveConnectionGrantFromSession({ ...valid, ...patch }, c),
     );
+});
+test("fleet-compatible target binding stays strict across 5.x patch releases", () => {
+  const ready = structuredClone(makeFixture().ready!);
+  ready.server.pluginVersion = "5.0.1";
+  ready.server.hostVersion = "5.0.1";
+  ready.server.paperTargetCompatible = undefined;
+  ready.server.hostTargetCompatible = undefined;
+  assert.equal(compatibleActionTarget(ready, "PAPER"), false);
+  assert.equal(compatibleActionTarget(ready, "HOST"), false);
+
+  ready.server.paperTargetCompatible = true;
+  ready.server.hostTargetCompatible = true;
+  assert.equal(compatibleActionTarget(ready, "PAPER"), true);
+  assert.equal(compatibleActionTarget(ready, "HOST"), true);
 });
 test("effective authority intersects signed and reported grants", () => {
   const signed = {
@@ -227,6 +242,30 @@ test("new Paper session clears roster and receipts, Host online survives stopped
   assert.equal(next.receipts?.paperHealth, undefined);
   assert.equal(next.ready?.agents.host, true);
   assert.equal(next.server.tps, undefined);
+});
+test("console batches are stamped with browser receipt time", () => {
+  const state = makeFixture();
+  const before = Date.now();
+  const next = applyControlMessage(state, {
+    type: "server.event",
+    serverId: state.serverId,
+    agentKind: "HOST",
+    agentSession: "fixture-host",
+    eventType: "console.lines",
+    body: {
+      lines: [
+        {
+          capturedAt: new Date(0).toISOString(),
+          level: "INFO",
+          source: "HOST_JOURNAL",
+          content: "receipt evidence",
+          journalCursor: "s=receipt;i=1",
+        },
+      ],
+    },
+  });
+  assert.equal(typeof next.console.at(-1)?.receivedAt, "number");
+  assert.ok((next.console.at(-1)?.receivedAt as number) >= before);
 });
 test("control histories and high-rate console are bounded", () => {
   let state = makeFixture();
