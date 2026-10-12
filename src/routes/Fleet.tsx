@@ -4,6 +4,7 @@ import { number, str } from "../adapter/control-state";
 import { connectionPhaseLabel, session } from "../adapter/session";
 import { useSession } from "../hooks";
 import { navigate } from "../router";
+import { formatTime } from "../lib/time";
 
 export default function Fleet() {
   const snap = useSession();
@@ -155,7 +156,7 @@ export default function Fleet() {
                     <dt>Last signal</dt>
                     <dd>
                       {row.state.updatedAt
-                        ? new Date(row.state.updatedAt).toLocaleTimeString()
+                        ? formatTime(row.state.updatedAt, { seconds: true })
                         : "No sample"}
                     </dd>
                   </div>
