@@ -47,9 +47,11 @@ export function ActionReview({
   );
   const confirmsAgent = forceAgentConfirmation || highRiskConfirmation;
   const consequence =
-    prepared.action === "server.stop" || prepared.action === "server.restart"
-      ? "Players will disconnect. Unsaved progress depends on the server completing its save before shutdown."
-      : prepared.action.includes("restore")
+    prepared.action === "console.execute" && forceAgentConfirmation
+      ? "Paper local policy requires an explicit confirmation before this allowed console command is dispatched."
+      : prepared.action === "server.stop" || prepared.action === "server.restart"
+        ? "Players will disconnect. Unsaved progress depends on the server completing its save before shutdown."
+        : prepared.action.includes("restore")
         ? "Restoring replaces current server data and may stop the server. Verify the selected backup first."
         : prepared.action.includes("delete")
           ? "This removes the selected item. Make sure you have a backup before continuing."
