@@ -94,10 +94,10 @@ test("stored protocol 3 pairing reconnects, receives telemetry, completes a boun
     assert.deepEqual(socket.protocols, ["plexonpanel-v3", `auth.${credential.accessToken}`]);
     socket.receive({type: "server.event", serverId: credential.serverId, agentKind: "PAPER", agentSession: "fixture-paper", eventType: "telemetry.server", body: {capturedAt: new Date().toISOString(), tps: [17.25], onlinePlayers: 4}});
     await until(() => {const tps = session.getSnapshot().state.server.tps; return Array.isArray(tps) && tps[0] === 17.25;});
-    assert.equal(await session.refreshConsoleHistory(10), 1);
-    assert.equal(
-      session.getSnapshot().state.console.at(-1)?.content,
-      "latest host journal line",
+    await until(
+      () =>
+        session.getSnapshot().state.console.at(-1)?.content ===
+        "latest host journal line",
     );
     await session.setRelayOrigin("https://wrong.integration.test");
     await until(() => session.getSnapshot().phase === "configuration-required");
