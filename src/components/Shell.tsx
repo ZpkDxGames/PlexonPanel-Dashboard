@@ -380,7 +380,7 @@ export function Shell({
                 </button>
               )}
               <button
-                className="iconbtn"
+                className="iconbtn theme-toggle"
                 onClick={() =>
                   preferences.update({
                     theme:
