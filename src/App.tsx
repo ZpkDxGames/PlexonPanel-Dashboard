@@ -30,6 +30,7 @@ export default function App() {
   const snap = useSession();
   const prefs = usePreferences();
   const [route, setRoute] = useState(routeFromHash);
+  const [workspaceEntered, setWorkspaceEntered] = useState(false);
   const [minimumSplashElapsed, setMinimumSplashElapsed] = useState(false);
   useEffect(() => {
     const timer = setTimeout(() => setMinimumSplashElapsed(true), 250);
@@ -59,7 +60,11 @@ export default function App() {
     return () => media.removeEventListener("change", update);
   }, [prefs.theme]);
   useEffect(() => {
-    const update = () => setRoute(routeFromHash());
+    const update = () => {
+      const next = routeFromHash();
+      setRoute(next);
+      setWorkspaceEntered(next !== "Fleet");
+    };
     addEventListener("hashchange", update);
     return () => removeEventListener("hashchange", update);
   }, []);
@@ -74,6 +79,22 @@ export default function App() {
     );
   if (experience === "splash") return <Splash />;
   if (experience === "pairing") return <PairingGate />;
+
+  const FleetView = views.Fleet;
+  if (route === "Fleet" || (!workspaceEntered && !snap.fixture))
+    return (
+      <Suspense
+        fallback={
+          <div
+            className="route-skeleton fleet-route-skeleton"
+            aria-label={copy.loading_workspace_4f4da}
+          />
+        }
+      >
+        <FleetView />
+      </Suspense>
+    );
+
   const View = views[route];
   return (
     <Shell route={route}>
