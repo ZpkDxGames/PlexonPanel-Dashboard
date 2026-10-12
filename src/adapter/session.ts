@@ -273,8 +273,19 @@ async function connect(credential: RelayCredential, revision: number) {
           return;
         }
         receive(message);
-        if (message.type === "dashboard.ready")
+        if (message.type === "dashboard.ready") {
+          // A fresh browser session explicitly asks both bound agents for their
+          // current snapshots. This avoids depending on relay-room replay age
+          // for Paper telemetry, roster/plugin/world inventories or Host state.
+          if (candidate.readyState === WebSocket.OPEN)
+            candidate.send(
+              JSON.stringify({
+                type: "gateway.snapshot_request",
+                serverId: credential.serverId,
+              }),
+            );
           void session.refreshConsoleHistory(100);
+        }
       } catch {
         publish({
           error: "Invalid relay message. No data from this packet was used.",
