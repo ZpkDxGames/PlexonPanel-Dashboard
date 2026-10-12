@@ -86,27 +86,39 @@ export default function Backups() {
     ]);
 
     const nextErrors: string[] = [];
-    if (preflightResult.status === "fulfilled")
-      setPreflight(record(preflightResult.value.data));
-    else
+    const actionError = (
+      label: string,
+      result: { status: string; code?: string; message?: string },
+    ) =>
+      `${label}: ${result.message || result.code || result.status || "unavailable"}`;
+
+    if (preflightResult.status === "fulfilled") {
+      if (preflightResult.value.status === "SUCCESS")
+        setPreflight(record(preflightResult.value.data));
+      else nextErrors.push(actionError("Backup preflight", preflightResult.value));
+    } else
       nextErrors.push(
         preflightResult.reason instanceof Error
           ? preflightResult.reason.message
           : "Backup preflight unavailable.",
       );
 
-    if (statusResult.status === "fulfilled")
-      setMaintenance(record(statusResult.value.data));
-    else
+    if (statusResult.status === "fulfilled") {
+      if (statusResult.value.status === "SUCCESS")
+        setMaintenance(record(statusResult.value.data));
+      else nextErrors.push(actionError("Maintenance status", statusResult.value));
+    } else
       nextErrors.push(
         statusResult.reason instanceof Error
           ? statusResult.reason.message
           : "Maintenance status unavailable.",
       );
 
-    if (listResult.status === "fulfilled")
-      setBackups(records(record(listResult.value.data).backups));
-    else
+    if (listResult.status === "fulfilled") {
+      if (listResult.value.status === "SUCCESS")
+        setBackups(records(record(listResult.value.data).backups));
+      else nextErrors.push(actionError("Backup inventory", listResult.value));
+    } else
       nextErrors.push(
         listResult.reason instanceof Error
           ? listResult.reason.message
@@ -116,6 +128,11 @@ export default function Backups() {
     setErrors(nextErrors);
     setRefreshing(false);
   };
+
+  useEffect(() => {
+    setPreflight({});
+    setMaintenance({});
+  }, [snap.state.serverId, snap.state.ready?.server.hostSession]);
 
   useEffect(() => {
     if (snap.phase !== "live") return;
