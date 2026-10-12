@@ -6,6 +6,7 @@ import { ActionReview } from "../features/ActionReview";
 import { Button, Notice, Panel, Status } from "../components/ui";
 import { useSession } from "../hooks";
 import { effectiveScopes } from "../store/selectors";
+import { formatDateTime } from "../lib/time";
 
 type AuditEntry = JsonMap & { _agent?: Kind };
 
@@ -468,9 +469,7 @@ export default function Access() {
                       key={`${str(entry.requestId, timestamp)}:${entry._agent ?? "unknown"}:${outcome}:${index}`}
                     >
                       <td>
-                        {timestamp
-                          ? new Date(timestamp).toLocaleString()
-                          : "Unavailable"}
+                        {timestamp ? formatDateTime(timestamp) : "Unavailable"}
                       </td>
                       <td>
                         <Status
