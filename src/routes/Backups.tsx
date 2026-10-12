@@ -152,11 +152,15 @@ export default function Backups() {
       }
     : operation;
   const displayProgress = resolvedAfterRetry ? null : progress;
-  const phase = effectiveBackupPhase(effectiveOperation, displayProgress);
-  const progressPercent = effectiveBackupProgress(
-    effectiveOperation,
-    displayProgress,
-  );
+  const operationKind = str(effectiveOperation.kind);
+  const isBackupJob =
+    !operationKind || operationKind === "FULL_RESTORE_POINT";
+  const phase = isBackupJob
+    ? effectiveBackupPhase(effectiveOperation, displayProgress)
+    : "IDLE";
+  const progressPercent = isBackupJob
+    ? effectiveBackupProgress(effectiveOperation, displayProgress)
+    : 0;
   const recovery = backupRecoveryRequired(
     preflight,
     maintenance,
@@ -164,18 +168,20 @@ export default function Backups() {
   );
   const ready = backupReady(preflight, maintenance, effectiveOperation);
   const hostLive = Boolean(snap.state.ready?.agents.host);
+  const healthOperation = isBackupJob
+    ? effectiveOperation
+    : { ...effectiveOperation, phase: "IDLE" };
   const health = backupHealth({
     hostLive,
     ready,
     recovery,
-    operation: effectiveOperation,
+    operation: healthOperation,
   });
   const copy = healthCopy(health);
   const operationActive =
+    isBackupJob &&
     phase !== "IDLE" &&
-    !isTerminalBackupPhase(str(effectiveOperation.phase, phase)) &&
-    str(effectiveOperation.kind, "FULL_RESTORE_POINT") ===
-      "FULL_RESTORE_POINT";
+    !isTerminalBackupPhase(str(effectiveOperation.phase, phase));
 
   useEffect(() => {
     if (snap.phase !== "live") return;
@@ -422,6 +428,14 @@ export default function Backups() {
             </Status>
           }
         >
+          {!isBackupJob && operationKind && (
+            <Notice tone="warning" title="Another Host maintenance job is active">
+              {phaseLabel(operationKind)} is currently in the
+              {" "}{phaseLabel(str(effectiveOperation.phase, "QUEUED"))} phase.
+              Backup creation remains blocked until that Host-owned job finishes.
+            </Notice>
+          )}
+
           <div className="backup-job-meta">
             <div>
               <span>Job</span>
