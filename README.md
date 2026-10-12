@@ -40,4 +40,4 @@ QA: `npm run test:visual`, `npm run test:revamp`, `npm run test:refinement`, `np
 
 6.5.0 adds fixed-window, independently inspected telemetry charts; complete effective Owner scopes; the corrected Console action target; and viewport regression coverage from 320×568 through 1920×1080. The 6.0.0 light-glass/dark design, signed authority, endpoints and pairing flow remain intact.
 
-[Audit](docs/REVAMP_AUDIT.md) · [Design system and page/chart extension](docs/DESIGN_SYSTEM.md) · [Scored review](docs/REVAMP_REVIEW.md) · [Final report](docs/REVAMP_REPORT.md).
+[Current-state and operating guide](docs/PLEXONPANEL_DASHBOARD_6_5_CURRENT_STATE.md) · [Audit](docs/REVAMP_AUDIT.md) · [Design system and page/chart extension](docs/DESIGN_SYSTEM.md) · [Scored review](docs/REVAMP_REVIEW.md) · [Final report](docs/REVAMP_REPORT.md).

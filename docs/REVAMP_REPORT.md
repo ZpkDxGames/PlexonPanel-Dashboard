@@ -43,7 +43,7 @@ Next acceptance: authenticated PlexonCraft/TonimSMP preview, then physical mobil
 
 Owner authority now has one resolver. A verified, reconciled Owner receives all 54 scopes known to the negotiated Dashboard contract, and Access reports full control. Console command dispatch selects the capable Paper action target even when Host supplies the visible stream. Agent presence, instance binding, data freshness, capability support, high-risk confirmation and the server's final action result remain enforced.
 
-Console interaction is complete: ordinary commands dispatch without a redundant modal, destructive commands retain typed target confirmation, and only successfully completed commands enter bounded per-server history. Arrow recall restores an unfinished draft; the History control supports recall, individual removal and clear-all. Stop and Restart now send the relay-required `confirmed: true` parameter after their single review dialog.
+Console interaction is complete: ordinary commands dispatch without a redundant modal, destructive commands retain typed target confirmation, and commands enter bounded per-server history only after dispatch returns a completion. Cancelled reviews are not recorded. Arrow recall restores an unfinished draft; the History control supports recall, individual removal and clear-all. Stop and Restart now send the relay-required `confirmed: true` parameter after their single review dialog.
 
 The shell now has explicit top-bar/content rows, scroll position resets on route changes, bounded Console sizing, compact chart/header/tooltip layouts and corrected mobile gutters. All routes were verified from 320×568 through 1920×1080, including the exact supplied 1577×929 Console viewport. Card highlights, controls and chart depth were refined within the supplied token system; obsolete Files-route CSS and the superseded authority helper were deleted instead of covered by another compatibility layer.
 
@@ -74,4 +74,4 @@ All eleven pages pass the independent visual gate at 45–49/50 with no category
 - Run a final physical-device, Safari/Firefox and screen-reader pass. Mobile wide tables are contained and labelled but still require horizontal swipe.
 - Retained in-browser history is at most 35 minutes. Long-range charts require a server-side history endpoint or metrics store.
 
-Release references: [audit](REVAMP_AUDIT.md), [design system](DESIGN_SYSTEM.md), [review and scores](REVAMP_REVIEW.md), [changelog](../CHANGELOG.md), [6.5 screenshots](revamp/6.5.0/final), [6.0 before](revamp/before) and [6.0 final](revamp/after).
+Release references: [current-state and operating guide](PLEXONPANEL_DASHBOARD_6_5_CURRENT_STATE.md), [audit](REVAMP_AUDIT.md), [design system](DESIGN_SYSTEM.md), [review and scores](REVAMP_REVIEW.md), [changelog](../CHANGELOG.md), [6.5 screenshots](revamp/6.5.0/final), [6.0 before](revamp/before) and [6.0 final](revamp/after).
