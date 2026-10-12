@@ -135,17 +135,47 @@ export default function Backups() {
   }, [durableOperation, phasePush]);
 
   const progress = snap.state.backupProgress;
-  const phase = effectiveBackupPhase(operation, progress);
-  const progressPercent = effectiveBackupProgress(operation, progress);
-  const recovery = backupRecoveryRequired(preflight, maintenance, operation);
-  const ready = backupReady(preflight, maintenance, operation);
+  const operationBackup = backups.find(
+    (backup) => str(backup.backupId) === str(operation.backupId),
+  );
+  const resolvedAfterRetry =
+    str(operation.phase) === "DEGRADED" && operationBackup?.offsite === true;
+  const effectiveOperation = resolvedAfterRetry
+    ? {
+        ...operation,
+        phase: "COMPLETED",
+        result: "SUCCESS",
+        errorCode: "",
+        errorMessage: "",
+        remoteBackupVerified: true,
+        progressPercent: 100,
+      }
+    : operation;
+  const displayProgress = resolvedAfterRetry ? null : progress;
+  const phase = effectiveBackupPhase(effectiveOperation, displayProgress);
+  const progressPercent = effectiveBackupProgress(
+    effectiveOperation,
+    displayProgress,
+  );
+  const recovery = backupRecoveryRequired(
+    preflight,
+    maintenance,
+    effectiveOperation,
+  );
+  const ready = backupReady(preflight, maintenance, effectiveOperation);
   const hostLive = Boolean(snap.state.ready?.agents.host);
-  const health = backupHealth({ hostLive, ready, recovery, operation });
+  const health = backupHealth({
+    hostLive,
+    ready,
+    recovery,
+    operation: effectiveOperation,
+  });
   const copy = healthCopy(health);
   const operationActive =
     phase !== "IDLE" &&
-    !isTerminalBackupPhase(str(operation.phase, phase)) &&
-    str(operation.kind, "FULL_RESTORE_POINT") === "FULL_RESTORE_POINT";
+    !isTerminalBackupPhase(str(effectiveOperation.phase, phase)) &&
+    str(effectiveOperation.kind, "FULL_RESTORE_POINT") ===
+      "FULL_RESTORE_POINT";
 
   useEffect(() => {
     if (snap.phase !== "live") return;
@@ -174,11 +204,14 @@ export default function Backups() {
       str(backup.verification).startsWith("VERIFIED") ||
       str(backup.result).startsWith("SUCCESS"),
   ).length;
-  const retryAvailable = retryUploadAvailable(operation);
+  const retryAvailable =
+    !resolvedAfterRetry &&
+    (retryUploadAvailable(operation) ||
+      (operationBackup?.local === true && operationBackup?.offsite !== true));
   const countdownRemaining = number(maintenance.countdownRemainingSeconds);
-  const progressSpeed = speed(progress?.bytesPerSecond);
-  const liveBytes = number(progress?.bytesUploaded ?? progress?.bytes);
-  const liveTotal = number(progress?.totalBytes);
+  const progressSpeed = speed(displayProgress?.bytesPerSecond);
+  const liveBytes = number(displayProgress?.bytesUploaded ?? displayProgress?.bytes);
+  const liveTotal = number(displayProgress?.totalBytes);
 
   const readiness: Readiness[] = [
     {
@@ -467,6 +500,14 @@ export default function Backups() {
                 </div>
               )}
             </div>
+          )}
+
+          {resolvedAfterRetry && (
+            <Notice tone="success" title="Offsite verification recovered">
+              The original backup job completed degraded, but a later Retry Upload
+              verified the same restore point offsite. No additional server shutdown
+              was required.
+            </Notice>
           )}
 
           {Boolean(operation.errorCode || operation.errorMessage) && (
