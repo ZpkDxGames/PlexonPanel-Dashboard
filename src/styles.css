@@ -831,17 +831,21 @@ td code {
   fill: var(--warn) !important;
   font-weight: 700 !important;
 }
-.chart-line {
-  stroke-width: 2.5;
+.chart-line-glow {
+  stroke-width: 7;
   stroke-linecap: round;
   stroke-linejoin: round;
   vector-effect: non-scaling-stroke;
-  filter: drop-shadow(
-    0 4px 5px color-mix(in srgb, currentColor 20%, transparent)
-  );
+  opacity: 0.1;
+}
+.chart-line {
+  stroke-width: 2.35;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
 }
 .chart-area {
-  opacity: 0.9;
+  opacity: 0.82;
 }
 .crosshair {
   stroke: var(--t3);
@@ -859,7 +863,60 @@ td code {
   animation: ring 2s infinite;
 }
 .chart-draw {
-  animation: chart-reveal 1.4s var(--ease);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: 14px;
+  animation: chart-reveal 700ms var(--ease);
+}
+.chart-draw::after {
+  content: "";
+  position: absolute;
+  inset: 0 0 0 auto;
+  width: 18%;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--primary) 3%, transparent)
+  );
+  opacity: 0.8;
+}
+.chart-window-readout {
+  position: absolute;
+  z-index: 4;
+  top: 8px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 24px;
+  padding: 3px 7px;
+  border: 1px solid var(--line);
+  border-radius: 99px;
+  background: color-mix(in srgb, var(--surface-raise) 88%, transparent);
+  color: var(--t3);
+  font-size: 9px;
+  font-weight: 700;
+  pointer-events: none;
+  backdrop-filter: blur(8px);
+}
+.chart-window-readout i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--t3);
+}
+.chart-window-readout i.live {
+  background: var(--ok);
+  box-shadow: 0 0 0 3px var(--ok-bg);
+}
+.chart-window-readout span {
+  color: var(--t2);
+}
+.chart-window-readout b {
+  font-weight: 700;
+  color: var(--t3);
 }
 @keyframes chart-reveal {
   from {
@@ -2287,6 +2344,9 @@ td code {
   .chart-tooltip {
     min-width: min(184px, calc(100% - 12px));
     padding: 8px 10px;
+  }
+  .chart-window-readout b {
+    display: none;
   }
   .panel-header,
   .card-head {
