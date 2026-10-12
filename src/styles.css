@@ -1152,82 +1152,6 @@ td code {
   overflow: auto;
   font-size: 11px;
 }
-.fleet-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 280px;
-  gap: 20px;
-}
-.fleet-table {
-  overflow: auto;
-}
-.fleet-row {
-  display: grid;
-  grid-template-columns: minmax(190px, 1.5fr) 100px 55px 60px 90px 65px;
-  align-items: center;
-  gap: 12px;
-  min-height: 74px;
-  border-bottom: 1px solid var(--line);
-}
-.fleet-row > div {
-  display: flex;
-  gap: 10px;
-  min-width: 0;
-  align-items: center;
-}
-.fleet-row > div span {
-  display: grid;
-  min-width: 0;
-}
-.fleet-row small {
-  font: 10px var(--font-mono);
-  color: var(--t3);
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.fleet-row > span {
-  font-size: 12px;
-  color: var(--t2);
-}
-.fleet-head {
-  font-size: 12px;
-  color: var(--t3);
-  min-height: 36px;
-}
-.fleet-summary {
-  padding: 24px;
-  border: 1px solid var(--line);
-  border-radius: var(--r-lg);
-  background: var(--surface);
-  box-shadow: var(--shadow);
-}
-.fleet-summary h2 {
-  font-size: 22px;
-}
-.fleet-summary p {
-  color: var(--t3);
-  margin-top: 8px;
-}
-.fleet-summary dl {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 12px;
-  margin-top: 24px;
-}
-.fleet-summary dt {
-  color: var(--t3);
-}
-.fleet-summary dd {
-  margin: 0;
-  font-weight: 800;
-  font-size: 22px;
-}
-.fleet-empty {
-  display: grid;
-  gap: 7px;
-  min-height: 250px;
-  align-content: center;
-  justify-items: start;
-}
 .chat-layout {
   display: grid;
   grid-template-columns: 1.4fr 1fr;
@@ -1700,9 +1624,6 @@ td code {
   .overview-kpis {
     grid-template-columns: repeat(3, 1fr);
   }
-  .fleet-layout {
-    grid-template-columns: 1fr;
-  }
   .overview-players {
     min-height: 0;
   }
@@ -1878,12 +1799,6 @@ td code {
   }
   .action-grid {
     grid-template-columns: repeat(2, 1fr);
-  }
-  .fleet-row {
-    min-width: 680px;
-  }
-  .fleet-summary {
-    display: none;
   }
   .backup-hero {
     flex-direction: column;
@@ -2577,12 +2492,6 @@ td code {
   white-space: nowrap;
   overflow-wrap: normal;
 }
-.fleet-row > div {
-  min-width: 0;
-}
-.fleet-summary {
-  align-self: start;
-}
 .player-detail .notice {
   font-size: 12px;
 }
@@ -2608,9 +2517,6 @@ td code {
   .scope-view > div {
     max-height: 180px;
     overflow: auto;
-  }
-  .fleet-empty {
-    min-height: 180px;
   }
 }
 th {
@@ -2641,9 +2547,6 @@ th {
 .player-detail .notice {
   margin: 0;
 }
-.fleet-layout .panel {
-  align-self: start;
-}
 .sidebar .primary-nav {
   max-height: calc(100dvh - 176px);
 }
@@ -2660,9 +2563,6 @@ th {
 }
 .primary-nav .nav-pill {
   height: 40px;
-}
-.fleet-table {
-  min-height: 0;
 }
 .access-grid {
   align-items: start;
