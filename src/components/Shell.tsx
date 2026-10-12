@@ -115,9 +115,14 @@ export function Shell({
         receivedAt: snap.state.receipts?.paperHealth,
         connected: snap.phase === "live",
         now,
+        expectedIntervalMs:
+          typeof snap.state.server.sourceIntervalMillis === "number"
+            ? snap.state.server.sourceIntervalMillis
+            : undefined,
       }),
     [
       snap.state.server.capturedAt,
+      snap.state.server.sourceIntervalMillis,
       snap.state.receipts?.paperHealth,
       snap.phase,
       now,
