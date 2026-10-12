@@ -1,7 +1,8 @@
 import { reconcileDeviceGrant } from "../adapter/device-grant";
+import { effectiveGrantScopes } from "../adapter/authority";
 import { classifyTelemetry, type TelemetryKind } from "../adapter/telemetry-freshness";
 import type { ControlState } from "../adapter/control-state";
-import type { LiveConnectionGrant } from "../adapter/data-source";
+import type { DeviceGrantLike } from "../adapter/device-grant";
 
 export type SourceStatus = {
   source: "Paper" | "Host";
@@ -23,9 +24,9 @@ export function sourceStatus(state: ControlState, source: "Paper" | "Host", conn
   return { source, ...result };
 }
 
-export function effectiveScopes(state: ControlState, grant: LiveConnectionGrant | null): ReadonlySet<string> {
+export function effectiveScopes(state: ControlState, grant: DeviceGrantLike | null): ReadonlySet<string> {
   const reconciled = reconcileDeviceGrant(grant, state.ready?.device);
-  return new Set(reconciled?.scopes ?? []);
+  return effectiveGrantScopes(reconciled);
 }
 
 export function metric(value: unknown, unit: string, digits = 1): { value: string; unit: string; available: boolean } {

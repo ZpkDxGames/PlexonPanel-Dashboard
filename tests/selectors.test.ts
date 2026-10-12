@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { bytes, entityDensity, metric } from "../src/store/selectors";
-import { actionCapability } from "../src/features/capabilities";
+import { resolveActionAuthority } from "../src/adapter/authority";
 
 test("formatters preserve zero and distinguish unavailable measurements", () => {
   assert.deepEqual(metric(0, "ms", 1), { value: "0.0", unit: "ms", available: true });
@@ -17,11 +17,35 @@ test("entity density is derived only from a positive known denominator", () => {
   assert.equal(entityDensity(undefined, 4), null);
 });
 
-test("capability gates intersect scope, agent advertisement, presence and evidence", () => {
-  const base = { action: "server.stop", scopes: ["server.stop"], advertised: { "server.stop": true }, agentOnline: true, evidenceUsable: true };
-  assert.equal(actionCapability(base).state, "available");
-  assert.equal(actionCapability({ ...base, scopes: [] }).state, "denied");
-  assert.equal(actionCapability({ ...base, agentOnline: false }).state, "agent-offline");
-  assert.equal(actionCapability({ ...base, advertised: { "server.stop": false } }).state, "unsupported");
-  assert.equal(actionCapability({ ...base, evidenceUsable: false }).state, "stale");
+test("action authority grants every known scope to verified owners", () => {
+  const owner = {
+    deviceId: "owner",
+    role: "Owner",
+    scopes: [] as string[],
+    metadataMatches: false,
+  };
+  assert.equal(
+    resolveActionAuthority({
+      action: "server.stop",
+      grant: owner,
+      capabilities: { "server.stop": true },
+    }).state,
+    "available",
+  );
+  assert.equal(
+    resolveActionAuthority({
+      action: "server.stop",
+      grant: { ...owner, role: "Viewer" },
+      capabilities: { "server.stop": true },
+    }).state,
+    "denied",
+  );
+  assert.equal(
+    resolveActionAuthority({
+      action: "server.stop",
+      grant: owner,
+      capabilities: { "server.stop": false },
+    }).state,
+    "unsupported",
+  );
 });

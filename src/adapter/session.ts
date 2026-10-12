@@ -7,7 +7,8 @@ import {
   type ControlState,
   type JsonMap,
 } from "./control-state";
-import { ACTION_CONTRACT_ID, canAction } from "./scopes";
+import { ACTION_CONTRACT_ID } from "./scopes";
+import { resolveActionAuthority } from "./authority";
 import { reconcileDeviceGrant, type DeviceGrantLike } from "./device-grant";
 import {
   bindLiveSocket,
@@ -434,15 +435,14 @@ export const session = {
       grant.role !== "Owner"
     )
       return "Owner authority required.";
-    return canAction(
+    return resolveActionAuthority({
       action,
-      grant.scopes,
-      kind === "HOST"
-        ? ready.server.hostCapabilities
-        : ready.server.paperCapabilities,
-    )
-      ? ""
-      : "The device scope or server policy does not permit this action.";
+      grant,
+      capabilities:
+        kind === "HOST"
+          ? ready.server.hostCapabilities
+          : ready.server.paperCapabilities,
+    }).reason;
   },
   prepare(action: string, parameters: JsonMap, kind: Kind): Prepared {
     const reason = this.reason(action, kind);

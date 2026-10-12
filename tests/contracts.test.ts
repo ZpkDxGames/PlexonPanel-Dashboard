@@ -9,7 +9,8 @@ import {
   liveConnectionGrantFromSession,
   ActionError,
 } from "../src/adapter/data-source";
-import { ACTION_CONTRACT_ID, canAction, SCOPES } from "../src/adapter/scopes";
+import { ACTION_CONTRACT_ID, SCOPES } from "../src/adapter/scopes";
+import { resolveActionAuthority } from "../src/adapter/authority";
 import { reconcileDeviceGrant } from "../src/adapter/device-grant";
 import {
   applyControlMessage,
@@ -73,12 +74,11 @@ test("effective authority intersects signed and reported grants", () => {
     reconcileDeviceGrant(signed, { ...signed, role: "Viewer" })?.scopes,
     [],
   );
-  assert.equal(
-    canAction("server.restart", ["server.restart"], {
-      "server.restart": false,
-    }),
-    false,
-  );
+  assert.equal(resolveActionAuthority({
+    action: "server.restart",
+    grant: { ...signed, metadataMatches: true },
+    capabilities: { "server.restart": false },
+  }).state, "unsupported");
 });
 test("queued acknowledgement is not completion; only bound result resolves", async () => {
   const socket = new Socket();

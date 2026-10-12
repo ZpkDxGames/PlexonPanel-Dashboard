@@ -246,9 +246,14 @@ export function ConsoleView({
     container = useRef<HTMLElement>(null);
   const current = sourceLines ?? (paused ? frozen : snap.state.console);
   const entries = useMemo(() => groupLogs(current), [current]);
-  const authority =
-    snap.state.ready?.consoleAuthority === "HOST" ? "HOST" : "PAPER";
-  const offline = !snap.state.ready?.agents.paper;
+  const paperCommandReason = session.reason("console.execute", "PAPER");
+  const authority = paperCommandReason
+    ? snap.state.ready?.consoleAuthority === "HOST"
+      ? "HOST"
+      : "PAPER"
+    : "PAPER";
+  const offline =
+    !snap.state.ready?.agents[authority === "HOST" ? "host" : "paper"];
   const commandReason = session.reason("console.execute", authority);
   useEffect(() => {
     try {

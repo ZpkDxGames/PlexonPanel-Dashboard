@@ -5,6 +5,7 @@ import { session, type Prepared } from "../adapter/session";
 import { ActionReview } from "../features/ActionReview";
 import { Button, Notice, Panel, Status } from "../components/ui";
 import { useSession } from "../hooks";
+import { effectiveScopes } from "../store/selectors";
 export default function Access() {
   const snap = useSession();
   const [devices, setDevices] = useState<JsonMap[]>([]);
@@ -33,6 +34,8 @@ export default function Access() {
   const visible = audit.filter((entry) =>
     JSON.stringify(entry).toLowerCase().includes(filter.toLowerCase()),
   );
+  const granted = [...effectiveScopes(snap.state, snap.grant)];
+  const owner = snap.state.ready?.device.role === "Owner";
   return (
     <>
       <div className="access-grid">
@@ -102,11 +105,14 @@ export default function Access() {
             <strong>
               {snap.state.ready?.device.name ?? "No signed device"}
             </strong>
-            <span>{snap.state.ready?.device.role ?? "Unpaired"}</span>
+            <span>
+              {snap.state.ready?.device.role ?? "Unpaired"}
+              {owner ? ` · Full control · ${granted.length} permissions` : ""}
+            </span>
             <details>
               <summary>{copy.view_all_permissions_9a316}</summary>
               <div>
-                {snap.state.ready?.device.scopes.map((scope) => (
+                {granted.map((scope) => (
                   <code key={scope}>{scope}</code>
                 ))}
               </div>

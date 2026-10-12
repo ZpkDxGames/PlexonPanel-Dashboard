@@ -152,13 +152,3 @@ export function validScopes(value: unknown): value is string[] {
   );
 }
 
-export function canAction(
-  action: string,
-  scopes: readonly string[],
-  capabilities: Record<string, boolean>,
-): boolean {
-  const scope = ACTION_SCOPES[action];
-  return Boolean(
-    scope && scopes.includes(scope) && capabilities[scope] === true,
-  );
-}
