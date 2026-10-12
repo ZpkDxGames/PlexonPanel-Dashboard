@@ -8,6 +8,7 @@ import {
   domain,
   monotone,
   stableDomain,
+  presentationWindow,
   resample,
   windowStart,
 } from "../../lib/chart";
@@ -224,12 +225,8 @@ export function TimeSeries({
   }, [samples, series, hidden]);
   const latestAt = present.at(-1)?.at ?? samples.at(-1)?.at ?? Date.now();
   const requestedWindow = Math.max(30_000, windowMs ?? prefs.chartWindowMs);
-  // Raw telemetry may arrive at 4 Hz, but moving the whole x-axis on every
-  // packet makes the chart appear to wobble. Keep a bounded presentation clock:
-  // 500 ms for short windows and 1 s for long windows.
-  const presentationStep = requestedWindow <= 60_000 ? 500 : 1_000;
-  const end = Math.ceil(latestAt / presentationStep) * presentationStep;
-  const start = end - requestedWindow;
+  // Raw telemetry may arrive faster than the display should translate.
+  const { start, end } = presentationWindow(latestAt, requestedWindow);
   const visibleStart = windowStart(present, start);
   const visible = present.slice(visibleStart).filter((sample) => sample.at <= end);
   const values = visible.flatMap((s) =>
