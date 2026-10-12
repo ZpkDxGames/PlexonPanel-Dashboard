@@ -60,6 +60,11 @@ export interface Sample {
   players: number | null;
   gc: number | null;
 }
+function fleetAwareVersion(value: unknown): boolean {
+  const match = /^(\d+)\.(\d+)\.(\d+)(?:[-+].*)?$/.exec(String(value ?? ""));
+  return Boolean(match && Number(match[1]) >= 5);
+}
+
 export function compatibleActionTarget(
   ready: Ready,
   kind: "PAPER" | "HOST",
@@ -69,8 +74,9 @@ export function compatibleActionTarget(
       ? ready.server.hostTargetCompatible
       : ready.server.paperTargetCompatible;
   const fleetRelease =
-    ready.server.pluginVersion === "5.0.0" ||
-    ready.server.hostVersion === "5.0.0";
+    Boolean(ready.server.fleetContract) ||
+    fleetAwareVersion(ready.server.pluginVersion) ||
+    fleetAwareVersion(ready.server.hostVersion);
   return fleetRelease ? declared === true : declared !== false;
 }
 export interface ControlState {
