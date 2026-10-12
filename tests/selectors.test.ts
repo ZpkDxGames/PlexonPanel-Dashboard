@@ -4,7 +4,11 @@ import { bytes, entityDensity, metric } from "../src/store/selectors";
 import { resolveActionAuthority } from "../src/adapter/authority";
 
 test("formatters preserve zero and distinguish unavailable measurements", () => {
-  assert.deepEqual(metric(0, "ms", 1), { value: "0.0", unit: "ms", available: true });
+  assert.deepEqual(metric(0, "ms", 1), {
+    value: "0.0",
+    unit: "ms",
+    available: true,
+  });
   assert.equal(metric(undefined, "ms").available, false);
   assert.equal(bytes(0).value, "0");
   assert.equal(bytes(undefined).available, false);

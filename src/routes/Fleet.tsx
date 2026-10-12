@@ -137,6 +137,7 @@ export default function Fleet() {
           <TimeSeries
             title={copy.selected_server_tick_rate_5b00d}
             samples={snap.state.history}
+            windowMs={35 * 60_000}
             height={220}
             threshold={18}
             live={Boolean(snap.state.ready?.agents.paper)}
@@ -152,6 +153,7 @@ export default function Fleet() {
           <TimeSeries
             title={copy.selected_server_players_4ec60}
             samples={snap.state.history}
+            windowMs={35 * 60_000}
             height={220}
             live={Boolean(snap.state.ready?.agents.paper)}
             series={[

@@ -244,7 +244,7 @@ export function Shell({
             <div>
               <b>{snap.state.ready?.device.name ?? "Paired browser"}</b>
               {snap.state.ready?.device.role ?? "Unpaired"}
-              <small> · 6.0.0</small>
+              <small> · 6.5.0</small>
             </div>
           </div>
         </aside>

@@ -89,6 +89,7 @@ test('quiet telemetry cannot repeatedly rescale its axis',()=>{
  const spike=stableDomain([12,20],3,bounds);
  assert.ok(spike[0]<=12&&spike[1]>=20);
  assert.deepEqual(stableDomain([19.9,20],3,spike),spike);
+ assert.deepEqual(stableDomain([19.9,20],3,spike,true),bounds);
 });
 test('bounded chart geometry preserves endpoints and input samples',()=>{
  const points:[number,number][]=[[0,10],[10,30],[20,15]];

@@ -64,6 +64,12 @@ export function Sparkline({
         <>
           <path d={`${p}L180,40L0,40Z`} fill={`url(#${id})`} />
           <path className="ln" d={p} />
+          <circle
+            className="spark-end"
+            cx={pts.at(-1)?.[0]}
+            cy={pts.at(-1)?.[1]}
+            r="2.5"
+          />
         </>
       )}
     </svg>
@@ -91,6 +97,7 @@ function PlotSegment({
     <>
       {area && (
         <SmoothPath
+          className="chart-area"
           d={`${path}L${points.at(-1)![0]},${bottom}L${points[0][0]},${bottom}Z`}
           fill={`url(#${id})`}
         />
@@ -133,6 +140,7 @@ export function TimeSeries({
   yMin,
   yMax,
   live = true,
+  windowMs,
 }: {
   samples: Sample[];
   series: Series[];
@@ -143,11 +151,12 @@ export function TimeSeries({
   yMin?: number;
   yMax?: number;
   live?: boolean;
+  windowMs?: number;
 }) {
   const prefs = usePreferences();
-  const axis = useRef<{ key: string; bounds: [number, number] } | undefined>(
-    undefined,
-  );
+  const axis = useRef<
+    { key: string; bounds: [number, number]; calm: number } | undefined
+  >(undefined);
   const [table, setTable] = useState(false),
     [hidden, setHidden] = useState<Set<MetricKey>>(new Set()),
     [width, setWidth] = useState(600),
@@ -194,7 +203,17 @@ export function TimeSeries({
     }
     return [...merged.values()].sort((a, b) => a.at - b.at);
   }, [samples, series, hidden]);
-  const values = present.flatMap((s) =>
+  const latestAt = present.at(-1)?.at ?? samples.at(-1)?.at ?? Date.now();
+  const requestedWindow = Math.max(
+    60_000,
+    windowMs ?? latestAt - (present[0]?.at ?? latestAt - 5 * 60_000),
+  );
+  const start = latestAt - requestedWindow,
+    end = latestAt;
+  const visible = present.filter(
+    (sample) => sample.at >= start && sample.at <= end,
+  );
+  const values = visible.flatMap((s) =>
     active
       .map((a) => s[a.key])
       .filter((v): v is number => typeof v === "number" && Number.isFinite(v)),
@@ -214,12 +233,26 @@ export function TimeSeries({
             : 1;
   const [fit, setFit] = useState(0);
   const axisKey = active.map((a) => a.key).join(",") + fit;
+  const previous = axis.current?.key === axisKey ? axis.current : undefined;
+  const proposed = stableDomain(
+    values.map((v) => v / scale),
+    minimumSpan,
+  );
+  const comfortablyInside = Boolean(
+    previous &&
+    proposed[0] > previous.bounds[0] &&
+    proposed[1] < previous.bounds[1],
+  );
+  const calm = comfortablyInside ? (previous?.calm ?? 0) + 1 : 0;
   const bounds = stableDomain(
     values.map((v) => v / scale),
     minimumSpan,
-    axis.current?.key === axisKey ? axis.current.bounds : undefined,
+    previous?.bounds,
+    calm >= 12,
   );
-  axis.current = values.length ? { key: axisKey, bounds } : undefined;
+  axis.current = values.length
+    ? { key: axisKey, bounds, calm: calm >= 12 ? 0 : calm }
+    : undefined;
   let [lo, hi] = bounds;
   if (yMin !== undefined) lo = yMin;
   if (yMax !== undefined) hi = Math.max(hi, yMax);
@@ -227,8 +260,6 @@ export function TimeSeries({
     right = width - 24,
     top = 22,
     bottom = height - 30;
-  const start = present[0]?.at ?? 0,
-    end = present.at(-1)?.at ?? 1;
   const x = (at: number) =>
       left + ((at - start) / Math.max(1, end - start)) * (right - left),
     y = (v: number) => bottom - ((v / scale - lo) / (hi - lo)) * (bottom - top);
@@ -236,7 +267,7 @@ export function TimeSeries({
   const nearest =
     hover === null
       ? null
-      : present.reduce<Sample | null>(
+      : visible.reduce<Sample | null>(
           (best, s) =>
             !best || Math.abs(s.at - hover) < Math.abs(best.at - hover)
               ? s
@@ -246,7 +277,7 @@ export function TimeSeries({
   const nearestFor = (key: MetricKey) =>
     hover === null
       ? null
-      : present.reduce<Sample | null>(
+      : visible.reduce<Sample | null>(
           (best, s) =>
             typeof s[key] !== "number"
               ? best
@@ -258,7 +289,7 @@ export function TimeSeries({
   const paths = active.map((s) => {
     const groups: [number, number][][] = [];
     let last = 0;
-    for (const p of present) {
+    for (const p of visible) {
       const v = p[s.key];
       if (typeof v !== "number") continue;
       if (p.at - last > 10000) {
@@ -270,7 +301,7 @@ export function TimeSeries({
       }
       last = p.at;
     }
-    const maxPoints = Math.max(80, Math.floor(width * 2));
+    const maxPoints = Math.max(80, Math.floor(width * 1.5));
     return {
       s,
       groups: groups
@@ -290,7 +321,12 @@ export function TimeSeries({
           const points =
             prefs.chartCurve === "step"
               ? g
-              : resample(g, prefs.chartDensity === "rich" ? 320 : 120);
+              : resample(
+                  g,
+                  prefs.chartDensity === "rich"
+                    ? Math.max(160, Math.min(480, Math.round(width * 0.8)))
+                    : Math.max(80, Math.min(180, Math.round(width * 0.35))),
+                );
           const path =
             prefs.chartCurve === "smooth"
               ? monotone(points)
@@ -307,8 +343,8 @@ export function TimeSeries({
         }),
     };
   });
-  const summary = present.length
-    ? `${title}. ${present.length} samples. Range ${lo.toFixed(1)} to ${hi.toFixed(1)} ${bytes ? "GiB" : (active[0]?.unit ?? "")}.`
+  const summary = visible.length
+    ? `${title}. ${visible.length} samples. Range ${lo.toFixed(1)} to ${hi.toFixed(1)} ${bytes ? "GiB" : (active[0]?.unit ?? "")}.`
     : `${title}. No samples received.`;
   const inspect = (at: number | null) => {
     setLocal(at);
@@ -319,13 +355,18 @@ export function TimeSeries({
         <button className="table-toggle" onClick={() => setFit((n) => n + 1)}>
           {copy.refine_4b290c75}
         </button>
-        {series.length > 1 &&
-          series.map((s) => (
+        {series.map((s) => {
+          const latest = visible.findLast(
+            (sample) => typeof sample[s.key] === "number",
+          );
+          return (
             <button
               key={s.key}
               aria-pressed={!hidden.has(s.key)}
               className={hidden.has(s.key) ? "muted" : ""}
+              disabled={series.length === 1}
               onClick={() =>
+                series.length > 1 &&
                 setHidden((v) => {
                   const n = new Set(v);
                   n.has(s.key) ? n.delete(s.key) : n.add(s.key);
@@ -335,16 +376,23 @@ export function TimeSeries({
             >
               <i style={{ background: s.color }} />
               {s.label}
-              {present.filter((p) => typeof p[s.key] === "number").length <
+              {latest && (
+                <b className="series-current">
+                  {(latest[s.key]! / scale).toFixed(s.unit === "bytes" ? 2 : 1)}
+                  {s.unit === "bytes" ? " GiB" : ` ${s.unit}`}
+                </b>
+              )}
+              {visible.filter((p) => typeof p[s.key] === "number").length <
                 2 && (
                 <small className="series-status">
-                  {present.some((p) => typeof p[s.key] === "number")
+                  {visible.some((p) => typeof p[s.key] === "number")
                     ? "Collecting history"
                     : "Awaiting sample"}
                 </small>
               )}
             </button>
-          ))}
+          );
+        })}
         <button className="table-toggle" onClick={() => setTable((v) => !v)}>
           {table ? "Hide table" : "View as table"}
         </button>
@@ -358,28 +406,37 @@ export function TimeSeries({
           tabIndex={0}
           onPointerMove={(e) => {
             const rect = e.currentTarget.getBoundingClientRect();
-            inspect(
+            const cursor =
               start +
-                Math.max(
-                  0,
-                  Math.min(1, (e.clientX - rect.left - left) / (right - left)),
-                ) *
-                  (end - start),
+              Math.max(
+                0,
+                Math.min(1, (e.clientX - rect.left - left) / (right - left)),
+              ) *
+                (end - start);
+            inspect(
+              visible.reduce<Sample | null>(
+                (best, sample) =>
+                  !best ||
+                  Math.abs(sample.at - cursor) < Math.abs(best.at - cursor)
+                    ? sample
+                    : best,
+                null,
+              )?.at ?? null,
             );
           }}
           onPointerLeave={() => inspect(null)}
           onBlur={() => inspect(null)}
           onKeyDown={(e) => {
-            if (!["ArrowLeft", "ArrowRight"].includes(e.key) || !present.length)
+            if (!["ArrowLeft", "ArrowRight"].includes(e.key) || !visible.length)
               return;
             e.preventDefault();
-            const at = nearest ? present.indexOf(nearest) : present.length - 1;
+            const at = nearest ? visible.indexOf(nearest) : visible.length - 1;
             inspect(
-              present[
+              visible[
                 Math.max(
                   0,
                   Math.min(
-                    present.length - 1,
+                    visible.length - 1,
                     at + (e.key === "ArrowRight" ? 1 : -1),
                   ),
                 )
@@ -397,7 +454,8 @@ export function TimeSeries({
                 x2="0"
                 y2="1"
               >
-                <stop offset="0" stopColor={s.color} stopOpacity=".28" />
+                <stop offset="0" stopColor={s.color} stopOpacity=".32" />
+                <stop offset=".55" stopColor={s.color} stopOpacity=".1" />
                 <stop offset="1" stopColor={s.color} stopOpacity="0" />
               </linearGradient>
             ))}
@@ -410,6 +468,24 @@ export function TimeSeries({
               />
             </clipPath>
           </defs>
+          <rect
+            className="chart-plot"
+            x={left}
+            y={top}
+            width={right - left}
+            height={bottom - top}
+            rx="12"
+          />
+          {(width < 400 ? [0, 0.5, 1] : [0, 0.25, 0.5, 0.75, 1]).map((r) => (
+            <line
+              key={`vertical-${r}`}
+              className="gridline vertical"
+              x1={left + (right - left) * r}
+              x2={left + (right - left) * r}
+              y1={top}
+              y2={bottom}
+            />
+          ))}
           {[0, 0.25, 0.5, 0.75, 1].map((r) => (
             <g key={r}>
               <line
@@ -477,7 +553,7 @@ export function TimeSeries({
               y={height - 6}
               textAnchor={r === 0 ? "start" : r === 1 ? "end" : "middle"}
             >
-              {present.length
+              {visible.length
                 ? new Date(start + (end - start) * r).toLocaleTimeString([], {
                     hour: "2-digit",
                     minute: "2-digit",
@@ -516,44 +592,44 @@ export function TimeSeries({
             </g>
           )}
         </svg>
-        {!present.length && (
+        {!visible.length && (
           <div className="inline-empty chart-empty">
             <strong>{copy.no_samples_yet_32176}</strong>
             <span>{copy.metrics_appear_when_the_server_connect_cac63}</span>
           </div>
         )}
+        {nearest && (
+          <div
+            className="chart-tooltip"
+            style={{
+              left: Math.max(6, Math.min(width - 198, x(nearest.at) - 82)),
+            }}
+          >
+            <strong>{new Date(nearest.at).toLocaleTimeString()}</strong>
+            {active.map((s) => {
+              const sample = nearestFor(s.key);
+              return (
+                <span
+                  key={s.key}
+                  title={
+                    sample
+                      ? new Date(sample.at).toLocaleTimeString()
+                      : "No sample"
+                  }
+                >
+                  <i style={{ background: s.color }} />
+                  {s.label}
+                  <b>
+                    {sample
+                      ? `${(sample[s.key]! / scale).toFixed(2)} ${bytes ? "GiB" : s.unit}`
+                      : "—"}
+                  </b>
+                </span>
+              );
+            })}
+          </div>
+        )}
       </div>
-      {nearest && (
-        <div
-          className="chart-tooltip"
-          style={{
-            left: Math.max(0, Math.min(width - 190, x(nearest.at) - 75)),
-          }}
-        >
-          <strong>{new Date(nearest.at).toLocaleTimeString()}</strong>
-          {active.map((s) => {
-            const sample = nearestFor(s.key);
-            return (
-              <span
-                key={s.key}
-                title={
-                  sample
-                    ? new Date(sample.at).toLocaleTimeString()
-                    : "No sample"
-                }
-              >
-                <i style={{ background: s.color }} />
-                {s.label}
-                <b>
-                  {sample
-                    ? `${(sample[s.key]! / scale).toFixed(2)} ${bytes ? "GiB" : s.unit}`
-                    : "—"}
-                </b>
-              </span>
-            );
-          })}
-        </div>
-      )}
       <p className="sr-only">
         {summary}
         {copy._use_arrow_keys_to_inspect_samples_d2b97}
@@ -574,7 +650,7 @@ export function TimeSeries({
               </tr>
             </thead>
             <tbody>
-              {present.slice(-50).map((s) => (
+              {visible.slice(-50).map((s) => (
                 <tr key={s.at}>
                   <td>{new Date(s.at).toLocaleTimeString()}</td>
                   {series.map((k) => (
@@ -593,8 +669,8 @@ export function TimeSeries({
       <footer className="chart-provenance">
         <span>{source}</span>
         <span>
-          {present.length
-            ? `${Math.max(1, Math.round((end - start) / 60000))} min of data`
+          {visible.length
+            ? `${Math.max(1, Math.round(requestedWindow / 60000))} min window`
             : "Waiting for data"}
         </span>
         <span>{live ? "Live window" : "History retained"}</span>

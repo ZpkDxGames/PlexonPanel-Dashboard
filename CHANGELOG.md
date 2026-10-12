@@ -1,3 +1,11 @@
+## 6.5.0 — adaptive telemetry workspace (2026-10-12 UTC)
+
+- Consolidated action authorization so a verified Owner receives every scope in the negotiated Dashboard contract. Console commands now select the capable Paper action target even when Host supplies the visible journal stream.
+- Rebuilt time-series presentation around fixed time windows, stable axes that recover after old spikes, responsive ticks, richer gradients, current-value legends and sample-snapped per-chart inspection.
+- Made the shell use explicit top-bar/content rows, removed the Console title overlap, reduced fragile viewport-height assumptions and added compact-width/short-height layouts.
+- Refined cards, controls, plot surfaces and light/dark depth with the existing prototype tokens. Removed the obsolete Files-route style layer and normalized the remaining shared CSS.
+- Added 6.5.0 visual, overflow, accessibility, motion and owner-permission regression coverage. Existing endpoints, signed action dispatch, server identity and Vercel deployment shape remain unchanged.
+
 ## 6.0.0 — owner refinement (2026-10-12 UTC)
 
 - Stabilized chart axes, replaced repeated horizontal animation with short path transitions, synchronized the live endpoint, and made hover independent per chart/source. Added Fit scale, area/line, smooth/straight/step and rich/compact choices.

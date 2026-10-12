@@ -76,6 +76,7 @@ export default function Performance() {
         >
           <TimeSeries
             samples={samples}
+            windowMs={minutes * 60_000}
             title={copy.tick_rate_528a7}
             threshold={18}
             live={live}
@@ -94,6 +95,7 @@ export default function Performance() {
         >
           <TimeSeries
             samples={samples}
+            windowMs={minutes * 60_000}
             title={copy.mean_tick_duration_c262d}
             threshold={50}
             live={live}
@@ -113,6 +115,7 @@ export default function Performance() {
         >
           <TimeSeries
             samples={samples}
+            windowMs={minutes * 60_000}
             height={240}
             title={copy.cpu_utilization_241cc}
             live={Boolean(state.ready?.agents.host || live)}
@@ -140,6 +143,7 @@ export default function Performance() {
         >
           <TimeSeries
             samples={samples}
+            windowMs={minutes * 60_000}
             height={240}
             title={copy.memory_usage_530f6}
             live={Boolean(state.ready?.agents.host || live)}

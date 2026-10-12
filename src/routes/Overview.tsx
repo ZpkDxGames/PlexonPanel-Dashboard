@@ -337,6 +337,7 @@ export default function Overview() {
             <TimeSeries
               title={metricName}
               samples={samples}
+              windowMs={minutes * 60_000}
               live={online && metricLive}
               threshold={key === "tps" ? 18 : key === "mspt" ? 50 : undefined}
               series={[{ key, label: metricName, unit: metricUnit, color }]}

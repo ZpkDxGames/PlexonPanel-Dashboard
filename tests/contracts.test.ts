@@ -74,11 +74,14 @@ test("effective authority intersects signed and reported grants", () => {
     reconcileDeviceGrant(signed, { ...signed, role: "Viewer" })?.scopes,
     [],
   );
-  assert.equal(resolveActionAuthority({
-    action: "server.restart",
-    grant: { ...signed, metadataMatches: true },
-    capabilities: { "server.restart": false },
-  }).state, "unsupported");
+  assert.equal(
+    resolveActionAuthority({
+      action: "server.restart",
+      grant: { ...signed, metadataMatches: true },
+      capabilities: { "server.restart": false },
+    }).state,
+    "unsupported",
+  );
 });
 test("queued acknowledgement is not completion; only bound result resolves", async () => {
   const socket = new Socket();

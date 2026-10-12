@@ -66,6 +66,7 @@ export function stableDomain(
   values: number[],
   span: number,
   previous?: [number, number],
+  settle = false,
 ): [number, number] {
   const [lo, hi] = domain(values, span);
   const step = span / 3;
@@ -74,6 +75,7 @@ export function stableDomain(
     Math.ceil(hi / step) * step,
   ];
   if (!previous) return next;
+  if (settle) return next;
   return [Math.min(previous[0], next[0]), Math.max(previous[1], next[1])];
 }
 
