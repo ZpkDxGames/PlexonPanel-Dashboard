@@ -114,13 +114,6 @@ function PlotSegment({
           fill={`url(#${id})`}
         />
       )}
-      <path
-        className="chart-line-glow"
-        d={path}
-        fill="none"
-        stroke={color}
-        aria-hidden="true"
-      />
       <SmoothPath
         className="chart-line"
         d={path}
@@ -180,7 +173,8 @@ export function TimeSeries({
   const [table, setTable] = useState(false),
     [hidden, setHidden] = useState<Set<MetricKey>>(new Set()),
     [width, setWidth] = useState(600),
-    [local, setLocal] = useState<number | null>(null);
+    [local, setLocal] = useState<number | null>(null),
+    [fit, setFit] = useState(0);
   const root = useRef<HTMLDivElement>(null);
   const id = useId().replaceAll(":", "");
   useEffect(() => {
@@ -190,7 +184,10 @@ export function TimeSeries({
     if (root.current) observer.observe(root.current);
     return () => observer.disconnect();
   }, []);
-  const active = series.filter((s) => !hidden.has(s.key));
+  const active = useMemo(
+    () => series.filter((s) => !hidden.has(s.key)),
+    [series, hidden],
+  );
   const present = useMemo(() => {
     const merged = new Map<number, Sample>();
     for (const a of active) {
@@ -222,17 +219,27 @@ export function TimeSeries({
       }
     }
     return [...merged.values()].sort((a, b) => a.at - b.at);
-  }, [samples, series, hidden]);
+  }, [samples, active]);
   const latestAt = present.at(-1)?.at ?? samples.at(-1)?.at ?? Date.now();
   const requestedWindow = Math.max(30_000, windowMs ?? prefs.chartWindowMs);
-  // Raw telemetry may arrive faster than the display should translate.
   const { start, end } = presentationWindow(latestAt, requestedWindow);
-  const visibleStart = windowStart(present, start);
-  const visible = present.slice(visibleStart).filter((sample) => sample.at <= end);
-  const values = visible.flatMap((s) =>
-    active
-      .map((a) => s[a.key])
-      .filter((v): v is number => typeof v === "number" && Number.isFinite(v)),
+  const visible = useMemo(() => {
+    const from = windowStart(present, start);
+    let to = present.length;
+    while (to > from && present[to - 1].at > end) to--;
+    return present.slice(from, to);
+  }, [present, start, end]);
+  const values = useMemo(
+    () =>
+      visible.flatMap((sample) =>
+        active
+          .map((entry) => sample[entry.key])
+          .filter(
+            (value): value is number =>
+              typeof value === "number" && Number.isFinite(value),
+          ),
+      ),
+    [visible, active],
   );
   const bytes = active[0]?.unit === "bytes",
     scale = bytes ? 2 ** 30 : 1;
@@ -247,28 +254,28 @@ export function TimeSeries({
           : bytes
             ? 1
             : 1;
-  const [fit, setFit] = useState(0);
-  const axisKey = active.map((a) => a.key).join(",") + fit;
-  const previous = axis.current?.key === axisKey ? axis.current : undefined;
-  const proposed = stableDomain(
-    values.map((v) => v / scale),
-    minimumSpan,
-  );
-  const comfortablyInside = Boolean(
-    previous &&
-    proposed[0] > previous.bounds[0] &&
-    proposed[1] < previous.bounds[1],
-  );
-  const calm = comfortablyInside ? (previous?.calm ?? 0) + 1 : 0;
-  const bounds = stableDomain(
-    values.map((v) => v / scale),
-    minimumSpan,
-    previous?.bounds,
-    calm >= 12,
-  );
-  axis.current = values.length
-    ? { key: axisKey, bounds, calm: calm >= 12 ? 0 : calm }
-    : undefined;
+  const axisKey = active.map((entry) => entry.key).join(",") + ":" + fit;
+  const bounds = useMemo(() => {
+    const scaled = values.map((value) => value / scale);
+    const previous = axis.current?.key === axisKey ? axis.current : undefined;
+    const proposed = stableDomain(scaled, minimumSpan);
+    const comfortablyInside = Boolean(
+      previous &&
+      proposed[0] > previous.bounds[0] &&
+      proposed[1] < previous.bounds[1],
+    );
+    const calm = comfortablyInside ? (previous?.calm ?? 0) + 1 : 0;
+    const next = stableDomain(
+      scaled,
+      minimumSpan,
+      previous?.bounds,
+      calm >= 12,
+    );
+    axis.current = values.length
+      ? { key: axisKey, bounds: next, calm: calm >= 12 ? 0 : calm }
+      : undefined;
+    return next;
+  }, [axisKey, minimumSpan, scale, values]);
   let [lo, hi] = bounds;
   if (yMin !== undefined) lo = yMin;
   if (yMax !== undefined) hi = Math.max(hi, yMax);
@@ -278,15 +285,16 @@ export function TimeSeries({
     bottom = height - 30;
   const x = (at: number) =>
       left + ((at - start) / Math.max(1, end - start)) * (right - left),
-    y = (v: number) => bottom - ((v / scale - lo) / (hi - lo)) * (bottom - top);
+    y = (value: number) =>
+      bottom - ((value / scale - lo) / (hi - lo)) * (bottom - top);
   const hover = local;
   const nearest =
     hover === null
       ? null
       : visible.reduce<Sample | null>(
-          (best, s) =>
-            !best || Math.abs(s.at - hover) < Math.abs(best.at - hover)
-              ? s
+          (best, sample) =>
+            !best || Math.abs(sample.at - hover) < Math.abs(best.at - hover)
+              ? sample
               : best,
           null,
         );
@@ -294,71 +302,89 @@ export function TimeSeries({
     hover === null
       ? null
       : visible.reduce<Sample | null>(
-          (best, s) =>
-            typeof s[key] !== "number"
+          (best, sample) =>
+            typeof sample[key] !== "number"
               ? best
-              : !best || Math.abs(s.at - hover) < Math.abs(best.at - hover)
-                ? s
+              : !best || Math.abs(sample.at - hover) < Math.abs(best.at - hover)
+                ? sample
                 : best,
           null,
         );
-  const paths = active.map((s) => {
-    const groups: [number, number][][] = [];
-    let last = 0;
-    for (const p of visible) {
-      const v = p[s.key];
-      if (typeof v !== "number") continue;
-      if (p.at - last > 10000) {
-        if (groups.at(-1)?.length) groups.push([]);
-      }
-      if (typeof v === "number") {
+  const paths = useMemo(() => {
+    const px = (at: number) =>
+      left + ((at - start) / Math.max(1, end - start)) * (right - left);
+    const py = (value: number) =>
+      bottom - ((value / scale - lo) / (hi - lo)) * (bottom - top);
+    return active.map((entry) => {
+      const groups: [number, number][][] = [];
+      let last = 0;
+      for (const point of visible) {
+        const value = point[entry.key];
+        if (typeof value !== "number") continue;
+        if (point.at - last > 10_000 && groups.at(-1)?.length) groups.push([]);
         if (!groups.length) groups.push([]);
-        groups.at(-1)!.push([x(p.at), y(v)]);
+        groups.at(-1)!.push([px(point.at), py(value)]);
+        last = point.at;
       }
-      last = p.at;
-    }
-    const maxPoints = Math.max(80, Math.floor(width * 1.5));
-    return {
-      s,
-      groups: groups
-        .filter((g) => g.length)
-        .map((g) => {
-          if (g.length > maxPoints) {
-            const kept: [number, number][] = [];
-            const step = Math.ceil(g.length / maxPoints);
-            for (let i = 0; i < g.length; i += step) {
-              const bucket = g.slice(i, i + step);
-              const min = bucket.reduce((a, b) => (a[1] < b[1] ? a : b)),
-                max = bucket.reduce((a, b) => (a[1] > b[1] ? a : b));
-              kept.push(...[min, max].sort((a, b) => a[0] - b[0]));
+      const maxPoints = Math.max(80, Math.floor(width * 1.5));
+      return {
+        s: entry,
+        groups: groups
+          .filter((group) => group.length)
+          .map((group) => {
+            let geometry = group;
+            if (geometry.length > maxPoints) {
+              const kept: [number, number][] = [];
+              const step = Math.ceil(geometry.length / maxPoints);
+              for (let i = 0; i < geometry.length; i += step) {
+                const bucket = geometry.slice(i, i + step);
+                const min = bucket.reduce((a, b) => (a[1] < b[1] ? a : b));
+                const max = bucket.reduce((a, b) => (a[1] > b[1] ? a : b));
+                kept.push(...[min, max].sort((a, b) => a[0] - b[0]));
+              }
+              geometry = kept;
             }
-            g = kept;
-          }
-          const points =
-            prefs.chartCurve === "step"
-              ? g
-              : resample(
-                  g,
-                  prefs.chartDensity === "rich"
-                    ? Math.max(72, Math.min(144, Math.round(width * 0.24)))
-                    : Math.max(48, Math.min(96, Math.round(width * 0.16))),
-                );
-          const path =
-            prefs.chartCurve === "smooth"
-              ? monotone(points)
-              : points
-                  .map(([x, y], i) =>
-                    i === 0
-                      ? `M${x},${y}`
-                      : prefs.chartCurve === "step"
-                        ? `H${x}V${y}`
-                        : `L${x},${y}`,
-                  )
-                  .join("");
-          return { points, path };
-        }),
-    };
-  });
+            const points =
+              prefs.chartCurve === "step"
+                ? geometry
+                : resample(
+                    geometry,
+                    prefs.chartDensity === "rich"
+                      ? Math.max(72, Math.min(144, Math.round(width * 0.24)))
+                      : Math.max(48, Math.min(96, Math.round(width * 0.16))),
+                  );
+            const path =
+              prefs.chartCurve === "smooth"
+                ? monotone(points)
+                : points
+                    .map(([pointX, pointY], index) =>
+                      index === 0
+                        ? `M${pointX},${pointY}`
+                        : prefs.chartCurve === "step"
+                          ? `H${pointX}V${pointY}`
+                          : `L${pointX},${pointY}`,
+                    )
+                    .join("");
+            return { points, path };
+          }),
+      };
+    });
+  }, [
+    active,
+    visible,
+    width,
+    start,
+    end,
+    scale,
+    lo,
+    hi,
+    bottom,
+    top,
+    left,
+    right,
+    prefs.chartCurve,
+    prefs.chartDensity,
+  ]);
   const summary = visible.length
     ? `${title}. ${visible.length} samples. Range ${lo.toFixed(1)} to ${hi.toFixed(1)} ${bytes ? "GiB" : (active[0]?.unit ?? "")}.`
     : `${title}. No samples received.`;
