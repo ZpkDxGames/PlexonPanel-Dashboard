@@ -1,0 +1,24 @@
+[
+  {
+    "route": "Fleet",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 1440,
+    "file": "docs/revamp/refinement/screenshots/Fleet-light-1440-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Fleet",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 1440,
+    "file": "docs/revamp/refinement/screenshots/Fleet-dark-1440-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  }
+]

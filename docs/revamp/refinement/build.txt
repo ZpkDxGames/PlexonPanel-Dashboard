@@ -1,0 +1,42 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> plexonpanel-command-center@6.0.0 build
+> tsc --noEmit && vite build && node scripts/identity.mjs
+
+vite v8.3.4 building client environment for production...
+transforming...
+✓ 79 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                                        1.09 kB │ gzip:   0.56 kB
+dist/assets/jetbrains-mono-vietnamese-wght-normal-Bt-aOZkq.woff2       7.50 kB
+dist/assets/plus-jakarta-sans-vietnamese-wght-normal-qRpaaN48.woff2    8.35 kB
+dist/assets/jetbrains-mono-greek-wght-normal-Bw9x6K1M.woff2            9.00 kB
+dist/assets/jetbrains-mono-cyrillic-wght-normal-D73BlboJ.woff2        12.10 kB
+dist/assets/jetbrains-mono-latin-ext-wght-normal-DBQx-q_a.woff2       15.19 kB
+dist/assets/plus-jakarta-sans-latin-ext-wght-normal-DmpS2jIq.woff2    21.72 kB
+dist/assets/plus-jakarta-sans-latin-wght-normal-eXO_dkmS.woff2        27.34 kB
+dist/assets/jetbrains-mono-latin-wght-normal-B9CIFXIH.woff2           40.40 kB
+dist/assets/index-Xg1oVejZ.css                                        77.42 kB │ gzip:  20.49 kB
+dist/assets/selectors-CwuPXG0R.js                                      0.67 kB │ gzip:   0.43 kB
+dist/assets/Segmented-Cwhseljk.js                                      0.68 kB │ gzip:   0.44 kB
+dist/assets/PlayerHead-Dc6AX21g.js                                     1.41 kB │ gzip:   0.76 kB
+dist/assets/Worlds-CJrAm5sQ.js                                         2.29 kB │ gzip:   0.90 kB
+dist/assets/Select-CkBs8A6V.js                                         2.30 kB │ gzip:   1.11 kB
+dist/assets/Logs-D8AmS9Fb.js                                           3.07 kB │ gzip:   1.39 kB
+dist/assets/ActionReview-DHkCdiEw.js                                   3.14 kB │ gzip:   1.46 kB
+dist/assets/Fleet-BmWkHQHB.js                                          3.66 kB │ gzip:   1.36 kB
+dist/assets/Access-BA8LHvIT.js                                         3.99 kB │ gzip:   1.58 kB
+dist/assets/Console-BlZCY069.js                                        4.58 kB │ gzip:   1.75 kB
+dist/assets/Schedules-hHWh7KFz.js                                      5.86 kB │ gzip:   2.38 kB
+dist/assets/Backups-CxVFwfln.js                                        6.04 kB │ gzip:   2.24 kB
+dist/assets/FormattedText-CysMMEZ8.js                                  6.09 kB │ gzip:   2.82 kB
+dist/assets/Performance-CCG8vVQN.js                                    6.74 kB │ gzip:   2.69 kB
+dist/assets/Players-CH5ArSfO.js                                        8.25 kB │ gzip:   2.95 kB
+dist/assets/Settings-0YAzMbQf.js                                       8.80 kB │ gzip:   2.71 kB
+dist/assets/ConsoleView-BzTj8RcR.js                                   10.83 kB │ gzip:   4.16 kB
+dist/assets/TimeSeries-BPTM9Ud-.js                                    11.87 kB │ gzip:   4.78 kB
+dist/assets/Overview-CFLYaKhD.js                                      14.15 kB │ gzip:   5.01 kB
+dist/assets/index-BJ8xKsgo.js                                        309.50 kB │ gzip: 100.77 kB
+
+✓ built in 397ms

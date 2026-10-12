@@ -29,7 +29,7 @@ All eight original route workflows remain. Owner refinements add stable chart ra
 
 Server icons load automatically when the signed file-download capability is permitted; Settings also offers Load server-icon.png, a local 64×64 PNG and Reset. Icons are transfer-verified, decoded, and stored per instance in this browser. The actual server file/live skin lookup still needs authenticated runtime acceptance. Provider fallback is browser-tested against controlled responses. Full backup restore/download/recovery UI, arbitrary schedules, world editing, plugin toggles and longer-range history remain unavailable/deferred capability states.
 
-Latest refinement captures and browser evidence are in [refinement](revamp/refinement). The original review records remain as historical evidence; use the appended owner-refinement score table for the revised pages.
+Latest refinement: 84 screenshot/axe cases pass, 16 refinement and 17 retained browser checks pass, and all seven revised pages score 45–46 with no category below 4. Captures and browser evidence are in [refinement](revamp/refinement). The original review records remain as historical evidence; use the appended owner-refinement score table for the revised pages.
 
 Fresh captures, cached history, zero, unavailable and offline are distinct. Chart aggregates are sample statistics; daily totals/network/per-core data and tick percentiles are not fabricated. Retained charts cover at most 35 minutes.
 

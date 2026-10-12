@@ -48,3 +48,23 @@ All pages clear 45/50; no category is below 4. The shared scores carry to idle/o
 5. Mobile tables require horizontal swiping, now signposted.
 
 These retain 4-point scores. Physical-device 60fps, Safari/Firefox, screen-reader and live authenticated acceptance have not been executed; Chromium fixture evidence is not those certifications.
+
+## Owner refinement — 2026-10-12 UTC
+
+The owner removed Files/Plugins and requested Activity, chart/skin/Host/settings/icon refinements. Seven revised pages were reviewed independently against the same references. Surface/geometry/typography remain 5, shared components use the original evidence, and motion is established by separate executable behavior checks rather than inferred from still images.
+
+| Page | Surface | Geometry | Color | Type | KPI | Charts | Density | Console | Motion | Copy | Total |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| Overview | 5 | 5 | 5 | 5 | 4 | 4 | 5 | 5 | 4 | 4 | 46 |
+| Players | 5 | 5 | 5 | 5 | 4 | 4 | 4 | 5 | 4 | 4 | 45 |
+| Performance | 5 | 5 | 5 | 5 | 4 | 4 | 4 | 5 | 4 | 4 | 45 |
+| Backups | 5 | 5 | 5 | 5 | 4 | 4 | 5 | 5 | 4 | 4 | 46 |
+| Settings | 5 | 5 | 5 | 5 | 4 | 4 | 4 | 5 | 4 | 4 | 45 |
+| Activity | 5 | 5 | 5 | 5 | 4 | 4 | 5 | 5 | 4 | 4 | 46 |
+| Fleet | 5 | 5 | 5 | 5 | 4 | 4 | 4 | 5 | 4 | 5 | 46 |
+
+Correction loop: Activity initially scored 43 with density 3 (long identical rounded strips and clipped mobile filters). Replaced with eight compact divider rows, semantic icon chips/error tint, older-event expansion and wrapped measured-thumb tabs; corrected views score 46. A transient detached chart endpoint was fixed by driving the dot and path with identical interpolation coordinates. Empty Host fields were condensed; missing/new service series are labeled Awaiting sample/Collecting history. Settings copy and file-selector styling were corrected. Two captures caught a lazy loading skeleton; stronger content/landmark/font waits and fresh recaptures replace those images.
+
+Reviewer actually inspected all seven healthy light desktop/mobile and dark desktop; dark healthy mobile Overview/Players/Performance; all twelve Players cases; all light idle/offline desktop; corrected Activity healthy light both widths/dark desktop, and light offline. All other combinations receive screenshot/axe/overflow/runtime checks. The reviewer subsequently inspected and accepted the replaced Fleet dark desktop (02:33:02 UTC): table, summary and both charts rendered correctly. Final review has no blocker.
+
+Evidence: [84-case matrix](revamp/refinement/visual-matrix.json), [screenshots](revamp/refinement/screenshots), [refinement behavior](revamp/refinement/interactions.json), [retained behaviors](revamp/refinement/retained-interactions.json). Skin tests use controlled provider responses. Live authenticated skin/icon/Host acceptance is still unexecuted. Remaining 4-point gaps: backup stage markers are sparse, Players detail is taller than the roster, and idle Overview console has extra breathing room. No physical-device frame-rate claim.

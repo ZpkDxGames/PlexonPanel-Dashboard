@@ -1,0 +1,67 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> plexonpanel-command-center@6.0.0 check
+> tsc --noEmit && node --import tsx --test tests/*.test.ts
+
+✔ provider connectivity and source/storage failures remain separate (6.68327ms)
+✔ new successful preflight supersedes older provider result (0.344157ms)
+✔ grant validation enforces server, protocol, device, expiry and scope identity (4.752746ms)
+✔ effective authority intersects signed and reported grants (2.975522ms)
+✔ queued acknowledgement is not completion; only bound result resolves (3.929998ms)
+✔ scope switch invalidates prepared targets and pending operation; no resend (1.242599ms)
+✔ agent denial preserves code, scope and execution boundary (1.495916ms)
+✔ missing differs from zero; cross-server and superseded sessions are discarded (5.523951ms)
+✔ new Paper session clears roster and receipts, Host online survives stopped Paper (4.046418ms)
+✔ control histories and high-rate console are bounded (317.977137ms)
+✔ independent captures keep placement; missing timestamps never become chart samples (5.000438ms)
+✔ long-lived grants are scheduled without overflowing browser timers (2.54348ms)
+✔ near and expired grant deadlines are classified exactly (0.544468ms)
+✔ production CSP permits only the verified relay HTTP and WebSocket origins (2.184288ms)
+✔ entry experience waits for both storage initialization and the minimum splash (2.277076ms)
+✔ an initialized browser without pairings enters onboarding (0.234347ms)
+✔ stored credentials and development fixtures enter the dashboard (0.224651ms)
+✔ fleet caps passive connections, ignores other room data and cleans up each roster replacement (17.295341ms)
+✔ future capture 6000 expires by receipt (15.396118ms)
+✔ future capture 30000 expires by receipt (0.668087ms)
+✔ future capture 120000 expires by receipt (0.446338ms)
+✔ missing, disconnected, small offset and behind clock remain distinct (0.754758ms)
+✔ maintenance validator rejects unsafe limits, timezone and missing mandatory exclusions (41.514228ms)
+✔ pairing claims a one-time code and persists only a same-relay credential (124.189747ms)
+✔ pairing rejects a credential whose WebSocket belongs to another relay (8.095694ms)
+✔ player command replaces structured identity placeholders (3.046426ms)
+✔ player command rejects control characters and unknown placeholders (1.347263ms)
+✔ permission builder produces bounded LuckPerms commands (1.06564ms)
+✔ demo and styleguide entry imports are compile-time gated (2.494178ms)
+✔ the working deployment's public relay variable migrates without exposing private credentials (2.365846ms)
+✔ relay selection preserves explicit browser overrides, legacy deployment defaults and bound pairing fallback (8.412006ms)
+✔ relay origins reject credential-bearing URLs and unsafe stored WebSocket endpoints (1.915302ms)
+✔ a blocked preference store does not prevent recovery of an existing browser pairing (0.966766ms)
+✔ relay mismatch sends no token and retains the stored credential (29.117881ms)
+✔ stored protocol 3 pairing reconnects, receives telemetry, completes a bound query and repairs its endpoint without re-pairing (2392.709778ms)
+✔ console parser accepts modern, legacy, plugins and inert markup (3.882442ms)
+✔ console groups stack traces and identical lines without dropping first raw line (1.783975ms)
+✔ flat TPS stays legible and its lag threshold remains in view (0.419829ms)
+✔ chart monotone path preserves endpoints and avoids invalid values (0.502471ms)
+✔ human formats retain zero and unknown states (0.331888ms)
+✔ maintenance preview respects declared timezone and disabled state (0.277178ms)
+✔ demo idle has honest zero players and production adapter is not needed (2.319128ms)
+✔ quiet telemetry cannot repeatedly rescale its axis (1.587979ms)
+✔ bounded chart geometry preserves endpoints and input samples (0.977984ms)
+✔ formatters preserve zero and distinguish unavailable measurements (86.052216ms)
+✔ entity density is derived only from a positive known denominator (0.986972ms)
+✔ capability gates intersect scope, agent advertisement, presence and evidence (1.056412ms)
+✔ virtual 30-minute reducer load keeps telemetry, console and roster within declared budgets (14537.680946ms)
+✔ ANSI 16, 256 and truecolor sequences become bounded segments (2.77337ms)
+✔ legacy section codes support styles and hex while ampersands stay literal (0.768714ms)
+✔ composer mode enables ampersand aliases (0.679265ms)
+✔ MiniMessage styles, safe URLs and malformed tags remain inert (0.882058ms)
+✔ format parser caps adversarial input and tag volume (12.153399ms)
+✔ theme initializer is the exact script allowlisted in production CSP (2.132985ms)
+ℹ tests 54
+ℹ suites 0
+ℹ pass 54
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 16513.854295

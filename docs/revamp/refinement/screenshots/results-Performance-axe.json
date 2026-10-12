@@ -1,0 +1,188 @@
+[
+  {
+    "route": "Performance",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 1440,
+    "file": "docs/revamp/refinement/screenshots/Performance-light-1440-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Performance",
+    "theme": "light",
+    "mode": "healthy",
+    "width": 390,
+    "file": "docs/revamp/refinement/screenshots/Performance-light-390-healthy.png",
+    "overflow": false,
+    "overs": [
+      "ok",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Performance",
+    "theme": "light",
+    "mode": "idle",
+    "width": 1440,
+    "file": "docs/revamp/refinement/screenshots/Performance-light-1440-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Performance",
+    "theme": "light",
+    "mode": "idle",
+    "width": 390,
+    "file": "docs/revamp/refinement/screenshots/Performance-light-390-idle.png",
+    "overflow": false,
+    "overs": [
+      "ok",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Performance",
+    "theme": "light",
+    "mode": "offline",
+    "width": 1440,
+    "file": "docs/revamp/refinement/screenshots/Performance-light-1440-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Performance",
+    "theme": "light",
+    "mode": "offline",
+    "width": 390,
+    "file": "docs/revamp/refinement/screenshots/Performance-light-390-offline.png",
+    "overflow": false,
+    "overs": [
+      "ok",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Performance",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 1440,
+    "file": "docs/revamp/refinement/screenshots/Performance-dark-1440-healthy.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Performance",
+    "theme": "dark",
+    "mode": "healthy",
+    "width": 390,
+    "file": "docs/revamp/refinement/screenshots/Performance-dark-390-healthy.png",
+    "overflow": false,
+    "overs": [
+      "ok",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Performance",
+    "theme": "dark",
+    "mode": "idle",
+    "width": 1440,
+    "file": "docs/revamp/refinement/screenshots/Performance-dark-1440-idle.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Performance",
+    "theme": "dark",
+    "mode": "idle",
+    "width": 390,
+    "file": "docs/revamp/refinement/screenshots/Performance-dark-390-idle.png",
+    "overflow": false,
+    "overs": [
+      "ok",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Performance",
+    "theme": "dark",
+    "mode": "offline",
+    "width": 1440,
+    "file": "docs/revamp/refinement/screenshots/Performance-dark-1440-offline.png",
+    "overflow": false,
+    "overs": [],
+    "errors": [],
+    "violations": []
+  },
+  {
+    "route": "Performance",
+    "theme": "dark",
+    "mode": "offline",
+    "width": 390,
+    "file": "docs/revamp/refinement/screenshots/Performance-dark-390-offline.png",
+    "overflow": false,
+    "overs": [
+      "ok",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ],
+    "errors": [],
+    "violations": []
+  }
+]

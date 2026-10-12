@@ -103,7 +103,7 @@ try {
         await page.evaluate(() => document.fonts.ready);
         for (const route of routes) {
           await context.close();
-          context = await browser.newContext({reducedMotion:"reduce"});
+          context = await browser.newContext({ reducedMotion: "reduce" });
           page = await context.newPage();
           await page.setViewportSize({
             width,
@@ -129,7 +129,19 @@ try {
             await page.locator(".style-colors").waitFor();
           else await page.locator(".workspace h1").first().waitFor();
           await page.locator(".route-skeleton").waitFor({ state: "hidden" });
-          await page.locator(".workspace .card").first().waitFor();
+          const landmarks = {
+            Overview: ".overview-kpis",
+            Players: ".players-layout",
+            Performance: ".performance-grid",
+            Backups: ".backup-create",
+            Settings: ".settings-grid",
+            Logs: ".event-list",
+            Fleet: ".fleet-layout",
+          };
+          await page
+            .locator(landmarks[route] ?? ".workspace .card")
+            .first()
+            .waitFor({ state: "attached" });
           await page.evaluate(() => document.fonts.ready);
           await page.waitForTimeout(1000);
           const file = `${out}/${route}-${theme}-${width}${baseline ? "" : "-" + mode}.png`;
