@@ -305,12 +305,12 @@ export default function Overview() {
                 ))}
               </Segmented>
               <Segmented label={copy.range_a16c5} value={windowMs}>
-                {[
+                {([
                   [30_000, "30s"],
                   [60_000, "1min"],
                   [300_000, "5min"],
                   [600_000, "10min"],
-                ].map(([value, label]) => (
+                ] as const).map(([value, label]) => (
                   <button
                     key={value}
                     className={windowMs === value ? "active" : ""}
