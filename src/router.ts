@@ -1,4 +1,4 @@
-export const routes = [
+export const workspaceRoutes = [
   "Overview",
   "Console",
   "Players",
@@ -7,11 +7,13 @@ export const routes = [
   "Backups",
   "Schedules",
   "Logs",
-  "Fleet",
   "Access",
   "Settings",
 ] as const;
+
+export const routes = ["Fleet", ...workspaceRoutes] as const;
 export type RouteName = (typeof routes)[number];
+export type WorkspaceRouteName = (typeof workspaceRoutes)[number];
 
 export const routeLabels: Record<RouteName, string> = {
   Fleet: "Fleet",
