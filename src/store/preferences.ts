@@ -4,8 +4,9 @@ export type Preferences = {
   theme: "dark" | "light" | "system";
   density: "comfortable" | "compact";
   reduceMotion: boolean;
-  timezone: "browser" | "UTC";
+  timezone: "America/Sao_Paulo";
   telemetryInterval: 50 | 100 | 250 | 500 | 1000;
+  chartWindowMs: 30_000 | 60_000 | 300_000 | 600_000;
   chartStyle: "area" | "line";
   chartCurve: "smooth" | "straight" | "step";
   chartDensity: "rich" | "compact";
@@ -24,9 +25,10 @@ const defaults: Preferences = {
   theme: "system",
   density: "comfortable",
   reduceMotion: false,
-  timezone: "browser",
+  timezone: "America/Sao_Paulo",
   skinProvider: "auto",
   telemetryInterval: 100,
+  chartWindowMs: 60_000,
   chartStyle: "area",
   chartCurve: "smooth",
   chartDensity: "rich",
@@ -46,6 +48,11 @@ function read(): Preferences {
       merged.skinProvider = "auto";
     if (![50, 100, 250, 500, 1000].includes(merged.telemetryInterval))
       merged.telemetryInterval = defaults.telemetryInterval;
+    // PlexonPanel operational timestamps use one canonical display zone so
+    // browser locale/OS settings cannot make Console and telemetry disagree.
+    merged.timezone = "America/Sao_Paulo";
+    if (![30_000, 60_000, 300_000, 600_000].includes(merged.chartWindowMs))
+      merged.chartWindowMs = defaults.chartWindowMs;
     if (!merged.serverIcons || typeof merged.serverIcons !== "object")
       merged.serverIcons = {};
     return merged;
