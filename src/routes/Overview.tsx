@@ -2,7 +2,7 @@ import { classifyTelemetry } from "../adapter/telemetry-freshness";
 import { Segmented } from "../components/Segmented";
 import { copy } from "../i18n/en";
 import { useMemo, useState } from "react";
-import { useSession, useNow } from "../hooks";
+import { usePlayerSnapshotRefresh, useSession, useNow } from "../hooks";
 import { number, str } from "../adapter/control-state";
 import { bytes, sourceStatus } from "../store/selectors";
 import { Button, Panel } from "../components/ui";
@@ -26,6 +26,7 @@ import { navigate } from "../router";
 import { preferences, usePreferences } from "../store/preferences";
 import { playerPingMillis } from "../lib/player-telemetry";
 export default function Overview() {
+  usePlayerSnapshotRefresh();
   const snap = useSession(),
     now = useNow(),
     state = snap.state,
