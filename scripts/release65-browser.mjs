@@ -223,6 +223,8 @@ try {
         await page.screenshot({
           path: `${out}/console-fixed-1577x929.png`,
           fullPage: true,
+          animations: "disabled",
+          timeout: 45_000,
         });
       }
       if (route === "Access" && viewport.width === 1577) {
