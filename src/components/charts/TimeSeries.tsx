@@ -5,6 +5,11 @@ import { copy } from "../../i18n/en";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import type { Sample } from "../../adapter/control-state";
 import { domain, monotone, stableDomain, resample } from "../../lib/chart";
+import {
+  chartWindowLabel,
+  formatChartTime,
+  formatTime,
+} from "../../lib/time";
 export type MetricKey = keyof Pick<
   Sample,
   | "tps"
@@ -102,6 +107,13 @@ function PlotSegment({
           fill={`url(#${id})`}
         />
       )}
+      <SmoothPath
+        className="chart-line-glow"
+        d={path}
+        fill="none"
+        stroke={color}
+        aria-hidden="true"
+      />
       <SmoothPath
         className="chart-line"
         d={path}
@@ -205,8 +217,8 @@ export function TimeSeries({
   }, [samples, series, hidden]);
   const latestAt = present.at(-1)?.at ?? samples.at(-1)?.at ?? Date.now();
   const requestedWindow = Math.max(
-    60_000,
-    windowMs ?? latestAt - (present[0]?.at ?? latestAt - 5 * 60_000),
+    30_000,
+    windowMs ?? prefs.chartWindowMs,
   );
   const start = latestAt - requestedWindow,
     end = latestAt;
@@ -398,6 +410,11 @@ export function TimeSeries({
         </button>
       </div>
       <div className="chart chart-draw" style={{ height }}>
+        <div className="chart-window-readout" aria-hidden="true">
+          <i className={live ? "live" : ""} />
+          <span>{chartWindowLabel(requestedWindow)}</span>
+          <b>{visible.length} samples</b>
+        </div>
         <svg
           className="time-series"
           viewBox={`0 0 ${width} ${height}`}
@@ -554,11 +571,7 @@ export function TimeSeries({
               textAnchor={r === 0 ? "start" : r === 1 ? "end" : "middle"}
             >
               {visible.length
-                ? new Date(start + (end - start) * r).toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    ...(end - start < 300000 ? { second: "2-digit" } : {}),
-                  })
+                ? formatChartTime(start + (end - start) * r, requestedWindow)
                 : r === 0.5
                   ? "Waiting for data"
                   : ""}
@@ -605,7 +618,7 @@ export function TimeSeries({
               left: Math.max(6, Math.min(width - 198, x(nearest.at) - 82)),
             }}
           >
-            <strong>{new Date(nearest.at).toLocaleTimeString()}</strong>
+            <strong>{formatTime(nearest.at, { seconds: true })}</strong>
             {active.map((s) => {
               const sample = nearestFor(s.key);
               return (
@@ -613,7 +626,7 @@ export function TimeSeries({
                   key={s.key}
                   title={
                     sample
-                      ? new Date(sample.at).toLocaleTimeString()
+                      ? formatTime(sample.at, { seconds: true })
                       : "No sample"
                   }
                 >
@@ -652,7 +665,7 @@ export function TimeSeries({
             <tbody>
               {visible.slice(-50).map((s) => (
                 <tr key={s.at}>
-                  <td>{new Date(s.at).toLocaleTimeString()}</td>
+                  <td>{formatTime(s.at, { seconds: true })}</td>
                   {series.map((k) => (
                     <td key={k.key}>
                       {typeof s[k.key] === "number"
@@ -670,7 +683,7 @@ export function TimeSeries({
         <span>{source}</span>
         <span>
           {visible.length
-            ? `${Math.max(1, Math.round(requestedWindow / 60000))} min window`
+            ? `${chartWindowLabel(requestedWindow)} window · São Paulo time`
             : "Waiting for data"}
         </span>
         <span>{live ? "Live window" : "History retained"}</span>
