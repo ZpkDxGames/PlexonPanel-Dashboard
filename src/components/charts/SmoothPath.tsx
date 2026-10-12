@@ -5,8 +5,12 @@ import { prefersReducedMotion } from "../../lib/motion";
 export function SmoothPath({
   d = "",
   endpoint,
+  durationMs = 150,
   ...props
-}: SVGProps<SVGPathElement> & { endpoint?: RefObject<SVGGElement | null> }) {
+}: SVGProps<SVGPathElement> & {
+  endpoint?: RefObject<SVGGElement | null>;
+  durationMs?: number;
+}) {
   const node = useRef<SVGPathElement>(null);
   const visible = useRef("");
   useLayoutEffect(() => {
@@ -35,7 +39,7 @@ export function SmoothPath({
     }
     const started = performance.now();
     const tick = (at: number) => {
-      const t = Math.min(1, (at - started) / 220);
+      const t = Math.min(1, (at - started) / Math.max(80, durationMs));
       const eased = t * (2 - t);
       let i = 0;
       const path = d.replace(numbers, () => {
@@ -56,6 +60,6 @@ export function SmoothPath({
     point(a.at(-2)!, a.at(-1)!);
     frame = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(frame);
-  }, [d]);
+  }, [d, durationMs]);
   return <path ref={node} d={d} {...props} />;
 }
