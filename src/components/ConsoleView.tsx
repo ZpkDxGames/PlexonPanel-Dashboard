@@ -250,9 +250,6 @@ export function ConsoleView({
     [error, setError] = useState(""),
     [histIndex, setHistIndex] = useState(-1),
     [history, setHistory] = useState<string[]>([]),
-    [historySync, setHistorySync] = useState<"idle" | "syncing" | "synced">(
-      "idle",
-    ),
     [suggest, setSuggest] = useState(0);
   const searchRef = useRef<HTMLInputElement>(null),
     commandRef = useRef<HTMLInputElement>(null),
@@ -328,34 +325,6 @@ export function ConsoleView({
     setHistIndex(-1);
     historyDraft.current = "";
   }, [snap.state.serverId]);
-  useEffect(() => {
-    if (
-      mini ||
-      readOnly ||
-      snap.phase !== "live" ||
-      snap.state.ready?.consoleAuthority !== "HOST" ||
-      !snap.state.ready?.agents.host
-    ) {
-      setHistorySync("idle");
-      return;
-    }
-    let active = true;
-    setHistorySync("syncing");
-    void session.refreshConsoleHistory(100).then((count) => {
-      if (active) setHistorySync(count > 0 ? "synced" : "idle");
-    });
-    return () => {
-      active = false;
-    };
-  }, [
-    mini,
-    readOnly,
-    snap.phase,
-    snap.state.serverId,
-    snap.state.ready?.server.hostSession,
-    snap.state.ready?.consoleAuthority,
-    snap.state.ready?.agents.host,
-  ]);
   let expression: RegExp | null = null,
     regexError = "";
   if (regex && query) {
@@ -492,9 +461,7 @@ export function ConsoleView({
               ? `${sourceName} offline · history available`
               : paused
                 ? `${sourceName} · paused`
-                : historySync === "syncing"
-                  ? `${sourceName} · syncing latest`
-                  : `${sourceName} · live`}
+                : `${sourceName} · live`}
         </span>
         {mini ? (
           <a className="link" href="#Console">
