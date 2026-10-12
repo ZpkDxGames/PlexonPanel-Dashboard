@@ -524,7 +524,8 @@ export default function Backups() {
             </Notice>
           )}
 
-          {Boolean(operation.errorCode || operation.errorMessage) && (
+          {!resolvedAfterRetry &&
+            Boolean(operation.errorCode || operation.errorMessage) && (
             <Notice
               tone={
                 health === "degraded" || health === "recovery"
