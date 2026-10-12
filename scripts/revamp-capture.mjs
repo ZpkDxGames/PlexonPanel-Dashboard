@@ -13,17 +13,20 @@ const routes = routeArg
       "Console",
       "Players",
       "Performance",
-      "Files",
       "Backups",
       "Settings",
-      "Plugins",
       "Worlds",
       "Schedules",
       "Logs",
       "Fleet",
       "Access",
     ];
-const out = baseline ? "docs/revamp/before" : "docs/revamp/after";
+const outArg = args.find((a) => a.startsWith("--out="));
+const out = outArg
+  ? outArg.slice(6)
+  : baseline
+    ? "docs/revamp/before"
+    : "docs/revamp/after";
 const port = baseline ? 4180 : 4205;
 const cwd = baseline ? process.env.PLEXON_BASELINE_DIR : process.cwd();
 const server = spawn("npm", ["run", "dev", "--", "--port", String(port)], {
@@ -53,7 +56,7 @@ try {
       ? { executablePath: process.env.PLEXON_CHROMIUM, args: browserArgs }
       : {}),
   });
-  const context = await browser.newContext();
+  let context = await browser.newContext({ reducedMotion: "reduce" });
   let page = await context.newPage();
   const results = [];
   let errors = [];
@@ -99,7 +102,8 @@ try {
         await page.locator(".workspace").waitFor();
         await page.evaluate(() => document.fonts.ready);
         for (const route of routes) {
-          await page.close();
+          await context.close();
+          context = await browser.newContext({reducedMotion:"reduce"});
           page = await context.newPage();
           await page.setViewportSize({
             width,
@@ -124,13 +128,16 @@ try {
           if (route === "Styleguide")
             await page.locator(".style-colors").waitFor();
           else await page.locator(".workspace h1").first().waitFor();
-          await page.waitForTimeout(800);
+          await page.locator(".route-skeleton").waitFor({ state: "hidden" });
+          await page.locator(".workspace .card").first().waitFor();
+          await page.evaluate(() => document.fonts.ready);
+          await page.waitForTimeout(1000);
           const file = `${out}/${route}-${theme}-${width}${baseline ? "" : "-" + mode}.png`;
           await page.screenshot({
             path: file,
             fullPage: true,
             animations: "disabled",
-            timeout: 15000,
+            timeout: 30000,
           });
           const overflow = await page.evaluate(() => ({
             page: document.documentElement.scrollWidth > innerWidth,

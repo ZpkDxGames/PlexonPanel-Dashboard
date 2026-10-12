@@ -1,3 +1,11 @@
+## 6.0.0 — owner refinement (2026-10-12 UTC)
+
+- Stabilized chart axes, replaced repeated horizontal animation with short path transitions, synchronized the live endpoint, and made hover independent per chart/source. Added Fit scale, area/line, smooth/straight/step and rich/compact choices.
+- Added 50–1000ms local telemetry buffering (100ms default) and exposed existing Host disk/swap/load/service metrics. No synthetic production captures or new endpoints.
+- Added automatic player-head provider fallback; corrected the settings gear. Added per-instance verified server-icon.png loading and local icon selection.
+- Removed Files and Plugins destinations at the owner's request; retained signed protocol actions and the original Console plugin tab. Logs is now compact, filtered Activity with eight initial events and explicit older-event expansion.
+- Added accent presets, accessible custom dropdowns, scrollbars and a themed file picker.
+
 
 ## 6.0.0 — prototype-led UI revamp (2026-10-11)
 

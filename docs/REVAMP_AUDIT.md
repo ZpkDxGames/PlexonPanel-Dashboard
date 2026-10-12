@@ -101,3 +101,17 @@ Before screenshots: docs/revamp/before, eight existing routes × light/dark × 1
 - CPU/heap availability and CPU-chart Live state use independent JVM capture/receipt freshness, while TPS uses Paper health. Fresh Paper samples cannot make a stale system capture fresh.
 - Source review of Core confirms files parameters, 24 KiB text bounds, server-root path joining and hash conflict checks. Writable file operations may use Paper when Host is read-only and Paper advertises signed authority.
 - Screenshots use the original supplied palette. Component text inks were strengthened only where automated AA checks found insufficient contrast; categorical hues were unchanged.
+
+## Owner refinement (2026-10-12 UTC)
+
+The owner requested smoother and denser charts, faster configurable display, independent hover, skin loading, extra Host metrics, fewer pages, more settings/custom controls, corrected icons and the selected server icon. This supersedes the earlier requirement to retain the newly added Files and Plugins pages: both routes/components are removed; Console's original plugin tab and all protocol actions remain. Logs becomes Activity, focused on presence, world-generation warnings/errors and backup incidents.
+
+Chart diagnosis: restarting a full sample-interval wrapper translation plus unquantized axis recomputation caused visual instability. Removed shared hover context and wrapper animation. Each chart now projects metric points on its own source capture timestamps, keeps quantized bounds until Fit scale, and morphs bounded geometry for 220ms. The endpoint uses the same coordinates as its line. A source with no samples says Awaiting sample; one sample says Collecting history. Dense geometry is interpolation of received observations, never additional telemetry. Display buffering is 50/100/250/500/1000ms (default 100ms, previously 500ms); actual capture cadence remains controlled by Paper/Host.
+
+Host schema verified in Core's protocol SystemMetrics and reducer: logical processors, load averages, physical memory/available memory, swap, disk usage/available capacity, periodic server directory size, OS and architecture. The existing systemd cgroup service CPU (% of one core) and memory are charted separately from Host and JVM. Missing fields receive one compact summary. Per-core/network/disk I/O are not invented; a continuously running relay alone cannot supply measurements absent from its Host payload.
+
+Skin default becomes automatic username-based lookup with mc-heads → Minotar → Crafatar fallback. Legacy default Crafatar preferences migrate to Auto; deliberately disabled and other choices remain. Provider fallback is checked with intercepted provider responses, not a live player/skin certification. Bedrock names need a texture source and retain the honest pixel fallback.
+
+The protocol does not supply a server icon field. When advertised/permitted, the UI requests server-icon.png through existing signed files.download/chunk/cancel contracts, verifies transfer identity/size/SHA-256 and PNG decoding, and stores a 64×64 PNG per instance. One attempt per source session is coalesced across logo instances; Settings can retry/load a local copy/reset. Transfers are never silently redirected to a different server.
+
+Custom button/listbox selects replace settings/player/backup OS controls; scrollbars and file-selector button are themed. Indigo/teal/sky/rose interface accents do not recolor categorical metric series. No runtime dependency or backend/config schema was added.

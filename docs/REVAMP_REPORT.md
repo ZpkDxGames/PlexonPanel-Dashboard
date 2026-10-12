@@ -2,13 +2,13 @@
 
 ## Delivered
 
-Thirteen lazy routes: Overview, Console/Chat, Players, Performance, Files, Backups, Settings, Plugins, Worlds, Schedules, Logs, Fleet, Access & audit. Light glass and dark variants share prototype tokens, cards, KPIs, charts, terminal treatment, navigation and motion. Existing auth, endpoints, signed checks, server isolation and reviewed actions are retained. Self-hosted Plus Jakarta Sans replaces Manrope; no chart/editor/icon library was added.
+Eleven lazy routes: Overview, Console/Chat, Players, Performance, Backups, Settings, Worlds, Schedules, Activity (Logs hash), Fleet, Access & audit. Files and Plugins destinations were removed at the owner’s request. The original Console plugin tab remains. Light glass and dark variants share prototype tokens, cards, KPIs, charts, terminal treatment, navigation and motion. Existing auth, endpoints, signed checks, server isolation and reviewed actions are retained. Self-hosted Plus Jakarta Sans replaces Manrope; no chart/editor/icon library was added.
 
 [Audit](REVAMP_AUDIT.md), [design system](DESIGN_SYSTEM.md), [review scores](REVAMP_REVIEW.md), [before](revamp/before), [after](revamp/after). Scores: 45–47/50 per page, no category below 4.
 
 ## Verification
 
-- TypeScript and 52 unit/contract tests pass: pairing/reconnect, signed action generation, freshness, bounded history, safe formatting, log grouping, domains, formats, schedule preview.
+- TypeScript and 54 unit/contract tests pass: pairing/reconnect, signed action generation, freshness, bounded history, safe formatting, log grouping, domains, formats, schedule preview.
 - Vite production build passes; initial JS ~96 KiB gzipped, below the 180 KiB budget. Demo/styleguide are absent from production output.
 - Built theme script matches the allowlisted CSP SHA-256; relay origins/security headers remain preserved.
 - 156 screenshot/axe cases, plus 130 additional responsive captures. Final machine evidence: [visual-matrix.json](revamp/qa/visual-matrix.json).
@@ -25,7 +25,11 @@ Branch: `revamp/6.0.0`, separate phase commits. Main is not merged/promoted. Git
 
 ## Parity and limitations
 
-All eight original route workflows remain. Plugins is also first-class while its Console tab remains. Files exposes existing signed text contracts and original-hash saves/create/upload/rename/delete; write authority can choose Paper when Host is read-only. Text limit: 24 KiB. Existing verified browser transfer adapter limit: 64 MiB. Full backup restore/download/recovery UI, arbitrary schedules, world editing, plugin toggles, longer-range history and IDE-style editing are explicit gaps/capability states rather than invented functionality.
+All eight original route workflows remain. Owner refinements add stable chart ranges, short geometry transitions with attached endpoints, independent hover, 50–1000ms local display buffering, graph format/curve/detail and interface accent settings, custom dropdowns/scrollbars, automatic skin-provider fallback and additional existing Host metrics. Activity retains eight initially visible relevant events, with explicit expansion and filters.
+
+Server icons load automatically when the signed file-download capability is permitted; Settings also offers Load server-icon.png, a local 64×64 PNG and Reset. Icons are transfer-verified, decoded, and stored per instance in this browser. The actual server file/live skin lookup still needs authenticated runtime acceptance. Provider fallback is browser-tested against controlled responses. Full backup restore/download/recovery UI, arbitrary schedules, world editing, plugin toggles and longer-range history remain unavailable/deferred capability states.
+
+Latest refinement captures and browser evidence are in [refinement](revamp/refinement). The original review records remain as historical evidence; use the appended owner-refinement score table for the revised pages.
 
 Fresh captures, cached history, zero, unavailable and offline are distinct. Chart aggregates are sample statistics; daily totals/network/per-core data and tick percentiles are not fabricated. Retained charts cover at most 35 minutes.
 

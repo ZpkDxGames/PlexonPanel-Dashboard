@@ -1,3 +1,4 @@
+import { preferences } from "../store/preferences";
 import {
   applyControlMessage,
   emptyControlState,
@@ -128,7 +129,7 @@ function receive(message: JsonMap) {
     !String(message.eventType).startsWith("telemetry.")
   )
     flush();
-  else if (!publishTimer) publishTimer = setTimeout(flush, 500);
+  else if (!publishTimer) publishTimer = setTimeout(flush, preferences.getSnapshot().telemetryInterval);
 }
 async function connect(credential: RelayCredential, revision: number) {
   const sequence = ++connection;

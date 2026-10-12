@@ -4,10 +4,8 @@ export const routes = [
   "Players",
   "Performance",
   "Worlds",
-  "Files",
   "Backups",
   "Schedules",
-  "Plugins",
   "Logs",
   "Fleet",
   "Access",
@@ -25,10 +23,8 @@ export const routeLabels: Record<RouteName, string> = {
   Access: "Access & audit",
   Settings: "Settings",
   Worlds: "Worlds",
-  Files: "Files",
   Schedules: "Schedules",
-  Plugins: "Plugins",
-  Logs: "Logs",
+  Logs: "Activity",
 };
 
 export function routeFromHash(): RouteName {

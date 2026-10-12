@@ -1,16 +1,10 @@
+import { SmoothPath } from "./SmoothPath";
+import { usePreferences } from "../../store/preferences";
+import { projectHistory } from "../../adapter/history";
 import { copy } from "../../i18n/en";
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useId,
-  useMemo,
-  useRef,
-  useState,
-  type ReactNode,
-} from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import type { Sample } from "../../adapter/control-state";
-import { domain, monotone } from "../../lib/chart";
+import { domain, monotone, stableDomain, resample } from "../../lib/chart";
 export type MetricKey = keyof Pick<
   Sample,
   | "tps"
@@ -21,6 +15,8 @@ export type MetricKey = keyof Pick<
   | "memory"
   | "players"
   | "gc"
+  | "serviceCpu"
+  | "serviceMemory"
 >;
 type Series = {
   key: MetricKey;
@@ -28,16 +24,6 @@ type Series = {
   color: string;
   unit: string;
 };
-const Crosshair = createContext<{
-  at: number | null;
-  setAt: (n: number | null) => void;
-}>({ at: null, setAt: () => {} });
-export function CrosshairGroup({ children }: { children: ReactNode }) {
-  const [at, setAt] = useState<number | null>(null);
-  return (
-    <Crosshair.Provider value={{ at, setAt }}>{children}</Crosshair.Provider>
-  );
-}
 export function Sparkline({
   values,
   color = "var(--c1)",
@@ -83,6 +69,60 @@ export function Sparkline({
     </svg>
   );
 }
+function PlotSegment({
+  path,
+  points,
+  color,
+  id,
+  area,
+  end,
+  bottom,
+}: {
+  path: string;
+  points: [number, number][];
+  color: string;
+  id: string;
+  area: boolean;
+  end: boolean;
+  bottom: number;
+}) {
+  const endpoint = useRef<SVGGElement>(null);
+  return (
+    <>
+      {area && (
+        <SmoothPath
+          d={`${path}L${points.at(-1)![0]},${bottom}L${points[0][0]},${bottom}Z`}
+          fill={`url(#${id})`}
+        />
+      )}
+      <SmoothPath
+        className="chart-line"
+        d={path}
+        fill="none"
+        stroke={color}
+        endpoint={endpoint}
+      />
+      {end && (
+        <g ref={endpoint}>
+          <circle
+            className="chart-end-ring"
+            cx={points.at(-1)![0]}
+            cy={points.at(-1)![1]}
+            r={7}
+            style={{ fill: color }}
+          />
+          <circle
+            className="chart-end"
+            cx={points.at(-1)![0]}
+            cy={points.at(-1)![1]}
+            r={4}
+            style={{ fill: color }}
+          />
+        </g>
+      )}
+    </>
+  );
+}
 export function TimeSeries({
   samples,
   series,
@@ -104,15 +144,16 @@ export function TimeSeries({
   yMax?: number;
   live?: boolean;
 }) {
+  const prefs = usePreferences();
+  const axis = useRef<{ key: string; bounds: [number, number] } | undefined>(
+    undefined,
+  );
   const [table, setTable] = useState(false),
     [hidden, setHidden] = useState<Set<MetricKey>>(new Set()),
     [width, setWidth] = useState(600),
     [local, setLocal] = useState<number | null>(null);
-  const root = useRef<HTMLDivElement>(null),
-    flow = useRef<SVGGElement>(null),
-    previous = useRef(0);
-  const id = useId().replaceAll(":", ""),
-    cross = useContext(Crosshair);
+  const root = useRef<HTMLDivElement>(null);
+  const id = useId().replaceAll(":", "");
   useEffect(() => {
     const observer = new ResizeObserver(([e]) =>
       setWidth(Math.max(240, e.contentRect.width)),
@@ -121,11 +162,38 @@ export function TimeSeries({
     return () => observer.disconnect();
   }, []);
   const active = series.filter((s) => !hidden.has(s.key));
-  const present = useMemo(
-    () =>
-      samples.filter((s) => active.some((a) => typeof s[a.key] === "number")),
-    [samples, series, hidden],
-  );
+  const present = useMemo(() => {
+    const merged = new Map<number, Sample>();
+    for (const a of active) {
+      const source = ["hostCpu", "memory"].includes(a.key)
+        ? "hostSystem"
+        : ["processCpu", "heap", "gc"].includes(a.key)
+          ? "paperSystem"
+          : ["serviceCpu", "serviceMemory"].includes(a.key)
+            ? "service"
+            : "paperHealth";
+      const points = samples.some((s) => s.sources)
+        ? projectHistory(samples, source)
+        : samples;
+      for (const point of points) {
+        if (typeof point[a.key] !== "number") continue;
+        const row = merged.get(point.at) ?? {
+          at: point.at,
+          tps: null,
+          mspt: null,
+          hostCpu: null,
+          processCpu: null,
+          heap: null,
+          memory: null,
+          players: null,
+          gc: null,
+        };
+        Object.assign(row, { [a.key]: point[a.key] });
+        merged.set(point.at, row);
+      }
+    }
+    return [...merged.values()].sort((a, b) => a.at - b.at);
+  }, [samples, series, hidden]);
   const values = present.flatMap((s) =>
     active
       .map((a) => s[a.key])
@@ -144,11 +212,15 @@ export function TimeSeries({
           : bytes
             ? 1
             : 1;
-  let [lo, hi] = domain(
+  const [fit, setFit] = useState(0);
+  const axisKey = active.map((a) => a.key).join(",") + fit;
+  const bounds = stableDomain(
     values.map((v) => v / scale),
     minimumSpan,
-    threshold,
+    axis.current?.key === axisKey ? axis.current.bounds : undefined,
   );
+  axis.current = values.length ? { key: axisKey, bounds } : undefined;
+  let [lo, hi] = bounds;
   if (yMin !== undefined) lo = yMin;
   if (yMax !== undefined) hi = Math.max(hi, yMax);
   const left = 44,
@@ -160,7 +232,7 @@ export function TimeSeries({
   const x = (at: number) =>
       left + ((at - start) / Math.max(1, end - start)) * (right - left),
     y = (v: number) => bottom - ((v / scale - lo) / (hi - lo)) * (bottom - top);
-  const hover = local ?? cross.at;
+  const hover = local;
   const nearest =
     hover === null
       ? null
@@ -171,12 +243,25 @@ export function TimeSeries({
               : best,
           null,
         );
+  const nearestFor = (key: MetricKey) =>
+    hover === null
+      ? null
+      : present.reduce<Sample | null>(
+          (best, s) =>
+            typeof s[key] !== "number"
+              ? best
+              : !best || Math.abs(s.at - hover) < Math.abs(best.at - hover)
+                ? s
+                : best,
+          null,
+        );
   const paths = active.map((s) => {
     const groups: [number, number][][] = [];
     let last = 0;
     for (const p of present) {
       const v = p[s.key];
-      if (typeof v !== "number" || p.at - last > 10000) {
+      if (typeof v !== "number") continue;
+      if (p.at - last > 10000) {
         if (groups.at(-1)?.length) groups.push([]);
       }
       if (typeof v === "number") {
@@ -202,47 +287,38 @@ export function TimeSeries({
             }
             g = kept;
           }
-          return { points: g, path: monotone(g) };
+          const points =
+            prefs.chartCurve === "step"
+              ? g
+              : resample(g, prefs.chartDensity === "rich" ? 320 : 120);
+          const path =
+            prefs.chartCurve === "smooth"
+              ? monotone(points)
+              : points
+                  .map(([x, y], i) =>
+                    i === 0
+                      ? `M${x},${y}`
+                      : prefs.chartCurve === "step"
+                        ? `H${x}V${y}`
+                        : `L${x},${y}`,
+                  )
+                  .join("");
+          return { points, path };
         }),
     };
   });
-  useEffect(() => {
-    const last = present.at(-1)?.at ?? 0;
-    if (
-      last > previous.current &&
-      previous.current &&
-      flow.current &&
-      !nearest &&
-      live &&
-      !matchMedia("(prefers-reduced-motion: reduce)").matches &&
-      document.documentElement.dataset.reduceMotion !== "true"
-    ) {
-      const sampleInterval = last - previous.current;
-      if (sampleInterval <= 10000) {
-        flow.current.getAnimations().forEach((a) => a.cancel());
-        flow.current.animate(
-          [
-            {
-              transform: `translateX(${((right - left) * sampleInterval) / Math.max(sampleInterval, end - start)}px)`,
-            },
-            { transform: "translateX(0)" },
-          ],
-          { duration: sampleInterval, easing: "linear" },
-        );
-      }
-    }
-    previous.current = last;
-  }, [samples, live, width]);
   const summary = present.length
     ? `${title}. ${present.length} samples. Range ${lo.toFixed(1)} to ${hi.toFixed(1)} ${bytes ? "GiB" : (active[0]?.unit ?? "")}.`
     : `${title}. No samples received.`;
   const inspect = (at: number | null) => {
     setLocal(at);
-    cross.setAt(at);
   };
   return (
     <div className="chart-block" ref={root}>
       <div className="chart-legend">
+        <button className="table-toggle" onClick={() => setFit((n) => n + 1)}>
+          {copy.refine_4b290c75}
+        </button>
         {series.length > 1 &&
           series.map((s) => (
             <button
@@ -259,6 +335,14 @@ export function TimeSeries({
             >
               <i style={{ background: s.color }} />
               {s.label}
+              {present.filter((p) => typeof p[s.key] === "number").length <
+                2 && (
+                <small className="series-status">
+                  {present.some((p) => typeof p[s.key] === "number")
+                    ? "Collecting history"
+                    : "Awaiting sample"}
+                </small>
+              )}
             </button>
           ))}
         <button className="table-toggle" onClick={() => setTable((v) => !v)}>
@@ -367,41 +451,21 @@ export function TimeSeries({
             </g>
           )}
           <g clipPath={`url(#${id}-clip)`}>
-            <g ref={flow}>
+            <g>
               {paths.map(({ s, groups }) => (
                 <g key={s.key}>
                   {groups.map(({ path, points }, i) => (
-                    <g key={i}>
-                      <path
-                        d={`${path}L${points.at(-1)![0]},${bottom}L${points[0][0]},${bottom}Z`}
-                        fill={`url(#${id}-${s.key})`}
-                      />
-                      <path
-                        className="chart-line"
-                        d={path}
-                        fill="none"
-                        stroke={s.color}
-                      />
-                    </g>
+                    <PlotSegment
+                      key={i}
+                      path={path}
+                      points={points}
+                      color={s.color}
+                      id={`${id}-${s.key}`}
+                      area={prefs.chartStyle === "area"}
+                      end={live && i === groups.length - 1}
+                      bottom={bottom}
+                    />
                   ))}
-                  {live && groups.at(-1) && (
-                    <>
-                      <circle
-                        className="chart-end-ring"
-                        cx={groups.at(-1)!.points.at(-1)![0]}
-                        cy={groups.at(-1)!.points.at(-1)![1]}
-                        r={7}
-                        style={{ fill: s.color }}
-                      />
-                      <circle
-                        className="chart-end"
-                        cx={groups.at(-1)!.points.at(-1)![0]}
-                        cy={groups.at(-1)!.points.at(-1)![1]}
-                        r={4}
-                        style={{ fill: s.color }}
-                      />
-                    </>
-                  )}
                 </g>
               ))}
             </g>
@@ -417,6 +481,7 @@ export function TimeSeries({
                 ? new Date(start + (end - start) * r).toLocaleTimeString([], {
                     hour: "2-digit",
                     minute: "2-digit",
+                    ...(end - start < 300000 ? { second: "2-digit" } : {}),
                   })
                 : r === 0.5
                   ? "Waiting for data"
@@ -432,20 +497,22 @@ export function TimeSeries({
                 y1={top}
                 y2={bottom}
               />
-              {active.map(
-                (s) =>
-                  typeof nearest[s.key] === "number" && (
+              {active.map((s) => {
+                const sample = nearestFor(s.key);
+                return (
+                  sample && (
                     <circle
                       key={s.key}
-                      cx={x(nearest.at)}
-                      cy={y(nearest[s.key]!)}
+                      cx={x(sample.at)}
+                      cy={y(sample[s.key]!)}
                       r={5}
                       fill={s.color}
                       stroke="var(--surface-solid)"
                       strokeWidth={3}
                     />
-                  ),
-              )}
+                  )
+                );
+              })}
             </g>
           )}
         </svg>
@@ -464,17 +531,27 @@ export function TimeSeries({
           }}
         >
           <strong>{new Date(nearest.at).toLocaleTimeString()}</strong>
-          {active.map((s) => (
-            <span key={s.key}>
-              <i style={{ background: s.color }} />
-              {s.label}
-              <b>
-                {typeof nearest[s.key] === "number"
-                  ? `${(nearest[s.key]! / scale).toFixed(2)} ${bytes ? "GiB" : s.unit}`
-                  : "—"}
-              </b>
-            </span>
-          ))}
+          {active.map((s) => {
+            const sample = nearestFor(s.key);
+            return (
+              <span
+                key={s.key}
+                title={
+                  sample
+                    ? new Date(sample.at).toLocaleTimeString()
+                    : "No sample"
+                }
+              >
+                <i style={{ background: s.color }} />
+                {s.label}
+                <b>
+                  {sample
+                    ? `${(sample[s.key]! / scale).toFixed(2)} ${bytes ? "GiB" : s.unit}`
+                    : "—"}
+                </b>
+              </span>
+            );
+          })}
         </div>
       )}
       <p className="sr-only">

@@ -1,3 +1,4 @@
+import { usePreferences } from "../store/preferences";
 import { copy } from "../i18n/en";
 import { Icon } from "./Icon";
 import { Sparkline } from "./charts/TimeSeries";
@@ -26,7 +27,8 @@ export function Kpi({
   values?: (number | null)[];
   gauge?: number;
 }) {
-  const shown = useTween(value);
+  const prefs = usePreferences();
+  const shown = useTween(value, Math.min(300, Math.max(80, prefs.telemetryInterval * 2)));
   return (
     <section
       className="card kpi"

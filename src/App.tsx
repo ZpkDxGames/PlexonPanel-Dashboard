@@ -20,9 +20,7 @@ const views: Record<
   Access: lazy(() => import("./routes/Access")),
   Settings: lazy(() => import("./routes/Settings")),
   Worlds: lazy(() => import("./routes/Worlds")),
-  Files: lazy(() => import("./routes/Files")),
   Schedules: lazy(() => import("./routes/Schedules")),
-  Plugins: lazy(() => import("./routes/Plugins")),
   Logs: lazy(() => import("./routes/Logs")),
 };
 const Styleguide = import.meta.env.DEV
@@ -46,6 +44,7 @@ export default function App() {
         : prefs.theme;
     document.documentElement.dataset.theme = resolved;
     document.documentElement.dataset.density = prefs.density;
+    document.documentElement.dataset.accent = prefs.accent;
     document.documentElement.dataset.reduceMotion = String(prefs.reduceMotion);
   }, [prefs]);
   useEffect(() => {

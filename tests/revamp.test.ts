@@ -81,3 +81,18 @@ test("demo idle has honest zero players and production adapter is not needed", (
   assert.equal(idle.server.onlinePlayers, 0);
   assert.equal(idle.history.at(-1)?.tps, 20);
 });
+
+import { stableDomain, resample } from '../src/lib/chart';
+test('quiet telemetry cannot repeatedly rescale its axis',()=>{
+ const bounds=stableDomain([19.8,20],3);
+ assert.deepEqual(stableDomain([19.81,19.99],3,bounds),bounds);
+ const spike=stableDomain([12,20],3,bounds);
+ assert.ok(spike[0]<=12&&spike[1]>=20);
+ assert.deepEqual(stableDomain([19.9,20],3,spike),spike);
+});
+test('bounded chart geometry preserves endpoints and input samples',()=>{
+ const points:[number,number][]=[[0,10],[10,30],[20,15]];
+ const copy=JSON.stringify(points),out=resample(points,320);
+ assert.equal(out.length,320);assert.deepEqual(out[0],points[0]);assert.deepEqual(out.at(-1),points.at(-1));assert.equal(JSON.stringify(points),copy);
+ assert.ok(out.every(p=>p[1]>=10&&p[1]<=30));
+});

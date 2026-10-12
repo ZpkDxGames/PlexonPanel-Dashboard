@@ -1,3 +1,4 @@
+import { Select } from "../components/Select";
 import { copy } from "../i18n/en";
 import { useMemo, useState } from "react";
 import { number, str, type JsonMap } from "../adapter/control-state";
@@ -120,12 +121,12 @@ export default function Players() {
         </label>
         <label className="field">
           <span className="sr-only">{copy.filter_by_world_bd8cb}</span>
-          <select value={world} onChange={(e) => setWorld(e.target.value)}>
+          <Select value={world} onChange={(e) => setWorld(e.target.value)}>
             <option value="all">{copy.all_worlds_c07d5}</option>
             {worlds.map((item) => (
               <option key={item}>{item}</option>
             ))}
-          </select>
+          </Select>
         </label>
         <Status tone={snap.state.ready?.agents.paper ? "success" : "neutral"}>
           {snap.state.players.length}
@@ -235,7 +236,7 @@ export default function Players() {
                   </label>
                   <label className="field">
                     {copy.gamemode_49906}
-                    <select
+                    <Select
                       value={gameMode}
                       onChange={(e) => setGameMode(e.target.value)}
                     >
@@ -244,7 +245,7 @@ export default function Players() {
                           <option key={v}>{v}</option>
                         ),
                       )}
-                    </select>
+                    </Select>
                   </label>
                 </div>
                 <div className="action-grid">

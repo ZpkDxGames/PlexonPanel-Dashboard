@@ -1,3 +1,4 @@
+import { Select } from "../components/Select";
 import { copy } from "../i18n/en";
 import { useEffect, useState } from "react";
 import {
@@ -80,7 +81,7 @@ export default function Backups() {
         <div className="backup-create">
           <label className="field">
             {copy.player_warning_306a0}
-            <select
+            <Select
               value={countdown}
               onChange={(e) => setCountdown(Number(e.target.value))}
             >
@@ -90,7 +91,7 @@ export default function Backups() {
                   {copy._minutes_ae098}
                 </option>
               ))}
-            </select>
+            </Select>
           </label>
           <Button
             variant="primary"

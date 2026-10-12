@@ -1,7 +1,7 @@
 import { copy } from "../i18n/en";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Icon } from "./Icon";
-import { BlockMark } from "./BlockMark";
+import { ServerIcon } from "./ServerIcon";
 import { navigate, routeLabels, routes, type RouteName } from "../router";
 import { useSession, useNow } from "../hooks";
 import { classifyTelemetry } from "../adapter/telemetry-freshness";
@@ -13,10 +13,8 @@ const icons: Record<RouteName, string> = {
   Players: "players",
   Performance: "performance",
   Worlds: "globe",
-  Files: "folder",
   Backups: "backups",
   Schedules: "clock",
-  Plugins: "plugin",
   Logs: "logs",
   Fleet: "fleet",
   Access: "access",
@@ -28,11 +26,9 @@ const descriptions: Record<RouteName, string> = {
   Players: "Your community, online and within reach.",
   Performance: "Understand ticks, compute and memory over time.",
   Worlds: "A closer look at every world and dimension.",
-  Files: "Browse and edit server files with reviewed saves.",
   Backups: "Keep your worlds safe, locally and offsite.",
   Schedules: "Plan restarts and review your maintenance policy.",
-  Plugins: "Installed plugins and their available actions.",
-  Logs: "Find the moments that matter in server output.",
+  Logs: "Player arrivals, world issues and backup events.",
   Fleet: "All your paired servers in one place.",
   Access: "Manage trusted devices and review activity.",
   Settings: "Make this workspace yours.",
@@ -215,7 +211,7 @@ export function Shell({
             onClick={() => navigate("Fleet")}
             aria-label={copy.open_fleet_2cf70}
           >
-            <BlockMark />
+            <ServerIcon />
             <span className="brand-copy">
               <strong>{copy.plexon_6bab8}</strong>
               <small>{copy.server_panel_6100c}</small>

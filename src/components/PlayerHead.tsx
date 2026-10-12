@@ -20,24 +20,35 @@ export function PlayerHead({
   large?: boolean;
 }) {
   const { skinProvider } = usePreferences(),
-    [failed, setFailed] = useState(false);
-  useEffect(() => setFailed(false), [uuid, name, skinProvider]);
+    [attempt, setAttempt] = useState(0);
+  useEffect(() => setAttempt(0), [uuid, name, skinProvider]);
+  const providers =
+    skinProvider === "auto"
+      ? ["mc-heads", "minotar", "crafatar"]
+      : [
+          skinProvider,
+          ...["mc-heads", "minotar", "crafatar"].filter(
+            (p) => p !== skinProvider,
+          ),
+        ];
   const unavailable =
-    skinProvider === "disabled" || failed || name.startsWith(".");
+    skinProvider === "disabled" ||
+    attempt >= providers.length ||
+    name.startsWith(".");
+  const provider = providers[attempt];
   return (
     <span
       className={`player-head ${large ? "large" : ""}`}
-      title={
-        unavailable ? "Local pixel head" : `${name} skin via ${skinProvider}`
-      }
+      title={unavailable ? "Local pixel head" : `${name} skin via ${provider}`}
     >
       {!unavailable ? (
         <img
-          src={source(skinProvider, uuid, name)}
+          key={source(provider, uuid, name)}
+          src={source(provider, uuid, name)}
           alt=""
           loading="lazy"
           referrerPolicy="no-referrer"
-          onError={() => setFailed(true)}
+          onError={() => setAttempt((n) => n + 1)}
         />
       ) : (
         <svg

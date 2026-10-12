@@ -1,8 +1,9 @@
+import { HostTelemetry } from "../components/HostTelemetry";
 import { Segmented } from "../components/Segmented";
 import { copy } from "../i18n/en";
 import { useMemo, useState } from "react";
 import { useSession } from "../hooks";
-import { CrosshairGroup, TimeSeries } from "../components/charts/TimeSeries";
+import { TimeSeries } from "../components/charts/TimeSeries";
 import { Panel, Status } from "../components/ui";
 import { sampleStats, windowStart } from "../lib/chart";
 import { number, str } from "../adapter/control-state";
@@ -36,7 +37,7 @@ export default function Performance() {
     );
   const live = Boolean(state.ready?.agents.paper);
   return (
-    <CrosshairGroup>
+    <>
       <div className="performance-toolbar">
         <Segmented label={copy.time_range_22cd3} value={minutes}>
           {[5, 15, 35].map((m) => (
@@ -114,7 +115,7 @@ export default function Performance() {
             samples={samples}
             height={240}
             title={copy.cpu_utilization_241cc}
-            live={live}
+            live={Boolean(state.ready?.agents.host || live)}
             series={[
               {
                 key: "processCpu",
@@ -123,6 +124,12 @@ export default function Performance() {
                 color: "var(--c4)",
               },
               { key: "hostCpu", label: "Host", unit: "%", color: "var(--c5)" },
+              {
+                key: "serviceCpu",
+                label: "Minecraft service · % of one core",
+                unit: "%",
+                color: "var(--c1)",
+              },
             ]}
             source="Paper + Host"
           />
@@ -135,7 +142,7 @@ export default function Performance() {
             samples={samples}
             height={240}
             title={copy.memory_usage_530f6}
-            live={live}
+            live={Boolean(state.ready?.agents.host || live)}
             series={[
               { key: "heap", label: "Heap", unit: "bytes", color: "var(--c3)" },
               {
@@ -143,6 +150,12 @@ export default function Performance() {
                 label: "Host memory",
                 unit: "bytes",
                 color: "var(--c1)",
+              },
+              {
+                key: "serviceMemory",
+                label: "Minecraft service",
+                unit: "bytes",
+                color: "var(--c4)",
               },
             ]}
             source="Paper + Host"
@@ -236,20 +249,8 @@ export default function Performance() {
             )}
           </div>
         </Panel>
-        <Panel
-          title={copy.more_telemetry_b143e}
-          eyebrow={copy.available_when_the_server_reports_it_933e4}
-          className="wide-panel"
-        >
-          <div className="coverage">
-            <span>{copy.per_core_cpu_network_i_o_disk_i_o_thre_34eb0}</span>
-            <Status>{copy.not_available_on_this_server_911d0}</Status>
-          </div>
-          <p className="subtle" style={{ marginTop: 10 }}>
-            {copy.these_measurements_need_a_supported_ba_e799b}
-          </p>
-        </Panel>
+        <HostTelemetry />
       </div>
-    </CrosshairGroup>
+    </>
   );
 }

@@ -87,24 +87,6 @@ try {
     "Destructive action is not focused",
   );
   await p.getByRole("button", { name: "Cancel", exact: true }).click();
-  await p.evaluate(() => (location.hash = "Files"));
-  await p.locator(".code-editor").waitFor();
-  await p.locator(".code-editor").fill("view-distance: 10\n");
-  let guard = false;
-  p.once("dialog", async (d) => {
-    guard = true;
-    await d.dismiss();
-  });
-  await p
-    .getByRole("button", { name: "Overview", exact: true })
-    .first()
-    .click();
-  check(
-    "Unsaved navigation guard retains draft",
-    guard && (await p.locator(".code-editor").inputValue()).includes("10"),
-    "Canceled navigation preserved text",
-  );
-  await p.getByRole("button", { name: "Reset draft" }).click();
   const security = await p.evaluate(async () => {
     const { session } = await import("/src/adapter/session.ts");
     const { makeFixture, fixtureAction } =
@@ -118,7 +100,7 @@ try {
     session.installFixture("security", state, fixtureAction);
     return attack;
   });
-  for (const route of ["Overview", "Console", "Players", "Plugins"]) {
+  for (const route of ["Overview", "Console", "Players"]) {
     await p.evaluate((r) => (location.hash = r), route);
     await p.waitForTimeout(400);
     check(
@@ -222,12 +204,12 @@ try {
         tps: [18.7, 19, 19],
       },
     });
-    await new Promise((r) => setTimeout(r, 580));
+    await new Promise((r) => setTimeout(r, 150));
     const intermediate = document.querySelectorAll(".kpi-value")[1].textContent;
-    const flow = document
-      .querySelector(".time-series g[clip-path] g")
-      ?.getAnimations()
-      .some((a) => a.playState === "running");
+    const path=document.querySelector('.time-series .chart-line');
+    const beforePath=path.getAttribute('d');
+    await new Promise(r=>setTimeout(r,60));
+    const flow=beforePath!==path.getAttribute('d');
     for (
       let i = 0;
       i < 30 &&
@@ -247,9 +229,9 @@ try {
     JSON.stringify(countUp),
   );
   check(
-    "Live chart flows between samples",
+    "Live chart morphs between samples",
     countUp.flow,
-    "Live SVG wrapper animation observed",
+    "Bounded SVG path interpolation observed",
   );
   await p.evaluate(async () => {
     const { session } = await import("/src/adapter/session.ts");
@@ -297,9 +279,9 @@ try {
   console.log(JSON.stringify(checks, null, 2));
 } finally {
   s.kill();
-  await mkdir("docs/revamp/qa", { recursive: true });
+  await mkdir("docs/revamp/refinement", { recursive: true });
   await writeFile(
-    "docs/revamp/qa/interactions.json",
+    "docs/revamp/refinement/retained-interactions.json",
     JSON.stringify(checks, null, 2),
   );
 }

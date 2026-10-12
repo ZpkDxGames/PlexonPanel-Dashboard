@@ -5,7 +5,19 @@ export type Preferences = {
   density: "comfortable" | "compact";
   reduceMotion: boolean;
   timezone: "browser" | "UTC";
-  skinProvider: "proxy" | "crafatar" | "mc-heads" | "minotar" | "disabled";
+  telemetryInterval: 50 | 100 | 250 | 500 | 1000;
+  chartStyle: "area" | "line";
+  chartCurve: "smooth" | "straight" | "step";
+  chartDensity: "rich" | "compact";
+  accent: "indigo" | "teal" | "sky" | "rose";
+  serverIcons: Record<string, string>;
+  skinProvider:
+    | "auto"
+    | "proxy"
+    | "crafatar"
+    | "mc-heads"
+    | "minotar"
+    | "disabled";
 };
 
 const defaults: Preferences = {
@@ -13,7 +25,13 @@ const defaults: Preferences = {
   density: "comfortable",
   reduceMotion: false,
   timezone: "browser",
-  skinProvider: "crafatar",
+  skinProvider: "auto",
+  telemetryInterval: 100,
+  chartStyle: "area",
+  chartCurve: "smooth",
+  chartDensity: "rich",
+  accent: "indigo",
+  serverIcons: {},
 };
 let value = read();
 const listeners = new Set<() => void>();
@@ -23,7 +41,14 @@ function read(): Preferences {
     const raw = JSON.parse(
       localStorage.getItem("plexon:preferences") ?? "{}",
     ) as Partial<Preferences>;
-    return { ...defaults, ...raw };
+    const merged = { ...defaults, ...raw };
+    if (raw.telemetryInterval === undefined && raw.skinProvider === "crafatar")
+      merged.skinProvider = "auto";
+    if (![50, 100, 250, 500, 1000].includes(merged.telemetryInterval))
+      merged.telemetryInterval = defaults.telemetryInterval;
+    if (!merged.serverIcons || typeof merged.serverIcons !== "object")
+      merged.serverIcons = {};
+    return merged;
   } catch {
     return defaults;
   }

@@ -7,7 +7,6 @@ import { number, str } from "../adapter/control-state";
 import { bytes, sourceStatus } from "../store/selectors";
 import { Button, Panel } from "../components/ui";
 import {
-  CrosshairGroup,
   Sparkline,
   TimeSeries,
   type MetricKey,
@@ -15,7 +14,7 @@ import {
 import { Kpi } from "../components/Kpi";
 import { ActionReview } from "../features/ActionReview";
 import { session, type Prepared } from "../adapter/session";
-import { BlockMark } from "../components/BlockMark";
+import { ServerIcon } from "../components/ServerIcon";
 import { Icon } from "../components/Icon";
 import { PlayerHead } from "../components/PlayerHead";
 import { FormattedText } from "../components/FormattedText";
@@ -112,7 +111,7 @@ export default function Overview() {
     <>
       <section className="card server">
         <div className="server-icon">
-          <BlockMark />
+          <ServerIcon />
         </div>
         <div>
           <div className="server-name">
@@ -272,7 +271,7 @@ export default function Overview() {
           }
         />
       </div>
-      <CrosshairGroup>
+      <>
         <div className="grid">
           <Panel
             title={copy.server_performance_cd946}
@@ -543,7 +542,7 @@ export default function Overview() {
             </p>
           </Panel>
         </div>
-      </CrosshairGroup>
+      </>
       <div className="overview-bottom">
         <ConsoleView mini />
         <div className="support-stack">

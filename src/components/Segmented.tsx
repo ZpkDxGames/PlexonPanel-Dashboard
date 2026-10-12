@@ -10,12 +10,17 @@ export function Segmented({
   children: ReactNode;
 }) {
   const root = useRef<HTMLDivElement>(null);
-  const [thumb, setThumb] = useState({ left: 4, width: 0 });
+  const [thumb, setThumb] = useState({ left: 4, width: 0, top: 4, height: 35 });
   useLayoutEffect(() => {
     const measure = () => {
       const selected = root.current?.querySelector<HTMLElement>(".active");
       if (selected)
-        setThumb({ left: selected.offsetLeft, width: selected.offsetWidth });
+        setThumb({
+          left: selected.offsetLeft,
+          width: selected.offsetWidth,
+          top: selected.offsetTop,
+          height: selected.offsetHeight,
+        });
     };
     measure();
     const observer = new ResizeObserver(measure);
@@ -27,7 +32,12 @@ export function Segmented({
       <span
         className="thumb"
         aria-hidden="true"
-        style={{ width: thumb.width, transform: `translateX(${thumb.left}px)` }}
+        style={{
+          top: thumb.top,
+          height: thumb.height,
+          width: thumb.width,
+          transform: `translateX(${thumb.left}px)`,
+        }}
       />
       {children}
     </div>

@@ -60,3 +60,50 @@ export function windowStart<T extends { at: number }>(
   }
   return lo;
 }
+
+/** Quantized bounds expand when needed; quiet noise cannot rescale every packet. */
+export function stableDomain(
+  values: number[],
+  span: number,
+  previous?: [number, number],
+): [number, number] {
+  const [lo, hi] = domain(values, span);
+  const step = span / 3;
+  const next: [number, number] = [
+    Math.max(0, Math.floor(lo / step) * step),
+    Math.ceil(hi / step) * step,
+  ];
+  if (!previous) return next;
+  return [Math.min(previous[0], next[0]), Math.max(previous[1], next[1])];
+}
+
+/** Equal-count interpolation preserves endpoints/extrema for stable SVG topology. */
+export function resample(
+  points: [number, number][],
+  count: number,
+): [number, number][] {
+  if (points.length < 2) return points;
+  const out: [number, number][] = [];
+  // Keep original extrema by distributing points by path length, not inventing observations.
+  const lengths = [0];
+  for (let i = 1; i < points.length; i++)
+    lengths.push(
+      lengths[i - 1] +
+        Math.hypot(
+          points[i][0] - points[i - 1][0],
+          points[i][1] - points[i - 1][1],
+        ),
+    );
+  let j = 1;
+  for (let i = 0; i < count; i++) {
+    const at = (lengths.at(-1)! * i) / (count - 1);
+    while (j < points.length - 1 && lengths[j] < at) j++;
+    const t =
+      (at - lengths[j - 1]) / Math.max(0.001, lengths[j] - lengths[j - 1]);
+    out.push([
+      points[j - 1][0] + (points[j][0] - points[j - 1][0]) * t,
+      points[j - 1][1] + (points[j][1] - points[j - 1][1]) * t,
+    ]);
+  }
+  return out;
+}
