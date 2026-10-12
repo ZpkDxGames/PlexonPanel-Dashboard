@@ -41,9 +41,11 @@ export function ActionReview({
     prepared.action,
     prepared.parameters,
   );
-  const confirmsAgent =
-    forceAgentConfirmation ||
-    requiresAgentConfirmation(prepared.action, prepared.parameters);
+  const highRiskConfirmation = requiresAgentConfirmation(
+    prepared.action,
+    prepared.parameters,
+  );
+  const confirmsAgent = forceAgentConfirmation || highRiskConfirmation;
   const consequence =
     prepared.action === "server.stop" || prepared.action === "server.restart"
       ? "Players will disconnect. Unsaved progress depends on the server completing its save before shutdown."
@@ -136,7 +138,7 @@ export function ActionReview({
         </Button>
         {!result && (
           <Button
-            variant={confirmsAgent ? "danger" : "primary"}
+            variant={highRiskConfirmation ? "danger" : "primary"}
             onClick={() => void execute()}
             disabled={busy || (strong && typed !== confirmText)}
           >
