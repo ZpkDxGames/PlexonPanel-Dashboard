@@ -5,7 +5,7 @@ export type Preferences = {
   density: "comfortable" | "compact";
   reduceMotion: boolean;
   timezone: "America/Sao_Paulo";
-  telemetryInterval: 50 | 100 | 250 | 500 | 1000;
+  telemetryInterval: 250 | 500 | 1000;
   chartWindowMs: 30_000 | 60_000 | 300_000 | 600_000;
   chartStyle: "area" | "line";
   chartCurve: "smooth" | "straight" | "step";
@@ -27,7 +27,7 @@ const defaults: Preferences = {
   reduceMotion: false,
   timezone: "America/Sao_Paulo",
   skinProvider: "auto",
-  telemetryInterval: 100,
+  telemetryInterval: 250,
   chartWindowMs: 60_000,
   chartStyle: "area",
   chartCurve: "smooth",
@@ -46,7 +46,7 @@ function read(): Preferences {
     const merged = { ...defaults, ...raw };
     if (raw.telemetryInterval === undefined && raw.skinProvider === "crafatar")
       merged.skinProvider = "auto";
-    if (![50, 100, 250, 500, 1000].includes(merged.telemetryInterval))
+    if (![250, 500, 1000].includes(merged.telemetryInterval))
       merged.telemetryInterval = defaults.telemetryInterval;
     // PlexonPanel operational timestamps use one canonical display zone so
     // browser locale/OS settings cannot make Console and telemetry disagree.
