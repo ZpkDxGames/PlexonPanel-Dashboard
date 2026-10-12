@@ -534,6 +534,10 @@ export const session = {
         receivedAt: raw.receipts?.service,
         connected: true,
         now: Date.now(),
+        expectedIntervalMs:
+          typeof raw.service.sourceIntervalMillis === "number"
+            ? raw.service.sourceIntervalMillis
+            : undefined,
       });
       if (!current.usable)
         return "Wait for current Host service evidence before starting or stopping.";
