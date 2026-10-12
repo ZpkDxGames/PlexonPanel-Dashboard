@@ -619,7 +619,7 @@ export function ConsoleView({
                 ? "view paused"
                 : "live ingestion"
               : "history retained"}{" "}
-            · {receiptLabel}
+            · {receiptLabel} · São Paulo time
           </span>
         </div>
       )}
