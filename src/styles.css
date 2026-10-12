@@ -5,6 +5,11 @@
     sans-serif;
   --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
 }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
 html,
 body,
 #root {
@@ -2203,6 +2208,12 @@ td code {
     grid-template-columns: 1fr;
     padding: 20px;
   }
+  .backup-health-copy,
+  .backup-summary-grid,
+  .backup-create {
+    grid-column: 1;
+    grid-row: auto;
+  }
   .backup-summary-grid {
     grid-template-columns: repeat(4, minmax(110px, 1fr));
     overflow-x: auto;
@@ -2653,6 +2664,9 @@ td code {
 @media (max-width: 480px) {
   .context-bar {
     padding-inline: 10px;
+  }
+  .context-actions .theme-toggle {
+    display: none;
   }
   .server-context {
     flex: 1;
@@ -3763,6 +3777,25 @@ input[type="file"]::file-selector-button:hover {
 }
 .access-data-grid {
   margin-top: 0;
+}
+
+@media (max-width: 1280px) {
+  .backup-control-hero {
+    grid-template-columns: minmax(0, 1fr) 240px;
+  }
+  .backup-health-copy {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .backup-create {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .backup-summary-grid {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 980px) {
