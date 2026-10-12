@@ -82,6 +82,11 @@ export interface ControlState {
   service: JsonMap;
   worlds: JsonMap[];
   inventoryIds?: { players?: string; plugins?: string };
+  inventoryCapturedAt?: {
+    players?: string;
+    plugins?: string;
+    worlds?: string;
+  };
   pendingPlayerSnapshot?: {
     snapshotId: string;
     capturedAt: string;
@@ -105,6 +110,9 @@ export interface ControlState {
     paperSystem?: number;
     hostSystem?: number;
     service?: number;
+    players?: number;
+    plugins?: number;
+    worlds?: number;
   };
   cached: boolean;
 }
@@ -201,6 +209,15 @@ export function applyControlMessage(
           state.ready?.server.hostSession === ready.server.hostSession
             ? state.receipts?.service
             : undefined,
+        players: preserveRoster ? state.receipts?.players : undefined,
+        plugins:
+          ready.agents.paper && samePaperSession && !state.cached
+            ? state.receipts?.plugins
+            : undefined,
+        worlds:
+          ready.agents.paper && samePaperSession && !state.cached
+            ? state.receipts?.worlds
+            : undefined,
       },
       updatedAt: Date.now(),
       paperConnectedAt: ready.agents.paper
@@ -229,9 +246,22 @@ export function applyControlMessage(
           ? state.service
           : {},
       players: preserveRoster ? state.players : [],
-      inventoryIds: preserveRoster
-        ? state.inventoryIds
-        : { ...state.inventoryIds, players: undefined },
+      worlds:
+        ready.agents.paper && samePaperSession && !state.cached
+          ? state.worlds
+          : [],
+      plugins:
+        ready.agents.paper && samePaperSession && !state.cached
+          ? state.plugins
+          : [],
+      inventoryIds:
+        ready.agents.paper && samePaperSession && !state.cached
+          ? state.inventoryIds
+          : { players: undefined, plugins: undefined },
+      inventoryCapturedAt:
+        ready.agents.paper && samePaperSession && !state.cached
+          ? state.inventoryCapturedAt
+          : undefined,
       pendingPlayerSnapshot: undefined,
       presenceDeltas: preserveRoster ? (state.presenceDeltas ?? []) : [],
       presenceEventIds: preserveRoster ? (state.presenceEventIds ?? []) : [],
@@ -279,18 +309,38 @@ export function applyControlMessage(
         [kind === "HOST" ? "hostSystem" : "paperSystem"]: receivedAt,
       };
       break;
-    case "telemetry.worlds":
+    case "telemetry.worlds": {
+      if (
+        capturedBefore(
+          body.capturedAt,
+          state.inventoryCapturedAt?.worlds,
+        )
+      )
+        return state;
       next.worlds = records(body.worlds, 64);
+      next.inventoryCapturedAt = {
+        ...state.inventoryCapturedAt,
+        worlds: str(body.capturedAt, ""),
+      };
+      next.receipts = { ...next.receipts, worlds: receivedAt };
       break;
+    }
     case "inventory.players": {
       const offset = number(body.offset) ?? 0;
       if (!Number.isSafeInteger(offset) || typeof body.snapshotId !== "string")
+        return state;
+      const capturedAt = str(body.capturedAt, "");
+      if (
+        offset === 0 &&
+        (capturedBefore(capturedAt, state.inventoryCapturedAt?.players) ||
+          capturedBefore(capturedAt, state.pendingPlayerSnapshot?.capturedAt))
+      )
         return state;
       let pending =
         offset === 0
           ? {
               snapshotId: body.snapshotId,
-              capturedAt: str(body.capturedAt, ""),
+              capturedAt,
               agentSession,
               players: [] as JsonMap[],
             }
@@ -326,12 +376,20 @@ export function applyControlMessage(
         ...state.inventoryIds,
         players: body.snapshotId,
       };
+      next.inventoryCapturedAt = {
+        ...state.inventoryCapturedAt,
+        players: pending.capturedAt,
+      };
+      next.receipts = { ...next.receipts, players: receivedAt };
       break;
     }
     case "inventory.plugins": {
       const offset = number(body.offset) ?? 0;
+      const capturedAt = str(body.capturedAt, "");
       if (
         !Number.isSafeInteger(offset) ||
+        (offset === 0 &&
+          capturedBefore(capturedAt, state.inventoryCapturedAt?.plugins)) ||
         (offset &&
           (state.inventoryIds?.plugins !== body.snapshotId ||
             state.plugins.length !== offset))
@@ -345,6 +403,13 @@ export function applyControlMessage(
         ...state.inventoryIds,
         plugins: str(body.snapshotId),
       };
+      if (body.complete === true) {
+        next.inventoryCapturedAt = {
+          ...state.inventoryCapturedAt,
+          plugins: capturedAt,
+        };
+        next.receipts = { ...next.receipts, plugins: receivedAt };
+      }
       break;
     }
     case "players.presence": {
@@ -462,6 +527,11 @@ export function applyControlMessage(
 function supersededCapture(previous: JsonMap, incoming: JsonMap): boolean {
   const before = capturedAtMillis(previous.capturedAt);
   const after = capturedAtMillis(incoming.capturedAt);
+  return before !== null && (after === null || after < before);
+}
+function capturedBefore(incoming: unknown, previous: unknown): boolean {
+  const after = capturedAtMillis(incoming);
+  const before = capturedAtMillis(previous);
   return before !== null && (after === null || after < before);
 }
 export function safeCache(state: ControlState): ControlState {
