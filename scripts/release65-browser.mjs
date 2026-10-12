@@ -126,6 +126,7 @@ try {
               const el = /** @type {HTMLElement} */ (node);
               const rect = el.getBoundingClientRect();
               if (
+                el.classList.contains("sr-only") ||
                 rect.width < 1 ||
                 rect.height < 1 ||
                 rect.bottom <= 0 ||
