@@ -238,6 +238,136 @@ button {
 .source-chip svg {
   width: 14px;
 }
+.runtime-menu {
+  position: relative;
+  flex: none;
+}
+.runtime-menu > summary {
+  list-style: none;
+}
+.runtime-menu > summary::-webkit-details-marker {
+  display: none;
+}
+.runtime-summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 38px;
+  max-width: 190px;
+  padding: 7px 10px;
+  border: 1px solid var(--line);
+  border-radius: 99px;
+  background: var(--surface);
+  color: var(--t2);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+  transition:
+    border-color var(--duration-hover) var(--ease),
+    background var(--duration-hover) var(--ease),
+    transform var(--duration-press) var(--ease);
+}
+.runtime-summary:hover,
+.runtime-menu[open] .runtime-summary {
+  border-color: var(--line-strong);
+  background: var(--surface-raise);
+}
+.runtime-summary:active {
+  transform: scale(0.98);
+}
+.runtime-summary > i,
+.runtime-row span > i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--t3);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--t3) 12%, transparent);
+  flex: none;
+}
+.runtime-menu[data-tone="ok"] .runtime-summary > i,
+.runtime-row span > i.ok {
+  background: var(--ok);
+  box-shadow: 0 0 0 3px var(--ok-bg);
+}
+.runtime-menu[data-tone="warn"] .runtime-summary > i,
+.runtime-row span > i.warn {
+  background: var(--warn);
+  box-shadow: 0 0 0 3px var(--warn-bg);
+}
+.runtime-menu[data-tone="bad"] .runtime-summary > i,
+.runtime-row span > i.bad {
+  background: var(--bad);
+  box-shadow: 0 0 0 3px var(--bad-bg);
+}
+.runtime-summary-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.runtime-summary svg {
+  width: 12px;
+  flex: none;
+  transition: transform var(--duration-hover) var(--ease);
+}
+.runtime-menu[open] .runtime-summary svg {
+  transform: rotate(90deg);
+}
+.runtime-card {
+  position: absolute;
+  z-index: 80;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 310px;
+  padding: 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-md);
+  background: var(--surface-raise);
+  box-shadow: var(--shadow-hover);
+  backdrop-filter: var(--blur);
+}
+.runtime-card-head {
+  display: grid;
+  gap: 2px;
+  padding: 2px 4px 10px;
+  border-bottom: 1px solid var(--line);
+}
+.runtime-card-head strong {
+  color: var(--t1);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.runtime-card-head span {
+  color: var(--t3);
+  font-size: 11px;
+}
+.runtime-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  min-height: 34px;
+  padding: 6px 4px;
+  border-bottom: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+  font-size: 12px;
+}
+.runtime-row:last-child {
+  border-bottom: 0;
+}
+.runtime-row span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--t2);
+  min-width: 0;
+}
+.runtime-row b {
+  color: var(--t1);
+  font-size: 11px;
+  text-align: right;
+  max-width: 160px;
+  overflow-wrap: anywhere;
+}
 .workspace {
   padding: 26px 32px 56px;
   max-width: 1680px;
@@ -1638,6 +1768,22 @@ td code {
   .server-context .crumb-label,
   .source-chip {
     display: none;
+  }
+  .runtime-summary {
+    width: 40px;
+    max-width: 40px;
+    padding: 9px;
+    justify-content: center;
+  }
+  .runtime-summary-label,
+  .runtime-summary svg {
+    display: none;
+  }
+  .runtime-card {
+    position: fixed;
+    top: 62px;
+    right: 12px;
+    width: min(310px, calc(100vw - 24px));
   }
   .workspace {
     padding: 20px 18px 96px;
