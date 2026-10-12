@@ -8,6 +8,7 @@ import { session, type Prepared } from "../adapter/session";
 import { ActionReview } from "../features/ActionReview";
 import { useNow, useSession } from "../hooks";
 import {
+  isServerConfirmationRequired,
   normalizeConsoleCommand,
   parseCommandHistory,
   recordCommand,
@@ -384,7 +385,7 @@ export function ConsoleView({
       }
       setSending(true);
       const completion = await session.execute(nextPrepared);
-      if (completion.code === "CONFIRMATION_REQUIRED") {
+      if (isServerConfirmationRequired(completion)) {
         // ALLOWLIST_WITH_CONFIRMATION is a server policy, not a Dashboard guess.
         // Re-open the exact prepared target and require a second explicit dispatch.
         setPreparedCommand(normalized);
