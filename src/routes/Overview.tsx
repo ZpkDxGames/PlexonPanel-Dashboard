@@ -23,13 +23,16 @@ import { duration, relative } from "../lib/format";
 import { sampleStats, windowStart } from "../lib/chart";
 import { groupLogs } from "../lib/log-parser";
 import { navigate } from "../router";
+import { preferences, usePreferences } from "../store/preferences";
+import { playerPingMillis } from "../lib/player-telemetry";
 export default function Overview() {
   const snap = useSession(),
     now = useNow(),
-    state = snap.state;
+    state = snap.state,
+    prefs = usePreferences(),
+    windowMs = prefs.chartWindowMs;
   const [prepared, setPrepared] = useState<Prepared | null>(null),
-    [selected, setSelected] = useState<MetricKey>("tps"),
-    [minutes, setMinutes] = useState(5);
+    [selected, setSelected] = useState<MetricKey>("tps");
   const paper = sourceStatus(
     state,
     "Paper",
@@ -60,10 +63,10 @@ export default function Overview() {
       state.history.slice(
         windowStart(
           state.history,
-          (state.history.at(-1)?.at ?? now) - minutes * 60000,
+          (state.history.at(-1)?.at ?? now) - windowMs,
         ),
       ),
-    [state.history, minutes],
+    [state.history, windowMs],
   );
   const key = selected,
     values = samples
@@ -301,16 +304,28 @@ export default function Overview() {
                   </button>
                 ))}
               </Segmented>
-              <Segmented label={copy.range_a16c5} value={minutes}>
-                {[1, 5, 15].map((m) => (
+              <Segmented label={copy.range_a16c5} value={windowMs}>
+                {[
+                  [30_000, "30s"],
+                  [60_000, "1min"],
+                  [300_000, "5min"],
+                  [600_000, "10min"],
+                ].map(([value, label]) => (
                   <button
-                    key={m}
-                    className={minutes === m ? "active" : ""}
-                    aria-pressed={minutes === m}
-                    onClick={() => setMinutes(m)}
+                    key={value}
+                    className={windowMs === value ? "active" : ""}
+                    aria-pressed={windowMs === value}
+                    onClick={() =>
+                      preferences.update({
+                        chartWindowMs: value as
+                          | 30_000
+                          | 60_000
+                          | 300_000
+                          | 600_000,
+                      })
+                    }
                   >
-                    {m}
-                    {copy._min_f4e8a}
+                    {label}
                   </button>
                 ))}
               </Segmented>
@@ -337,7 +352,7 @@ export default function Overview() {
             <TimeSeries
               title={metricName}
               samples={samples}
-              windowMs={minutes * 60_000}
+              windowMs={windowMs}
               live={online && metricLive}
               threshold={key === "tps" ? 18 : key === "mspt" ? 50 : undefined}
               series={[{ key, label: metricName, unit: metricUnit, color }]}
@@ -377,10 +392,10 @@ export default function Overview() {
                     </small>
                   </div>
                   <span
-                    className={`ping ${(number(p.ping) ?? 0) > 100 ? "high" : (number(p.ping) ?? 0) > 70 ? "mid" : ""}`}
+                    className={`ping ${(playerPingMillis(p) ?? 0) > 100 ? "high" : (playerPingMillis(p) ?? 0) > 70 ? "mid" : ""}`}
                   >
                     <i />
-                    {number(p.ping) ?? "—"}
+                    {playerPingMillis(p) ?? "—"}
                     {copy._ms_c980f}
                   </span>
                 </div>
