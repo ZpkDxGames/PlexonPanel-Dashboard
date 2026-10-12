@@ -228,6 +228,30 @@ test("new Paper session clears roster and receipts, Host online survives stopped
   assert.equal(next.ready?.agents.host, true);
   assert.equal(next.server.tps, undefined);
 });
+test("console batches are stamped with browser receipt time", () => {
+  const state = makeFixture();
+  const before = Date.now();
+  const next = applyControlMessage(state, {
+    type: "server.event",
+    serverId: state.serverId,
+    agentKind: "HOST",
+    agentSession: "fixture-host",
+    eventType: "console.lines",
+    body: {
+      lines: [
+        {
+          capturedAt: new Date(0).toISOString(),
+          level: "INFO",
+          source: "HOST_JOURNAL",
+          content: "receipt evidence",
+          journalCursor: "s=receipt;i=1",
+        },
+      ],
+    },
+  });
+  assert.equal(typeof next.console.at(-1)?.receivedAt, "number");
+  assert.ok((next.console.at(-1)?.receivedAt as number) >= before);
+});
 test("control histories and high-rate console are bounded", () => {
   let state = makeFixture();
   for (let i = 0; i < 40; i++) {
