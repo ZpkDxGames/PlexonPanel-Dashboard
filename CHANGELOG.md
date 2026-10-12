@@ -3,6 +3,8 @@
 - Consolidated action authorization so a verified Owner receives every scope in the negotiated Dashboard contract. Console commands now select the capable Paper action target even when Host supplies the visible journal stream.
 - Rebuilt time-series presentation around fixed time windows, stable axes that recover after old spikes, responsive ticks, richer gradients, current-value legends and sample-snapped per-chart inspection.
 - Made the shell use explicit top-bar/content rows, removed the Console title overlap, reduced fragile viewport-height assumptions and added compact-width/short-height layouts.
+- Completed the Console interaction pass: ordinary commands dispatch immediately, destructive commands retain typed review, and completed per-server history can be recalled, removed or cleared without losing the unfinished draft.
+- Fixed lifecycle review so Stop and Restart forward the required confirmed flag to both fixture and live action dispatch instead of reopening as an unconfirmed operation.
 - Refined cards, controls, plot surfaces and light/dark depth with the existing prototype tokens. Removed the obsolete Files-route style layer and normalized the remaining shared CSS.
 - Added 6.5.0 visual, overflow, accessibility, motion and owner-permission regression coverage. Existing endpoints, signed action dispatch, server identity and Vercel deployment shape remain unchanged.
 

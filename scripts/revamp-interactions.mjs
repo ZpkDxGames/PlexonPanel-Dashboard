@@ -73,6 +73,63 @@ try {
     (await input.inputValue()).startsWith("save-all"),
     "Tab completion",
   );
+  await input.fill("list");
+  await input.press("Enter");
+  await p.waitForFunction(() => {
+    const key = Object.keys(localStorage).find((item) =>
+      item.startsWith("plexon:commands:"),
+    );
+    return key && JSON.parse(localStorage.getItem(key) ?? "[]")[0] === "list";
+  });
+  check(
+    "Safe console command dispatches without a dialog",
+    (await p.locator("dialog[open]").count()) === 0 &&
+      (await input.inputValue()) === "",
+    "Completed command was sent and input cleared",
+  );
+  await input.fill("draft command");
+  await input.press("ArrowUp");
+  const recalled = await input.inputValue();
+  await input.press("ArrowDown");
+  check(
+    "History arrows restore the unfinished draft",
+    recalled === "list" && (await input.inputValue()) === "draft command",
+    JSON.stringify({ recalled, restored: await input.inputValue() }),
+  );
+  await p.locator(".command-history summary").click();
+  check(
+    "Command history exposes completed entries",
+    (await p.locator(".history-recall", { hasText: "/list" }).count()) === 1,
+    "Per-server history menu",
+  );
+  const historyAxe = await new AxeBuilder({ page: p })
+    .include(".con-foot")
+    .analyze();
+  check(
+    "Console input and history have no axe violations",
+    historyAxe.violations.length === 0,
+    JSON.stringify(historyAxe.violations.map((item) => item.id)),
+  );
+  await mkdir("docs/revamp/6.5.0", { recursive: true });
+  await p.screenshot({
+    path: "docs/revamp/6.5.0/console-history-fixed.png",
+    fullPage: true,
+  });
+  await p.locator(".history-recall", { hasText: "/list" }).click();
+  check(
+    "History entry recalls without executing",
+    (await input.inputValue()) === "list",
+    await input.inputValue(),
+  );
+  await p.locator(".command-history summary").click();
+  await p.getByRole("button", { name: "Clear all", exact: true }).click();
+  check(
+    "Command history can be cleared per server",
+    (await p.locator(".command-history summary").textContent())?.includes(
+      "History 0",
+    ),
+    "History count returned to zero",
+  );
   await input.fill("stop");
   await input.press("Enter");
   await p.locator("dialog[open]").waitFor();
@@ -87,6 +144,18 @@ try {
     "Destructive action is not focused",
   );
   await p.getByRole("button", { name: "Cancel", exact: true }).click();
+  check(
+    "Cancelled command is not written to history",
+    !(await p.evaluate(() => {
+      const key = Object.keys(localStorage).find((item) =>
+        item.startsWith("plexon:commands:"),
+      );
+      return (
+        key && JSON.parse(localStorage.getItem(key) ?? "[]").includes("stop")
+      );
+    })),
+    "Only completed commands are retained",
+  );
   const security = await p.evaluate(async () => {
     const { session } = await import("/src/adapter/session.ts");
     const { makeFixture, fixtureAction } =
@@ -148,8 +217,50 @@ try {
     JSON.stringify(burst),
   );
   await p.evaluate(() => (location.hash = "Overview"));
+  await p.getByRole("button", { name: "Stop", exact: true }).click();
+  await p.locator("dialog[open]").waitFor();
+  check(
+    "Stop uses one review without redundant typed confirmation",
+    (await p.locator("dialog[open] input").count()) === 0,
+    "Lifecycle confirmation is the review dialog itself",
+  );
+  await p.screenshot({
+    path: "docs/revamp/6.5.0/lifecycle-confirm-fixed.png",
+    fullPage: true,
+  });
+  await p
+    .getByRole("button", { name: "Confirm & dispatch", exact: true })
+    .click();
+  await p.getByText("Server result received").waitFor();
+  const stopAction = await p.evaluate(async () => {
+    const { actionLog } = await import("/src/development/fixtures.ts");
+    return actionLog.at(-1);
+  });
+  check(
+    "Stop sends the required agent confirmation",
+    stopAction?.action === "server.stop" &&
+      stopAction?.parameters?.confirmed === true,
+    JSON.stringify(stopAction),
+  );
+  await p.getByRole("button", { name: "Close", exact: true }).click();
+  await p.getByRole("button", { name: "Restart", exact: true }).click();
+  await p
+    .getByRole("button", { name: "Confirm & dispatch", exact: true })
+    .click();
+  await p.getByText("Server result received").waitFor();
+  const restartAction = await p.evaluate(async () => {
+    const { actionLog } = await import("/src/development/fixtures.ts");
+    return actionLog.at(-1);
+  });
+  check(
+    "Restart sends the required agent confirmation",
+    restartAction?.action === "server.restart" &&
+      restartAction?.parameters?.confirmed === true,
+    JSON.stringify(restartAction),
+  );
+  await p.getByRole("button", { name: "Close", exact: true }).click();
   await p.waitForFunction(() => {
-    const thumb = document.querySelector('.segmented .thumb');
+    const thumb = document.querySelector(".segmented .thumb");
     return thumb && thumb.getBoundingClientRect().width > 0;
   });
   await p.waitForTimeout(500);
@@ -206,10 +317,10 @@ try {
     });
     await new Promise((r) => setTimeout(r, 150));
     const intermediate = document.querySelectorAll(".kpi-value")[1].textContent;
-    const path=document.querySelector('.time-series .chart-line');
-    const beforePath=path.getAttribute('d');
-    await new Promise(r=>setTimeout(r,60));
-    const flow=beforePath!==path.getAttribute('d');
+    const path = document.querySelector(".time-series .chart-line");
+    const beforePath = path.getAttribute("d");
+    await new Promise((r) => setTimeout(r, 60));
+    const flow = beforePath !== path.getAttribute("d");
     for (
       let i = 0;
       i < 30 &&
@@ -279,9 +390,9 @@ try {
   console.log(JSON.stringify(checks, null, 2));
 } finally {
   s.kill();
-  await mkdir("docs/revamp/refinement", { recursive: true });
+  await mkdir("docs/revamp/6.5.0", { recursive: true });
   await writeFile(
-    "docs/revamp/refinement/retained-interactions.json",
+    "docs/revamp/6.5.0/retained-interactions.json",
     JSON.stringify(checks, null, 2),
   );
 }

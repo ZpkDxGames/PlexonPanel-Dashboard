@@ -1,0 +1,82 @@
+[
+  {
+    "name": "Removed pages leave navigation",
+    "pass": true,
+    "details": ""
+  },
+  {
+    "name": "Hover is local to one chart",
+    "pass": true,
+    "details": ""
+  },
+  {
+    "name": "Skin provider fallback loads an image response (stubbed providers)",
+    "pass": true,
+    "details": ""
+  },
+  {
+    "name": "Custom dropdown keyboard selection",
+    "pass": true,
+    "details": ""
+  },
+  {
+    "name": "Accent applies",
+    "pass": true,
+    "details": ""
+  },
+  {
+    "name": "Settings including custom dropdowns has no axe violations",
+    "pass": true,
+    "details": "[]"
+  },
+  {
+    "name": "Selected server icon replaces panel logo",
+    "pass": true,
+    "details": ""
+  },
+  {
+    "name": "Live geometry changes smoothly without wrapper restart",
+    "pass": true,
+    "details": "{\"endpointError\":0.004746444215257384,\"axisBefore\":\"21.0,20.0,19.0,18.0,17.0\",\"axisAfter\":\"21.0,20.0,19.0,18.0,17.0\",\"distinct\":9,\"firstChange\":148.10000000009313,\"elapsed\":466.20000000018626,\"wrapperAnimations\":0}"
+  },
+  {
+    "name": "Live point follows the interpolated line",
+    "pass": true,
+    "details": "{\"endpointError\":0.004746444215257384,\"axisBefore\":\"21.0,20.0,19.0,18.0,17.0\",\"axisAfter\":\"21.0,20.0,19.0,18.0,17.0\",\"distinct\":9,\"firstChange\":148.10000000009313,\"elapsed\":466.20000000018626,\"wrapperAnimations\":0}"
+  },
+  {
+    "name": "Small telemetry changes do not rescale axes",
+    "pass": true,
+    "details": "{\"endpointError\":0.004746444215257384,\"axisBefore\":\"21.0,20.0,19.0,18.0,17.0\",\"axisAfter\":\"21.0,20.0,19.0,18.0,17.0\",\"distinct\":9,\"firstChange\":148.10000000009313,\"elapsed\":466.20000000018626,\"wrapperAnimations\":0}"
+  },
+  {
+    "name": "Default display buffering responds in under 500ms",
+    "pass": true,
+    "details": "{\"endpointError\":0.004746444215257384,\"axisBefore\":\"21.0,20.0,19.0,18.0,17.0\",\"axisAfter\":\"21.0,20.0,19.0,18.0,17.0\",\"distinct\":9,\"firstChange\":148.10000000009313,\"elapsed\":466.20000000018626,\"wrapperAnimations\":0}"
+  },
+  {
+    "name": "Activity replaces duplicated console",
+    "pass": true,
+    "details": ""
+  },
+  {
+    "name": "Activity excludes ordinary output and chat",
+    "pass": true,
+    "details": ""
+  },
+  {
+    "name": "Activity filters world generation incidents",
+    "pass": true,
+    "details": ""
+  },
+  {
+    "name": "Selected server icons cannot cross instance boundaries",
+    "pass": true,
+    "details": ""
+  },
+  {
+    "name": "No runtime errors",
+    "pass": true,
+    "details": "[]"
+  }
+]

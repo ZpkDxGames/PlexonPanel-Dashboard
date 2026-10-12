@@ -1,0 +1,137 @@
+[
+  {
+    "name": "Palette filters and Enter navigates",
+    "pass": true,
+    "detail": "Worlds route rendered"
+  },
+  {
+    "name": "Console search filters",
+    "pass": true,
+    "detail": "One WorldGuard entry"
+  },
+  {
+    "name": "Trace expands",
+    "pass": true,
+    "detail": "Grouped trace visible"
+  },
+  {
+    "name": "Autocomplete fills command",
+    "pass": true,
+    "detail": "Tab completion"
+  },
+  {
+    "name": "Safe console command dispatches without a dialog",
+    "pass": true,
+    "detail": "Completed command was sent and input cleared"
+  },
+  {
+    "name": "History arrows restore the unfinished draft",
+    "pass": true,
+    "detail": "{\"recalled\":\"list\",\"restored\":\"draft command\"}"
+  },
+  {
+    "name": "Command history exposes completed entries",
+    "pass": true,
+    "detail": "Per-server history menu"
+  },
+  {
+    "name": "Console input and history have no axe violations",
+    "pass": true,
+    "detail": "[]"
+  },
+  {
+    "name": "History entry recalls without executing",
+    "pass": true,
+    "detail": "list"
+  },
+  {
+    "name": "Command history can be cleared per server",
+    "pass": true,
+    "detail": "History count returned to zero"
+  },
+  {
+    "name": "Danger command requires typed confirmation",
+    "pass": true,
+    "detail": "Typed target confirmation present"
+  },
+  {
+    "name": "Cancel receives initial dialog focus",
+    "pass": true,
+    "detail": "Destructive action is not focused"
+  },
+  {
+    "name": "Cancelled command is not written to history",
+    "pass": true,
+    "detail": "Only completed commands are retained"
+  },
+  {
+    "name": "Untrusted Overview is inert",
+    "pass": true,
+    "detail": "Injected markup remained text"
+  },
+  {
+    "name": "Untrusted Console is inert",
+    "pass": true,
+    "detail": "Injected markup remained text"
+  },
+  {
+    "name": "Untrusted Players is inert",
+    "pass": true,
+    "detail": "Injected markup remained text"
+  },
+  {
+    "name": "100k log burst stays bounded",
+    "pass": true,
+    "detail": "{\"retained\":2500,\"domRows\":16}"
+  },
+  {
+    "name": "Stop uses one review without redundant typed confirmation",
+    "pass": true,
+    "detail": "Lifecycle confirmation is the review dialog itself"
+  },
+  {
+    "name": "Stop sends the required agent confirmation",
+    "pass": true,
+    "detail": "{\"action\":\"server.stop\",\"parameters\":{\"confirmed\":true}}"
+  },
+  {
+    "name": "Restart sends the required agent confirmation",
+    "pass": true,
+    "detail": "{\"action\":\"server.restart\",\"parameters\":{\"confirmed\":true}}"
+  },
+  {
+    "name": "Segmented thumb slides between metrics",
+    "pass": true,
+    "detail": "Metric selection moved the segmented thumb"
+  },
+  {
+    "name": "KPI values tween to real measurements",
+    "pass": true,
+    "detail": "{\"intermediate\":\"19.45\",\"final\":\"18.70\",\"flow\":true}"
+  },
+  {
+    "name": "Live chart morphs between samples",
+    "pass": true,
+    "detail": "Bounded SVG path interpolation observed"
+  },
+  {
+    "name": "JVM tiles use their own source freshness",
+    "pass": true,
+    "detail": "Fresh Paper TPS does not make stale system values fresh"
+  },
+  {
+    "name": "Reduced motion disables looping animations",
+    "pass": true,
+    "detail": "0"
+  },
+  {
+    "name": "Theme toggle persists",
+    "pass": true,
+    "detail": "Stored dark preference"
+  },
+  {
+    "name": "Demo contacts no live relay",
+    "pass": true,
+    "detail": "[]"
+  }
+]

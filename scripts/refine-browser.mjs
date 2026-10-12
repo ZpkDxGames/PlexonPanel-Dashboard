@@ -264,9 +264,9 @@ try {
   check("No runtime errors", errors.length === 0, JSON.stringify(errors));
 } finally {
   server.kill();
-  await mkdir("docs/revamp/refinement", { recursive: true });
+  await mkdir("docs/revamp/6.5.0", { recursive: true });
   await writeFile(
-    "docs/revamp/refinement/interactions.json",
+    "docs/revamp/6.5.0/refinement-interactions.json",
     JSON.stringify(checks, null, 2),
   );
   await b.close();

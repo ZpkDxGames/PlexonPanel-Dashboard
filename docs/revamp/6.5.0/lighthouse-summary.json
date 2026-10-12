@@ -1,0 +1,22 @@
+{
+  "mobile": {
+    "performance": 99,
+    "accessibility": 100,
+    "bestPractices": 100,
+    "fcp": "1.6 s",
+    "lcp": "1.6 s",
+    "tbt": "0 ms",
+    "cls": "0.001",
+    "speedIndex": "1.6 s"
+  },
+  "desktop": {
+    "performance": 100,
+    "accessibility": 100,
+    "bestPractices": 100,
+    "fcp": "0.4 s",
+    "lcp": "0.5 s",
+    "tbt": "0 ms",
+    "cls": "0",
+    "speedIndex": "0.4 s"
+  }
+}

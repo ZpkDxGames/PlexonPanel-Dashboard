@@ -7,6 +7,13 @@ import { Icon } from "./Icon";
 import { session, type Prepared } from "../adapter/session";
 import { ActionReview } from "../features/ActionReview";
 import { useSession } from "../hooks";
+import {
+  normalizeConsoleCommand,
+  parseCommandHistory,
+  recordCommand,
+  removeCommand,
+  requiresTypedConfirmation,
+} from "../lib/console-command";
 const catalogue = [
   ["list", "Players online"],
   ["tps", "Current tick rate"],
@@ -237,35 +244,46 @@ export function ConsoleView({
     [fontSize, setFont] = useState(13),
     [command, setCommand] = useState(""),
     [prepared, setPrepared] = useState<Prepared | null>(null),
+    [preparedCommand, setPreparedCommand] = useState(""),
+    [sending, setSending] = useState(false),
     [error, setError] = useState(""),
     [histIndex, setHistIndex] = useState(-1),
     [history, setHistory] = useState<string[]>([]),
     [suggest, setSuggest] = useState(0);
   const searchRef = useRef<HTMLInputElement>(null),
     commandRef = useRef<HTMLInputElement>(null),
-    container = useRef<HTMLElement>(null);
+    container = useRef<HTMLElement>(null),
+    historyDraft = useRef("");
   const current = sourceLines ?? (paused ? frozen : snap.state.console);
   const entries = useMemo(() => groupLogs(current), [current]);
   const paperCommandReason = session.reason("console.execute", "PAPER");
-  const authority = paperCommandReason
-    ? snap.state.ready?.consoleAuthority === "HOST"
+  const hostCommandReason = session.reason("console.execute", "HOST");
+  const authority = !paperCommandReason
+    ? "PAPER"
+    : !hostCommandReason
       ? "HOST"
-      : "PAPER"
-    : "PAPER";
+      : snap.state.ready?.consoleAuthority === "HOST"
+        ? "HOST"
+        : "PAPER";
   const offline =
     !snap.state.ready?.agents[authority === "HOST" ? "host" : "paper"];
-  const commandReason = session.reason("console.execute", authority);
+  const commandReason =
+    authority === "PAPER" ? paperCommandReason : hostCommandReason;
   useEffect(() => {
     try {
       setHistory(
-        JSON.parse(
-          localStorage.getItem(`plexon:commands:${snap.state.serverId}`) ??
-            "[]",
+        parseCommandHistory(
+          JSON.parse(
+            localStorage.getItem(`plexon:commands:${snap.state.serverId}`) ??
+              "[]",
+          ),
         ),
       );
     } catch {
       setHistory([]);
     }
+    setHistIndex(-1);
+    historyDraft.current = "";
   }, [snap.state.serverId]);
   let expression: RegExp | null = null,
     regexError = "";
@@ -298,28 +316,51 @@ export function ConsoleView({
         .filter(([cmd]) => cmd.startsWith(command.replace(/^\//, "")))
         .slice(0, 5)
     : [];
-  const prepare = (text: string) => {
+  const saveHistory = (next: string[]) => {
+    setHistory(next);
+    try {
+      localStorage.setItem(
+        `plexon:commands:${snap.state.serverId}`,
+        JSON.stringify(next),
+      );
+    } catch {}
+  };
+  const completeCommand = (text: string) => {
+    saveHistory(recordCommand(history, text));
+    setCommand("");
+    setHistIndex(-1);
+    historyDraft.current = "";
+  };
+  const submitCommand = async (text: string) => {
+    const normalized = normalizeConsoleCommand(text);
+    if (!normalized || sending) return;
     try {
       setError("");
-      setPrepared(
-        session.prepare(
-          "console.execute",
-          { command: text.replace(/^\//, "") },
-          authority,
-        ),
+      const nextPrepared = session.prepare(
+        "console.execute",
+        { command: normalized },
+        authority,
       );
-      const next = [text, ...history.filter((c) => c !== text)].slice(0, 200);
-      setHistory(next);
-      try {
-        localStorage.setItem(
-          `plexon:commands:${snap.state.serverId}`,
-          JSON.stringify(next),
-        );
-      } catch {}
+      if (
+        requiresTypedConfirmation(nextPrepared.action, nextPrepared.parameters)
+      ) {
+        setPreparedCommand(normalized);
+        setPrepared(nextPrepared);
+        return;
+      }
+      setSending(true);
+      const completion = await session.execute(nextPrepared);
+      completeCommand(normalized);
+      if (completion.status !== "SUCCESS")
+        setError(completion.message || completion.code || completion.status);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Command unavailable.");
+    } finally {
+      setSending(false);
     }
   };
+  const removeHistory = (commandToRemove: string) =>
+    saveHistory(removeCommand(history, commandToRemove));
   const exportLines = () => {
     const url = URL.createObjectURL(
       new Blob(
@@ -570,7 +611,7 @@ export function ConsoleView({
             className="prompt"
             onSubmit={(e) => {
               e.preventDefault();
-              if (command.trim()) prepare(command.trim());
+              void submitCommand(command);
             }}
           >
             <b>{copy._gt_03c7b}</b>
@@ -578,10 +619,11 @@ export function ConsoleView({
               ref={commandRef}
               aria-label={copy.server_command_72fe4}
               value={command}
-              disabled={offline || Boolean(commandReason)}
+              disabled={offline || Boolean(commandReason) || sending}
               onChange={(e) => {
                 setCommand(e.target.value.replace(/[\r\n]/g, " "));
                 setSuggest(0);
+                if (histIndex < 0) historyDraft.current = e.target.value;
               }}
               placeholder={
                 offline
@@ -598,6 +640,8 @@ export function ConsoleView({
                 }
                 if (e.key === "ArrowUp" || e.key === "ArrowDown") {
                   e.preventDefault();
+                  if (e.key === "ArrowUp" && histIndex < 0)
+                    historyDraft.current = command;
                   const next = Math.max(
                     -1,
                     Math.min(
@@ -606,7 +650,7 @@ export function ConsoleView({
                     ),
                   );
                   setHistIndex(next);
-                  setCommand(next < 0 ? "" : history[next]);
+                  setCommand(next < 0 ? historyDraft.current : history[next]);
                 }
                 if ((e.ctrlKey || e.metaKey) && e.key === "r") {
                   e.preventDefault();
@@ -614,13 +658,20 @@ export function ConsoleView({
                     history.find((h) => h.includes(command)) ?? command,
                   );
                 }
+                if (e.key === "Escape") {
+                  setHistIndex(-1);
+                  setSuggest(0);
+                  setCommand(historyDraft.current);
+                }
               }}
             />
             <button
               type="submit"
-              disabled={!command.trim() || offline || Boolean(commandReason)}
-              title={copy.review_command_7a98f}
-              aria-label={copy.review_command_7a98f}
+              disabled={
+                !command.trim() || offline || Boolean(commandReason) || sending
+              }
+              title={sending ? "Sending command" : "Send command"}
+              aria-label={sending ? "Sending command" : "Send command"}
             >
               <Icon name="send" />
             </button>
@@ -638,15 +689,69 @@ export function ConsoleView({
             ].map((cmd) => (
               <button
                 key={cmd}
-                disabled={offline || Boolean(commandReason)}
+                disabled={offline || Boolean(commandReason) || sending}
                 onClick={() => {
                   setCommand(cmd);
-                  prepare(cmd);
+                  void submitCommand(cmd);
                 }}
               >
                 /{cmd}
               </button>
             ))}
+            <details className="command-history">
+              <summary>
+                <Icon name="clock" /> History {history.length}
+              </summary>
+              <div className="history-menu">
+                <header>
+                  <span>
+                    <strong>Command history</strong>
+                    <small>Completed commands saved on this device</small>
+                  </span>
+                  <button
+                    type="button"
+                    disabled={!history.length}
+                    onClick={() => saveHistory([])}
+                  >
+                    Clear all
+                  </button>
+                </header>
+                {history.length ? (
+                  <div className="history-list">
+                    {history.slice(0, 50).map((item) => (
+                      <div className="history-item" key={item}>
+                        <button
+                          type="button"
+                          className="history-recall"
+                          title={`Recall /${item}`}
+                          onClick={(event) => {
+                            setCommand(item);
+                            setHistIndex(-1);
+                            historyDraft.current = item;
+                            event.currentTarget
+                              .closest("details")
+                              ?.removeAttribute("open");
+                            commandRef.current?.focus();
+                          }}
+                        >
+                          /{item}
+                        </button>
+                        <button
+                          type="button"
+                          className="history-remove"
+                          aria-label={`Remove /${item} from history`}
+                          onClick={() => removeHistory(item)}
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p>No completed commands yet.</p>
+                )}
+              </div>
+            </details>
           </div>
           {error && (
             <p className="console-message" role="alert">
@@ -655,7 +760,20 @@ export function ConsoleView({
           )}
         </footer>
       )}
-      <ActionReview prepared={prepared} onClose={() => setPrepared(null)} />
+      <ActionReview
+        prepared={prepared}
+        onClose={() => {
+          setPrepared(null);
+          setPreparedCommand("");
+        }}
+        onComplete={(completion) => {
+          if (preparedCommand) completeCommand(preparedCommand);
+          if (completion.status !== "SUCCESS")
+            setError(
+              completion.message || completion.code || completion.status,
+            );
+        }}
+      />
     </section>
   );
 }

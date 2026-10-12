@@ -34,3 +34,42 @@ Latest refinement: 84 screenshot/axe cases pass, 16 refinement and 17 retained b
 Fresh captures, cached history, zero, unavailable and offline are distinct. Chart aggregates are sample statistics; daily totals/network/per-core data and tick percentiles are not fabricated. Retained charts cover at most 35 minutes.
 
 Next acceptance: authenticated PlexonCraft/TonimSMP preview, then physical mobile/browser compatibility checks. Local UI threshold is met; production/server certification remains unexecuted.
+
+## PlexonPanel 6.5.0 release report
+
+### Delivered
+
+6.5.0 keeps the eleven-route 6.0 dashboard and makes its telemetry, authority and shell release-safe. Overview, Performance and Fleet now use fixed requested time windows, bounded settling axes, denser width-aware geometry, current-value legends, richer plot surfaces and sample-snapped inspection local to each chart. Charts show only received measurements; interpolated points shape the line without becoming telemetry.
+
+Owner authority now has one resolver. A verified, reconciled Owner receives all 54 scopes known to the negotiated Dashboard contract, and Access reports full control. Console command dispatch selects the capable Paper action target even when Host supplies the visible stream. Agent presence, instance binding, data freshness, capability support, high-risk confirmation and the server's final action result remain enforced.
+
+Console interaction is complete: ordinary commands dispatch without a redundant modal, destructive commands retain typed target confirmation, and only successfully completed commands enter bounded per-server history. Arrow recall restores an unfinished draft; the History control supports recall, individual removal and clear-all. Stop and Restart now send the relay-required `confirmed: true` parameter after their single review dialog.
+
+The shell now has explicit top-bar/content rows, scroll position resets on route changes, bounded Console sizing, compact chart/header/tooltip layouts and corrected mobile gutters. All routes were verified from 320×568 through 1920×1080, including the exact supplied 1577×929 Console viewport. Card highlights, controls and chart depth were refined within the supplied token system; obsolete Files-route CSS and the superseded authority helper were deleted instead of covered by another compatibility layer.
+
+### Feature parity and intentional differences
+
+Pairing, stored credentials, relay endpoints, signed actions, selected-server generation binding, lifecycle/player/chat/backup/device flows, Console Plugins and Vercel's static Vite deployment shape are unchanged. Files and standalone Plugins remain intentionally absent at the owner's request. `#Logs` remains the compact Activity destination for join/leave, world-generation and backup-critical events.
+
+Verified Owner means full client-side scope for all actions in the current contract; it does not manufacture a backend handler. An immutable credential created by an older server can still receive an authoritative server-side `SCOPE_DENIED`. Re-pair that Owner after the Core grant migration if this occurs.
+
+### Dependencies
+
+No runtime dependency was added. The release stays on React/Vite/TypeScript with project-owned SVG charts and the existing Motion package. Browser and Lighthouse runtimes are QA-only.
+
+### Run, build, deploy and demo
+
+Use Node 24: `npm ci`, `npm run dev`, `npm run check`, `npm run build`. For design review, open `http://127.0.0.1:4173/?demo=1`; append `&idle=1` or `&offline=1` and select either theme. Demo/styleguide code is compile-time gated out of production and never supplies production values. Run `npm run test:revamp`, `npm run test:refinement`, `npm run test:release65` and `npm run test:perf` for the recorded checks. `npx vite preview` serves the production bundle locally; Vercel continues to publish `dist` with the existing CSP and relay configuration.
+
+### Verification result
+
+All eleven pages pass the independent visual gate at 45–49/50 with no category below 4. The final 132-screen matrix has no overflow, runtime errors or axe violations; the 88-case viewport sweep has no failures. All 56 unit/contract tests, 43 retained/refinement browser checks and the production build pass. The post-fix Console review remains 47/50 and confirms the mobile input/history/macros/navigation fit without severed controls. Lighthouse on the production bundle is 99/100/100 mobile and 100/100/100 desktop. Initial-route JavaScript is 99,871 bytes gzip against the 180 KiB budget.
+
+### Known limitations and next steps
+
+- No paired live VPS session was available, so real Host telemetry, server-side Owner migration, live skin-provider resolution and signed server-icon transfer still need an authenticated acceptance pass.
+- The current Host schema does not provide per-core CPU, network throughput or disk I/O rates. Add those fields to the relayer/Core contract before exposing them; the dashboard deliberately does not infer them.
+- Run a final physical-device, Safari/Firefox and screen-reader pass. Mobile wide tables are contained and labelled but still require horizontal swipe.
+- Retained in-browser history is at most 35 minutes. Long-range charts require a server-side history endpoint or metrics store.
+
+Release references: [audit](REVAMP_AUDIT.md), [design system](DESIGN_SYSTEM.md), [review and scores](REVAMP_REVIEW.md), [changelog](../CHANGELOG.md), [6.5 screenshots](revamp/6.5.0/final), [6.0 before](revamp/before) and [6.0 final](revamp/after).

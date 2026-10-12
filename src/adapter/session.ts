@@ -36,11 +36,30 @@ import {
 } from "./browser-store";
 import { FleetFeed, type FleetSnapshot } from "./fleet-feed";
 import { classifyTelemetry } from "./telemetry-freshness";
-import { browserRelayConfiguration, saveRelayPreference, RelayConfigurationError, type RelayConfiguration } from "./relay-config";
+import {
+  browserRelayConfiguration,
+  saveRelayPreference,
+  RelayConfigurationError,
+  type RelayConfiguration,
+} from "./relay-config";
 import { deadlineDelay } from "./deadline";
 export type Kind = "HOST" | "PAPER";
 export function connectionPhaseLabel(phase: string): string {
-  return ({"configuration-required": "Configure relay", "storage-error": "Browser storage blocked", revoked: "Pairing revoked or expired", incompatible: "Incompatible relay session", unpaired: "Not paired", pairing: "Pairing browser", connecting: "Connecting", reconnecting: "Reconnecting", live: "Relay connected"} as Record<string, string>)[phase] ?? phase;
+  return (
+    (
+      {
+        "configuration-required": "Configure relay",
+        "storage-error": "Browser storage blocked",
+        revoked: "Pairing revoked or expired",
+        incompatible: "Incompatible relay session",
+        unpaired: "Not paired",
+        pairing: "Pairing browser",
+        connecting: "Connecting",
+        reconnecting: "Reconnecting",
+        live: "Relay connected",
+      } as Record<string, string>
+    )[phase] ?? phase
+  );
 }
 export type SessionSnapshot = {
   initialized: boolean;
@@ -77,7 +96,7 @@ let snapshot: SessionSnapshot = {
   fleet: [],
   fixture: "",
   grant: null,
-  relay: {origin: "", source: "unconfigured", error: ""},
+  relay: { origin: "", source: "unconfigured", error: "" },
 };
 let socket: WebSocket | null = null,
   retry: ReturnType<typeof setTimeout> | undefined,
@@ -130,7 +149,11 @@ function receive(message: JsonMap) {
     !String(message.eventType).startsWith("telemetry.")
   )
     flush();
-  else if (!publishTimer) publishTimer = setTimeout(flush, preferences.getSnapshot().telemetryInterval);
+  else if (!publishTimer)
+    publishTimer = setTimeout(
+      flush,
+      preferences.getSnapshot().telemetryInterval,
+    );
 }
 async function connect(credential: RelayCredential, revision: number) {
   const sequence = ++connection;
@@ -210,7 +233,11 @@ async function connect(credential: RelayCredential, revision: number) {
           const server = record(message.server),
             agents = record(message.agents);
           bindLiveSocket(candidate, grant.serverId, {
-            authorization: JSON.stringify({deviceId:reported.deviceId,role:reported.role,scopes:reported.scopes}),
+            authorization: JSON.stringify({
+              deviceId: reported.deviceId,
+              role: reported.role,
+              scopes: reported.scopes,
+            }),
             PAPER: JSON.stringify({
               session: server.paperSession,
               connected: agents.paper,
@@ -278,7 +305,10 @@ async function connect(credential: RelayCredential, revision: number) {
               : snapshot.error
             : `Relay WebSocket closed before telemetry was ready (code ${event.code || 1006}).`,
       });
-      if (incompatible) { publish({phase: "incompatible"}); return; }
+      if (incompatible) {
+        publish({ phase: "incompatible" });
+        return;
+      }
       if (expired || event.code === 4003) {
         publish({
           phase: "revoked",
@@ -293,12 +323,23 @@ async function connect(credential: RelayCredential, revision: number) {
       );
     };
   } catch (error) {
-    if (stopped || revision !== snapshot.revision || sequence !== connection) return;
-    const terminal = error instanceof RelayConfigurationError ? "configuration-required" :
-      error instanceof DashboardRequestError && (error.status === 401 || error.status === 403) ? "revoked" : "";
+    if (stopped || revision !== snapshot.revision || sequence !== connection)
+      return;
+    const terminal =
+      error instanceof RelayConfigurationError
+        ? "configuration-required"
+        : error instanceof DashboardRequestError &&
+            (error.status === 401 || error.status === 403)
+          ? "revoked"
+          : "";
     publish({
       phase: terminal || "reconnecting",
-      error: error instanceof TypeError ? "The relay could not be reached. Verify its HTTPS endpoint and allow this dashboard origin in the relay configuration." : error instanceof Error ? error.message : "Connection failed",
+      error:
+        error instanceof TypeError
+          ? "The relay could not be reached. Verify its HTTPS endpoint and allow this dashboard origin in the relay configuration."
+          : error instanceof Error
+            ? error.message
+            : "Connection failed",
     });
     if (terminal) return;
     attempt++;
@@ -318,19 +359,32 @@ export const session = {
   getSnapshot: () => snapshot,
   async start() {
     try {
-    const [credentials, selected, labels] = await Promise.all([
-      listRelayCredentials(),
-      loadRelayCredential(),
-      loadServerLabels(),
-    ]);
-    const relay = browserRelayConfiguration(selected);
-    publish({ credentials, labels, relay, error: relay.error, phase: relay.error ? "configuration-required" : "unpaired" });
-    if (selected) await this.select(selected.serverId);
-    else if (!relay.error) configureRelay(relay.origin);
+      const [credentials, selected, labels] = await Promise.all([
+        listRelayCredentials(),
+        loadRelayCredential(),
+        loadServerLabels(),
+      ]);
+      const relay = browserRelayConfiguration(selected);
+      publish({
+        credentials,
+        labels,
+        relay,
+        error: relay.error,
+        phase: relay.error ? "configuration-required" : "unpaired",
+      });
+      if (selected) await this.select(selected.serverId);
+      else if (!relay.error) configureRelay(relay.origin);
     } catch (error) {
-      publish({phase: "storage-error", grant: null, error: error instanceof Error ? error.message : "Browser pairing storage is unavailable."});
+      publish({
+        phase: "storage-error",
+        grant: null,
+        error:
+          error instanceof Error
+            ? error.message
+            : "Browser pairing storage is unavailable.",
+      });
     } finally {
-      publish({initialized: true});
+      publish({ initialized: true });
     }
   },
   async select(id: string) {
@@ -346,16 +400,34 @@ export const session = {
       phase: "connecting",
       error: "",
     });
-    try { await selectRelayCredential(id); } catch (error) {
-      if (snapshot.revision === revision) publish({phase: "revoked", error: error instanceof Error ? error.message : "Stored pairing unavailable."});
+    try {
+      await selectRelayCredential(id);
+    } catch (error) {
+      if (snapshot.revision === revision)
+        publish({
+          phase: "revoked",
+          error:
+            error instanceof Error
+              ? error.message
+              : "Stored pairing unavailable.",
+        });
       return;
     }
     if (snapshot.revision !== revision) return;
     const credential = snapshot.credentials.find((c) => c.serverId === id);
-    if (!credential) { publish({phase: "unpaired", error: "The stored pairing is unavailable. Pair this browser again."}); return; }
+    if (!credential) {
+      publish({
+        phase: "unpaired",
+        error: "The stored pairing is unavailable. Pair this browser again.",
+      });
+      return;
+    }
     const relay = browserRelayConfiguration(credential);
-    publish({relay});
-    if (relay.error) { publish({phase: "configuration-required", error: relay.error}); return; }
+    publish({ relay });
+    if (relay.error) {
+      publish({ phase: "configuration-required", error: relay.error });
+      return;
+    }
     configureRelay(relay.origin);
     fleet.updateRoster(snapshot.credentials, id);
     stopped = false;
@@ -367,12 +439,24 @@ export const session = {
     cleanup();
     fleet.updateRoster([], "");
     connection++;
-    raw = {...raw, ready: null, players: [], receipts: undefined};
+    raw = { ...raw, ready: null, players: [], receipts: undefined };
     const relay = browserRelayConfiguration();
     configureRelay(relay.origin);
-    publish({relay, state: raw, grant: null, revision: snapshot.revision + 1, phase: "pairing", error: ""});
-    try { await pairDashboardServer(code, name); } catch (error) {
-      publish({phase: "unpaired", error: error instanceof Error ? error.message : "Pairing failed."});
+    publish({
+      relay,
+      state: raw,
+      grant: null,
+      revision: snapshot.revision + 1,
+      phase: "pairing",
+      error: "",
+    });
+    try {
+      await pairDashboardServer(code, name);
+    } catch (error) {
+      publish({
+        phase: "unpaired",
+        error: error instanceof Error ? error.message : "Pairing failed.",
+      });
       throw error;
     }
     const credentials = await listRelayCredentials();
@@ -386,7 +470,11 @@ export const session = {
     if (id) await this.select(id);
     else {
       const relay = browserRelayConfiguration();
-      publish({relay, phase: relay.error ? "configuration-required" : "unpaired", error: relay.error});
+      publish({
+        relay,
+        phase: relay.error ? "configuration-required" : "unpaired",
+        error: relay.error,
+      });
       if (!relay.error) configureRelay(relay.origin);
     }
   },
@@ -422,11 +510,26 @@ export const session = {
       return `${kind} instance association is incomplete.`;
     if (!ready.agents[kind === "HOST" ? "host" : "paper"])
       return `${kind === "HOST" ? "Host" : "Paper"} is offline.`;
-    if (kind === "HOST" && (action === "server.start" || action === "server.stop")) {
-      const current = classifyTelemetry({ capturedAt: record(raw.service.resources).capturedAt ?? raw.service.capturedAt, receivedAt: raw.receipts?.service, connected: true, now: Date.now() });
-      if (!current.usable) return "Wait for current Host service evidence before starting or stopping.";
-      if (action === "server.start" && !["inactive", "failed"].includes(String(raw.service.state))) return "Start requires a confirmed stopped service.";
-      if (action === "server.stop" && raw.service.state !== "active") return "Stop requires a confirmed active service.";
+    if (
+      kind === "HOST" &&
+      (action === "server.start" || action === "server.stop")
+    ) {
+      const current = classifyTelemetry({
+        capturedAt:
+          record(raw.service.resources).capturedAt ?? raw.service.capturedAt,
+        receivedAt: raw.receipts?.service,
+        connected: true,
+        now: Date.now(),
+      });
+      if (!current.usable)
+        return "Wait for current Host service evidence before starting or stopping.";
+      if (
+        action === "server.start" &&
+        !["inactive", "failed"].includes(String(raw.service.state))
+      )
+        return "Start requires a confirmed stopped service.";
+      if (action === "server.stop" && raw.service.state !== "active")
+        return "Stop requires a confirmed active service.";
     }
     if (
       (action === "player.op" ||
@@ -498,15 +601,16 @@ export const session = {
       throw new Error("This operation is already in progress.");
     pending.add(key);
     try {
+      const parameters = {
+        ...prepared.parameters,
+        ...(confirmed ? { confirmed: true } : {}),
+      };
       const result =
         snapshot.fixture && fixtureAction
-          ? await fixtureAction(prepared.action, prepared.parameters)
+          ? await fixtureAction(prepared.action, parameters)
           : await sendDashboardAction(
               prepared.action,
-              {
-                ...prepared.parameters,
-                ...(confirmed ? { confirmed: true } : {}),
-              },
+              parameters,
               prepared.kind,
               prepared.target,
             );
@@ -522,9 +626,15 @@ export const session = {
   async query(action: string, parameters: JsonMap = {}, kind: Kind = "PAPER") {
     const prepared = this.prepare(action, parameters, kind);
     const key = `${snapshot.revision}:${kind}:${action}:${JSON.stringify(parameters)}`;
-    const existing = queries.get(key); if (existing) return existing;
-    const response = this.execute(prepared); queries.set(key, response);
-    try { return await response; } finally { if (queries.get(key) === response) queries.delete(key); }
+    const existing = queries.get(key);
+    if (existing) return existing;
+    const response = this.execute(prepared);
+    queries.set(key, response);
+    try {
+      return await response;
+    } finally {
+      if (queries.get(key) === response) queries.delete(key);
+    }
   },
   installFixture(
     name: string,

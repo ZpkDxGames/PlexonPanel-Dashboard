@@ -3,21 +3,18 @@ import { useEffect, useRef, useState } from "react";
 import type { ActionCompletion } from "../adapter/data-source";
 import { session, type Prepared } from "../adapter/session";
 import { Button, Notice } from "../components/ui";
-const stronger = new Set([
-  "player.ban",
-  "player.kill",
-  "player.op",
-  "player.deop",
-  "backup.full.delete",
-  "files.delete",
-  "backup.full.restore",
-]);
+import {
+  requiresAgentConfirmation,
+  requiresTypedConfirmation,
+} from "../lib/console-command";
 export function ActionReview({
   prepared,
   onClose,
+  onComplete,
 }: {
   prepared: Prepared | null;
   onClose: () => void;
+  onComplete?: (result: ActionCompletion) => void;
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const [typed, setTyped] = useState("");
@@ -38,12 +35,14 @@ export function ActionReview({
   }, [prepared]);
   if (!prepared) return null;
   const confirmText = prepared.subject ?? prepared.name;
-  const strong =
-    stronger.has(prepared.action) ||
-    (prepared.action === "console.execute" &&
-      /^(?:\/?(?:stop|op|deop|ban|kill|fill|reload)\b|\/?whitelist\s+off)/i.test(
-        String(prepared.parameters.command),
-      ));
+  const strong = requiresTypedConfirmation(
+    prepared.action,
+    prepared.parameters,
+  );
+  const confirmsAgent = requiresAgentConfirmation(
+    prepared.action,
+    prepared.parameters,
+  );
   const consequence =
     prepared.action === "server.stop" || prepared.action === "server.restart"
       ? "Players will disconnect. Unsaved progress depends on the server completing its save before shutdown."
@@ -58,7 +57,9 @@ export function ActionReview({
     setBusy(true);
     setError("");
     try {
-      setResult(await session.execute(prepared, strong));
+      const completion = await session.execute(prepared, confirmsAgent);
+      setResult(completion);
+      onComplete?.(completion);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Operation failed.");
     } finally {
@@ -134,11 +135,15 @@ export function ActionReview({
         </Button>
         {!result && (
           <Button
-            variant={strong ? "danger" : "primary"}
+            variant={confirmsAgent ? "danger" : "primary"}
             onClick={() => void execute()}
             disabled={busy || (strong && typed !== confirmText)}
           >
-            {busy ? "Waiting for agent…" : "Dispatch operation"}
+            {busy
+              ? "Waiting for agent…"
+              : confirmsAgent
+                ? "Confirm & dispatch"
+                : "Dispatch operation"}
           </Button>
         )}
       </div>
