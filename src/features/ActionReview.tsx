@@ -11,10 +11,12 @@ export function ActionReview({
   prepared,
   onClose,
   onComplete,
+  forceAgentConfirmation = false,
 }: {
   prepared: Prepared | null;
   onClose: () => void;
   onComplete?: (result: ActionCompletion) => void;
+  forceAgentConfirmation?: boolean;
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const [typed, setTyped] = useState("");
@@ -39,10 +41,9 @@ export function ActionReview({
     prepared.action,
     prepared.parameters,
   );
-  const confirmsAgent = requiresAgentConfirmation(
-    prepared.action,
-    prepared.parameters,
-  );
+  const confirmsAgent =
+    forceAgentConfirmation ||
+    requiresAgentConfirmation(prepared.action, prepared.parameters);
   const consequence =
     prepared.action === "server.stop" || prepared.action === "server.restart"
       ? "Players will disconnect. Unsaved progress depends on the server completing its save before shutdown."
