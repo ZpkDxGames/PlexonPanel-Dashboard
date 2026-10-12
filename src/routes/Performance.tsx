@@ -43,12 +43,12 @@ export default function Performance() {
     <>
       <div className="performance-toolbar">
         <Segmented label={copy.time_range_22cd3} value={windowMs}>
-          {[
+          {([
             [30_000, "30s"],
             [60_000, "1min"],
             [300_000, "5min"],
             [600_000, "10min"],
-          ].map(([value, label]) => (
+          ] as const).map(([value, label]) => (
             <button
               key={value}
               onClick={() =>
