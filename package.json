@@ -14,7 +14,8 @@
     "test:perf": "node scripts/performance.mjs",
     "test:revamp": "node scripts/revamp-interactions.mjs",
     "test:visual": "node scripts/revamp-capture.mjs --axe",
-    "test:refinement": "node scripts/refine-browser.mjs"
+    "test:refinement": "node scripts/refine-browser.mjs",
+    "test:release65": "node scripts/release65-browser.mjs"
   },
   "dependencies": {
     "@fontsource-variable/jetbrains-mono": "5.2.8",

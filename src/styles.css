@@ -636,9 +636,8 @@ td code {
   pointer-events: none;
   z-index: 5;
   top: 12px;
-  width: max-content;
-  min-width: 184px;
-  max-width: calc(100% - 12px);
+  width: min(190px, calc(100% - 12px));
+  min-width: 0;
   padding: 10px 14px;
   border-radius: 12px;
   background: var(--tip-bg);
@@ -652,8 +651,15 @@ td code {
 .chart-tooltip span {
   display: block;
 }
+.chart-tooltip span {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 6px;
+}
 .chart-tooltip b {
-  margin-left: 10px;
+  margin-left: 0;
+  white-space: nowrap;
 }
 .chart-tooltip i {
   display: inline-block;

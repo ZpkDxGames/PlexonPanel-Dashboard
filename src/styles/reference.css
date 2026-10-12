@@ -201,7 +201,7 @@ p {
   align-items: center;
   gap: 14px;
   padding: 14px 32px;
-  background: color-mix(in srgb, var(--surface-solid) 55%, transparent);
+  background: color-mix(in srgb, var(--surface-solid) 82%, transparent);
   backdrop-filter: var(--blur);
   -webkit-backdrop-filter: var(--blur);
   border-bottom: 1px solid var(--line);

@@ -1,0 +1,1107 @@
+{
+  "generatedAt": "2026-10-12T03:37:50.640Z",
+  "cases": 88,
+  "runtimeErrors": [],
+  "failures": [],
+  "results": [
+    {
+      "route": "Overview",
+      "viewport": "320x568",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": [
+        {
+          "index": 0,
+          "crosshair": true,
+          "tooltipInside": true
+        }
+      ]
+    },
+    {
+      "route": "Console",
+      "viewport": "320x568",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Players",
+      "viewport": "320x568",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Performance",
+      "viewport": "320x568",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": [
+        {
+          "index": 0,
+          "crosshair": true,
+          "tooltipInside": true
+        },
+        {
+          "index": 1,
+          "crosshair": true,
+          "tooltipInside": true
+        },
+        {
+          "index": 2,
+          "crosshair": true,
+          "tooltipInside": true
+        },
+        {
+          "index": 3,
+          "crosshair": true,
+          "tooltipInside": true
+        }
+      ]
+    },
+    {
+      "route": "Worlds",
+      "viewport": "320x568",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Backups",
+      "viewport": "320x568",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Schedules",
+      "viewport": "320x568",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Logs",
+      "viewport": "320x568",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Fleet",
+      "viewport": "320x568",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": [
+        {
+          "index": 0,
+          "crosshair": true,
+          "tooltipInside": true
+        },
+        {
+          "index": 1,
+          "crosshair": true,
+          "tooltipInside": true
+        }
+      ]
+    },
+    {
+      "route": "Access",
+      "viewport": "320x568",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Settings",
+      "viewport": "320x568",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Overview",
+      "viewport": "360x640",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": [
+        {
+          "index": 0,
+          "crosshair": true,
+          "tooltipInside": true
+        }
+      ]
+    },
+    {
+      "route": "Console",
+      "viewport": "360x640",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Players",
+      "viewport": "360x640",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Performance",
+      "viewport": "360x640",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": [
+        {
+          "index": 0,
+          "crosshair": true,
+          "tooltipInside": true
+        },
+        {
+          "index": 1,
+          "crosshair": true,
+          "tooltipInside": true
+        },
+        {
+          "index": 2,
+          "crosshair": true,
+          "tooltipInside": true
+        },
+        {
+          "index": 3,
+          "crosshair": true,
+          "tooltipInside": true
+        }
+      ]
+    },
+    {
+      "route": "Worlds",
+      "viewport": "360x640",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Backups",
+      "viewport": "360x640",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Schedules",
+      "viewport": "360x640",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Logs",
+      "viewport": "360x640",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Fleet",
+      "viewport": "360x640",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": [
+        {
+          "index": 0,
+          "crosshair": true,
+          "tooltipInside": true
+        },
+        {
+          "index": 1,
+          "crosshair": true,
+          "tooltipInside": true
+        }
+      ]
+    },
+    {
+      "route": "Access",
+      "viewport": "360x640",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Settings",
+      "viewport": "360x640",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Overview",
+      "viewport": "390x844",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": [
+        {
+          "index": 0,
+          "crosshair": true,
+          "tooltipInside": true
+        }
+      ]
+    },
+    {
+      "route": "Console",
+      "viewport": "390x844",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Players",
+      "viewport": "390x844",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Performance",
+      "viewport": "390x844",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": [
+        {
+          "index": 0,
+          "crosshair": true,
+          "tooltipInside": true
+        },
+        {
+          "index": 1,
+          "crosshair": true,
+          "tooltipInside": true
+        },
+        {
+          "index": 2,
+          "crosshair": true,
+          "tooltipInside": true
+        },
+        {
+          "index": 3,
+          "crosshair": true,
+          "tooltipInside": true
+        }
+      ]
+    },
+    {
+      "route": "Worlds",
+      "viewport": "390x844",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Backups",
+      "viewport": "390x844",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Schedules",
+      "viewport": "390x844",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Logs",
+      "viewport": "390x844",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Fleet",
+      "viewport": "390x844",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": [
+        {
+          "index": 0,
+          "crosshair": true,
+          "tooltipInside": true
+        },
+        {
+          "index": 1,
+          "crosshair": true,
+          "tooltipInside": true
+        }
+      ]
+    },
+    {
+      "route": "Access",
+      "viewport": "390x844",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Settings",
+      "viewport": "390x844",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Overview",
+      "viewport": "768x800",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": [
+        {
+          "index": 0,
+          "crosshair": true,
+          "tooltipInside": true
+        }
+      ]
+    },
+    {
+      "route": "Console",
+      "viewport": "768x800",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Players",
+      "viewport": "768x800",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Performance",
+      "viewport": "768x800",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": [
+        {
+          "index": 0,
+          "crosshair": true,
+          "tooltipInside": true
+        },
+        {
+          "index": 1,
+          "crosshair": true,
+          "tooltipInside": true
+        },
+        {
+          "index": 2,
+          "crosshair": true,
+          "tooltipInside": true
+        },
+        {
+          "index": 3,
+          "crosshair": true,
+          "tooltipInside": true
+        }
+      ]
+    },
+    {
+      "route": "Worlds",
+      "viewport": "768x800",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Backups",
+      "viewport": "768x800",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Schedules",
+      "viewport": "768x800",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Logs",
+      "viewport": "768x800",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Fleet",
+      "viewport": "768x800",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": [
+        {
+          "index": 0,
+          "crosshair": true,
+          "tooltipInside": true
+        },
+        {
+          "index": 1,
+          "crosshair": true,
+          "tooltipInside": true
+        }
+      ]
+    },
+    {
+      "route": "Access",
+      "viewport": "768x800",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Settings",
+      "viewport": "768x800",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Overview",
+      "viewport": "1024x720",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": [
+        {
+          "index": 0,
+          "crosshair": true,
+          "tooltipInside": true
+        }
+      ]
+    },
+    {
+      "route": "Console",
+      "viewport": "1024x720",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Players",
+      "viewport": "1024x720",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Performance",
+      "viewport": "1024x720",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": [
+        {
+          "index": 0,
+          "crosshair": true,
+          "tooltipInside": true
+        },
+        {
+          "index": 1,
+          "crosshair": true,
+          "tooltipInside": true
+        },
+        {
+          "index": 2,
+          "crosshair": true,
+          "tooltipInside": true
+        },
+        {
+          "index": 3,
+          "crosshair": true,
+          "tooltipInside": true
+        }
+      ]
+    },
+    {
+      "route": "Worlds",
+      "viewport": "1024x720",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Backups",
+      "viewport": "1024x720",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Schedules",
+      "viewport": "1024x720",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Logs",
+      "viewport": "1024x720",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Fleet",
+      "viewport": "1024x720",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": [
+        {
+          "index": 0,
+          "crosshair": true,
+          "tooltipInside": true
+        },
+        {
+          "index": 1,
+          "crosshair": true,
+          "tooltipInside": true
+        }
+      ]
+    },
+    {
+      "route": "Access",
+      "viewport": "1024x720",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Settings",
+      "viewport": "1024x720",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Overview",
+      "viewport": "1280x800",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": [
+        {
+          "index": 0,
+          "crosshair": true,
+          "tooltipInside": true
+        }
+      ]
+    },
+    {
+      "route": "Console",
+      "viewport": "1280x800",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Players",
+      "viewport": "1280x800",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Performance",
+      "viewport": "1280x800",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": [
+        {
+          "index": 0,
+          "crosshair": true,
+          "tooltipInside": true
+        },
+        {
+          "index": 1,
+          "crosshair": true,
+          "tooltipInside": true
+        },
+        {
+          "index": 2,
+          "crosshair": true,
+          "tooltipInside": true
+        },
+        {
+          "index": 3,
+          "crosshair": true,
+          "tooltipInside": true
+        }
+      ]
+    },
+    {
+      "route": "Worlds",
+      "viewport": "1280x800",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Backups",
+      "viewport": "1280x800",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Schedules",
+      "viewport": "1280x800",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Logs",
+      "viewport": "1280x800",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Fleet",
+      "viewport": "1280x800",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": [
+        {
+          "index": 0,
+          "crosshair": true,
+          "tooltipInside": true
+        },
+        {
+          "index": 1,
+          "crosshair": true,
+          "tooltipInside": true
+        }
+      ]
+    },
+    {
+      "route": "Access",
+      "viewport": "1280x800",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Settings",
+      "viewport": "1280x800",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Overview",
+      "viewport": "1577x929",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": [
+        {
+          "index": 0,
+          "crosshair": true,
+          "tooltipInside": true
+        }
+      ]
+    },
+    {
+      "route": "Console",
+      "viewport": "1577x929",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": [],
+      "ownerCommandEnabled": true,
+      "headingGap": 75
+    },
+    {
+      "route": "Players",
+      "viewport": "1577x929",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Performance",
+      "viewport": "1577x929",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": [
+        {
+          "index": 0,
+          "crosshair": true,
+          "tooltipInside": true
+        },
+        {
+          "index": 1,
+          "crosshair": true,
+          "tooltipInside": true
+        },
+        {
+          "index": 2,
+          "crosshair": true,
+          "tooltipInside": true
+        },
+        {
+          "index": 3,
+          "crosshair": true,
+          "tooltipInside": true
+        }
+      ]
+    },
+    {
+      "route": "Worlds",
+      "viewport": "1577x929",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Backups",
+      "viewport": "1577x929",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Schedules",
+      "viewport": "1577x929",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Logs",
+      "viewport": "1577x929",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Fleet",
+      "viewport": "1577x929",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": [
+        {
+          "index": 0,
+          "crosshair": true,
+          "tooltipInside": true
+        },
+        {
+          "index": 1,
+          "crosshair": true,
+          "tooltipInside": true
+        }
+      ]
+    },
+    {
+      "route": "Access",
+      "viewport": "1577x929",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": [],
+      "ownerFullControl": true
+    },
+    {
+      "route": "Settings",
+      "viewport": "1577x929",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Overview",
+      "viewport": "1920x1080",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": [
+        {
+          "index": 0,
+          "crosshair": true,
+          "tooltipInside": true
+        }
+      ]
+    },
+    {
+      "route": "Console",
+      "viewport": "1920x1080",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Players",
+      "viewport": "1920x1080",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Performance",
+      "viewport": "1920x1080",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": [
+        {
+          "index": 0,
+          "crosshair": true,
+          "tooltipInside": true
+        },
+        {
+          "index": 1,
+          "crosshair": true,
+          "tooltipInside": true
+        },
+        {
+          "index": 2,
+          "crosshair": true,
+          "tooltipInside": true
+        },
+        {
+          "index": 3,
+          "crosshair": true,
+          "tooltipInside": true
+        }
+      ]
+    },
+    {
+      "route": "Worlds",
+      "viewport": "1920x1080",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Backups",
+      "viewport": "1920x1080",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Schedules",
+      "viewport": "1920x1080",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Logs",
+      "viewport": "1920x1080",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Fleet",
+      "viewport": "1920x1080",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": [
+        {
+          "index": 0,
+          "crosshair": true,
+          "tooltipInside": true
+        },
+        {
+          "index": 1,
+          "crosshair": true,
+          "tooltipInside": true
+        }
+      ]
+    },
+    {
+      "route": "Access",
+      "viewport": "1920x1080",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    },
+    {
+      "route": "Settings",
+      "viewport": "1920x1080",
+      "documentOverflow": false,
+      "titleOverlap": false,
+      "cutControls": [],
+      "clippedText": [],
+      "chartHover": []
+    }
+  ]
+}

@@ -139,6 +139,9 @@ export function Shell({
     }
   }, [route, collapsed]);
   useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, [route, snap.state.serverId]);
+  useEffect(() => {
     if (palette) paletteRef.current?.showModal();
     else if (paletteRef.current?.open) {
       paletteRef.current.close();
