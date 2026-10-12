@@ -4,7 +4,13 @@ import { projectHistory } from "../../adapter/history";
 import { copy } from "../../i18n/en";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import type { Sample } from "../../adapter/control-state";
-import { domain, monotone, stableDomain, resample } from "../../lib/chart";
+import {
+  domain,
+  monotone,
+  stableDomain,
+  resample,
+  windowStart,
+} from "../../lib/chart";
 import {
   chartWindowLabel,
   formatChartTime,
@@ -101,13 +107,13 @@ function PlotSegment({
   return (
     <>
       {area && (
-        <SmoothPath
+        <path
           className="chart-area"
           d={`${path}L${points.at(-1)![0]},${bottom}L${points[0][0]},${bottom}Z`}
           fill={`url(#${id})`}
         />
       )}
-      <SmoothPath
+      <path
         className="chart-line-glow"
         d={path}
         fill="none"
@@ -120,6 +126,7 @@ function PlotSegment({
         fill="none"
         stroke={color}
         endpoint={endpoint}
+        durationMs={150}
       />
       {end && (
         <g ref={endpoint}>
@@ -216,15 +223,15 @@ export function TimeSeries({
     return [...merged.values()].sort((a, b) => a.at - b.at);
   }, [samples, series, hidden]);
   const latestAt = present.at(-1)?.at ?? samples.at(-1)?.at ?? Date.now();
-  const requestedWindow = Math.max(
-    30_000,
-    windowMs ?? prefs.chartWindowMs,
-  );
-  const start = latestAt - requestedWindow,
-    end = latestAt;
-  const visible = present.filter(
-    (sample) => sample.at >= start && sample.at <= end,
-  );
+  const requestedWindow = Math.max(30_000, windowMs ?? prefs.chartWindowMs);
+  // Raw telemetry may arrive at 4 Hz, but moving the whole x-axis on every
+  // packet makes the chart appear to wobble. Keep a bounded presentation clock:
+  // 500 ms for short windows and 1 s for long windows.
+  const presentationStep = requestedWindow <= 60_000 ? 500 : 1_000;
+  const end = Math.ceil(latestAt / presentationStep) * presentationStep;
+  const start = end - requestedWindow;
+  const visibleStart = windowStart(present, start);
+  const visible = present.slice(visibleStart).filter((sample) => sample.at <= end);
   const values = visible.flatMap((s) =>
     active
       .map((a) => s[a.key])
@@ -336,8 +343,8 @@ export function TimeSeries({
               : resample(
                   g,
                   prefs.chartDensity === "rich"
-                    ? Math.max(160, Math.min(480, Math.round(width * 0.8)))
-                    : Math.max(80, Math.min(180, Math.round(width * 0.35))),
+                    ? Math.max(72, Math.min(144, Math.round(width * 0.24)))
+                    : Math.max(48, Math.min(96, Math.round(width * 0.16))),
                 );
           const path =
             prefs.chartCurve === "smooth"
