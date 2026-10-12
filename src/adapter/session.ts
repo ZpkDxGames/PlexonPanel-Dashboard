@@ -273,6 +273,8 @@ async function connect(credential: RelayCredential, revision: number) {
           return;
         }
         receive(message);
+        if (message.type === "dashboard.ready")
+          void session.refreshConsoleHistory(100);
       } catch {
         publish({
           error: "Invalid relay message. No data from this packet was used.",
