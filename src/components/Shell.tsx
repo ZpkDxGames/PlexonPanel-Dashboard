@@ -2,7 +2,12 @@ import { copy } from "../i18n/en";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Icon } from "./Icon";
 import { ServerIcon } from "./ServerIcon";
-import { navigate, routeLabels, routes, type RouteName } from "../router";
+import {
+  navigate,
+  routeLabels,
+  workspaceRoutes,
+  type RouteName,
+} from "../router";
 import { useSession, useNow } from "../hooks";
 import { classifyTelemetry } from "../adapter/telemetry-freshness";
 import { connectionPhaseLabel, session } from "../adapter/session";
@@ -118,7 +123,7 @@ export function Shell({
       now,
     ],
   );
-  const filtered = routes.filter((r) =>
+  const filtered = workspaceRoutes.filter((r) =>
     `${routeLabels[r]} ${descriptions[r]}`
       .toLowerCase()
       .includes(query.toLowerCase()),
@@ -207,9 +212,9 @@ export function Shell({
           }}
         />
       )}
-      {routes.map((item, i) => (
+      {workspaceRoutes.map((item, i) => (
         <div key={item}>
-          {[5, 10].includes(i) && (
+          {[5, 8].includes(i) && (
             <div className="nav-group">{i === 5 ? "Manage" : "Workspace"}</div>
           )}
           <button
