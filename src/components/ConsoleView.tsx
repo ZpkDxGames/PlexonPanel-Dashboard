@@ -6,7 +6,7 @@ import { FormattedText } from "./FormattedText";
 import { Icon } from "./Icon";
 import { session, type Prepared } from "../adapter/session";
 import { ActionReview } from "../features/ActionReview";
-import { useSession } from "../hooks";
+import { useNow, useSession } from "../hooks";
 import {
   normalizeConsoleCommand,
   parseCommandHistory,
@@ -230,7 +230,8 @@ export function ConsoleView({
   mini?: boolean;
   sourceLines?: JsonMap[];
 }) {
-  const snap = useSession();
+  const snap = useSession(),
+    now = useNow();
   const [query, setQuery] = useState(""),
     [filter, setFilter] = useState("all"),
     [paused, setPaused] = useState(false),
@@ -249,6 +250,9 @@ export function ConsoleView({
     [error, setError] = useState(""),
     [histIndex, setHistIndex] = useState(-1),
     [history, setHistory] = useState<string[]>([]),
+    [historySync, setHistorySync] = useState<"idle" | "syncing" | "synced">(
+      "idle",
+    ),
     [suggest, setSuggest] = useState(0);
   const searchRef = useRef<HTMLInputElement>(null),
     commandRef = useRef<HTMLInputElement>(null),
@@ -256,19 +260,58 @@ export function ConsoleView({
     historyDraft = useRef("");
   const current = sourceLines ?? (paused ? frozen : snap.state.console);
   const entries = useMemo(() => groupLogs(current), [current]);
+  const ready = snap.state.ready;
   const paperCommandReason = session.reason("console.execute", "PAPER");
   const hostCommandReason = session.reason("console.execute", "HOST");
-  const authority = !paperCommandReason
+  const commandAuthority = !paperCommandReason
     ? "PAPER"
     : !hostCommandReason
       ? "HOST"
-      : snap.state.ready?.consoleAuthority === "HOST"
+      : ready?.consoleAuthority === "HOST"
         ? "HOST"
         : "PAPER";
-  const offline =
-    !snap.state.ready?.agents[authority === "HOST" ? "host" : "paper"];
   const commandReason =
-    authority === "PAPER" ? paperCommandReason : hostCommandReason;
+    commandAuthority === "PAPER" ? paperCommandReason : hostCommandReason;
+  const commandOffline =
+    !ready?.agents[commandAuthority === "HOST" ? "host" : "paper"];
+  const sourceAuthority =
+    ready?.consoleAuthority === "HOST"
+      ? "HOST"
+      : ready?.consoleAuthority === "PAPER_FALLBACK"
+        ? "PAPER"
+        : null;
+  const sourceOnline =
+    sourceAuthority === "HOST"
+      ? Boolean(ready?.agents.host)
+      : sourceAuthority === "PAPER"
+        ? Boolean(ready?.agents.paper)
+        : false;
+  const sourceName =
+    ready?.consoleAuthority === "HOST"
+      ? "Host journal"
+      : ready?.consoleAuthority === "PAPER_FALLBACK"
+        ? "Paper fallback"
+        : "Console source";
+  const sourceState = ready?.consoleSourceState ?? "unknown";
+  const sourceStateLabel = sourceState.replaceAll("_", " ").toLowerCase();
+  const latestReceivedAt = current.reduce(
+    (latest, line) =>
+      typeof line.receivedAt === "number" && Number.isFinite(line.receivedAt)
+        ? Math.max(latest, line.receivedAt)
+        : latest,
+    0,
+  );
+  const receiptAgeSeconds = latestReceivedAt
+    ? Math.max(0, Math.floor((now - latestReceivedAt) / 1000))
+    : null;
+  const receiptLabel =
+    receiptAgeSeconds === null
+      ? "no browser receipt yet"
+      : receiptAgeSeconds < 2
+        ? "received now"
+        : receiptAgeSeconds < 60
+          ? `received ${receiptAgeSeconds}s ago`
+          : `received ${Math.floor(receiptAgeSeconds / 60)}m ago`;
   useEffect(() => {
     try {
       setHistory(
@@ -285,6 +328,34 @@ export function ConsoleView({
     setHistIndex(-1);
     historyDraft.current = "";
   }, [snap.state.serverId]);
+  useEffect(() => {
+    if (
+      mini ||
+      readOnly ||
+      snap.phase !== "live" ||
+      snap.state.ready?.consoleAuthority !== "HOST" ||
+      !snap.state.ready?.agents.host
+    ) {
+      setHistorySync("idle");
+      return;
+    }
+    let active = true;
+    setHistorySync("syncing");
+    void session.refreshConsoleHistory(100).then((count) => {
+      if (active) setHistorySync(count > 0 ? "synced" : "idle");
+    });
+    return () => {
+      active = false;
+    };
+  }, [
+    mini,
+    readOnly,
+    snap.phase,
+    snap.state.serverId,
+    snap.state.ready?.server.hostSession,
+    snap.state.ready?.consoleAuthority,
+    snap.state.ready?.agents.host,
+  ]);
   let expression: RegExp | null = null,
     regexError = "";
   if (regex && query) {
@@ -339,7 +410,7 @@ export function ConsoleView({
       const nextPrepared = session.prepare(
         "console.execute",
         { command: normalized },
-        authority,
+        commandAuthority,
       );
       if (
         requiresTypedConfirmation(nextPrepared.action, nextPrepared.parameters)
@@ -413,13 +484,17 @@ export function ConsoleView({
             ? "Console"
             : (snap.state.ready?.server.serverName ?? "Server console")}
         </h2>
-        <span className={`conn ${offline ? "off" : ""}`}>
+        <span className={`conn ${!sourceOnline ? "off" : ""}`}>
           <i />
-          {offline
-            ? "Offline · history available"
-            : paused
-              ? "Paused"
-              : "Connected"}
+          {!sourceAuthority
+            ? "Console unavailable"
+            : !sourceOnline
+              ? `${sourceName} offline · history available`
+              : paused
+                ? `${sourceName} · paused`
+                : historySync === "syncing"
+                  ? `${sourceName} · syncing latest`
+                  : `${sourceName} · live`}
         </span>
         {mini ? (
           <a className="link" href="#Console">
@@ -571,15 +646,13 @@ export function ConsoleView({
             {copy._retained_c1491}
           </span>
           <span>
-            {snap.state.ready?.consoleAuthority === "HOST"
-              ? "Host journal"
-              : "Paper output"}{" "}
-            ·{" "}
-            {offline
-              ? "history retained"
-              : paused
+            {sourceName} · {sourceStateLabel} ·{" "}
+            {sourceOnline
+              ? paused
                 ? "view paused"
-                : "live ingestion"}
+                : "live ingestion"
+              : "history retained"}{" "}
+            · {receiptLabel}
           </span>
         </div>
       )}
@@ -619,15 +692,15 @@ export function ConsoleView({
               ref={commandRef}
               aria-label={copy.server_command_72fe4}
               value={command}
-              disabled={offline || Boolean(commandReason) || sending}
+              disabled={Boolean(commandReason) || sending}
               onChange={(e) => {
                 setCommand(e.target.value.replace(/[\r\n]/g, " "));
                 setSuggest(0);
                 if (histIndex < 0) historyDraft.current = e.target.value;
               }}
               placeholder={
-                offline
-                  ? "Server offline. Start it to send commands."
+                commandOffline
+                  ? "Command target offline. Check Relay, Host and Paper status."
                   : "Type a command. Tab completes, ↑ ↓ browse history"
               }
               onKeyDown={(e) => {
@@ -668,7 +741,7 @@ export function ConsoleView({
             <button
               type="submit"
               disabled={
-                !command.trim() || offline || Boolean(commandReason) || sending
+                !command.trim() || Boolean(commandReason) || sending
               }
               title={sending ? "Sending command" : "Send command"}
               aria-label={sending ? "Sending command" : "Send command"}
@@ -676,7 +749,7 @@ export function ConsoleView({
               <Icon name="send" />
             </button>
           </form>
-          {commandReason && !offline && (
+          {commandReason && (
             <p className="console-message">{commandReason}</p>
           )}
           <div className="macros">
@@ -689,7 +762,7 @@ export function ConsoleView({
             ].map((cmd) => (
               <button
                 key={cmd}
-                disabled={offline || Boolean(commandReason) || sending}
+                disabled={Boolean(commandReason) || sending}
                 onClick={() => {
                   setCommand(cmd);
                   void submitCommand(cmd);
