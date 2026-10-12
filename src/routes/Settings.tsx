@@ -184,16 +184,10 @@ export default function Settings() {
             </label>
             <label className="field">
               {copy.time_zone_eea79}
-              <Select
-                value={prefs.timezone}
-                onChange={(e) =>
-                  preferences.update({
-                    timezone: e.target.value as typeof prefs.timezone,
-                  })
-                }
-              >
-                <option value="browser">{copy.browser_54a2c}</option>
-                <option value="UTC">{copy.utc_bdfd4}</option>
+              <Select value={prefs.timezone} disabled>
+                <option value="America/Sao_Paulo">
+                  Brazil / São Paulo (America/Sao_Paulo)
+                </option>
               </Select>
             </label>
           </div>
@@ -251,6 +245,28 @@ export default function Settings() {
               </Select>
             </label>
             <p className="subtle">{copy.refine_87df9bb2}</p>
+            <label className="field">
+              Default graph window
+              <Select
+                value={prefs.chartWindowMs}
+                onChange={(e) =>
+                  preferences.update({
+                    chartWindowMs: Number(
+                      e.target.value,
+                    ) as typeof prefs.chartWindowMs,
+                  })
+                }
+              >
+                <option value={30_000}>30 seconds</option>
+                <option value={60_000}>1 minute · default</option>
+                <option value={300_000}>5 minutes</option>
+                <option value={600_000}>10 minutes</option>
+              </Select>
+            </label>
+            <p className="subtle">
+              Stored locally and shared by telemetry charts. Retained source
+              history remains longer than the visible window.
+            </p>
             <label className="field">
               {copy.refine_cbcf5f2f}
               <Select
