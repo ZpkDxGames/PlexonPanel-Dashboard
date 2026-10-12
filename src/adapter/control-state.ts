@@ -372,7 +372,10 @@ export function applyControlMessage(
       break;
     }
     case "console.lines":
-      next.console = mergeConsoleLines(state.console, records(body.lines, 100));
+      next.console = mergeConsoleLines(
+        state.console,
+        records(body.lines, 100).map((line) => ({ ...line, receivedAt })),
+      );
       break;
     case "chat.message":
       next.chat = [...state.chat, body].slice(-200);
