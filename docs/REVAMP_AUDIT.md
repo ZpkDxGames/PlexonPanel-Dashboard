@@ -115,3 +115,23 @@ Skin default becomes automatic username-based lookup with mc-heads → Minotar �
 The protocol does not supply a server icon field. When advertised/permitted, the UI requests server-icon.png through existing signed files.download/chunk/cancel contracts, verifies transfer identity/size/SHA-256 and PNG decoding, and stores a 64×64 PNG per instance. One attempt per source session is coalesced across logo instances; Settings can retry/load a local copy/reset. Transfers are never silently redirected to a different server.
 
 Custom button/listbox selects replace settings/player/backup OS controls; scrollbars and file-selector button are themed. Indigo/teal/sky/rose interface accents do not recolor categorical metric series. No runtime dependency or backend/config schema was added.
+
+## 6.5.0 refinement audit (2026-10-12 UTC)
+
+The owner supplied a 1577 × 929 Console capture after the 6.0.0 refinement. It shows the route heading occupying the sticky top-bar row, an empty retained console, and the command composer disabled with a device-scope message even though the signed device is labelled Owner. This release treats that exact viewport as a regression target in addition to 360, 390, 768, 1024, 1280, 1440 and 1920 px widths.
+
+### Findings
+
+1. **Owner authority is evaluated in overlapping layers.** `reconcileDeviceGrant`, `effectiveScopes`, `canAction`, `session.reason` and route-level disabled states each interpret the grant. A verified Owner can therefore be shown as denied when the signed and reported arrays are stale or when the active console stream comes from Host even though command execution belongs to Paper. The Core protocol already defines `Owner = Scopes.ALL` for newly paired devices. The Dashboard will use one effective-authority resolver, expose the complete known Owner scope set, and select the capable action target. Agent presence, instance binding, live evidence, high-risk confirmation and explicitly disabled/unsupported server capability remain separate operational gates.
+2. **The chart viewport is data-shaped rather than time-shaped.** Its X bounds use the first and last received points, so a new or recovering session continually stretches and reflows the plot. The Y domain only expands until a manual reset. Tooltip positioning is tied to the whole chart block and can crowd controls at narrow widths. The 6.5 chart will use a fixed requested time window, a bounded hysteresis domain, responsive tick density, clipped floating inspection, and stable plot geometry. Received observations remain the only source data.
+3. **Responsive shell behavior lacks an explicit content row.** The sticky bar and route content share an implicit block layout, while the full Console computes height from viewport constants. This is fragile at short desktop heights and produced the supplied overlap. The shell will use explicit grid rows and the Console will size against its available content container with bounded minimums.
+4. **The style layer contains superseded selectors and malformed duplicated rules.** Removed Files-route selectors remain, and the ported reference sheet contains duplicate opening selectors for `.search` and `.btn:hover`, causing subsequent declarations to be parsed as nested CSS in modern browsers. These are deleted or repaired rather than patched over. Console Plugins selectors remain because that original tab is still active.
+5. **Some fixed minima overflow compact viewports.** Fleet rows intentionally force a wide table, full Console imposes a 530 px mobile minimum, graph labels assume five ticks, and several flex headers rely on clipping. The release will preserve horizontal tables only inside labelled scroll regions and make every other component reflow without page-level overflow or clipped controls.
+
+### 6.5.0 boundaries
+
+- No endpoint, token, relay origin, signature, generation binding or server identity rule changes.
+- Owner means every scope known by the negotiated Dashboard contract. It does not fabricate an action handler or treat an offline agent as available.
+- The Dashboard cannot rewrite an immutable credential already stored by the server. A server-side `SCOPE_DENIED` remains authoritative and is surfaced plainly; no client-side success is inferred.
+- Graph interpolation is visual geometry between received observations. It never creates telemetry samples or changes retained history.
+- Removed route CSS and duplicate presentation rules are deleted. Historical 6.0.0 evidence stays intact under `docs/revamp`; 6.5.0 evidence receives its own directory.
