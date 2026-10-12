@@ -82,22 +82,44 @@ export function isTerminalBackupPhase(phase: string) {
   return TERMINAL.has(phase);
 }
 
+function progressBelongsToOperation(
+  operation: JsonMap,
+  progress: JsonMap | null | undefined,
+) {
+  const operationJob = str(operation.jobId);
+  const operationBackup = str(operation.backupId);
+  const progressJob = str(progress?.jobId);
+  const progressBackup = str(progress?.backupId);
+  if (operationJob && progressJob === operationJob) return true;
+
+  // Retry Upload has its own transport jobId but intentionally reuses the original backupId.
+  // Accept it only after a degraded terminal job; unrelated stale progress must never override it.
+  if (
+    str(operation.phase) === "DEGRADED" &&
+    operationBackup &&
+    progressBackup === operationBackup &&
+    progressJob &&
+    progressJob !== operationJob
+  ) {
+    const completed = Date.parse(str(operation.completedAt));
+    const captured = Date.parse(str(progress?.capturedAt));
+    return (
+      !Number.isFinite(completed) ||
+      (Number.isFinite(captured) && captured >= completed)
+    );
+  }
+
+  return false;
+}
+
 export function effectiveBackupPhase(
   operation: JsonMap,
   progress: JsonMap | null | undefined,
 ): string {
   const durable = str(operation.phase, "IDLE");
-  const operationJob = str(operation.jobId);
-  const operationBackup = str(operation.backupId);
-  const progressJob = str(progress?.jobId);
-  const progressBackup = str(progress?.backupId);
   const progressPhase = str(progress?.phase);
 
-  if (
-    progressPhase &&
-    ((operationJob && progressJob === operationJob) ||
-      (operationBackup && progressBackup === operationBackup))
-  )
+  if (progressPhase && progressBelongsToOperation(operation, progress))
     return progressPhase;
 
   return durable;
@@ -108,7 +130,11 @@ export function effectiveBackupProgress(
   progress: JsonMap | null | undefined,
 ): number {
   const live = number(progress?.progress);
-  if (live !== null) return Math.max(0, Math.min(100, live * 100));
+  if (
+    live !== null &&
+    progressBelongsToOperation(operation, progress)
+  )
+    return Math.max(0, Math.min(100, live * 100));
   return Math.max(0, Math.min(100, number(operation.progressPercent) ?? 0));
 }
 
