@@ -8,19 +8,12 @@ import { PlayerHead } from "../components/PlayerHead";
 import { Button, Notice, Panel, Status } from "../components/ui";
 import { ActionReview } from "../features/ActionReview";
 import { useSession } from "../hooks";
+import { formatTime } from "../lib/time";
 type Tab = "console" | "chat" | "plugins";
 const lineHeight = 28;
 function stamp(value: unknown) {
-  const at = typeof value === "string" ? Date.parse(value) : NaN;
-  return Number.isFinite(at)
-    ? new Intl.DateTimeFormat(undefined, {
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-        fractionalSecondDigits: 3,
-        hour12: false,
-      }).format(at)
-    : "--:--:--.---";
+  const formatted = formatTime(value, { seconds: true, millis: true });
+  return formatted === "—" ? "--:--:--.---" : formatted;
 }
 function ConsoleLines({ lines, wrap }: { lines: JsonMap[]; wrap: boolean }) {
   const [scrollTop, setScrollTop] = useState(0);
