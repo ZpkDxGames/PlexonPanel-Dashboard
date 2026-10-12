@@ -4,6 +4,7 @@ import { copy } from "../i18n/en";
 import { useMemo } from "react";
 import { useSession } from "../hooks";
 import { TimeSeries } from "../components/charts/TimeSeries";
+import { FocusedMetricPanel } from "../components/FocusedMetricPanel";
 import { Panel, Status } from "../components/ui";
 import { sampleStats, windowStart } from "../lib/chart";
 import { number, str } from "../adapter/control-state";
@@ -126,62 +127,74 @@ export default function Performance() {
             ]}
           />
         </Panel>
-        <Panel
+        <FocusedMetricPanel
           title={copy.cpu_load_01bd8}
-          eyebrow={copy.jvm_process_and_host_utilization_8cbd1}
-        >
-          <TimeSeries
-            samples={samples}
-            windowMs={windowMs}
-            height={240}
-            title={copy.cpu_utilization_241cc}
-            live={Boolean(state.ready?.agents.host || live)}
-            series={[
-              {
-                key: "processCpu",
-                label: "JVM process",
-                unit: "%",
-                color: "var(--c4)",
-              },
-              { key: "hostCpu", label: "Host", unit: "%", color: "var(--c5)" },
-              {
-                key: "serviceCpu",
-                label: "Minecraft service · % of one core",
-                unit: "%",
-                color: "var(--c1)",
-              },
-            ]}
-            source="Paper + Host"
-          />
-        </Panel>
-        <Panel
+          eyebrow="Inspect one CPU authority at a time, or compare them."
+          samples={samples}
+          windowMs={windowMs}
+          live={Boolean(state.ready?.agents.host || live)}
+          defaultMetric="serviceCpu"
+          options={[
+            {
+              key: "serviceCpu",
+              shortLabel: "Minecraft",
+              label: "Minecraft service · % of one core",
+              unit: "%",
+              color: "var(--c1)",
+              source: "Host service",
+            },
+            {
+              key: "processCpu",
+              shortLabel: "JVM",
+              label: "JVM process",
+              unit: "%",
+              color: "var(--c4)",
+              source: "Paper JVM",
+            },
+            {
+              key: "hostCpu",
+              shortLabel: "Host",
+              label: "Host utilization",
+              unit: "%",
+              color: "var(--c5)",
+              source: "Host",
+            },
+          ]}
+        />
+        <FocusedMetricPanel
           title={copy.memory_89c8a}
-          eyebrow={copy.jvm_heap_and_physical_host_memory_08742}
-        >
-          <TimeSeries
-            samples={samples}
-            windowMs={windowMs}
-            height={240}
-            title={copy.memory_usage_530f6}
-            live={Boolean(state.ready?.agents.host || live)}
-            series={[
-              { key: "heap", label: "Heap", unit: "bytes", color: "var(--c3)" },
-              {
-                key: "memory",
-                label: "Host memory",
-                unit: "bytes",
-                color: "var(--c1)",
-              },
-              {
-                key: "serviceMemory",
-                label: "Minecraft service",
-                unit: "bytes",
-                color: "var(--c4)",
-              },
-            ]}
-            source="Paper + Host"
-          />
-        </Panel>
+          eyebrow="Separate heap, Minecraft service and physical Host memory."
+          samples={samples}
+          windowMs={windowMs}
+          live={Boolean(state.ready?.agents.host || live)}
+          defaultMetric="serviceMemory"
+          options={[
+            {
+              key: "serviceMemory",
+              shortLabel: "Minecraft",
+              label: "Minecraft service memory",
+              unit: "bytes",
+              color: "var(--c4)",
+              source: "Host service",
+            },
+            {
+              key: "heap",
+              shortLabel: "Heap",
+              label: "JVM heap used",
+              unit: "bytes",
+              color: "var(--c3)",
+              source: "Paper JVM",
+            },
+            {
+              key: "memory",
+              shortLabel: "Host",
+              label: "Physical Host memory used",
+              unit: "bytes",
+              color: "var(--c1)",
+              source: "Host",
+            },
+          ]}
+        />
         <Panel
           title={copy.slow_ticks_832c6}
           eyebrow={copy.mean_samples_above_the_50_ms_budget_2526c}
