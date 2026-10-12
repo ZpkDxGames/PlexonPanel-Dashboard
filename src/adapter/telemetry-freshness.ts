@@ -17,11 +17,13 @@ export function classifyTelemetry({
   receivedAt,
   connected,
   now,
+  expectedIntervalMs,
 }: {
   capturedAt: unknown;
   receivedAt?: number;
   connected: boolean;
   now: number;
+  expectedIntervalMs?: number | null;
 }): {
   kind: TelemetryKind;
   label: string;
@@ -65,7 +67,20 @@ export function classifyTelemetry({
       skewAheadMs,
       ageMs,
     };
-  const aged = ageMs! > 30000 ? "stale" : ageMs! > 10000 ? "delayed" : "live",
+  const expected =
+      typeof expectedIntervalMs === "number" &&
+      Number.isFinite(expectedIntervalMs) &&
+      expectedIntervalMs >= 50
+        ? Math.min(30_000, expectedIntervalMs)
+        : null,
+    delayedAfterMs = expected === null ? 10_000 : Math.max(3_000, expected * 4),
+    staleAfterMs = expected === null ? 30_000 : Math.max(10_000, expected * 12),
+    aged =
+      ageMs! > staleAfterMs
+        ? "stale"
+        : ageMs! > delayedAfterMs
+          ? "delayed"
+          : "live",
     seconds = Math.floor(ageMs! / 1000);
   const note = `clock skew +${Math.round(skewAheadMs / 1000)} s · received ${seconds} s ago`;
   return {
