@@ -152,7 +152,7 @@ export default function Backups() {
       }
     : operation;
   const displayProgress = resolvedAfterRetry ? null : progress;
-  const operationKind = str(effectiveOperation.kind);
+  const operationKind = str(effectiveOperation.kind, "");
   const isBackupJob =
     !operationKind || operationKind === "FULL_RESTORE_POINT";
   const phase = isBackupJob
@@ -168,15 +168,20 @@ export default function Backups() {
   );
   const ready = backupReady(preflight, maintenance, effectiveOperation);
   const hostLive = Boolean(snap.state.ready?.agents.host);
+  const preflightKnown = Object.keys(preflight).length > 0;
+  const maintenanceKnown = Object.keys(maintenance).length > 0;
   const healthOperation = isBackupJob
     ? effectiveOperation
     : { ...effectiveOperation, phase: "IDLE" };
-  const health = backupHealth({
-    hostLive,
-    ready,
-    recovery,
-    operation: healthOperation,
-  });
+  const health =
+    hostLive && (!preflightKnown || !maintenanceKnown)
+      ? "checking"
+      : backupHealth({
+          hostLive,
+          ready,
+          recovery,
+          operation: healthOperation,
+        });
   const copy = healthCopy(health);
   const operationActive =
     isBackupJob &&
@@ -222,7 +227,12 @@ export default function Backups() {
   const readiness: Readiness[] = [
     {
       label: "Host authority",
-      state: preflight.hostAuthenticated === true ? "ready" : "blocked",
+      state:
+        preflight.hostAuthenticated === true
+          ? "ready"
+          : preflight.hostAuthenticated === false
+            ? "blocked"
+            : "unknown",
       detail:
         preflight.hostAuthenticated === true
           ? "The Host session is authenticated."
@@ -245,7 +255,12 @@ export default function Backups() {
     },
     {
       label: "Recovery gate",
-      state: recovery ? "blocked" : "ready",
+      state:
+        !preflightKnown || !maintenanceKnown
+          ? "unknown"
+          : recovery
+            ? "blocked"
+            : "ready",
       detail: recovery
         ? "A durable recovery condition must be resolved before another backup."
         : "No backup or maintenance recovery gate is active.",
@@ -315,7 +330,9 @@ export default function Backups() {
           ? "Refresh preflight and review the failure before creating another restore point."
           : health === "blocked"
             ? "Resolve the blocked readiness checks below."
-            : health === "running"
+            : health === "checking"
+              ? "Waiting for current Host preflight and maintenance state."
+              : health === "running"
               ? `Keep the Host online while ${phaseLabel(phase).toLowerCase()} finishes.`
               : backups.length
                 ? "Create a new restore point when you are ready."
