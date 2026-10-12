@@ -92,6 +92,13 @@ test("stored protocol 3 pairing reconnects, receives telemetry, completes a boun
     const socket = Socket.all.at(-1)!;
     assert.equal(socket.url, credential.websocketUrl);
     assert.deepEqual(socket.protocols, ["plexonpanel-v3", `auth.${credential.accessToken}`]);
+    await until(() =>
+      socket.sent.some(
+        (message) =>
+          message.type === "gateway.snapshot_request" &&
+          message.serverId === credential.serverId,
+      ),
+    );
     socket.receive({type: "server.event", serverId: credential.serverId, agentKind: "PAPER", agentSession: "fixture-paper", eventType: "telemetry.server", body: {capturedAt: new Date().toISOString(), tps: [17.25], onlinePlayers: 4}});
     await until(() => {const tps = session.getSnapshot().state.server.tps; return Array.isArray(tps) && tps[0] === 17.25;});
     await until(
