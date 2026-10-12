@@ -1,6 +1,6 @@
 import { Select } from "../components/Select";
 import { copy } from "../i18n/en";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { number, str, type JsonMap } from "../adapter/control-state";
 import { session, type Prepared } from "../adapter/session";
 import { PlayerHead } from "../components/PlayerHead";
@@ -8,6 +8,7 @@ import { Button, Notice, Panel, Status } from "../components/ui";
 import { ActionReview } from "../features/ActionReview";
 import { playerCommand, permissionCommand } from "../lib/playerCommands";
 import { useSession } from "../hooks";
+import { playerPingMillis } from "../lib/player-telemetry";
 type Player = {
   uuid: string;
   name: string;
@@ -56,7 +57,7 @@ export default function Players() {
           uuid: str(raw.uuid, ""),
           name: str(raw.name, "Unknown"),
           world: str(raw.world, "Unknown"),
-          ping: number(raw.ping),
+          ping: playerPingMillis(raw),
           onlineMs: number(raw.onlineDurationMillis),
           raw,
         }))
@@ -74,6 +75,34 @@ export default function Players() {
   const worlds = [
     ...new Set(snap.state.players.map((p) => str(p.world, "Unknown"))),
   ];
+  useEffect(() => {
+    if (
+      snap.phase !== "live" ||
+      !snap.state.ready?.agents.paper ||
+      session.reason("players.snapshot.request", "PAPER")
+    )
+      return;
+
+    let active = true;
+    const refresh = () => {
+      if (!active || document.visibilityState === "hidden") return;
+      void session.query("players.snapshot.request", {}, "PAPER").catch(() => {
+        /* Periodic roster reconciliation is best-effort; live presence remains authoritative. */
+      });
+    };
+
+    refresh();
+    const timer = window.setInterval(refresh, 5_500);
+    return () => {
+      active = false;
+      window.clearInterval(timer);
+    };
+  }, [
+    snap.phase,
+    snap.revision,
+    snap.state.ready?.agents.paper,
+    snap.state.ready?.server.paperSession,
+  ]);
   const prepare = (action: string, parameters: JsonMap) => {
     setBuilderError("");
     try {
