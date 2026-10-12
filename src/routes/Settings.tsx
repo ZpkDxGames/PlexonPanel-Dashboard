@@ -10,6 +10,7 @@ import { PairingForm } from "../components/PairingForm";
 import { Button, Notice, Panel, Status } from "../components/ui";
 import { useSession } from "../hooks";
 import { preferences, usePreferences } from "../store/preferences";
+import { formatDateTime } from "../lib/time";
 type BuildInfo = {
   commit?: string;
   builtAt?: string;
@@ -391,13 +392,13 @@ export default function Settings() {
             <code>{build.commit ?? "Unavailable"}</code>
           </dd>
           <dt>{copy.built_a6ad3}</dt>
-          <dd>{build.builtAt ?? "Unavailable"}</dd>
+          <dd>{formatDateTime(build.builtAt)}</dd>
           <dt>{copy.protocol_1ed77}</dt>
           <dd>{build.protocolVersion ?? 3}</dd>
           <dt>{copy.paper_clock_37d6c}</dt>
           <dd>
             {snap.state.server.capturedAt
-              ? String(snap.state.server.capturedAt)
+              ? formatDateTime(snap.state.server.capturedAt)
               : "No sample"}
           </dd>
           <dt>{copy.grant_role_d9dd7}</dt>
