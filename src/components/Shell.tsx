@@ -67,6 +67,42 @@ export function Shell({
       snap.labels[snap.state.serverId] ??
       (snap.state.serverId || "No server selected"),
   );
+  const relayLive = snap.phase === "live";
+  const hostLive = Boolean(snap.state.ready?.agents.host);
+  const hostInstalled = snap.state.ready?.agents.hostInstalled !== false;
+  const paperLive = Boolean(snap.state.ready?.agents.paper);
+  const serviceState =
+    typeof snap.state.service.state === "string"
+      ? snap.state.service.state
+      : "unknown";
+  const serviceRunning = hostLive && serviceState === "active";
+  const serviceStopped =
+    hostLive && (serviceState === "inactive" || serviceState === "failed");
+  const serviceLabel = !hostLive
+    ? "Unknown"
+    : serviceRunning
+      ? "Running"
+      : serviceStopped
+        ? "Stopped"
+        : serviceState === "unknown"
+          ? "Unknown"
+          : serviceState;
+  const runtimeSummary = !relayLive
+    ? connectionPhaseLabel(snap.phase)
+    : !hostLive
+      ? hostInstalled
+        ? "Host offline"
+        : "Host not installed"
+      : serviceStopped
+        ? "Server stopped"
+        : !paperLive
+          ? "Paper offline"
+          : "Runtime healthy";
+  const runtimeTone = !relayLive || !hostLive
+    ? "bad"
+    : serviceStopped || !paperLive
+      ? "warn"
+      : "ok";
   const freshness = useMemo(
     () =>
       classifyTelemetry({
@@ -271,6 +307,49 @@ export function Shell({
             </button>
             <div className="spacer" />
             <div className="context-actions">
+              <details className="runtime-menu" data-tone={runtimeTone}>
+                <summary
+                  className="runtime-summary"
+                  aria-label={`Runtime status: ${runtimeSummary}`}
+                  title="Relay, Host, Minecraft service and console source status"
+                >
+                  <i />
+                  <span className="runtime-summary-label">{runtimeSummary}</span>
+                  <Icon name="chevron" />
+                </summary>
+                <div className="runtime-card" role="status">
+                  <div className="runtime-card-head">
+                    <strong>{name}</strong>
+                    <span>Live connection evidence</span>
+                  </div>
+                  <div className="runtime-row">
+                    <span><i className={relayLive ? "ok" : "bad"} />Relay</span>
+                    <b>{relayLive ? "Connected" : connectionPhaseLabel(snap.phase)}</b>
+                  </div>
+                  <div className="runtime-row">
+                    <span><i className={hostLive ? "ok" : "bad"} />Host agent</span>
+                    <b>{hostLive ? "Connected" : hostInstalled ? "Offline" : "Not installed"}</b>
+                  </div>
+                  <div className="runtime-row">
+                    <span><i className={serviceRunning ? "ok" : serviceStopped ? "warn" : ""} />Minecraft service</span>
+                    <b>{serviceLabel}</b>
+                  </div>
+                  <div className="runtime-row">
+                    <span><i className={paperLive ? "ok" : "bad"} />Paper agent</span>
+                    <b>{paperLive ? "Connected" : "Offline"}</b>
+                  </div>
+                  <div className="runtime-row">
+                    <span><i className={snap.state.ready?.consoleAuthority === "HOST" && hostLive ? "ok" : snap.state.ready?.consoleAuthority === "PAPER_FALLBACK" && paperLive ? "warn" : "bad"} />Console</span>
+                    <b>
+                      {snap.state.ready?.consoleAuthority === "HOST"
+                        ? `Host · ${snap.state.ready.consoleSourceState ?? "unknown"}`
+                        : snap.state.ready?.consoleAuthority === "PAPER_FALLBACK"
+                          ? `Paper fallback · ${snap.state.ready.consoleSourceState ?? "unknown"}`
+                          : "Unavailable"}
+                    </b>
+                  </div>
+                </div>
+              </details>
               <button
                 className="search"
                 ref={trigger}
