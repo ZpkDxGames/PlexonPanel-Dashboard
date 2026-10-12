@@ -263,6 +263,13 @@ export class FleetFeed {
               phase: "live",
               state: applyControlMessage(entry.snapshot.state, message),
             };
+            if (socket.readyState === 1)
+              socket.send(
+                JSON.stringify({
+                  type: "gateway.snapshot_request",
+                  serverId: entry.credential.serverId,
+                }),
+              );
             this.emit(true);
           } else if (
             message.type === "server.event" &&
