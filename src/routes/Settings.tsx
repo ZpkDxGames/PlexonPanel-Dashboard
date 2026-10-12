@@ -237,10 +237,10 @@ export default function Settings() {
                   })
                 }
               >
-                {[50, 100, 250, 500, 1000].map((n) => (
+                {[250, 500, 1000].map((n) => (
                   <option key={n} value={n}>
                     {n} {copy.refine_26cc3217}
-                    {n === 100 ? " · recommended" : ""}
+                    {n === 250 ? " · recommended" : ""}
                   </option>
                 ))}
               </Select>

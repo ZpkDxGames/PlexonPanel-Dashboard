@@ -11,10 +11,12 @@ export function ActionReview({
   prepared,
   onClose,
   onComplete,
+  forceAgentConfirmation = false,
 }: {
   prepared: Prepared | null;
   onClose: () => void;
   onComplete?: (result: ActionCompletion) => void;
+  forceAgentConfirmation?: boolean;
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const [typed, setTyped] = useState("");
@@ -39,14 +41,17 @@ export function ActionReview({
     prepared.action,
     prepared.parameters,
   );
-  const confirmsAgent = requiresAgentConfirmation(
+  const highRiskConfirmation = requiresAgentConfirmation(
     prepared.action,
     prepared.parameters,
   );
+  const confirmsAgent = forceAgentConfirmation || highRiskConfirmation;
   const consequence =
-    prepared.action === "server.stop" || prepared.action === "server.restart"
-      ? "Players will disconnect. Unsaved progress depends on the server completing its save before shutdown."
-      : prepared.action.includes("restore")
+    prepared.action === "console.execute" && forceAgentConfirmation
+      ? "Paper local policy requires an explicit confirmation before this allowed console command is dispatched."
+      : prepared.action === "server.stop" || prepared.action === "server.restart"
+        ? "Players will disconnect. Unsaved progress depends on the server completing its save before shutdown."
+        : prepared.action.includes("restore")
         ? "Restoring replaces current server data and may stop the server. Verify the selected backup first."
         : prepared.action.includes("delete")
           ? "This removes the selected item. Make sure you have a backup before continuing."
@@ -135,7 +140,7 @@ export function ActionReview({
         </Button>
         {!result && (
           <Button
-            variant={confirmsAgent ? "danger" : "primary"}
+            variant={highRiskConfirmation ? "danger" : "primary"}
             onClick={() => void execute()}
             disabled={busy || (strong && typed !== confirmText)}
           >

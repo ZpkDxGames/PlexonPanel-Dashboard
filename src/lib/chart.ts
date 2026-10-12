@@ -109,3 +109,18 @@ export function resample(
   }
   return out;
 }
+
+
+/**
+ * Keep the visible x-axis from translating on every raw telemetry packet.
+ * Short live windows advance twice per second; longer windows once per second.
+ */
+export function presentationWindow(
+  latestAt: number,
+  windowMs: number,
+): { start: number; end: number; step: number } {
+  const safeWindow = Math.max(30_000, windowMs);
+  const step = safeWindow <= 60_000 ? 500 : 1_000;
+  const end = Math.ceil(latestAt / step) * step;
+  return { start: end - safeWindow, end, step };
+}

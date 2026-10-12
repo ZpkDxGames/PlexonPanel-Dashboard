@@ -2,6 +2,7 @@ import { number, str, type JsonMap } from "../adapter/control-state";
 
 export type BackupHealth =
   | "offline"
+  | "checking"
   | "ready"
   | "running"
   | "degraded"
@@ -243,6 +244,11 @@ export function healthCopy(health: BackupHealth) {
       return {
         title: "Host unavailable",
         description: "Reconnect the Host agent before managing restore points.",
+      };
+    case "checking":
+      return {
+        title: "Checking backup authority",
+        description: "Waiting for the Host preflight, maintenance journal and restore-point inventory.",
       };
     case "running":
       return {

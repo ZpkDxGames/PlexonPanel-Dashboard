@@ -35,6 +35,12 @@ export function requiresTypedConfirmation(
   );
 }
 
+export function isServerConfirmationRequired(
+  result: { code?: unknown; status?: unknown },
+): boolean {
+  return result.code === "CONFIRMATION_REQUIRED";
+}
+
 export function requiresAgentConfirmation(
   action: string,
   parameters: JsonMap,

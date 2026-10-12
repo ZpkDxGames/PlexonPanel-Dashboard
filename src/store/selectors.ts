@@ -30,6 +30,15 @@ export function sourceStatus(
       : state.receipts?.hostSystem,
     connected,
     now,
+    expectedIntervalMs:
+      typeof (paper ? state.server.sourceIntervalMillis : state.hostSystem.sourceIntervalMillis) ===
+      "number"
+        ? Number(
+            paper
+              ? state.server.sourceIntervalMillis
+              : state.hostSystem.sourceIntervalMillis,
+          )
+        : undefined,
   });
   return { source, ...result };
 }

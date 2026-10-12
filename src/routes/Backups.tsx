@@ -86,27 +86,39 @@ export default function Backups() {
     ]);
 
     const nextErrors: string[] = [];
-    if (preflightResult.status === "fulfilled")
-      setPreflight(record(preflightResult.value.data));
-    else
+    const actionError = (
+      label: string,
+      result: { status: string; code?: string; message?: string },
+    ) =>
+      `${label}: ${result.message || result.code || result.status || "unavailable"}`;
+
+    if (preflightResult.status === "fulfilled") {
+      if (preflightResult.value.status === "SUCCESS")
+        setPreflight(record(preflightResult.value.data));
+      else nextErrors.push(actionError("Backup preflight", preflightResult.value));
+    } else
       nextErrors.push(
         preflightResult.reason instanceof Error
           ? preflightResult.reason.message
           : "Backup preflight unavailable.",
       );
 
-    if (statusResult.status === "fulfilled")
-      setMaintenance(record(statusResult.value.data));
-    else
+    if (statusResult.status === "fulfilled") {
+      if (statusResult.value.status === "SUCCESS")
+        setMaintenance(record(statusResult.value.data));
+      else nextErrors.push(actionError("Maintenance status", statusResult.value));
+    } else
       nextErrors.push(
         statusResult.reason instanceof Error
           ? statusResult.reason.message
           : "Maintenance status unavailable.",
       );
 
-    if (listResult.status === "fulfilled")
-      setBackups(records(record(listResult.value.data).backups));
-    else
+    if (listResult.status === "fulfilled") {
+      if (listResult.value.status === "SUCCESS")
+        setBackups(records(record(listResult.value.data).backups));
+      else nextErrors.push(actionError("Backup inventory", listResult.value));
+    } else
       nextErrors.push(
         listResult.reason instanceof Error
           ? listResult.reason.message
@@ -116,6 +128,11 @@ export default function Backups() {
     setErrors(nextErrors);
     setRefreshing(false);
   };
+
+  useEffect(() => {
+    setPreflight({});
+    setMaintenance({});
+  }, [snap.state.serverId, snap.state.ready?.server.hostSession]);
 
   useEffect(() => {
     if (snap.phase !== "live") return;
@@ -152,7 +169,7 @@ export default function Backups() {
       }
     : operation;
   const displayProgress = resolvedAfterRetry ? null : progress;
-  const operationKind = str(effectiveOperation.kind);
+  const operationKind = str(effectiveOperation.kind, "");
   const isBackupJob =
     !operationKind || operationKind === "FULL_RESTORE_POINT";
   const phase = isBackupJob
@@ -168,15 +185,20 @@ export default function Backups() {
   );
   const ready = backupReady(preflight, maintenance, effectiveOperation);
   const hostLive = Boolean(snap.state.ready?.agents.host);
+  const preflightKnown = Object.keys(preflight).length > 0;
+  const maintenanceKnown = Object.keys(maintenance).length > 0;
   const healthOperation = isBackupJob
     ? effectiveOperation
     : { ...effectiveOperation, phase: "IDLE" };
-  const health = backupHealth({
-    hostLive,
-    ready,
-    recovery,
-    operation: healthOperation,
-  });
+  const health =
+    hostLive && (!preflightKnown || !maintenanceKnown)
+      ? "checking"
+      : backupHealth({
+          hostLive,
+          ready,
+          recovery,
+          operation: healthOperation,
+        });
   const copy = healthCopy(health);
   const operationActive =
     isBackupJob &&
@@ -222,7 +244,12 @@ export default function Backups() {
   const readiness: Readiness[] = [
     {
       label: "Host authority",
-      state: preflight.hostAuthenticated === true ? "ready" : "blocked",
+      state:
+        preflight.hostAuthenticated === true
+          ? "ready"
+          : preflight.hostAuthenticated === false
+            ? "blocked"
+            : "unknown",
       detail:
         preflight.hostAuthenticated === true
           ? "The Host session is authenticated."
@@ -245,7 +272,12 @@ export default function Backups() {
     },
     {
       label: "Recovery gate",
-      state: recovery ? "blocked" : "ready",
+      state:
+        !preflightKnown || !maintenanceKnown
+          ? "unknown"
+          : recovery
+            ? "blocked"
+            : "ready",
       detail: recovery
         ? "A durable recovery condition must be resolved before another backup."
         : "No backup or maintenance recovery gate is active.",
@@ -315,7 +347,9 @@ export default function Backups() {
           ? "Refresh preflight and review the failure before creating another restore point."
           : health === "blocked"
             ? "Resolve the blocked readiness checks below."
-            : health === "running"
+            : health === "checking"
+              ? "Waiting for current Host preflight and maintenance state."
+              : health === "running"
               ? `Keep the Host online while ${phaseLabel(phase).toLowerCase()} finishes.`
               : backups.length
                 ? "Create a new restore point when you are ready."
