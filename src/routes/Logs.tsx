@@ -8,6 +8,7 @@ import { str } from "../adapter/control-state";
 import { Panel, Status } from "../components/ui";
 import { Segmented } from "../components/Segmented";
 import { FormattedText } from "../components/FormattedText";
+import { formatTime } from "../lib/time";
 export default function Logs() {
   const { state } = useSession(),
     [filter, setFilter] = useState("all"),
@@ -47,7 +48,7 @@ export default function Logs() {
     // Prefer dedicated presence events where available; avoid the corresponding console duplicate.
     const presence = state.presenceDeltas.map((e) => ({
       id: str(e.eventId),
-      time: new Date(str(e.observedAt)).toLocaleTimeString(),
+      time: formatTime(e.observedAt, { seconds: true }),
       category: "players",
       message: `${str(e.name)} ${e.state === "JOINED" ? "joined" : "left"} the game`,
       level: "INFO",
@@ -58,12 +59,11 @@ export default function Logs() {
       ? [
           {
             id: "backup-current",
-            time: new Date(
-              str(
-                state.backupProgress.capturedAt,
-                state.updatedAt ? new Date(state.updatedAt).toISOString() : "",
-              ),
-            ).toLocaleTimeString(),
+            time: formatTime(
+              state.backupProgress.capturedAt ??
+                (state.updatedAt ? state.updatedAt : undefined),
+              { seconds: true },
+            ),
             category: "backups",
             message: `Backup: ${str(state.backupProgress.message, str(state.backupProgress.phase, "Update received"))}`,
             level: state.backupProgress.status === "FAILED" ? "ERROR" : "INFO",
