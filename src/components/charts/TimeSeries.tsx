@@ -168,7 +168,11 @@ export function TimeSeries({
 }) {
   const prefs = usePreferences();
   const axis = useRef<
-    { key: string; bounds: [number, number]; calm: number } | undefined
+    {
+      key: string;
+      bounds: [number, number];
+      insideSince: number | null;
+    } | undefined
   >(undefined);
   const [table, setTable] = useState(false),
     [hidden, setHidden] = useState<Set<MetricKey>>(new Set()),
@@ -264,18 +268,29 @@ export function TimeSeries({
       proposed[0] > previous.bounds[0] &&
       proposed[1] < previous.bounds[1],
     );
-    const calm = comfortablyInside ? (previous?.calm ?? 0) + 1 : 0;
+    const insideSince = comfortablyInside
+      ? (previous?.insideSince ?? latestAt)
+      : null;
+    // Expand immediately, but only contract after a sustained 15 s calm
+    // interval. This makes auto-scale independent of whether the source is
+    // publishing at 250 ms, 1 s or a slower configured cadence.
+    const settle =
+      insideSince !== null && latestAt - insideSince >= 15_000;
     const next = stableDomain(
       scaled,
       minimumSpan,
       previous?.bounds,
-      calm >= 12,
+      settle,
     );
     axis.current = values.length
-      ? { key: axisKey, bounds: next, calm: calm >= 12 ? 0 : calm }
+      ? {
+          key: axisKey,
+          bounds: next,
+          insideSince: settle ? latestAt : insideSince,
+        }
       : undefined;
     return next;
-  }, [axisKey, minimumSpan, scale, values]);
+  }, [axisKey, latestAt, minimumSpan, scale, values]);
   let [lo, hi] = bounds;
   if (yMin !== undefined) lo = yMin;
   if (yMax !== undefined) hi = Math.max(hi, yMax);
