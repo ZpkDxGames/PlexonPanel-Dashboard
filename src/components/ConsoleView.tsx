@@ -246,6 +246,7 @@ export function ConsoleView({
     [command, setCommand] = useState(""),
     [prepared, setPrepared] = useState<Prepared | null>(null),
     [preparedCommand, setPreparedCommand] = useState(""),
+    [serverConfirmation, setServerConfirmation] = useState(false),
     [sending, setSending] = useState(false),
     [error, setError] = useState(""),
     [histIndex, setHistIndex] = useState(-1),
@@ -258,19 +259,11 @@ export function ConsoleView({
   const current = sourceLines ?? (paused ? frozen : snap.state.console);
   const entries = useMemo(() => groupLogs(current), [current]);
   const ready = snap.state.ready;
-  const paperCommandReason = session.reason("console.execute", "PAPER");
-  const hostCommandReason = session.reason("console.execute", "HOST");
-  const commandAuthority = !paperCommandReason
-    ? "PAPER"
-    : !hostCommandReason
-      ? "HOST"
-      : ready?.consoleAuthority === "HOST"
-        ? "HOST"
-        : "PAPER";
-  const commandReason =
-    commandAuthority === "PAPER" ? paperCommandReason : hostCommandReason;
-  const commandOffline =
-    !ready?.agents[commandAuthority === "HOST" ? "host" : "paper"];
+  // Console output may be Host-owned, but command execution is deliberately Paper-only.
+  // Never route browser command text through the Host maintenance/RCON boundary.
+  const commandAuthority = "PAPER" as const;
+  const commandReason = session.reason("console.execute", commandAuthority);
+  const commandOffline = !ready?.agents.paper;
   const sourceAuthority =
     ready?.consoleAuthority === "HOST"
       ? "HOST"
@@ -385,14 +378,22 @@ export function ConsoleView({
         requiresTypedConfirmation(nextPrepared.action, nextPrepared.parameters)
       ) {
         setPreparedCommand(normalized);
+        setServerConfirmation(false);
         setPrepared(nextPrepared);
         return;
       }
       setSending(true);
       const completion = await session.execute(nextPrepared);
-      completeCommand(normalized);
-      if (completion.status !== "SUCCESS")
-        setError(completion.message || completion.code || completion.status);
+      if (completion.code === "CONFIRMATION_REQUIRED") {
+        // ALLOWLIST_WITH_CONFIRMATION is a server policy, not a Dashboard guess.
+        // Re-open the exact prepared target and require a second explicit dispatch.
+        setPreparedCommand(normalized);
+        setServerConfirmation(true);
+        setPrepared(nextPrepared);
+        return;
+      }
+      if (completion.status === "SUCCESS") completeCommand(normalized);
+      else setError(completion.message || completion.code || completion.status);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Command unavailable.");
     } finally {
@@ -667,7 +668,7 @@ export function ConsoleView({
               }}
               placeholder={
                 commandOffline
-                  ? "Command target offline. Check Relay, Host and Paper status."
+                  ? "Paper command agent offline. Host journal remains read-only."
                   : "Type a command. Tab completes, ↑ ↓ browse history"
               }
               onKeyDown={(e) => {
@@ -802,16 +803,20 @@ export function ConsoleView({
       )}
       <ActionReview
         prepared={prepared}
+        forceAgentConfirmation={serverConfirmation}
         onClose={() => {
           setPrepared(null);
           setPreparedCommand("");
+          setServerConfirmation(false);
         }}
         onComplete={(completion) => {
-          if (preparedCommand) completeCommand(preparedCommand);
-          if (completion.status !== "SUCCESS")
+          if (completion.status === "SUCCESS" && preparedCommand)
+            completeCommand(preparedCommand);
+          else if (completion.status !== "SUCCESS")
             setError(
               completion.message || completion.code || completion.status,
             );
+          setServerConfirmation(false);
         }}
       />
     </section>
