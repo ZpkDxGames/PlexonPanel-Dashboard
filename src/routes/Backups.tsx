@@ -9,6 +9,7 @@ import {
   type JsonMap,
 } from "../adapter/control-state";
 import { session, type Prepared } from "../adapter/session";
+import { formatDateTime } from "../lib/time";
 import { ActionReview } from "../features/ActionReview";
 import { Button, Notice, Panel, Status } from "../components/ui";
 import { useSession } from "../hooks";
@@ -254,7 +255,7 @@ export default function Backups() {
                       <strong>{str(backup.filename)}</strong>
                       <small>{str(backup.backupId)}</small>
                     </td>
-                    <td>{str(backup.timestamp)}</td>
+                    <td>{formatDateTime(backup.timestamp)}</td>
                     <td>{size(backup.archiveBytes)}</td>
                     <td>
                       {backup.local === true ? "Verified" : "Unavailable"}
