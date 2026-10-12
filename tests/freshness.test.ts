@@ -61,3 +61,37 @@ test("missing, disconnected, small offset and behind clock remain distinct", () 
     "stale",
   );
 });
+
+
+test("advertised source cadence tightens delayed and stale detection without changing legacy fallback", () => {
+  const capturedAt = new Date(now).toISOString();
+  assert.equal(
+    classifyTelemetry({
+      capturedAt,
+      receivedAt: now,
+      connected: true,
+      now: now + 3500,
+      expectedIntervalMs: 250,
+    }).kind,
+    "delayed",
+  );
+  assert.equal(
+    classifyTelemetry({
+      capturedAt,
+      receivedAt: now,
+      connected: true,
+      now: now + 11000,
+      expectedIntervalMs: 250,
+    }).kind,
+    "stale",
+  );
+  assert.equal(
+    classifyTelemetry({
+      capturedAt,
+      receivedAt: now,
+      connected: true,
+      now: now + 11000,
+    }).kind,
+    "delayed",
+  );
+});
