@@ -3798,6 +3798,18 @@ input[type="file"]::file-selector-button:hover {
   }
 }
 
+@media (max-width: 767px) {
+  .backup-control-hero {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .backup-health-copy,
+  .backup-summary-grid,
+  .backup-create {
+    grid-column: 1;
+    grid-row: auto;
+  }
+}
+
 @media (max-width: 980px) {
   .access-summary-grid,
   .permission-groups {
