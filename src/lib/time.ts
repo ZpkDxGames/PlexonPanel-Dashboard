@@ -1,17 +1,19 @@
 export const DASHBOARD_TIMEZONE = "America/Sao_Paulo" as const;
 
-function instant(value: number | string | Date): number | null {
+function instant(value: unknown): number | null {
   const at =
     value instanceof Date
       ? value.getTime()
       : typeof value === "number"
         ? value
-        : Date.parse(value);
+        : typeof value === "string"
+          ? Date.parse(value)
+          : NaN;
   return Number.isFinite(at) ? at : null;
 }
 
 export function formatTime(
-  value: number | string | Date,
+  value: unknown,
   options: { seconds?: boolean; millis?: boolean } = {},
 ): string {
   const at = instant(value);
@@ -27,7 +29,7 @@ export function formatTime(
   return formatter.format(at);
 }
 
-export function formatDateTime(value: number | string | Date): string {
+export function formatDateTime(value: unknown): string {
   const at = instant(value);
   if (at === null) return "Unavailable";
   return new Intl.DateTimeFormat("en-GB", {
