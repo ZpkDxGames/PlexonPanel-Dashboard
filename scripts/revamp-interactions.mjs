@@ -351,9 +351,14 @@ try {
     await new Promise((r) => setTimeout(r, 150));
     const intermediate = document.querySelectorAll(".kpi-value")[1].textContent;
     const path = document.querySelector(".time-series .chart-line");
-    const beforePath = path.getAttribute("d");
-    await new Promise((r) => setTimeout(r, 60));
-    const flow = beforePath !== path.getAttribute("d");
+    // The reducer publishes on a 250ms cadence. Observe the whole publish +
+    // 150ms interpolation interval instead of comparing two pre-publication frames.
+    const paths = new Set([path.getAttribute("d")]);
+    for (let i = 0; i < 30; i++) {
+      await new Promise((r) => setTimeout(r, 20));
+      paths.add(path.getAttribute("d"));
+    }
+    const flow = paths.size > 2;
     for (
       let i = 0;
       i < 30 &&
@@ -365,6 +370,7 @@ try {
       intermediate,
       final: document.querySelectorAll(".kpi-value")[1].textContent,
       flow,
+      distinctPaths: paths.size,
     };
   });
   check(
@@ -375,7 +381,7 @@ try {
   check(
     "Live chart morphs between samples",
     countUp.flow,
-    "Bounded SVG path interpolation observed",
+    JSON.stringify(countUp),
   );
   await p.evaluate(async () => {
     const { session } = await import("/src/adapter/session.ts");
