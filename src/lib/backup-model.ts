@@ -146,13 +146,14 @@ export function effectiveBackupPhase(
 export function effectiveBackupProgress(
   operation: JsonMap,
   progress: JsonMap | null | undefined,
-): number {
-  if (isTerminalBackupPhase(str(operation.phase, "")))
-    return number(operation.progressPercent) ?? 0;
+): number | null {
+  const durable = number(operation.progressPercent);
+  const bounded = durable === null ? null : Math.max(0, Math.min(100, durable));
+  if (isTerminalBackupPhase(str(operation.phase, ""))) return bounded;
   const live = number(progress?.progress);
   if (live !== null && progressBelongsToOperation(operation, progress))
     return Math.max(0, Math.min(100, live * 100));
-  return Math.max(0, Math.min(100, number(operation.progressPercent) ?? 0));
+  return bounded;
 }
 
 export function backupRecoveryRequired(
@@ -221,7 +222,7 @@ export function backupHealth({
 export function stepState(
   step: BackupTimelineStep,
   phase: string,
-  progressPercent: number,
+  progressPercent: number | null,
   operation: JsonMap,
 ): "pending" | "active" | "done" | "warning" | "error" {
   const terminal = str(operation.phase);
@@ -243,7 +244,7 @@ export function stepState(
 
   if (terminal === "FAILED" || terminal === "RECOVERY_REQUIRED") {
     const inferred = BACKUP_TIMELINE.findLastIndex(
-      (candidate) => progressPercent >= candidate.minProgress,
+      (candidate) => progressPercent !== null && progressPercent >= candidate.minProgress,
     );
     if (stepIndex < inferred) return "done";
     if (stepIndex === inferred)
@@ -257,7 +258,7 @@ export function stepState(
     return "pending";
   }
 
-  if (progressPercent >= step.minProgress) return "done";
+  if (progressPercent !== null && progressPercent >= step.minProgress) return "done";
   return "pending";
 }
 

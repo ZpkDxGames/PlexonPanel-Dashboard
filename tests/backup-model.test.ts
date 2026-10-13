@@ -6,6 +6,7 @@ import {
   backupReady,
   backupRecoveryRequired,
   effectiveBackupPhase,
+  effectiveBackupProgress,
   retryUploadAvailable,
   stepState,
 } from "../src/lib/backup-model";
@@ -105,4 +106,13 @@ test("timeline distinguishes completed, degraded and recovery outcomes", () => {
     }),
     "pending",
   );
+});
+
+
+test("missing backup progress stays unknown and terminal evidence ignores stale pushes", () => {
+  assert.equal(effectiveBackupProgress({}, null), null);
+  assert.equal(effectiveBackupProgress({ phase: "FAILED" }, { progress: 0.5 }), null);
+  assert.equal(effectiveBackupProgress({ phase: "FAILED", progressPercent: 0 }, null), 0);
+  assert.equal(effectiveBackupProgress({ jobId: "j", phase: "ARCHIVING" }, { jobId: "j", progress: 0 }), 0);
+  assert.equal(stepState(BACKUP_TIMELINE[0], "FAILED", null, { phase: "FAILED" }), "pending");
 });

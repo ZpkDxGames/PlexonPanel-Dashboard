@@ -485,7 +485,7 @@ export default function Backups() {
               <div>
                 <span>Progress</span>
                 <strong>
-                  {phase === "IDLE" ? "—" : percent(progressPercent)}
+                  {phase === "IDLE" || progressPercent === null ? "—" : percent(progressPercent)}
                 </strong>
               </div>
               <div>
@@ -496,7 +496,7 @@ export default function Backups() {
               </div>
             </div>
 
-            {phase !== "IDLE" && (
+            {phase !== "IDLE" && progressPercent !== null && (
               <div
                 className="backup-progress-track"
                 role="progressbar"

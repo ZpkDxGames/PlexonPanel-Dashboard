@@ -216,18 +216,28 @@ try {
     burst.retained === 2500 && burst.domRows < 100,
     JSON.stringify(burst),
   );
-  const refreshService = () => p.evaluate(async () => {
+  // Simulate the declared Host producer cadence while this fixture owns the session.
+  // Browser actionability/screenshot time must not turn an otherwise live fixture stale.
+  await p.evaluate(async () => {
     const { session } = await import("/src/adapter/session.ts");
-    const snap = session.getSnapshot();
-    session.receiveFixture({
-      type: "server.event", serverId: snap.state.serverId, agentKind: "HOST",
-      agentSession: "fixture-host", eventType: "service.status",
-      body: { ...snap.state.service, capturedAt: new Date().toISOString(),
-        resources: { ...snap.state.service.resources, capturedAt: new Date().toISOString() } }
-    });
+    const refreshService = () => {
+      const snap = session.getSnapshot();
+      if (snap.fixture !== "security") return;
+      const capturedAt = new Date().toISOString();
+      session.receiveFixture({
+        type: "server.event", serverId: snap.state.serverId, agentKind: "HOST",
+        agentSession: snap.state.ready.server.hostSession, eventType: "service.status",
+        body: { ...snap.state.service, capturedAt,
+          resources: { ...snap.state.service.resources, capturedAt } }
+      });
+    };
+    refreshService();
+    const timer = setInterval(() => {
+      if (session.getSnapshot().fixture !== "security") clearInterval(timer);
+      else refreshService();
+    }, 1000);
   });
   await p.evaluate(() => (location.hash = "Overview"));
-  await refreshService();
   await p.getByRole("button", { name: "Stop", exact: true }).click();
   await p.locator("dialog[open]").waitFor();
   check(
@@ -239,8 +249,6 @@ try {
     path: "docs/revamp/6.5.0/lifecycle-confirm-fixed.png",
     fullPage: true,
   });
-  // Screenshot capture is not a service producer; refresh fixture evidence before dispatch.
-  await refreshService();
   await p
     .getByRole("button", { name: "Confirm & dispatch", exact: true })
     .click();
@@ -263,8 +271,6 @@ try {
   );
   await p.getByRole("button", { name: "Close", exact: true }).click();
   await p.getByRole("button", { name: "Restart", exact: true }).click();
-  // Screenshot capture is not a service producer; refresh fixture evidence before dispatch.
-  await refreshService();
   await p
     .getByRole("button", { name: "Confirm & dispatch", exact: true })
     .click();

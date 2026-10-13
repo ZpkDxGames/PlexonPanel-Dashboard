@@ -102,4 +102,4 @@ After source, browser and controlled live acceptance, merge matched Core fixes, 
 
 For idle rollback, stop the exact Host/Minecraft units, verify inactive, restore BOTH saved JARs to their original paths with cp --preserve=all, compare hashes with recorded originals, then start and prove Paper/Host/RCON readiness. Never interrupt an active backup merely to roll back; investigate a safe terminal/recovery boundary. Preserve durable state, inventory, partials, identity and config. Any narrow live config/ACL correction needs its own recorded reversal. The previous verified Vercel deployment must be recorded before promotion; none was selected here.
 
-The local workspace connection later failed, preventing final local ZIP assembly and screenshot reinspection. Source edits and CI evidence remain on GitHub. This is an execution boundary, not certification evidence.
+The workspace connection was restored after an interruption. Candidate JAR hashes were rechecked locally and CI screenshots were inspected. The remaining live infrastructure boundary is VPS execution and an Owner-capable paired session; fixture results cannot substitute for that evidence.
