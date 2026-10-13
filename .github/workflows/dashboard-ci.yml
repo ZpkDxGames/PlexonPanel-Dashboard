@@ -50,6 +50,14 @@ jobs:
       - name: Stabilization source clocks, uptime and responsive gates
         run: npm run test:stabilization
 
+      - name: General browser gate
+        run: |
+          npm run dev > /tmp/plexon-vite.log 2>&1 &
+          VITE_PID=$!
+          trap 'kill "$VITE_PID"' EXIT
+          for attempt in {1..50}; do curl --silent --fail http://127.0.0.1:4173/ >/dev/null && break; sleep 0.2; done
+          npm run test:browser
+
       - name: Existing interaction, accessibility and refinement gates
         run: |
           npm run test:perf

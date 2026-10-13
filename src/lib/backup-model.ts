@@ -349,6 +349,7 @@ export function backupView({
   phasePush,
   progress,
   backups,
+  preflightFailure = "",
 }: {
   hostLive: boolean;
   preflight: JsonMap;
@@ -356,6 +357,7 @@ export function backupView({
   phasePush: JsonMap;
   progress: JsonMap | null;
   backups: JsonMap[];
+  preflightFailure?: string;
 }) {
   const durable = record(maintenance.currentOperation);
   const durableTime = Date.parse(
@@ -386,6 +388,8 @@ export function backupView({
         ? phase.startsWith("VERIFYING")
           ? "verifying"
           : "running"
+        : preflightFailure
+          ? "failed"
         : !known
           ? "checking"
           : backupHealth({ hostLive, ready, recovery, operation });

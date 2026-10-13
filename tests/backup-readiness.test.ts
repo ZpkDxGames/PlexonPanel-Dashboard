@@ -1,66 +1,14 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import {
-  backupCheckState,
-  backupProviderReadiness,
-} from "../src/adapter/backup-readiness";
-const base = {
-  hasSuccess: false,
-  busy: false,
-  error: "",
-  data: {},
-  failure: null,
-  completedAt: 0,
-};
-test("provider connectivity and source/storage failures remain separate", () => {
-  assert.equal(backupProviderReadiness(base, base), "Unknown");
-  assert.equal(
-    backupCheckState(
-      {
-        ...base,
-        error: "rclone failed",
-        failure: { code: "REMOTE_VERIFY_FAILED", stage: "provider" },
-      },
-      "storage",
-    ),
-    "Unknown",
-  );
-  assert.equal(
-    backupCheckState(
-      {
-        ...base,
-        error: "disk full",
-        failure: { code: "BACKUP_DISK_SPACE_LOW", stage: "capacity" },
-      },
-      "storage",
-    ),
-    "Failed",
-  );
-  assert.equal(
-    backupCheckState(
-      {
-        ...base,
-        hasSuccess: true,
-        data: { backupRootWritable: true },
-        completedAt: 10,
-      },
-      "storage",
-    ),
-    "Ready",
-  );
+import { backupView } from "../src/lib/backup-model";
+const base = { hostLive: true, preflight: {}, maintenance: {}, phasePush: {}, progress: null, backups: [] };
+test("known preflight failure is failed, missing evidence stays unknown", () => {
+  assert.equal(backupView(base).health, "checking");
+  assert.equal(backupView({ ...base, preflightFailure: "BACKUP_SOURCE_UNREADABLE" }).health, "failed");
+  assert.equal(backupView({ ...base, preflightFailure: "RCLONE_UNAVAILABLE" }).health, "failed");
 });
-test("new successful preflight supersedes older provider result", () => {
-  const provider = {
-    ...base,
-    hasSuccess: true,
-    data: { configured: true, status: "FAILED" },
-    completedAt: 1,
-  };
-  const preflight = {
-    ...base,
-    hasSuccess: true,
-    data: { providerStatus: "CONNECTED" },
-    completedAt: 2,
-  };
-  assert.equal(backupProviderReadiness(provider, preflight), "Ready");
+test("recovery and offline authority take precedence over preflight failure", () => {
+  const failed = { ...base, preflightFailure: "BACKUP_SOURCE_UNREADABLE", maintenance: { jobRecoveryRequired: true } };
+  assert.equal(backupView(failed).health, "recovery");
+  assert.equal(backupView({ ...failed, hostLive: false }).health, "offline");
 });

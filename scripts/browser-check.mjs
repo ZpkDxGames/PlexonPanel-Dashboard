@@ -8,6 +8,9 @@ const browser = await chromium.launch({ headless: true });
 const results = [];
 for (const viewport of [{ name:"desktop", width:1440, height:1000 }, { name:"phone", width:390, height:844 }]) {
   const page = await browser.newPage({ viewport });
+  await page.route(/https:\/\/(crafatar|mc-heads|minotar)/, (route) => route.fulfill({
+    contentType: "image/svg+xml", body: '<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><path fill="#b88753" d="M0 0h64v64H0z"/></svg>'
+  }));
   const errors = [];
   page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
   page.on("pageerror", (error) => errors.push(error.message));

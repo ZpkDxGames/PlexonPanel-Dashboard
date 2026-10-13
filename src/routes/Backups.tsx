@@ -68,7 +68,8 @@ export default function Backups() {
     maintenance: JsonMap;
     backups: JsonMap[];
     errors: string[];
-  }>({ key: "", preflight: {}, maintenance: {}, backups: [], errors: [] });
+    preflightFailure: string;
+  }>({ key: "", preflight: {}, maintenance: {}, backups: [], errors: [], preflightFailure: "" });
   const identity = `${snap.revision}:${snap.state.serverId}:${snap.state.ready?.server.hostSession ?? ""}`;
   const generation = useRef(identity);
   generation.current = identity;
@@ -76,8 +77,8 @@ export default function Backups() {
   const current: Omit<typeof evidence, "key"> =
     evidence.key === identity
       ? evidence
-      : { preflight: {}, maintenance: {}, backups: [], errors: [] };
-  const { preflight, maintenance, backups, errors } = current;
+      : { preflight: {}, maintenance: {}, backups: [], errors: [], preflightFailure: "" };
+  const { preflight, maintenance, backups, errors, preflightFailure } = current;
   const setErrors = (next: string[]) =>
     setEvidence((value) => ({ ...value, errors: next }));
   const [prepared, setPrepared] = useState<Prepared | null>(null);
@@ -123,6 +124,8 @@ export default function Backups() {
       maintenance: data[1],
       backups: records(data[2].backups),
       errors: failures,
+      preflightFailure: result[0].status === "fulfilled" && result[0].value.status !== "SUCCESS"
+        ? result[0].value.code ?? "PREFLIGHT_FAILED" : "",
     });
     inFlight.current = null;
     setRefreshing(false);
@@ -135,6 +138,7 @@ export default function Backups() {
     phasePush: record(snap.state.maintenancePhase),
     progress,
     backups,
+    preflightFailure,
   });
   const {
     operation,
@@ -180,7 +184,8 @@ export default function Backups() {
   };
 
   const provider = record(maintenance.provider);
-  const latestBackup = backups[0];
+  const latestSuccessful = backups.find((backup) => str(backup.result, "").startsWith("SUCCESS"));
+  const latestOffsite = backups.find((backup) => backup.offsite === true);
   const localCount = backups.filter((backup) => backup.local === true).length;
   const offsiteCount = backups.filter(
     (backup) => backup.offsite === true,
@@ -200,7 +205,8 @@ export default function Backups() {
   const readiness: Readiness[] = [
     {
       label: "Backup source",
-      state: preflightKnown ? "ready" : "unknown",
+      state: /^(BACKUP_SOURCE_|BACKUP_INCLUDE_|BACKUP_SYMLINK_|BACKUP_ENTRY_|BACKUP_SIZE_)/.test(preflightFailure)
+        ? "blocked" : preflightKnown ? "ready" : "unknown",
       detail: preflightKnown
         ? "Configured sources passed the Host source scan."
         : (errors.find((e) => e.startsWith("Backup preflight:")) ??
@@ -322,26 +328,24 @@ export default function Backups() {
 
         <div className="backup-summary-grid" aria-label="Backup summary">
           <div>
-            <span>Last restore point</span>
+            <span>Last successful backup</span>
             <strong>
-              {latestBackup
-                ? formatDateTime(latestBackup.timestamp)
+              {latestSuccessful
+                ? formatDateTime(latestSuccessful.timestamp)
                 : "None yet"}
             </strong>
           </div>
           <div>
-            <span>Verified inventory</span>
-            <strong>
-              {verifiedCount} / {backups.length || 0}
-            </strong>
+            <span>Last verified offsite backup</span>
+            <strong>{latestOffsite ? formatDateTime(latestOffsite.timestamp) : "None yet"}</strong>
           </div>
           <div>
-            <span>Local copies</span>
-            <strong>{localCount}</strong>
+            <span>Provider</span>
+            <strong>{str(provider.provider, "Unknown")} · {str(provider.status, "Unknown")}</strong>
           </div>
           <div>
-            <span>Offsite copies</span>
-            <strong>{offsiteCount}</strong>
+            <span>Host authority</span>
+            <strong>{snap.phase === "live" && snap.state.ready?.agents.host ? "Connected" : "Unavailable"}</strong>
           </div>
         </div>
 
