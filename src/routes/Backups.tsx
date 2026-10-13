@@ -255,14 +255,16 @@ export default function Backups() {
     {
       label: "Recovery gate",
       state:
-        !preflightKnown || !maintenanceKnown
-          ? "unknown"
-          : recovery
-            ? "blocked"
+        recovery
+          ? "blocked"
+          : !preflightKnown || !maintenanceKnown
+            ? "unknown"
             : "ready",
       detail: recovery
         ? "A durable recovery condition must be resolved before another backup."
-        : "No backup or maintenance recovery gate is active.",
+        : preflightKnown && maintenanceKnown
+          ? "No backup or maintenance recovery gate is active."
+          : "Recovery state has not been fully reported.",
     },
     {
       label: "Backup storage",
@@ -301,7 +303,9 @@ export default function Backups() {
       detail:
         preflight.hostConfigRestartRequired === true
           ? "Host configuration changed on disk; restart Host before a new backup."
-          : "The loaded Host configuration matches the current file.",
+          : preflight.hostConfigRestartRequired === false
+            ? "The loaded Host configuration matches the current file."
+            : "Host configuration state has not been reported.",
     },
   ];
 
