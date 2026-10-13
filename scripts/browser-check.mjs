@@ -7,7 +7,8 @@ await mkdir("artifacts/browser", { recursive: true });
 const browser = await chromium.launch({ headless: true });
 const results = [];
 for (const viewport of [{ name:"desktop", width:1440, height:1000 }, { name:"phone", width:390, height:844 }]) {
-  const page = await browser.newPage({ viewport });
+  const context = await browser.newContext({ viewport });
+  const page = await context.newPage();
   await page.route(/https:\/\/(crafatar|mc-heads|minotar)/, (route) => route.fulfill({
     contentType: "image/svg+xml", body: '<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><path fill="#b88753" d="M0 0h64v64H0z"/></svg>'
   }));
@@ -23,7 +24,7 @@ for (const viewport of [{ name:"desktop", width:1440, height:1000 }, { name:"pho
     results.push({ viewport:viewport.name, route, overflow, violations:axe.violations.map((v)=>({id:v.id,impact:v.impact,nodes:v.nodes.length})) });
   }
   results.push({ viewport:viewport.name, consoleErrors:errors });
-  await page.close();
+  await context.close();
 }
 await browser.close();
 await writeFile("artifacts/browser-results.json", JSON.stringify({base,createdAt:new Date().toISOString(),results},null,2));

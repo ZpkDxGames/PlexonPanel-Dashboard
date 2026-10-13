@@ -58,12 +58,21 @@ jobs:
           for attempt in {1..50}; do curl --silent --fail http://127.0.0.1:4173/ >/dev/null && break; sleep 0.2; done
           npm run test:browser
 
-      - name: Existing interaction, accessibility and refinement gates
-        run: |
-          npm run test:perf
-          npm run test:revamp
-          npm run test:visual -- --out=artifacts/visual
-          npm run test:refinement
+      - name: Bundle performance budget
+        if: ${{ !cancelled() }}
+        run: npm run test:perf
+
+      - name: Retained interaction gates
+        if: ${{ !cancelled() }}
+        run: npm run test:revamp
+
+      - name: Visual accessibility gates
+        if: ${{ !cancelled() }}
+        run: npm run test:visual -- --out=artifacts/visual
+
+      - name: Refinement gates
+        if: ${{ !cancelled() }}
+        run: npm run test:refinement
 
       - name: Upload browser evidence
         if: always()
