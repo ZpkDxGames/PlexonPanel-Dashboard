@@ -246,7 +246,11 @@ try {
     .click();
   await p.locator("dialog[open] .notice").waitFor();
   check("Lifecycle result succeeds", await p.getByText("Server result received").isVisible(),
-    await p.locator("dialog[open]").innerText());
+    (await p.locator("dialog[open]").innerText()) + "\n" + await p.evaluate(async () => {
+      const { session } = await import("/src/adapter/session.ts");
+      const s = session.getSnapshot();
+      return JSON.stringify({ reason: session.reason("server.stop", "HOST"), revision: s.revision, fixture: s.fixture, service: s.state.service, receipt: s.state.receipts?.service, now: Date.now() });
+    }));
   const stopAction = await p.evaluate(async () => {
     const { actionLog } = await import("/src/development/fixtures.ts");
     return actionLog.at(-1);
@@ -266,7 +270,11 @@ try {
     .click();
   await p.locator("dialog[open] .notice").waitFor();
   check("Lifecycle result succeeds", await p.getByText("Server result received").isVisible(),
-    await p.locator("dialog[open]").innerText());
+    (await p.locator("dialog[open]").innerText()) + "\n" + await p.evaluate(async () => {
+      const { session } = await import("/src/adapter/session.ts");
+      const s = session.getSnapshot();
+      return JSON.stringify({ reason: session.reason("server.stop", "HOST"), revision: s.revision, fixture: s.fixture, service: s.state.service, receipt: s.state.receipts?.service, now: Date.now() });
+    }));
   const restartAction = await p.evaluate(async () => {
     const { actionLog } = await import("/src/development/fixtures.ts");
     return actionLog.at(-1);

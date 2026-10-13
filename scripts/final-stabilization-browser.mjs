@@ -103,7 +103,8 @@ try {
           // Complete layout/scroll before freezing the presentation clock.
           await plot.hover({ position: { x: 100, y: 50 } });
           // Hover may not touch paths or scale.
-          await p.clock.pauseAt(new Date());
+          await p.clock.pauseAt(new Date(await p.evaluate(() => Date.now()) + 100));
+          await p.clock.runFor(32);
           const counters = await p.evaluate(() => [
             window.__resourceProjections,
             window.__resourceGeometry,
