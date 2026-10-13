@@ -2,14 +2,9 @@ name: Dashboard CI
 
 on:
   pull_request:
-    branches:
-      - main
-      - "revamp/**"
+    branches: [main, "revamp/**"]
   push:
-    branches:
-      - main
-      - "fix/**"
-      - "revamp/**"
+    branches: [main, "fix/**", "revamp/**"]
 
 permissions:
   contents: read
@@ -19,70 +14,74 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  verify:
+  source:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 10
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Node 24
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 24
           cache: npm
+      - run: npm ci
+      - run: npm run check
+      - run: npm run build
+      - run: npm run test:perf
 
-      - name: Install
-        run: npm ci
-
-      - name: Typecheck and unit tests
-        run: npm run check
-
-      - name: Production build
-        run: npm run build
-
-      - name: Install Chromium
-        run: npx playwright install --with-deps chromium
-
-      - name: Responsive release browser gate
-        run: npm run test:release65
-
-      - name: Stabilization source clocks, uptime and responsive gates
-        run: npm run test:stabilization
-
-      - name: General browser gate
-        if: ${{ !cancelled() }}
+  browser:
+    needs: source
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        gate: [release65, stabilization, browser, revamp, visual, refinement]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Remove historical evidence from the runner checkout
+        run: rm -f docs/revamp/6.5.0/refinement-interactions.json docs/revamp/6.5.0/retained-interactions.json docs/revamp/6.5.0/console-history-fixed.png docs/revamp/6.5.0/lifecycle-confirm-fixed.png
+      - name: Run browser gate
+        env:
+          GATE: ${{ matrix.gate }}
         run: |
-          npm run dev > /tmp/plexon-vite.log 2>&1 &
-          VITE_PID=$!
-          trap 'kill "$VITE_PID"' EXIT
-          for attempt in {1..50}; do curl --silent --fail http://127.0.0.1:4173/ >/dev/null && break; sleep 0.2; done
-          npm run test:browser
-
-      - name: Bundle performance budget
-        if: ${{ !cancelled() }}
-        run: npm run test:perf
-
-      - name: Retained interaction gates
-        if: ${{ !cancelled() }}
-        run: npm run test:revamp
-
-      - name: Visual accessibility gates
-        if: ${{ !cancelled() }}
-        run: npm run test:visual -- --out=artifacts/visual
-
-      - name: Refinement gates
-        if: ${{ !cancelled() }}
-        run: npm run test:refinement
-
-      - name: Upload browser evidence
+          case "$GATE" in
+            browser)
+              node node_modules/vite/bin/vite.js --host 127.0.0.1 --port 4173 > /tmp/plexon-vite.log 2>&1 &
+              VITE_PID=$!
+              trap 'kill "$VITE_PID"' EXIT
+              for attempt in {1..50}; do curl --silent --fail http://127.0.0.1:4173/ >/dev/null && break; sleep 0.2; done
+              npm run test:browser
+              ;;
+            visual) npm run test:visual -- --out=artifacts/visual ;;
+            *) npm run "test:$GATE" ;;
+          esac
+      - name: Upload current browser evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: stabilization-browser-evidence
+          name: stabilization-browser-${{ matrix.gate }}
           path: |
             artifacts/
             docs/revamp/6.5.0/refinement-interactions.json
             docs/revamp/6.5.0/retained-interactions.json
             docs/revamp/6.5.0/console-history-fixed.png
             docs/revamp/6.5.0/lifecycle-confirm-fixed.png
+
+  verify:
+    if: always()
+    needs: [source, browser]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require every source and browser gate
+        env:
+          SOURCE_RESULT: ${{ needs.source.result }}
+          BROWSER_RESULT: ${{ needs.browser.result }}
+        run: |
+          test "$SOURCE_RESULT" = success
+          test "$BROWSER_RESULT" = success
