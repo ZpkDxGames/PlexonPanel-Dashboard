@@ -4,7 +4,7 @@ import { chromium } from "@playwright/test";
 
 const port = 4216;
 const base = `http://127.0.0.1:${port}`;
-const out = "docs/revamp/6.5.1";
+const out = "artifacts/release65";
 const routes = [
   "Overview",
   "Console",

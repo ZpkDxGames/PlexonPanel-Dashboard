@@ -46,3 +46,22 @@ jobs:
 
       - name: Responsive release browser gate
         run: npm run test:release65
+
+      - name: Stabilization source clocks, uptime and responsive gates
+        run: npm run test:stabilization
+
+      - name: Existing interaction, accessibility and refinement gates
+        run: |
+          npm run test:perf
+          npm run test:revamp
+          npm run test:visual
+          npm run test:refinement
+
+      - name: Upload browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stabilization-browser-evidence
+          path: |
+            artifacts/
+            docs/revamp/

@@ -1,3 +1,4 @@
+import { collectResources, type Resources } from "../lib/resource-series";
 import { DASHBOARD_LABEL } from "./dashboard-version";
 import type { Scope } from "./scopes";
 import { capturedAtMillis, classifyTelemetry } from "./telemetry-freshness";
@@ -46,17 +47,9 @@ export interface Sample {
   sources?: {
     paperHealth: number | null;
     paperSystem: number | null;
-    hostSystem: number | null;
-    service: number | null;
   };
-  serviceCpu?: number | null;
-  serviceMemory?: number | null;
   tps: number | null;
   mspt: number | null;
-  hostCpu: number | null;
-  processCpu: number | null;
-  heap: number | null;
-  memory: number | null;
   players: number | null;
   gc: number | null;
 }
@@ -106,6 +99,7 @@ export interface ControlState {
   console: JsonMap[];
   chat: JsonMap[];
   history: Sample[];
+  resources: Resources;
   backupProgress: JsonMap | null;
   maintenancePhase?: JsonMap | null;
   updatedAt: number;
@@ -143,6 +137,7 @@ export function emptyControlState(serverId: string): ControlState {
     console: [],
     chat: [],
     history: [],
+    resources: {},
     backupProgress: null,
     updatedAt: 0,
     telemetryUpdatedAt: 0,
@@ -194,6 +189,27 @@ export function applyControlMessage(
     return {
       ...state,
       ready,
+      resources: Object.fromEntries(
+        Object.entries(state.resources ?? {}).filter(([key, series]) =>
+          ["heap", "processCpu"].includes(key)
+            ? ready.agents.paper &&
+              !state.cached &&
+              series?.session === ready.server.paperSession
+            : ready.agents.host &&
+              !state.cached &&
+              series?.session === ready.server.hostSession,
+        ),
+      ),
+      backupProgress:
+        state.ready?.server.hostSession === ready.server.hostSession &&
+        !state.cached
+          ? state.backupProgress
+          : null,
+      maintenancePhase:
+        state.ready?.server.hostSession === ready.server.hostSession &&
+        !state.cached
+          ? state.maintenancePhase
+          : null,
       receipts: {
         paperHealth:
           ready.agents.paper && samePaperSession && !state.cached
@@ -316,12 +332,7 @@ export function applyControlMessage(
       };
       break;
     case "telemetry.worlds": {
-      if (
-        capturedBefore(
-          body.capturedAt,
-          state.inventoryCapturedAt?.worlds,
-        )
-      )
+      if (capturedBefore(body.capturedAt, state.inventoryCapturedAt?.worlds))
         return state;
       next.worlds = records(body.worlds, 64);
       next.inventoryCapturedAt = {
@@ -474,19 +485,8 @@ export function applyControlMessage(
     default:
       return state;
   }
-  if (
-    message.eventType === "telemetry.server" ||
-    message.eventType === "telemetry.system" ||
-    message.eventType === "service.status"
-  ) {
-    const resources = record(next.service.resources);
-    const at =
-        capturedAtMillis(
-          message.eventType === "service.status"
-            ? resources.capturedAt
-            : body.capturedAt,
-        ) ?? receivedAt,
-      host = next.ready?.agents.host ? next.hostSystem : {},
+  if (message.eventType === "telemetry.server") {
+    const at = capturedAtMillis(body.capturedAt) ?? receivedAt,
       paper = next.ready?.agents.paper ? next.system : {},
       server = next.ready?.agents.paper ? next.server : {},
       tps = Array.isArray(server.tps) ? number(server.tps[0]) : null;
@@ -495,30 +495,9 @@ export function applyControlMessage(
       sources: {
         paperHealth: capturedAtMillis(server.capturedAt),
         paperSystem: capturedAtMillis(paper.capturedAt),
-        hostSystem: capturedAtMillis(host.capturedAt),
-        service: next.ready?.agents.host
-          ? capturedAtMillis(resources.capturedAt)
-          : null,
       },
-      serviceCpu:
-        resources.scope === "MINECRAFT_SERVICE" &&
-        resources.source === "SYSTEMD_CGROUP" &&
-        resources.cpuAvailable === true &&
-        resources.cpuUnit === "PERCENT_OF_ONE_CORE"
-          ? number(resources.cpuPercent)
-          : null,
-      serviceMemory:
-        resources.scope === "MINECRAFT_SERVICE" &&
-        resources.source === "SYSTEMD_CGROUP" &&
-        resources.memoryAvailable === true
-          ? number(resources.memoryBytes)
-          : null,
       tps,
       mspt: number(server.averageTickMillis),
-      hostCpu: number(host.hostCpuPercent),
-      processCpu: number(paper.processCpuPercent),
-      heap: number(paper.jvmHeapUsedBytes),
-      memory: number(host.physicalMemoryUsedBytes),
       players: number(server.onlinePlayers),
       gc: number(paper.gcPauseTotalMillis),
     };
@@ -528,6 +507,14 @@ export function applyControlMessage(
       history: appendHistory(next.history, sample),
     };
   }
+  next.resources = collectResources(
+    state.resources ?? {},
+    message.eventType,
+    kind,
+    agentSession,
+    body,
+    receivedAt,
+  );
   return next;
 }
 function supersededCapture(previous: JsonMap, incoming: JsonMap): boolean {

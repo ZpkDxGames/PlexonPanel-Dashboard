@@ -4,13 +4,65 @@ import { copy } from "../i18n/en";
 import { useMemo } from "react";
 import { useSession } from "../hooks";
 import { TimeSeries } from "../components/charts/TimeSeries";
-import { FocusedMetricPanel } from "../components/FocusedMetricPanel";
+import { ResourcePanel } from "../components/ResourcePanel";
 import { Panel, Status } from "../components/ui";
 import { sampleStats, windowStart } from "../lib/chart";
 import { number, str } from "../adapter/control-state";
 import { entityDensity } from "../store/selectors";
 import { preferences, usePreferences } from "../store/preferences";
 import { chartWindowLabel, formatTime } from "../lib/time";
+const CPU_OPTIONS = [
+  {
+    key: "serviceCpu",
+    shortLabel: "Minecraft",
+    label: "Minecraft service · % of one core",
+    unit: "%",
+    color: "var(--c1)",
+    source: "Host service",
+  },
+  {
+    key: "processCpu",
+    shortLabel: "JVM",
+    label: "JVM process",
+    unit: "%",
+    color: "var(--c4)",
+    source: "Paper JVM",
+  },
+  {
+    key: "hostCpu",
+    shortLabel: "Host",
+    label: "Host utilization",
+    unit: "%",
+    color: "var(--c5)",
+    source: "Host",
+  },
+] as const;
+const MEMORY_OPTIONS = [
+  {
+    key: "serviceMemory",
+    shortLabel: "Minecraft",
+    label: "Minecraft service memory",
+    unit: "bytes",
+    color: "var(--c4)",
+    source: "Host service",
+  },
+  {
+    key: "heap",
+    shortLabel: "Heap",
+    label: "JVM heap used",
+    unit: "bytes",
+    color: "var(--c3)",
+    source: "Paper JVM",
+  },
+  {
+    key: "memory",
+    shortLabel: "Host",
+    label: "Physical Host memory used",
+    unit: "bytes",
+    color: "var(--c1)",
+    source: "Host",
+  },
+] as const;
 export default function Performance() {
   const { state } = useSession();
   const prefs = usePreferences();
@@ -44,21 +96,19 @@ export default function Performance() {
     <>
       <div className="performance-toolbar">
         <Segmented label={copy.time_range_22cd3} value={windowMs}>
-          {([
-            [30_000, "30s"],
-            [60_000, "1min"],
-            [300_000, "5min"],
-            [600_000, "10min"],
-          ] as const).map(([value, label]) => (
+          {(
+            [
+              [30_000, "30s"],
+              [60_000, "1min"],
+              [300_000, "5min"],
+              [600_000, "10min"],
+            ] as const
+          ).map(([value, label]) => (
             <button
               key={value}
               onClick={() =>
                 preferences.update({
-                  chartWindowMs: value as
-                    | 30_000
-                    | 60_000
-                    | 300_000
-                    | 600_000,
+                  chartWindowMs: value as 30_000 | 60_000 | 300_000 | 600_000,
                 })
               }
               className={value === windowMs ? "active" : ""}
@@ -69,7 +119,8 @@ export default function Performance() {
           ))}
         </Segmented>
         <span>
-          {chartWindowLabel(windowMs)} live window · 35 min retained · São Paulo time
+          {chartWindowLabel(windowMs)} live window · 35 min retained · São Paulo
+          time
         </span>
       </div>
       <div className="performance-grid">
@@ -127,73 +178,25 @@ export default function Performance() {
             ]}
           />
         </Panel>
-        <FocusedMetricPanel
+        <ResourcePanel
+          key={`${state.serverId}:${state.ready?.server.paperSession}:${state.ready?.server.hostSession}`}
           title={copy.cpu_load_01bd8}
           eyebrow="Inspect one CPU authority at a time, or compare them."
-          samples={samples}
+          resources={state.resources}
           windowMs={windowMs}
-          live={Boolean(state.ready?.agents.host || live)}
+          connections={{ paper: live, host: Boolean(state.ready?.agents.host) }}
           defaultMetric="serviceCpu"
-          options={[
-            {
-              key: "serviceCpu",
-              shortLabel: "Minecraft",
-              label: "Minecraft service · % of one core",
-              unit: "%",
-              color: "var(--c1)",
-              source: "Host service",
-            },
-            {
-              key: "processCpu",
-              shortLabel: "JVM",
-              label: "JVM process",
-              unit: "%",
-              color: "var(--c4)",
-              source: "Paper JVM",
-            },
-            {
-              key: "hostCpu",
-              shortLabel: "Host",
-              label: "Host utilization",
-              unit: "%",
-              color: "var(--c5)",
-              source: "Host",
-            },
-          ]}
+          options={CPU_OPTIONS}
         />
-        <FocusedMetricPanel
+        <ResourcePanel
+          key={`${state.serverId}:${state.ready?.server.paperSession}:${state.ready?.server.hostSession}`}
           title={copy.memory_89c8a}
           eyebrow="Separate heap, Minecraft service and physical Host memory."
-          samples={samples}
+          resources={state.resources}
           windowMs={windowMs}
-          live={Boolean(state.ready?.agents.host || live)}
+          connections={{ paper: live, host: Boolean(state.ready?.agents.host) }}
           defaultMetric="serviceMemory"
-          options={[
-            {
-              key: "serviceMemory",
-              shortLabel: "Minecraft",
-              label: "Minecraft service memory",
-              unit: "bytes",
-              color: "var(--c4)",
-              source: "Host service",
-            },
-            {
-              key: "heap",
-              shortLabel: "Heap",
-              label: "JVM heap used",
-              unit: "bytes",
-              color: "var(--c3)",
-              source: "Paper JVM",
-            },
-            {
-              key: "memory",
-              shortLabel: "Host",
-              label: "Physical Host memory used",
-              unit: "bytes",
-              color: "var(--c1)",
-              source: "Host",
-            },
-          ]}
+          options={MEMORY_OPTIONS}
         />
         <Panel
           title={copy.slow_ticks_832c6}

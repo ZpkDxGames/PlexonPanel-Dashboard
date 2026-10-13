@@ -1,3 +1,8 @@
+import {
+  ResourcePanel,
+  type ResourceOption,
+} from "../components/ResourcePanel";
+import { paperProcessUptime } from "../lib/uptime";
 import { classifyTelemetry } from "../adapter/telemetry-freshness";
 import { Segmented } from "../components/Segmented";
 import { copy } from "../i18n/en";
@@ -25,6 +30,16 @@ import { groupLogs } from "../lib/log-parser";
 import { navigate } from "../router";
 import { preferences, usePreferences } from "../store/preferences";
 import { playerPingMillis } from "../lib/player-telemetry";
+const JVM_OPTION: readonly ResourceOption[] = [
+  {
+    key: "processCpu",
+    shortLabel: "JVM",
+    label: "JVM process",
+    unit: "%",
+    color: "var(--c4)",
+    source: "Paper JVM",
+  },
+];
 export default function Overview() {
   usePlayerSnapshotRefresh();
   const snap = useSession(),
@@ -33,7 +48,7 @@ export default function Overview() {
     prefs = usePreferences(),
     windowMs = prefs.chartWindowMs;
   const [prepared, setPrepared] = useState<Prepared | null>(null),
-    [selected, setSelected] = useState<MetricKey>("tps");
+    [selected, setSelected] = useState<MetricKey | "processCpu">("tps");
   const paper = sourceStatus(
     state,
     "Paper",
@@ -58,7 +73,7 @@ export default function Overview() {
     heap = systemFresh ? number(state.system.jvmHeapUsedBytes) : null,
     heapMax = number(state.system.jvmHeapMaximumBytes);
   const heapPct = heap !== null && heapMax ? (heap / heapMax) * 100 : null;
-  const uptime = number(state.server.uptimeMillis ?? state.system.uptimeMillis);
+  const uptime = paperProcessUptime(state, now);
   const samples = useMemo(
     () =>
       state.history.slice(
@@ -69,7 +84,7 @@ export default function Overview() {
       ),
     [state.history, windowMs],
   );
-  const key = selected,
+  const key = selected === "processCpu" ? "tps" : selected,
     values = samples
       .map((s) => s[key])
       .filter((v): v is number => typeof v === "number"),
@@ -252,27 +267,21 @@ export default function Overview() {
           color="var(--c4)"
           icon="cpu"
           context={systemFresh ? "JVM process" : "Waiting for data"}
-          values={samples.map((s) => s.processCpu)}
         />
         <Kpi
           label={copy.uptime_6aafa}
-          sub="since restart"
+          sub="Paper JVM since restart"
           value={
             online && uptime !== null ? Math.floor(uptime / 86400000) : null
           }
           unit={
             uptime !== null
-              ? "d · " + uptimeLabel.split(" ").slice(1).join(" ")
+              ? "d · " + duration(uptime % 86400000)
               : "unavailable"
           }
           color="var(--c5)"
           icon="clock"
           context={online ? "Current session" : "Server stopped"}
-          values={
-            uptime !== null
-              ? samples.map((s) => (uptime - (now - s.at)) / 3600000)
-              : []
-          }
         />
       </div>
       <>
@@ -294,7 +303,9 @@ export default function Overview() {
                 </span>
               )}
               <Segmented label={copy.metric_b2bb7} value={selected}>
-                {(["tps", "mspt", "processCpu"] as MetricKey[]).map((k) => (
+                {(
+                  ["tps", "mspt", "processCpu"] as (MetricKey | "processCpu")[]
+                ).map((k) => (
                   <button
                     key={k}
                     className={key === k ? "active" : ""}
@@ -306,12 +317,14 @@ export default function Overview() {
                 ))}
               </Segmented>
               <Segmented label={copy.range_a16c5} value={windowMs}>
-                {([
-                  [30_000, "30s"],
-                  [60_000, "1min"],
-                  [300_000, "5min"],
-                  [600_000, "10min"],
-                ] as const).map(([value, label]) => (
+                {(
+                  [
+                    [30_000, "30s"],
+                    [60_000, "1min"],
+                    [300_000, "5min"],
+                    [600_000, "10min"],
+                  ] as const
+                ).map(([value, label]) => (
                   <button
                     key={value}
                     className={windowMs === value ? "active" : ""}
@@ -319,10 +332,7 @@ export default function Overview() {
                     onClick={() =>
                       preferences.update({
                         chartWindowMs: value as
-                          | 30_000
-                          | 60_000
-                          | 300_000
-                          | 600_000,
+                          30_000 | 60_000 | 300_000 | 600_000,
                       })
                     }
                   >
@@ -331,33 +341,50 @@ export default function Overview() {
                 ))}
               </Segmented>
             </div>
-            <div className="stats-row">
-              {[
-                [online ? "Now" : "Last sample", stats?.current],
-                ["Average", stats?.average],
-                ["Lowest", stats?.min],
-                ["Peak", stats?.max],
-              ].map(([label, value]) => (
-                <div className="stat" key={String(label)}>
-                  <b>
-                    {typeof value === "number"
-                      ? value.toFixed(key === "tps" ? 2 : 1)
-                      : "—"}
-                  </b>
-                  <span>
-                    {label} · {metricName}
-                  </span>
-                </div>
-              ))}
-            </div>
-            <TimeSeries
-              title={metricName}
-              samples={samples}
-              windowMs={windowMs}
-              live={online && metricLive}
-              threshold={key === "tps" ? 18 : key === "mspt" ? 50 : undefined}
-              series={[{ key, label: metricName, unit: metricUnit, color }]}
-            />
+            {selected !== "processCpu" && (
+              <div className="stats-row">
+                {[
+                  [online ? "Now" : "Last sample", stats?.current],
+                  ["Average", stats?.average],
+                  ["Lowest", stats?.min],
+                  ["Peak", stats?.max],
+                ].map(([label, value]) => (
+                  <div className="stat" key={String(label)}>
+                    <b>
+                      {typeof value === "number"
+                        ? value.toFixed(key === "tps" ? 2 : 1)
+                        : "—"}
+                    </b>
+                    <span>
+                      {label} · {metricName}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+            {selected === "processCpu" ? (
+              <ResourcePanel
+                key={`${state.serverId}:${state.ready?.server.paperSession}`}
+                title="CPU"
+                eyebrow="Paper JVM process"
+                resources={state.resources}
+                windowMs={windowMs}
+                connections={{ paper: online, host: false }}
+                options={JVM_OPTION}
+                defaultMetric="processCpu"
+              />
+            ) : (
+              <TimeSeries
+                title={metricName}
+                samples={samples}
+                windowMs={windowMs}
+                live={online && metricLive}
+                threshold={key === "tps" ? 18 : key === "mspt" ? 50 : undefined}
+                series={[
+                  { key: selected, label: metricName, unit: metricUnit, color },
+                ]}
+              />
+            )}
           </Panel>
           <Panel
             title={copy.online_players_621c6}

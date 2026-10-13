@@ -28,6 +28,7 @@ export function startDemo(mode: string) {
     send("telemetry.system", {
       ...snap.state.system,
       capturedAt: skew,
+      processUptimeMillis: Number(snap.state.system.processUptimeMillis ?? 0) + 3000,
       processCpuPercent: idle ? 0.4 : 42 + Math.sin(tick / 4) * 8,
     });
     session.receiveFixture({type:"server.event",serverId:snap.state.serverId,agentKind:"HOST",agentSession:"fixture-host",eventType:"service.status",body:{...snap.state.service,resources:{...((snap.state.service.resources??{}) as Record<string,unknown>),capturedAt}}});

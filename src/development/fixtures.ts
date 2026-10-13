@@ -1,3 +1,5 @@
+import { record } from "../adapter/control-state";
+import { collectResources } from "../lib/resource-series";
 import {
   emptyControlState,
   type ControlState,
@@ -58,7 +60,6 @@ export function makeFixture(mode = "healthy", now = Date.now()): ControlState {
     maxPlayers: 80,
     serverName: state.ready.server.serverName,
     motd: "§bTonimSMP §7| §aSurvival §e26.3 §7· Welcome home!",
-    uptimeMillis: 3 * 86400000 + 14 * 3600000 + 22 * 60000,
   };
   state.system =
     mode === "partial"
@@ -66,6 +67,8 @@ export function makeFixture(mode = "healthy", now = Date.now()): ControlState {
       : {
           capturedAt,
           processCpuPercent: 42.8,
+          processUptimeMillis: 3 * 86400000 + 14 * 3600000 + 22 * 60000,
+          sourceIntervalMillis: 1000,
           jvmHeapUsedBytes: 3.2 * 2 ** 30,
           jvmHeapCommittedBytes: 6 * 2 ** 30,
           jvmHeapMaximumBytes: 8 * 2 ** 30,
@@ -74,11 +77,13 @@ export function makeFixture(mode = "healthy", now = Date.now()): ControlState {
         };
   state.hostSystem = {
     capturedAt: new Date(now).toISOString(),
+    sourceIntervalMillis: 1000,
     hostCpuPercent: 27.6,
     physicalMemoryUsedBytes: 7.8 * 2 ** 30,
     physicalMemoryTotalBytes: 16 * 2 ** 30,
   };
   state.service = {
+    sourceIntervalMillis: 1000,
     state: mode === "stopped" ? "inactive" : "active",
     minecraftReady: mode !== "stopped",
     resources: {
@@ -181,17 +186,11 @@ export function makeFixture(mode = "healthy", now = Date.now()): ControlState {
           : lag
             ? 65 + Math.sin(i) * 8
             : 28 + Math.sin(i / 13) * 7,
-      hostCpu: 26 + Math.sin(i / 14) * 8,
-      processCpu: 40 + Math.sin(i / 13) * 12,
-      heap: (3 + Math.sin(i / 20) * 0.5) * 2 ** 30,
-      memory: 7.8 * 2 ** 30,
       players: 20 + Math.min(4, Math.floor(i / 60)),
       gc: 1200 + i,
       sources: {
         paperHealth: now - (299 - i) * 3000,
         paperSystem: now - (299 - i) * 3000,
-        hostSystem: now - (299 - i) * 3000,
-        service: now - (299 - i) * 3000,
       },
     };
   });
@@ -224,6 +223,40 @@ export function makeFixture(mode = "healthy", now = Date.now()): ControlState {
     state.system = {};
     state.players = [];
   }
+  if (mode !== "partial" && mode !== "stopped")
+    for (let i = 600; i >= 0; i--) {
+      const time = now - i * 1000;
+      state.resources = collectResources(
+        state.resources,
+        "telemetry.system",
+        "PAPER",
+        "fixture-paper",
+        { ...state.system, capturedAt: new Date(time).toISOString() },
+        time,
+      );
+      state.resources = collectResources(
+        state.resources,
+        "telemetry.system",
+        "HOST",
+        "fixture-host",
+        { ...state.hostSystem, capturedAt: new Date(time + 150).toISOString() },
+        time + 200,
+      );
+      state.resources = collectResources(
+        state.resources,
+        "service.status",
+        "HOST",
+        "fixture-host",
+        {
+          ...state.service,
+          resources: {
+            ...record(state.service.resources),
+            capturedAt: new Date(time + 300).toISOString(),
+          },
+        },
+        time + 350,
+      );
+    }
   return state;
 }
 let content = "view-distance: 8\nsimulation-distance: 6\nmax-players: 80\n";
@@ -244,6 +277,9 @@ export async function fixtureAction(
   };
   if (action === "maintenance.status")
     data = {
+      jobRecoveryRequired: false,
+      restoreRecoveryRequired: false,
+      provider: {provider:"RCLONE",status:"CONNECTED"},
       currentOperation: {
         backupId: "backup-20261010-001",
         jobId: "backup-20261010-001",

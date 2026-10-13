@@ -21,14 +21,8 @@ export type MetricKey = keyof Pick<
   Sample,
   | "tps"
   | "mspt"
-  | "hostCpu"
-  | "processCpu"
-  | "heap"
-  | "memory"
   | "players"
   | "gc"
-  | "serviceCpu"
-  | "serviceMemory"
 >;
 type Series = {
   key: MetricKey;
@@ -195,13 +189,7 @@ export function TimeSeries({
   const present = useMemo(() => {
     const merged = new Map<number, Sample>();
     for (const a of active) {
-      const source = ["hostCpu", "memory"].includes(a.key)
-        ? "hostSystem"
-        : ["processCpu", "heap", "gc"].includes(a.key)
-          ? "paperSystem"
-          : ["serviceCpu", "serviceMemory"].includes(a.key)
-            ? "service"
-            : "paperHealth";
+      const source = a.key === "gc" ? "paperSystem" : "paperHealth";
       const points = samples.some((s) => s.sources)
         ? projectHistory(samples, source)
         : samples;
@@ -211,10 +199,6 @@ export function TimeSeries({
           at: point.at,
           tps: null,
           mspt: null,
-          hostCpu: null,
-          processCpu: null,
-          heap: null,
-          memory: null,
           players: null,
           gc: null,
         };

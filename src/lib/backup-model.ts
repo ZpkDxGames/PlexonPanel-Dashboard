@@ -1,10 +1,11 @@
-import { number, str, type JsonMap } from "../adapter/control-state";
+import { number, record, str, type JsonMap } from "../adapter/control-state";
 
 export type BackupHealth =
   | "offline"
   | "checking"
   | "ready"
   | "running"
+  | "verifying"
   | "degraded"
   | "failed"
   | "recovery"
@@ -77,7 +78,12 @@ export const BACKUP_TIMELINE: readonly BackupTimelineStep[] = [
   },
 ] as const;
 
-const TERMINAL = new Set(["COMPLETED", "DEGRADED", "FAILED", "RECOVERY_REQUIRED"]);
+const TERMINAL = new Set([
+  "COMPLETED",
+  "DEGRADED",
+  "FAILED",
+  "RECOVERY_REQUIRED",
+]);
 
 export function isTerminalBackupPhase(phase: string) {
   return TERMINAL.has(phase);
@@ -87,11 +93,21 @@ function progressBelongsToOperation(
   operation: JsonMap,
   progress: JsonMap | null | undefined,
 ) {
-  const operationJob = str(operation.jobId);
-  const operationBackup = str(operation.backupId);
-  const progressJob = str(progress?.jobId);
-  const progressBackup = str(progress?.backupId);
-  if (operationJob && progressJob === operationJob) return true;
+  const operationJob = str(operation.jobId, "");
+  const operationBackup = str(operation.backupId, "");
+  const progressJob = str(progress?.jobId, "");
+  const progressBackup = str(progress?.backupId, "");
+  if (operationJob && progressJob === operationJob) {
+    const phaseAt = Date.parse(
+      str(operation.phaseTimestamp ?? operation.updatedAt, ""),
+    );
+    const progressAt = Date.parse(str(progress?.capturedAt, ""));
+    return !(
+      Number.isFinite(phaseAt) &&
+      Number.isFinite(progressAt) &&
+      progressAt < phaseAt
+    );
+  }
 
   // Retry Upload has its own transport jobId but intentionally reuses the original backupId.
   // Accept it only after a degraded terminal job; unrelated stale progress must never override it.
@@ -118,7 +134,8 @@ export function effectiveBackupPhase(
   progress: JsonMap | null | undefined,
 ): string {
   const durable = str(operation.phase, "IDLE");
-  const progressPhase = str(progress?.phase);
+  const progressPhase = str(progress?.phase, "");
+  if (isTerminalBackupPhase(durable)) return durable;
 
   if (progressPhase && progressBelongsToOperation(operation, progress))
     return progressPhase;
@@ -130,11 +147,10 @@ export function effectiveBackupProgress(
   operation: JsonMap,
   progress: JsonMap | null | undefined,
 ): number {
+  if (isTerminalBackupPhase(str(operation.phase, "")))
+    return number(operation.progressPercent) ?? 0;
   const live = number(progress?.progress);
-  if (
-    live !== null &&
-    progressBelongsToOperation(operation, progress)
-  )
+  if (live !== null && progressBelongsToOperation(operation, progress))
     return Math.max(0, Math.min(100, live * 100));
   return Math.max(0, Math.min(100, number(operation.progressPercent) ?? 0));
 }
@@ -173,7 +189,7 @@ export function retryUploadAvailable(operation: JsonMap): boolean {
     str(operation.phase) === "DEGRADED" &&
     operation.localBackupVerified === true &&
     operation.remoteBackupVerified !== true &&
-    Boolean(str(operation.backupId))
+    Boolean(str(operation.backupId, ""))
   );
 }
 
@@ -193,7 +209,11 @@ export function backupHealth({
   const phase = str(operation.phase, "IDLE");
   if (phase === "DEGRADED") return "degraded";
   if (phase === "FAILED") return "failed";
-  if (phase !== "IDLE" && phase !== "COMPLETED" && !isTerminalBackupPhase(phase))
+  if (
+    phase !== "IDLE" &&
+    phase !== "COMPLETED" &&
+    !isTerminalBackupPhase(phase)
+  )
     return "running";
   return ready ? "ready" : "blocked";
 }
@@ -205,7 +225,9 @@ export function stepState(
   operation: JsonMap,
 ): "pending" | "active" | "done" | "warning" | "error" {
   const terminal = str(operation.phase);
-  const stepIndex = BACKUP_TIMELINE.findIndex((candidate) => candidate.key === step.key);
+  const stepIndex = BACKUP_TIMELINE.findIndex(
+    (candidate) => candidate.key === step.key,
+  );
   const activeIndex = BACKUP_TIMELINE.findIndex((candidate) =>
     candidate.phases.includes(phase),
   );
@@ -214,7 +236,8 @@ export function stepState(
 
   if (terminal === "DEGRADED") {
     if (step.key === "offsite" || step.key === "complete") return "warning";
-    if (step.key === "restart") return operation.restartRecoveryRequired ? "error" : "done";
+    if (step.key === "restart")
+      return operation.restartRecoveryRequired ? "error" : "done";
     return stepIndex < 5 ? "done" : "pending";
   }
 
@@ -248,37 +271,49 @@ export function healthCopy(health: BackupHealth) {
     case "checking":
       return {
         title: "Checking backup authority",
-        description: "Waiting for the Host preflight, maintenance journal and restore-point inventory.",
+        description:
+          "Waiting for the Host preflight, maintenance journal and restore-point inventory.",
+      };
+    case "verifying":
+      return {
+        title: "Verifying backup",
+        description: "Waiting for the Host verification result.",
       };
     case "running":
       return {
         title: "Backup in progress",
-        description: "The Host owns this job. Closing the browser will not cancel it.",
+        description:
+          "The Host owns this job. Closing the browser will not cancel it.",
       };
     case "degraded":
       return {
         title: "Verified locally · offsite needs attention",
-        description: "The local restore point is usable. Retry the offsite copy without another shutdown.",
+        description:
+          "The local restore point is usable. Retry the offsite copy without another shutdown.",
       };
     case "failed":
       return {
         title: "Backup failed",
-        description: "Minecraft was not reported as a complete backup. Review the failure before retrying.",
+        description:
+          "Minecraft was not reported as a complete backup. Review the failure before retrying.",
       };
     case "recovery":
       return {
         title: "Recovery required",
-        description: "A durable recovery gate is blocking another destructive maintenance operation.",
+        description:
+          "A durable recovery gate is blocking another destructive maintenance operation.",
       };
     case "blocked":
       return {
         title: "Backup blocked",
-        description: "One or more Host preflight requirements are not currently satisfied.",
+        description:
+          "One or more Host preflight requirements are not currently satisfied.",
       };
     default:
       return {
         title: "Ready for a restore point",
-        description: "Host preflight is healthy and no conflicting maintenance operation is active.",
+        description:
+          "Host preflight is healthy and no conflicting maintenance operation is active.",
       };
   }
 }
@@ -291,7 +326,11 @@ export function phaseLabel(phase: string) {
     .replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
-export function durationLabel(startedAt: unknown, endedAt: unknown, now = Date.now()) {
+export function durationLabel(
+  startedAt: unknown,
+  endedAt: unknown,
+  now = Date.now(),
+) {
   const start = Date.parse(str(startedAt));
   const end = Date.parse(str(endedAt));
   if (!Number.isFinite(start)) return "—";
@@ -300,4 +339,73 @@ export function durationLabel(startedAt: unknown, endedAt: unknown, now = Date.n
   const minutes = Math.floor(duration / 60_000);
   const seconds = Math.round((duration % 60_000) / 1000);
   return `${minutes}m ${seconds}s`;
+}
+
+/** One presentation decision from current Host evidence; inventory never rewrites job outcome. */
+export function backupView({
+  hostLive,
+  preflight,
+  maintenance,
+  phasePush,
+  progress,
+  backups,
+}: {
+  hostLive: boolean;
+  preflight: JsonMap;
+  maintenance: JsonMap;
+  phasePush: JsonMap;
+  progress: JsonMap | null;
+  backups: JsonMap[];
+}) {
+  const durable = record(maintenance.currentOperation);
+  const durableTime = Date.parse(
+    str(durable.updatedAt ?? durable.phaseTimestamp, ""),
+  );
+  const pushTime = Date.parse(str(phasePush.capturedAt, ""));
+  const sameJob =
+    Boolean(str(durable.jobId, "")) &&
+    str(durable.jobId, "") === str(phasePush.jobId, "");
+  const newer =
+    Number.isFinite(pushTime) &&
+    (!Number.isFinite(durableTime) || pushTime > durableTime);
+  const operation =
+    sameJob && newer && !isTerminalBackupPhase(str(durable.phase, ""))
+      ? { ...durable, ...phasePush }
+      : durable;
+  const known = ["hostAuthenticated","operationBusy","recoveryRequired","backupRootWritable","commandChannelConfigured","hostConfigRestartRequired"].every(key=>typeof preflight[key]==="boolean")
+    && typeof maintenance.jobRecoveryRequired==="boolean" && typeof maintenance.restoreRecoveryRequired==="boolean";
+  const recovery = backupRecoveryRequired(preflight, maintenance, operation);
+  const ready = known && backupReady(preflight, maintenance, operation);
+  const phase = effectiveBackupPhase(operation, progress);
+  const active = phase !== "IDLE" && !isTerminalBackupPhase(phase);
+  const health: BackupHealth = !hostLive
+    ? "offline"
+    : recovery
+      ? "recovery"
+      : active
+        ? phase.startsWith("VERIFYING")
+          ? "verifying"
+          : "running"
+        : !known
+          ? "checking"
+          : backupHealth({ hostLive, ready, recovery, operation });
+  const backup = backups.find(
+    (b) => str(b.backupId, "") !== "" && b.backupId === operation.backupId,
+  );
+  const resolvedAfterRetry =
+    str(operation.phase, "") === "DEGRADED" && backup?.offsite === true;
+  return {
+    operation,
+    phase,
+    health,
+    recovery,
+    ready: hostLive && ready,
+    active,
+    progressPercent: effectiveBackupProgress(operation, progress),
+    resolvedAfterRetry,
+    retryAvailable:
+      !resolvedAfterRetry &&
+      retryUploadAvailable(operation) &&
+      backup?.local === true,
+  };
 }

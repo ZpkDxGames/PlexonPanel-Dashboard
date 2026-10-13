@@ -3,7 +3,7 @@ const cache = new WeakMap<readonly Sample[], Map<string, Sample[]>>();
 /** Each series is placed by its own source capture. Host packets never resample Paper. */
 export function projectHistory(
   history: readonly Sample[],
-  source: "paperHealth" | "paperSystem" | "hostSystem" | "service",
+  source: "paperHealth" | "paperSystem",
 ): Sample[] {
   let projections = cache.get(history);
   if (!projections) { projections = new Map(); cache.set(history, projections); }
