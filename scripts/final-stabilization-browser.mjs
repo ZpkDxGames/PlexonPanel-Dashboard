@@ -95,7 +95,13 @@ try {
             (await p.locator(".resource-plot path").count()) > 0,
             "real source geometry present",
           );
-          // Freeze the presentation clock, then inspect: hover may not touch paths or scale.
+          const plot = panel.locator("svg");
+          assert.equal(await plot.evaluate((svg) => svg.getBoundingClientRect().height), 235,
+            "resource chart must not inherit icon height");
+          await plot.evaluate((svg) => svg.scrollIntoView({ block: "center", behavior: "instant" }));
+          // Complete layout/scroll before freezing the presentation clock.
+          await plot.hover({ position: { x: 100, y: 50 } });
+          // Hover may not touch paths or scale.
           await p.clock.pauseAt(new Date());
           const counters = await p.evaluate(() => [
             window.__resourceProjections,
@@ -111,7 +117,7 @@ try {
                 (n) => n.textContent,
               ),
             }));
-          await panel.locator("svg").hover({ position: { x: 100, y: 50 } });
+          await plot.hover({ position: { x: 130, y: 80 } });
           const after = await panel
             .locator("svg")
             .evaluate((svg) => ({

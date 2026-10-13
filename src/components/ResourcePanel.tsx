@@ -318,7 +318,7 @@ export function ResourcePanel({
             ))}
           </div>
           <p className="subtle">
-            {focus.option.source} ·{" "}
+            {focus.option.label} · {focus.option.source} ·{" "}
             {freshness?.label ?? "waiting for telemetry"} · cadence{" "}
             {current?.sourceIntervalMillis
               ? `${current.sourceIntervalMillis} ms`

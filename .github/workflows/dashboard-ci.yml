@@ -54,7 +54,7 @@ jobs:
         run: |
           npm run test:perf
           npm run test:revamp
-          npm run test:visual
+          npm run test:visual -- --out=artifacts/visual
           npm run test:refinement
 
       - name: Upload browser evidence
@@ -64,4 +64,7 @@ jobs:
           name: stabilization-browser-evidence
           path: |
             artifacts/
-            docs/revamp/
+            docs/revamp/6.5.0/refinement-interactions.json
+            docs/revamp/6.5.0/retained-interactions.json
+            docs/revamp/6.5.0/console-history-fixed.png
+            docs/revamp/6.5.0/lifecycle-confirm-fixed.png

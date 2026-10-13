@@ -3753,7 +3753,7 @@ input[type="file"]::file-selector-button:hover {
 .resource-stats strong { font-size:clamp(12px,1.4vw,19px); overflow-wrap:anywhere; }
 .resource-stats span, .resource-inspector { font-size:11px; color:var(--t3); }
 .resource-plot { min-width:0; }
-.resource-plot svg { width:100%; display:block; }
+.resource-plot svg { width:100%; height:235px; display:block; }
 .resource-inspector { min-height:64px; display:flex; flex-wrap:wrap; gap:8px; }
 .resource-legend { display:flex; flex-wrap:wrap; gap:8px; }
 .resource-legend button { display:flex; gap:6px; align-items:center; }
