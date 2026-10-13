@@ -51,6 +51,7 @@ jobs:
         run: npm run test:stabilization
 
       - name: General browser gate
+        if: ${{ !cancelled() }}
         run: |
           npm run dev > /tmp/plexon-vite.log 2>&1 &
           VITE_PID=$!

@@ -244,7 +244,9 @@ try {
   await p
     .getByRole("button", { name: "Confirm & dispatch", exact: true })
     .click();
-  await p.getByText("Server result received").waitFor();
+  await p.locator("dialog[open] .notice").waitFor();
+  check("Lifecycle result succeeds", await p.getByText("Server result received").isVisible(),
+    await p.locator("dialog[open]").innerText());
   const stopAction = await p.evaluate(async () => {
     const { actionLog } = await import("/src/development/fixtures.ts");
     return actionLog.at(-1);
@@ -262,7 +264,9 @@ try {
   await p
     .getByRole("button", { name: "Confirm & dispatch", exact: true })
     .click();
-  await p.getByText("Server result received").waitFor();
+  await p.locator("dialog[open] .notice").waitFor();
+  check("Lifecycle result succeeds", await p.getByText("Server result received").isVisible(),
+    await p.locator("dialog[open]").innerText());
   const restartAction = await p.evaluate(async () => {
     const { actionLog } = await import("/src/development/fixtures.ts");
     return actionLog.at(-1);

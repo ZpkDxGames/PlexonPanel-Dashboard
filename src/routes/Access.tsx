@@ -282,7 +282,7 @@ export default function Access() {
                   /{scopes.length} usable
                 </span>
               </header>
-              <div className="permission-table">
+              <div className="permission-table" tabIndex={0}>
                 <div className="permission-row permission-head">
                   <span>Permission</span>
                   <span>Browser</span>

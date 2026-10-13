@@ -69,7 +69,8 @@ export default function Backups() {
     backups: JsonMap[];
     errors: string[];
     preflightFailure: string;
-  }>({ key: "", preflight: {}, maintenance: {}, backups: [], errors: [], preflightFailure: "" });
+    inventoryKnown: boolean;
+  }>({ key: "", preflight: {}, maintenance: {}, backups: [], errors: [], preflightFailure: "", inventoryKnown: false });
   const identity = `${snap.revision}:${snap.state.serverId}:${snap.state.ready?.server.hostSession ?? ""}`;
   const generation = useRef(identity);
   generation.current = identity;
@@ -77,8 +78,8 @@ export default function Backups() {
   const current: Omit<typeof evidence, "key"> =
     evidence.key === identity
       ? evidence
-      : { preflight: {}, maintenance: {}, backups: [], errors: [], preflightFailure: "" };
-  const { preflight, maintenance, backups, errors, preflightFailure } = current;
+      : { preflight: {}, maintenance: {}, backups: [], errors: [], preflightFailure: "", inventoryKnown: false };
+  const { preflight, maintenance, backups, errors, preflightFailure, inventoryKnown } = current;
   const setErrors = (next: string[]) =>
     setEvidence((value) => ({ ...value, errors: next }));
   const [prepared, setPrepared] = useState<Prepared | null>(null);
@@ -123,6 +124,7 @@ export default function Backups() {
       preflight: data[0],
       maintenance: data[1],
       backups: records(data[2].backups),
+      inventoryKnown: result[2].status === "fulfilled" && result[2].value.status === "SUCCESS",
       errors: failures,
       preflightFailure: result[0].status === "fulfilled" && result[0].value.status !== "SUCCESS"
         ? result[0].value.code ?? "PREFLIGHT_FAILED" : "",
@@ -332,12 +334,12 @@ export default function Backups() {
             <strong>
               {latestSuccessful
                 ? formatDateTime(latestSuccessful.timestamp)
-                : "None yet"}
+                : inventoryKnown ? "None yet" : "Unavailable"}
             </strong>
           </div>
           <div>
             <span>Last verified offsite backup</span>
-            <strong>{latestOffsite ? formatDateTime(latestOffsite.timestamp) : "None yet"}</strong>
+            <strong>{latestOffsite ? formatDateTime(latestOffsite.timestamp) : inventoryKnown ? "None yet" : "Unavailable"}</strong>
           </div>
           <div>
             <span>Provider</span>
@@ -497,6 +499,10 @@ export default function Backups() {
             {phase !== "IDLE" && (
               <div
                 className="backup-progress-track"
+                role="progressbar"
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-valuenow={progressPercent}
                 aria-label="Backup job progress"
               >
                 <i style={{ width: `${progressPercent}%` }} />
@@ -643,19 +649,19 @@ export default function Backups() {
         className="backup-inventory-panel"
         action={
           <span className="subtle">
-            {backups.length} restore point{backups.length === 1 ? "" : "s"}
+            {inventoryKnown ? `${backups.length} restore point${backups.length === 1 ? "" : "s"}` : "Inventory unavailable"}
           </span>
         }
       >
         <div className="backup-inventory-summary">
           <span>
-            <b>{localCount}</b> local
+            <b>{inventoryKnown ? localCount : "—"}</b> local
           </span>
           <span>
-            <b>{offsiteCount}</b> offsite
+            <b>{inventoryKnown ? offsiteCount : "—"}</b> offsite
           </span>
           <span>
-            <b>{verifiedCount}</b> verified
+            <b>{inventoryKnown ? verifiedCount : "—"}</b> verified
           </span>
         </div>
         <p className="table-scroll-hint">Swipe to see archive actions →</p>
@@ -747,9 +753,9 @@ export default function Backups() {
                 <tr>
                   <td colSpan={7}>
                     <div className="backup-empty-state">
-                      <strong>No restore points yet</strong>
+                      <strong>{inventoryKnown ? "No restore points yet" : "Inventory unavailable"}</strong>
                       <span>
-                        {ready
+                        {!inventoryKnown ? "Waiting for current Host restore-point evidence." : ready
                           ? "Host preflight is healthy. Create the first verified backup when ready."
                           : "Resolve the readiness checks before creating the first restore point."}
                       </span>

@@ -363,16 +363,17 @@ export function backupView({
   const durableTime = Date.parse(
     str(durable.updatedAt ?? durable.phaseTimestamp, ""),
   );
-  const pushTime = Date.parse(str(phasePush.capturedAt, ""));
+  const pushTime = Date.parse(str(phasePush.phaseTimestamp ?? phasePush.capturedAt, ""));
   const sameJob =
     Boolean(str(durable.jobId, "")) &&
     str(durable.jobId, "") === str(phasePush.jobId, "");
   const newer =
     Number.isFinite(pushTime) &&
     (!Number.isFinite(durableTime) || pushTime > durableTime);
+  const hasPushJob = Boolean(str(phasePush.jobId, ""));
   const operation =
-    sameJob && newer && !isTerminalBackupPhase(str(durable.phase, ""))
-      ? { ...durable, ...phasePush }
+    hasPushJob && newer && (!sameJob || !isTerminalBackupPhase(str(durable.phase, "")))
+      ? sameJob ? { ...durable, ...phasePush } : phasePush
       : durable;
   const known = ["hostAuthenticated","operationBusy","recoveryRequired","backupRootWritable","commandChannelConfigured","hostConfigRestartRequired"].every(key=>typeof preflight[key]==="boolean")
     && typeof maintenance.jobRecoveryRequired==="boolean" && typeof maintenance.restoreRecoveryRequired==="boolean";

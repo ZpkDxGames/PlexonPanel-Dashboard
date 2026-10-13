@@ -28,6 +28,7 @@ try {
       route.abort(),
     );
     const p = await ctx.newPage();
+    await p.clock.install();
     const errors = [];
     p.on("pageerror", (e) => errors.push(e.message));
     for (const [width, height] of [
@@ -143,6 +144,7 @@ try {
           );
           await p.clock.resume();
         }
+        await p.evaluate(() => scrollTo({ top: 0, behavior: "instant" }));
         results.push({ route, width, height, reducedMotion, pass: true });
         if (
           reducedMotion === "reduce" &&
