@@ -388,6 +388,8 @@ export function backupView({
         ? phase.startsWith("VERIFYING")
           ? "verifying"
           : "running"
+        : ["FAILED", "DEGRADED"].includes(phase)
+          ? backupHealth({ hostLive, ready, recovery, operation })
         : preflightFailure
           ? "failed"
         : !known

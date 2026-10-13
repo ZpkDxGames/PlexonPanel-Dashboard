@@ -99,7 +99,7 @@ try {
         await page.goto(
           `http://127.0.0.1:${port}/?fixture=${mode}&theme=${theme}#${routes[0]}`,
         );
-        await page.locator(".workspace").waitFor();
+        await page.locator("main").waitFor();
         await page.evaluate(() => document.fonts.ready);
         for (const route of routes) {
           await context.close();
@@ -119,15 +119,15 @@ try {
               }),
             );
           });
+          errors = [];
           await page.goto(
             `http://127.0.0.1:${port}/?fixture=${mode}&theme=${theme}#${route}`,
           );
-          await page.locator(".workspace").waitFor();
-          errors = [];
+          await page.locator("main").waitFor();
           await page.evaluate((r) => (location.hash = r), route);
           if (route === "Styleguide")
             await page.locator(".style-colors").waitFor();
-          else await page.locator(".workspace h1").first().waitFor();
+          else await page.locator("main h1").first().waitFor();
           await page.locator(".route-skeleton").waitFor({ state: "hidden" });
           const landmarks = {
             Overview: ".overview-kpis",
@@ -136,7 +136,7 @@ try {
             Backups: ".backup-create",
             Settings: ".settings-grid",
             Logs: ".event-list",
-            Fleet: ".fleet-layout",
+            Fleet: ".fleet-gate",
           };
           await page
             .locator(landmarks[route] ?? ".workspace .card")
@@ -189,6 +189,7 @@ try {
             `${out}/progress.json`,
             JSON.stringify(results, null, 2),
           );
+          if (violations.length) console.log(JSON.stringify({ route, theme, mode, width, violations }));
           console.log(
             `${route} ${theme} ${mode} ${width}: overflow=${overflow.page}, errors=${errors.length}, axe=${violations.length}`,
           );

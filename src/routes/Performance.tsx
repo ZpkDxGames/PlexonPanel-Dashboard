@@ -179,7 +179,7 @@ export default function Performance() {
           />
         </Panel>
         <ResourcePanel
-          key={`${state.serverId}:${state.ready?.server.paperSession}:${state.ready?.server.hostSession}`}
+          key={`${state.serverId}:${state.ready?.server.paperSession}:${state.ready?.server.hostSession}:cpu`}
           title={copy.cpu_load_01bd8}
           eyebrow="Inspect one CPU authority at a time, or compare them."
           resources={state.resources}
@@ -189,7 +189,7 @@ export default function Performance() {
           options={CPU_OPTIONS}
         />
         <ResourcePanel
-          key={`${state.serverId}:${state.ready?.server.paperSession}:${state.ready?.server.hostSession}`}
+          key={`${state.serverId}:${state.ready?.server.paperSession}:${state.ready?.server.hostSession}:memory`}
           title={copy.memory_89c8a}
           eyebrow="Separate heap, Minecraft service and physical Host memory."
           resources={state.resources}
@@ -204,6 +204,7 @@ export default function Performance() {
         >
           <div
             className="heat-strip"
+            role="img"
             aria-label={`${spikes.length} slow samples`}
           >
             {samples.slice(-120).map((s) => (

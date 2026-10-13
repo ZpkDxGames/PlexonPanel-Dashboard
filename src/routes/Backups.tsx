@@ -326,7 +326,7 @@ export default function Backups() {
           <p>{copy.description}</p>
         </div>
 
-        <div className="backup-summary-grid" aria-label="Backup summary">
+        <div className="backup-summary-grid" role="group" aria-label="Backup summary">
           <div>
             <span>Last successful backup</span>
             <strong>
@@ -503,7 +503,7 @@ export default function Backups() {
               </div>
             )}
 
-            <div className="backup-stepper" aria-label="Backup phases">
+            <div className="backup-stepper" role="group" aria-label="Backup phases">
               {BACKUP_TIMELINE.map((step, index) => {
                 const state = stepState(
                   step,

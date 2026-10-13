@@ -28,7 +28,7 @@ export function Segmented({
     return () => observer.disconnect();
   }, [value]);
   return (
-    <div ref={root} className="segmented" aria-label={label}>
+    <div ref={root} className="segmented" role="group" aria-label={label}>
       <span
         className="thumb"
         aria-hidden="true"

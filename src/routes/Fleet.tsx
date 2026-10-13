@@ -54,7 +54,7 @@ export default function Fleet() {
           </p>
         </div>
 
-        <div className="fleet-card-grid" aria-label="Paired servers">
+        <div className="fleet-card-grid" role="group" aria-label="Paired servers">
           {rows.map((row) => {
             const ready = row.state.ready;
             const name = str(

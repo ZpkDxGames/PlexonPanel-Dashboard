@@ -87,6 +87,7 @@ export default function App() {
         fallback={
           <div
             className="route-skeleton fleet-route-skeleton"
+            role="status"
             aria-label={copy.loading_workspace_4f4da}
           />
         }
@@ -102,6 +103,7 @@ export default function App() {
         fallback={
           <div
             className="route-skeleton"
+            role="status"
             aria-label={copy.loading_workspace_4f4da}
           />
         }

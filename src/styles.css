@@ -2102,10 +2102,6 @@ td code {
     grid-column: 1;
     grid-row: auto;
   }
-  .backup-summary-grid {
-    grid-template-columns: repeat(4, minmax(110px, 1fr));
-    overflow-x: auto;
-  }
   .backup-operations-grid {
     grid-template-columns: 1fr;
   }
@@ -3666,6 +3662,7 @@ input[type="file"]::file-selector-button:hover {
 }
 
 @media (max-width: 767px) {
+  .backup-summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .backup-status-strip {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -3756,6 +3753,6 @@ input[type="file"]::file-selector-button:hover {
 .resource-plot svg { width:100%; height:235px; display:block; }
 .resource-inspector { min-height:64px; display:flex; flex-wrap:wrap; gap:8px; }
 .resource-legend { display:flex; flex-wrap:wrap; gap:8px; }
-.resource-legend button { display:flex; gap:6px; align-items:center; }
-.resource-legend button[aria-pressed=false] { opacity:.45; }
+.resource-legend button { display:flex; gap:6px; align-items:center; padding:6px 9px; border:1px solid var(--line); border-radius:8px; background:var(--sunken); color:var(--t1); font:inherit; cursor:pointer; }
+.resource-legend button[aria-pressed=false] { color:var(--t3); text-decoration:line-through; }
 .resource-legend i { width:7px; height:7px; border-radius:50%; }

@@ -18,10 +18,13 @@ for (const viewport of [{ name:"desktop", width:1440, height:1000 }, { name:"pho
   for (const route of ["Overview","Performance","Players","Console","Backups","Access","Settings"]) {
     await page.goto(`${base}/?fixture=healthy#${route}`, { waitUntil:"networkidle" });
     await page.locator("h1").waitFor();
+    await page.locator(".route-skeleton").waitFor({state:"hidden"});
+    await page.evaluate(() => document.fonts.ready);
+    await page.waitForTimeout(500);
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth);
     const axe = await new AxeBuilder({ page }).analyze();
     await page.screenshot({ path:`artifacts/browser/${viewport.name}-${route.toLowerCase()}.png`, fullPage:true });
-    results.push({ viewport:viewport.name, route, overflow, violations:axe.violations.map((v)=>({id:v.id,impact:v.impact,nodes:v.nodes.length})) });
+    results.push({ viewport:viewport.name, route, overflow, violations:axe.violations.map((v)=>({id:v.id,impact:v.impact,nodes:v.nodes.map(n=>({target:n.target,summary:n.failureSummary}))})) });
   }
   results.push({ viewport:viewport.name, consoleErrors:errors });
   await context.close();
