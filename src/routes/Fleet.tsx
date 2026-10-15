@@ -1,12 +1,218 @@
-import { useSession } from "../hooks";
-import { navigate } from "../router";
-import { Button, Panel, Status } from "../components/ui";
+import { useState } from "react";
+import { useSession, useNow } from "../hooks";
 import { number, str } from "../adapter/control-state";
 import { session } from "../adapter/session";
-
+import { navigate } from "../router";
+import { sourceEvidence, verifiedNodes } from "../presentation/telemetry";
+import { Button, Status, Notice, Empty } from "../components/ui";
+import { Icon } from "../components/Icon";
+import { Sparkline } from "../components/Telemetry";
+import { bytes } from "../store/selectors";
 export default function Fleet() {
-  const snap = useSession();
-  const selected = snap.state.serverId ? [{serverId:snap.state.serverId,phase:snap.phase,state:snap.state}] : [];
-  const rows = [...selected, ...snap.fleet].filter((row, index, all) => all.findIndex((candidate) => candidate.serverId === row.serverId) === index);
-  return <div className="fleet-layout"><Panel eyebrow="Paired rooms" title="Server fleet" description="Each room keeps independent connection and telemetry state" action={<Status tone={rows.some((row) => row.phase === "live") ? "success" : "neutral"}>{rows.length} paired</Status>}><div className="fleet-table" role="table" aria-label="Server fleet"><div className="fleet-row fleet-head" role="row"><span role="columnheader">Server</span><span role="columnheader">Connection</span><span role="columnheader">Players</span><span role="columnheader">TPS</span><span role="columnheader">Last seen</span><span role="columnheader">Action</span></div>{rows.length ? rows.map((row) => { const name=str(row.state.ready?.server.serverName,snap.labels[row.serverId] ?? row.serverId); const tps=number(Array.isArray(row.state.server.tps)?row.state.server.tps[0]:null); return <div className="fleet-row" role="row" key={row.serverId}><div role="cell"><i className={row.phase === "live" ? "server-live" : ""}/><span><strong>{name}</strong><small>{row.serverId}</small></span></div><span role="cell"><Status tone={row.phase === "live" ? "success" : row.phase === "reconnecting" ? "warning" : "neutral"}>{row.phase}</Status></span><b role="cell">{number(row.state.server.onlinePlayers)?.toLocaleString() ?? "—"}</b><b role="cell">{tps?.toFixed(2) ?? "—"}</b><span role="cell">{row.state.updatedAt ? new Date(row.state.updatedAt).toLocaleTimeString() : "No sample"}</span><span role="cell"><Button variant="quiet" onClick={() => {void session.select(row.serverId);navigate("Overview");}}>Open</Button></span></div>; }) : <div className="fleet-empty"><strong>No paired servers</strong><span>Pair this browser from Settings. Production never invents a server row.</span><Button onClick={() => navigate("Settings")}>Open connection settings</Button></div>}</div></Panel><aside className="fleet-summary" aria-label="Fleet summary"><span className="eyebrow">Attention model</span><h2>Every row owns its source state.</h2><p>Passive rooms are read-only and capped at 16. Selecting a server moves action authority to one room.</p><dl><dt>Connected</dt><dd>{rows.filter((row) => row.phase === "live").length}</dd><dt>Attention</dt><dd>{rows.filter((row) => row.phase !== "live").length}</dd><dt>Action target</dt><dd>{snap.state.serverId ? "1" : "0"}</dd></dl></aside></div>;
+  const snap = useSession(),
+    now = useNow(),
+    [error, setError] = useState(""),
+    [query, setQuery] = useState("");
+  const rows = [
+      ...(snap.state.serverId
+        ? [
+            {
+              serverId: snap.state.serverId,
+              state: snap.state,
+              phase: snap.phase,
+            },
+          ]
+        : []),
+      ...snap.fleet,
+    ].filter(
+      (row, index, all) =>
+        all.findIndex((other) => other.serverId === row.serverId) === index,
+    ),
+    nodes = verifiedNodes(rows, now);
+  const open = async (id: string) => {
+    setError("");
+    try {
+      if (id !== snap.state.serverId) await session.select(id);
+      navigate("Overview");
+    } catch (cause) {
+      setError(
+        cause instanceof Error ? cause.message : "Unable to select server.",
+      );
+    }
+  };
+  return (
+    <>
+      <div className="directory-intro">
+        <div>
+          <span className="directory-number">
+            {String(rows.length).padStart(2, "0")}
+          </span>
+          <div>
+            <h2>Your server estate.</h2>
+            <p>
+              {rows.filter((row) => row.phase === "live").length} relay
+              connected · {nodes.length} verified nodes
+            </p>
+          </div>
+        </div>
+        <Button variant="primary" onClick={() => navigate("Settings")}>
+          <Icon name="plus" />
+          Pair another server
+        </Button>
+      </div>
+      <div className="directory-toolbar">
+        <label className="search-field">
+          <Icon name="search" />
+          <input
+            aria-label="Search servers"
+            placeholder="Find a server or instance…"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+        </label>
+        <span className="subtle">
+          One selected action target · passive feeds are read only
+        </span>
+      </div>
+      <section className="server-directory" aria-label="Server estate">
+        <div className="directory-columns">
+          <span>SERVER / INSTANCE</span>
+          <span>RUNTIME SIGNAL</span>
+          <span>PLAYERS</span>
+          <span>SOURCE HEALTH</span>
+          <span>WORKSPACE</span>
+        </div>
+        {rows
+          .filter((row) =>
+            `${row.state.ready?.server.serverName ?? ""} ${row.serverId} ${row.state.ready?.server.instanceKey ?? ""}`
+              .toLowerCase()
+              .includes(query.toLowerCase()),
+          )
+          .map((row, index) => {
+            const paper = sourceEvidence(row.state, "paperHealth", now),
+              host = sourceEvidence(row.state, "hostSystem", now),
+              selected = row.serverId === snap.state.serverId,
+              tps = number(
+                Array.isArray(row.state.server.tps)
+                  ? row.state.server.tps[0]
+                  : null,
+              );
+            return (
+              <article
+                className={`server-directory-row ${selected ? "selected" : ""}`}
+                key={row.serverId}
+              >
+                <div className="server-directory-identity">
+                  <span className="server-initial">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <div>
+                    <h2>
+                      {str(
+                        row.state.ready?.server.serverName,
+                        snap.labels[row.serverId] ?? row.serverId,
+                      )}
+                    </h2>
+                    <code>
+                      {row.state.ready?.server.instanceKey ?? "Legacy instance"}
+                    </code>
+                    <small>{row.serverId}</small>
+                  </div>
+                </div>
+                <div className="directory-signal">
+                  <strong>
+                    {row.state.ready?.agents.paper
+                      ? (tps?.toFixed(2) ?? "—")
+                      : "—"}
+                    <small>TPS</small>
+                  </strong>
+                  <Sparkline samples={row.state.history} metric="tps" />
+                </div>
+                <div className="directory-players">
+                  <strong>
+                    {row.state.ready?.agents.paper
+                      ? (number(row.state.server.onlinePlayers) ?? "—")
+                      : "—"}
+                  </strong>
+                  <small>players · Paper</small>
+                </div>
+                <div className="directory-sources">
+                  <span>
+                    <b>Paper</b>
+                    {paper.kind}
+                  </span>
+                  <span>
+                    <b>Host</b>
+                    {host.kind}
+                  </span>
+                  <time title="Source capture timestamp">
+                    {paper.capturedAt ?? host.capturedAt ?? "No capture"}
+                  </time>
+                </div>
+                <div className="directory-enter">
+                  <Status tone={row.phase === "live" ? "success" : "neutral"}>
+                    {selected ? "Selected" : row.phase}
+                  </Status>
+                  <Button
+                    variant="quiet"
+                    onClick={() => void open(row.serverId)}
+                  >
+                    {selected ? "Enter workspace" : "Select server"}
+                    <Icon name="arrow" />
+                  </Button>
+                </div>
+              </article>
+            );
+          })}
+        {!rows.length && (
+          <Empty title="Your fleet starts here">
+            Pair this browser with your first server in Settings.
+          </Empty>
+        )}
+      </section>
+      <section className="node-ledger">
+        <header className="section-heading">
+          <div>
+            <span className="eyebrow">HOST / VERIFIED NODE REGISTER</span>
+            <h2>The infrastructure underneath.</h2>
+          </div>
+          <span className="subtle">Shared nodes counted once</span>
+        </header>
+        {nodes.length ? (
+          nodes.map((node) => {
+            const memory = bytes(node.memory);
+            return (
+              <div className="node-row" key={node.nodeId}>
+                <Icon name="server" />
+                <div>
+                  <strong>{node.nodeId}</strong>
+                  <small>{str(node.state.hostSystem.capturedAt)}</small>
+                </div>
+                <div>
+                  <strong>{node.cpu?.toFixed(1) ?? "—"}%</strong>
+                  <small>Node CPU</small>
+                </div>
+                <div>
+                  <strong>
+                    {memory.value} {memory.unit}
+                  </strong>
+                  <small>Node memory used</small>
+                </div>
+              </div>
+            );
+          })
+        ) : (
+          <Empty title="No verified node measurements">
+            Legacy peers remain usable. Aggregation requires fresh, matching
+            node identity.
+          </Empty>
+        )}
+      </section>
+      {error && (
+        <Notice tone="error" title="Server selection">
+          {error}
+        </Notice>
+      )}
+    </>
+  );
 }

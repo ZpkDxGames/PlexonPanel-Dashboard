@@ -1,10 +1,10 @@
-# PlexonPanel Command Center
+# PlexonPanel · Signal Atlas
 
-A fresh operations dashboard for PlexonPanel protocol 3. The project has independent Git history and a new React/Vite/TypeScript interface; the existing Dashboard and Core repositories are integration references only.
+A new Minecraft operations control plane built with React 19, TypeScript and Vite. It reconstructs every workspace while preserving PlexonPanel Protocol 3, authenticated relay sessions, immutable device grants and reviewed server operations.
 
-## Local setup
+## Run locally
 
-Requires Node 24.x.
+Node 24.x:
 
 ```sh
 npm ci
@@ -12,21 +12,25 @@ cp .env.example .env.local
 npm run dev
 ```
 
-Set only the public `VITE_PLEXON_RELAY_URL`. Never place Cloudflare credentials, pairing peppers, token secrets or signing keys in frontend variables.
+Set only the public `VITE_PLEXON_RELAY_URL`. Private signing keys, Cloudflare credentials and service secrets do not belong in frontend variables.
 
-## Checks
+## Validate
 
 ```sh
 npm run check
 npm run build
 npm run test:perf
-npm run test:browser
+npx playwright install firefox
+node scripts/qa-local.mjs
+node scripts/qa-local.mjs scripts/control-plane-check.mjs
+node scripts/qa-local.mjs scripts/visual-proofs.mjs
+node --import tsx scripts/telemetry-profile.mjs
 ```
 
-`test:browser` requires a locally installed Playwright Chromium runtime and a running dev server. Development fixtures are available through `?fixture=healthy|skew|stale|partial|stopped|offline|denied`; production builds exclude the fixture module.
+`npm run test:browser` also works with a separately running local server in the same network namespace. The browser harnesses permit localhost only, disable third-party skins and use clearly labelled development fixtures. Production excludes the fixture module.
 
-## Deployment
+## Review and rollout
 
-Create a separate Vercel project, set `VITE_PLEXON_RELAY_URL`, and add that exact HTTPS and WSS relay origin to `connect-src` in `vercel.json`. Add the new dashboard HTTPS origin to the relay allowlist. Do not promote over the existing production project until live acceptance is complete.
+Start with [verification](docs/NEW_DASHBOARD_VERIFICATION.md), [feature parity](docs/FEATURE_PARITY_MATRIX.md), [compatibility](docs/NEW_DASHBOARD_COMPATIBILITY.md), [design](docs/NEW_DASHBOARD_DESIGN.md), [risks](docs/NEW_DASHBOARD_RISKS.md), and [rollout/rollback](docs/NEW_DASHBOARD_ROLLOUT.md).
 
-See `docs/MIGRATION_ROLLBACK.md` for rollout and pairing steps.
+This branch is for review and nonproduction acceptance. Actual Paper/Host/VPS runtime acceptance remains separate. Do not promote production, alter relay allowlists or replace running services without explicit operator authorization.
