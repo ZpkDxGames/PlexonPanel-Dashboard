@@ -7,7 +7,6 @@ import {
   sourceFor,
   type MetricKey,
 } from "../presentation/telemetry";
-import { Icon } from "./Icon";
 export const Sparkline = memo(function Sparkline({
   samples,
   metric,
@@ -15,7 +14,7 @@ export const Sparkline = memo(function Sparkline({
   samples: Sample[];
   metric: MetricKey;
 }) {
-  const epochs = usePlotHistory();
+  const epochs = usePlotHistory(samples);
   const points = historyFor(
       epochs?.[sourceFor[metric]] ?? samples,
       sourceFor[metric],
@@ -49,36 +48,6 @@ export const Sparkline = memo(function Sparkline({
     </svg>
   );
 });
-export function MetricCell({
-  label,
-  reading,
-  detail,
-  icon,
-  history,
-  metric,
-}: {
-  label: string;
-  reading: { value: string; unit: string; available: boolean };
-  detail: string;
-  icon: string;
-  history?: Sample[];
-  metric?: MetricKey;
-}) {
-  return (
-    <div className="metric-cell" data-available={reading.available}>
-      <span className="metric-label">
-        <Icon name={icon} />
-        {label}
-      </span>
-      <div className="metric-value">
-        <strong>{reading.value}</strong>
-        <em>{reading.unit}</em>
-      </div>
-      <small>{detail}</small>
-      {history && metric && <Sparkline samples={history} metric={metric} />}
-    </div>
-  );
-}
 export function SectionLabel({
   index,
   title,

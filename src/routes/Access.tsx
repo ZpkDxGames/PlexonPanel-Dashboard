@@ -14,7 +14,8 @@ export default function Access() {
     [prepared, setPrepared] = useState<Prepared | null>(null),
     [filter, setFilter] = useState(""),
     [loading, setLoading] = useState(false),
-    [auditSource, setAuditSource] = useState<Kind>("HOST");
+    [auditSource, setAuditSource] = useState<Kind>("HOST"),
+    [view, setView] = useState("audit");
   const mounted = useRef(true),
     request = useRef(0);
   const grant = reconcileDeviceGrant(snap.grant, snap.state.ready?.device),
@@ -73,24 +74,133 @@ export default function Access() {
   };
   return (
     <>
-      <div className="access-summary">
-        <div>
-          <strong>{devices.length.toString().padStart(2, "0")}</strong>
-          <span>Reported devices</span>
-        </div>
-        <div>
-          <strong>{grant?.scopes.length ?? "—"}</strong>
-          <span>Effective scopes</span>
-        </div>
-        <div>
-          <strong>{audit.length.toString().padStart(2, "0")}</strong>
-          <span>Loaded records</span>
+      <div className="access-command">
+        <div className="workspace-tabs" aria-label="Access views">
+          {[
+            ["audit", "Operation trail"],
+            ["devices", "Paired devices"],
+            ["grant", "Your authority"],
+          ].map(([key, label]) => (
+            <button
+              key={key}
+              aria-pressed={view === key}
+              className={view === key ? "active" : ""}
+              onClick={() => setView(key)}
+            >
+              {label}
+              <span>
+                {key === "audit"
+                  ? audit.length
+                  : key === "devices"
+                    ? devices.length
+                    : (grant?.scopes.length ?? "—")}
+              </span>
+            </button>
+          ))}
         </div>
         <Button loading={loading} onClick={() => void refresh()}>
           Refresh access
         </Button>
       </div>
-      <div className="access-grid">
+      <div hidden={view !== "audit"} className="audit-workspace">
+        {" "}
+        <SectionLabel
+          index="02"
+          title="Operation audit"
+          detail={
+            auditAction === "audit.self"
+              ? "This device only"
+              : "Authorized audit scope"
+          }
+        />
+        <Panel
+          eyebrow={`${auditSource} / AUTHORITATIVE RECORDS`}
+          title="Trace the operation"
+        >
+          <div className="access-toolbar">
+            <label className="field">
+              <span className="sr-only">Filter audit</span>
+              <input
+                value={filter}
+                onChange={(e) => setFilter(e.target.value)}
+                placeholder="Filter audit"
+              />
+            </label>
+            <label className="field">
+              <span className="sr-only">Audit authority</span>
+              <select
+                value={auditSource}
+                onChange={(e) => setAuditSource(e.target.value as Kind)}
+              >
+                <option value="HOST">Host audit</option>
+                <option value="PAPER">Paper audit</option>
+              </select>
+            </label>
+          </div>
+          <div
+            className="table-region"
+            tabIndex={0}
+            role="region"
+            aria-label="Audit records"
+          >
+            <table>
+              <thead>
+                <tr>
+                  <th>Recorded</th>
+                  <th>Actor</th>
+                  <th>Operation</th>
+                  <th>Target</th>
+                  <th>Outcome</th>
+                </tr>
+              </thead>
+              <tbody>
+                {visible.length ? (
+                  visible.map((entry, index) => {
+                    const outcome = str(
+                      entry.outcome,
+                      str(entry.status, "Unknown"),
+                    );
+                    return (
+                      <tr key={`${str(entry.timestamp)}:${index}`}>
+                        <td>{str(entry.timestamp)}</td>
+                        <td>{str(entry.actorLabel, str(entry.actor))}</td>
+                        <td>
+                          <code>
+                            {str(entry.actionType, str(entry.action))}
+                          </code>
+                        </td>
+                        <td>{str(entry.target)}</td>
+                        <td>
+                          <Status
+                            tone={
+                              outcome === "SUCCESS"
+                                ? "success"
+                                : outcome === "DEGRADED" ||
+                                    outcome === "STARTED"
+                                  ? "warning"
+                                  : "neutral"
+                            }
+                          >
+                            {str(entry.code, outcome)}
+                          </Status>
+                        </td>
+                      </tr>
+                    );
+                  })
+                ) : (
+                  <tr>
+                    <td colSpan={5}>
+                      No matching authorized records received.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </Panel>
+      </div>
+      <div hidden={view !== "devices"} className="devices-workspace">
+        {" "}
         <Panel
           eyebrow={`DEVICE REGISTER / ${deviceKind === "PAPER" ? "PAPER AUTHORITY" : "HOST MIRROR"}`}
           title="Paired browser devices"
@@ -142,6 +252,9 @@ export default function Access() {
             )}
           </div>
         </Panel>
+      </div>
+      <div hidden={view !== "grant"} className="grant-workspace">
+        {" "}
         <Panel eyebrow="THIS BROWSER / EFFECTIVE GRANT" title="Your authority">
           <div className="scope-view">
             <strong>
@@ -164,95 +277,6 @@ export default function Access() {
           </div>
         </Panel>
       </div>
-      <SectionLabel
-        index="02"
-        title="Operation audit"
-        detail={
-          auditAction === "audit.self"
-            ? "This device only"
-            : "Authorized audit scope"
-        }
-      />
-      <Panel
-        eyebrow={`${auditSource} / AUTHORITATIVE RECORDS`}
-        title="Trace the operation"
-      >
-        <div className="access-toolbar">
-          <label className="field">
-            <span className="sr-only">Filter audit</span>
-            <input
-              value={filter}
-              onChange={(e) => setFilter(e.target.value)}
-              placeholder="Filter audit"
-            />
-          </label>
-          <label className="field">
-            <span className="sr-only">Audit authority</span>
-            <select
-              value={auditSource}
-              onChange={(e) => setAuditSource(e.target.value as Kind)}
-            >
-              <option value="HOST">Host audit</option>
-              <option value="PAPER">Paper audit</option>
-            </select>
-          </label>
-        </div>
-        <div
-          className="table-region"
-          tabIndex={0}
-          role="region"
-          aria-label="Audit records"
-        >
-          <table>
-            <thead>
-              <tr>
-                <th>Recorded</th>
-                <th>Actor</th>
-                <th>Operation</th>
-                <th>Target</th>
-                <th>Outcome</th>
-              </tr>
-            </thead>
-            <tbody>
-              {visible.length ? (
-                visible.map((entry, index) => {
-                  const outcome = str(
-                    entry.outcome,
-                    str(entry.status, "Unknown"),
-                  );
-                  return (
-                    <tr key={`${str(entry.timestamp)}:${index}`}>
-                      <td>{str(entry.timestamp)}</td>
-                      <td>{str(entry.actorLabel, str(entry.actor))}</td>
-                      <td>
-                        <code>{str(entry.actionType, str(entry.action))}</code>
-                      </td>
-                      <td>{str(entry.target)}</td>
-                      <td>
-                        <Status
-                          tone={
-                            outcome === "SUCCESS"
-                              ? "success"
-                              : outcome === "DEGRADED" || outcome === "STARTED"
-                                ? "warning"
-                                : "neutral"
-                          }
-                        >
-                          {str(entry.code, outcome)}
-                        </Status>
-                      </td>
-                    </tr>
-                  );
-                })
-              ) : (
-                <tr>
-                  <td colSpan={5}>No matching authorized records received.</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </Panel>
       {error && (
         <div className="page-notice">
           <Notice tone="error" title="Some access evidence is unavailable">

@@ -2,15 +2,15 @@ import { BrandMark } from "./Brand";
 export function Splash() {
   return (
     <main className="splash" aria-label="Initializing PlexonPanel">
-      <div className="splash-emblem">
-        <BrandMark />
-      </div>
-      <h1>PlexonPanel</h1>
-      <p>Clarity for every world.</p>
+      <BrandMark />
+      <h1>
+        plexon<span>panel</span>
+      </h1>
       <div className="splash-progress" role="status">
         <span />
-        Preparing your workspace
+        Opening your operations workspace
       </div>
+      <p>Built for the worlds you run.</p>
     </main>
   );
 }

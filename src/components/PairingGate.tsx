@@ -8,72 +8,58 @@ export function PairingGate() {
     <main className="pairing-gate">
       <header className="pairing-brand">
         <BrandMark />
-        <strong>PlexonPanel</strong>
-        <span>CONTROL PLANE</span>
+        <strong>
+          plexon<span>panel</span>
+        </strong>
+        <small>MINECRAFT OPERATIONS</small>
       </header>
-      <div className="pairing-layout">
-        <section className="pairing-intro">
-          <span className="eyebrow">YOUR WORLDS. ONE WORKSPACE.</span>
-          <h1>
-            Great worlds
-            <br />
-            start with
-            <br />
-            <em>clear signals.</em>
-          </h1>
-          <p>
-            Live Minecraft telemetry. Thoughtful controls.
-            <br />A complete picture of your server.
-          </p>
-          <div
-            className="pairing-architecture"
-            aria-label="Paper and Host connect securely to this browser"
-          >
-            <span>
-              <Icon name="server" />
-              Paper <small>Game runtime</small>
-            </span>
-            <b>+</b>
-            <span>
-              <Icon name="performance" />
-              Host <small>Infrastructure</small>
-            </span>
-            <Icon name="arrow" />
-            <span>
-              <BrandMark />
-              You <small>In control</small>
-            </span>
-          </div>
-        </section>
-        <section className="pairing-card" aria-labelledby="pairing-form-title">
-          <div className="pairing-card-head">
-            <span className="eyebrow">01 / CONNECT YOUR SERVER</span>
-            <h2 id="pairing-form-title">Make the connection.</h2>
-            <p>
-              Use a fresh, single-use pairing code from your Minecraft server.
-            </p>
+      <section className="provisioning">
+        <span className="eyebrow">LET’S GET YOU CONNECTED</span>
+        <h1>
+          Your next great
+          <br />
+          world starts here.
+        </h1>
+        <p className="pairing-lead">
+          Pair this browser with your server.
+          <br />
+          Your worlds, players and live signals will meet you here.
+        </p>
+        <div className="provisioning-form">
+          <div className="provisioning-heading">
+            <span className="setup-index">01</span>
+            <div>
+              <h2 id="pairing-form-title">Connect a server</h2>
+              <p>
+                A fresh pairing code gives this browser its own scoped access.
+              </p>
+            </div>
           </div>
           <PairingForm onboarding />
-          <div className="pairing-help">
+        </div>
+        <div className="pairing-trust">
+          <div>
+            <Icon name="server" />
+            <strong>Paper</strong>
+            <span>Game & player telemetry</span>
+          </div>
+          <div>
+            <Icon name="performance" />
+            <strong>Host</strong>
+            <span>Infrastructure & backups</span>
+          </div>
+          <div>
             <Icon name="access" />
-            <p>
-              This browser receives only the access granted by your server. You
-              can review or revoke devices later.
-            </p>
+            <strong>Your browser</strong>
+            <span>Only the access you grant</span>
           </div>
-          <div className="pairing-boundary">
-            <span>Relay endpoint</span>
-            <code>
-              {snap.relay.origin || "Enter your public HTTPS relay above"}
-            </code>
-          </div>
-        </section>
-      </div>
-      <footer className="pairing-footer">
-        <span>Encrypted transport</span>
-        <span>Scoped access</span>
-        <span>Protocol 3</span>
-      </footer>
+        </div>
+        <p className="pairing-boundary">
+          Relay <code>{snap.relay.origin || "Your public HTTPS endpoint"}</code>
+          <span>Protocol 3 · Encrypted transport</span>
+        </p>
+      </section>
+      <footer className="pairing-footer">Built for the worlds you run.</footer>
     </main>
   );
 }

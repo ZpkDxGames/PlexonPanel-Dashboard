@@ -8,8 +8,10 @@ import {
   gcMovement,
 } from "../presentation/telemetry";
 import { CrosshairGroup, TimeSeries } from "../components/charts/TimeSeries";
-import { Panel, Status } from "../components/ui";
-import { Coverage, SectionLabel } from "../components/Telemetry";
+import { Status } from "../components/ui";
+import { Coverage } from "../components/Telemetry";
+import { usePlotHistory } from "../presentation/PlotHistory";
+import { Icon } from "../components/Icon";
 const plots = [
   {
     title: "Minecraft service CPU",
@@ -69,21 +71,55 @@ const plots = [
 export default function Performance() {
   const { state } = useSession(),
     now = useNow(),
-    [minutes, setMinutes] = useState(15);
-  const cutoff = Math.floor(now / 10000) * 10000 - minutes * 60_000;
-  const samples = state.history;
+    [minutes, setMinutes] = useState(15),
+    [selected, setSelected] = useState("tps"),
+    [allSignals, setAllSignals] = useState(false);
+  const epochs = usePlotHistory();
+  const cutoff = Math.floor(now / 10000) * 10000 - minutes * 60000,
+    samples = state.history;
   const health = useMemo(
-      () => historyFor(samples, "paperHealth", cutoff),
-      [samples, cutoff],
+    () => historyFor(epochs?.paperHealth ?? samples, "paperHealth", cutoff),
+    [samples, cutoff, epochs],
+  );
+  const instruments = [
+    {
+      title: "Tick rate",
+      source: "paperHealth" as const,
+      key: "tps" as const,
+      label: "Tick rate",
+      unit: "TPS",
+      color: "var(--chart-1)",
+      description: "Paper · Minecraft runtime tick frequency.",
+    },
+    {
+      title: "Mean tick duration",
+      source: "paperHealth" as const,
+      key: "mspt" as const,
+      label: "Mean tick duration",
+      unit: "ms",
+      color: "var(--chart-2)",
+      description: "Paper · observed average tick duration, not a percentile.",
+    },
+    ...plots,
+  ];
+  const active =
+      instruments.find((plot) => plot.key === selected) ?? instruments[0],
+    summary = observedSummary(
+      historyFor(epochs?.[active.source] ?? samples, active.source, cutoff),
+      active.key,
     ),
-    spikes = health.filter(
-      (sample) => sample.mspt !== null && sample.mspt > 50,
-    ),
-    paper = sourceEvidence(state, "paperHealth", now),
-    gcRate = gcMovement(historyFor(samples, "paperSystem", cutoff));
+    gcRate = gcMovement(
+      historyFor(epochs?.paperSystem ?? samples, "paperSystem", cutoff),
+    );
+  const display = (value: number | null, unit = active.unit) =>
+    value === null
+      ? "—"
+      : unit === "bytes"
+        ? `${(value / 2 ** 30).toFixed(2)} GiB`
+        : `${value.toFixed(unit === "TPS" ? 2 : 1)} ${unit}`;
   return (
     <CrosshairGroup>
-      <div className="performance-toolbar">
+      <div className="analysis-toolbar">
         <div className="segmented" aria-label="Time range">
           {[1, 5, 15, 30].map((value) => (
             <button
@@ -96,162 +132,238 @@ export default function Performance() {
             </button>
           ))}
         </div>
-        <span>Retained session window · shared sample inspection</span>
+        <span className="subtle">Source capture time · retained session</span>
+        <button
+          className={`button ${allSignals ? "primary" : "secondary"}`}
+          aria-pressed={allSignals}
+          onClick={() => setAllSignals((value) => !value)}
+        >
+          {allSignals ? "Focus one signal" : "Compare all signals"}
+        </button>
       </div>
-      <div className="lab-grid">
-        <Panel
-          eyebrow="01 / TICK DIAGNOSTICS"
-          title="Runtime, at resolution"
-          className="wide-panel instrument-panel"
-          action={
+      <label className="mobile-signal-picker">
+        <span className="eyebrow">SELECT AN INSTRUMENT</span>
+        <select
+          aria-label="Performance signal"
+          value={selected}
+          onChange={(e) => {
+            setSelected(e.target.value);
+            setAllSignals(false);
+          }}
+        >
+          {["Runtime", "Compute", "Memory"].map((category) => (
+            <optgroup label={category} key={category}>
+              {instruments
+                .filter((plot) =>
+                  category === "Runtime"
+                    ? plot.source === "paperHealth"
+                    : category === "Memory"
+                      ? plot.unit === "bytes"
+                      : plot.source !== "paperHealth" && plot.unit !== "bytes",
+                )
+                .map((plot) => (
+                  <option key={plot.key} value={plot.key}>
+                    {plot.title}
+                  </option>
+                ))}
+            </optgroup>
+          ))}
+        </select>
+      </label>
+      <div className="analysis-workspace">
+        <aside className="signal-catalog" aria-label="Signal catalog">
+          {["Runtime", "Compute", "Memory"].map((category, i) => (
+            <div className="signal-category" key={category}>
+              <span className="eyebrow">
+                0{i + 1} / {category}
+              </span>
+              {instruments
+                .filter((plot) =>
+                  category === "Runtime"
+                    ? plot.source === "paperHealth"
+                    : category === "Memory"
+                      ? plot.unit === "bytes"
+                      : plot.source !== "paperHealth" && plot.unit !== "bytes",
+                )
+                .map((plot) => (
+                  <button
+                    key={plot.key}
+                    className={selected === plot.key ? "active" : ""}
+                    aria-pressed={selected === plot.key}
+                    onClick={() => {
+                      setSelected(plot.key);
+                      setAllSignals(false);
+                    }}
+                  >
+                    <span
+                      className="signal-indicator"
+                      style={{ background: plot.color }}
+                    />
+                    <span>
+                      <strong>{plot.title}</strong>
+                      <small>
+                        {plot.source === "paperHealth"
+                          ? "Paper runtime"
+                          : plot.source === "paperSystem"
+                            ? "Paper process"
+                            : plot.source === "service"
+                              ? "Minecraft cgroup"
+                              : "Host node"}
+                      </small>
+                    </span>
+                    <span className="catalog-arrow">↗</span>
+                  </button>
+                ))}
+            </div>
+          ))}
+        </aside>
+        <section className="analysis-focus">
+          <header className="analysis-title">
+            <div>
+              <span className="eyebrow">
+                {allSignals
+                  ? "CAPTURE-ALIGNED SIGNALS"
+                  : `${active.source === "paperHealth" ? "PAPER RUNTIME" : active.source === "paperSystem" ? "PAPER JVM" : active.source === "service" ? "MINECRAFT SERVICE" : "HOST NODE"} / ${active.unit === "bytes" ? "MEMORY" : "INSTRUMENT"}`}
+              </span>
+              <h2>{allSignals ? "Every source, in context." : active.title}</h2>
+              <p>
+                {allSignals
+                  ? "Independent units and scales. Inspection synchronizes by actual capture time."
+                  : active.description}
+              </p>
+            </div>
             <Status
               tone={
-                spikes.length
-                  ? "warning"
-                  : health.length
-                    ? "success"
-                    : "neutral"
+                sourceEvidence(state, active.source, now).kind === "live"
+                  ? "success"
+                  : "neutral"
               }
             >
-              {spikes.length
-                ? `${spikes.length} budget crossings`
-                : health.length
-                  ? "No observed crossings"
-                  : "No observations"}
+              {sourceEvidence(state, active.source, now).kind}
             </Status>
-          }
-        >
-          <div className="lab-ticks">
-            {[
-              {
-                key: "tps" as const,
-                label: "Tick rate",
-                unit: "TPS",
-                color: "var(--chart-1)",
-                max: 20,
-              },
-              {
-                key: "mspt" as const,
-                label: "Mean tick duration",
-                unit: "ms",
-                color: "var(--chart-2)",
-                max: undefined,
-              },
-            ].map((item) => {
-              const summary = observedSummary(health, item.key);
-              return (
-                <div className="instrument-track" key={item.key}>
-                  <div className="lab-readout">
-                    {summary.mean === null
-                      ? "—"
-                      : summary.mean.toFixed(item.key === "tps" ? 2 : 1)}
-                    <small>{item.unit} · observed mean</small>
-                  </div>
+          </header>
+          {!allSignals && (
+            <>
+              <div className="analysis-summary">
+                <div>
+                  <span>OBSERVED MEAN</span>
+                  <strong>{display(summary.mean)}</strong>
+                </div>
+                <div>
+                  <span>LOWEST</span>
+                  <strong>{display(summary.min)}</strong>
+                </div>
+                <div>
+                  <span>HIGHEST</span>
+                  <strong>{display(summary.max)}</strong>
+                </div>
+                <div>
+                  <span>ACTUAL SAMPLES</span>
+                  <strong>{summary.count.toLocaleString()}</strong>
+                </div>
+              </div>
+              <TimeSeries
+                key={active.key}
+                title={active.title}
+                source={active.description}
+                samples={samples}
+                windowStart={cutoff}
+                series={[
+                  {
+                    key: active.key,
+                    label: active.label,
+                    unit: active.unit,
+                    color: active.color,
+                  },
+                ]}
+                height={360}
+                yMax={
+                  active.key === "tps"
+                    ? 20
+                    : active.unit === "%"
+                      ? 100
+                      : undefined
+                }
+                threshold={active.key === "mspt" ? 50 : undefined}
+                evidence={sourceEvidence(state, active.source, now)}
+              />
+              <div className="analysis-explanation">
+                <Icon name="performance" />
+                <p>
+                  {active.key === "serviceCpu"
+                    ? "This scale is percent of one core. A reading above 100% is valid; 150% represents 1.5 cores."
+                    : active.key === "mspt"
+                      ? "50 ms is the tick budget for 20 TPS. The observations are means; no percentiles or causes are inferred."
+                      : active.unit === "bytes"
+                        ? "Binary memory units. Node, service cgroup and JVM heap account for different scopes and should be read separately."
+                        : "Inspect with the arrow keys or touch a sample to pin it. Missing measurements and source boundaries remain disconnected."}
+                </p>
+              </div>
+            </>
+          )}
+          {allSignals && (
+            <div className="comparison-tracks">
+              {instruments.map((plot) => (
+                <section className="comparison-track" key={plot.key}>
+                  <header>
+                    <h3>{plot.title}</h3>
+                    <p>{plot.description}</p>
+                  </header>
                   <TimeSeries
-                    title={item.label}
+                    title={plot.title}
+                    source={plot.description}
                     samples={samples}
                     windowStart={cutoff}
                     series={[
                       {
-                        key: item.key,
-                        label: item.label,
-                        unit: item.unit,
-                        color: item.color,
+                        key: plot.key,
+                        label: plot.label,
+                        unit: plot.unit,
+                        color: plot.color,
                       },
                     ]}
-                    height={230}
-                    yMax={item.max}
-                    threshold={item.key === "mspt" ? 50 : undefined}
-                    evidence={paper}
+                    height={190}
+                    yMax={
+                      plot.key === "tps"
+                        ? 20
+                        : plot.unit === "%"
+                          ? 100
+                          : undefined
+                    }
+                    threshold={plot.key === "mspt" ? 50 : undefined}
+                    evidence={sourceEvidence(state, plot.source, now)}
                   />
-                </div>
-              );
-            })}
-          </div>
-          <div className="diagnostic-note">
-            TPS and milliseconds use separate axes. Crosshairs align by source
-            capture time; no additional observations are interpolated.
-          </div>
-        </Panel>
-      </div>
-      <SectionLabel
-        index="02"
-        title="Resource instruments"
-        detail="One source and unit per plot"
-      />
-      <div className="lab-grid">
-        {plots.map((plot) => (
-          <Panel
-            key={plot.key}
-            eyebrow={`${plot.source === "paperSystem" ? "PAPER JVM" : plot.source === "service" ? "MINECRAFT SERVICE" : "HOST NODE"} / ${plot.unit === "bytes" ? "MEMORY" : "COMPUTE"}`}
-            title={plot.title}
-            description={plot.description}
-            className="instrument-panel"
-          >
-            <TimeSeries
-              title={plot.title}
-              source={plot.description}
-              samples={samples}
-              windowStart={cutoff}
-              series={[
-                {
-                  key: plot.key,
-                  label: plot.label,
-                  unit: plot.unit,
-                  color: plot.color,
-                },
-              ]}
-              height={220}
-              yMax={plot.unit === "%" ? 100 : undefined}
-              evidence={sourceEvidence(state, plot.source, now)}
-            />
-          </Panel>
-        ))}
-      </div>
-      <SectionLabel index="03" title="Observation notes" />
-      <div className="lab-grid">
-        <Panel eyebrow="TICK BUDGET" title="Recent mean tick samples">
-          <div className="coverage-block">
-            <Coverage samples={health} />
-            <div className="spike-list">
-              {spikes
-                .slice(-5)
-                .reverse()
-                .map((sample) => (
-                  <div key={sample.at}>
-                    <time>{new Date(sample.at).toLocaleTimeString()}</time>
-                    <strong>{sample.mspt!.toFixed(1)} ms</strong>
-                    <span>Above 50 ms</span>
-                  </div>
-                ))}
-              {!spikes.length && (
-                <p>No mean samples above 50 ms in this window.</p>
-              )}
+                </section>
+              ))}
             </div>
-          </div>
-        </Panel>
-        <Panel
-          eyebrow="GARBAGE COLLECTION / PAPER"
-          title="Cumulative pause movement"
-        >
-          <div className="single-evidence">
-            <strong>
-              {gcRate === null ? "—" : gcRate.toFixed(1)} <small>ms/min</small>
-            </strong>
-            <span>
-              Counter movement over the observed window. A reset makes this rate
-              unavailable.
-            </span>
-            <small>
-              Current collections:{" "}
-              {number(state.system.gcCollections)?.toLocaleString() ??
-                "Unavailable"}
-              . Tick and pause percentiles require source distributions and are
-              not inferred from means.
-            </small>
-          </div>
-        </Panel>
+          )}
+        </section>
       </div>
+      <section className="observation-ledger">
+        <div>
+          <span className="eyebrow">TICK BUDGET / PAPER</span>
+          <h2>Observed mean samples.</h2>
+          <Coverage samples={health} />
+          <p>
+            {health.filter((s) => s.mspt !== null && s.mspt > 50).length}{" "}
+            samples above 50 ms in this window. Unobserved periods have no
+            inferred state.
+          </p>
+        </div>
+        <div>
+          <span className="eyebrow">GARBAGE COLLECTION / PAPER</span>
+          <h2>
+            {gcRate === null ? "—" : gcRate.toFixed(1)} <small>ms/min</small>
+          </h2>
+          <p>
+            Cumulative pause movement across the observed window. A counter
+            reset makes the rate unavailable. Current collections:{" "}
+            {number(state.system.gcCollections)?.toLocaleString() ??
+              "Unavailable"}
+            .
+          </p>
+        </div>
+      </section>
     </CrosshairGroup>
   );
 }

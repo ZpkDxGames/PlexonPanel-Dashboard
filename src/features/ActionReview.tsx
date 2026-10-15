@@ -18,11 +18,20 @@ export function ActionReview({
     [result, setResult] = useState<ActionCompletion | null>(null),
     [error, setError] = useState("");
   useEffect(() => {
-    if (prepared && !dialog.current?.open) dialog.current?.showModal();
-    if (!prepared && dialog.current?.open) dialog.current.close();
+    if (!prepared) return;
+    const current = dialog.current;
+    const previous =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
+    if (current && !current.open) current.showModal();
     setTyped("");
     setResult(null);
     setError("");
+    return () => {
+      if (current?.open) current.close();
+      if (previous?.isConnected) previous.focus();
+    };
   }, [prepared]);
   if (!prepared) return null;
   const confirmText = prepared.subject ?? prepared.name,

@@ -73,15 +73,18 @@ try {
     "player search, sort, editable parameters and reviewed UUID target",
     async () => {
       await go("Players");
-      await page.getByPlaceholder("Search name or UUID").fill("LumaCraft");
+      await page
+        .getByLabel("Search players", { exact: true })
+        .fill("LumaCraft");
       await expect(page.locator(".player-row")).toHaveCount(4);
+      await page.locator(".player-row").first().click();
       await page
         .getByLabel("Private message", { exact: true })
         .fill("A reviewed test message");
       await page
         .getByRole("button", { name: "Review message", exact: true })
         .click();
-      const dialog = page.getByRole("dialog");
+      const dialog = page.locator("dialog.review-dialog");
       await expect(dialog).toContainText("player.message");
       await expect(dialog).toContainText("A reviewed test message");
       await expect(dialog).toContainText("playerId");
@@ -92,13 +95,16 @@ try {
       await page
         .getByRole("button", { name: "Review game mode", exact: true })
         .click();
-      await expect(page.getByRole("dialog")).toContainText("CREATIVE");
+      await expect(page.locator("dialog.review-dialog")).toContainText(
+        "CREATIVE",
+      );
       await page.keyboard.press("Escape");
     },
   );
   await record(
     "high risk action requires typed confirmation; server context change discards review",
     async () => {
+      await page.getByRole("button", { name: "Moderate", exact: true }).click();
       await page.getByRole("button", { name: "Ban", exact: true }).click();
       await expect(
         page.getByRole("button", { name: "Dispatch operation" }),
@@ -113,7 +119,7 @@ try {
         next.ready.serverId = next.serverId;
         session.installFixture("switched-server", next, fixtureAction);
       });
-      await expect(page.getByRole("dialog")).toHaveCount(0);
+      await expect(page.locator("dialog.review-dialog")).toHaveCount(0);
       const mutations = await page.evaluate(async () => {
         const { actionLog } = await import("/src/development/fixtures.ts");
         return actionLog.filter((e) => e.action.startsWith("player."));
@@ -127,7 +133,7 @@ try {
       await go("Console");
       await page.getByLabel("Server command", { exact: true }).fill("list");
       await page.getByRole("button", { name: "Review", exact: true }).click();
-      const dialog = page.getByRole("dialog");
+      const dialog = page.locator("dialog.review-dialog");
       await expect(dialog).toContainText("PAPER");
       await expect(dialog).toContainText("console.execute");
       await dialog.getByRole("button", { name: "Dispatch operation" }).click();
@@ -200,30 +206,29 @@ try {
     "current device revoke disabled; reviewed revoke is bound to Paper",
     async () => {
       await go("Access");
+      await page.getByRole("button", { name: /Paired devices/ }).click();
       await expect(
         page.getByRole("button", { name: "Review revoke" }).first(),
       ).toBeDisabled();
       await page.getByRole("button", { name: "Review revoke" }).last().click();
-      await expect(page.getByRole("dialog")).toContainText("PAPER");
-      await expect(page.getByRole("dialog")).toContainText("fixture-observer");
+      await expect(page.locator("dialog.review-dialog")).toContainText("PAPER");
+      await expect(page.locator("dialog.review-dialog")).toContainText(
+        "fixture-observer",
+      );
       await page.keyboard.press("Escape");
     },
   );
   await record(
-    "settings preference persistence and connections tab",
+    "settings preference persistence and anchored connection document",
     async () => {
       await go("Settings");
-      await page
-        .getByRole("button", { name: "Limestone Light workspace" })
-        .click();
+      await page.getByRole("button", { name: "Paper Light workspace" }).click();
       await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
-      await page.getByRole("tab", { name: "Connections", exact: true }).click();
+      await page.getByRole("link", { name: /Connections/ }).click();
       await expect(
         page.getByLabel("Relay HTTPS origin", { exact: true }).first(),
       ).toBeVisible();
-      await page
-        .getByRole("tab", { name: "Privacy & skins", exact: true })
-        .click();
+      await page.getByRole("link", { name: /Privacy & skins/ }).click();
       await expect(
         page.getByRole("combobox", { name: /Skin provider/ }),
       ).toBeVisible();
@@ -289,7 +294,7 @@ try {
         p.getByRole("main", { name: "Initializing PlexonPanel" }),
       ).toBeVisible();
       await expect(
-        p.getByRole("heading", { name: "Make the connection." }),
+        p.getByRole("heading", { name: "Connect a server" }),
       ).toBeVisible({ timeout: 15000 });
       await expect(p.locator(".workspace")).toHaveCount(0);
       await p.route("https://relay.example/v1/pairings/claim", (route) =>
@@ -318,25 +323,32 @@ try {
   await record(
     "Host generation change does not connect old source history",
     async () => {
+      await page.setViewportSize({ width: 1440, height: 900 });
       await go("Performance");
+      await page
+        .getByRole("button", { name: "Compare all signals", exact: true })
+        .click();
       await page.evaluate(async () => {
         const { session } = await import("/src/adapter/session.ts");
         const ready = structuredClone(session.getSnapshot().state.ready);
         ready.server.hostSession = "next-host-generation";
         session.receiveFixture({ ...ready, type: "dashboard.ready" });
       });
-      const servicePanel = page
-        .locator("section.panel")
-        .filter({
-          has: page.getByRole("heading", {
-            name: "Minecraft service CPU",
-            exact: true,
-          }),
-        });
+      await page
+        .locator(".signal-catalog")
+        .getByRole("button", { name: /Minecraft service CPU/ })
+        .click();
       await expect(
-        servicePanel.getByText("No observed signal", { exact: true }),
+        page
+          .locator(".analysis-focus")
+          .getByText("No observed signal", { exact: true }),
       ).toBeVisible();
-      await expect(page.locator(".lab-ticks .chart-empty")).toHaveCount(0);
+      await expect(page.locator(".analysis-summary")).toContainText("0");
+      await page
+        .locator(".signal-catalog")
+        .getByRole("button", { name: /^Tick rate/ })
+        .click();
+      await expect(page.locator(".analysis-focus .chart-empty")).toHaveCount(0);
       const retained = await page.evaluate(async () => {
         const { session } = await import("/src/adapter/session.ts");
         return session.getSnapshot().state.history.length;

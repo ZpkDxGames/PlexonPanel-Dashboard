@@ -1,14 +1,13 @@
-# Visual review
+# Rendered visual review
 
-The delivery bundle contains original-size before/after screenshots. All operational screenshots use explicitly labelled synthetic development fixtures, never a connected production server.
+Evidence uses development-only synthetic fixtures, with operational dispatch disabled and all non-localhost requests blocked. The production bundle excludes the fixture module. Screenshots do not certify a connected VPS.
 
-- Baseline: all eight routes at 1440 dark, 1024 light and 390 light, plus 360/768/1920, accent, partial/offline/denied cases.
-- Final matrix: the same 37 cases with axe, overflow, preferences, browser errors, command palette and mobile dialog assertions.
-- Final proof set: all eight rebuilt routes at 1440×900 and 390×844, independently in dark and light. Thirty-two full-page PNGs, with axe and viewport checks.
-- Expanded acceptance: all routes at 360/390/768/820/1024/1280/1440/1920, source states, reviewed operations, pairing rejection, keyboard sample inspection, touch pin and source-generation isolation.
+Both concepts were rendered at desktop/mobile before implementation. Actual integrated renders were inspected for all eight workspaces in light and dark at 1440 and 390 pixels. Additional browser matrices cover 360, 768, 820, 1024, 1280 and 1920 pixels. Large-text interaction checks cover 390, 820 and 1280 pixels, plus every route at 390/820.
 
-Reviewed actual renders: instrument hierarchy and separate tick scales; readable mobile pairing; light-theme contrast; scoped empty states; console local scrolling/live tail; backup verification distinctions and phase grid; complete settings; player roster/profile; new server board and node register. Adjusted metadata sizes, contrast, source landmark, scope scroll focus and mobile profile reachability in response to rendered evidence.
+Visual corrections from real renders: added a landmark for the horizontal workspace bar; darkened light-theme metadata to meet contrast checks; increased small metadata; separated chart provenance fields; constrained coverage bars to their own register; made text preferences scale type; sized loaded player-head images; maintained local console/archive scrolling; preserved native modal focus through nested review.
 
-The new direction replaces the old 248px sidebar and six-KPI grid with a labelled 104px rail, source ribbon, four-column metric ledger, dominant dual-track tick instrument and side authority stack. Fleet, terminal, operation journal, access and preferences each have a distinct composition.
+The source chart shows real capture gaps and an observed tick-budget excursion. Worlds are proportional entity-count columns with numerical chunk/density evidence. Missing or disconnected source states remain explicit.
 
-Subjective review, not certification: originality/geometry/typography/responsive composition/source accuracy have no known major visual defect in the inspected captures. Motion is deliberately restrained. Physical phones, Safari, Chromium, screen-reader operation and 200% browser zoom are not certified by these headless captures.
+The desktop composition is a broad instrument and document/register system. Mobile has a dedicated workspace sheet, full-width plots, stacked registers and a full-screen player inspector. No global browser scaling is used.
+
+The screenshots are review evidence, not a self-awarded design certification. Physical devices, Safari/Chromium, screen readers and live operational acceptance remain pending.

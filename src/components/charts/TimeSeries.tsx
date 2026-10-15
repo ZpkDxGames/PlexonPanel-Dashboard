@@ -62,7 +62,7 @@ export const TimeSeries = memo(function TimeSeries({
   windowStart?: number;
 }) {
   const prefs = usePreferences();
-  const epochHistories = usePlotHistory();
+  const epochHistories = usePlotHistory(samples);
   const [table, setTable] = useState(false),
     [hidden, setHidden] = useState<Set<MetricKey>>(new Set()),
     [width, setWidth] = useState(600),
@@ -483,27 +483,6 @@ export const TimeSeries = memo(function TimeSeries({
           </div>
         )}
       </div>
-      <div className="sample-tools">
-        <button
-          aria-label={`Inspect previous ${title} sample`}
-          onClick={() => step(-1)}
-        >
-          ← Previous
-        </button>
-        <button
-          aria-label={`Inspect next ${title} sample`}
-          onClick={() => step(1)}
-        >
-          Next →
-        </button>
-        {nearest && (
-          <button
-            onClick={() => setPinned(pinned === null ? nearest.at : null)}
-          >
-            {pinned === null ? "Pin sample" : "Unpin"}
-          </button>
-        )}
-      </div>
       <div id={`${id}-table`} hidden={!table}>
         {table && (
           <div
@@ -551,6 +530,28 @@ export const TimeSeries = memo(function TimeSeries({
         )}
       </div>
       <footer className="chart-provenance">
+        {" "}
+        <div className="sample-tools">
+          <button
+            aria-label={`Inspect previous ${title} sample`}
+            onClick={() => step(-1)}
+          >
+            ← Previous
+          </button>
+          <button
+            aria-label={`Inspect next ${title} sample`}
+            onClick={() => step(1)}
+          >
+            Next →
+          </button>
+          {nearest && (
+            <button
+              onClick={() => setPinned(pinned === null ? nearest.at : null)}
+            >
+              {pinned === null ? "Pin sample" : "Unpin"}
+            </button>
+          )}
+        </div>
         <span>{source}</span>
         <span>{all.length} observations</span>
         <span>

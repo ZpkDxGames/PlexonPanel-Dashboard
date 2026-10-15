@@ -261,7 +261,7 @@ for (const matrix of matrices) {
     const palette = page.getByRole("dialog", { name: "Command palette" });
     await palette.waitFor();
     await page
-      .getByPlaceholder("Search workspaces and paired servers")
+      .getByLabel("Search commands", {exact:true})
       .fill("backups");
     await palette.getByRole("button", { name: /Backups/ }).click();
     await page.locator("h1", { hasText: "Backups" }).waitFor();

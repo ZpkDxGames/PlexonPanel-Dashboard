@@ -3,9 +3,10 @@ import { spawn } from "node:child_process";
 import { mkdir, writeFile } from "node:fs/promises";
 const browser = await firefox.launch();
 const reports = [];
-for (const [name, cwd, port] of [
+for (const [name, cwd, port, compare] of [
   ["baseline", "../baseline", 4180],
-  ["atlas", ".", 4181],
+  ["operations-focus", ".", 4181, false],
+  ["operations-compare", ".", 4182, true],
 ]) {
   const server = spawn(
     process.execPath,
@@ -46,7 +47,7 @@ for (const [name, cwd, port] of [
     await page.goto(`http://127.0.0.1:${port}/?fixture=healthy#Performance`);
     await page.locator(".workspace-heading h1").waitFor();
     await page.locator(".route-skeleton").waitFor({ state: "detached" });
-    const metrics = await page.evaluate(async () => {
+    const metrics = await page.evaluate(async (compare) => {
       const { session } = await import("/src/adapter/session.ts"),
         { makeFixture, fixtureAction } = await import(
           "/src/development/fixtures.ts"
@@ -81,6 +82,19 @@ for (const [name, cwd, port] of [
         serviceMemory: 4e9,
       }));
       session.installFixture("profile", state, fixtureAction);
+      // Wait for fixture ownership to settle, then measure the actual chosen view.
+      await new Promise((resolve) =>
+        requestAnimationFrame(() => requestAnimationFrame(resolve)),
+      );
+      if (compare) {
+        [...document.querySelectorAll("button")]
+          .find((button) => button.textContent === "Compare all signals")
+          ?.click();
+        await new Promise((resolve) =>
+          requestAnimationFrame(() => requestAnimationFrame(resolve)),
+        );
+      }
+      const plotCount = document.querySelectorAll(".time-series").length;
       const frames = [],
         begin = performance.now();
       let previous = begin,
@@ -115,6 +129,7 @@ for (const [name, cwd, port] of [
       return {
         durationMs: performance.now() - begin,
         events: ingested,
+        plotCount,
         retainedSamples: session.getSnapshot().state.history.length,
         domNodes: document.querySelectorAll("*").length,
         svgPathCharacters: [...document.querySelectorAll("svg path")].reduce(
@@ -126,7 +141,7 @@ for (const [name, cwd, port] of [
         frameP95Ms: frames[Math.floor(frames.length * 0.95)],
         framesOver50ms: frames.filter((x) => x > 50).length,
       };
-    });
+    }, compare);
     await page.goto(`http://127.0.0.1:${port}/?fixture=healthy#Console`);
     await page.locator(".terminal-scroll").waitFor();
     await page.evaluate(async () => {

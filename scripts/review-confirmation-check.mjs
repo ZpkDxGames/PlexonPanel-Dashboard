@@ -44,7 +44,7 @@ try {
     await page.locator(".route-skeleton").waitFor({ state: "detached" });
   }
   async function dispatch() {
-    const dialog = page.getByRole("dialog");
+    const dialog = page.locator("dialog.review-dialog");
     await dialog.getByRole("button", { name: "Dispatch operation" }).click();
     await expect(dialog).toContainText("Agent result received");
     await dialog.getByRole("button", { name: "Close", exact: true }).click();
@@ -64,11 +64,14 @@ try {
     .click();
   await dispatch();
   await route("Access");
+  await page.getByRole("button", { name: /Paired devices/ }).click();
   await page.getByRole("button", { name: "Review revoke" }).last().click();
   await dispatch();
   await route("Players");
+  await page.locator(".player-row").first().click();
+  await page.getByRole("button", { name: "Moderate", exact: true }).click();
   await page.getByRole("button", { name: "Ban", exact: true }).click();
-  const dialog = page.getByRole("dialog");
+  const dialog = page.locator("dialog.review-dialog");
   await expect(
     dialog.getByRole("button", { name: "Dispatch operation" }),
   ).toBeDisabled();

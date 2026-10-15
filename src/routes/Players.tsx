@@ -2,12 +2,13 @@ import { useMemo, useState } from "react";
 import { number, str, type JsonMap } from "../adapter/control-state";
 import { session, type Prepared } from "../adapter/session";
 import { PlayerHead } from "../components/PlayerHead";
-import { Button, Notice, Panel, Status, Empty } from "../components/ui";
+import { Button, Notice, Status, Empty } from "../components/ui";
 import { ActionReview } from "../features/ActionReview";
 import { playerCommand, permissionCommand } from "../lib/playerCommands";
 import { useSession, useNow } from "../hooks";
 import { toast } from "../components/toast";
 import { Icon } from "../components/Icon";
+import { Modal } from "../components/Modal";
 import { hasScope } from "../presentation/authority";
 import { sourceEvidence } from "../presentation/telemetry";
 type Player = {
@@ -47,7 +48,9 @@ export default function Players() {
     [error, setError] = useState(""),
     [message, setMessage] = useState(""),
     [reason, setReason] = useState(""),
-    [gameMode, setGameMode] = useState("SURVIVAL");
+    [gameMode, setGameMode] = useState("SURVIVAL"),
+    [inspecting, setInspecting] = useState(false),
+    [playerTab, setPlayerTab] = useState("interact");
   const allowed = hasScope(snap, "players.view"),
     evidence = sourceEvidence(snap.state, "paperHealth", now);
   const roster = useMemo<Player[]>(
@@ -113,13 +116,28 @@ export default function Players() {
   };
   return (
     <>
+      <div className="community-intro">
+        <div>
+          <span className="directory-number">
+            {String(roster.length).padStart(2, "0")}
+          </span>
+          <div>
+            <h2>People make the world.</h2>
+            <p>{worlds.length} observed worlds · Paper roster</p>
+          </div>
+        </div>
+        <Status tone={evidence.kind === "live" ? "success" : "neutral"}>
+          {evidence.kind} observations
+        </Status>
+      </div>
       <div className="players-toolbar">
-        <label className="field">
-          <span className="sr-only">Search players</span>
+        <label className="search-field">
+          <Icon name="search" />
           <input
+            aria-label="Search players"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search name or UUID"
+            placeholder="Find a player by name or UUID"
           />
         </label>
         <label className="field">
@@ -139,70 +157,88 @@ export default function Players() {
             <option value="duration">Longest session</option>
           </select>
         </label>
-        <Status tone={evidence.kind === "live" ? "success" : "neutral"}>
-          {roster.length} observed · {evidence.kind}
-        </Status>
+        <span className="subtle">{players.length} results</span>
       </div>
-      <div className="players-layout">
-        <Panel
-          eyebrow="PAPER / PLAYER ROSTER"
-          title="People in your worlds"
-          action={<span className="subtle">{players.length} results</span>}
-        >
-          <div className="roster-head">
-            <span>Player identity</span>
-            <span>World / session</span>
-            <span>Latency</span>
-          </div>
-          <div className="roster">
-            {players.length ? (
-              players.map((player) => (
-                <button
-                  key={player.uuid}
-                  className={`player-row ${active?.uuid === player.uuid ? "selected" : ""}`}
-                  aria-pressed={active?.uuid === player.uuid}
-                  onClick={() => {
-                    setSelected(player.uuid);
-                    if (matchMedia("(max-width: 820px)").matches)
-                      requestAnimationFrame(() =>
-                        document
-                          .getElementById("selected-player-panel")
-                          ?.scrollIntoView({ block: "start" }),
-                      );
-                  }}
-                >
+      <section className="player-directory" aria-label="Player roster">
+        <div className="roster-head">
+          <span>PLAYER IDENTITY</span>
+          <span>WORLD</span>
+          <span>SESSION</span>
+          <span>LATENCY</span>
+          <span />
+        </div>
+        <div className="roster">
+          {players.length ? (
+            players.map((player) => (
+              <button
+                key={player.uuid}
+                className={`player-row ${inspecting && active?.uuid === player.uuid ? "selected" : ""}`}
+                aria-label={`Inspect ${player.name}`}
+                onClick={() => {
+                  setSelected(player.uuid);
+                  setPlayerTab("interact");
+                  setInspecting(true);
+                }}
+              >
+                <span className="player-directory-name">
                   <PlayerHead uuid={player.uuid} name={player.name} />
                   <span className="player-identity">
                     <strong>{player.name}</strong>
                     <small>{player.uuid}</small>
                   </span>
-                  <span>
-                    <b>{player.world}</b>
-                    <small>{duration(player.onlineMs)} session</small>
-                  </span>
-                  <span className="ping">
-                    {player.ping === null ? "—" : `${player.ping} ms`}
-                  </span>
-                </button>
-              ))
-            ) : (
-              <Empty
-                title={
-                  allowed ? "No matching players" : "Roster access restricted"
-                }
-              >
-                {allowed
-                  ? "Players appear when Paper reports them. Try another search or world."
-                  : "This device needs the players.view scope."}
-              </Empty>
-            )}
-          </div>
-        </Panel>
-        <aside
-          id="selected-player-panel"
-          className="player-detail"
-          aria-label="Selected player details"
-        >
+                </span>
+                <span className="world-tag">{player.world}</span>
+                <span className="session-duration">
+                  {duration(player.onlineMs)}
+                </span>
+                <span className="ping">
+                  <i aria-hidden="true" />
+                  {player.ping === null ? "—" : `${player.ping} ms`}
+                </span>
+                <span className="roster-inspect">
+                  Inspect <Icon name="arrow" />
+                </span>
+              </button>
+            ))
+          ) : (
+            <Empty
+              title={
+                allowed ? "No matching players" : "Roster access restricted"
+              }
+            >
+              {allowed
+                ? "Players appear when Paper reports them. Try another search or world."
+                : "This device needs the players.view scope."}
+            </Empty>
+          )}
+        </div>
+      </section>
+      <div className="directory-footnote">
+        <Icon name="players" />
+        <p>
+          Select a player to open their session, gameplay and moderation tools.
+          Controls use the player’s UUID and the selected Paper authority.
+        </p>
+        <span>{evidence.label}</span>
+      </div>
+      <Modal
+        open={inspecting}
+        onClose={() => setInspecting(false)}
+        label="Selected player details"
+        className="player-inspector"
+      >
+        <div className="inspector-topbar">
+          <span>PLAYER / SESSION INSPECTOR</span>
+          <button
+            className="icon-button"
+            aria-label="Close player inspector"
+            onClick={() => setInspecting(false)}
+          >
+            <Icon name="close" />
+          </button>
+        </div>
+        <div id="selected-player-panel" className="player-detail">
+          {" "}
           {active ? (
             <>
               <div className="player-profile">
@@ -248,7 +284,26 @@ export default function Players() {
                 <dt>Session</dt>
                 <dd>{duration(active.onlineMs)}</dd>
               </dl>
-              <section>
+              <div
+                className="inspector-tabs segmented"
+                aria-label="Player tools"
+              >
+                {[
+                  ["interact", "Interact"],
+                  ["moderate", "Moderate"],
+                  ["commands", "Commands"],
+                ].map(([key, label]) => (
+                  <button
+                    key={key}
+                    className={playerTab === key ? "active" : ""}
+                    aria-pressed={playerTab === key}
+                    onClick={() => setPlayerTab(key)}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+              <section hidden={playerTab !== "interact"}>
                 <span className="eyebrow">MESSAGE & GAMEPLAY</span>
                 <div className="player-fields">
                   <label className="field">
@@ -302,7 +357,7 @@ export default function Players() {
                   </Button>
                 </div>
               </section>
-              <section>
+              <section hidden={playerTab !== "moderate"}>
                 <span className="eyebrow">MODERATION & ACCESS</span>
                 <div className="player-fields">
                   <label className="field">
@@ -347,7 +402,10 @@ export default function Players() {
                   ))}
                 </div>
               </section>
-              <section className="player-command">
+              <section
+                className="player-command"
+                hidden={playerTab !== "commands"}
+              >
                 <span className="eyebrow">COMMAND BUILDER</span>
                 <label className="field">
                   Allowed command template
@@ -369,7 +427,10 @@ export default function Players() {
                   Review command
                 </Button>
               </section>
-              <section className="player-command">
+              <section
+                className="player-command"
+                hidden={playerTab !== "commands"}
+              >
                 <span className="eyebrow">PERMISSION NODE / LUCKPERMS</span>
                 <label className="field">
                   Node
@@ -408,8 +469,8 @@ export default function Players() {
               Select a player to inspect their available controls.
             </Empty>
           )}
-        </aside>
-      </div>
+        </div>
+      </Modal>
       <ActionReview prepared={prepared} onClose={() => setPrepared(null)} />
     </>
   );

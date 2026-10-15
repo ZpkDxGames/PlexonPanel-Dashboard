@@ -8,7 +8,10 @@ import {
 import type { ControlState, Sample } from "../adapter/control-state";
 import type { Source } from "./telemetry";
 import { SourceEpochs } from "./epochs";
-const History = createContext<Record<Source, Sample[]> | null>(null);
+type PlotViews = Record<Source, Sample[]>;
+const History = createContext<{ raw: Sample[]; sources: PlotViews } | null>(
+  null,
+);
 export function PlotHistoryProvider({
   state,
   revision,
@@ -34,6 +37,14 @@ export function PlotHistoryProvider({
       ) as Record<Source, Sample[]>,
     [state.history, generation],
   );
-  return <History.Provider value={value}>{children}</History.Provider>;
+  const owned = useMemo(
+    () => ({ raw: state.history, sources: value }),
+    [state.history, value],
+  );
+  return <History.Provider value={owned}>{children}</History.Provider>;
 }
-export const usePlotHistory = () => useContext(History);
+/** Never substitute the selected server’s history for a passive fleet row. */
+export function usePlotHistory(raw?: Sample[]) {
+  const value = useContext(History);
+  return value && (!raw || raw === value.raw) ? value.sources : null;
+}

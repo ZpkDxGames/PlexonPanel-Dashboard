@@ -15,6 +15,8 @@ npx playwright install firefox
 node scripts/qa-local.mjs
 node scripts/qa-local.mjs scripts/control-plane-check.mjs
 node scripts/qa-local.mjs scripts/review-confirmation-check.mjs
+node scripts/qa-local.mjs scripts/reconstruction-check.mjs
+node scripts/qa-local.mjs scripts/visual-proofs.mjs
 node --import tsx scripts/telemetry-profile.mjs
 MOZ_DISABLE_CONTENT_SANDBOX=1 node scripts/browser-profile.mjs
 ```

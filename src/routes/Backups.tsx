@@ -168,8 +168,8 @@ export default function Backups() {
   const title =
     phase === "IDLE"
       ? ready
-        ? "Ready for your next restore point."
-        : "Verify readiness before you begin."
+        ? "Create a restore point."
+        : "Readiness comes first."
       : phase === "DEGRADED"
         ? "Your off-site copy needs attention."
         : phase === "RECOVERY_REQUIRED"
@@ -177,7 +177,7 @@ export default function Backups() {
           : `Operation / ${phase.replaceAll("_", " ").toLowerCase()}`;
   return (
     <>
-      <section className="backup-hero">
+      <section className="backup-titlebar">
         <div>
           <span className="eyebrow">RESTORE POINTS / HOST OPERATIONS</span>
           <h2>{title}</h2>
@@ -222,185 +222,8 @@ export default function Backups() {
           </Button>
         </div>
       </section>
-      <div className="operations-grid">
-        <Panel
-          eyebrow="01 / DURABLE OPERATION JOURNAL"
-          title={phase === "IDLE" ? "No reported operation" : "Latest Host job"}
-          description={
-            jobId
-              ? `Job ${jobId}`
-              : "The Host owns every phase, including recovery."
-          }
-          action={
-            <Status
-              tone={
-                phase === "DEGRADED"
-                  ? "warning"
-                  : phase === "FAILED" || phase === "RECOVERY_REQUIRED"
-                    ? "error"
-                    : phase === "COMPLETED"
-                      ? "success"
-                      : active
-                        ? "info"
-                        : "neutral"
-              }
-            >
-              {phase}
-            </Status>
-          }
-        >
-          <div className="operation-register">
-            <div>
-              <span>Local verification</span>
-              <Status
-                tone={
-                  operation.localBackupVerified === true ? "success" : "neutral"
-                }
-              >
-                {operation.localBackupVerified === true
-                  ? "Verified"
-                  : operation.localBackupVerified === false
-                    ? "Not verified"
-                    : "Unknown"}
-              </Status>
-            </div>
-            <div>
-              <span>Remote verification</span>
-              <Status
-                tone={
-                  operation.remoteBackupVerified === true
-                    ? "success"
-                    : "warning"
-                }
-              >
-                {operation.remoteBackupVerified === true
-                  ? "Verified"
-                  : operation.remoteBackupVerified === false
-                    ? "Not verified"
-                    : "Unknown"}
-              </Status>
-            </div>
-          </div>
-          <div className="phase-timeline" aria-label="Backup operation phases">
-            {phases.map(([key, label], index) => (
-              <div
-                key={key}
-                className={
-                  currentIndex < 0
-                    ? "pending"
-                    : index < currentIndex
-                      ? "done"
-                      : index === currentIndex
-                        ? "current"
-                        : "pending"
-                }
-              >
-                <i />
-                <span>{label}</span>
-              </div>
-            ))}
-          </div>
-          {active && (
-            <section
-              className={`backup-progress ${ratio === null ? "indeterminate" : ""}`}
-            >
-              <header>
-                <div>
-                  <span>Reported Host progress</span>
-                  <strong>{progressPhase.replaceAll("_", " ")}</strong>
-                </div>
-                <strong>
-                  {ratio === null ? "—" : `${Math.round(ratio * 100)}%`}
-                </strong>
-              </header>
-              <div
-                className="progress-track"
-                role="progressbar"
-                aria-label="Reported backup progress"
-                aria-valuemin={0}
-                aria-valuemax={100}
-                aria-valuenow={
-                  ratio === null ? undefined : Math.round(ratio * 100)
-                }
-              >
-                <i style={{ "--progress": ratio ?? 0 } as CSSProperties} />
-              </div>
-              <div className="backup-progress-meta">
-                <span>
-                  Processed
-                  <strong>
-                    {size(processed)} / {size(total)}
-                  </strong>
-                </span>
-                <span>
-                  Transfer rate
-                  <strong>
-                    {number(progress?.bytesPerSecond) === null
-                      ? "Not reported"
-                      : `${size(progress?.bytesPerSecond)}/s`}
-                  </strong>
-                </span>
-                <span>
-                  Provider
-                  <strong>
-                    {str(progress?.providerState, "Not reported")}
-                  </strong>
-                </span>
-              </div>
-              {phase === "COUNTDOWN" && (
-                <p className="subtle">
-                  Host countdown:{" "}
-                  {number(operation.remainingSeconds) ?? "Not reported"} seconds
-                  remaining.
-                </p>
-              )}
-            </section>
-          )}
-          {operation.message !== undefined && (
-            <div className="operation-message">
-              <Notice
-                tone={phase === "DEGRADED" ? "warning" : "neutral"}
-                title={str(operation.errorCode, "Host status")}
-              >
-                {str(operation.message)}
-              </Notice>
-            </div>
-          )}
-          {phase === "DEGRADED" && (
-            <div className="degraded-summary">
-              <div>
-                <strong>
-                  {operation.localBackupVerified === true
-                    ? "Local archive verified. Off-site verification is incomplete."
-                    : "The Host reported a degraded operation."}
-                </strong>
-                <span>
-                  Upload retry reuses the existing archive without another
-                  shutdown.
-                </span>
-              </div>
-              {operation.retryable === true && (
-                <Button
-                  disabled={
-                    !!session.reason("backup.full.retry-upload", "HOST")
-                  }
-                  onClick={() =>
-                    prepare("backup.full.retry-upload", {
-                      backupId: str(operation.backupId),
-                    })
-                  }
-                >
-                  Review upload retry
-                </Button>
-              )}
-            </div>
-          )}
-          <div className="journal-footnote">
-            {statusAt
-              ? `Host status read ${new Date(statusAt).toLocaleTimeString()}. Closing this browser does not cancel a job.`
-              : "No durable Host status received."}
-          </div>
-        </Panel>
+      <div className="readiness-band">
+        {" "}
         <Panel
           eyebrow="02 / READINESS"
           title="Preflight checklist"
@@ -446,101 +269,296 @@ export default function Backups() {
           </p>
         </Panel>
       </div>
-      <SectionLabel
-        index="03"
-        title="Archive inventory"
-        detail={`${backups.length} reported restore points`}
-      />
-      <Panel>
-        <div
-          className="backup-table table-region"
-          tabIndex={0}
-          role="region"
-          aria-label="Backup archive inventory"
-        >
-          <table>
-            <thead>
-              <tr>
-                <th>Restore point</th>
-                <th>Created</th>
-                <th>Archive size</th>
-                <th>Local copy</th>
-                <th>Off-site copy</th>
-                <th>Operations</th>
-              </tr>
-            </thead>
-            <tbody>
-              {backups.length ? (
-                backups.map((backup) => (
-                  <tr key={str(backup.backupId)}>
-                    <td>
-                      <strong>{str(backup.filename)}</strong>
-                      <small>{str(backup.backupId)}</small>
-                    </td>
-                    <td>{str(backup.timestamp)}</td>
-                    <td>{size(backup.archiveBytes)}</td>
-                    <td>
-                      <Status
-                        tone={backup.local === true ? "success" : "neutral"}
-                      >
-                        {backup.local === true
-                          ? "Available"
-                          : backup.local === false
-                            ? "Absent"
-                            : "Unknown"}
-                      </Status>
-                    </td>
-                    <td>
-                      <Status
-                        tone={backup.offsite === true ? "success" : "warning"}
-                      >
-                        {backup.offsite === true
-                          ? "Available"
-                          : backup.offsite === false
-                            ? "Absent"
-                            : "Unknown"}
-                      </Status>
-                    </td>
-                    <td>
-                      <div className="button-row">
-                        <Button
-                          disabled={
-                            !!session.reason("backup.full.verify", "HOST")
-                          }
-                          onClick={() =>
-                            prepare("backup.full.verify", {
-                              backupId: str(backup.backupId),
-                            })
-                          }
-                        >
-                          Verify
-                        </Button>
-                        <Button
-                          variant="danger"
-                          disabled={
-                            !!session.reason("backup.full.delete", "HOST")
-                          }
-                          onClick={() =>
-                            prepare("backup.full.delete", {
-                              backupId: str(backup.backupId),
-                            })
-                          }
-                        >
-                          Delete
-                        </Button>
-                      </div>
-                    </td>
+      <div className="backup-workspace">
+        <div className="archive-book">
+          {" "}
+          <SectionLabel
+            index="03"
+            title="Archive inventory"
+            detail={`${backups.length} reported restore points`}
+          />
+          <Panel>
+            <div
+              className="backup-table table-region"
+              tabIndex={0}
+              role="region"
+              aria-label="Backup archive inventory"
+            >
+              <table>
+                <thead>
+                  <tr>
+                    <th>Restore point</th>
+                    <th>Created</th>
+                    <th>Archive size</th>
+                    <th>Local copy</th>
+                    <th>Off-site copy</th>
+                    <th>Operations</th>
                   </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={6}>No authorized inventory received.</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                </thead>
+                <tbody>
+                  {backups.length ? (
+                    backups.map((backup) => (
+                      <tr key={str(backup.backupId)}>
+                        <td>
+                          <strong>{str(backup.filename)}</strong>
+                          <small>{str(backup.backupId)}</small>
+                        </td>
+                        <td>{str(backup.timestamp)}</td>
+                        <td>{size(backup.archiveBytes)}</td>
+                        <td>
+                          <Status
+                            tone={backup.local === true ? "success" : "neutral"}
+                          >
+                            {backup.local === true
+                              ? "Available"
+                              : backup.local === false
+                                ? "Absent"
+                                : "Unknown"}
+                          </Status>
+                        </td>
+                        <td>
+                          <Status
+                            tone={
+                              backup.offsite === true ? "success" : "warning"
+                            }
+                          >
+                            {backup.offsite === true
+                              ? "Available"
+                              : backup.offsite === false
+                                ? "Absent"
+                                : "Unknown"}
+                          </Status>
+                        </td>
+                        <td>
+                          <div className="button-row">
+                            <Button
+                              disabled={
+                                !!session.reason("backup.full.verify", "HOST")
+                              }
+                              onClick={() =>
+                                prepare("backup.full.verify", {
+                                  backupId: str(backup.backupId),
+                                })
+                              }
+                            >
+                              Verify
+                            </Button>
+                            <Button
+                              variant="danger"
+                              disabled={
+                                !!session.reason("backup.full.delete", "HOST")
+                              }
+                              onClick={() =>
+                                prepare("backup.full.delete", {
+                                  backupId: str(backup.backupId),
+                                })
+                              }
+                            >
+                              Delete
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={6}>No authorized inventory received.</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </Panel>
         </div>
-      </Panel>
+        <aside className="job-book">
+          {" "}
+          <Panel
+            eyebrow="01 / DURABLE OPERATION JOURNAL"
+            title={
+              phase === "IDLE" ? "No reported operation" : "Latest Host job"
+            }
+            description={
+              jobId
+                ? `Job ${jobId}`
+                : "The Host owns every phase, including recovery."
+            }
+            action={
+              <Status
+                tone={
+                  phase === "DEGRADED"
+                    ? "warning"
+                    : phase === "FAILED" || phase === "RECOVERY_REQUIRED"
+                      ? "error"
+                      : phase === "COMPLETED"
+                        ? "success"
+                        : active
+                          ? "info"
+                          : "neutral"
+                }
+              >
+                {phase}
+              </Status>
+            }
+          >
+            <div className="operation-register">
+              <div>
+                <span>Local verification</span>
+                <Status
+                  tone={
+                    operation.localBackupVerified === true
+                      ? "success"
+                      : "neutral"
+                  }
+                >
+                  {operation.localBackupVerified === true
+                    ? "Verified"
+                    : operation.localBackupVerified === false
+                      ? "Not verified"
+                      : "Unknown"}
+                </Status>
+              </div>
+              <div>
+                <span>Remote verification</span>
+                <Status
+                  tone={
+                    operation.remoteBackupVerified === true
+                      ? "success"
+                      : "warning"
+                  }
+                >
+                  {operation.remoteBackupVerified === true
+                    ? "Verified"
+                    : operation.remoteBackupVerified === false
+                      ? "Not verified"
+                      : "Unknown"}
+                </Status>
+              </div>
+            </div>
+            <div
+              className="phase-timeline"
+              aria-label="Backup operation phases"
+            >
+              {phases.map(([key, label], index) => (
+                <div
+                  key={key}
+                  className={
+                    currentIndex < 0
+                      ? "pending"
+                      : index < currentIndex
+                        ? "done"
+                        : index === currentIndex
+                          ? "current"
+                          : "pending"
+                  }
+                >
+                  <i />
+                  <span>{label}</span>
+                </div>
+              ))}
+            </div>
+            {active && (
+              <section
+                className={`backup-progress ${ratio === null ? "indeterminate" : ""}`}
+              >
+                <header>
+                  <div>
+                    <span>Reported Host progress</span>
+                    <strong>{progressPhase.replaceAll("_", " ")}</strong>
+                  </div>
+                  <strong>
+                    {ratio === null ? "—" : `${Math.round(ratio * 100)}%`}
+                  </strong>
+                </header>
+                <div
+                  className="progress-track"
+                  role="progressbar"
+                  aria-label="Reported backup progress"
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-valuenow={
+                    ratio === null ? undefined : Math.round(ratio * 100)
+                  }
+                >
+                  <i style={{ "--progress": ratio ?? 0 } as CSSProperties} />
+                </div>
+                <div className="backup-progress-meta">
+                  <span>
+                    Processed
+                    <strong>
+                      {size(processed)} / {size(total)}
+                    </strong>
+                  </span>
+                  <span>
+                    Transfer rate
+                    <strong>
+                      {number(progress?.bytesPerSecond) === null
+                        ? "Not reported"
+                        : `${size(progress?.bytesPerSecond)}/s`}
+                    </strong>
+                  </span>
+                  <span>
+                    Provider
+                    <strong>
+                      {str(progress?.providerState, "Not reported")}
+                    </strong>
+                  </span>
+                </div>
+                {phase === "COUNTDOWN" && (
+                  <p className="subtle">
+                    Host countdown:{" "}
+                    {number(operation.remainingSeconds) ?? "Not reported"}{" "}
+                    seconds remaining.
+                  </p>
+                )}
+              </section>
+            )}
+            {operation.message !== undefined && (
+              <div className="operation-message">
+                <Notice
+                  tone={phase === "DEGRADED" ? "warning" : "neutral"}
+                  title={str(operation.errorCode, "Host status")}
+                >
+                  {str(operation.message)}
+                </Notice>
+              </div>
+            )}
+            {phase === "DEGRADED" && (
+              <div className="degraded-summary">
+                <div>
+                  <strong>
+                    {operation.localBackupVerified === true
+                      ? "Local archive verified. Off-site verification is incomplete."
+                      : "The Host reported a degraded operation."}
+                  </strong>
+                  <span>
+                    Upload retry reuses the existing archive without another
+                    shutdown.
+                  </span>
+                </div>
+                {operation.retryable === true && (
+                  <Button
+                    disabled={
+                      !!session.reason("backup.full.retry-upload", "HOST")
+                    }
+                    onClick={() =>
+                      prepare("backup.full.retry-upload", {
+                        backupId: str(operation.backupId),
+                      })
+                    }
+                  >
+                    Review upload retry
+                  </Button>
+                )}
+              </div>
+            )}
+            <div className="journal-footnote">
+              {statusAt
+                ? `Host status read ${new Date(statusAt).toLocaleTimeString()}. Closing this browser does not cancel a job.`
+                : "No durable Host status received."}
+            </div>
+          </Panel>
+        </aside>
+      </div>
       {error && (
         <div className="page-notice">
           <Notice tone="error" title="Host evidence unavailable">
