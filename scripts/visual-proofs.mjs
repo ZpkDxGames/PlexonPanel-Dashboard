@@ -41,6 +41,11 @@ for (const theme of ["dark", "light"])
       });
       await page.locator(".workspace-heading h1").waitFor();
       await page.locator(".route-skeleton").waitFor({ state: "detached" });
+      await page.evaluate(async (theme) => {
+        const { preferences } = await import("/src/store/preferences.ts");
+        preferences.update({ theme, motion: "off", skinProvider: "disabled" });
+      }, theme);
+      await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
       await page.evaluate(() => document.fonts.ready);
       const axe = await new AxeBuilder({ page }).analyze(),
         overflow = await page.evaluate(
@@ -54,6 +59,7 @@ for (const theme of ["dark", "light"])
       });
       results.push({
         theme,
+        actualTheme: await page.locator("html").getAttribute("data-theme"),
         width,
         route,
         overflow,

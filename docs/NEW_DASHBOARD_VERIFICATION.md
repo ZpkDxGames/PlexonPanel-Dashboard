@@ -28,7 +28,7 @@ Browser: headless Firefox 157. All operational data is synthetic. Harnesses bloc
 | Initial-route JS, gzip | 114,221 B | 89,698 B (21.5% smaller) |
 | Display-path benchmark, 8192 raw points | 8192 rendered | 474 rendered; raw retained |
 | Line/area path characters, pure benchmark | 194,828 | 11,316 |
-| Median path generation | 1.66 ms | 0.083 ms cached; 0.497 ms cold including sample copy |
+| Median path generation | 1.52 ms | 0.081 ms cached; 0.394 ms cold including sample copy |
 | Development Performance page DOM | 485 nodes | 914 nodes; more independent instruments |
 | Development SVG path characters | 595,270 | 52,162 |
 | Development frame interval median | 17.08 ms | 17.12 ms |
@@ -44,4 +44,4 @@ Reproduction: `scripts/telemetry-profile.mjs` and `scripts/browser-profile.mjs`;
 - Signed source state → independent source capture projection → source epoch → display reduction → charts/tables: new regressions and browser inspection pass. Actual telemetry correlation is PENDING LIVE ACCEPTANCE.
 - Host durable job → queried state/matched progress → journal/verification → reviewed actions: mock/contract evidence passes. Actual systemd/RCON/rclone/backups remain PENDING LIVE ACCEPTANCE.
 
-No backend changes were needed or prepared. Runtime versions and existing 5.0 release coordination gates are not certified by this frontend work. Vercel project inspection returned a scoped 403; no preview URL is claimed without deployment evidence. See rollout and risk documents.
+No backend changes were needed or prepared. Runtime versions and existing 5.0 release coordination gates are not certified by this frontend work. Direct Vercel project inspection returned a scoped 403. Git integration subsequently reported the nonproduction preview Ready; see NEW_DASHBOARD_RELEASE_RECEIPT.md for the exact evidence and URL. See rollout and risk documents.
