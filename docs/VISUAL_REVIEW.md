@@ -1,41 +1,44 @@
 # Rendered visual review
 
-Date: 2026-10-11 UTC
+Date: 2026-10-15 UTC
+Branch: `ui/refinement-20261015`
 
-## Surfaces inspected
+## Automated rendered matrix
 
-The Overview and Performance workspaces were inspected in a deployed Chromium browser at 1363 × 936 against an isolated, clearly labelled synthetic fixture. The disconnected Overview state was also inspected before enabling the fixture.
+`npm run test:browser` rendered 37 cases in Playwright Firefox. Every case ran axe, a document-overflow check and a console/page-error check before saving a full-page PNG under `artifacts/browser/`.
 
-| Surface | Theme | State | Result |
-| --- | --- | --- | --- |
-| Overview | dark | disconnected | Clear empty values, action controls disabled, no invented telemetry |
-| Overview | dark | healthy fixture | Dense six-metric summary, readable tick/resource charts, evidence and provenance visible |
-| Overview | dark | +12 second Paper clock skew | Compact clock-offset chip; no page-wide yellow warning; receipt-age freshness remains visible |
-| Performance | dark | healthy fixture | Correlation chart, threshold, spike strip and source-aligned resource charts read as one workspace |
-| Performance | light | healthy fixture | Tokens, chart contrast, borders and hierarchy remain legible |
-| Players | dark | 24-player fixture | Search/filter controls, bounded roster, player identity, UUID-bound action groups and fallbacks remain scannable |
-| Console | dark | 90-line fixture | Fixed-column timestamps and source tags align; ANSI/legacy emphasis is readable without overpowering the stream |
-| Chat | dark | message fixture | Author, time, message body and reviewed-send state are visually distinct |
-| Plugins | dark | three-plugin fixture | Inventory and reviewed reload actions are compact and unambiguous |
-| Backups | dark | degraded remote verification | Local/offsite verification remain separate; phase failure and retry path are visible without presenting a false success |
-| Access & audit | dark | two-device fixture | Role, scope count, self-revoke guard and effective grants are visible; audit records remain below the authority summary |
-| Settings | dark | unconfigured relay | Relay boundary, pairing, preferences, privacy disclosure and exact build identity are separated into clear cards |
-| Startup splash | dark | production initialization | Focused brand state appears immediately with clear loading language and a restrained progress treatment |
-| First pairing | dark | zero stored credentials | Operational shell is replaced by a focused device-name/code workflow; relay boundary and least-privilege guidance are visible without competing navigation |
+| Coverage | Cases |
+| --- | --- |
+| Every workspace | Fleet, Overview, Performance, Players, Console/Chat/Plugins, Backups, Access/Audit and Settings |
+| Required widths | 360, 390, 768, 1024, 1440 and 1920 px |
+| Theme / density / motion | dark + comfortable + full; light + spacious + reduced; light + compact + off |
+| Accent contrast | Teal, Azure and Violet in both light and dark |
+| Chart preference | Filled and no-fill Overview charts |
+| Operational states | healthy, partial evidence, Host/Paper offline and denied access |
+| Keyboard interactions | Ctrl/Cmd+K navigation and mobile-drawer Escape close |
 
-## Corrections and observations
+Result: zero axe violations, zero document overflow cases and zero browser console/page errors. The selected root attributes were asserted in each preference case so a default-theme screenshot cannot masquerade as a light, density or motion check.
 
-- The previous page-wide yellow clock warning is not used. Clock offset is source health metadata in the sticky context bar and chart status; raw timestamps are not rewritten.
-- The deployed view has no horizontal document overflow at 1363 × 936 (`scrollWidth` 1348, viewport width 1363).
-- The later full-workspace pass also reported zero horizontal overflow on Players, Console, Chat, Plugins, Backups, Access and Settings (`scrollWidth` 1348, client width 1348).
-- The initial load animation was allowed to settle before judging chart and metric rendering.
-- The synthetic fixture ages naturally because it is a fixed snapshot; delayed/stale labels observed after waiting are expected and demonstrate the receipt-aware freshness states.
-- Light theme activation was confirmed from the root theme attribute and computed canvas/surface colours, then visually inspected after repaint.
-- Browser console inspection found no application-origin warning or error. Four errors came from the remote browser inspection extension and are not dashboard runtime errors.
-- The production first-pairing page filled the 1363 × 936 viewport without horizontal or vertical document overflow (`scrollWidth` and `innerWidth` both 1363; `scrollHeight` and `innerHeight` both 936). Its action remained disabled with empty inputs and enabled after both test values were present; no pairing request was submitted.
+## Manual screenshot review
 
-## Not executed
+All generated workspace screenshots were inspected as dark-desktop, light-tablet and light-mobile contact sheets. Individual high-resolution review covered Overview, Performance, Settings, Console and Backups, plus Azure/Violet, chart-fill-off, partial, offline and denied states.
 
-- A true mobile-viewport screenshot was not executed because the available deployed-browser surface does not expose viewport resizing.
-- Safari and Firefox visual inspection were not executed.
-- Real relay telemetry visual inspection was not executed because TonimSMP still requires a fresh least-privilege browser pairing.
+Observed outcomes:
+
+- The six Overview metrics remain the strongest hierarchy without crowding the chart evidence below.
+- Paper process CPU and Host CPU remain visually and textually distinct in tiles, legends and provenance.
+- Chart gaps remain open; first-draw area fills, current markers, threshold lines, axis units and narrow-card layouts read correctly.
+- The 1/5/15/30-minute control, terminal toolbar, player action hierarchy and backup degraded/retry state remain scannable.
+- Offline console authority renders `UNAVAILABLE`; the footer says authority is unavailable and the composer remains disabled.
+- Offline backup preflight renders unknown values, a disabled creation action and a visible Host-offline error. No backup availability is inferred.
+- Denied Access shows only the effective Viewer grant and an explicit permission error without leaking unavailable records.
+- The fixed mobile bottom navigation overlays no actionable control at the active viewport; full-page screenshots show its fixed viewport position by design.
+- Both palettes use deliberate surface layering and readable shadows/borders. All accent/theme combinations passed axe contrast checks.
+
+## Before / after evidence
+
+Four baseline screenshots were rendered from commit `0ccb709038d17209a50db4fddf70a35948c4988f` in an isolated detached worktree: desktop Overview, desktop Settings, phone Overview and phone Console. Matching after screenshots are in the browser matrix. Artifacts are intentionally git-ignored.
+
+## Scope boundary
+
+This is source and synthetic-fixture presentation evidence. No claim is made for a real Paper/Host session, real action dispatch, physical phone, Safari or screen-reader acceptance. Production fixture exclusion remains structurally enforced by the Vite build.

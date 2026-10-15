@@ -5,7 +5,9 @@ import { createRoot } from "react-dom/client";
 import App from "./App";
 import "./styles.css";
 import { session } from "./adapter/session";
+import { applyPreferencesToDocument, preferences } from "./store/preferences";
 
+applyPreferencesToDocument(preferences.getSnapshot());
 createRoot(document.getElementById("root")!).render(<StrictMode><App /></StrictMode>);
 
 async function initialize() {

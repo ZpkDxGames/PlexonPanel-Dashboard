@@ -1,18 +1,18 @@
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 
-export function Panel({ title, eyebrow, action, children, className = "" }: { title?: string; eyebrow?: string; action?: ReactNode; children: ReactNode; className?: string }) {
+export function Panel({ title, eyebrow, description, action, children, className = "" }: { title?: string; eyebrow?: string; description?: string; action?: ReactNode; children: ReactNode; className?: string }) {
   return <section className={`panel ${className}`}>
-    {(title || eyebrow || action) && <header className="panel-header"><div>{eyebrow && <span className="eyebrow">{eyebrow}</span>}{title && <h2>{title}</h2>}</div>{action}</header>}
+    {(title || eyebrow || action) && <header className="panel-header"><div>{eyebrow && <span className="eyebrow">{eyebrow}</span>}{title && <h2>{title}</h2>}{description && <p>{description}</p>}</div>{action}</header>}
     {children}
   </section>;
 }
 
-export function Button({ variant = "secondary", ...props }: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: "primary" | "secondary" | "danger" | "quiet" }) {
-  return <button {...props} className={`button ${variant} ${props.className ?? ""}`} />;
+export function Button({ variant = "secondary", loading = false, children, disabled, ...props }: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: "primary" | "secondary" | "danger" | "quiet"; loading?: boolean }) {
+  return <button {...props} disabled={disabled || loading} aria-busy={loading || undefined} className={`button ${variant} ${props.className ?? ""}`}><span className="button-label">{children}</span>{loading && <span className="button-spinner" aria-hidden="true" />}</button>;
 }
 
 export function Status({ tone = "neutral", children }: { tone?: "neutral" | "success" | "warning" | "error" | "info"; children: ReactNode }) {
-  return <span className={`status ${tone}`}><i />{children}</span>;
+  return <span key={`${tone}:${typeof children === "string" || typeof children === "number" ? children : "status"}`} className={`status ${tone}`}><i />{children}</span>;
 }
 
 export function Notice({ tone = "neutral", title, children }: { tone?: "neutral" | "warning" | "error" | "success"; title: string; children: ReactNode }) {
