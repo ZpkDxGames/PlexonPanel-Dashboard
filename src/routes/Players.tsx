@@ -6,6 +6,7 @@ import { Button, Notice, Panel, Status } from "../components/ui";
 import { ActionReview } from "../features/ActionReview";
 import { playerCommand, permissionCommand } from "../lib/playerCommands";
 import { useSession } from "../hooks";
+import { toast } from "../components/toast";
 
 type Player = { uuid: string; name: string; world: string; ping: number | null; onlineMs: number | null; raw: JsonMap };
 const actions = [
@@ -45,12 +46,12 @@ export default function Players() {
     </div>
     <div className="players-layout">
       <Panel eyebrow="Paper roster" title="Online players" action={<span className="subtle">UUID-bound actions</span>}>
-        <div className="roster" role="list">{players.length ? players.map((player) => <button role="listitem" className={`player-row ${active?.uuid === player.uuid ? "selected" : ""}`} key={player.uuid} onClick={() => setSelected(player.uuid)}>
+        <div className="roster">{players.length ? players.map((player) => <button className={`player-row ${active?.uuid === player.uuid ? "selected" : ""}`} key={player.uuid} onClick={() => setSelected(player.uuid)}>
           <PlayerHead uuid={player.uuid} name={player.name} /><span className="player-identity"><strong>{player.name}</strong><small>{player.uuid}</small></span><span><b>{player.world}</b><small>{duration(player.onlineMs)} online</small></span><span className="ping">{player.ping === null ? "—" : `${player.ping} ms`}</span>
         </button>) : <div className="inline-empty"><strong>No matching players</strong><span>{snap.state.ready?.agents.paper ? "Adjust the search or filters." : "Waiting for the Paper roster."}</span></div>}</div>
       </Panel>
-      <aside className="player-detail">{active ? <>
-        <div className="player-profile"><PlayerHead uuid={active.uuid} name={active.name} large /><div><span className="eyebrow">Selected player</span><h2>{active.name}</h2><button className="copy-id" onClick={() => void navigator.clipboard.writeText(active.uuid)}>Copy UUID</button></div></div>
+      <aside className="player-detail" aria-label="Selected player details">{active ? <>
+        <div className="player-profile"><PlayerHead uuid={active.uuid} name={active.name} large /><div><span className="eyebrow">Selected player</span><h2>{active.name}</h2><button className="copy-id" onClick={() => { void navigator.clipboard.writeText(active.uuid); toast.push("UUID copied", active.name, "success"); }}>Copy UUID</button></div></div>
         <dl className="identity-facts"><dt>Status</dt><dd>Online</dd><dt>World</dt><dd>{active.world}</dd><dt>Ping</dt><dd>{active.ping === null ? "Unknown" : `${active.ping} ms`}</dd><dt>Session</dt><dd>{duration(active.onlineMs)}</dd></dl>
         <section><span className="eyebrow">Typed actions</span><div className="action-grid">{actions.map(([label, action]) => { const reason = session.reason(action, "PAPER"); return <Button key={action} variant={action === "player.ban" || action === "player.kill" ? "danger" : "secondary"} disabled={Boolean(reason)} title={reason} onClick={() => prepare(action, { playerId: active.uuid, ...(action === "player.message" ? { message: "" } : {}) })}>{label}</Button>; })}</div></section>
         <section className="player-command"><span className="eyebrow">Allowed command</span><label className="field">Template<input value={commandTemplate} onChange={(e) => setCommandTemplate(e.target.value)} /></label><code>{commandTemplate.replaceAll("{player}", active.name).replaceAll("{uuid}", active.uuid)}</code><Button onClick={runTemplate} disabled={Boolean(session.reason("console.execute", "PAPER"))}>Review command</Button></section>

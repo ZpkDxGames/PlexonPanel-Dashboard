@@ -38,7 +38,7 @@ export function PairingForm({ defaultName = "", onboarding = false }: { defaultN
     {!snap.relay.origin && <label className="field" htmlFor={`${id}-origin`}>Relay HTTPS origin<input id={`${id}-origin`} value={origin} onChange={(event) => setOrigin(event.target.value)} placeholder="https://relay.example.com" inputMode="url" autoComplete="url" /></label>}
     <label className="field" htmlFor={`${id}-name`}>Device name<input id={`${id}-name`} value={name} onChange={(event) => setName(event.target.value.slice(0, 80))} placeholder="My desktop" autoComplete="off" /></label>
     <label className="field" htmlFor={`${id}-code`}>Pairing code<input id={`${id}-code`} value={code} onChange={(event) => setCode(event.target.value.replace(/\s/g, "").slice(0, 128))} placeholder="Enter the one-time code" autoComplete="one-time-code" autoCapitalize="none" spellCheck={false} inputMode="text" type="password" /></label>
-    <Button variant="primary" type="submit" disabled={pairing || !origin || !code || !name.trim()}>{pairing ? "Pairing securely…" : "Pair server"}</Button>
+    <Button variant="primary" type="submit" loading={pairing} disabled={!origin || !code || !name.trim()}>{pairing ? "Pairing securely…" : "Pair server"}</Button>
     {visibleError && <Notice tone="error" title="Pairing not completed">{visibleError}</Notice>}
     {message && <Notice tone="success" title="Pairing accepted">{message}</Notice>}
   </form>;

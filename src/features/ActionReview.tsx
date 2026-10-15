@@ -32,6 +32,6 @@ export function ActionReview({ prepared, onClose }: { prepared: Prepared | null;
     {strong && <label className="field">Type <strong>{confirmText}</strong> to confirm<input value={typed} onChange={(event) => setTyped(event.target.value)} autoComplete="off" /></label>}
     {result && <Notice tone="success" title={result.status === "SUCCESS" ? "Agent result received" : result.status}>{result.message || result.code}</Notice>}
     {error && <Notice tone="error" title="Operation not completed">{error}</Notice>}
-    <div className="dialog-actions"><Button variant="quiet" onClick={onClose} disabled={busy}>{result ? "Close" : "Cancel"}</Button>{!result && <Button variant={strong ? "danger" : "primary"} onClick={() => void execute()} disabled={busy || (strong && typed !== confirmText)}>{busy ? "Waiting for agent…" : "Dispatch operation"}</Button>}</div>
+    <div className="dialog-actions"><Button variant="quiet" onClick={onClose} disabled={busy}>{result ? "Close" : "Cancel"}</Button>{!result && <Button variant={strong ? "danger" : "primary"} onClick={() => void execute()} disabled={strong && typed !== confirmText} loading={busy}>{busy ? "Waiting for agent…" : "Dispatch operation"}</Button>}</div>
   </dialog>;
 }

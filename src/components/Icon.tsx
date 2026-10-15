@@ -1,14 +1,6 @@
 import type { SVGProps } from "react";
 
 const paths: Record<string, string[]> = {
-  layers: ["M12 3 3 8l9 5 9-5-9-5", "M3 12l9 5 9-5M3 16l9 5 9-5"],
-  close: ["M6 6l12 12M6 18 18 6"],
-  cpu: ["M7 7h10v10H7z", "M10 10h4v4h-4z", "M9 3v4M15 3v4M9 17v4M15 17v4M3 9h4M3 15h4M17 9h4M17 15h4"],
-  memory: ["M3 7h18v10H3z", "M7 10v4M11 10v4M15 10v4M19 10v4", "M6 17v3M10 17v3M14 17v3M18 17v3"],
-  play: ["m8 5 11 7-11 7V5"],
-  restart: ["M20 7v5h-5", "M19 12a7 7 0 1 0-2 5M20 12a8 8 0 0 0-2-7"],
-  stop: ["M6 6h12v12H6z"],
-
   fleet: ["M4 6.5h16v11H4z", "M8 17.5v2M16 17.5v2", "M7 10h.01M10 10h7"],
   overview: ["M4 13h6V4H4z", "M14 20h6V11h-6z", "M4 20h6v-3H4z", "M14 7h6V4h-6z"],
   performance: ["M3 17l4-5 4 2 5-8 5 3", "M3 21h18"],
@@ -23,6 +15,15 @@ const paths: Record<string, string[]> = {
   sun: ["M12 4V2M12 22v-2M4.93 4.93 3.51 3.51M20.49 20.49l-1.42-1.42M4 12H2M22 12h-2M4.93 19.07l-1.42 1.42M20.49 3.51l-1.42 1.42", "M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8"],
   alert: ["M12 3 2.7 20h18.6z", "M12 9v4M12 17h.01"],
   clock: ["M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20", "M12 6v6l4 2"],
+  close: ["M6 6l12 12M18 6 6 18"],
+  check: ["M5 12l4 4L19 6"],
+  server: ["M4 4h16v6H4zM4 14h16v6H4z", "M8 7h.01M8 17h.01M12 7h5M12 17h5"],
+  copy: ["M8 8h11v11H8z", "M5 16H4V5h11v1"],
+  download: ["M12 3v12M7 10l5 5 5-5", "M5 21h14"],
+  pause: ["M8 5v14M16 5v14"],
+  play: ["M8 5l11 7-11 7z"],
+  arrow: ["M5 12h14", "M13 6l6 6-6 6"],
+  sparkle: ["M12 3l1.4 4.1L17.5 8.5l-4.1 1.4L12 14l-1.4-4.1L6.5 8.5l4.1-1.4z", "M18 15l.8 2.2L21 18l-2.2.8L18 21l-.8-2.2L15 18l2.2-.8z"],
 };
 
 export function Icon({ name, ...props }: SVGProps<SVGSVGElement> & { name: string }) {

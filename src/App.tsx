@@ -1,11 +1,13 @@
 import { lazy, Suspense, useEffect, useState } from "react";
+import { MotionConfig } from "motion/react";
 import { Shell } from "./components/Shell";
 import { PairingGate } from "./components/PairingGate";
 import { Splash } from "./components/Splash";
 import { useSession } from "./hooks";
 import { routeFromHash, type RouteName } from "./router";
 import { entryExperience } from "./entry-state";
-import { usePreferences } from "./store/preferences";
+import { applyPreferencesToDocument, usePreferences } from "./store/preferences";
+import { motionTokens } from "./motion";
 
 const views: Record<RouteName, React.LazyExoticComponent<React.ComponentType>> = {
   Fleet: lazy(() => import("./routes/Fleet")),
@@ -28,10 +30,12 @@ export default function App() {
     return () => clearTimeout(timer);
   }, []);
   useEffect(() => {
-    const resolved = prefs.theme === "system" ? (matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark") : prefs.theme;
-    document.documentElement.dataset.theme = resolved;
-    document.documentElement.dataset.density = prefs.density;
-    document.documentElement.dataset.reduceMotion = String(prefs.reduceMotion);
+    applyPreferencesToDocument(prefs);
+    if (prefs.theme !== "system") return;
+    const query = matchMedia("(prefers-color-scheme: light)");
+    const update = () => applyPreferencesToDocument(prefs);
+    query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
   }, [prefs]);
   useEffect(() => {
     const update = () => setRoute(routeFromHash());
@@ -42,5 +46,7 @@ export default function App() {
   if (experience === "splash") return <Splash />;
   if (experience === "pairing") return <PairingGate />;
   const View = views[route];
-  return <Shell route={route}><Suspense fallback={<div className="route-skeleton" aria-label="Loading workspace" />}><View /></Suspense></Shell>;
+  return <MotionConfig reducedMotion={prefs.motion === "full" ? "user" : "always"} transition={{ duration: motionTokens[prefs.motion].base }}>
+    <Shell route={route}><Suspense fallback={<div className="route-skeleton" role="status" aria-label="Loading workspace"><i /><i /><i /><i /></div>}><View /></Suspense></Shell>
+  </MotionConfig>;
 }
