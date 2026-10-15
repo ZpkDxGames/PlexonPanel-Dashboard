@@ -1,6 +1,14 @@
 import type { SVGProps } from "react";
 
 const paths: Record<string, string[]> = {
+  layers: ["M12 3 3 8l9 5 9-5-9-5", "M3 12l9 5 9-5M3 16l9 5 9-5"],
+  close: ["M6 6l12 12M6 18 18 6"],
+  cpu: ["M7 7h10v10H7z", "M10 10h4v4h-4z", "M9 3v4M15 3v4M9 17v4M15 17v4M3 9h4M3 15h4M17 9h4M17 15h4"],
+  memory: ["M3 7h18v10H3z", "M7 10v4M11 10v4M15 10v4M19 10v4", "M6 17v3M10 17v3M14 17v3M18 17v3"],
+  play: ["m8 5 11 7-11 7V5"],
+  restart: ["M20 7v5h-5", "M19 12a7 7 0 1 0-2 5M20 12a8 8 0 0 0-2-7"],
+  stop: ["M6 6h12v12H6z"],
+
   fleet: ["M4 6.5h16v11H4z", "M8 17.5v2M16 17.5v2", "M7 10h.01M10 10h7"],
   overview: ["M4 13h6V4H4z", "M14 20h6V11h-6z", "M4 20h6v-3H4z", "M14 7h6V4h-6z"],
   performance: ["M3 17l4-5 4 2 5-8 5 3", "M3 21h18"],
