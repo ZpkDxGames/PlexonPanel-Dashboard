@@ -1,36 +1,79 @@
 import { useSession } from "../hooks";
 import { PairingForm } from "./PairingForm";
-
+import { BrandMark } from "./Brand";
+import { Icon } from "./Icon";
 export function PairingGate() {
   const snap = useSession();
-  return <main className="pairing-gate">
-    <header className="pairing-brand" aria-label="PlexonPanel Command Center">
-      <span className="brand-mark" aria-hidden="true">P</span>
-      <span className="brand-copy"><strong>PlexonPanel</strong><small>Command center</small></span>
-    </header>
-    <div className="pairing-layout">
-      <section className="pairing-intro" aria-labelledby="pairing-title">
-        <span className="eyebrow">First connection</span>
-        <h1 id="pairing-title">Bring your server into view.</h1>
-        <p>Pair this browser with one Minecraft server to unlock live telemetry, operational controls and audit-aware workflows.</p>
-        <ol className="pairing-steps">
-          <li><span>1</span><div><strong>Create a fresh code</strong><small>Use the PlexonPanel pairing flow on your server. Codes are single-use and short-lived.</small></div></li>
-          <li><span>2</span><div><strong>Name this browser</strong><small>Choose a device name you will recognize later in Access &amp; Audit.</small></div></li>
-          <li><span>3</span><div><strong>Connect with least privilege</strong><small>Monitoring does not require owner authority. The signed grant controls every available action.</small></div></li>
-        </ol>
-      </section>
-      <section className="pairing-card" aria-labelledby="pairing-form-title">
-        <div className="pairing-card-head">
-          <div><span className="eyebrow">Secure browser authority</span><h2 id="pairing-form-title">Pair a server</h2></div>
-          <span className={snap.relay.origin ? "relay-ready" : "relay-ready relay-missing"}><i />{snap.relay.origin ? "Relay ready" : "Relay required"}</span>
-        </div>
-        <PairingForm onboarding />
-        <div className="pairing-boundary">
-          <span>Public relay</span><code>{snap.relay.origin || "Not configured"}</code>
-          <p>Credentials stay in this browser. Cloudflare tokens, signing keys and pairing secrets never enter the dashboard bundle.</p>
-        </div>
-      </section>
-    </div>
-    <footer className="pairing-footer"><span>Protocol 3</span><span>Encrypted relay transport</span><span>Permission-aware actions</span></footer>
-  </main>;
+  return (
+    <main className="pairing-gate">
+      <header className="pairing-brand">
+        <BrandMark />
+        <strong>PlexonPanel</strong>
+        <span>CONTROL PLANE</span>
+      </header>
+      <div className="pairing-layout">
+        <section className="pairing-intro">
+          <span className="eyebrow">YOUR WORLDS. ONE WORKSPACE.</span>
+          <h1>
+            Great worlds
+            <br />
+            start with
+            <br />
+            <em>clear signals.</em>
+          </h1>
+          <p>
+            Live Minecraft telemetry. Thoughtful controls.
+            <br />A complete picture of your server.
+          </p>
+          <div
+            className="pairing-architecture"
+            aria-label="Paper and Host connect securely to this browser"
+          >
+            <span>
+              <Icon name="server" />
+              Paper <small>Game runtime</small>
+            </span>
+            <b>+</b>
+            <span>
+              <Icon name="performance" />
+              Host <small>Infrastructure</small>
+            </span>
+            <Icon name="arrow" />
+            <span>
+              <BrandMark />
+              You <small>In control</small>
+            </span>
+          </div>
+        </section>
+        <section className="pairing-card" aria-labelledby="pairing-form-title">
+          <div className="pairing-card-head">
+            <span className="eyebrow">01 / CONNECT YOUR SERVER</span>
+            <h2 id="pairing-form-title">Make the connection.</h2>
+            <p>
+              Use a fresh, single-use pairing code from your Minecraft server.
+            </p>
+          </div>
+          <PairingForm onboarding />
+          <div className="pairing-help">
+            <Icon name="access" />
+            <p>
+              This browser receives only the access granted by your server. You
+              can review or revoke devices later.
+            </p>
+          </div>
+          <div className="pairing-boundary">
+            <span>Relay endpoint</span>
+            <code>
+              {snap.relay.origin || "Enter your public HTTPS relay above"}
+            </code>
+          </div>
+        </section>
+      </div>
+      <footer className="pairing-footer">
+        <span>Encrypted transport</span>
+        <span>Scoped access</span>
+        <span>Protocol 3</span>
+      </footer>
+    </main>
+  );
 }

@@ -45,7 +45,7 @@ export function makeFixture(mode = "healthy", now = Date.now()): ControlState {
       hostSession: "fixture-host",
       paperTargetCompatible: true,
       hostTargetCompatible: true,
-      nodeId: "node-sao-01",
+      nodeId: "edfc80d2-c550-4dbd-b739-0121b71de224",
       instanceKey: "survival",
       fleetState: "BOUND",
     },
@@ -71,6 +71,10 @@ export function makeFixture(mode = "healthy", now = Date.now()): ControlState {
           gcCollections: 182,
         };
   state.hostSystem = {
+    nodeId: "edfc80d2-c550-4dbd-b739-0121b71de224",
+    metricScope: "NODE",
+    processRole: "HOST",
+    sourceIntervalMillis: 3000,
     capturedAt: new Date(now).toISOString(),
     hostCpuPercent: 27.6,
     physicalMemoryUsedBytes: 7.8 * 2 ** 30,
@@ -176,6 +180,8 @@ export function makeFixture(mode = "healthy", now = Date.now()): ControlState {
       memory: 7.8 * 2 ** 30,
       players: 20 + (i % 6),
       gc: 1200 + i,
+      serviceCpu: 146.2 + Math.sin(i / 13) * 18,
+      serviceMemory: (4.1 + Math.sin(i / 20) * 0.2) * 2 ** 30,
       sources: {
         paperHealth: now - (299 - i) * 3000,
         paperSystem: now - (299 - i) * 3000,

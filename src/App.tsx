@@ -1,15 +1,20 @@
 import { lazy, Suspense, useEffect, useState } from "react";
-import { MotionConfig } from "motion/react";
 import { Shell } from "./components/Shell";
 import { PairingGate } from "./components/PairingGate";
 import { Splash } from "./components/Splash";
+import { PlotHistoryProvider } from "./presentation/PlotHistory";
 import { useSession } from "./hooks";
 import { routeFromHash, type RouteName } from "./router";
 import { entryExperience } from "./entry-state";
-import { applyPreferencesToDocument, usePreferences } from "./store/preferences";
-import { motionTokens } from "./motion";
+import {
+  applyPreferencesToDocument,
+  usePreferences,
+} from "./store/preferences";
 
-const views: Record<RouteName, React.LazyExoticComponent<React.ComponentType>> = {
+const views: Record<
+  RouteName,
+  React.LazyExoticComponent<React.ComponentType>
+> = {
   Fleet: lazy(() => import("./routes/Fleet")),
   Overview: lazy(() => import("./routes/Overview")),
   Performance: lazy(() => import("./routes/Performance")),
@@ -46,7 +51,30 @@ export default function App() {
   if (experience === "splash") return <Splash />;
   if (experience === "pairing") return <PairingGate />;
   const View = views[route];
-  return <MotionConfig reducedMotion={prefs.motion === "full" ? "user" : "always"} transition={{ duration: motionTokens[prefs.motion].base }}>
-    <Shell route={route}><Suspense fallback={<div className="route-skeleton" role="status" aria-label="Loading workspace"><i /><i /><i /><i /></div>}><View /></Suspense></Shell>
-  </MotionConfig>;
+  return (
+    <>
+      <PlotHistoryProvider state={snap.state} revision={snap.revision}>
+        <Shell route={route}>
+          <Suspense
+            fallback={
+              <div
+                className="route-skeleton"
+                role="status"
+                aria-label="Loading workspace"
+              >
+                <i />
+                <i />
+                <i />
+                <i />
+              </div>
+            }
+          >
+            <View
+              key={`${snap.revision}:${snap.state.serverId}:${snap.state.ready?.server.paperSession}:${snap.state.ready?.server.hostSession}`}
+            />
+          </Suspense>
+        </Shell>
+      </PlotHistoryProvider>
+    </>
+  );
 }
