@@ -1,15 +1,21 @@
-# Verified source baseline
+# Reference Control Room — reconnaissance
 
-Dashboard main `1b9463e18b0e7dac6c5209760d5510732d6d62b0`; Core main `209f8b41d4fe6360a8dcf2f9cdabe7b7df6cc128`. Both were checked through GitHub and local clones on 2026-10-15. Clean worktree; no nested AGENTS.md. Attached AGENTS and full PlexonPanel skill govern this task. Dedicated branch: `design/new-control-plane-20261015`.
+Implementation base: `cea185cca07d9892967215baed097bedbe0e77ca`, freshly fetched from GitHub main. Core main was independently rechecked at `209f8b41d4fe6360a8dcf2f9cdabe7b7df6cc128`. Baseline GitHub Vercel commit status was successful. Installed VPS/Paper/Host versions were not inspected.
 
-React 19.3, Vite 8.3, TypeScript 7, Node 24. Hash routes and lazy chunks are retained. Credentials are IndexedDB only. One writable selected session; passive fleet connections remain capped at 16. All queries and reviewed mutations pass through session prepare/execute. No new sockets or transport store.
+Read the package START_HERE, AGENTS, complete SKILL, new reference brief, current-state record and all four PNGs. Inspected application entry/router, all eight routes, components, preferences, presentation projections, session prepare/valid/execute/query paths, grants, reducer bounds, transport ownership, tests, deployment configuration and Core protocol/fleet/Host/backup/release-gate sources. The latest visual brief supersedes Operations Desk's older art direction.
 
-Read: all eight routes, shell/pairing/review, selectors/preferences, adapter session/data-source/control-state/grants/scopes/history/fleet/freshness, tests and hosting policy. Cross-checked Core protocol/fleet/telemetry/Host/backups/access/instance authorization/lifecycle/release-gate docs and Paper actions plus source telemetry emitters.
+This remains React 19.3.0, Vite 8.3.4, TypeScript 7.0.2 and Node 24.x. There is no lint script. The new working branch is `design/reference-control-room`.
 
-Findings to correct in presentation: shared TPS/ms axis; missing source projection at chart call sites; stale current KPIs; absent cgroup graphs despite existing samples; console commands targeted at journal authority rather than Paper; message/gamemode actions lack editable parameters; asynchronous query state needs identity-bound clearing; Access revoke should use Paper's negotiated authority, independent of Host audit reads.
+## Trust lock
 
-Core 5.0 source is prepared, runtime/migration/backups/rollback remain uncertified. Current installed versions cannot be established from this session. No VPS credentials or live server pairing are used. Additive cadence/fleet fields must be detected. No server-side change is justified by evidence.
+- Entry: initialized credential storage plus 2.8-second minimum splash; credentials remain in IndexedDB.
+- One selected writable session, at most 16 passive feeds; source epochs and server/revision remounts remain intact.
+- Signed Protocol 3, `/v1`, immutable scopes, exact Host/Paper association and action targets remain authoritative.
+- Mutations use reason → prepare → explicit review → execute. No retry of unknown outcomes.
+- Paper runtime, Paper JVM, Host node and Minecraft cgroup remain distinct; fresh known capacity is required for a resource bar.
+- Backups retain the five fail-closed readiness booleans, durable phases, job-matched progress and reviewed archive operations.
+- Raw telemetry retention, console/roster/world bounds and original extrema/gap reduction remain unchanged.
 
-## Operations Desk follow-up
+No source bottleneck justifies a backend change. The 5.0 source gates still do not certify deployed runtime, migration or backups. NO SERVER-SIDE CHANGE NEEDED.
 
-The Signal Atlas presentation did not meet the owner’s requirement for a different product. Its rail, KPI ledger and repeated card compositions are replaced on `design/operations-workspace-20261015`; only verified integration and nonvisual safeguards are retained. Reconfirmed main/Core HEADs and baseline are recorded in BASELINE_CHECKS. DESIGN and FEATURE_PARITY_MATRIX describe the final route architecture.
+The package verifier was run after Git commands had refreshed `.git/index` and reported that index-byte mismatch. The checkout was clean and exactly matched the recorded commit before source edits. Git's index metadata is not application source. A separate byte-for-byte ZIP verification subsequently checked all 493 manifest entries with zero mismatches.

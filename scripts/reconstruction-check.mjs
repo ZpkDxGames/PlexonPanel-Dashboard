@@ -34,19 +34,25 @@ async function record(name, fn) {
 }
 try {
   await record(
-    "horizontal navigation replaces the permanent rail and KPI card grid",
+    "sidebar, console-led overview and real resource modules replace Operations Desk",
     async () => {
       await go("Overview");
+      await expect(page.locator(".sidebar")).toBeVisible();
       await expect(
-        page.locator(".sidebar,.metric-ledger,.cockpit-grid"),
+        page
+          .getByRole("navigation", { name: "Primary navigation" })
+          .getByRole("button"),
+      ).toHaveCount(8);
+      await expect(page.locator(".overview-console")).toBeVisible();
+      await expect(page.locator(".usage-panel")).toBeVisible();
+      await expect(page.locator(".stat-cell")).toHaveCount(4);
+      await expect(
+        page.locator(".signal-landscape,.runtime-register,.workspace-bar"),
       ).toHaveCount(0);
-      await expect(
-        page.getByRole("navigation", { name: "Primary navigation" }),
-      ).toBeVisible();
-      await expect(page.locator(".signal-landscape")).toBeVisible();
-      await expect(page.locator(".runtime-register .runtime-row")).toHaveCount(
-        4,
-      );
+      const usageTop = await page
+        .locator(".usage-panel")
+        .evaluate((el) => el.getBoundingClientRect().top);
+      expect(usageTop).toBeLessThan(900);
     },
   );
   await record(
@@ -80,13 +86,13 @@ try {
     },
   );
   await record(
-    "player inspector and nested review restore focus without dispatch",
+    "full player profile and reviewed moderation restore focus without dispatch",
     async () => {
       await go("Players");
       const row = page.locator(".player-row").first();
       await row.click();
       await expect(
-        page.getByRole("dialog", { name: "Selected player details" }),
+        page.getByRole("region", { name: "Selected player details" }),
       ).toBeVisible();
       await page.getByRole("button", { name: "Moderate", exact: true }).click();
       const ban = page.getByRole("button", { name: "Ban", exact: true });
@@ -102,7 +108,9 @@ try {
         .getByRole("button", { name: "Cancel", exact: true })
         .click();
       await expect(ban).toBeFocused();
-      await page.keyboard.press("Escape");
+      await page
+        .getByRole("button", { name: "Back to players", exact: true })
+        .click();
       await expect(row).toBeFocused();
     },
   );
@@ -125,7 +133,7 @@ try {
     },
   );
   await record(
-    "settings anchor navigation reaches real connection and privacy fields",
+    "settings section navigation reaches real connection and privacy fields",
     async () => {
       await go("Settings");
       await page.getByRole("link", { name: /Connections/ }).click();
@@ -138,7 +146,7 @@ try {
   );
   for (const width of [390, 820, 1280])
     await record(
-      `large text preference and modal accessibility at ${width}px`,
+      `large text preference and player profile accessibility at ${width}px`,
       async () => {
         await page.setViewportSize({ width, height: 900 });
         await go("Players");
@@ -160,7 +168,9 @@ try {
         await page.screenshot({
           path: `artifacts/reconstruction/interactions/inspector-${width}.png`,
         });
-        await page.keyboard.press("Escape");
+        await page
+          .getByRole("button", { name: "Back to players", exact: true })
+          .click();
       },
     );
   for (const width of [390, 820])
@@ -199,8 +209,10 @@ try {
       const trigger = page.getByRole("button", { name: "Open navigation" });
       await trigger.click();
       await expect(
-        page.getByRole("dialog", { name: "Navigation" }).getByRole("button"),
-      ).toHaveCount(9);
+        page
+          .getByRole("navigation", { name: "Navigation drawer" })
+          .getByRole("button"),
+      ).toHaveCount(8);
       await page
         .getByRole("dialog", { name: "Navigation" })
         .getByRole("button", { name: "Backups", exact: true })

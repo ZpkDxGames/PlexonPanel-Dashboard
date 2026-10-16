@@ -17,7 +17,7 @@ try {
     }
   }
   if (!ready) throw Error("Vite did not become ready.");
-  const run = spawn(process.execPath, [target], {
+  const run = spawn(process.execPath, [target, ...process.argv.slice(3)], {
     stdio: "inherit",
     env: { ...process.env, MOZ_DISABLE_CONTENT_SANDBOX: "1" },
   });

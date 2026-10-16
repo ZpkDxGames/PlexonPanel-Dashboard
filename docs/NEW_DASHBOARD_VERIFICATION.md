@@ -1,52 +1,61 @@
-# Verification / Operations Desk
+# Verification — Reference Control Room
 
-Source baseline: Dashboard main `1b9463e18b0e7dac6c5209760d5510732d6d62b0`. Reconstruction base: `4295d16e6ecac0be27b0142e20b1b69c78862c66`. Core source: `209f8b41d4fe6360a8dcf2f9cdabe7b7df6cc128`. Exact published implementation and review receipt are recorded in NEW_DASHBOARD_RELEASE_RECEIPT.
+Frontend baseline: `cea185cca07d9892967215baed097bedbe0e77ca`, reconfirmed as remote main on 2026-10-16. Backend reference: `209f8b41d4fe6360a8dcf2f9cdabe7b7df6cc128`, inspected read-only. The review branch is `design/reference-control-room`. This report supersedes the historical Operations Desk verification for this candidate.
 
 ## Executed gates
 
 | Check | Actual result |
 | --- | --- |
-| npm ci | PASS, lockfile unchanged |
-| npm run check | PASS, 58 tests; all original 48 retained |
-| npx tsc --noEmit | PASS at implementation checkpoints |
-| npm run build | PASS, Vite/React architecture retained |
-| npm run test:perf | PASS, 89,567 initial JS gzip bytes against unchanged 184,320-byte budget |
-| npm run test:browser via qa-local | PASS, 37 route/matrix cases; zero axe findings, document overflow or console errors |
-| control-plane-check | PASS, 25 groups including all eight routes at eight widths, source states, pairing recovery, grant denial, immutable review and source generation |
-| reconstruction-check | PASS, 12 groups: new IA, eight instruments, comparison inspection, nested-modal focus, Access views, settings anchors, large type and mobile signal/navigation controls |
-| review-confirmation-check | PASS, five simulated reviewed dispatches preserve required confirmation; typed ban guard retained |
-| visual-proofs | PASS, 32 captures: all eight routes × 1440/390 × actual dark/light themes, zero axe findings/overflow/errors |
-| npm audit --omit=dev --audit-level=high | PASS, zero production dependency vulnerabilities |
-| git diff --check | PASS |
-| Protected modules compared to main | No adapter/store/lib/security/package/config diff |
-| Production fixture exclusion | Synthetic fixture names absent from production JS; DEV import gate unchanged |
+| Baseline install/check/build/performance | PASS; 58 original tests; initial JS 89,567 gzip bytes |
+| Final `npm run check` | PASS; TypeScript and 61 tests, including all original 58 |
+| Final `npm run build` | PASS; unchanged React/Vite architecture and pinned dependencies |
+| `npm run test:perf` | PASS; 89,808 initial JS gzip bytes against unchanged 184,320-byte budget |
+| Browser matrix | PASS; 37 route/state/preference cases; zero axe violations, document overflow or console errors |
+| Control-plane checks | PASS; 25 groups, including all eight workspaces at eight widths, source states, pairing recovery, grant denial, immutable review and source generation |
+| Reconstruction interactions | PASS; 12 groups covering sidebar, focused/eight-track charts, profile/focus restoration, Access views, Settings modules, large text and mobile navigation |
+| Reference acceptance | PASS; seven groups: persisted preferences, exact UUID history/cursor, late-response isolation, vanished selection, plugin search, stale meters and Settings deep links |
+| Reviewed-action fixtures | PASS; five simulated reviewed dispatches preserve required confirmation; typed ban guard retained |
+| Main visual proofs | PASS; 32 captures: eight workspaces × 1440/390 × dark/light |
+| Extended proofs | PASS; 32 additional captures for viewport Overview, profile, Settings modules, Chat, Plugins and pairing; two desktop usage-position assertions |
+| Final Console/Backups proofs | PASS; eight refreshed captures after filter sizing and honest Host-phase styling |
+| Production artifact | PASS; synthetic fixture data absent, fixture URL cannot bypass pairing, Protocol 3 build identity retained |
+| Production dependency audit | PASS; zero vulnerabilities |
+| `git diff --check` | PASS |
 
-Browser: headless Firefox 157, localhost only. Test harnesses block nonlocal requests and disable external skins. Fixtures cannot dispatch operations. Browser/server are launched together because execution namespaces isolate independent localhost sessions. There is no lint script; TypeScript checks are included in check/build.
+Local browser checks use headless Firefox and development fixtures with nonlocal traffic blocked and external skins disabled. No fixture can execute a real server operation. Browser/server launch together through `qa-local.mjs`. There is no lint script; TypeScript is checked by both check/build. Screenshots and complete JSON/log evidence accompany the handoff.
 
-The added render regression proves that a passive Fleet trace cannot use the selected server’s history. Generation-aware summaries now match their plotted source view. Action review restores keyboard focus without weakening execution guards.
+The protected adapter, library, capability, reviewed-action, entry-state, transport and source-history files are unchanged, as are package versions, lockfile, relay/CSP configuration and `vercel.json`. The single protected-area exception is a preference initialization-order bug fix: initialize `oneOf` before the first persisted read. It changes no storage schema or default. See compatibility and the fresh-module regression.
 
 ## Measured performance
 
-Display-path benchmark: 8,192 raw observations → 474 display points while preserving a sharp excursion, null gap and original samples. Legacy median 1.571 ms; cached reduction 0.075 ms; cold reduction including a copied array 0.456 ms. Path text falls from 194,828 to 11,316 characters. This measures pure view processing, not the complete UI.
+All bundle measurements below use Node `zlib.gzipSync` defaults on clean production asset directories. They compare this task's actual main baseline with this candidate, not an older redesign.
 
-| Same-container browser replay | Main baseline | Focused instrument | Eight-track comparison |
+| Artifact | Baseline | Control Room |
+| --- | ---: | ---: |
+| Initial JS gzip | 89,567 B | 89,808 B |
+| All lazy/initial JS gzip | 121,697 B | 125,911 B |
+| Compiled CSS | 95,501 B | 84,159 B |
+| CSS gzip | 22,761 B | 20,666 B |
+| JS asset count | 14 | 15 |
+
+Initial JS increases 241 bytes (0.27%); CSS gzip falls 2,095 bytes (9.2%). Lazy loading and the existing budget remain intact. The added read-only player history is a separate lazy presentation module. No raw retention or source cadence changes were made.
+
+Same-container development-build browser replay at 1440×900: 8,192 retained observations and 24 synthetic events spaced at 125 ms. Wall time also includes asynchronous rendering/inspection. These short, sequential runs measure local UI behavior, not production service load or sustained throughput.
+
+| Replay | Baseline p95 frame interval | Control Room p95 | Baseline → candidate DOM nodes |
 | --- | ---: | ---: | ---: |
-| Visible SVG plots | 3 | 1 | 8 |
-| Retained observations | 8,192 | 8,192 | 8,192 |
-| DOM nodes | 485 | 546 | 915 |
-| SVG path characters | 595,270 | 14,038 | 89,888 |
-| Median frame interval | 17.10 ms | 17.06 ms | 17.08 ms |
-| p95 frame interval | 33.26 ms | 17.30 ms | 49.44 ms |
-| Frames above 50 ms | 6 | 7 | 8 |
-| 24-event replay duration | 3.98 s | 4.09 s | 8.20 s |
-| Console rows rendered, 2,500 retained | 35 | 26 | 26 |
+| Overview | 49.44 ms | 33.28 ms | 633 → 889 |
+| Focused Performance | 17.22 ms | 17.22 ms | 546 → 593 |
+| Optional eight-track comparison, median of three runs | 50.48 ms | 83.50 ms | 915 → 962 |
 
-Focused view has a better p95 in this run. Eight-track comparison costs more CPU/replay time and has a worse p95 than baseline. This is an explicit tradeoff, not a universal frame-rate improvement or hardware certification. Raw retention/transport/cadence are unchanged. The 24-event synthetic run is not a live sustained throughput claim.
+Overview's bounded console preview memoizes rows and the existing safe text formatter. The focused instrument remains the default. Eight-track comparison is an explicit heavier mode: baseline p95 values were 50.48/66.12/33.34 ms, candidate 33.72/99.88/83.50 ms. It has a higher tail cost in these noisy short replays. This is a documented regression/limit, not a universal frame-rate improvement. Comparison uses one column below 1800px to preserve legibility and control concurrent plot width.
 
-Initial JS is 21.6% smaller than main (114,221 → 89,567 gzip bytes). The compiled stylesheet is larger: Vite’s reported gzip is approximately 19.41 → 22.89 kB. Lazy route loading and the original initial-JS budget remain intact.
+Console retains 2,500 lines while rendering 26 rows in the ordinary viewport and a bounded 400 in wrap mode. Raw telemetry remains bounded at 8,192 observations. Firefox exposes no `performance.memory` here; no heap-growth claim is made.
 
-## Not executed / pending
+The existing display-path benchmark still preserves the spike, null gap and raw observations: 8,192 raw points → 474 display points, 194,828 → 11,316 path characters. This run recorded legacy median 2.185 ms, cached reduction 0.094 ms and cold reduction including copy 0.491 ms. That is an inherited isolated path comparison, not a new whole-app speedup over the current baseline. The underlying geometry/reduction implementation is unchanged.
 
-Real Paper/Host/relay/VPS round trips, production origin allowlisting, installed-version verification, real destructive/lifecycle/backup operations, Chromium, Safari, physical mobile devices, screen readers, 200% browser zoom and an actual 24-hour browser/heap soak are pending. A virtual 30-minute reducer soak is included in the passing contract tests. No production promotion, service restart, JAR replacement, credential change or backend migration occurred.
+## Pending live acceptance
 
-Use NEW_DASHBOARD_ROLLOUT for the separate safe live-acceptance and rollback procedure. NO SERVER-SIDE CHANGE IS PROPOSED: the measured bottleneck is in display processing, and backend runtime load was not profiled.
+Real paired Paper/Host/relay/VPS round trips, installed runtime/version verification, real lifecycle/destructive/backup operations, production origin approval, Chromium/Safari, physical phones, screen-reader hardware, 200% browser zoom and an actual 24-hour heap/browser soak were not executed. The passing reducer suite includes a virtual 30-minute retention exercise, which is not a real browser soak.
+
+No production promotion, service restart, JAR replacement, credential/allowlist change, backend modification or state migration occurred. A Git preview does not imply paired-runtime acceptance or relay origin approval. Follow `NEW_DASHBOARD_ROLLOUT.md` for the separate safe acceptance and rollback procedure.

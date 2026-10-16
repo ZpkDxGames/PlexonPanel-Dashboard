@@ -1,14 +1,16 @@
-# Review risks and acceptance boundaries
+# Candidate risks and pending acceptance
 
-| Area | Evidence and practical limit |
+| Area | Control / limit |
 | --- | --- |
-| Production state | Source and localhost tests only. Installed VPS versions, origin allowlist and live credentials were not inspected. |
-| Runtime safety | Protected adapters, stores, scopes and original contract tests are unchanged. Live destructive/lifecycle/backup acceptance needs separate authorization. |
-| Browser coverage | Headless Firefox 157 tested. Chromium, Safari, physical touch devices and screen readers remain unexecuted. |
-| Telemetry | Honest gaps, independent clocks/epochs and missing values. Legacy metadata stays optional. No inferred distributions or fabricated history. |
-| Performance | Focused view reduces active work; optional eight-signal comparison costs more CPU/replay time. Reported frame results are one synthetic container run, not a 60 fps certification. |
-| Long sessions | Virtual 30-minute bounded reducer soak passed. No actual 24-hour connected or browser heap soak was executed. |
-| Preview origin | A branch preview does not inherit production pairing or relay allowlisting. Do not widen live configuration without approval. |
-| Visual acceptance | New structure is proven in rendered fixtures. Owner review of the final design remains a review gate. |
+| Live runtime | No real Paper/Host/VPS connection or mutation was exercised. Source contracts and fixture acceptance do not certify installed versions. |
+| New read-only history | Requires current Paper capability and immutable history scope. Exact UUID projection and bounded opaque pagination are tested. Retained observations cannot establish lifetime totals. |
+| Preference startup exception | Initialization order only; no schema/default/migration/credential change. Fresh-module regression covers restoration. |
+| Richer Overview | More DOM and console presentation than the baseline. Compare replay numbers in verification; do not infer universal 60fps. Display formatting is memoized and histories remain bounded. |
+| Eight-track comparison | Explicit optional mode; local three-run median p95 frame interval rose from 50.48 to 83.50 ms. Focused one-plot view remains the default; no universal 60fps claim. |
+| Mobile tables | Wide archive/audit/sample tables scroll inside labelled regions. The document itself must never scroll horizontally. |
+| Preview origin | A Git integration preview is not automatically allowlisted by the relay. No allowlist change is part of this branch. |
+| Browser/device coverage | Headless Firefox locally; physical phones, Safari and actual assistive-technology hardware remain untested. |
+| Memory | Retained sample/console/roster bounds are tested; Firefox does not expose performance.memory here. No heap-growth or 24-hour soak claim. |
+| Rollout | Retain the current immutable frontend deployment and stable origin/IndexedDB pairing. Release-specific approval is required before cutover. |
 
-No server-side change is needed for this frontend. Production remains untouched.
+No backend change, service restart, JAR replacement, credential rotation, provider change, or state migration is required by this frontend candidate.

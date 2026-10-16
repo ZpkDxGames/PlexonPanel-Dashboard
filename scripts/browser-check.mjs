@@ -171,12 +171,6 @@ for (const matrix of matrices) {
       ? route.continue()
       : route.abort("blockedbyclient"),
   );
-  await context.addInitScript(() =>
-    localStorage.setItem(
-      "plexon:preferences",
-      JSON.stringify({ skinProvider: "disabled" }),
-    ),
-  );
   const preferenceFixture = {
     theme: matrix.theme,
     density: matrix.density,
@@ -187,6 +181,10 @@ for (const matrix of matrices) {
     timezone: "browser",
     skinProvider: "disabled",
   };
+  await context.addInitScript(
+    (next) => localStorage.setItem("plexon:preferences", JSON.stringify(next)),
+    preferenceFixture,
+  );
   const page = await context.newPage();
   const errors = [];
   page.on("console", (message) => {
@@ -260,9 +258,7 @@ for (const matrix of matrices) {
     await page.keyboard.press("Control+K");
     const palette = page.getByRole("dialog", { name: "Command palette" });
     await palette.waitFor();
-    await page
-      .getByLabel("Search commands", {exact:true})
-      .fill("backups");
+    await page.getByLabel("Search commands", { exact: true }).fill("backups");
     await palette.getByRole("button", { name: /Backups/ }).click();
     await page.locator("h1", { hasText: "Backups" }).waitFor();
     results.push({

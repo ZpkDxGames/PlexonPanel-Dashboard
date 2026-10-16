@@ -21,11 +21,13 @@ const defaults: Preferences = {
   timezone: "browser",
   skinProvider: "crafatar",
 };
-let value = read();
 const listeners = new Set<() => void>();
 
 const oneOf = <T extends string>(value: unknown, allowed: readonly T[], fallback: T): T =>
   typeof value === "string" && allowed.includes(value as T) ? value as T : fallback;
+
+// Parsing calls oneOf: initialize it before the first persisted read.
+let value = read();
 
 export function parsePreferences(raw: unknown): Preferences {
   const saved = raw && typeof raw === "object" ? raw as Record<string, unknown> : {};

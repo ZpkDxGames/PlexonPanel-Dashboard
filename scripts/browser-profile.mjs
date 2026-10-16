@@ -3,11 +3,23 @@ import { spawn } from "node:child_process";
 import { mkdir, writeFile } from "node:fs/promises";
 const browser = await firefox.launch();
 const reports = [];
-for (const [name, cwd, port, compare] of [
-  ["baseline", "../baseline", 4180],
-  ["operations-focus", ".", 4181, false],
-  ["operations-compare", ".", 4182, true],
-]) {
+const cases = [
+  ["baseline-overview", "../baseline", 4180, false, "Overview"],
+  ["control-room-overview", ".", 4181, false, "Overview"],
+  ["baseline-focus", "../baseline", 4182, false, "Performance"],
+  ["control-room-focus", ".", 4183, false, "Performance"],
+  ["baseline-compare", "../baseline", 4184, true, "Performance"],
+  ["control-room-compare", ".", 4185, true, "Performance"],
+];
+const selectedCases =
+  process.argv[2] === "compare"
+    ? [1, 2, 3].flatMap((run) =>
+        cases
+          .filter((row) => row[3])
+          .map((row) => [`${row[0]}-run${run}`, ...row.slice(1)]),
+      )
+    : cases;
+for (const [name, cwd, port, compare, route] of selectedCases) {
   const server = spawn(
     process.execPath,
     [
@@ -44,14 +56,23 @@ for (const [name, cwd, port, compare] of [
         : route.abort("blockedbyclient"),
     );
     const page = await context.newPage();
-    await page.goto(`http://127.0.0.1:${port}/?fixture=healthy#Performance`);
+    await page.goto(`http://127.0.0.1:${port}/?fixture=healthy#${route}`);
     await page.locator(".workspace-heading h1").waitFor();
     await page.locator(".route-skeleton").waitFor({ state: "detached" });
+    await page.evaluate(async () => {
+      const { preferences } = await import("/src/store/preferences.ts");
+      preferences.update({
+        theme: "dark",
+        motion: "off",
+        skinProvider: "disabled",
+        textSize: "standard",
+        density: "comfortable",
+      });
+    });
     const metrics = await page.evaluate(async (compare) => {
       const { session } = await import("/src/adapter/session.ts"),
-        { makeFixture, fixtureAction } = await import(
-          "/src/development/fixtures.ts"
-        );
+        { makeFixture, fixtureAction } =
+          await import("/src/development/fixtures.ts");
       const end = Date.now(),
         start = end - 3000,
         state = makeFixture("healthy", start);
@@ -146,9 +167,8 @@ for (const [name, cwd, port, compare] of [
     await page.locator(".terminal-scroll").waitFor();
     await page.evaluate(async () => {
       const { session } = await import("/src/adapter/session.ts"),
-        { makeFixture, fixtureAction } = await import(
-          "/src/development/fixtures.ts"
-        );
+        { makeFixture, fixtureAction } =
+          await import("/src/development/fixtures.ts");
       const state = makeFixture();
       state.console = Array.from({ length: 2500 }, (_, i) => ({
         id: `log-${i}`,
@@ -161,6 +181,10 @@ for (const [name, cwd, port, compare] of [
     });
     await page.waitForTimeout(300);
     metrics.consoleRenderedRows = await page.locator(".terminal-line").count();
+    await page.getByRole("button", { name: "Wrap", exact: true }).click();
+    metrics.consoleWrappedRows = await page.locator(".terminal-line").count();
+    metrics.heapMeasurement =
+      "Not available through Firefox performance.memory; no heap growth claim";
     reports.push({ name, ...metrics });
     await context.close();
   } finally {
@@ -174,7 +198,7 @@ await writeFile(
   JSON.stringify(
     {
       environment:
-        "Headless Firefox 157, same container, 1440x900, development Vite builds, synthetic replay; not hardware certification or live VPS soak",
+        "Headless Firefox, same container and sequential identical 8192-point / 24-event replay at 1440x900, development Vite builds; not hardware certification or live VPS soak",
       reports,
     },
     null,

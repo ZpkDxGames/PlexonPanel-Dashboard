@@ -1,35 +1,27 @@
-# PlexonPanel / Operations Desk
+# Reference Control Room — design decisions
 
-The presentation is rebuilt around a horizontal workspace bar, broad instrument surfaces and flat operational registers. There is no permanent application sidebar, KPI strip, rounded-card grid, source ribbon or numbered chapter masthead. The self-hosted Manrope and JetBrains fonts stay; the change is the product’s structure and interaction model.
+The four owner references define the visual family. Reference 3/4 supplies the hosting-panel composition, reference 1 the rounded modules and aligned fields, and reference 2 the substantial player identity/profile hierarchy. The new source brief is `REFERENCE_UI_REVAMP_BRIEF.md`.
 
-## Concept proof
+Two variants were considered within this direction: a narrow icon rail with a secondary server column, and a persistent labelled sidebar with a two-column server workspace. The labelled sidebar was selected because it preserves clear destinations, matches the references, and remains understandable without hover. Tablet/mobile uses an accessible native-dialog drawer.
 
-Two newly coded concepts were rendered at 1440 and 390 pixels: **Operations Desk**, a paper/forest operations register with horizontal navigation; and **Orbital Observatory**, a radial instrument with a floating workspace dock. Operations Desk was selected for precise time-axis reading, accessible navigation and better use of mobile width. The orbital concept’s radial geometry and floating dock obstructed useful content. Concept screenshots contain illustrative synthetic strokes, not source measurements.
+## Rebuilt presentation
 
-The earlier Signal Atlas branch is superseded as a design proposal. Its visual system is not the template for this implementation. Its tested nonvisual source projections, action-confirmation correction and bounded display reduction are retained.
+- A 240px grouped sidebar, scoped server switcher, device identity and relay status replace horizontal navigation.
+- Compact operational heading, original local voxel landscape, explicit server status and reviewed lifecycle controls replace the editorial hero.
+- Overview now combines server information, a real bounded console preview, usage selector/chart, resource summary, quick navigation, player preview and world/tick modules.
+- Fleet becomes a searchable card directory with independent source health, identity disclosure and verified-node measurements.
+- Performance moves from an editorial signal rail to an eight-signal instrument selector and substantial focused/comparison panels.
+- Players replaces its side dialog with an in-page identity header, current-session facts, gameplay/moderation/command panels, and a gated read-only history panel. A disappearing UUID never silently selects another player.
+- Console, chat, plugins, backup readiness/archive/job modules and access views use the same operational panels. No screenshot-only feature was added.
+- Settings is a four-section workspace with deep-linkable Appearance, Connections, Privacy & skins and Diagnostics panels. Preference feedback is immediate; relay save has a distinct pending state.
+- Splash, pairing, recovery, search and reviewed dialogs receive the same surfaces and focus treatment.
 
-## Route architecture
+## Visual system
 
-| Workspace | New composition and interaction |
-| --- | --- |
-| Fleet | Full-width searchable server directory, inline source evidence and tick traces; separate verified node register |
-| Overview | Landscape tick canvas with a leading current reading; flat runtime register and world entity columns; separate tick-duration study; contextual Host controls |
-| Performance | Eight-signal catalog, one focused instrument with observed summary, and optional eight-track synchronized comparison |
-| Players | Broad roster directory; selecting a player opens a native side inspector with Interact, Moderate and Commands tools |
-| Console | Docked channel switcher and dark terminal; chat transcript/composer and plugin register share the workbench |
-| Backups | Readiness checklist above an archive book and a vertical durable Host runbook; inventory presence and verification remain distinct |
-| Access | Audit-first operation trail; paired devices and effective grant are peer views, rather than side-by-side cards |
-| Settings | Anchored document with all controls, actual connection fields, privacy and diagnostics; no nested tab dashboard or miniature fake dashboard |
-| Pairing | Centered provisioning form, numbered connection step and explicit Paper/Host/browser responsibilities |
+Charcoal canvas, navy/sidebar, three levels of blue-grey panels, 16px panel geometry, blue actions and cyan instrumentation. Independent light surfaces use white, cool neutral canvas and darker accessible signal colors. Manrope and JetBrains Mono remain self-hosted. The original preference schema and stored accent choices remain supported; the teal option now has a cyan interpretation within the requested palette.
 
-## System
+The former 111KB stylesheet was replaced by one token/component/responsive system; no override stylesheet or dashboard kit was added. The SVG header artwork is original local vector artwork, not a third-party brand or hosted asset.
 
-Dark **Forest** uses deep green structural surfaces, warm neutral text, pale fern data and restrained clay thresholds. Light **Paper** uses an ivory document surface, green-black typography and independently tuned instrument contrast. Semantic colors are reserved for actual source status and outcomes. User accent, density, text size, fill, motion and timezone preferences retain the existing schema. Rem typography makes the text preference affect labels and measurements; density changes real register rows.
+Real data remains literal: source clocks, skew, gaps, source generations, actual samples and CPU denominators are preserved. The tested existing chart projection/reduction engine remains in use. The new usage selector only filters retained observations.
 
-A four-square mark references block geometry without game decoration. Flat rules and shared baselines replace rounded containers. Source/receipt metadata remains readable and collapses only through explicit details controls. There is no value-smoothing animation.
-
-Navigation and feedback use short color transitions; route entry uses a small opacity/position transition; native inspectors enter from the side; reviews and workspace sheets preserve focus. OS reduced motion and user reduced/off motion govern effects. No new dependency, WebGL surface, remote font or runtime UI CDN is introduced.
-
-## Chart reading
-
-Original source samples, independent capture clocks, gaps, source epochs and units remain authoritative. Pointer, keyboard and touch inspection, pinning, series toggles, source evidence and original-sample tables are available. The display reducer retains endpoints and extrema. One-core service CPU may exceed 100%; heap, service memory and node memory have separate scopes. Observed summaries use the same eligible source generation as the plot.
+Proof renders at 1440×900 and 390×844 exposed a lower-than-intended usage panel and a light-theme contrast issue. Both were corrected before the final capture matrix. Full-page screenshots show the complete workspaces; viewport captures establish actual 100% scale. Every fixture screen is labelled.

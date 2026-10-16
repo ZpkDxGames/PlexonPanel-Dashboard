@@ -171,52 +171,37 @@ export default function Performance() {
         </select>
       </label>
       <div className="analysis-workspace">
-        <aside className="signal-catalog" aria-label="Signal catalog">
-          {["Runtime", "Compute", "Memory"].map((category, i) => (
-            <div className="signal-category" key={category}>
-              <span className="eyebrow">
-                0{i + 1} / {category}
+        <section className="signal-catalog" aria-label="Signal catalog">
+          {instruments.map((plot) => (
+            <button
+              key={plot.key}
+              className={selected === plot.key ? "active" : ""}
+              aria-pressed={selected === plot.key}
+              onClick={() => {
+                setSelected(plot.key);
+                setAllSignals(false);
+              }}
+            >
+              <span
+                className="signal-indicator"
+                style={{ background: plot.color }}
+              />
+              <span>
+                <strong>{plot.title}</strong>
+                <small>
+                  {plot.source === "paperHealth"
+                    ? "Paper runtime"
+                    : plot.source === "paperSystem"
+                      ? "Paper JVM"
+                      : plot.source === "service"
+                        ? "Host · Minecraft cgroup"
+                        : "Host · node total"}
+                </small>
               </span>
-              {instruments
-                .filter((plot) =>
-                  category === "Runtime"
-                    ? plot.source === "paperHealth"
-                    : category === "Memory"
-                      ? plot.unit === "bytes"
-                      : plot.source !== "paperHealth" && plot.unit !== "bytes",
-                )
-                .map((plot) => (
-                  <button
-                    key={plot.key}
-                    className={selected === plot.key ? "active" : ""}
-                    aria-pressed={selected === plot.key}
-                    onClick={() => {
-                      setSelected(plot.key);
-                      setAllSignals(false);
-                    }}
-                  >
-                    <span
-                      className="signal-indicator"
-                      style={{ background: plot.color }}
-                    />
-                    <span>
-                      <strong>{plot.title}</strong>
-                      <small>
-                        {plot.source === "paperHealth"
-                          ? "Paper runtime"
-                          : plot.source === "paperSystem"
-                            ? "Paper process"
-                            : plot.source === "service"
-                              ? "Minecraft cgroup"
-                              : "Host node"}
-                      </small>
-                    </span>
-                    <span className="catalog-arrow">↗</span>
-                  </button>
-                ))}
-            </div>
+              <Icon name="chevron" />
+            </button>
           ))}
-        </aside>
+        </section>
         <section className="analysis-focus">
           <header className="analysis-title">
             <div>
@@ -225,7 +210,7 @@ export default function Performance() {
                   ? "CAPTURE-ALIGNED SIGNALS"
                   : `${active.source === "paperHealth" ? "PAPER RUNTIME" : active.source === "paperSystem" ? "PAPER JVM" : active.source === "service" ? "MINECRAFT SERVICE" : "HOST NODE"} / ${active.unit === "bytes" ? "MEMORY" : "INSTRUMENT"}`}
               </span>
-              <h2>{allSignals ? "Every source, in context." : active.title}</h2>
+              <h2>{allSignals ? "Signal comparison" : active.title}</h2>
               <p>
                 {allSignals
                   ? "Independent units and scales. Inspection synchronizes by actual capture time."
@@ -342,7 +327,7 @@ export default function Performance() {
       <section className="observation-ledger">
         <div>
           <span className="eyebrow">TICK BUDGET / PAPER</span>
-          <h2>Observed mean samples.</h2>
+          <h2>Tick budget observations</h2>
           <Coverage samples={health} />
           <p>
             {health.filter((s) => s.mspt !== null && s.mspt > 50).length}{" "}

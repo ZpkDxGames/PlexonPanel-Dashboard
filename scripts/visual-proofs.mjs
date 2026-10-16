@@ -35,7 +35,9 @@ for (const theme of ["dark", "light"])
       "Backups",
       "Access",
       "Settings",
-    ]) {
+    ].filter(
+      (route) => !process.argv[2] || process.argv[2].split(",").includes(route),
+    )) {
       await page.goto(`${base}/?fixture=healthy#${route}`, {
         waitUntil: "networkidle",
       });
@@ -71,7 +73,9 @@ for (const theme of ["dark", "light"])
   }
 await browser.close();
 await writeFile(
-  "artifacts/previews/results.json",
+  process.argv[2]
+    ? `artifacts/previews/results-${process.argv[2]}.json`
+    : "artifacts/previews/results.json",
   JSON.stringify(results, null, 2),
 );
 const failures = results.filter((r) => r.overflow || r.violations.length);
