@@ -105,7 +105,7 @@ export default function Access() {
       <div hidden={view !== "audit"} className="audit-workspace">
         {" "}
         <SectionLabel
-          index="02"
+          index=""
           title="Operation audit"
           detail={
             auditAction === "audit.self"
@@ -115,7 +115,7 @@ export default function Access() {
         />
         <Panel
           eyebrow={`${auditSource} / AUTHORITATIVE RECORDS`}
-          title="Trace the operation"
+          title="Audit records"
         >
           <div className="access-toolbar">
             <label className="field">

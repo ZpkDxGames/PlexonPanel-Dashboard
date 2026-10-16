@@ -48,14 +48,19 @@ export default function Fleet() {
             {String(rows.length).padStart(2, "0")}
           </span>
           <div>
-            <h2>Your server estate.</h2>
+            <h2>Paired servers</h2>
             <p>
               {rows.filter((row) => row.phase === "live").length} relay
               connected · {nodes.length} verified nodes
             </p>
           </div>
         </div>
-        <Button variant="primary" onClick={() => navigate("Settings")}>
+        <Button
+          variant="primary"
+          onClick={() => {
+            location.hash = "Settings?section=connection";
+          }}
+        >
           <Icon name="plus" />
           Pair another server
         </Button>
@@ -75,20 +80,13 @@ export default function Fleet() {
         </span>
       </div>
       <section className="server-directory" aria-label="Server estate">
-        <div className="directory-columns">
-          <span>SERVER / INSTANCE</span>
-          <span>RUNTIME SIGNAL</span>
-          <span>PLAYERS</span>
-          <span>SOURCE HEALTH</span>
-          <span>WORKSPACE</span>
-        </div>
         {rows
           .filter((row) =>
             `${row.state.ready?.server.serverName ?? ""} ${row.serverId} ${row.state.ready?.server.instanceKey ?? ""}`
               .toLowerCase()
               .includes(query.toLowerCase()),
           )
-          .map((row, index) => {
+          .map((row) => {
             const paper = sourceEvidence(row.state, "paperHealth", now),
               host = sourceEvidence(row.state, "hostSystem", now),
               selected = row.serverId === snap.state.serverId,
@@ -102,9 +100,9 @@ export default function Fleet() {
                 className={`server-directory-row ${selected ? "selected" : ""}`}
                 key={row.serverId}
               >
-                <div className="server-directory-identity">
+                <header className="fleet-card-header">
                   <span className="server-initial">
-                    {String(index + 1).padStart(2, "0")}
+                    <Icon name="server" />
                   </span>
                   <div>
                     <h2>
@@ -113,28 +111,38 @@ export default function Fleet() {
                         snap.labels[row.serverId] ?? row.serverId,
                       )}
                     </h2>
-                    <code>
-                      {row.state.ready?.server.instanceKey ?? "Legacy instance"}
-                    </code>
-                    <small>{row.serverId}</small>
+                    <span>
+                      {row.state.ready?.server.instanceKey ?? "Legacy instance"}{" "}
+                      · Minecraft{" "}
+                      {row.state.ready?.server.minecraftVersion ??
+                        "unavailable"}
+                    </span>
                   </div>
-                </div>
-                <div className="directory-signal">
-                  <strong>
-                    {row.state.ready?.agents.paper
-                      ? (tps?.toFixed(2) ?? "—")
-                      : "—"}
-                    <small>TPS</small>
-                  </strong>
-                  <Sparkline samples={row.state.history} metric="tps" />
-                </div>
-                <div className="directory-players">
-                  <strong>
-                    {row.state.ready?.agents.paper
-                      ? (number(row.state.server.onlinePlayers) ?? "—")
-                      : "—"}
-                  </strong>
-                  <small>players · Paper</small>
+                  <Status tone={row.phase === "live" ? "success" : "neutral"}>
+                    {row.phase}
+                  </Status>
+                </header>
+                <div className="fleet-card-metrics">
+                  <div className="directory-signal">
+                    <span>
+                      <small>Paper tick rate</small>
+                      <strong>
+                        {row.state.ready?.agents.paper
+                          ? (tps?.toFixed(2) ?? "—")
+                          : "—"}
+                        <small>TPS</small>
+                      </strong>
+                    </span>
+                    <Sparkline samples={row.state.history} metric="tps" />
+                  </div>
+                  <div className="directory-players">
+                    <small>Players · Paper</small>
+                    <strong>
+                      {row.state.ready?.agents.paper
+                        ? (number(row.state.server.onlinePlayers) ?? "—")
+                        : "—"}
+                    </strong>
+                  </div>
                 </div>
                 <div className="directory-sources">
                   <span>
@@ -149,6 +157,15 @@ export default function Fleet() {
                     {paper.capturedAt ?? host.capturedAt ?? "No capture"}
                   </time>
                 </div>
+                <details className="fleet-identity">
+                  <summary>Instance identity</summary>
+                  <code>{row.serverId}</code>
+                  <p>
+                    {row.state.ready?.server.fleetState ?? "Legacy"} ·{" "}
+                    {row.state.ready?.server.nodeId ??
+                      "Node identity not reported"}
+                  </p>
+                </details>
                 <div className="directory-enter">
                   <Status tone={row.phase === "live" ? "success" : "neutral"}>
                     {selected ? "Selected" : row.phase}
@@ -167,6 +184,17 @@ export default function Fleet() {
         {!rows.length && (
           <Empty title="Your fleet starts here">
             Pair this browser with your first server in Settings.
+          </Empty>
+        )}
+        {rows.filter((row) =>
+          `${row.state.ready?.server.serverName ?? ""} ${row.serverId} ${row.state.ready?.server.instanceKey ?? ""}`
+            .toLowerCase()
+            .includes(query.toLowerCase()),
+        ).length === 0 && (
+          <Empty
+            title={rows.length ? "No matching servers" : "No paired servers"}
+          >
+            Try another name or pair a server in Connections.
           </Empty>
         )}
       </section>

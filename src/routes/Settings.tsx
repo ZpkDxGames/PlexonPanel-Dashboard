@@ -7,6 +7,7 @@ import { useSession } from "../hooks";
 import { preferences, usePreferences } from "../store/preferences";
 import { toast } from "../components/toast";
 import { BrandMark } from "../components/Brand";
+import { Icon } from "../components/Icon";
 type BuildInfo = {
   commit?: string;
   builtAt?: string;
@@ -46,6 +47,30 @@ function Options<T extends string>({
   );
 }
 export default function Settings() {
+  const sectionFromHash = (): Section => {
+    const value = new URLSearchParams(location.hash.split("?")[1] ?? "").get(
+      "section",
+    );
+    return ["appearance", "connection", "privacy", "diagnostics"].includes(
+      value ?? "",
+    )
+      ? (value as Section)
+      : "appearance";
+  };
+  const [section, setSection] = useState<Section>(sectionFromHash);
+  const [saving, setSaving] = useState(false),
+    [preferenceSaved, setPreferenceSaved] = useState(false);
+  useEffect(() => {
+    const update = () => setSection(sectionFromHash());
+    addEventListener("hashchange", update);
+    return () => removeEventListener("hashchange", update);
+  }, []);
+  const updatePreference = (
+    patch: Parameters<typeof preferences.update>[0],
+  ) => {
+    preferences.update(patch);
+    setPreferenceSaved(true);
+  };
   const snap = useSession(),
     prefs = usePreferences(),
     [origin, setOrigin] = useState(snap.relay.origin),
@@ -70,15 +95,23 @@ export default function Settings() {
   const save = async () => {
     setError("");
     setMessage("");
+    setSaving(true);
     try {
       await session.setRelayOrigin(origin);
       setMessage(
         "Relay preference saved. Connection state will confirm reachability.",
       );
+      toast.push(
+        "Relay preference saved",
+        "Connection state will confirm reachability.",
+        "success",
+      );
     } catch (cause) {
       setError(
         cause instanceof Error ? cause.message : "Relay origin rejected.",
       );
+    } finally {
+      setSaving(false);
     }
   };
   const copy = () => {
@@ -109,27 +142,38 @@ export default function Settings() {
     <>
       <div className="settings-document">
         <aside className="settings-index">
-          <span className="eyebrow">ON THIS PAGE</span>
+          <span className="eyebrow">SETTINGS</span>
           <nav aria-label="Settings sections">
-            {sections.map(([value, label], i) => (
+            {sections.map(([value, label]) => (
               <a
                 key={value}
                 href={`#Settings?section=${value}`}
+                className={section === value ? "active" : ""}
+                aria-current={section === value ? "page" : undefined}
                 onClick={(e) => {
                   e.preventDefault();
-                  document
-                    .getElementById(`settings-${value}`)
-                    ?.scrollIntoView({ behavior: "instant", block: "start" });
+                  setSection(value);
+                  history.replaceState(null, "", `#Settings?section=${value}`);
                 }}
               >
-                <small>0{i + 1}</small>
+                <Icon
+                  name={
+                    value === "appearance"
+                      ? "sun"
+                      : value === "connection"
+                        ? "server"
+                        : value === "privacy"
+                          ? "players"
+                          : "performance"
+                  }
+                />
                 {label}
               </a>
             ))}
           </nav>
           <div className="workspace-passport">
             <BrandMark />
-            <strong>Your workspace.</strong>
+            <strong>Browser preferences</strong>
             <p>
               Preferences stay in this browser. Server permissions come from
               your signed grant.
@@ -138,12 +182,21 @@ export default function Settings() {
           </div>
         </aside>
         <div className="settings-content">
-          {" "}
-          <section id="settings-appearance" className="settings-chapter">
+          {preferenceSaved && (
+            <div className="save-feedback" role="status">
+              <Icon name="check" />
+              Preferences saved to this browser
+            </div>
+          )}{" "}
+          <section
+            id="settings-appearance"
+            hidden={section !== "appearance"}
+            className="settings-chapter"
+          >
             <Panel
               eyebrow="LOCAL WORKSPACE"
-              title="Find your focus."
-              description="Presentation preferences apply immediately on this browser."
+              title="Appearance"
+              description="Choose a theme and tune the way your workspace feels. Changes save automatically."
               className="preferences-panel"
             >
               <div className="preferences-layout">
@@ -154,12 +207,12 @@ export default function Settings() {
                     options={[
                       {
                         value: "dark",
-                        label: "Forest",
+                        label: "Dark",
                         detail: "Dark workspace",
                       },
                       {
                         value: "light",
-                        label: "Paper",
+                        label: "Light",
                         detail: "Light workspace",
                       },
                       {
@@ -168,7 +221,7 @@ export default function Settings() {
                         detail: "Follow your device",
                       },
                     ]}
-                    onChange={(theme) => preferences.update({ theme })}
+                    onChange={(theme) => updatePreference({ theme })}
                   />
                   <Options
                     label="Layout density"
@@ -178,7 +231,7 @@ export default function Settings() {
                       { value: "comfortable", label: "Comfortable" },
                       { value: "spacious", label: "Spacious" },
                     ]}
-                    onChange={(density) => preferences.update({ density })}
+                    onChange={(density) => updatePreference({ density })}
                   />
                   <Options
                     label="Text size"
@@ -188,7 +241,7 @@ export default function Settings() {
                       { value: "standard", label: "Standard" },
                       { value: "large", label: "Large" },
                     ]}
-                    onChange={(textSize) => preferences.update({ textSize })}
+                    onChange={(textSize) => updatePreference({ textSize })}
                   />
                   <Options
                     label="Motion"
@@ -206,17 +259,17 @@ export default function Settings() {
                       },
                       { value: "off", label: "Off", detail: "Instant changes" },
                     ]}
-                    onChange={(motion) => preferences.update({ motion })}
+                    onChange={(motion) => updatePreference({ motion })}
                   />
                   <Options
                     label="Signal accent"
                     value={prefs.accent}
                     options={[
-                      { value: "teal", label: "Fern" },
+                      { value: "teal", label: "Cyan" },
                       { value: "blue", label: "Azure" },
                       { value: "violet", label: "Violet" },
                     ]}
-                    onChange={(accent) => preferences.update({ accent })}
+                    onChange={(accent) => updatePreference({ accent })}
                   />
                   <div className="settings-inline-options">
                     <label className="check-row">
@@ -224,7 +277,7 @@ export default function Settings() {
                         type="checkbox"
                         checked={prefs.chartFill}
                         onChange={(e) =>
-                          preferences.update({ chartFill: e.target.checked })
+                          updatePreference({ chartFill: e.target.checked })
                         }
                       />
                       Soft plot area fill
@@ -234,7 +287,7 @@ export default function Settings() {
                       <select
                         value={prefs.timezone}
                         onChange={(e) =>
-                          preferences.update({
+                          updatePreference({
                             timezone: e.target.value as typeof prefs.timezone,
                           })
                         }
@@ -246,12 +299,12 @@ export default function Settings() {
                   </div>
                 </div>
                 <aside className="preference-preview">
-                  <span className="eyebrow">LIVE TYPE SPECIMEN</span>
+                  <span className="eyebrow">WORKSPACE PREVIEW</span>
                   <div className="type-specimen">
                     Aa<span>0123456789</span>
                   </div>
-                  <strong>Made for a closer look.</strong>
-                  <p>Stable measurements. Readable labels. Room to think.</p>
+                  <strong>Clear at every scale.</strong>
+                  <p>Legible labels and stable, tabular measurements.</p>
                   <div className="specimen-lines">
                     <i />
                     <i />
@@ -262,7 +315,11 @@ export default function Settings() {
               </div>
             </Panel>
           </section>
-          <section id="settings-connection" className="settings-chapter">
+          <section
+            id="settings-connection"
+            hidden={section !== "connection"}
+            className="settings-chapter"
+          >
             <div className="settings-grid">
               <Panel
                 eyebrow="TRANSPORT / PUBLIC ENDPOINT"
@@ -288,7 +345,14 @@ export default function Settings() {
                     service credentials are never needed here.
                   </p>
                   <div className="button-row">
-                    <Button onClick={() => void save()}>Save origin</Button>
+                    <Button
+                      variant="primary"
+                      loading={saving}
+                      disabled={origin === snap.relay.origin}
+                      onClick={() => void save()}
+                    >
+                      Save origin
+                    </Button>
                     <Button
                       disabled={!snap.state.serverId}
                       onClick={() => session.reconnect()}
@@ -306,15 +370,16 @@ export default function Settings() {
                   </dl>
                 </div>
               </Panel>
-              <Panel
-                eyebrow="PAIRING / ADD SERVER"
-                title="Expand your workspace"
-              >
+              <Panel eyebrow="PAIRING / ADD SERVER" title="Pair another server">
                 <PairingForm defaultName="Operations browser" />
               </Panel>
             </div>
           </section>
-          <section id="settings-privacy" className="settings-chapter">
+          <section
+            id="settings-privacy"
+            hidden={section !== "privacy"}
+            className="settings-chapter"
+          >
             <Panel
               eyebrow="PLAYER IDENTITY"
               title="Skins and privacy"
@@ -326,7 +391,7 @@ export default function Settings() {
                   <select
                     value={prefs.skinProvider}
                     onChange={(e) =>
-                      preferences.update({
+                      updatePreference({
                         skinProvider: e.target
                           .value as typeof prefs.skinProvider,
                       })
@@ -349,10 +414,14 @@ export default function Settings() {
               </div>
             </Panel>
           </section>
-          <section id="settings-diagnostics" className="settings-chapter">
+          <section
+            id="settings-diagnostics"
+            hidden={section !== "diagnostics"}
+            className="settings-chapter"
+          >
             <Panel
               eyebrow="BUILD / CONNECTION EVIDENCE"
-              title="Know this workspace"
+              title="Build & connection evidence"
               action={<Button onClick={copy}>Copy redacted diagnostics</Button>}
             >
               <dl className="diagnostic-grid">

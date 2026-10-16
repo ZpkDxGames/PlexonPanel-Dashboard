@@ -8,9 +8,9 @@ export function Splash() {
       </h1>
       <div className="splash-progress" role="status">
         <span />
-        Opening your operations workspace
+        Initializing your server workspace
       </div>
-      <p>Built for the worlds you run.</p>
+      <p>Connected to your worlds.</p>
     </main>
   );
 }

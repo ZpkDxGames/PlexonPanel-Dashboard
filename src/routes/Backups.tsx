@@ -168,8 +168,8 @@ export default function Backups() {
   const title =
     phase === "IDLE"
       ? ready
-        ? "Create a restore point."
-        : "Readiness comes first."
+        ? "Create a full restore point"
+        : "Backup readiness"
       : phase === "DEGRADED"
         ? "Your off-site copy needs attention."
         : phase === "RECOVERY_REQUIRED"
@@ -179,7 +179,7 @@ export default function Backups() {
     <>
       <section className="backup-titlebar">
         <div>
-          <span className="eyebrow">RESTORE POINTS / HOST OPERATIONS</span>
+          <span className="eyebrow">MANUAL FULL BACKUPS</span>
           <h2>{title}</h2>
           <p>
             A full backup saves your worlds, stops the exact service, verifies
@@ -225,7 +225,7 @@ export default function Backups() {
       <div className="readiness-band">
         {" "}
         <Panel
-          eyebrow="02 / READINESS"
+          eyebrow="HOST EVIDENCE"
           title="Preflight checklist"
           description={
             fresh
@@ -273,7 +273,7 @@ export default function Backups() {
         <div className="archive-book">
           {" "}
           <SectionLabel
-            index="03"
+            index=""
             title="Archive inventory"
             detail={`${backups.length} reported restore points`}
           />
@@ -373,7 +373,7 @@ export default function Backups() {
         <aside className="job-book">
           {" "}
           <Panel
-            eyebrow="01 / DURABLE OPERATION JOURNAL"
+            eyebrow="DURABLE HOST WORKFLOW"
             title={
               phase === "IDLE" ? "No reported operation" : "Latest Host job"
             }
@@ -441,11 +441,17 @@ export default function Backups() {
               {phases.map(([key, label], index) => (
                 <div
                   key={key}
+                  aria-current={index === currentIndex ? "step" : undefined}
+                  title={
+                    index < currentIndex
+                      ? "Earlier workflow position; this is not a per-stage completion record."
+                      : undefined
+                  }
                   className={
                     currentIndex < 0
                       ? "pending"
                       : index < currentIndex
-                        ? "done"
+                        ? "prior"
                         : index === currentIndex
                           ? "current"
                           : "pending"
@@ -552,6 +558,10 @@ export default function Backups() {
               </div>
             )}
             <div className="journal-footnote">
+              <p>
+                Workflow order only. The highlighted phase is reported by the
+                Host; earlier stages may have been skipped.
+              </p>
               {statusAt
                 ? `Host status read ${new Date(statusAt).toLocaleTimeString()}. Closing this browser does not cancel a job.`
                 : "No durable Host status received."}

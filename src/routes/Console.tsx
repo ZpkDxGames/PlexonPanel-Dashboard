@@ -114,6 +114,7 @@ export default function Console() {
     prefs = usePreferences(),
     [tab, setTab] = useState<Tab>("console"),
     [query, setQuery] = useState(""),
+    [pluginQuery, setPluginQuery] = useState(""),
     [level, setLevel] = useState("all"),
     [source, setSource] = useState("all"),
     [paused, setPaused] = useState(false),
@@ -493,43 +494,70 @@ export default function Console() {
               title="Installed plugins"
               description="Reported versions and runtime state. Reload requires server policy and a review."
             >
+              <div className="plugin-toolbar">
+                <label className="search-field">
+                  <Icon name="search" />
+                  <input
+                    aria-label="Search plugins"
+                    placeholder="Find an installed plugin…"
+                    value={pluginQuery}
+                    onChange={(e) => setPluginQuery(e.target.value)}
+                  />
+                </label>
+              </div>
               <div className="plugin-list">
-                {canPlugins && snap.state.plugins.length ? (
-                  snap.state.plugins.map((plugin) => (
-                    <article className="plugin-row" key={str(plugin.name)}>
-                      <div>
-                        <strong>{str(plugin.name)}</strong>
-                        <span>{str(plugin.version, "Version unknown")}</span>
-                      </div>
-                      <Status
-                        tone={plugin.enabled === true ? "success" : "neutral"}
-                      >
-                        {plugin.enabled === true
-                          ? "Enabled"
-                          : plugin.enabled === false
-                            ? "Disabled"
-                            : "Unknown"}
-                      </Status>
-                      <Button
-                        disabled={
-                          !!session.reason("plugin.command.reload", "PAPER")
-                        }
-                        title={session.reason("plugin.command.reload", "PAPER")}
-                        onClick={() =>
-                          prepare("plugin.command.reload", {
-                            plugin: str(plugin.name),
-                          })
-                        }
-                      >
-                        Review reload
-                      </Button>
-                    </article>
-                  ))
+                {canPlugins &&
+                snap.state.plugins.filter((plugin) =>
+                  `${str(plugin.name)} ${str(plugin.version)}`
+                    .toLowerCase()
+                    .includes(pluginQuery.toLowerCase()),
+                ).length ? (
+                  snap.state.plugins
+                    .filter((plugin) =>
+                      `${str(plugin.name)} ${str(plugin.version)}`
+                        .toLowerCase()
+                        .includes(pluginQuery.toLowerCase()),
+                    )
+                    .map((plugin) => (
+                      <article className="plugin-row" key={str(plugin.name)}>
+                        <div>
+                          <strong>{str(plugin.name)}</strong>
+                          <span>{str(plugin.version, "Version unknown")}</span>
+                        </div>
+                        <Status
+                          tone={plugin.enabled === true ? "success" : "neutral"}
+                        >
+                          {plugin.enabled === true
+                            ? "Enabled"
+                            : plugin.enabled === false
+                              ? "Disabled"
+                              : "Unknown"}
+                        </Status>
+                        <Button
+                          disabled={
+                            !!session.reason("plugin.command.reload", "PAPER")
+                          }
+                          title={session.reason(
+                            "plugin.command.reload",
+                            "PAPER",
+                          )}
+                          onClick={() =>
+                            prepare("plugin.command.reload", {
+                              plugin: str(plugin.name),
+                            })
+                          }
+                        >
+                          Review reload
+                        </Button>
+                      </article>
+                    ))
                 ) : (
                   <Empty
                     title={
                       canPlugins
-                        ? "Waiting for plugin inventory"
+                        ? pluginQuery
+                          ? "No matching plugins"
+                          : "Waiting for plugin inventory"
                         : "Plugin access restricted"
                     }
                   >

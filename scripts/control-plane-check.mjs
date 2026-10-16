@@ -111,9 +111,8 @@ try {
       ).toBeDisabled();
       await page.evaluate(async () => {
         const { session } = await import("/src/adapter/session.ts");
-        const { makeFixture, fixtureAction } = await import(
-          "/src/development/fixtures.ts"
-        );
+        const { makeFixture, fixtureAction } =
+          await import("/src/development/fixtures.ts");
         const next = makeFixture();
         next.serverId = "3c37e785-5102-46b4-bf08-294781babd87";
         next.ready.serverId = next.serverId;
@@ -160,9 +159,8 @@ try {
       await go("Backups");
       await page.evaluate(async () => {
         const { session } = await import("/src/adapter/session.ts");
-        const { makeFixture, fixtureAction } = await import(
-          "/src/development/fixtures.ts"
-        );
+        const { makeFixture, fixtureAction } =
+          await import("/src/development/fixtures.ts");
         session.installFixture(
           "unknown-preflight",
           makeFixture(),
@@ -219,10 +217,10 @@ try {
     },
   );
   await record(
-    "settings preference persistence and anchored connection document",
+    "settings preference persistence and modular connections",
     async () => {
       await go("Settings");
-      await page.getByRole("button", { name: "Paper Light workspace" }).click();
+      await page.getByRole("button", { name: "Light Light workspace" }).click();
       await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
       await page.getByRole("link", { name: /Connections/ }).click();
       await expect(

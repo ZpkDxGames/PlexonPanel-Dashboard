@@ -19,15 +19,23 @@ const icons: Record<RouteName, string> = {
   Settings: "settings",
 };
 const descriptions: Record<RouteName, string> = {
-  Fleet: "Every instance. One place to begin.",
-  Overview: "Your Minecraft server, in perspective.",
-  Performance: "Inspect the measurements behind the moment.",
-  Players: "Know your community. Act with context.",
-  Console: "The live record of your server.",
-  Backups: "A durable record of your worlds.",
-  Access: "Follow the operation. Understand the authority.",
-  Settings: "A workspace that works your way.",
+  Fleet: "All your paired servers, together.",
+  Overview: "Monitor your server and manage its next move.",
+  Performance: "Explore runtime, compute and memory signals.",
+  Players: "Your community, with the context to manage it.",
+  Console: "Live output, conversations and installed plugins.",
+  Backups: "Protect your worlds with verified restore points.",
+  Access: "Manage paired devices and inspect server activity.",
+  Settings: "Make this browser workspace your own.",
 };
+const groups: { label: string; items: RouteName[] }[] = [
+  { label: "Workspace", items: ["Fleet", "Access"] },
+  {
+    label: "Selected server",
+    items: ["Overview", "Performance", "Players", "Console", "Backups"],
+  },
+  { label: "Application", items: ["Settings"] },
+];
 export function Shell({
   route,
   children,
@@ -40,7 +48,8 @@ export function Shell({
     prefs = usePreferences();
   const [drawer, setDrawer] = useState(false),
     [palette, setPalette] = useState(false),
-    [query, setQuery] = useState("");
+    [query, setQuery] = useState(""),
+    [selectError, setSelectError] = useState("");
   const name = String(
     snap.state.ready?.server.serverName ??
       snap.labels[snap.state.serverId] ??
@@ -94,37 +103,59 @@ export function Shell({
     setDrawer(false);
     setPalette(false);
   };
+  const search = () => {
+    setDrawer(false);
+    setPalette(true);
+    setQuery("");
+    setSelectError("");
+  };
   const nav = (mobile = false) => (
     <nav
       className="primary-nav"
       aria-label={mobile ? "Navigation drawer" : "Primary navigation"}
     >
-      {routes.map((item) => (
-        <button
-          key={item}
-          className={`nav-link ${route === item ? "active" : ""}`}
-          aria-label={routeLabels[item]}
-          aria-current={route === item ? "page" : undefined}
-          onClick={() => open(item)}
-        >
-          <Icon name={icons[item]} />
-          <span>
-            {item === "Console"
-              ? "Console"
-              : item === "Access"
-                ? "Access"
-                : routeLabels[item]}
-          </span>
-        </button>
+      {groups.map((group) => (
+        <div className="nav-group" key={group.label}>
+          <span className="nav-group-label">{group.label}</span>
+          {group.items.map((item) => (
+            <button
+              key={item}
+              className={`nav-link ${route === item ? "active" : ""}`}
+              aria-label={routeLabels[item]}
+              aria-current={route === item ? "page" : undefined}
+              onClick={() => open(item)}
+            >
+              <Icon name={icons[item]} />
+              <span>{routeLabels[item]}</span>
+              {route === item && <i className="nav-active-mark" />}
+            </button>
+          ))}
+        </div>
       ))}
     </nav>
+  );
+  const serverSwitcher = (
+    <button
+      className="server-switcher"
+      aria-label="Select paired server"
+      onClick={search}
+    >
+      <span className="server-switcher-icon">
+        <Icon name="server" />
+      </span>
+      <span>
+        <small>SELECTED SERVER</small>
+        <strong>{name}</strong>
+      </span>
+      <Icon name="chevron" />
+    </button>
   );
   return (
     <div className="app-shell">
       <a className="skip-link" href="#main-content">
         Skip to workspace
       </a>
-      <header className="masthead">
+      <aside className="sidebar" aria-label="Workspace sidebar">
         <button
           className="brand"
           aria-label="Open fleet"
@@ -132,148 +163,136 @@ export function Shell({
         >
           <BrandMark />
           <span>
-            plexon<span className="brand-light">panel</span>
+            Plexon<span className="brand-light">Panel</span>
+            <small>SERVER MANAGEMENT</small>
           </span>
         </button>
-        <div className="masthead-divider" />
-        <button
-          className="server-context"
-          onClick={() => {
-            setQuery("");
-            setPalette(true);
-          }}
-        >
-          <Icon name="server" />
-          <span>
-            <small>SELECTED SERVER</small>
-            <strong>{name}</strong>
-          </span>
-          <Icon name="chevron" />
-        </button>
-        <div className="masthead-status">
-          <StatusDot live={snap.phase === "live"} />
-          <span>{connectionPhaseLabel(snap.phase)}</span>
-        </div>
-        <div className="context-actions">
-          <button
-            className="command-trigger"
-            aria-label="Find workspace or server"
-            onClick={() => {
-              setPalette(true);
-              setQuery("");
-            }}
-          >
-            <Icon name="search" />
-            <span>Search</span>
-            <kbd>⌘ K</kbd>
-          </button>
-          <button
-            className="icon-button"
-            aria-label="Toggle color theme"
-            onClick={() =>
-              preferences.update({
-                theme:
-                  document.documentElement.dataset.theme === "dark"
-                    ? "light"
-                    : "dark",
-              })
-            }
-          >
-            <Icon name="sun" />
-          </button>
-          <span
-            className="operator-avatar"
-            title={snap.state.ready?.device.name ?? "Browser device"}
-          >
-            {snap.state.ready?.device.name?.slice(0, 1).toUpperCase() ?? "P"}
-          </span>
-        </div>
-      </header>
-      <div className="workspace-bar" role="region" aria-label="Workspace navigation">
+        {serverSwitcher}
         {nav()}
-        <div className="mobile-location">
+        <div className="sidebar-bottom">
+          <div className="sidebar-connection">
+            <StatusDot live={snap.phase === "live"} />
+            <span>{connectionPhaseLabel(snap.phase)}</span>
+            <small>Protocol 3</small>
+          </div>
+          <button className="operator-profile" onClick={() => open("Access")}>
+            <span className="operator-avatar">
+              {snap.state.ready?.device.name?.slice(0, 1).toUpperCase() ?? "P"}
+            </span>
+            <span>
+              <strong>
+                {snap.state.ready?.device.name ?? "Browser device"}
+              </strong>
+              <small>{snap.state.ready?.device.role ?? "Awaiting grant"}</small>
+            </span>
+            <Icon name="chevron" />
+          </button>
+        </div>
+      </aside>
+      <div className="application-body">
+        <header className="masthead">
           <button
-            className="icon-button"
+            className="icon-button mobile-menu"
             aria-label="Open navigation"
             onClick={() => setDrawer(true)}
           >
             <Icon name="menu" />
           </button>
-          <strong>{routeLabels[route]}</strong>
-          <span>Workspace</span>
-        </div>
-        <time>
-          {clock.format(now)}
-          <small>{prefs.timezone === "UTC" ? " UTC" : " local"}</small>
-        </time>
-      </div>
-      <main
-        id="main-content"
-        className={`workspace workspace-${route.toLowerCase()}`}
-      >
-        {snap.fixture && (
-          <div className="fixture-banner">
-            DEVELOPMENT PREVIEW{" "}
-            <span>Synthetic telemetry · operational dispatch disabled</span>
+          <div className="breadcrumb">
+            <Icon name="server" />
+            <button onClick={() => open("Fleet")}>My servers</button>
+            <Icon name="chevron" />
+            <span title={name}>{name}</span>
+            <Icon name="chevron" />
+            <strong>{routeLabels[route]}</strong>
           </div>
-        )}
-        <div className="workspace-heading">
-          <div>
-            <span className="eyebrow">
-              {route === "Fleet"
-                ? "SERVER DIRECTORY"
-                : route === "Settings"
-                  ? "BROWSER WORKSPACE"
-                  : (snap.state.ready?.server.instanceKey ??
-                    "SERVER OPERATIONS")}
-            </span>
-            <h1>{routeLabels[route]}</h1>
-            <p>{descriptions[route]}</p>
-          </div>
-          <div className="workspace-meta" aria-label="Source health">
-            <span>
-              <StatusDot live={paper.kind === "live"} />
-              <b>Paper</b> {paper.kind}
-            </span>
-            <span>
-              <StatusDot live={host.kind === "live"} />
-              <b>Host</b> {host.kind}
-            </span>
-            <small>
-              Minecraft{" "}
-              {snap.state.ready?.server.minecraftVersion ?? "unavailable"}
-            </small>
-          </div>
-        </div>
-        {snap.error && snap.phase !== "live" && (
-          <div className="connection-notice" role="alert">
-            <Icon name="alert" />
-            <div>
-              <strong>{connectionPhaseLabel(snap.phase)}</strong>
-              <p>{snap.error}</p>
-            </div>
+          <div className="context-actions">
+            <time>
+              {clock.format(now)}
+              <small> {prefs.timezone === "UTC" ? "UTC" : "local"}</small>
+            </time>
             <button
-              className="button secondary"
-              onClick={() => session.reconnect()}
+              className="command-trigger"
+              aria-label="Find workspace or server"
+              onClick={search}
             >
-              Retry connection
+              <Icon name="search" />
+              <span>Quick find</span>
+              <kbd>⌘ K</kbd>
+            </button>
+            <button
+              className="icon-button"
+              aria-label="Toggle color theme"
+              onClick={() =>
+                preferences.update({
+                  theme:
+                    document.documentElement.dataset.theme === "dark"
+                      ? "light"
+                      : "dark",
+                })
+              }
+            >
+              <Icon name="sun" />
             </button>
           </div>
-        )}
-        <div className="route-stage" key={`${route}:${snap.revision}`}>
-          {children}
-        </div>
-        <footer className="workspace-footer">
-          <span>
-            <BrandMark />
-            PlexonPanel
-          </span>
-          <span>
-            {name} <b>·</b> Protocol 3
-          </span>
-          <span>Operations, with perspective.</span>
-        </footer>
-      </main>
+        </header>
+        <main
+          id="main-content"
+          className={`workspace workspace-${route.toLowerCase()}`}
+        >
+          {snap.fixture && (
+            <div className="fixture-banner">
+              <Icon name="access" />
+              <strong>DEVELOPMENT PREVIEW</strong>
+              <span>Synthetic telemetry · operational dispatch disabled</span>
+            </div>
+          )}
+          <div className="workspace-heading">
+            <div>
+              <h1>{routeLabels[route]}</h1>
+              <p>{descriptions[route]}</p>
+            </div>
+            <div className="workspace-meta" aria-label="Source health">
+              <span title={paper.label}>
+                <StatusDot live={paper.kind === "live"} />
+                <b>Paper</b> {paper.kind}
+              </span>
+              <span title={host.label}>
+                <StatusDot live={host.kind === "live"} />
+                <b>Host</b> {host.kind}
+              </span>
+            </div>
+          </div>
+          {snap.error && snap.phase !== "live" && (
+            <div className="connection-notice" role="alert">
+              <Icon name="alert" />
+              <div>
+                <strong>{connectionPhaseLabel(snap.phase)}</strong>
+                <p>{snap.error}</p>
+              </div>
+              <button
+                className="button secondary"
+                onClick={() => session.reconnect()}
+              >
+                Retry connection
+              </button>
+            </div>
+          )}
+          <div className="route-stage" key={`${route}:${snap.revision}`}>
+            {children}
+          </div>
+          <footer className="workspace-footer">
+            <span>
+              <BrandMark />
+              PlexonPanel
+            </span>
+            <span>
+              {name} <b>·</b> Protocol 3
+            </span>
+            <span>Connected to your worlds.</span>
+          </footer>
+        </main>
+      </div>
       <Modal
         open={drawer}
         onClose={() => setDrawer(false)}
@@ -282,7 +301,7 @@ export function Shell({
       >
         <div className="drawer-head">
           <BrandMark />
-          <strong>Workspaces</strong>
+          <strong>PlexonPanel</strong>
           <button
             className="icon-button"
             aria-label="Close navigation"
@@ -291,7 +310,11 @@ export function Shell({
             <Icon name="close" />
           </button>
         </div>
+        {serverSwitcher}
         {nav(true)}
+        <p className="drawer-connection">
+          {connectionPhaseLabel(snap.phase)} · Protocol 3
+        </p>
       </Modal>
       <Modal
         open={palette}
@@ -343,9 +366,17 @@ export function Shell({
               <button
                 key={row.serverId}
                 onClick={() => {
+                  setSelectError("");
                   void session
                     .select(row.serverId)
-                    .then(() => open("Overview"));
+                    .then(() => open("Overview"))
+                    .catch((cause) =>
+                      setSelectError(
+                        cause instanceof Error
+                          ? cause.message
+                          : "Server selection unavailable.",
+                      ),
+                    );
                 }}
               >
                 <Icon name="server" />
@@ -361,6 +392,7 @@ export function Shell({
                 </span>
               </button>
             ))}
+          {selectError && <p role="alert">{selectError}</p>}
         </div>
       </Modal>
       <ToastViewport />

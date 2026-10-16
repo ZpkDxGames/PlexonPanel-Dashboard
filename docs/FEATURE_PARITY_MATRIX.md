@@ -1,40 +1,47 @@
-# Source-driven feature parity
+# Source-driven parity — Reference Control Room
 
-Baseline: `1b9463e18b0e7dac6c5209760d5510732d6d62b0`. New branch: `design/operations-workspace-20261015`.
+Baseline `cea185cca07d9892967215baed097bedbe0e77ca`. All eight existing hash route identifiers and lazy imports remain compatible.
 
-| Baseline behavior | New location / integration | Verification |
+| Existing behavior | New location | Evidence |
 | --- | --- | --- |
-| 2.8s splash and initialized credential gate | New four-square brand splash and centered provisioning composition; entry-state unchanged | Entry tests; browser first-visit check |
-| Device name/code/conditional relay field, inline failures | PairingForm retained with new pairing gate; same claim and IndexedDB storage | Pairing and relay session tests; rejected-claim browser test |
-| Hash route deep links and lazy workspaces | Horizontal workspace bar, mobile native sheet, searchable route/server palette | Original 8 identifiers; browser navigation matrix |
-| Selected room, independent passive fleet, max 16 | Searchable Fleet server directory, selected target and passive feeds | Existing fleet/session isolation tests |
-| Node provenance, shared node totals | Fleet node register requires matching UUID, BOUND identity, NODE scope and usable Host reading | New deduplication, mismatch and expiry tests |
-| Tick rate, mean duration, player count, JVM heap/process CPU | Overview landscape, runtime register and independent duration study | Same fields; chart/source tests |
-| Host machine CPU/memory trends | Performance node instruments; Overview source health | Host attribution retained; independent capture projection |
-| Minecraft service CPU/memory | New Performance cgroup instruments; Overview current service CPU | Exact scope/source/units; no one-core 100% clamp |
-| World entities, chunks and density | Overview proportional entity bars with actual counts/density | Positive-known denominator required |
-| Threshold crossings, retained window, GC movement | Performance signal browser/comparison, 1/5/15/30m and GC notes | Source-clock windowing, counter-reset and geometry tests |
-| Chart crosshair, legends and data table | Synchronized pointer/arrow inspection, pin, touch, visible previous/next controls, latest 50 original samples | Browser interaction and pure chart tests |
-| Search/world-filter roster, UUID copy | Players searchable/sortable roster and native session inspector | Browser search; scopes hide unauthorized fixture data |
-| Message/kick/ban/whitelist/gamemode/heal/feed/kill/op/deop | Inspector Interact/Moderate tools and reviewed actions | Message/gameMode now collect required parameters; typed high-risk confirmation retained |
-| Typed player template and LuckPerms node command | Inspector Commands tools and protected builders | Protected validators unchanged; server policy still authoritative |
-| Console live stream/severity/search/pause/wrap/export/clear | New terminal workstation; adds source filter, true following tail and source-specific guidance | Bounded virtual rows; read-only display controls never dispatch |
-| Console command dispatch | Reviewed composer explicitly targets PAPER | Corrects prior coupling to HOST journal authority; browser review verifies agent |
-| Chat send/MiniMessage/preview | Live chat workspace; grant + capability required for MiniMessage | Safe text formatter unchanged; reviewed send |
-| Plugin inventory/reload | Plugin register and reviewed reload | plugins.view guard; reload reason gate |
-| Backup preflight/countdown presets/create | Readiness band and contextual backup creation | Same five fail-closed booleans; fresh successful evidence required |
-| Durable job phases/progress/retry | Vertical Host runbook, verification states and job-matched progress | No fabricated progress; status reads refresh active jobs; no mutation retries |
-| Backup list/verify/delete | Archive register, available/absent/unknown copy labels | Presence is not labelled verification; verify/delete remain reviewed |
-| Device list/current-device safeguard/revoke | Access peer views for operation trail, paired devices and effective grant | PAPER revocation capability; current device disabled |
-| Audit filter | Explicit Host/Paper source register, audit.list or audit.self per grant | Actual actorLabel/actionType/outcome plus legacy aliases |
-| Theme/density/text/motion/accent/fill/time zone | Settings Appearance document chapter | Existing preference schema untouched |
-| Relay save/reconnect/add pair | Settings Connections document chapter | Same trusted session API |
-| Skin provider/privacy | Settings Privacy & skins chapter | Same options and disclosure; QA disables external requests |
-| Build identity/redacted diagnostics | Settings Diagnostics chapter | Existing diagnostic redaction unchanged |
-| Action target/generation validation, review, result and unknown outcome | Native reviewed-operation dialog with focus restoration, exact response evidence and invalid-target disabled state | Existing session/contract tests; browser context-change check |
+| Initialized credential gate and minimum splash | Compact branded startup → dedicated pairing panel | Entry contracts; first-visit/rejected-claim browser flow; production artifact test |
+| Name, masked code and conditional HTTPS relay | Pairing panel; Connections → Pair another server | Original PairingForm/session/IndexedDB flow retained |
+| Route navigation, search and server selection | Grouped sidebar; native mobile drawer; Ctrl/Cmd+K palette | Eight route IDs; drawer focus/Escape; palette navigation |
+| Selected room plus passive feeds ≤16 | Fleet server cards and server switcher | Existing fleet/session tests; passive history isolation regression |
+| Node identity and deduplicated totals | Fleet → verified node module | Existing matching BOUND/NODE/freshness rules untouched |
+| TPS, mean MSPT, online count and observed peak | Overview KPI strip; tick/usage modules | Real Paper fields; same source-epoch summaries |
+| Paper process CPU and heap | Overview resource disclosure; Performance selectors | Independent Paper JVM provenance |
+| Service CPU/memory and node CPU/memory | Overview resources; all eight Performance selectors | Cgroup vs node units, >100% one-core scale, fresh known capacity bars |
+| Source clocks, skew, cadence and session generations | Header source badges, chart source details | Original freshness/projection/epoch tests retained |
+| Worlds, entities, loaded chunks and density | Overview → Loaded worlds | Only positive known chunk denominator |
+| Retained window, sample count and tick budget | Usage range selector; Performance 1/5/15/30m; tick health | Original capture/gap/extrema/sample-table logic |
+| GC pause movement/counter reset | Performance → Garbage collection | Existing tested gcMovement helper |
+| Pointer, arrows, pin, touch and synchronized inspection | Instrument panels; focused/compare modes | Control-plane and touch tests; chart geometry tests |
+| Series toggles and original-sample table | Chart legend/View data/Source details | Actual latest 50 observations; no smoothing or fabricated percentiles |
+| Roster search/world filter/sort | Players roster; responsive rows | Existing search + new profile/focus checks |
+| Player UUID copy/session/world/ping | Full Players profile header and fact cells | UUID selection remains independent from roster filters |
+| Message and gamemode parameters | Profile → Interact | Reviewed UUID-bound Paper parameters |
+| Kick/ban/whitelist/heal/feed/kill/OP/de-OP | Profile → Moderate | Existing guarded actions; added existing whitelist-remove action; typed high-risk checks retained |
+| Command template and LuckPerms builder | Profile → Commands | Protected validators; server allowed-command policy unchanged |
+| Player history contract (previously deferred UI) | Profile → Session history | Additive read-only exact-UUID query; opaque cursor; request cancellation; bounded projection tests |
+| Console level/source/search filters | Console workspace toolbar | Viewing scopes remain separate from Paper command authority |
+| Pause, wrap, follow-tail, clear display, export | Console terminal toolbar/status | Existing 2,500 raw-line bound and bounded render path |
+| Console preview | New Overview read-only window | At most eight authorized formatted lines; no dispatch |
+| Reviewed Paper commands | Console composer | Exact Paper target; agent result vs queued/unknown retained |
+| Chat transcript, preview, MiniMessage | Console → Live chat | Safe text formatting; scope + capability gate |
+| Plugin inventory/reload | Console → Plugin inventory | Existing real inventory; added local search; reviewed reload |
+| Backup five-boolean readiness, countdown presets/create | Backups readiness/create panels | Fail-closed source evidence; same 30/15/10/5-minute choices |
+| List/status/verify/delete | Backups archive inventory | Same Host queries and review guards; presence is not verification |
+| Durable phases, progress and upload retry | Backups Host workflow module | Same job-matched progress, unknown states and retry review |
+| Device list/current-device protection/revoke | Access → Paired devices | Current device disabled; exact Paper revocation target |
+| Audit source/filter and scope | Access → Operation trail | Actual audit.list/self response fields; Host/Paper selection |
+| Immutable effective scopes | Access → Your authority | Original signed/reported grant intersection |
+| Theme/system/density/text/motion/accent/fill/timezone | Settings → Appearance | Existing schema; explicit startup regression fixes persisted-read initialization |
+| Relay save/reconnect/add-server pair | Settings → Connections | Trusted session API; pending/dirty/success/error feedback |
+| Skin provider/privacy | Settings → Privacy & skins | Original provider choices and direct-request disclosure |
+| Build identity/redacted diagnostics | Settings → Diagnostics | Original build.json/diagnostics redaction; no secret fields added |
+| Reviewed target invalidation, confirmations and result | Shared review dialog | Original prepare/valid/execute behavior unchanged; 5-operation confirmation test |
 
-Previously deferred backend features remain deferred: presence-history browser, remote restore/download UI, file management, permission trees, tick percentiles/distributions. They were not working UI features at the baseline. No new artificial analytics or unsupported controls were added.
+Unsupported reference features remain absent: item inventory/Ender Chest, admin notes, gamerules, MOTD/icon uploads, files/config writes, datapacks, scheduled backups, shortcut restore/download UI, integration management, billing and invitations. Lifetime playtime/session totals are not inferred from the bounded history browser.
 
-Reviewed dispatch now also corrects an existing missing-confirmation defect: lifecycle, backup creation and device revocation carry the existing Protocol 3 `confirmed` flag after review; confirmation-mode Paper commands/reload do likewise. Typed ban/kill/op/deop/delete safeguards remain intact.
-
-Additional verification: passive Fleet sparklines cannot consume selected-server history; focused summary statistics use the same source epoch as their plot. New 12-group reconstruction checks cover the new information architecture and nested-modal focus, without reducing previous workflow assertions.
+Architecture-only browser assertions were updated deliberately: horizontal navigation → sidebar/console composition; dialog-based player inspector → full profile/back navigation; Settings anchors → focused section links. UUID binding, nested review focus, source isolation, eight routes, responsive states, capability denial and immutable grant assertions remain covered.

@@ -137,13 +137,13 @@ export function makeFixture(mode = "healthy", now = Date.now()): ControlState {
         ? "Can't keep up! Running 1241ms or 24 ticks behind"
         : i === 8
           ? "\u001b[33m[Server thread/WARN]\u001b[0m Chunk save exceeded the target window"
-        : i === 16
-          ? "§a[Paper] §fWorld §bworld_nether §freloaded in §l842 ms"
-        : i === 24
-          ? "<aqua><bold>[PlexonPanel]</bold></aqua> <gray>Host journal stream attached</gray>"
-        : i % 9 === 0
-          ? "[Server] Saved the game"
-          : `[Server] ${["AntônioNeto", "LumaCraft", "EnderScout"][i % 3]} issued server command: /home`,
+          : i === 16
+            ? "§a[Paper] §fWorld §bworld_nether §freloaded in §l842 ms"
+            : i === 24
+              ? "<aqua><bold>[PlexonPanel]</bold></aqua> <gray>Host journal stream attached</gray>"
+              : i % 9 === 0
+                ? "[Server] Saved the game"
+                : `[Server] ${["AntônioNeto", "LumaCraft", "EnderScout"][i % 3]} issued server command: /home`,
     source: "HOST",
   }));
   state.chat = [
@@ -201,7 +201,9 @@ let content = "view-distance: 8\nsimulation-distance: 6\nmax-players: 80\n";
 let hash = "fixture-v1";
 export const actionLog: { action: string; parameters: JsonMap }[] = [];
 let fixtureMode = "healthy";
-export function setFixtureMode(value: string) { fixtureMode = value; }
+export function setFixtureMode(value: string) {
+  fixtureMode = value;
+}
 export async function fixtureAction(
   action: string,
   parameters: JsonMap,
@@ -225,7 +227,45 @@ export async function fixtureAction(
       },
       commandChannel: { enabled: true },
     };
-  if (action === 'maintenance.settings.get' || action === 'maintenance.settings.update') data = { settings: parameters.settings ?? { schemaVersion: 1, timezone: 'America/Sao_Paulo', restart: { schedule: { enabled: false, type: 'DAILY', weekdays: [], time: '04:00' }, warningSeconds: [900,300,60,30,10], stopTimeoutSeconds: 180, startupTimeoutSeconds: 180 }, fullRestorePoint: { retentionMode: 'SINGLE_CURRENT', retentionCount: 1, restartAfter: true, canonicalFilename: 'PlexonCraft-Latest.zip', uploadTimeoutSeconds: 1800, verificationMode: 'SIZE_AND_HASH_WHEN_AVAILABLE', maximumBytes: 1099511627776, excludes: ['logs','crash-reports','cache','.cache','plugins/PlexonPanel/audit','plugins/PlexonPanel/identity','plugins/spark/tmp'] } } };
+  if (
+    action === "maintenance.settings.get" ||
+    action === "maintenance.settings.update"
+  )
+    data = {
+      settings: parameters.settings ?? {
+        schemaVersion: 1,
+        timezone: "America/Sao_Paulo",
+        restart: {
+          schedule: {
+            enabled: false,
+            type: "DAILY",
+            weekdays: [],
+            time: "04:00",
+          },
+          warningSeconds: [900, 300, 60, 30, 10],
+          stopTimeoutSeconds: 180,
+          startupTimeoutSeconds: 180,
+        },
+        fullRestorePoint: {
+          retentionMode: "SINGLE_CURRENT",
+          retentionCount: 1,
+          restartAfter: true,
+          canonicalFilename: "PlexonCraft-Latest.zip",
+          uploadTimeoutSeconds: 1800,
+          verificationMode: "SIZE_AND_HASH_WHEN_AVAILABLE",
+          maximumBytes: 1099511627776,
+          excludes: [
+            "logs",
+            "crash-reports",
+            "cache",
+            ".cache",
+            "plugins/PlexonPanel/audit",
+            "plugins/PlexonPanel/identity",
+            "plugins/spark/tmp",
+          ],
+        },
+      },
+    };
   if (action === "backup.preflight")
     data = {
       hostAuthenticated: true,
@@ -300,7 +340,31 @@ export async function fixtureAction(
         "Saved. Application state not supplied; restart may be required.",
     };
   }
-  if (action === "players.history.list") data = { entries: [{ name: "LumaCraft", state: "JOINED", observedAt: "2026-10-10T18:31:04Z" }], hasMore: false, historyEnabled: true };
+  if (action === "players.history.list") {
+    const older = parameters.cursor === "fixture-history-page-2";
+    data = {
+      entries: [
+        {
+          eventId: older
+            ? "fixture-presence-older"
+            : "fixture-presence-current",
+          uuid: String(parameters.query),
+          name: "Development player",
+          state: older ? "LEFT" : "JOINED",
+          observedAt: new Date(
+            Date.now() - (older ? 7200000 : 500000),
+          ).toISOString(),
+          sessionDurationMillis: older ? null : 500000,
+          termination: older ? "UNKNOWN_DISCONNECT" : "OPEN",
+        },
+      ],
+      nextCursor: older ? null : "fixture-history-page-2",
+      hasMore: !older,
+      boundedWindow: true,
+      capturedAt: new Date().toISOString(),
+      historyEnabled: true,
+    };
+  }
   if (action === "devices.list")
     data = {
       devices: [

@@ -1,7 +1,15 @@
-# Operations Desk reconstruction
+# Reference Control Room changelog
 
-Replaces the presentation with a horizontal-navigation operations workspace and route-specific directories, instrument browser, player inspector, communication workbench, archive/runbook, audit views and settings document. Rebuilds splash and provisioning composition. The complete stylesheet and shell have been replaced.
+- Replaced horizontal Operations Desk navigation with a persistent grouped sidebar, accessible mobile drawer, selected-server switcher and compact breadcrumbs.
+- Rebuilt Overview around server identity, reviewed lifecycle controls, real console preview, telemetry/resource modules and active-player/world panels.
+- Rebuilt Fleet as a card directory and Performance around an eight-signal instrument selector, keeping focused default and optional comparison.
+- Replaced the player inspector dialog with a substantial in-page profile; preserved every moderation/gameplay/command tool and added existing whitelist-remove support.
+- Added a read-only scoped history browser using existing Paper query/cursor contracts, bounded pages and cancellation guards.
+- Reorganized Settings into focused deep-linkable modules, with immediate preference feedback and relay save pending/error/success behavior.
+- Restyled Console/Chat/Plugins, Backups, Access/Audit/Grant and startup/pairing/recovery with one new dark/light panel system; added actual plugin inventory search.
+- Replaced the large legacy stylesheet, added original local vector header artwork and raised default readability without scaling the page.
+- Fixed a pre-existing persisted-preference startup ordering defect; no schema or storage key change.
+- Memoized console preview formatting and stabilized plot-series props. Existing extrema/gap reduction, source epochs, protected session/transport and confirmation logic are retained.
+- Extended regression, production-artifact, responsive, visual, history and comparative replay verification.
 
-Preserves the Protocol 3 integration, grants, immutable targets, Host/Paper separation, backup safeguards and reviewed dispatch. Carries forward tested display-only reduction and the existing confirmation-field correction. Adds a passive-Fleet history isolation regression, generation-eligible observed summaries, nested-review focus restoration, effective text scaling and actual density controls. Reuses locale formatters for console timestamps.
-
-No backend, production, dependency, credential-store, routing/security-header or deployment-configuration change. See compatibility, feature parity, verification and rollout documents for exact evidence and pending live gates.
+No production promotion or backend change accompanies this candidate.
