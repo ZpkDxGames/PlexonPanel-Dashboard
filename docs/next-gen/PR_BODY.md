@@ -37,3 +37,11 @@ Complete full-page, tablet, nested and shared-state screenshots, raw logs, immut
 The owner approved branch and draft-PR publication with `git.deploymentEnabled["design/strata-next-gen-20261016"] = false`. The exact guard is included in the first remote feature-branch tip; main, other branches, build settings and security headers are unchanged. The repository's only workflow is main-only and is not dispatched. [Publication boundary and source identities](https://github.com/ZpkDxGames/PlexonPanel-Dashboard/blob/design/strata-next-gen-20261016/docs/next-gen/PUBLICATION_BLOCKER.md) record the explicit exception and project API access limitation. The supplied review archive remains the immutable pre-publication snapshot; application source and original evidence identities are unchanged.
 
 Keep the PR in draft while the steady-input timing gate fails and critical environment gates are blocked. Do not merge, enable auto-merge, deploy, promote, change backend/relay/VPS/credentials or perform live destructive tests. Production and live acceptance require separate owner authorization.
+
+## Publication identities
+
+- Verified frontend main/base: `4357a66bc674fddce7432cbc27a4fead00ac8234`.
+- Original tested product: `5ea142df03d9c0978887be95a56f4ab724f1489b`; original review snapshot: `9c3308e05227362502add498f7f3ac8c8b639999`.
+- Guarded local publication commit: `f0be6c65fb5feea0a24522d09c95701e9020d4fc`.
+- Published implementation commit: `43203a5889cb0bbe5b109b6d07c6fdf4e3785d61`. The connected GitHub API was used because shell Git has no authentication; its commit identity differs, while the complete source tree is identical: `c78dcea2da61153bf110e0d374dd3d9045c8fb25`.
+- Final publication preflight: 63 tests, production build, fixture exclusion and pairing protection PASS. Original staged history remains in the owner's immutable recovery bundle. No merge, workflow dispatch or deployment was initiated.

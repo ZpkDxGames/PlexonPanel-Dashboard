@@ -1,6 +1,6 @@
 # PlexonPanel · Control Room
 
-> **Strata implementation branch:** All eight workspaces have a frontend redesign. The owner approved draft-PR publication with a no-deploy guard for this exact branch. P7 is **not review-ready**: mixed-source steady timing fails and browser measurement gates are blocked. See [review and evidence](docs/next-gen/REVIEW.md), [delivery status](docs/next-gen/DELIVERY_STATUS.md) and [performance](docs/next-gen/PERFORMANCE.md). No merge or deployment was performed. Existing historical verification text below is not the new branch's acceptance claim.
+> **Strata implementation branch:** All eight workspaces have a frontend redesign. [Draft PR #91](https://github.com/ZpkDxGames/PlexonPanel-Dashboard/pull/91) is published with the owner-approved no-deploy guard for this exact branch. P7 is **not review-ready**: mixed-source steady timing fails and browser measurement gates are blocked. See [review and evidence](docs/next-gen/REVIEW.md), [delivery status](docs/next-gen/DELIVERY_STATUS.md) and [performance](docs/next-gen/PERFORMANCE.md). No merge or deployment was performed. Existing historical verification text below is not the new branch's acceptance claim.
 
 A reference-led Minecraft server management interface built with React 19, TypeScript and Vite. A persistent sidebar, console-led Overview, source-aware instrumentation and substantial player profiles replace Operations Desk's presentation while preserving Protocol 3, stored pairing, immutable grants and reviewed server operations.
 

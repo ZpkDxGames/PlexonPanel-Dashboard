@@ -6,7 +6,7 @@ Before applying it, the checkout was clean at `9c3308e05227362502add498f7f3ac8c8
 
 The original blocker was a successful Vercel check on main combined with 403 read access to the intended `zpkdxgames-projects/plexon-panel-dashboard` project. Project policy remains unverified through that API. Publication now uses the owner-approved repository guard, whose exact branch-only behavior is documented by Vercel. JSON, branch identity and the otherwise unchanged configuration are checked before pushing. The initial push must contain this guard; never push the unguarded product tip separately.
 
-Publication is authorized for a **draft PR**. P7 remains blocked by the failed mixed-source steady timing gate and unavailable CPU-throttled mobile/CLS/native-zoom measurements. Owner review and production acceptance remain NOT_EXECUTED. The completed remote publication receipt will be recorded in DELIVERY_STATUS.md.
+Publication is authorized for a **draft PR**. P7 remains blocked by the failed mixed-source steady timing gate and unavailable CPU-throttled mobile/CLS/native-zoom measurements. Owner review and production acceptance remain NOT_EXECUTED. [Draft PR #91](https://github.com/ZpkDxGames/PlexonPanel-Dashboard/pull/91) is published; the remote publication receipt is recorded in DELIVERY_STATUS.md.
 
 The previously delivered review archive is an immutable pre-publication snapshot at `9c3308e`; its source, bundle and publication status are historical. Product verification remains tied to `5ea142d`. This publication changes documentation and the exact guard only; it does not reinterpret old evidence as new measurements.
 
