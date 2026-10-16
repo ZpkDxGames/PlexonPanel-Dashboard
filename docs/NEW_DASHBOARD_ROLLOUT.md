@@ -1,6 +1,6 @@
 # Preview, live acceptance and rollback
 
-The new UI is a review branch. Production promotion is not authorized by this work.
+The owner authorized frontend production promotion and GitHub release publication on 2026-10-15. See [release notes](releases/dashboard-operations-desk-2026.10.15.md). Backend services/configuration, credentials, JARs and relay allowlists remain outside this frontend deployment authorization.
 
 ## Local review
 
