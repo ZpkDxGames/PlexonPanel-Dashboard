@@ -7,8 +7,7 @@ export function Splash() {
         plexon<span>panel</span>
       </h1>
       <div className="splash-progress" role="status">
-        <span />
-        Initializing your server workspace
+        Preparing your workspace
       </div>
       <p>Connected to your worlds.</p>
     </main>

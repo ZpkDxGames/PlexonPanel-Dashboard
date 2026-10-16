@@ -1,0 +1,69 @@
+{
+  "status": "BLOCKED",
+  "sourceHead": "5ea142df03d9c0978887be95a56f4ab724f1489b",
+  "browser": "157.0",
+  "method": "Native Control+= browser shortcut only; no CSS zoom, deviceScaleFactor or page-scale substitution",
+  "before": {
+    "dpr": 1,
+    "innerWidth": 640,
+    "innerHeight": 1600,
+    "visualScale": 1
+  },
+  "steps": [
+    {
+      "dpr": 1,
+      "innerWidth": 640,
+      "innerHeight": 1600,
+      "visualScale": 1
+    },
+    {
+      "dpr": 1,
+      "innerWidth": 640,
+      "innerHeight": 1600,
+      "visualScale": 1
+    },
+    {
+      "dpr": 1,
+      "innerWidth": 640,
+      "innerHeight": 1600,
+      "visualScale": 1
+    },
+    {
+      "dpr": 1,
+      "innerWidth": 640,
+      "innerHeight": 1600,
+      "visualScale": 1
+    },
+    {
+      "dpr": 1,
+      "innerWidth": 640,
+      "innerHeight": 1600,
+      "visualScale": 1
+    },
+    {
+      "dpr": 1,
+      "innerWidth": 640,
+      "innerHeight": 1600,
+      "visualScale": 1
+    },
+    {
+      "dpr": 1,
+      "innerWidth": 640,
+      "innerHeight": 1600,
+      "visualScale": 1
+    },
+    {
+      "dpr": 1,
+      "innerWidth": 640,
+      "innerHeight": 1600,
+      "visualScale": 1
+    }
+  ],
+  "after": {
+    "dpr": 1,
+    "innerWidth": 640,
+    "innerHeight": 1600,
+    "visualScale": 1
+  },
+  "reason": "Headless keyboard routing did not establish a verified native 200% browser zoom"
+}

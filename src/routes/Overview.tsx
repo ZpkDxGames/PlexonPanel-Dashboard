@@ -18,6 +18,7 @@ import { ConsolePreview } from "../components/ConsolePreview";
 import { CrosshairGroup, TimeSeries } from "../components/charts/TimeSeries";
 import { ActionReview } from "../features/ActionReview";
 import { navigate } from "../router";
+import { ActionAvailability } from "../components/nextgen/ActionAvailability";
 const metrics = [
   {
     key: "tps" as const,
@@ -73,28 +74,15 @@ export default function Overview() {
     players = connected ? number(state.server.onlinePlayers) : null,
     capacity = connected ? number(state.server.maxPlayers) : null;
   const heap = bytes(connected ? state.system.jvmHeapUsedBytes : null);
-  const stats = useMemo(
-    () =>
-      observedSummary(
-        historyFor(epochs?.paperHealth ?? state.history, "paperHealth"),
-        "tps",
-      ),
+  const health = useMemo(
+    () => historyFor(epochs?.paperHealth ?? state.history, "paperHealth"),
     [state.history, epochs],
   );
-  const peak = useMemo(
-    () =>
-      observedSummary(
-        historyFor(epochs?.paperHealth ?? state.history, "paperHealth"),
-        "players",
-      ).max,
-    [state.history, epochs],
-  );
+  const stats = useMemo(() => observedSummary(health, "tps"), [health]);
+  const peak = useMemo(() => observedSummary(health, "players").max, [health]);
   const spikes = useMemo(
-    () =>
-      historyFor(epochs?.paperHealth ?? state.history, "paperHealth").filter(
-        (s) => s.mspt !== null && s.mspt > 50,
-      ).length,
-    [state.history, epochs],
+    () => health.filter((s) => s.mspt !== null && s.mspt > 50).length,
+    [health],
   );
   const current = metrics.find((item) => item.key === metric) ?? metrics[0];
   const usageSeries = useMemo(() => [current], [current]);
@@ -184,23 +172,6 @@ export default function Overview() {
                   : "Service unknown"}
               </Status>
             </div>
-            <div className="server-banner-meta">
-              <span>
-                <Icon name="server" />
-                Minecraft{" "}
-                {state.ready?.server.minecraftVersion ?? "unavailable"}
-              </span>
-              <span>
-                <Icon name="players" />
-                {players ?? "—"}
-                {capacity !== null ? ` / ${capacity}` : ""} players ·{" "}
-                {paper.kind}
-              </span>
-              <span>
-                <Icon name="access" />
-                {state.ready?.server.instanceKey ?? "Legacy instance"}
-              </span>
-            </div>
           </div>
         </div>
         <div className="lifecycle-buttons">
@@ -222,6 +193,15 @@ export default function Overview() {
           ))}
         </div>
       </section>
+      <ActionAvailability
+        reason={[
+          ...new Set(
+            ["server.start", "server.restart", "server.stop"]
+              .map((a) => session.reason(a, "HOST"))
+              .filter(Boolean),
+          ),
+        ].join(" ")}
+      />
       <section
         className="metric-strip"
         aria-label="Current runtime measurements"
@@ -278,43 +258,96 @@ export default function Overview() {
       <CrosshairGroup>
         <div className="overview-grid">
           <Panel
-            title="Server information"
-            className="server-info"
-            action={<Icon name="server" />}
+            title="Usage instrument"
+            className="usage-panel"
+            action={
+              <button
+                className="text-link"
+                onClick={() => navigate("Performance")}
+              >
+                All signals <Icon name="arrow" />
+              </button>
+            }
           >
-            <div className="server-info-game">
-              <span className="game-cube" aria-hidden="true">
-                <i />
-                <i />
-                <i />
-              </span>
-              <div>
-                <strong>Minecraft</strong>
-                <span>Paper server instance</span>
+            <div className="usage-controls">
+              <div className="segmented" aria-label="Overview metric">
+                {metrics.map((item) => (
+                  <button
+                    key={item.key}
+                    className={metric === item.key ? "active" : ""}
+                    aria-pressed={metric === item.key}
+                    onClick={() => setMetric(item.key)}
+                  >
+                    {item.label}
+                  </button>
+                ))}
               </div>
+              <select
+                aria-label="Overview time range"
+                value={minutes}
+                onChange={(e) => setMinutes(Number(e.target.value))}
+              >
+                {[1, 5, 15, 30].map((value) => (
+                  <option key={value} value={value}>
+                    {value} minutes
+                  </option>
+                ))}
+              </select>
             </div>
-            <dl className="identity-facts">
-              <dt>Server ID</dt>
-              <dd>
-                <code>{state.serverId || "Unavailable"}</code>
-              </dd>
-              <dt>Paper version</dt>
-              <dd>{state.ready?.server.pluginVersion ?? "Unavailable"}</dd>
-              <dt>Host version</dt>
-              <dd>{state.ready?.server.hostVersion ?? "Unavailable"}</dd>
-              <dt>Service state</dt>
-              <dd>
-                {service.usable ? str(state.service.state) : "Unavailable"}
-              </dd>
-            </dl>
+            <div className="usage-reading">
+              <strong>
+                {currentSummary.mean === null
+                  ? "—"
+                  : current.unit === "bytes"
+                    ? formatBytes(currentSummary.mean)
+                    : `${currentSummary.mean.toFixed(2)} ${current.unit}`}
+              </strong>
+              <span>Observed mean · {currentSummary.count} actual samples</span>
+            </div>
+            <TimeSeries
+              key={current.key}
+              title={current.title}
+              samples={state.history}
+              series={usageSeries}
+              yMax={current.key === "tps" ? 20 : undefined}
+              height={190}
+              mobileHeight={240}
+              windowStart={cutoff}
+              evidence={sourceEvidence(state, current.source, now)}
+              source={
+                current.source === "service"
+                  ? "Host · Minecraft cgroup"
+                  : current.source === "paperSystem"
+                    ? "Paper JVM"
+                    : "Paper"
+              }
+            />
+            <p className="chart-footnote">
+              {current.key === "tps"
+                ? `20 TPS reference · observed low ${stats.min?.toFixed(2) ?? "—"} TPS.`
+                : current.key === "serviceCpu"
+                  ? "Percent of one CPU core. Service usage can exceed 100%."
+                  : "Java heap usage is separate from service and node memory."}{" "}
+              Missing samples remain gaps.
+            </p>
           </Panel>
           <ConsolePreview />
           <Panel
-            title="Resource summary"
+            title="Infrastructure layers"
             className="resource-summary"
             action={<Icon name="performance" />}
           >
-            <div className="resource-list">
+            <div className="resource-list strata-layers">
+              {resourceRow(
+                "Minecraft service memory",
+                service.usable &&
+                  resources.scope === "MINECRAFT_SERVICE" &&
+                  resources.memoryAvailable === true
+                  ? number(resources.memoryBytes)
+                  : null,
+                null,
+                `Host cgroup · ${service.kind}`,
+              )}
               {resourceRow(
                 "JVM heap",
                 knownHeap,
@@ -369,96 +402,44 @@ export default function Overview() {
             </details>
           </Panel>
           <Panel
-            title="Usage"
-            eyebrow="RETAINED SESSION SIGNALS"
-            className="usage-panel"
-            action={
-              <button
-                className="text-link"
-                onClick={() => navigate("Performance")}
-              >
-                All signals <Icon name="arrow" />
-              </button>
-            }
+            title="Loaded worlds"
+            eyebrow="PAPER SNAPSHOT"
+            className="world-panel"
           >
-            <div className="usage-controls">
-              <div className="segmented" aria-label="Overview metric">
-                {metrics.map((item) => (
-                  <button
-                    key={item.key}
-                    className={metric === item.key ? "active" : ""}
-                    aria-pressed={metric === item.key}
-                    onClick={() => setMetric(item.key)}
-                  >
-                    {item.label}
-                  </button>
-                ))}
-              </div>
-              <select
-                aria-label="Overview time range"
-                value={minutes}
-                onChange={(e) => setMinutes(Number(e.target.value))}
-              >
-                {[1, 5, 15, 30].map((value) => (
-                  <option key={value} value={value}>
-                    {value} minutes
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="usage-reading">
-              <strong>
-                {currentSummary.mean === null
-                  ? "—"
-                  : current.unit === "bytes"
-                    ? formatBytes(currentSummary.mean)
-                    : `${currentSummary.mean.toFixed(2)} ${current.unit}`}
-              </strong>
-              <span>Observed mean · {currentSummary.count} actual samples</span>
-            </div>
-            <TimeSeries
-              key={current.key}
-              title={current.title}
-              samples={state.history}
-              series={usageSeries}
-              yMax={current.key === "tps" ? 20 : undefined}
-              height={230}
-              windowStart={cutoff}
-              evidence={sourceEvidence(state, current.source, now)}
-              source={
-                current.source === "service"
-                  ? "Host · Minecraft cgroup"
-                  : current.source === "paperSystem"
-                    ? "Paper JVM"
-                    : "Paper"
-              }
-            />
-            <p className="chart-footnote">
-              {current.key === "tps"
-                ? `20 TPS reference · observed low ${stats.min?.toFixed(2) ?? "—"} TPS.`
-                : current.key === "serviceCpu"
-                  ? "Percent of one CPU core. Service usage can exceed 100%."
-                  : "Java heap usage is separate from service and node memory."}{" "}
-              Missing samples remain gaps.
-            </p>
-          </Panel>
-          <Panel title="Quick tools" className="quick-tools">
-            <div className="quick-tool-grid">
-              {[
-                ["Performance", "performance", "Inspect signals"],
-                ["Backups", "backups", "Restore points"],
-                ["Access", "access", "Device access"],
-              ].map(([route, icon, label]) => (
-                <button
-                  key={route}
-                  onClick={() =>
-                    navigate(route as "Performance" | "Backups" | "Access")
-                  }
-                >
-                  <Icon name={icon} />
-                  <span>{label}</span>
-                </button>
-              ))}
+            <div className="world-list">
+              {state.worlds.length && connected ? (
+                state.worlds.map((world) => {
+                  const entities = number(world.entities),
+                    chunks = number(world.loadedChunks),
+                    density = entityDensity(entities, chunks);
+                  return (
+                    <article className="world-row" key={str(world.name)}>
+                      <span className="world-icon">
+                        <Icon name="overview" />
+                      </span>
+                      <div>
+                        <strong>{str(world.name)}</strong>
+                        <small>
+                          {chunks?.toLocaleString() ?? "Unknown"} loaded chunks
+                        </small>
+                      </div>
+                      <div>
+                        <b>{entities?.toLocaleString() ?? "—"}</b>
+                        <small>
+                          entities ·{" "}
+                          {density === null
+                            ? "density unavailable"
+                            : `${density.toFixed(2)}/chunk`}
+                        </small>
+                      </div>
+                    </article>
+                  );
+                })
+              ) : (
+                <Empty title="World telemetry unavailable">
+                  Waiting for a Paper snapshot.
+                </Empty>
+              )}
             </div>
           </Panel>
           <Panel
@@ -507,47 +488,6 @@ export default function Overview() {
             </div>
           </Panel>
           <Panel
-            title="Loaded worlds"
-            eyebrow="PAPER SNAPSHOT"
-            className="world-panel"
-          >
-            <div className="world-list">
-              {state.worlds.length && connected ? (
-                state.worlds.map((world) => {
-                  const entities = number(world.entities),
-                    chunks = number(world.loadedChunks),
-                    density = entityDensity(entities, chunks);
-                  return (
-                    <article className="world-row" key={str(world.name)}>
-                      <span className="world-icon">
-                        <Icon name="overview" />
-                      </span>
-                      <div>
-                        <strong>{str(world.name)}</strong>
-                        <small>
-                          {chunks?.toLocaleString() ?? "Unknown"} loaded chunks
-                        </small>
-                      </div>
-                      <div>
-                        <b>{entities?.toLocaleString() ?? "—"}</b>
-                        <small>
-                          entities ·{" "}
-                          {density === null
-                            ? "density unavailable"
-                            : `${density.toFixed(2)}/chunk`}
-                        </small>
-                      </div>
-                    </article>
-                  );
-                })
-              ) : (
-                <Empty title="World telemetry unavailable">
-                  Waiting for a Paper snapshot.
-                </Empty>
-              )}
-            </div>
-          </Panel>
-          <Panel
             title="Tick health"
             eyebrow="PAPER / MEAN DURATION"
             className="tick-health"
@@ -572,6 +512,60 @@ export default function Overview() {
               50 ms is the tick budget for 20 TPS. Means only; no inferred
               percentiles.
             </p>
+          </Panel>
+          <Panel
+            title="Instance details"
+            className="server-info"
+            action={<Icon name="server" />}
+          >
+            <div className="server-info-game">
+              <span className="game-cube" aria-hidden="true">
+                <i />
+                <i />
+                <i />
+              </span>
+              <div>
+                <strong>Minecraft</strong>
+                <span>Paper server instance</span>
+              </div>
+            </div>
+            <dl className="identity-facts">
+              <dt>Minecraft version</dt>
+              <dd>{state.ready?.server.minecraftVersion ?? "Unavailable"}</dd>
+              <dt>Instance key</dt>
+              <dd>{state.ready?.server.instanceKey ?? "Legacy instance"}</dd>
+              <dt>Server ID</dt>
+              <dd>
+                <code>{state.serverId || "Unavailable"}</code>
+              </dd>
+              <dt>Paper version</dt>
+              <dd>{state.ready?.server.pluginVersion ?? "Unavailable"}</dd>
+              <dt>Host version</dt>
+              <dd>{state.ready?.server.hostVersion ?? "Unavailable"}</dd>
+              <dt>Service state</dt>
+              <dd>
+                {service.usable ? str(state.service.state) : "Unavailable"}
+              </dd>
+            </dl>
+          </Panel>
+          <Panel title="Quick tools" className="quick-tools">
+            <div className="quick-tool-grid">
+              {[
+                ["Performance", "performance", "Inspect signals"],
+                ["Backups", "backups", "Restore points"],
+                ["Access", "access", "Device access"],
+              ].map(([route, icon, label]) => (
+                <button
+                  key={route}
+                  onClick={() =>
+                    navigate(route as "Performance" | "Backups" | "Access")
+                  }
+                >
+                  <Icon name={icon} />
+                  <span>{label}</span>
+                </button>
+              ))}
+            </div>
           </Panel>
         </div>
       </CrosshairGroup>

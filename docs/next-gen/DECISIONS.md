@@ -1,0 +1,25 @@
+# Implementation decisions
+
+- Reconciled current main against both planning pins before editing; no source drift. Created an independent real Git checkout rather than repairing/resetting an older owner branch with a missing alternate object path.
+- Migrated the stylesheet into deterministic token/base/layout/components/shell/route/preferences/motion owners. Shared controls remain compatible; no new router, state/chart library, dependency version or font was introduced.
+- Strata uses the locked basalt/limestone tokens, an original three-layer SVG mark, horizontal route band, explicit four-source disclosures, connected readings and responsive records.
+- Overview's actual DOM puts the usage instrument and console before details. Service, JVM and node evidence retain their producers; values are never clamped into an invented utilization total.
+- Console measures its viewport and a CSS row ruler through ResizeObserver. Tail state reflects scroll position; Return to live is explicit. Wrap remains bounded to 400 rows and retention to 2,500.
+- Player head load/error state belongs to provider+UUID identity through a keyed inner component. Direct providers never cascade. A vanished roster target stays absent and Back has a stable focus fallback.
+- Backup reads retain independent status/preflight/inventory results and errors. Expired/failed preflight cannot enable creation; successful siblings are never replaced by a fabricated empty result. The durable job is first in DOM, with proof and exact retry target before phase details or inventory.
+- ActionReview still owns the single session.prepare/valid/execute path. It exposes full server ID and exact parameters, distinguishes Host QUEUED acceptance from completion, and disables resend after an unconfirmed outcome while offering read-only audit navigation.
+- Authority is an immutable action ledger of actual existing UI operations. It displays the signed/report intersection, capability and the existing fail-closed session.reason result. Local preferences are separate browser behavior.
+- Settings feedback says Applied in this browser. The optional-storage parser, eight enums/defaults, legacy migration, IndexedDB credentials and Protocol 3 are unchanged.
+- Chart paths are memoized independently of pointer inspection. Touch pins resolve to an actual capture, with unavailable pins labeled rather than silently retargeted. Original samples, gaps, extrema and source epochs remain authoritative.
+
+No protected adapter, lib, authority/epoch/review policy, preference parser, lock, protocol or backend file was changed. The later owner-approved publication exception adds only the exact feature branch's Vercel no-deploy guard; see PUBLICATION_BLOCKER.md. Test selectors were moved to the new frame and fixed inspection shelf without reducing behavior assertions.
+
+Final viewport refinements remove repeated Overview labels rather than hiding source values. Focus plots use responsive SVG geometry rather than a CSS height cap that scales labels. Chart projections explicitly select their source inputs. Existing source views may still share a raw-history array; the comparison replay measures that inherited publication cost. Changed captures still publish. Console keeps at least twelve standard desktop rows, with a compact authority header and an explicit mobile Filters & view disclosure. Audit records become labeled records on narrow screens.
+
+The font/viewport regression was reproduced with 2,500 retained lines: the old spacer left 8,828px below the viewport after row height changed. A layout effect now restores tail or the inspected row position after measured geometry changes, without interpreting resize scroll events as user intent. The strengthened browser test passes.
+
+The resumed final performance investigation reuses two Intl.NumberFormat instances per chart and one eligible Paper-health projection for Overview summaries. Formatting output, sample selection, raw bounds and source epochs are unchanged. The earlier interrupted/noisy profiles remain diagnostic evidence; final five-trial certification is recorded separately.
+
+Final keyboard review reproduced an inherited skip-link defect: activating it from Fleet changed the hash to #main-content, rendered Overview and did not focus main. The link now prevents hash navigation and focuses the existing workspace; a scroll margin keeps it below the sticky masthead. Exact-size focus/axe/reflow checks exercise all eight routes at every required viewport.
+
+Final certification does not claim review readiness. All five mixed-source steady pairs are retained: median baseline 33.34ms versus candidate 49.54ms exceeds the supplementary 36.674ms Focus limit. A React Profiler diagnostic did not establish the cause; no speculative cadence/retention/source or hidden-track reduction was applied to manufacture a pass. The blocked CPU-throttled/CLS/native-zoom measurements remain explicit. Owner approval of the branch-only guard resolves the publication authorization boundary, not these P7 gates.

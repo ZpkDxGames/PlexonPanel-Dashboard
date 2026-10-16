@@ -1,0 +1,120 @@
+{
+  "scope": "Prepare and cancel only. All network outside localhost blocked; no agent mutations executed.",
+  "results": [
+    {
+      "action": "player.heal",
+      "subject": "19f50206-26de-410c-a1bc-000000000001",
+      "typed": false,
+      "parameters": {
+        "playerId": "19f50206-26de-410c-a1bc-000000000001"
+      }
+    },
+    {
+      "action": "player.feed",
+      "subject": "19f50206-26de-410c-a1bc-000000000001",
+      "typed": false,
+      "parameters": {
+        "playerId": "19f50206-26de-410c-a1bc-000000000001"
+      }
+    },
+    {
+      "action": "player.message",
+      "subject": "19f50206-26de-410c-a1bc-000000000001",
+      "typed": false,
+      "parameters": {
+        "playerId": "19f50206-26de-410c-a1bc-000000000001",
+        "message": "Synthetic review only"
+      }
+    },
+    {
+      "action": "player.gamemode",
+      "subject": "19f50206-26de-410c-a1bc-000000000001",
+      "typed": false,
+      "parameters": {
+        "playerId": "19f50206-26de-410c-a1bc-000000000001",
+        "gameMode": "SURVIVAL"
+      }
+    },
+    {
+      "action": "player.whitelist.add",
+      "subject": "19f50206-26de-410c-a1bc-000000000001",
+      "typed": false,
+      "parameters": {
+        "playerId": "19f50206-26de-410c-a1bc-000000000001"
+      }
+    },
+    {
+      "action": "player.whitelist.remove",
+      "subject": "19f50206-26de-410c-a1bc-000000000001",
+      "typed": false,
+      "parameters": {
+        "playerId": "19f50206-26de-410c-a1bc-000000000001"
+      }
+    },
+    {
+      "action": "player.kick",
+      "subject": "19f50206-26de-410c-a1bc-000000000001",
+      "typed": false,
+      "parameters": {
+        "playerId": "19f50206-26de-410c-a1bc-000000000001"
+      }
+    },
+    {
+      "action": "player.ban",
+      "subject": "19f50206-26de-410c-a1bc-000000000001",
+      "typed": true,
+      "parameters": {
+        "playerId": "19f50206-26de-410c-a1bc-000000000001"
+      }
+    },
+    {
+      "action": "player.kill",
+      "subject": "19f50206-26de-410c-a1bc-000000000001",
+      "typed": true,
+      "parameters": {
+        "playerId": "19f50206-26de-410c-a1bc-000000000001"
+      }
+    },
+    {
+      "action": "player.op",
+      "subject": "19f50206-26de-410c-a1bc-000000000001",
+      "typed": true,
+      "parameters": {
+        "playerId": "19f50206-26de-410c-a1bc-000000000001"
+      }
+    },
+    {
+      "action": "player.deop",
+      "subject": "19f50206-26de-410c-a1bc-000000000001",
+      "typed": true,
+      "parameters": {
+        "playerId": "19f50206-26de-410c-a1bc-000000000001"
+      }
+    },
+    {
+      "action": "backup.full.verify",
+      "subject": "backup-20261010-001",
+      "typed": false,
+      "parameters": {
+        "backupId": "backup-20261010-001"
+      }
+    },
+    {
+      "action": "backup.full.delete",
+      "subject": "backup-20261010-001",
+      "typed": true,
+      "parameters": {
+        "backupId": "backup-20261010-001"
+      }
+    },
+    {
+      "action": "backup.full.retry-upload",
+      "subject": "backup-20261010-001",
+      "typed": false,
+      "parameters": {
+        "backupId": "backup-20261010-001"
+      }
+    }
+  ],
+  "errors": []
+}

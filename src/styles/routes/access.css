@@ -1,0 +1,219 @@
+.access-command {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.access-toolbar {
+  display: flex;
+  gap: 12px;
+  padding: 16px 20px;
+}
+.access-toolbar > .field:first-child {
+  flex: 1;
+}
+.device-list {
+  padding: 0 20px;
+}
+.device-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--line);
+}
+.device-row:last-child {
+  border-bottom: 0;
+}
+.device-row > div {
+  flex: 1;
+  min-width: 0;
+}
+.device-row strong {
+  display: block;
+}
+.device-row > div > span {
+  display: block;
+  color: var(--faint);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  margin-top: 4px;
+  overflow-wrap: anywhere;
+}
+.device-row > span {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.scope-view {
+  padding: var(--panel-pad);
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.scope-view > span {
+  color: var(--info);
+  font-size: 0.85rem;
+}
+.scope-view > p,
+.scope-view > div {
+  flex-basis: 100%;
+}
+.scope-view > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 8px;
+}
+.scope-view code {
+  padding: 7px 10px;
+  background: var(--instrument);
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+@media (max-width: 640px) {
+  .access-command {
+    gap: 12px;
+  }
+  .access-command > .button {
+    width: 100%;
+  }
+  .access-command .workspace-tabs > button {
+    flex: 1;
+    padding: 8px;
+    font-size: 0.73rem;
+    gap: 5px;
+  }
+  .access-toolbar {
+    padding: 16px;
+    flex-wrap: wrap;
+  }
+  .access-toolbar > .field {
+    flex-basis: 100%;
+  }
+  .device-list {
+    padding: 0 16px;
+  }
+  .device-row {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .device-row > div {
+    flex-basis: 100%;
+  }
+  .device-row > .button {
+    margin-left: auto;
+    font-size: 0.78rem;
+  }
+}
+.authority-ledger {
+  overflow: auto;
+  max-width: 100%;
+}
+.authority-ledger table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+.authority-ledger td {
+  overflow-wrap: anywhere;
+  vertical-align: top;
+}
+.authority-ledger small {
+  display: block;
+  margin-top: 6px;
+  color: var(--muted);
+}
+.granted-scopes {
+  padding: 12px;
+  border-top: 1px solid var(--line);
+}
+.granted-scopes summary {
+  cursor: pointer;
+  margin-bottom: 8px;
+}
+.granted-scopes code {
+  display: inline-block;
+  margin: 4px;
+}
+@media (max-width: 639px) {
+  .authority-ledger table,
+  .authority-ledger tbody,
+  .authority-ledger tr,
+  .authority-ledger td {
+    display: block;
+    width: 100%;
+  }
+  .authority-ledger thead {
+    display: none;
+  }
+  .authority-ledger tr {
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .authority-ledger td {
+    padding: 6px 0;
+    border: 0;
+  }
+  .authority-ledger caption {
+    display: block;
+    text-align: left;
+  }
+  .authority-ledger td:nth-child(3)::before {
+    content: "Capability · ";
+    color: var(--muted);
+  }
+  .device-row {
+    flex-wrap: wrap;
+  }
+  .device-row > div {
+    flex-basis: 100%;
+  }
+  .audit-workspace .table-region table {
+    min-width: 0;
+    table-layout: fixed;
+  }
+  .audit-workspace td,
+  .audit-workspace th {
+    padding: 8px 4px;
+    overflow-wrap: anywhere;
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 639px) {
+  .audit-workspace .table-region table,
+  .audit-workspace tbody,
+  .audit-workspace tr,
+  .audit-workspace td {
+    display: block;
+    width: 100%;
+  }
+  .audit-workspace thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+  .audit-workspace tr {
+    padding: 12px;
+    border-bottom: 1px solid var(--line);
+  }
+  .audit-workspace td {
+    border: 0;
+    padding: 4px 0;
+    font-size: 0.8125rem;
+  }
+  .audit-workspace td::before {
+    content: attr(data-label);
+    display: block;
+    color: var(--muted);
+    font-size: 0.75rem;
+    margin-bottom: 2px;
+  }
+}

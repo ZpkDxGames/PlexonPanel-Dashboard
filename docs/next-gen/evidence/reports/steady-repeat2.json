@@ -1,0 +1,64 @@
+{
+  "browser": "157.0",
+  "sourceHeads": {
+    "baseline": "4357a66bc674fddce7432cbc27a4fead00ac8234",
+    "candidate": "5ea142df03d9c0978887be95a56f4ab724f1489b"
+  },
+  "workload": "2500 console / 8192 raw points, continuous 125ms Paper frames; Host/system/console every fourth frame; route switches after first 60 seconds; sequential same-machine runs",
+  "reports": [
+    {
+      "label": "baseline",
+      "cwd": "/workspace/scratch/def85b0a0ac9/baseline",
+      "port": 4182,
+      "elapsedMs": 60131,
+      "steadySeconds": 60,
+      "targetSwitches": [],
+      "visibleAtEnd": "visible",
+      "events": 415,
+      "frameMedianMs": 17.07999999999447,
+      "frameP95Ms": 33.460000000002765,
+      "boundChecks": [],
+      "final": {
+        "history": 8192,
+        "console": 2500,
+        "players": 24,
+        "worlds": 3
+      },
+      "afterTeardown": {
+        "charts": 0,
+        "terminal": 0,
+        "domNodes": 341
+      },
+      "cls": null,
+      "heap": "Firefox performance.memory unsupported; no heap-growth claim",
+      "errors": []
+    },
+    {
+      "label": "candidate",
+      "cwd": "/workspace/scratch/def85b0a0ac9/PlexonPanel-Dashboard",
+      "port": 4183,
+      "elapsedMs": 60091,
+      "steadySeconds": 60,
+      "targetSwitches": [],
+      "visibleAtEnd": "visible",
+      "events": 375,
+      "frameMedianMs": 17.060000000004948,
+      "frameP95Ms": 49.539999999999054,
+      "boundChecks": [],
+      "final": {
+        "history": 8192,
+        "console": 2500,
+        "players": 24,
+        "worlds": 3
+      },
+      "afterTeardown": {
+        "charts": 0,
+        "terminal": 0,
+        "domNodes": 352
+      },
+      "cls": null,
+      "heap": "Firefox performance.memory unsupported; no heap-growth claim",
+      "errors": []
+    }
+  ]
+}

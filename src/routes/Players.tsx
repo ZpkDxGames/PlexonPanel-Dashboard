@@ -11,6 +11,7 @@ import { Icon } from "../components/Icon";
 import { PlayerHistory } from "../components/PlayerHistory";
 import { hasScope } from "../presentation/authority";
 import { sourceEvidence } from "../presentation/telemetry";
+import { ActionAvailability } from "../components/nextgen/ActionAvailability";
 type Player = {
   uuid: string;
   name: string;
@@ -93,7 +94,8 @@ export default function Players() {
   const profileHeading = useRef<HTMLHeadingElement>(null);
   useEffect(() => {
     if (inspecting) profileHeading.current?.focus();
-    else returnFocus.current?.focus();
+    else if (returnFocus.current?.isConnected) returnFocus.current.focus();
+    else document.getElementById("roster-heading")?.focus();
   }, [inspecting, selected]);
   const prepare = (action: string, parameters: JsonMap) => {
     setError("");
@@ -130,7 +132,9 @@ export default function Players() {
               {String(roster.length).padStart(2, "0")}
             </span>
             <div>
-              <h2>Online player roster</h2>
+              <h2 id="roster-heading" tabIndex={-1}>
+                Online player roster
+              </h2>
               <p>{worlds.length} observed worlds · Paper roster</p>
             </div>
           </div>
@@ -312,8 +316,23 @@ export default function Players() {
               <div className="profile-layout">
                 <Panel title="Player tools" eyebrow="SELECTED PAPER AUTHORITY">
                   <div className="profile-tools">
+                    <ActionAvailability
+                      reason={[
+                        ...new Set(
+                          [
+                            ...actions.map(([, a]) => a),
+                            "player.message",
+                            "player.gamemode",
+                            "console.execute",
+                          ]
+                            .map((a) => session.reason(a, "PAPER"))
+                            .filter(Boolean),
+                        ),
+                      ].join(" ")}
+                    />
                     <div
                       className="inspector-tabs segmented"
+                      role="group"
                       aria-label="Player tools"
                     >
                       {[
@@ -323,9 +342,18 @@ export default function Players() {
                       ].map(([key, label]) => (
                         <button
                           key={key}
+                          id={`player-tool-${key}`}
                           className={playerTab === key ? "active" : ""}
                           aria-pressed={playerTab === key}
                           onClick={() => setPlayerTab(key)}
+                          onKeyDown={(event) => {
+                            if (!["ArrowRight", "ArrowLeft", "Home", "End"].includes(event.key)) return;
+                            event.preventDefault();
+                            const keys = ["interact", "moderate", "commands"];
+                            const index = event.key === "Home" ? 0 : event.key === "End" ? 2 : (keys.indexOf(key) + (event.key === "ArrowRight" ? 1 : 2)) % 3;
+                            setPlayerTab(keys[index]);
+                            document.getElementById(`player-tool-${keys[index]}`)?.focus();
+                          }}
                         >
                           {label}
                         </button>
@@ -389,6 +417,25 @@ export default function Players() {
                           Review game mode
                         </Button>
                       </div>
+                      <div className="button-row supportive-actions">
+                        {actions
+                          .filter(
+                            ([, a]) =>
+                              a === "player.heal" || a === "player.feed",
+                          )
+                          .map(([label, action]) => (
+                            <Button
+                              key={action}
+                              disabled={!!session.reason(action, "PAPER")}
+                              title={session.reason(action, "PAPER")}
+                              onClick={() =>
+                                prepare(action, { playerId: active.uuid })
+                              }
+                            >
+                              {label}
+                            </Button>
+                          ))}
+                      </div>
                     </section>
                     <section hidden={playerTab !== "moderate"}>
                       <span className="eyebrow">MODERATION & ACCESS</span>
@@ -404,35 +451,41 @@ export default function Players() {
                         </label>
                       </div>
                       <div className="action-grid">
-                        {actions.map(([label, action]) => (
-                          <Button
-                            key={action}
-                            variant={
-                              [
-                                "player.ban",
-                                "player.kill",
-                                "player.op",
-                                "player.deop",
-                              ].includes(action)
-                                ? "danger"
-                                : "secondary"
-                            }
-                            disabled={!!session.reason(action, "PAPER")}
-                            title={session.reason(action, "PAPER")}
-                            onClick={() =>
-                              prepare(action, {
-                                playerId: active.uuid,
-                                ...((action === "player.kick" ||
-                                  action === "player.ban") &&
-                                reason
-                                  ? { reason }
-                                  : {}),
-                              })
-                            }
-                          >
-                            {label}
-                          </Button>
-                        ))}
+                        {actions
+                          .filter(
+                            ([, action]) =>
+                              action !== "player.heal" &&
+                              action !== "player.feed",
+                          )
+                          .map(([label, action]) => (
+                            <Button
+                              key={action}
+                              variant={
+                                [
+                                  "player.ban",
+                                  "player.kill",
+                                  "player.op",
+                                  "player.deop",
+                                ].includes(action)
+                                  ? "danger"
+                                  : "secondary"
+                              }
+                              disabled={!!session.reason(action, "PAPER")}
+                              title={session.reason(action, "PAPER")}
+                              onClick={() =>
+                                prepare(action, {
+                                  playerId: active.uuid,
+                                  ...((action === "player.kick" ||
+                                    action === "player.ban") &&
+                                  reason
+                                    ? { reason }
+                                    : {}),
+                                })
+                              }
+                            >
+                              {label}
+                            </Button>
+                          ))}
                       </div>
                     </section>
                     <section

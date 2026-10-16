@@ -14,13 +14,15 @@ export function PairingGate() {
         <small>MINECRAFT OPERATIONS</small>
       </header>
       <section className="provisioning">
-        <span className="eyebrow">SECURE SERVER ACCESS</span>
-        <h1>
-          Your server, within reach.
-        </h1>
-        <p className="pairing-lead">
-          Live telemetry, players and server controls in one place. Use a one-time code to connect this browser.
-        </p>
+        <div className="pairing-explanation">
+          <BrandMark />
+          <span className="eyebrow">SECURE SERVER ACCESS</span>
+          <h1>Your server, within reach.</h1>
+          <p className="pairing-lead">
+            Live telemetry, players and server controls in one place. Use a
+            one-time code to connect this browser.
+          </p>
+        </div>
         <div className="provisioning-form">
           <div className="provisioning-heading">
             <span className="setup-index">01</span>

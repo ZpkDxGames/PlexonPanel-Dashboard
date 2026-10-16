@@ -1,0 +1,151 @@
+{
+  "sourceHead": "5ea142df03d9c0978887be95a56f4ab724f1489b",
+  "browser": "157.0",
+  "results": [
+    {
+      "route": "Fleet",
+      "width": 1440,
+      "sourceHead": "5ea142df03d9c0978887be95a56f4ab724f1489b",
+      "forcedColors": true,
+      "osReduceOverridesFullPreference": true,
+      "UTCDisplayAndRawClocksPreserved": true,
+      "violations": []
+    },
+    {
+      "route": "Overview",
+      "width": 1440,
+      "sourceHead": "5ea142df03d9c0978887be95a56f4ab724f1489b",
+      "forcedColors": true,
+      "osReduceOverridesFullPreference": true,
+      "UTCDisplayAndRawClocksPreserved": true,
+      "violations": []
+    },
+    {
+      "route": "Performance",
+      "width": 1440,
+      "sourceHead": "5ea142df03d9c0978887be95a56f4ab724f1489b",
+      "forcedColors": true,
+      "osReduceOverridesFullPreference": true,
+      "UTCDisplayAndRawClocksPreserved": true,
+      "violations": []
+    },
+    {
+      "route": "Players",
+      "width": 1440,
+      "sourceHead": "5ea142df03d9c0978887be95a56f4ab724f1489b",
+      "forcedColors": true,
+      "osReduceOverridesFullPreference": true,
+      "UTCDisplayAndRawClocksPreserved": true,
+      "violations": []
+    },
+    {
+      "route": "Console",
+      "width": 1440,
+      "sourceHead": "5ea142df03d9c0978887be95a56f4ab724f1489b",
+      "forcedColors": true,
+      "osReduceOverridesFullPreference": true,
+      "UTCDisplayAndRawClocksPreserved": true,
+      "violations": []
+    },
+    {
+      "route": "Backups",
+      "width": 1440,
+      "sourceHead": "5ea142df03d9c0978887be95a56f4ab724f1489b",
+      "forcedColors": true,
+      "osReduceOverridesFullPreference": true,
+      "UTCDisplayAndRawClocksPreserved": true,
+      "violations": []
+    },
+    {
+      "route": "Access",
+      "width": 1440,
+      "sourceHead": "5ea142df03d9c0978887be95a56f4ab724f1489b",
+      "forcedColors": true,
+      "osReduceOverridesFullPreference": true,
+      "UTCDisplayAndRawClocksPreserved": true,
+      "violations": []
+    },
+    {
+      "route": "Settings",
+      "width": 1440,
+      "sourceHead": "5ea142df03d9c0978887be95a56f4ab724f1489b",
+      "forcedColors": true,
+      "osReduceOverridesFullPreference": true,
+      "UTCDisplayAndRawClocksPreserved": true,
+      "violations": []
+    },
+    {
+      "route": "Fleet",
+      "width": 390,
+      "sourceHead": "5ea142df03d9c0978887be95a56f4ab724f1489b",
+      "forcedColors": true,
+      "osReduceOverridesFullPreference": true,
+      "UTCDisplayAndRawClocksPreserved": true,
+      "violations": []
+    },
+    {
+      "route": "Overview",
+      "width": 390,
+      "sourceHead": "5ea142df03d9c0978887be95a56f4ab724f1489b",
+      "forcedColors": true,
+      "osReduceOverridesFullPreference": true,
+      "UTCDisplayAndRawClocksPreserved": true,
+      "violations": []
+    },
+    {
+      "route": "Performance",
+      "width": 390,
+      "sourceHead": "5ea142df03d9c0978887be95a56f4ab724f1489b",
+      "forcedColors": true,
+      "osReduceOverridesFullPreference": true,
+      "UTCDisplayAndRawClocksPreserved": true,
+      "violations": []
+    },
+    {
+      "route": "Players",
+      "width": 390,
+      "sourceHead": "5ea142df03d9c0978887be95a56f4ab724f1489b",
+      "forcedColors": true,
+      "osReduceOverridesFullPreference": true,
+      "UTCDisplayAndRawClocksPreserved": true,
+      "violations": []
+    },
+    {
+      "route": "Console",
+      "width": 390,
+      "sourceHead": "5ea142df03d9c0978887be95a56f4ab724f1489b",
+      "forcedColors": true,
+      "osReduceOverridesFullPreference": true,
+      "UTCDisplayAndRawClocksPreserved": true,
+      "violations": []
+    },
+    {
+      "route": "Backups",
+      "width": 390,
+      "sourceHead": "5ea142df03d9c0978887be95a56f4ab724f1489b",
+      "forcedColors": true,
+      "osReduceOverridesFullPreference": true,
+      "UTCDisplayAndRawClocksPreserved": true,
+      "violations": []
+    },
+    {
+      "route": "Access",
+      "width": 390,
+      "sourceHead": "5ea142df03d9c0978887be95a56f4ab724f1489b",
+      "forcedColors": true,
+      "osReduceOverridesFullPreference": true,
+      "UTCDisplayAndRawClocksPreserved": true,
+      "violations": []
+    },
+    {
+      "route": "Settings",
+      "width": 390,
+      "sourceHead": "5ea142df03d9c0978887be95a56f4ab724f1489b",
+      "forcedColors": true,
+      "osReduceOverridesFullPreference": true,
+      "UTCDisplayAndRawClocksPreserved": true,
+      "violations": []
+    }
+  ],
+  "errors": []
+}
