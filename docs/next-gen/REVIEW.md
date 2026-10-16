@@ -1,6 +1,6 @@
 # Strata review guide
 
-The complete frontend transformation is on `design/strata-next-gen-20261016`, based on `4357a66bc674fddce7432cbc27a4fead00ac8234`. The owner approved draft-PR publication with the exact branch-only no-deploy guard; see PUBLICATION_BLOCKER.md and DELIVERY_STATUS.md. P7 still has failed/blocked gates. No owner review, merge or production authorization is implied.
+The complete frontend transformation is on `design/strata-next-gen-20261016`, based on `4357a66bc674fddce7432cbc27a4fead00ac8234`. The owner approved draft-PR publication with the exact branch-only no-deploy guard; see PUBLICATION_BLOCKER.md and DELIVERY_STATUS.md. P7 still has failed/blocked gates. The owner later explicitly authorized main source integration with the reported limitations; formal P7 and production/runtime acceptance remain incomplete. See MAIN_INTEGRATION.md.
 
 Read VALIDATION.md for the exact test levels, PERFORMANCE.md for measured comparisons, PARITY_STATUS.md for all 88 feature IDs and ROLLBACK.md for recovery. The original planning Markdown is copied under planning/; its image/source-archive links refer to the original attached planning package, which remains the full input artifact.
 

@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "git": {"deploymentEnabled": {"design/strata-next-gen-20261016": false}},
+  "git": {"deploymentEnabled": {"design/strata-next-gen-20261016": false, "main": false}},
   "framework": "vite",
   "installCommand": "npm ci",
   "buildCommand": "npm run build",
