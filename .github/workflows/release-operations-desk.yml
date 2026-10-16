@@ -1,0 +1,108 @@
+name: Publish Operations Desk frontend
+
+'on':
+  push:
+    branches: [main]
+    paths: [docs/releases/dashboard-operations-desk-2026.10.15.md]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: operations-desk-2026-10-15-release
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  verify-and-package:
+    if: github.repository == 'ZpkDxGames/PlexonPanel-Dashboard' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - name: Check out the exact release commit
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Use the supported Node runtime
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Install the locked dependency tree
+        run: npm ci
+      - name: Verify and compile the frontend
+        env:
+          VITE_PLEXON_RELAY_URL: https://tonimserver.ddns.net
+        run: |
+          mkdir -p quality
+          npm run check | tee quality/check.log
+          npm run build | tee quality/build.log
+          npm run test:perf | tee quality/performance.log
+          npm audit --omit=dev --audit-level=high | tee quality/audit.log
+          node --input-type=module <<'JS'
+          import {readFileSync,readdirSync} from 'node:fs';
+          import assert from 'node:assert/strict';
+          const build=JSON.parse(readFileSync('dist/build.json','utf8'));
+          assert.equal(build.commit,process.env.GITHUB_SHA);
+          for(const name of readdirSync('dist/assets').filter(name=>name.endsWith('.js'))){
+            const code=readFileSync(`dist/assets/${name}`,'utf8');
+            assert(!code.includes('LumaCraft')&&!code.includes('Survival · São Paulo'),'Development data in production artifact');
+          }
+          JS
+      - name: Package source, static build and verification evidence
+        run: |
+          mkdir -p release
+          git archive --format=zip --output=release/PlexonPanel-Operations-Desk-source.zip HEAD
+          (cd dist && zip -qr ../release/PlexonPanel-Operations-Desk-web.zip .)
+          tar -czf release/PlexonPanel-Operations-Desk-verification.tar.gz quality artifacts/performance.json docs/NEW_DASHBOARD_VERIFICATION.md docs/FEATURE_PARITY_MATRIX.md docs/NEW_DASHBOARD_COMPATIBILITY.md docs/NEW_DASHBOARD_ROLLOUT.md
+          cp dist/build.json release/build.json
+          cp docs/releases/dashboard-operations-desk-2026.10.15.md release/RELEASE-NOTES.md
+          cp docs/releases/operations-desk-preview.png release/operations-desk-preview.png
+          (cd release && sha256sum *.zip *.tar.gz *.png build.json RELEASE-NOTES.md > SHA256SUMS.txt)
+      - name: Store only release deliverables
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: operations-desk-release
+          path: release/*
+          if-no-files-found: error
+          retention-days: 14
+
+  publish:
+    needs: verify-and-package
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - name: Retrieve the verified deliverables
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: operations-desk-release
+          path: release
+      - name: Publish the frontend release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_SHA: ${{ github.sha }}
+          RELEASE_TAG: dashboard-operations-desk-2026.10.15
+        run: |
+          cd release
+          sha256sum --check SHA256SUMS.txt
+          if gh release view "$RELEASE_TAG" --repo "$GH_REPO" --json isDraft,targetCommitish > /tmp/existing-release.json 2>/dev/null; then
+            target=$(jq -r .targetCommitish /tmp/existing-release.json)
+            test "$target" = "$RELEASE_SHA"
+            if test "$(jq -r .isDraft /tmp/existing-release.json)" = false; then
+              echo 'This exact release commit is already published.'
+              exit 0
+            fi
+          else
+            gh release create "$RELEASE_TAG" --repo "$GH_REPO" --target "$RELEASE_SHA" --draft --title 'Operations Desk — frontend release' --notes-file RELEASE-NOTES.md
+          fi
+          gh release upload "$RELEASE_TAG" --repo "$GH_REPO" --clobber PlexonPanel-Operations-Desk-source.zip PlexonPanel-Operations-Desk-web.zip PlexonPanel-Operations-Desk-verification.tar.gz operations-desk-preview.png build.json RELEASE-NOTES.md SHA256SUMS.txt
+          gh release edit "$RELEASE_TAG" --repo "$GH_REPO" --draft=false --latest
