@@ -3,6 +3,7 @@ import type { ActionCompletion } from "../adapter/data-source";
 import { session, type Prepared } from "../adapter/session";
 import { useSession } from "../hooks";
 import { Button, Notice } from "../components/ui";
+import { navigate } from "../router";
 import { reviewPolicy } from "../presentation/review-policy";
 export function ActionReview({
   prepared,
@@ -63,7 +64,9 @@ export function ActionReview({
     >
       <div className="review-head">
         <span className="eyebrow">OPERATION / REVIEW</span>
-        <h2 id="action-review-title">Review before dispatch</h2>
+        <h2 id="action-review-title">
+          Review {prepared.action.replaceAll(".", " ").replaceAll("-", " ")}
+        </h2>
         <p>
           Confirm the server, agent and exact parameters. Completion comes from
           the selected agent.
@@ -72,6 +75,10 @@ export function ActionReview({
       <dl className="review-target">
         <dt>Server</dt>
         <dd>{prepared.name}</dd>
+        <dt>Server ID</dt>
+        <dd>
+          <code>{prepared.target.serverId}</code>
+        </dd>
         <dt>Agent</dt>
         <dd>{prepared.kind}</dd>
         <dt>Operation</dt>
@@ -122,11 +129,17 @@ export function ActionReview({
             tone={result.status === "SUCCESS" ? "success" : "warning"}
             title={
               result.status === "SUCCESS"
-                ? "Agent result received"
+                ? prepared.action === "maintenance.full-backup.create" &&
+                  result.data?.state === "QUEUED"
+                  ? "Host accepted job · not completed"
+                  : "Agent result received"
                 : result.status
             }
           >
-            {result.message || result.code}
+            {prepared.action === "maintenance.full-backup.create" &&
+            result.data?.state === "QUEUED"
+              ? "The Host owns the queued job. Inspect durable status in Backups for completion and verification."
+              : result.message || result.code}
           </Notice>
           {result.data && (
             <pre className="parameter-preview" aria-label="Agent response">
@@ -136,9 +149,20 @@ export function ActionReview({
         </>
       )}
       {error && (
-        <Notice tone="error" title="Operation not completed">
-          {error}
+        <Notice tone="error" title="Outcome not confirmed">
+          {error} Inspect the agent audit or durable Host status before
+          preparing another operation.
         </Notice>
+      )}
+      {error && (
+        <Button
+          onClick={() => {
+            onClose();
+            navigate("Access");
+          }}
+        >
+          Inspect agent audit
+        </Button>
       )}
       <div className="dialog-actions">
         <Button variant="quiet" onClick={onClose} disabled={busy}>
@@ -147,7 +171,7 @@ export function ActionReview({
         {!result && (
           <Button
             variant={strong ? "danger" : "primary"}
-            disabled={!valid || (strong && typed !== confirmText)}
+            disabled={!!error || !valid || (strong && typed !== confirmText)}
             loading={busy}
             onClick={() => void execute()}
           >

@@ -1,0 +1,3759 @@
+{
+  "results": [
+    {
+      "name": "fleet",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:13:55.576Z",
+      "viewport": {
+        "width": 320,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "overview",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:13:57.359Z",
+      "viewport": {
+        "width": 320,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "performance",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:13:59.523Z",
+      "viewport": {
+        "width": 320,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "players",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:14:01.587Z",
+      "viewport": {
+        "width": 320,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "console",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:14:03.747Z",
+      "viewport": {
+        "width": 320,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "backups",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:14:05.848Z",
+      "viewport": {
+        "width": 320,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "access",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:14:07.804Z",
+      "viewport": {
+        "width": 320,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "settings",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:14:09.879Z",
+      "viewport": {
+        "width": 320,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "fleet",
+      "width": 390,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:14:11.188Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "overview",
+      "width": 390,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:14:13.280Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "performance",
+      "width": 390,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:14:14.634Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "players",
+      "width": 390,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:14:16.450Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "console",
+      "width": 390,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:14:17.980Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "backups",
+      "width": 390,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:14:19.393Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "backup-retry-first-viewport",
+      "width": 390,
+      "theme": "dark",
+      "bottom": 819.066650390625,
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255"
+    },
+    {
+      "name": "access",
+      "width": 390,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:14:20.799Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "settings",
+      "width": 390,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:14:22.160Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "fleet",
+      "width": 640,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:14:23.389Z",
+      "viewport": {
+        "width": 640,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "overview",
+      "width": 640,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:14:25.345Z",
+      "viewport": {
+        "width": 640,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "performance",
+      "width": 640,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:14:26.783Z",
+      "viewport": {
+        "width": 640,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "players",
+      "width": 640,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:14:28.689Z",
+      "viewport": {
+        "width": 640,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "console",
+      "width": 640,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:14:30.113Z",
+      "viewport": {
+        "width": 640,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "backups",
+      "width": 640,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:14:31.479Z",
+      "viewport": {
+        "width": 640,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "access",
+      "width": 640,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:14:32.885Z",
+      "viewport": {
+        "width": 640,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "settings",
+      "width": 640,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:14:34.146Z",
+      "viewport": {
+        "width": 640,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "fleet",
+      "width": 820,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:14:35.363Z",
+      "viewport": {
+        "width": 820,
+        "height": 1180
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "overview",
+      "width": 820,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:14:37.273Z",
+      "viewport": {
+        "width": 820,
+        "height": 1180
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "performance",
+      "width": 820,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:14:38.744Z",
+      "viewport": {
+        "width": 820,
+        "height": 1180
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "players",
+      "width": 820,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:14:40.512Z",
+      "viewport": {
+        "width": 820,
+        "height": 1180
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "console",
+      "width": 820,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:14:42.015Z",
+      "viewport": {
+        "width": 820,
+        "height": 1180
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "backups",
+      "width": 820,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:14:43.300Z",
+      "viewport": {
+        "width": 820,
+        "height": 1180
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "access",
+      "width": 820,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:14:44.549Z",
+      "viewport": {
+        "width": 820,
+        "height": 1180
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "settings",
+      "width": 820,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:14:45.892Z",
+      "viewport": {
+        "width": 820,
+        "height": 1180
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "fleet",
+      "width": 1024,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:14:47.060Z",
+      "viewport": {
+        "width": 1024,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "overview",
+      "width": 1024,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:14:48.955Z",
+      "viewport": {
+        "width": 1024,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "performance",
+      "width": 1024,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:14:50.457Z",
+      "viewport": {
+        "width": 1024,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "players",
+      "width": 1024,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:14:52.322Z",
+      "viewport": {
+        "width": 1024,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "console",
+      "width": 1024,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:14:53.746Z",
+      "viewport": {
+        "width": 1024,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "backups",
+      "width": 1024,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:14:55.051Z",
+      "viewport": {
+        "width": 1024,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "access",
+      "width": 1024,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:14:56.278Z",
+      "viewport": {
+        "width": 1024,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "settings",
+      "width": 1024,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:14:57.538Z",
+      "viewport": {
+        "width": 1024,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "fleet",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:14:58.817Z",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "overview",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:15:01.338Z",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "overview-first-viewport",
+      "width": 1440,
+      "theme": "dark",
+      "readings": 4,
+      "plotBottom": 898.7166748046875,
+      "sixthLineBottom": 786.4166870117188,
+      "passed": true
+    },
+    {
+      "name": "performance",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:15:02.990Z",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "players",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:15:05.058Z",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "console",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:15:06.668Z",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "console-first-viewport",
+      "width": 1440,
+      "theme": "dark",
+      "composerBottom": 887.8499755859375,
+      "visibleRows": 12,
+      "passed": true
+    },
+    {
+      "name": "backups",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:15:08.115Z",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "access",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:15:09.561Z",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "settings",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:15:11.049Z",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "fleet",
+      "width": 1920,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:15:12.252Z",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "overview",
+      "width": 1920,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:15:14.310Z",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "performance",
+      "width": 1920,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:15:15.803Z",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "players",
+      "width": 1920,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:15:17.636Z",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "console",
+      "width": 1920,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:15:19.244Z",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "backups",
+      "width": 1920,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:15:20.701Z",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "access",
+      "width": 1920,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:15:22.009Z",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "settings",
+      "width": 1920,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:15:23.559Z",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "fleet-preferences",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:15:24.813Z",
+      "viewport": {
+        "width": 320,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "overview-preferences",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:15:26.740Z",
+      "viewport": {
+        "width": 320,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "performance-preferences",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:15:28.226Z",
+      "viewport": {
+        "width": 320,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "players-preferences",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:15:30.007Z",
+      "viewport": {
+        "width": 320,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "console-preferences",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:15:31.446Z",
+      "viewport": {
+        "width": 320,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "backups-preferences",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:15:32.874Z",
+      "viewport": {
+        "width": 320,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "access-preferences",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:15:34.342Z",
+      "viewport": {
+        "width": 320,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "settings-preferences",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:15:35.830Z",
+      "viewport": {
+        "width": 320,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "fleet-preferences",
+      "width": 390,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:15:37.119Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "overview-preferences",
+      "width": 390,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:15:39.092Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "performance-preferences",
+      "width": 390,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:15:40.479Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "players-preferences",
+      "width": 390,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:15:42.275Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "console-preferences",
+      "width": 390,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:15:43.690Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "backups-preferences",
+      "width": 390,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:15:45.002Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "access-preferences",
+      "width": 390,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:15:46.226Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "settings-preferences",
+      "width": 390,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:15:47.557Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "fleet-preferences",
+      "width": 820,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:15:48.838Z",
+      "viewport": {
+        "width": 820,
+        "height": 1180
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "overview-preferences",
+      "width": 820,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:15:51.094Z",
+      "viewport": {
+        "width": 820,
+        "height": 1180
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "performance-preferences",
+      "width": 820,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:15:52.557Z",
+      "viewport": {
+        "width": 820,
+        "height": 1180
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "players-preferences",
+      "width": 820,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:15:54.470Z",
+      "viewport": {
+        "width": 820,
+        "height": 1180
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "console-preferences",
+      "width": 820,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:15:56.177Z",
+      "viewport": {
+        "width": 820,
+        "height": 1180
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "backups-preferences",
+      "width": 820,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:15:57.493Z",
+      "viewport": {
+        "width": 820,
+        "height": 1180
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "access-preferences",
+      "width": 820,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:15:58.908Z",
+      "viewport": {
+        "width": 820,
+        "height": 1180
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "settings-preferences",
+      "width": 820,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:16:00.447Z",
+      "viewport": {
+        "width": 820,
+        "height": 1180
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "profile-interact",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:16:02.347Z",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "profile-moderate",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:16:03.993Z",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "profile-commands",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:16:05.624Z",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "review-typed",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:16:07.008Z",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "chat",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:16:08.652Z",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "plugins",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:16:10.020Z",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "devices",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:16:11.424Z",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "authority",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:16:13.280Z",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "settings-connection",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:16:14.817Z",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "settings-privacy",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:16:16.110Z",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "settings-diagnostics",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:16:17.414Z",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "review-ordinary",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:16:18.764Z",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "palette-no-results",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:16:20.059Z",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "profile-interact",
+      "width": 390,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:16:21.808Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "profile-moderate",
+      "width": 390,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:16:23.244Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "profile-commands",
+      "width": 390,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:16:24.744Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "review-typed",
+      "width": 390,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:16:26.034Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "chat",
+      "width": 390,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:16:27.357Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "plugins",
+      "width": 390,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:16:28.945Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "devices",
+      "width": 390,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:16:30.260Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "authority",
+      "width": 390,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:16:32.080Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "settings-connection",
+      "width": 390,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:16:33.446Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "settings-privacy",
+      "width": 390,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:16:34.648Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "settings-diagnostics",
+      "width": 390,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:16:35.826Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "review-ordinary",
+      "width": 390,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:16:37.106Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "palette-no-results",
+      "width": 390,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:16:38.347Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "navigation",
+      "width": 390,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:16:39.595Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "pairing",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:16:43.701Z",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "pairing",
+      "width": 390,
+      "theme": "dark",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:16:44.736Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "dark"
+    },
+    {
+      "name": "fleet",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:16:51.605Z",
+      "viewport": {
+        "width": 320,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "overview",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:16:53.482Z",
+      "viewport": {
+        "width": 320,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "performance",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:16:55.222Z",
+      "viewport": {
+        "width": 320,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "players",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:16:57.732Z",
+      "viewport": {
+        "width": 320,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "console",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:17:00.056Z",
+      "viewport": {
+        "width": 320,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "backups",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:17:01.795Z",
+      "viewport": {
+        "width": 320,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "access",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:17:03.422Z",
+      "viewport": {
+        "width": 320,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "settings",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:17:05.612Z",
+      "viewport": {
+        "width": 320,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "fleet",
+      "width": 390,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:17:06.939Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "overview",
+      "width": 390,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:17:08.941Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "performance",
+      "width": 390,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:17:10.538Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "players",
+      "width": 390,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:17:12.378Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "console",
+      "width": 390,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:17:13.777Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "backups",
+      "width": 390,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:17:15.096Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "backup-retry-first-viewport",
+      "width": 390,
+      "theme": "light",
+      "bottom": 819.066650390625,
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255"
+    },
+    {
+      "name": "access",
+      "width": 390,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:17:16.431Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "settings",
+      "width": 390,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:17:17.727Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "fleet",
+      "width": 640,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:17:18.899Z",
+      "viewport": {
+        "width": 640,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "overview",
+      "width": 640,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:17:20.847Z",
+      "viewport": {
+        "width": 640,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "performance",
+      "width": 640,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:17:22.191Z",
+      "viewport": {
+        "width": 640,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "players",
+      "width": 640,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:17:24.262Z",
+      "viewport": {
+        "width": 640,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "console",
+      "width": 640,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:17:25.727Z",
+      "viewport": {
+        "width": 640,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "backups",
+      "width": 640,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:17:27.036Z",
+      "viewport": {
+        "width": 640,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "access",
+      "width": 640,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:17:28.307Z",
+      "viewport": {
+        "width": 640,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "settings",
+      "width": 640,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:17:29.671Z",
+      "viewport": {
+        "width": 640,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "fleet",
+      "width": 820,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:17:31.095Z",
+      "viewport": {
+        "width": 820,
+        "height": 1180
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "overview",
+      "width": 820,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:17:33.232Z",
+      "viewport": {
+        "width": 820,
+        "height": 1180
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "performance",
+      "width": 820,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:17:34.816Z",
+      "viewport": {
+        "width": 820,
+        "height": 1180
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "players",
+      "width": 820,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:17:36.680Z",
+      "viewport": {
+        "width": 820,
+        "height": 1180
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "console",
+      "width": 820,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:17:38.289Z",
+      "viewport": {
+        "width": 820,
+        "height": 1180
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "backups",
+      "width": 820,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:17:39.828Z",
+      "viewport": {
+        "width": 820,
+        "height": 1180
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "access",
+      "width": 820,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:17:41.297Z",
+      "viewport": {
+        "width": 820,
+        "height": 1180
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "settings",
+      "width": 820,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:17:42.865Z",
+      "viewport": {
+        "width": 820,
+        "height": 1180
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "fleet",
+      "width": 1024,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:17:44.034Z",
+      "viewport": {
+        "width": 1024,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "overview",
+      "width": 1024,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:17:45.873Z",
+      "viewport": {
+        "width": 1024,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "performance",
+      "width": 1024,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:17:47.245Z",
+      "viewport": {
+        "width": 1024,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "players",
+      "width": 1024,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:17:49.034Z",
+      "viewport": {
+        "width": 1024,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "console",
+      "width": 1024,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:17:50.587Z",
+      "viewport": {
+        "width": 1024,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "backups",
+      "width": 1024,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:17:52.077Z",
+      "viewport": {
+        "width": 1024,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "access",
+      "width": 1024,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:17:53.389Z",
+      "viewport": {
+        "width": 1024,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "settings",
+      "width": 1024,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:17:54.773Z",
+      "viewport": {
+        "width": 1024,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "fleet",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:17:56.306Z",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "overview",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:17:58.662Z",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "overview-first-viewport",
+      "width": 1440,
+      "theme": "light",
+      "readings": 4,
+      "plotBottom": 898.7166748046875,
+      "sixthLineBottom": 786.4166870117188,
+      "passed": true
+    },
+    {
+      "name": "performance",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:18:01.039Z",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "players",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:18:03.132Z",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "console",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:18:05.264Z",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "console-first-viewport",
+      "width": 1440,
+      "theme": "light",
+      "composerBottom": 887.8499755859375,
+      "visibleRows": 12,
+      "passed": true
+    },
+    {
+      "name": "backups",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:18:06.811Z",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "access",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:18:08.279Z",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "settings",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:18:09.839Z",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "fleet",
+      "width": 1920,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:18:11.083Z",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "overview",
+      "width": 1920,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:18:13.232Z",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "performance",
+      "width": 1920,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:18:14.900Z",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "players",
+      "width": 1920,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:18:17.058Z",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "console",
+      "width": 1920,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:18:18.828Z",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "backups",
+      "width": 1920,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:18:20.352Z",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "access",
+      "width": 1920,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:18:21.803Z",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "settings",
+      "width": 1920,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:18:23.350Z",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "fleet-preferences",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:18:24.609Z",
+      "viewport": {
+        "width": 320,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "overview-preferences",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:18:26.558Z",
+      "viewport": {
+        "width": 320,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "performance-preferences",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:18:28.018Z",
+      "viewport": {
+        "width": 320,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "players-preferences",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:18:30.326Z",
+      "viewport": {
+        "width": 320,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "console-preferences",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:18:31.841Z",
+      "viewport": {
+        "width": 320,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "backups-preferences",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:18:33.211Z",
+      "viewport": {
+        "width": 320,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "access-preferences",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:18:34.502Z",
+      "viewport": {
+        "width": 320,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "settings-preferences",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:18:35.876Z",
+      "viewport": {
+        "width": 320,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "fleet-preferences",
+      "width": 390,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:18:37.074Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "overview-preferences",
+      "width": 390,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:18:38.873Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "performance-preferences",
+      "width": 390,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:18:40.269Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "players-preferences",
+      "width": 390,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:18:42.305Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "console-preferences",
+      "width": 390,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:18:43.729Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "backups-preferences",
+      "width": 390,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:18:45.010Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "access-preferences",
+      "width": 390,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:18:46.177Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "settings-preferences",
+      "width": 390,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:18:47.613Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "fleet-preferences",
+      "width": 820,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:18:48.836Z",
+      "viewport": {
+        "width": 820,
+        "height": 1180
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "overview-preferences",
+      "width": 820,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:18:50.752Z",
+      "viewport": {
+        "width": 820,
+        "height": 1180
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "performance-preferences",
+      "width": 820,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:18:52.276Z",
+      "viewport": {
+        "width": 820,
+        "height": 1180
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "players-preferences",
+      "width": 820,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:18:54.037Z",
+      "viewport": {
+        "width": 820,
+        "height": 1180
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "console-preferences",
+      "width": 820,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:18:55.513Z",
+      "viewport": {
+        "width": 820,
+        "height": 1180
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "backups-preferences",
+      "width": 820,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:18:56.857Z",
+      "viewport": {
+        "width": 820,
+        "height": 1180
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "access-preferences",
+      "width": 820,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:18:58.063Z",
+      "viewport": {
+        "width": 820,
+        "height": 1180
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "settings-preferences",
+      "width": 820,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:18:59.329Z",
+      "viewport": {
+        "width": 820,
+        "height": 1180
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "profile-interact",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:19:01.252Z",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "profile-moderate",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:19:02.803Z",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "profile-commands",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:19:04.452Z",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "review-typed",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:19:05.790Z",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "chat",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:19:07.273Z",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "plugins",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:19:08.618Z",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "devices",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:19:09.986Z",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "authority",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:19:11.839Z",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "settings-connection",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:19:13.294Z",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "settings-privacy",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:19:14.560Z",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "settings-diagnostics",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:19:15.873Z",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "review-ordinary",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:19:17.154Z",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "palette-no-results",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:19:18.532Z",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "profile-interact",
+      "width": 390,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:19:20.186Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "profile-moderate",
+      "width": 390,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:19:21.597Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "profile-commands",
+      "width": 390,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:19:22.952Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "review-typed",
+      "width": 390,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:19:24.202Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "chat",
+      "width": 390,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:19:25.500Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "plugins",
+      "width": 390,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:19:26.673Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "devices",
+      "width": 390,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:19:27.935Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "authority",
+      "width": 390,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:19:29.677Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "settings-connection",
+      "width": 390,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:19:30.950Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "settings-privacy",
+      "width": 390,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:19:32.070Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "settings-diagnostics",
+      "width": 390,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:19:33.672Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "review-ordinary",
+      "width": 390,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:19:34.922Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "palette-no-results",
+      "width": 390,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:19:36.139Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "navigation",
+      "width": 390,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:19:37.371Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "pairing",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:19:41.376Z",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    },
+    {
+      "name": "pairing",
+      "width": 390,
+      "theme": "light",
+      "overflow": false,
+      "violations": [],
+      "sourceHead": "bb1f811c4a72da0f537cf7361e20611941561255",
+      "browser": "157.0",
+      "capturedAt": "2026-10-16T20:19:42.304Z",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "zoom": "100% (no browser zoom applied)",
+      "fixture": "healthy / local synthetic",
+      "actualTheme": "light"
+    }
+  ],
+  "errors": []
+}

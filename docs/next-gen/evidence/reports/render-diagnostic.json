@@ -1,0 +1,2463 @@
+{
+  "browser": "157.0",
+  "sourceHeads": {
+    "baseline": "4357a66bc674fddce7432cbc27a4fead00ac8234",
+    "candidate": "5ea142df03d9c0978887be95a56f4ab724f1489b"
+  },
+  "diagnostics": {
+    "mixed": true,
+    "instrumentedReactProfiler": true,
+    "eventCount": 120
+  },
+  "environment": "Headless Firefox, same container and sequential identical 8192-point / 24-event replay at 1440x900, development Vite builds; not hardware certification or live VPS soak",
+  "reports": [
+    {
+      "name": "baseline-focus-run1",
+      "durationMs": 20162,
+      "visibilityAtStart": {
+        "visibility": "visible",
+        "focused": true
+      },
+      "hiddenFrames": 0,
+      "visibilityAtEnd": "visible",
+      "events": 120,
+      "renderProfiles": [
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 3,
+          "base": 3,
+          "start": 4114,
+          "commit": 4121
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 14,
+          "base": 13,
+          "start": 4106,
+          "commit": 4121
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 19,
+          "base": 18,
+          "start": 4102,
+          "commit": 4121
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 1,
+          "base": 1,
+          "start": 4417,
+          "commit": 4422
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 7,
+          "base": 7,
+          "start": 4414,
+          "commit": 4422
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 10,
+          "base": 11,
+          "start": 4411,
+          "commit": 4422
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 5,
+          "base": 5,
+          "start": 4806,
+          "commit": 4817
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 19,
+          "base": 19,
+          "start": 4796,
+          "commit": 4817
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 26,
+          "base": 26,
+          "start": 4791,
+          "commit": 4817
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 1,
+          "base": 1,
+          "start": 5417,
+          "commit": 5420
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 5,
+          "base": 5,
+          "start": 5414,
+          "commit": 5420
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 9,
+          "base": 9,
+          "start": 5411,
+          "commit": 5420
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 3,
+          "base": 3,
+          "start": 5578,
+          "commit": 5585
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 14,
+          "base": 14,
+          "start": 5569,
+          "commit": 5585
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 20,
+          "base": 20,
+          "start": 5565,
+          "commit": 5585
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 2,
+          "base": 2,
+          "start": 6248,
+          "commit": 6254
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 11,
+          "base": 10,
+          "start": 6242,
+          "commit": 6254
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 17,
+          "base": 16,
+          "start": 6237,
+          "commit": 6254
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 1,
+          "base": 1,
+          "start": 6532,
+          "commit": 6536
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 3,
+          "base": 3,
+          "start": 6529,
+          "commit": 6536
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 8,
+          "base": 9,
+          "start": 6526,
+          "commit": 6536
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 3,
+          "base": 3,
+          "start": 6914,
+          "commit": 6924
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 11,
+          "base": 11,
+          "start": 6907,
+          "commit": 6924
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 20,
+          "base": 20,
+          "start": 6904,
+          "commit": 6924
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 1,
+          "base": 1,
+          "start": 7531,
+          "commit": 7535
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 4,
+          "base": 4,
+          "start": 7529,
+          "commit": 7535
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 9,
+          "base": 10,
+          "start": 7526,
+          "commit": 7535
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 2,
+          "base": 2,
+          "start": 7644,
+          "commit": 7655
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 10,
+          "base": 10,
+          "start": 7638,
+          "commit": 7655
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 21,
+          "base": 20,
+          "start": 7634,
+          "commit": 7655
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 2,
+          "base": 2,
+          "start": 8322,
+          "commit": 8328
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 9,
+          "base": 9,
+          "start": 8317,
+          "commit": 8328
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 15,
+          "base": 15,
+          "start": 8313,
+          "commit": 8328
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 1,
+          "base": 1,
+          "start": 8618,
+          "commit": 8621
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 5,
+          "base": 5,
+          "start": 8615,
+          "commit": 8621
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 9,
+          "base": 10,
+          "start": 8612,
+          "commit": 8621
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 4,
+          "base": 4,
+          "start": 9001,
+          "commit": 9009
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 16,
+          "base": 15,
+          "start": 8992,
+          "commit": 9009
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 19,
+          "base": 18,
+          "start": 8989,
+          "commit": 9009
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 1,
+          "base": 1,
+          "start": 9617,
+          "commit": 9621
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 4,
+          "base": 4,
+          "start": 9615,
+          "commit": 9621
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 8,
+          "base": 8,
+          "start": 9612,
+          "commit": 9621
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 1,
+          "base": 1,
+          "start": 9695,
+          "commit": 9701
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 13,
+          "base": 13,
+          "start": 9684,
+          "commit": 9701
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 18,
+          "base": 18,
+          "start": 9680,
+          "commit": 9701
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 3,
+          "base": 3,
+          "start": 10420,
+          "commit": 10426
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 11,
+          "base": 10,
+          "start": 10414,
+          "commit": 10426
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 15,
+          "base": 14,
+          "start": 10411,
+          "commit": 10426
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 2,
+          "base": 2,
+          "start": 10678,
+          "commit": 10683
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 4,
+          "base": 4,
+          "start": 10677,
+          "commit": 10683
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 10,
+          "base": 11,
+          "start": 10673,
+          "commit": 10683
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 5,
+          "base": 5,
+          "start": 11061,
+          "commit": 11070
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 14,
+          "base": 13,
+          "start": 11054,
+          "commit": 11070
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 19,
+          "base": 18,
+          "start": 11050,
+          "commit": 11070
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 2,
+          "base": 2,
+          "start": 11679,
+          "commit": 11684
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 6,
+          "base": 5,
+          "start": 11677,
+          "commit": 11684
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 10,
+          "base": 10,
+          "start": 11674,
+          "commit": 11684
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 5,
+          "base": 5,
+          "start": 11769,
+          "commit": 11780
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 14,
+          "base": 14,
+          "start": 11762,
+          "commit": 11780
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 21,
+          "base": 21,
+          "start": 11759,
+          "commit": 11780
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 4,
+          "base": 4,
+          "start": 12458,
+          "commit": 12466
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 12,
+          "base": 12,
+          "start": 12452,
+          "commit": 12466
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 18,
+          "base": 18,
+          "start": 12448,
+          "commit": 12466
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 2,
+          "base": 2,
+          "start": 12812,
+          "commit": 12818
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 8,
+          "base": 8,
+          "start": 12808,
+          "commit": 12818
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 14,
+          "base": 16,
+          "start": 12804,
+          "commit": 12818
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 3,
+          "base": 3,
+          "start": 13212,
+          "commit": 13219
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 13,
+          "base": 12,
+          "start": 13203,
+          "commit": 13219
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 19,
+          "base": 18,
+          "start": 13199,
+          "commit": 13219
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 2,
+          "base": 2,
+          "start": 13821,
+          "commit": 13831
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 9,
+          "base": 8,
+          "start": 13816,
+          "commit": 13831
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 23,
+          "base": 23,
+          "start": 13807,
+          "commit": 13831
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 7,
+          "base": 7,
+          "start": 13893,
+          "commit": 13952
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 79,
+          "base": 77,
+          "start": 13871,
+          "commit": 13952
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 91,
+          "base": 88,
+          "start": 13861,
+          "commit": 13952
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 2,
+          "base": 2,
+          "start": 14613,
+          "commit": 14619
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 13,
+          "base": 13,
+          "start": 14605,
+          "commit": 14619
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 18,
+          "base": 18,
+          "start": 14601,
+          "commit": 14619
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 3,
+          "base": 3,
+          "start": 14895,
+          "commit": 14902
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 8,
+          "base": 8,
+          "start": 14893,
+          "commit": 14902
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 12,
+          "base": 13,
+          "start": 14889,
+          "commit": 14902
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 3,
+          "base": 3,
+          "start": 15285,
+          "commit": 15292
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 11,
+          "base": 11,
+          "start": 15279,
+          "commit": 15292
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 17,
+          "base": 16,
+          "start": 15275,
+          "commit": 15292
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 1,
+          "base": 1,
+          "start": 15898,
+          "commit": 15903
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 7,
+          "base": 7,
+          "start": 15894,
+          "commit": 15903
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 13,
+          "base": 13,
+          "start": 15890,
+          "commit": 15903
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 3,
+          "base": 3,
+          "start": 15937,
+          "commit": 15947
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 16,
+          "base": 16,
+          "start": 15930,
+          "commit": 15947
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 21,
+          "base": 20,
+          "start": 15926,
+          "commit": 15947
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 2,
+          "base": 2,
+          "start": 16574,
+          "commit": 16579
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 11,
+          "base": 10,
+          "start": 16567,
+          "commit": 16579
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 16,
+          "base": 15,
+          "start": 16563,
+          "commit": 16579
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 1,
+          "base": 1,
+          "start": 16896,
+          "commit": 16901
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 5,
+          "base": 5,
+          "start": 16894,
+          "commit": 16901
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 10,
+          "base": 10,
+          "start": 16891,
+          "commit": 16901
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 3,
+          "base": 3,
+          "start": 17238,
+          "commit": 17250
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 16,
+          "base": 14,
+          "start": 17232,
+          "commit": 17250
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 22,
+          "base": 20,
+          "start": 17228,
+          "commit": 17250
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 3,
+          "base": 3,
+          "start": 17875,
+          "commit": 17882
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 11,
+          "base": 10,
+          "start": 17869,
+          "commit": 17882
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 19,
+          "base": 18,
+          "start": 17863,
+          "commit": 17882
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 1,
+          "base": 1,
+          "start": 18147,
+          "commit": 18150
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 5,
+          "base": 5,
+          "start": 18144,
+          "commit": 18150
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 9,
+          "base": 8,
+          "start": 18141,
+          "commit": 18150
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 2,
+          "base": 2,
+          "start": 18540,
+          "commit": 18549
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 14,
+          "base": 14,
+          "start": 18534,
+          "commit": 18549
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 19,
+          "base": 19,
+          "start": 18530,
+          "commit": 18549
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 2,
+          "base": 2,
+          "start": 19147,
+          "commit": 19151
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 6,
+          "base": 6,
+          "start": 19144,
+          "commit": 19151
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 10,
+          "base": 11,
+          "start": 19141,
+          "commit": 19151
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 3,
+          "base": 3,
+          "start": 19189,
+          "commit": 19199
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 15,
+          "base": 14,
+          "start": 19183,
+          "commit": 19199
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 19,
+          "base": 18,
+          "start": 19180,
+          "commit": 19199
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 2,
+          "base": 2,
+          "start": 19823,
+          "commit": 19829
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 9,
+          "base": 9,
+          "start": 19818,
+          "commit": 19829
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 14,
+          "base": 14,
+          "start": 19814,
+          "commit": 19829
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 2,
+          "base": 2,
+          "start": 20154,
+          "commit": 20158
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 5,
+          "base": 5,
+          "start": 20152,
+          "commit": 20158
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 9,
+          "base": 10,
+          "start": 20149,
+          "commit": 20158
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 2,
+          "base": 2,
+          "start": 20438,
+          "commit": 20447
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 12,
+          "base": 12,
+          "start": 20433,
+          "commit": 20447
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 18,
+          "base": 18,
+          "start": 20429,
+          "commit": 20447
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 2,
+          "base": 2,
+          "start": 21069,
+          "commit": 21075
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 12,
+          "base": 12,
+          "start": 21061,
+          "commit": 21075
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 17,
+          "base": 16,
+          "start": 21058,
+          "commit": 21075
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 1,
+          "base": 1,
+          "start": 21318,
+          "commit": 21321
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 4,
+          "base": 4,
+          "start": 21316,
+          "commit": 21321
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 8,
+          "base": 9,
+          "start": 21313,
+          "commit": 21321
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 2,
+          "base": 2,
+          "start": 21725,
+          "commit": 21732
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 12,
+          "base": 12,
+          "start": 21718,
+          "commit": 21732
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 16,
+          "base": 16,
+          "start": 21715,
+          "commit": 21732
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 3,
+          "base": 3,
+          "start": 22321,
+          "commit": 22328
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 9,
+          "base": 9,
+          "start": 22317,
+          "commit": 22328
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 14,
+          "base": 15,
+          "start": 22314,
+          "commit": 22328
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 2,
+          "base": 2,
+          "start": 22363,
+          "commit": 22370
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 12,
+          "base": 12,
+          "start": 22355,
+          "commit": 22370
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 18,
+          "base": 18,
+          "start": 22351,
+          "commit": 22370
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 2,
+          "base": 2,
+          "start": 22999,
+          "commit": 23006
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 11,
+          "base": 10,
+          "start": 22993,
+          "commit": 23006
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 16,
+          "base": 14,
+          "start": 22989,
+          "commit": 23006
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 1,
+          "base": 1,
+          "start": 23319,
+          "commit": 23323
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 6,
+          "base": 6,
+          "start": 23316,
+          "commit": 23323
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 9,
+          "base": 10,
+          "start": 23313,
+          "commit": 23323
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 2,
+          "base": 2,
+          "start": 23651,
+          "commit": 23657
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 11,
+          "base": 11,
+          "start": 23644,
+          "commit": 23657
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 15,
+          "base": 15,
+          "start": 23642,
+          "commit": 23657
+        }
+      ],
+      "plotCount": 1,
+      "retainedSamples": 8192,
+      "domNodes": 593,
+      "svgPathCharacters": 14513,
+      "frames": 701,
+      "frameMedianMs": 17.06000000000131,
+      "frameP95Ms": 33.400000000000546,
+      "framesOver50ms": 33,
+      "consoleRenderedRows": 26,
+      "consoleWrappedRows": 400,
+      "heapMeasurement": "Not available through Firefox performance.memory; no heap growth claim"
+    },
+    {
+      "name": "candidate-focus-run1",
+      "durationMs": 21547,
+      "visibilityAtStart": {
+        "visibility": "visible",
+        "focused": true
+      },
+      "hiddenFrames": 0,
+      "visibilityAtEnd": "visible",
+      "events": 120,
+      "renderProfiles": [
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 3,
+          "base": 3,
+          "start": 3487,
+          "commit": 3490
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 3,
+          "base": 18,
+          "start": 3487,
+          "commit": 3490
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 3,
+          "base": 25,
+          "start": 3487,
+          "commit": 3490
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 3,
+          "base": 3,
+          "start": 3884,
+          "commit": 3891
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 19,
+          "base": 18,
+          "start": 3871,
+          "commit": 3891
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 25,
+          "base": 24,
+          "start": 3866,
+          "commit": 3891
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 1,
+          "base": 1,
+          "start": 4223,
+          "commit": 4227
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 7,
+          "base": 6,
+          "start": 4219,
+          "commit": 4227
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 11,
+          "base": 10,
+          "start": 4215,
+          "commit": 4227
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 2,
+          "base": 2,
+          "start": 4607,
+          "commit": 4614
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 14,
+          "base": 13,
+          "start": 4598,
+          "commit": 4614
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 20,
+          "base": 19,
+          "start": 4594,
+          "commit": 4614
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 3,
+          "base": 3,
+          "start": 5238,
+          "commit": 5246
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 10,
+          "base": 10,
+          "start": 5232,
+          "commit": 5246
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 17,
+          "base": 18,
+          "start": 5227,
+          "commit": 5246
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 3,
+          "base": 3,
+          "start": 5388,
+          "commit": 5395
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 11,
+          "base": 10,
+          "start": 5382,
+          "commit": 5395
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 17,
+          "base": 16,
+          "start": 5377,
+          "commit": 5395
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 2,
+          "base": 2,
+          "start": 6104,
+          "commit": 6110
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 14,
+          "base": 13,
+          "start": 6095,
+          "commit": 6110
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 19,
+          "base": 18,
+          "start": 6091,
+          "commit": 6110
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 2,
+          "base": 2,
+          "start": 6435,
+          "commit": 6440
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 6,
+          "base": 6,
+          "start": 6432,
+          "commit": 6440
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 12,
+          "base": 13,
+          "start": 6427,
+          "commit": 6440
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 2,
+          "base": 2,
+          "start": 6819,
+          "commit": 6825
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 12,
+          "base": 12,
+          "start": 6811,
+          "commit": 6825
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 19,
+          "base": 19,
+          "start": 6805,
+          "commit": 6825
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 1,
+          "base": 1,
+          "start": 7433,
+          "commit": 7437
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 5,
+          "base": 5,
+          "start": 7430,
+          "commit": 7437
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 9,
+          "base": 12,
+          "start": 7427,
+          "commit": 7437
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 2,
+          "base": 2,
+          "start": 7494,
+          "commit": 7500
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 14,
+          "base": 14,
+          "start": 7484,
+          "commit": 7500
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 19,
+          "base": 19,
+          "start": 7480,
+          "commit": 7500
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 2,
+          "base": 2,
+          "start": 8210,
+          "commit": 8216
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 12,
+          "base": 11,
+          "start": 8203,
+          "commit": 8216
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 16,
+          "base": 15,
+          "start": 8199,
+          "commit": 8216
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 1,
+          "base": 1,
+          "start": 8554,
+          "commit": 8557
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 5,
+          "base": 5,
+          "start": 8551,
+          "commit": 8557
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 9,
+          "base": 10,
+          "start": 8548,
+          "commit": 8557
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 2,
+          "base": 2,
+          "start": 8950,
+          "commit": 8964
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 15,
+          "base": 14,
+          "start": 8940,
+          "commit": 8964
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 29,
+          "base": 28,
+          "start": 8935,
+          "commit": 8964
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 2,
+          "base": 2,
+          "start": 9553,
+          "commit": 9558
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 5,
+          "base": 5,
+          "start": 9551,
+          "commit": 9558
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 10,
+          "base": 11,
+          "start": 9547,
+          "commit": 9558
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 2,
+          "base": 2,
+          "start": 9741,
+          "commit": 9746
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 10,
+          "base": 10,
+          "start": 9735,
+          "commit": 9746
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 15,
+          "base": 15,
+          "start": 9731,
+          "commit": 9746
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 2,
+          "base": 2,
+          "start": 10423,
+          "commit": 10429
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 12,
+          "base": 11,
+          "start": 10415,
+          "commit": 10429
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 18,
+          "base": 17,
+          "start": 10411,
+          "commit": 10429
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 0,
+          "base": 0,
+          "start": 10769,
+          "commit": 10772
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 4,
+          "base": 4,
+          "start": 10767,
+          "commit": 10772
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 9,
+          "base": 10,
+          "start": 10763,
+          "commit": 10772
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 2,
+          "base": 2,
+          "start": 11191,
+          "commit": 11197
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 14,
+          "base": 14,
+          "start": 11182,
+          "commit": 11197
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 19,
+          "base": 18,
+          "start": 11178,
+          "commit": 11197
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 1,
+          "base": 1,
+          "start": 11772,
+          "commit": 11776
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 4,
+          "base": 4,
+          "start": 11770,
+          "commit": 11776
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 9,
+          "base": 9,
+          "start": 11766,
+          "commit": 11776
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 2,
+          "base": 2,
+          "start": 11854,
+          "commit": 11860
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 13,
+          "base": 13,
+          "start": 11846,
+          "commit": 11860
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 17,
+          "base": 17,
+          "start": 11843,
+          "commit": 11860
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 2,
+          "base": 2,
+          "start": 12519,
+          "commit": 12526
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 11,
+          "base": 10,
+          "start": 12513,
+          "commit": 12526
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 17,
+          "base": 16,
+          "start": 12509,
+          "commit": 12526
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 1,
+          "base": 1,
+          "start": 12821,
+          "commit": 12825
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 4,
+          "base": 4,
+          "start": 12819,
+          "commit": 12825
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 8,
+          "base": 9,
+          "start": 12816,
+          "commit": 12825
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 2,
+          "base": 2,
+          "start": 13204,
+          "commit": 13211
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 13,
+          "base": 12,
+          "start": 13197,
+          "commit": 13211
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 17,
+          "base": 16,
+          "start": 13193,
+          "commit": 13211
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 0,
+          "base": 0,
+          "start": 13822,
+          "commit": 13824
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 4,
+          "base": 4,
+          "start": 13819,
+          "commit": 13824
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 8,
+          "base": 9,
+          "start": 13816,
+          "commit": 13824
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 1,
+          "base": 1,
+          "start": 13924,
+          "commit": 13929
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 12,
+          "base": 12,
+          "start": 13914,
+          "commit": 13929
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 16,
+          "base": 16,
+          "start": 13911,
+          "commit": 13929
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 2,
+          "base": 2,
+          "start": 14701,
+          "commit": 14708
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 11,
+          "base": 11,
+          "start": 14695,
+          "commit": 14708
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 16,
+          "base": 16,
+          "start": 14691,
+          "commit": 14708
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 0,
+          "base": 0,
+          "start": 15003,
+          "commit": 15006
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 4,
+          "base": 4,
+          "start": 15000,
+          "commit": 15006
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 10,
+          "base": 11,
+          "start": 14996,
+          "commit": 15006
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 4,
+          "base": 4,
+          "start": 15452,
+          "commit": 15464
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 20,
+          "base": 18,
+          "start": 15441,
+          "commit": 15464
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 29,
+          "base": 27,
+          "start": 15433,
+          "commit": 15464
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 1,
+          "base": 1,
+          "start": 16004,
+          "commit": 16009
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 5,
+          "base": 5,
+          "start": 16001,
+          "commit": 16009
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 10,
+          "base": 12,
+          "start": 15997,
+          "commit": 16009
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 3,
+          "base": 3,
+          "start": 16180,
+          "commit": 16188
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 12,
+          "base": 12,
+          "start": 16173,
+          "commit": 16188
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 18,
+          "base": 18,
+          "start": 16169,
+          "commit": 16188
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 2,
+          "base": 2,
+          "start": 16858,
+          "commit": 16866
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 12,
+          "base": 11,
+          "start": 16851,
+          "commit": 16866
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 20,
+          "base": 19,
+          "start": 16845,
+          "commit": 16866
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 1,
+          "base": 1,
+          "start": 17171,
+          "commit": 17174
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 4,
+          "base": 4,
+          "start": 17169,
+          "commit": 17174
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 9,
+          "base": 10,
+          "start": 17165,
+          "commit": 17174
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 2,
+          "base": 2,
+          "start": 17555,
+          "commit": 17561
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 11,
+          "base": 11,
+          "start": 17548,
+          "commit": 17561
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 18,
+          "base": 18,
+          "start": 17543,
+          "commit": 17561
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 1,
+          "base": 1,
+          "start": 18171,
+          "commit": 18175
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 5,
+          "base": 5,
+          "start": 18168,
+          "commit": 18175
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 10,
+          "base": 11,
+          "start": 18165,
+          "commit": 18175
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 2,
+          "base": 2,
+          "start": 18277,
+          "commit": 18282
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 10,
+          "base": 10,
+          "start": 18271,
+          "commit": 18282
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 16,
+          "base": 16,
+          "start": 18266,
+          "commit": 18282
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 3,
+          "base": 3,
+          "start": 18955,
+          "commit": 18962
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 12,
+          "base": 11,
+          "start": 18949,
+          "commit": 18962
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 17,
+          "base": 16,
+          "start": 18944,
+          "commit": 18962
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 2,
+          "base": 2,
+          "start": 19280,
+          "commit": 19286
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 8,
+          "base": 8,
+          "start": 19276,
+          "commit": 19286
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 12,
+          "base": 13,
+          "start": 19273,
+          "commit": 19286
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 2,
+          "base": 2,
+          "start": 19663,
+          "commit": 19670
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 13,
+          "base": 12,
+          "start": 19655,
+          "commit": 19670
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 18,
+          "base": 17,
+          "start": 19651,
+          "commit": 19670
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 1,
+          "base": 1,
+          "start": 20279,
+          "commit": 20282
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 4,
+          "base": 4,
+          "start": 20276,
+          "commit": 20282
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 9,
+          "base": 11,
+          "start": 20273,
+          "commit": 20282
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 2,
+          "base": 2,
+          "start": 20388,
+          "commit": 20395
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 15,
+          "base": 15,
+          "start": 20377,
+          "commit": 20395
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 25,
+          "base": 25,
+          "start": 20370,
+          "commit": 20395
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 3,
+          "base": 3,
+          "start": 21123,
+          "commit": 21130
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 11,
+          "base": 11,
+          "start": 21117,
+          "commit": 21130
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 17,
+          "base": 17,
+          "start": 21112,
+          "commit": 21130
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 1,
+          "base": 1,
+          "start": 21468,
+          "commit": 21472
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 5,
+          "base": 5,
+          "start": 21465,
+          "commit": 21472
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 10,
+          "base": 11,
+          "start": 21462,
+          "commit": 21472
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 2,
+          "base": 2,
+          "start": 21854,
+          "commit": 21859
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 14,
+          "base": 14,
+          "start": 21844,
+          "commit": 21859
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 19,
+          "base": 19,
+          "start": 21840,
+          "commit": 21859
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 0,
+          "base": 0,
+          "start": 22468,
+          "commit": 22471
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 3,
+          "base": 3,
+          "start": 22466,
+          "commit": 22471
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 8,
+          "base": 9,
+          "start": 22463,
+          "commit": 22471
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 2,
+          "base": 2,
+          "start": 22549,
+          "commit": 22556
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 21,
+          "base": 20,
+          "start": 22533,
+          "commit": 22556
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 28,
+          "base": 27,
+          "start": 22528,
+          "commit": 22556
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 2,
+          "base": 2,
+          "start": 23236,
+          "commit": 23242
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 9,
+          "base": 9,
+          "start": 23231,
+          "commit": 23242
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 15,
+          "base": 15,
+          "start": 23227,
+          "commit": 23242
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 1,
+          "base": 1,
+          "start": 23561,
+          "commit": 23565
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 5,
+          "base": 5,
+          "start": 23559,
+          "commit": 23565
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 10,
+          "base": 11,
+          "start": 23555,
+          "commit": 23565
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 1,
+          "base": 1,
+          "start": 23964,
+          "commit": 23969
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 9,
+          "base": 8,
+          "start": 23958,
+          "commit": 23969
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 14,
+          "base": 13,
+          "start": 23954,
+          "commit": 23969
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 1,
+          "base": 1,
+          "start": 24562,
+          "commit": 24566
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 4,
+          "base": 3,
+          "start": 24560,
+          "commit": 24566
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 9,
+          "base": 9,
+          "start": 24556,
+          "commit": 24566
+        },
+        {
+          "id": "TimeSeries",
+          "phase": "update",
+          "actual": 5,
+          "base": 5,
+          "start": 24668,
+          "commit": 24684
+        },
+        {
+          "id": "Performance",
+          "phase": "update",
+          "actual": 38,
+          "base": 37,
+          "start": 24641,
+          "commit": 24684
+        },
+        {
+          "id": "App",
+          "phase": "update",
+          "actual": 51,
+          "base": 49,
+          "start": 24632,
+          "commit": 24684
+        }
+      ],
+      "plotCount": 1,
+      "retainedSamples": 8192,
+      "domNodes": 606,
+      "svgPathCharacters": 14307,
+      "frames": 703,
+      "frameMedianMs": 17.040000000000873,
+      "frameP95Ms": 33.399999999999636,
+      "framesOver50ms": 33,
+      "consoleRenderedRows": 20,
+      "consoleWrappedRows": 400,
+      "heapMeasurement": "Not available through Firefox performance.memory; no heap growth claim"
+    }
+  ]
+}

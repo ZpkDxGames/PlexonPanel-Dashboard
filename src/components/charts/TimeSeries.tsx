@@ -21,6 +21,8 @@ import {
 import { usePlotHistory } from "../../presentation/PlotHistory";
 import { usePreferences } from "../../store/preferences";
 
+import { nearestObservation } from "../../presentation/nextgen/inspection";
+
 type Series = { key: MetricKey; label: string; color: string; unit: string };
 export type ChartEvidence = {
   capturedAt: string | null;
@@ -46,7 +48,8 @@ export const TimeSeries = memo(function TimeSeries({
   threshold,
   title,
   source = "Paper",
-  height = 230,
+  height: preferredHeight = 230,
+  mobileHeight,
   evidence,
   windowStart = -Infinity,
 }: {
@@ -58,6 +61,7 @@ export const TimeSeries = memo(function TimeSeries({
   title: string;
   source?: string;
   height?: number;
+  mobileHeight?: number;
   evidence?: ChartEvidence;
   windowStart?: number;
 }) {
@@ -68,7 +72,13 @@ export const TimeSeries = memo(function TimeSeries({
     [width, setWidth] = useState(600),
     [pinned, setPinned] = useState<number | null>(null),
     [localAt, setLocalAt] = useState<number | null>(null);
+  const height =
+    width < 420
+      ? (mobileHeight ?? Math.min(preferredHeight, 260))
+      : preferredHeight;
   const touchClick = useRef(false);
+  const pointerFrame = useRef(0);
+  useEffect(() => () => cancelAnimationFrame(pointerFrame.current), []);
   const svgRef = useRef<SVGSVGElement>(null),
     id = useId().replaceAll(":", ""),
     crosshair = useContext(Crosshair);
@@ -81,19 +91,31 @@ export const TimeSeries = memo(function TimeSeries({
     observer.observe(svg);
     return () => observer.disconnect();
   }, []);
-  const signature = series.map((item) => `${item.key}:${item.unit}`).join("|");
-  const projected = useMemo(
-    () =>
-      series.map((item) => ({
-        item,
-        points: historyFor(
-          epochHistories?.[sourceFor[item.key]] ?? samples,
-          sourceFor[item.key],
-          windowStart,
-        ),
-      })),
-    [samples, signature, windowStart, epochHistories],
-  );
+  const signature = JSON.stringify(series);
+  const wanted = new Set(series.map((item) => sourceFor[item.key]));
+  const paperHealth = wanted.has("paperHealth")
+    ? (epochHistories?.paperHealth ?? samples)
+    : null;
+  const paperSystem = wanted.has("paperSystem")
+    ? (epochHistories?.paperSystem ?? samples)
+    : null;
+  const hostSystem = wanted.has("hostSystem")
+    ? (epochHistories?.hostSystem ?? samples)
+    : null;
+  const service = wanted.has("service")
+    ? (epochHistories?.service ?? samples)
+    : null;
+  const projected = useMemo(() => {
+    const inputs = { paperHealth, paperSystem, hostSystem, service };
+    return series.map((item) => ({
+      item,
+      points: historyFor(
+        inputs[sourceFor[item.key]] ?? [],
+        sourceFor[item.key],
+        windowStart,
+      ),
+    }));
+  }, [signature, windowStart, paperHealth, paperSystem, hostSystem, service]);
   const all = useMemo(() => {
     if (projected.length === 1)
       return projected[0].points.filter((sample) =>
@@ -135,10 +157,15 @@ export const TimeSeries = memo(function TimeSeries({
           ? "KiB"
           : "B"
     : (series[0]?.unit ?? "");
+  const numberFormatters = useMemo(
+    () => [
+      new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 }),
+      new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 }),
+    ],
+    [],
+  );
   const format = (value: number, digits = 1) =>
-    (value / divisor).toLocaleString(undefined, {
-      maximumFractionDigits: digits,
-    });
+    numberFormatters[digits === 2 ? 1 : 0].format(value / divisor);
   const clockFormatters = useMemo(
     () => ({
       short: new Intl.DateTimeFormat(undefined, {
@@ -171,32 +198,28 @@ export const TimeSeries = memo(function TimeSeries({
   const y = (value: number) =>
     bottom - ((value - yMin) / Math.max(1, maximum - yMin)) * (bottom - top);
   const focusAt = pinned ?? crosshair.at ?? localAt;
+  const pinExpired =
+    pinned !== null && !all.some((sample) => sample.at === pinned);
   const nearest =
-    focusAt === null || !all.length
-      ? null
-      : all.reduce((best, sample) =>
-          Math.abs(sample.at - focusAt) < Math.abs(best.at - focusAt)
-            ? sample
-            : best,
-        );
+    focusAt === null || pinExpired ? null : nearestObservation(all, focusAt);
   const inspect = (at: number | null) => {
     setLocalAt(at);
     crosshair.setAt(at);
   };
   const move = (clientX: number, rect: DOMRect) => {
     if (pinned !== null || !all.length) return;
-    inspect(
-      chartTimeAt(
-        clientX,
-        rect.left,
-        rect.width,
-        width,
-        left,
-        right,
-        minAt,
-        maxAt,
-      ),
+    const nextAt = chartTimeAt(
+      clientX,
+      rect.left,
+      rect.width,
+      width,
+      left,
+      right,
+      minAt,
+      maxAt,
     );
+    cancelAnimationFrame(pointerFrame.current);
+    pointerFrame.current = requestAnimationFrame(() => inspect(nextAt));
   };
   const step = (direction: number) => {
     if (!all.length) return;
@@ -212,6 +235,51 @@ export const TimeSeries = memo(function TimeSeries({
     if (pinned !== null) setPinned(all[next].at);
     inspect(all[next].at);
   };
+  const traces = useMemo(
+    () =>
+      visible.map(({ item, points }) => (
+        <g key={item.key}>
+          {displaySegments(
+            points,
+            item.key,
+            Math.max(100, Math.floor(width * 0.8)),
+          ).map((segment, index) => {
+            const line = segment
+              .map(
+                (sample, i) =>
+                  `${i ? "L" : "M"}${x(sample.at).toFixed(2)},${y(sample[item.key] as number).toFixed(2)}`,
+              )
+              .join("");
+            return (
+              <g key={index}>
+                {segment.length > 1 && (
+                  <path
+                    className="chart-area"
+                    d={`${line}L${x(segment.at(-1)!.at)},${bottom}L${x(segment[0].at)},${bottom}Z`}
+                    fill={`url(#${id}-${item.key})`}
+                  />
+                )}
+                <path
+                  className="chart-line"
+                  d={line}
+                  stroke={item.color}
+                  fill="none"
+                />
+                {segment.length === 1 && (
+                  <circle
+                    cx={x(segment[0].at)}
+                    cy={y(segment[0][item.key] as number)}
+                    r="3"
+                    fill={item.color}
+                  />
+                )}
+              </g>
+            );
+          })}
+        </g>
+      )),
+    [projected, hidden, width, minAt, maxAt, maximum, yMin, height, id],
+  );
   const exact = (points: Sample[], key: MetricKey) =>
     nearest
       ? points.find((sample) => sample.at === nearest.at && finite(sample[key]))
@@ -270,8 +338,9 @@ export const TimeSeries = memo(function TimeSeries({
                 maxAt,
               );
               touchClick.current = true;
-              inspect(at);
-              setPinned(at);
+              const actual = nearestObservation(all, at)?.at ?? at;
+              inspect(actual);
+              setPinned(actual);
             }
           }}
           onPointerMove={(event) =>
@@ -296,6 +365,14 @@ export const TimeSeries = memo(function TimeSeries({
             if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
               event.preventDefault();
               step(event.key === "ArrowLeft" ? -1 : 1);
+            }
+            if (event.key === "Home" || event.key === "End") {
+              event.preventDefault();
+              const sample = event.key === "Home" ? all[0] : all.at(-1);
+              if (sample) {
+                inspect(sample.at);
+                if (pinned !== null) setPinned(sample.at);
+              }
             }
             if (event.key === "Escape") {
               setPinned(null);
@@ -364,47 +441,7 @@ export const TimeSeries = memo(function TimeSeries({
               </text>
             </g>
           )}
-          {visible.map(({ item, points }) => (
-            <g key={item.key}>
-              {displaySegments(
-                points,
-                item.key,
-                Math.max(100, Math.floor(width * 0.8)),
-              ).map((segment, index) => {
-                const line = segment
-                  .map(
-                    (sample, i) =>
-                      `${i ? "L" : "M"}${x(sample.at).toFixed(2)},${y(sample[item.key] as number).toFixed(2)}`,
-                  )
-                  .join("");
-                return (
-                  <g key={index}>
-                    {segment.length > 1 && (
-                      <path
-                        className="chart-area"
-                        d={`${line}L${x(segment.at(-1)!.at)},${bottom}L${x(segment[0].at)},${bottom}Z`}
-                        fill={`url(#${id}-${item.key})`}
-                      />
-                    )}
-                    <path
-                      className="chart-line"
-                      d={line}
-                      stroke={item.color}
-                      fill="none"
-                    />
-                    {segment.length === 1 && (
-                      <circle
-                        cx={x(segment[0].at)}
-                        cy={y(segment[0][item.key] as number)}
-                        r="3"
-                        fill={item.color}
-                      />
-                    )}
-                  </g>
-                );
-              })}
-            </g>
-          ))}
+          {traces}
           {all.length > 0 && (
             <>
               <text x={left} y={height - 5}>
@@ -460,8 +497,10 @@ export const TimeSeries = memo(function TimeSeries({
             </span>
           </div>
         )}
+      </div>
+      <div className="inspection-shelf">
         {nearest && visible.length > 0 && (
-          <div className="chart-tooltip" role="status">
+          <div className="inspection-reading" role="status">
             <strong>
               {time(nearest.at, true)} {pinned !== null ? "· pinned" : ""}
             </strong>
@@ -481,6 +520,27 @@ export const TimeSeries = memo(function TimeSeries({
             })}
             <small>{source} · source capture time</small>
           </div>
+        )}
+        {!nearest && (
+          <p
+            className="inspection-hint"
+            role={pinExpired ? "status" : undefined}
+          >
+            {pinExpired
+              ? "Pinned sample is outside this source window. Clear pin to inspect current observations."
+              : "Inspect an actual observation with touch, pointer or Previous / Next."}
+          </p>
+        )}
+        {pinExpired && (
+          <button
+            className="text-link"
+            onClick={() => {
+              setPinned(null);
+              inspect(null);
+            }}
+          >
+            Clear pin
+          </button>
         )}
       </div>
       <div id={`${id}-table`} hidden={!table}>

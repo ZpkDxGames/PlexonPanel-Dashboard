@@ -13,6 +13,8 @@ import { Icon } from "../components/Icon";
 import { SectionLabel } from "../components/Telemetry";
 import { useSession, useNow } from "../hooks";
 import { bytes } from "../store/selectors";
+import { useTimestamp } from "../presentation/nextgen/time";
+import { ActionAvailability } from "../components/nextgen/ActionAvailability";
 const phases = [
   ["QUEUED", "Queued"],
   ["PREFLIGHT", "Preflight"],
@@ -44,6 +46,7 @@ function size(value: unknown) {
     : "Not reported";
 }
 export default function Backups() {
+  const stamp = useTimestamp();
   const snap = useSession(),
     now = useNow(),
     [preflight, setPreflight] = useState<JsonMap>({}),
@@ -54,15 +57,27 @@ export default function Backups() {
     [countdown, setCountdown] = useState(900),
     [loading, setLoading] = useState(false),
     [checkedAt, setCheckedAt] = useState(0),
-    [statusAt, setStatusAt] = useState(0);
+    [statusAt, setStatusAt] = useState(0),
+    [reads, setReads] = useState<
+      Record<string, { state: string; error: string; at: number }>
+    >({});
   const mounted = useRef(true),
-    sequence = useRef(0);
+    sequence = useRef(0),
+    fullPending = useRef(false);
   const refresh = async (statusOnly = false) => {
+    if (statusOnly && fullPending.current) return;
     const ticket = ++sequence.current;
+    if (!statusOnly) fullPending.current = true;
     if (!statusOnly) {
       setLoading(true);
-      setPreflight({});
-      setCheckedAt(0);
+      setReads((old) =>
+        Object.fromEntries(
+          ["preflight", "status", "inventory"].map((key) => [
+            key,
+            { state: "loading", error: "", at: old[key]?.at ?? 0 },
+          ]),
+        ),
+      );
     }
     setError("");
     const tasks = statusOnly
@@ -74,16 +89,26 @@ export default function Backups() {
         ];
     const results = await Promise.allSettled(tasks);
     if (!mounted.current || ticket !== sequence.current) return;
-    const failures: string[] = [];
+    const nextReads: Record<
+      string,
+      { state: string; error: string; at: number }
+    > = {};
     results.forEach((result, index) => {
-      if (result.status === "rejected") {
-        failures.push(
-          result.reason instanceof Error
-            ? result.reason.message
-            : "Host query unavailable.",
-        );
+      const key = statusOnly
+        ? "status"
+        : ["preflight", "status", "inventory"][index];
+      if (result.status === "rejected" || result.value.status !== "SUCCESS") {
+        const message =
+          result.status === "rejected"
+            ? result.reason instanceof Error
+              ? result.reason.message
+              : "Host query unavailable."
+            : result.value.message || result.value.code;
+        nextReads[key] = { state: "failed", error: message, at: 0 };
+        if (key === "preflight") setCheckedAt(0);
         return;
       }
+      nextReads[key] = { state: "received", error: "", at: Date.now() };
       const data = record(result.value.data);
       if (statusOnly || index === 1) {
         setOperation(record(data.currentOperation));
@@ -93,7 +118,8 @@ export default function Backups() {
         setCheckedAt(Date.now());
       } else setBackups(records(data.backups));
     });
-    setError([...new Set(failures)].join(" "));
+    setReads((old) => ({ ...old, ...nextReads }));
+    fullPending.current = false;
     setLoading(false);
   };
   useEffect(() => {
@@ -102,12 +128,12 @@ export default function Backups() {
     return () => {
       mounted.current = false;
       sequence.current++;
+      fullPending.current = false;
     };
   }, [snap.phase, snap.revision]);
   const phase = str(operation.phase, "IDLE"),
     jobId = str(operation.jobId, ""),
-    active = !terminal.has(phase),
-    currentIndex = phases.findIndex(([key]) => key === phase);
+    active = !terminal.has(phase);
   useEffect(() => {
     if (!active || snap.phase !== "live") return;
     const timer = setInterval(() => {
@@ -118,6 +144,7 @@ export default function Backups() {
   const fresh = checkedAt > 0 && now - checkedAt <= 30000,
     ready =
       fresh &&
+      reads.preflight?.state === "received" &&
       preflight.hostAuthenticated === true &&
       preflight.operationBusy === false &&
       preflight.recoveryRequired === false &&
@@ -177,97 +204,353 @@ export default function Backups() {
           : `Operation / ${phase.replaceAll("_", " ").toLowerCase()}`;
   return (
     <>
-      <section className="backup-titlebar">
-        <div>
-          <span className="eyebrow">MANUAL FULL BACKUPS</span>
-          <h2>{title}</h2>
-          <p>
-            A full backup saves your worlds, stops the exact service, verifies
-            the archive and off-site copy, then brings Minecraft back online.
-          </p>
-        </div>
-        <div className="backup-create">
-          <label className="field">
-            Player warning countdown
-            <select
-              value={countdown}
-              onChange={(e) => setCountdown(Number(e.target.value))}
-            >
-              {[1800, 900, 600, 300].map((seconds) => (
-                <option key={seconds} value={seconds}>
-                  {seconds / 60} minutes
-                </option>
-              ))}
-            </select>
-          </label>
-          <Button
-            variant="primary"
-            disabled={
-              !ready ||
-              !!session.reason("maintenance.full-backup.create", "HOST")
-            }
-            title={
-              !ready
-                ? "Refresh and pass every authoritative preflight check."
-                : session.reason("maintenance.full-backup.create", "HOST")
-            }
-            onClick={() =>
-              prepare("maintenance.full-backup.create", {
-                countdownSeconds: countdown,
-              })
-            }
-          >
-            <Icon name="backups" />
-            Review new backup
-          </Button>
-        </div>
-      </section>
-      <div className="readiness-band">
+      <aside className="job-book">
         {" "}
         <Panel
-          eyebrow="HOST EVIDENCE"
-          title="Preflight checklist"
+          eyebrow="DURABLE HOST WORKFLOW"
+          title={phase === "IDLE" ? "No reported operation" : "Latest Host job"}
           description={
-            fresh
-              ? "Authoritative checks from the Host."
-              : "Refresh evidence before creating a backup."
+            jobId
+              ? `Job ${jobId}`
+              : "The Host owns every phase, including recovery."
+          }
+          action={
+            <Status
+              tone={
+                phase === "DEGRADED"
+                  ? "warning"
+                  : phase === "FAILED" || phase === "RECOVERY_REQUIRED"
+                    ? "error"
+                    : phase === "COMPLETED"
+                      ? "success"
+                      : active
+                        ? "info"
+                        : "neutral"
+              }
+            >
+              {phase}
+            </Status>
           }
         >
-          <dl className="gate-list">
-            {gates.map(([label, value]) => (
-              <div className="gate-item" key={label}>
-                <dt>{label}</dt>
-                <dd>
-                  <Status
-                    tone={
-                      fresh && value === "Ready"
-                        ? "success"
-                        : value === "Blocked"
-                          ? "error"
-                          : "neutral"
-                    }
-                  >
-                    {fresh ? value : "Unknown"}
-                  </Status>
-                </dd>
+          <p className="read-evidence">
+            {reads.status?.error
+              ? `Status read unavailable: ${reads.status.error}. Showing last received evidence.`
+              : statusAt
+                ? `Host status · ${Math.max(0, Math.floor((now - statusAt) / 1000))}s since receipt${now - statusAt > 30000 ? " · stale" : ""}`
+                : "No durable Host status received."}
+          </p>
+          <div className="operation-register">
+            <div>
+              <span>Local verification</span>
+              <Status
+                tone={
+                  operation.localBackupVerified === true ? "success" : "neutral"
+                }
+              >
+                {operation.localBackupVerified === true
+                  ? "Verified"
+                  : operation.localBackupVerified === false
+                    ? "Not verified"
+                    : "Unknown"}
+              </Status>
+            </div>
+            <div>
+              <span>Remote verification</span>
+              <Status
+                tone={
+                  operation.remoteBackupVerified === true
+                    ? "success"
+                    : "warning"
+                }
+              >
+                {operation.remoteBackupVerified === true
+                  ? "Verified"
+                  : operation.remoteBackupVerified === false
+                    ? "Not verified"
+                    : "Unknown"}
+              </Status>
+            </div>
+          </div>
+          {operation.message !== undefined && (
+            <div className="operation-message">
+              <Notice
+                tone={phase === "DEGRADED" ? "warning" : "neutral"}
+                title={str(operation.errorCode, "Host status")}
+              >
+                {str(operation.message)}
+              </Notice>
+            </div>
+          )}
+          {phase === "DEGRADED" && (
+            <div className="degraded-summary">
+              <div>
+                <strong>
+                  {operation.localBackupVerified === true
+                    ? "Local archive verified. Off-site verification is incomplete."
+                    : "The Host reported a degraded operation."}
+                </strong>
               </div>
-            ))}
-          </dl>
-          <div className="panel-actions">
-            <Button
-              loading={loading}
-              disabled={!!session.reason("backup.preflight", "HOST")}
-              title={session.reason("backup.preflight", "HOST")}
-              onClick={() => void refresh()}
+              {operation.retryable === true && (
+                <Button
+                  disabled={
+                    !!session.reason("backup.full.retry-upload", "HOST")
+                  }
+                  onClick={() =>
+                    prepare("backup.full.retry-upload", {
+                      backupId: str(operation.backupId),
+                    })
+                  }
+                >
+                  Review upload retry
+                </Button>
+              )}
+              <ActionAvailability reason={session.reason("backup.full.retry-upload", "HOST")} />
+              <span>
+                Upload retry reuses the existing archive without another shutdown.
+              </span>
+            </div>
+          )}
+          <details className="phase-details">
+            <summary>Phase details · {phase}</summary>
+            <div
+              className="phase-timeline"
+              aria-label="Backup operation phases"
             >
-              Refresh evidence
+              {[
+                ["Prepare", 0, 3],
+                ["Stop", 3, 6],
+                ["Archive", 6, 9],
+                ["Off-site", 9, 12],
+                ["Return online", 12, 15],
+              ].map(([label, start, end]) => (
+                <details className="phase-group" key={String(label)}>
+                  <summary>
+                    {label}
+                    {phases
+                      .slice(Number(start), Number(end))
+                      .some(([key]) => key === phase)
+                      ? " · reported now"
+                      : ""}
+                  </summary>
+                  {phases
+                    .slice(Number(start), Number(end))
+                    .map(([key, title]) => (
+                      <div
+                        key={key}
+                        aria-current={key === phase ? "step" : undefined}
+                        className={key === phase ? "current" : "pending"}
+                      >
+                        <i />
+                        {title}
+                        <small>{key}</small>
+                      </div>
+                    ))}
+                </details>
+              ))}
+            </div>
+          </details>
+          {active && (
+            <section
+              className={`backup-progress ${ratio === null ? "indeterminate" : ""}`}
+            >
+              <header>
+                <div>
+                  <span>Reported Host progress</span>
+                  <strong>{progressPhase.replaceAll("_", " ")}</strong>
+                </div>
+                <strong>
+                  {ratio === null ? "—" : `${Math.round(ratio * 100)}%`}
+                </strong>
+              </header>
+              <div
+                className="progress-track"
+                role="progressbar"
+                aria-label="Reported backup progress"
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-valuenow={
+                  ratio === null ? undefined : Math.round(ratio * 100)
+                }
+              >
+                <i style={{ "--progress": ratio ?? 0 } as CSSProperties} />
+              </div>
+              <div className="backup-progress-meta">
+                <span>
+                  Processed
+                  <strong>
+                    {size(processed)} / {size(total)}
+                  </strong>
+                </span>
+                <span>
+                  Transfer rate
+                  <strong>
+                    {number(progress?.bytesPerSecond) === null
+                      ? "Not reported"
+                      : `${size(progress?.bytesPerSecond)}/s`}
+                  </strong>
+                </span>
+                <span>
+                  Provider
+                  <strong>
+                    {str(progress?.providerState, "Not reported")}
+                  </strong>
+                </span>
+              </div>
+              {phase === "COUNTDOWN" && (
+                <p className="subtle">
+                  Host countdown:{" "}
+                  {number(operation.remainingSeconds) ?? "Not reported"} seconds
+                  remaining.
+                </p>
+              )}
+            </section>
+          )}
+          {operation.restartRecoveryRequired !== undefined && (
+            <p className="read-evidence">
+              Restart recovery:{" "}
+              {operation.restartRecoveryRequired === true
+                ? "Required · follow the Host operator procedure"
+                : operation.restartRecoveryRequired === false
+                  ? "Not required by Host"
+                  : "Unknown"}
+            </p>
+          )}
+          <div className="journal-footnote">
+            <p>
+              Workflow order only. The highlighted phase is reported by the
+              Host; earlier stages may have been skipped.
+            </p>
+            {statusAt
+              ? `Host status read ${stamp(statusAt)}. Closing this browser does not cancel a job.`
+              : "No durable Host status received."}
+          </div>
+        </Panel>
+      </aside>
+      <div className="backup-create-preflight">
+        <section className="backup-titlebar">
+          <div>
+            <span className="eyebrow">MANUAL FULL BACKUPS</span>
+            <h2>{title}</h2>
+            <p>
+              A full backup saves your worlds, stops the exact service, verifies
+              the archive and off-site copy, then brings Minecraft back online.
+            </p>
+          </div>
+          <div className="backup-create">
+            <label className="field">
+              Player warning countdown
+              <select
+                value={countdown}
+                onChange={(e) => setCountdown(Number(e.target.value))}
+              >
+                {[1800, 900, 600, 300].map((seconds) => (
+                  <option key={seconds} value={seconds}>
+                    {seconds / 60} minutes
+                  </option>
+                ))}
+              </select>
+            </label>
+            <Button
+              variant="primary"
+              disabled={
+                !ready ||
+                !!session.reason("maintenance.full-backup.create", "HOST")
+              }
+              title={
+                !ready
+                  ? "Refresh and pass every authoritative preflight check."
+                  : session.reason("maintenance.full-backup.create", "HOST")
+              }
+              onClick={() =>
+                prepare("maintenance.full-backup.create", {
+                  countdownSeconds: countdown,
+                })
+              }
+            >
+              <Icon name="backups" />
+              Review new backup
             </Button>
           </div>
-          <p className="preflight-note">
-            Unknown or expired checks keep creation disabled. A provider
-            connectivity check does not certify an off-site backup.
-          </p>
-        </Panel>
+          <ActionAvailability
+            reason={
+              !ready
+                ? "Creation requires fresh successful Host preflight. Unknown or expired checks keep creation disabled."
+                : session.reason("maintenance.full-backup.create", "HOST")
+            }
+          />
+        </section>
+        <div className="readiness-band">
+          {" "}
+          <Panel
+            eyebrow="HOST EVIDENCE"
+            title="Preflight checklist"
+            description={
+              fresh
+                ? "Authoritative checks from the Host."
+                : "Refresh evidence before creating a backup."
+            }
+          >
+            {reads.preflight?.error && (
+              <p className="read-error" role="status">
+                Preflight unavailable: {reads.preflight.error}. Unreported
+                checks remain Unknown.
+              </p>
+            )}
+            <dl className="preflight-facts">
+              <dt>Provider</dt>
+              <dd>
+                {str(preflight.provider, "Unknown")} ·{" "}
+                {str(preflight.providerStatus, "Unknown")}
+                {!fresh && " · last received / not current readiness"}
+              </dd>
+              <dt>Source size</dt>
+              <dd>{size(preflight.sourceBytes)}</dd>
+              <dt>Source entries</dt>
+              <dd>
+                {number(preflight.entryCount)?.toLocaleString() ?? "Unknown"}
+              </dd>
+              <dt>Usable storage</dt>
+              <dd>{size(preflight.usableBytes)}</dd>
+              <dt>Required storage</dt>
+              <dd>{size(preflight.requiredBytes)}</dd>
+            </dl>
+            <dl className="gate-list">
+              {gates.map(([label, value]) => (
+                <div className="gate-item" key={label}>
+                  <dt>{label}</dt>
+                  <dd>
+                    <Status
+                      tone={
+                        fresh && value === "Ready"
+                          ? "success"
+                          : value === "Blocked"
+                            ? "error"
+                            : "neutral"
+                      }
+                    >
+                      {fresh ? value : "Unknown"}
+                    </Status>
+                  </dd>
+                </div>
+              ))}
+            </dl>
+            <div className="panel-actions">
+              <Button
+                loading={loading}
+                disabled={!!session.reason("backup.preflight", "HOST")}
+                title={session.reason("backup.preflight", "HOST")}
+                onClick={() => void refresh()}
+              >
+                Refresh evidence
+              </Button>
+              <ActionAvailability reason={session.reason("backup.preflight", "HOST")} />
+            </div>
+            <p className="preflight-note">
+              Unknown or expired checks keep creation disabled. A provider
+              connectivity check does not certify an off-site backup.
+            </p>
+          </Panel>
+        </div>
       </div>
       <div className="backup-workspace">
         <div className="archive-book">
@@ -278,6 +561,13 @@ export default function Backups() {
             detail={`${backups.length} reported restore points`}
           />
           <Panel>
+            <p className="read-evidence">
+              {reads.inventory?.error
+                ? `Inventory read unavailable: ${reads.inventory.error}. Last received records retained.`
+                : reads.inventory?.state === "received"
+                  ? `Host inventory received ${stamp(reads.inventory.at)}. Availability is separate from verification.`
+                  : "Reading authorized Host inventory…"}
+            </p>
             <div
               className="backup-table table-region"
               tabIndex={0}
@@ -303,7 +593,11 @@ export default function Backups() {
                           <strong>{str(backup.filename)}</strong>
                           <small>{str(backup.backupId)}</small>
                         </td>
-                        <td>{str(backup.timestamp)}</td>
+                        <td>
+                          <time title={str(backup.timestamp)}>
+                            {stamp(backup.timestamp)}
+                          </time>
+                        </td>
                         <td>{size(backup.archiveBytes)}</td>
                         <td>
                           <Status
@@ -357,12 +651,24 @@ export default function Backups() {
                               Delete
                             </Button>
                           </div>
+                          <ActionAvailability
+                            reason={[
+                              ...new Set([
+                                session.reason("backup.full.verify", "HOST"),
+                                session.reason("backup.full.delete", "HOST"),
+                              ].filter(Boolean)),
+                            ].join(" ")}
+                          />
                         </td>
                       </tr>
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={6}>No authorized inventory received.</td>
+                      <td colSpan={6}>
+                        {reads.inventory?.state === "received"
+                          ? "Host reported an empty archive inventory."
+                          : "No current authorized inventory received."}
+                      </td>
                     </tr>
                   )}
                 </tbody>
@@ -370,204 +676,6 @@ export default function Backups() {
             </div>
           </Panel>
         </div>
-        <aside className="job-book">
-          {" "}
-          <Panel
-            eyebrow="DURABLE HOST WORKFLOW"
-            title={
-              phase === "IDLE" ? "No reported operation" : "Latest Host job"
-            }
-            description={
-              jobId
-                ? `Job ${jobId}`
-                : "The Host owns every phase, including recovery."
-            }
-            action={
-              <Status
-                tone={
-                  phase === "DEGRADED"
-                    ? "warning"
-                    : phase === "FAILED" || phase === "RECOVERY_REQUIRED"
-                      ? "error"
-                      : phase === "COMPLETED"
-                        ? "success"
-                        : active
-                          ? "info"
-                          : "neutral"
-                }
-              >
-                {phase}
-              </Status>
-            }
-          >
-            <div className="operation-register">
-              <div>
-                <span>Local verification</span>
-                <Status
-                  tone={
-                    operation.localBackupVerified === true
-                      ? "success"
-                      : "neutral"
-                  }
-                >
-                  {operation.localBackupVerified === true
-                    ? "Verified"
-                    : operation.localBackupVerified === false
-                      ? "Not verified"
-                      : "Unknown"}
-                </Status>
-              </div>
-              <div>
-                <span>Remote verification</span>
-                <Status
-                  tone={
-                    operation.remoteBackupVerified === true
-                      ? "success"
-                      : "warning"
-                  }
-                >
-                  {operation.remoteBackupVerified === true
-                    ? "Verified"
-                    : operation.remoteBackupVerified === false
-                      ? "Not verified"
-                      : "Unknown"}
-                </Status>
-              </div>
-            </div>
-            <div
-              className="phase-timeline"
-              aria-label="Backup operation phases"
-            >
-              {phases.map(([key, label], index) => (
-                <div
-                  key={key}
-                  aria-current={index === currentIndex ? "step" : undefined}
-                  title={
-                    index < currentIndex
-                      ? "Earlier workflow position; this is not a per-stage completion record."
-                      : undefined
-                  }
-                  className={
-                    currentIndex < 0
-                      ? "pending"
-                      : index < currentIndex
-                        ? "prior"
-                        : index === currentIndex
-                          ? "current"
-                          : "pending"
-                  }
-                >
-                  <i />
-                  <span>{label}</span>
-                </div>
-              ))}
-            </div>
-            {active && (
-              <section
-                className={`backup-progress ${ratio === null ? "indeterminate" : ""}`}
-              >
-                <header>
-                  <div>
-                    <span>Reported Host progress</span>
-                    <strong>{progressPhase.replaceAll("_", " ")}</strong>
-                  </div>
-                  <strong>
-                    {ratio === null ? "—" : `${Math.round(ratio * 100)}%`}
-                  </strong>
-                </header>
-                <div
-                  className="progress-track"
-                  role="progressbar"
-                  aria-label="Reported backup progress"
-                  aria-valuemin={0}
-                  aria-valuemax={100}
-                  aria-valuenow={
-                    ratio === null ? undefined : Math.round(ratio * 100)
-                  }
-                >
-                  <i style={{ "--progress": ratio ?? 0 } as CSSProperties} />
-                </div>
-                <div className="backup-progress-meta">
-                  <span>
-                    Processed
-                    <strong>
-                      {size(processed)} / {size(total)}
-                    </strong>
-                  </span>
-                  <span>
-                    Transfer rate
-                    <strong>
-                      {number(progress?.bytesPerSecond) === null
-                        ? "Not reported"
-                        : `${size(progress?.bytesPerSecond)}/s`}
-                    </strong>
-                  </span>
-                  <span>
-                    Provider
-                    <strong>
-                      {str(progress?.providerState, "Not reported")}
-                    </strong>
-                  </span>
-                </div>
-                {phase === "COUNTDOWN" && (
-                  <p className="subtle">
-                    Host countdown:{" "}
-                    {number(operation.remainingSeconds) ?? "Not reported"}{" "}
-                    seconds remaining.
-                  </p>
-                )}
-              </section>
-            )}
-            {operation.message !== undefined && (
-              <div className="operation-message">
-                <Notice
-                  tone={phase === "DEGRADED" ? "warning" : "neutral"}
-                  title={str(operation.errorCode, "Host status")}
-                >
-                  {str(operation.message)}
-                </Notice>
-              </div>
-            )}
-            {phase === "DEGRADED" && (
-              <div className="degraded-summary">
-                <div>
-                  <strong>
-                    {operation.localBackupVerified === true
-                      ? "Local archive verified. Off-site verification is incomplete."
-                      : "The Host reported a degraded operation."}
-                  </strong>
-                  <span>
-                    Upload retry reuses the existing archive without another
-                    shutdown.
-                  </span>
-                </div>
-                {operation.retryable === true && (
-                  <Button
-                    disabled={
-                      !!session.reason("backup.full.retry-upload", "HOST")
-                    }
-                    onClick={() =>
-                      prepare("backup.full.retry-upload", {
-                        backupId: str(operation.backupId),
-                      })
-                    }
-                  >
-                    Review upload retry
-                  </Button>
-                )}
-              </div>
-            )}
-            <div className="journal-footnote">
-              <p>
-                Workflow order only. The highlighted phase is reported by the
-                Host; earlier stages may have been skipped.
-              </p>
-              {statusAt
-                ? `Host status read ${new Date(statusAt).toLocaleTimeString()}. Closing this browser does not cancel a job.`
-                : "No durable Host status received."}
-            </div>
-          </Panel>
-        </aside>
       </div>
       {error && (
         <div className="page-notice">

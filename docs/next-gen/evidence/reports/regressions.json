@@ -1,0 +1,49 @@
+{
+  "results": [
+    {
+      "name": "Q05: queued Host acceptance is never completion",
+      "passed": true
+    },
+    {
+      "name": "Q06: unknown outcome retains context, cannot redispatch, offers read-only audit",
+      "passed": true
+    },
+    {
+      "name": "Q01: a changed prepared target cannot dispatch",
+      "passed": true
+    },
+    {
+      "name": "Q21: preflight failure preserves successful durable status and inventory",
+      "passed": true
+    },
+    {
+      "name": "Q21: inventory failure stays distinct from empty and from durable job failure",
+      "passed": true
+    },
+    {
+      "name": "Q16: expiry disables creation without pretending historical checks are current",
+      "passed": true
+    },
+    {
+      "name": "Q18/Q20: recovery status and 100% transfer never invent remote verification",
+      "passed": true
+    },
+    {
+      "name": "Q24: Owner missing scope or capability receives no bypass in authority ledger",
+      "passed": true
+    },
+    {
+      "name": "Q12/Q11: terminal geometry follows large text/viewport; bounded wrap and explicit tail return",
+      "passed": true
+    },
+    {
+      "name": "Q26: blocked optional storage applies preferences without a false saved claim",
+      "passed": true
+    },
+    {
+      "name": "Q09: provider failure resets with provider change; disabled prevents image requests",
+      "passed": true
+    }
+  ],
+  "errors": []
+}

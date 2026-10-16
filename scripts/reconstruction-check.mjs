@@ -34,10 +34,11 @@ async function record(name, fn) {
 }
 try {
   await record(
-    "sidebar, console-led overview and real resource modules replace Operations Desk",
+    "horizontal route frame, console-led overview and real resource modules replace Control Room",
     async () => {
       await go("Overview");
-      await expect(page.locator(".sidebar")).toBeVisible();
+      await expect(page.locator(".route-band")).toBeVisible();
+      await expect(page.locator(".sidebar")).toHaveCount(0);
       await expect(
         page
           .getByRole("navigation", { name: "Primary navigation" })
@@ -77,7 +78,7 @@ try {
       await expect(page.locator(".comparison-track")).toHaveCount(8);
       await page.locator(".time-series").first().focus();
       await page.keyboard.press("ArrowRight");
-      expect(await page.locator(".chart-tooltip").count()).toBeGreaterThan(1);
+      expect(await page.locator(".inspection-reading").count()).toBeGreaterThan(1);
       await page.keyboard.press("Enter");
       await page.screenshot({
         path: "artifacts/reconstruction/interactions/compare-desktop.png",

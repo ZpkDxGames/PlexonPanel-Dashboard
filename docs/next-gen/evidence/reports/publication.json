@@ -1,0 +1,62 @@
+{
+  "recordedAt": "2026-10-16T21:24:40.413543+00:00",
+  "status": "PUBLISHED_DRAFT",
+  "pr": {
+    "number": 91,
+    "url": "https://github.com/ZpkDxGames/PlexonPanel-Dashboard/pull/91",
+    "createdAt": "2026-10-16T21:23:51Z",
+    "draft": true,
+    "merged": false
+  },
+  "ownerAuthorization": "Yes, approved the publishing",
+  "authorizedScope": "Exact feature-branch no-deploy guard and draft PR publication; no merge or deployment",
+  "frontendBase": "4357a66bc674fddce7432cbc27a4fead00ac8234",
+  "backendReadOnlyMain": "209f8b41d4fe6360a8dcf2f9cdabe7b7df6cc128",
+  "originalProductHead": "5ea142df03d9c0978887be95a56f4ab724f1489b",
+  "originalReviewHead": "9c3308e05227362502add498f7f3ac8c8b639999",
+  "guardedLocalHead": "f0be6c65fb5feea0a24522d09c95701e9020d4fc",
+  "remoteImplementationHead": "43203a5889cb0bbe5b109b6d07c6fdf4e3785d61",
+  "identicalCompleteTree": "c78dcea2da61153bf110e0d374dd3d9045c8fb25",
+  "publicationTransport": "Connected GitHub Git Data API; unauthenticated shell push failed without changing a ref",
+  "configuration": {
+    "branch": "design/strata-next-gen-20261016",
+    "deploymentEnabled": false,
+    "onlyApprovedBranchChanged": true,
+    "remainingFieldsUnchanged": true
+  },
+  "checks": {
+    "unitContracts": {
+      "status": "PASS",
+      "tests": 63
+    },
+    "build": "PASS",
+    "productionFixtureExclusionAndPairing": "PASS",
+    "configurationIdentity": "PASS",
+    "applicationSourceUnchanged": "PASS",
+    "remoteStatusList": []
+  },
+  "productionBuild": {
+    "dashboard": "PlexonPanel Command Center",
+    "commit": "f0be6c65fb5feea0a24522d09c95701e9020d4fc",
+    "builtAt": "2026-10-16T21:19:01.718Z",
+    "protocolVersion": 3,
+    "referenceDashboard": "d19f94f8e0092bf7ab802be0977959a5c65b7641",
+    "referenceCore": "09deffc568e36828b4cb56c91f576b7f8524122c"
+  },
+  "remainingP7": {
+    "mixedSourceSteadyFocus": "FAIL: baseline median 33.34ms; candidate 49.54ms; limit 36.674ms",
+    "throttledMobileAndCLS": "BLOCKED: unavailable pinned Chromium",
+    "nativeZoom": "BLOCKED",
+    "physicalDevicesSafariAT": "NOT_EXECUTED"
+  },
+  "notInitiated": [
+    "merge",
+    "auto-merge",
+    "workflow dispatch",
+    "deployment",
+    "backend/VPS/relay changes",
+    "credential changes",
+    "live destructive tests"
+  ],
+  "deploymentProjectInspection": "403; no independent project-level deployment certification"
+}

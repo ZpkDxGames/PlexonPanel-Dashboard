@@ -8,7 +8,9 @@ import { Button, Status, Notice, Empty } from "../components/ui";
 import { Icon } from "../components/Icon";
 import { Sparkline } from "../components/Telemetry";
 import { bytes } from "../store/selectors";
+import { useTimestamp } from "../presentation/nextgen/time";
 export default function Fleet() {
+  const stamp = useTimestamp();
   const snap = useSession(),
     now = useNow(),
     [error, setError] = useState(""),
@@ -154,7 +156,7 @@ export default function Fleet() {
                     {host.kind}
                   </span>
                   <time title="Source capture timestamp">
-                    {paper.capturedAt ?? host.capturedAt ?? "No capture"}
+                    {stamp(paper.capturedAt ?? host.capturedAt)}
                   </time>
                 </div>
                 <details className="fleet-identity">
@@ -168,7 +170,7 @@ export default function Fleet() {
                 </details>
                 <div className="directory-enter">
                   <Status tone={row.phase === "live" ? "success" : "neutral"}>
-                    {selected ? "Selected" : row.phase}
+                    {selected ? "Selected" : "Passive observation"}
                   </Status>
                   <Button
                     variant="quiet"
@@ -181,11 +183,6 @@ export default function Fleet() {
               </article>
             );
           })}
-        {!rows.length && (
-          <Empty title="Your fleet starts here">
-            Pair this browser with your first server in Settings.
-          </Empty>
-        )}
         {rows.filter((row) =>
           `${row.state.ready?.server.serverName ?? ""} ${row.serverId} ${row.state.ready?.server.instanceKey ?? ""}`
             .toLowerCase()
@@ -214,7 +211,7 @@ export default function Fleet() {
                 <Icon name="server" />
                 <div>
                   <strong>{node.nodeId}</strong>
-                  <small>{str(node.state.hostSystem.capturedAt)}</small>
+                  <small>{stamp(node.state.hostSystem.capturedAt)}</small>
                 </div>
                 <div>
                   <strong>{node.cpu?.toFixed(1) ?? "—"}%</strong>

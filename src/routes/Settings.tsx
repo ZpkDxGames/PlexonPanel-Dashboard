@@ -185,7 +185,7 @@ export default function Settings() {
           {preferenceSaved && (
             <div className="save-feedback" role="status">
               <Icon name="check" />
-              Preferences saved to this browser
+              Applied in this browser
             </div>
           )}{" "}
           <section
@@ -196,7 +196,7 @@ export default function Settings() {
             <Panel
               eyebrow="LOCAL WORKSPACE"
               title="Appearance"
-              description="Choose a theme and tune the way your workspace feels. Changes save automatically."
+              description="Choose a theme and tune the way your workspace feels. Changes apply immediately in this browser. Storage is optional."
               className="preferences-panel"
             >
               <div className="preferences-layout">
@@ -310,6 +310,13 @@ export default function Settings() {
                     <i />
                     <i />
                   </div>
+                  <Status>Source state · specimen</Status>
+                  <Button disabled title="Illustrative control only">
+                    Unavailable action
+                  </Button>
+                  <p className="action-availability">
+                    Specimen only; no server action.
+                  </p>
                   <small>System reduced motion is always respected.</small>
                 </aside>
               </div>
@@ -457,7 +464,7 @@ export default function Settings() {
       )}
       {message && (
         <div className="page-notice">
-          <Notice tone="success" title="Preference saved">
+          <Notice tone="success" title="Preference applied">
             {message}
           </Notice>
         </div>

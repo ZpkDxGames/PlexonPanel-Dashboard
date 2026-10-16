@@ -1,7 +1,9 @@
 import { firefox, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { mkdir, writeFile } from "node:fs/promises";
-const base = process.argv[2] ?? "http://127.0.0.1:4173";
+const base = process.argv[2]?.startsWith("http")
+  ? process.argv[2]
+  : "http://127.0.0.1:4173";
 const browser = await firefox.launch();
 const context = await browser.newContext({
   viewport: { width: 1440, height: 900 },
@@ -33,7 +35,9 @@ async function go(route, fixture = "healthy") {
   await page.locator(".workspace-heading h1").waitFor();
   await page.locator(".route-skeleton").waitFor({ state: "detached" });
 }
+const only = process.argv.find((a) => a.startsWith("--only="))?.slice(7);
 async function record(name, fn) {
+  if (only && !new RegExp(only, "i").test(name)) return;
   await fn();
   results.push({ name, passed: true });
 }
@@ -45,13 +49,13 @@ try {
       const chart = page.locator(".time-series").first();
       await chart.focus();
       await page.keyboard.press("ArrowRight");
-      await expect(page.locator(".chart-tooltip").first()).toBeVisible();
+      await expect(page.locator(".inspection-reading").first()).toBeVisible();
       await page.keyboard.press("Enter");
-      await expect(page.locator(".chart-tooltip").first()).toContainText(
+      await expect(page.locator(".inspection-reading").first()).toContainText(
         "pinned",
       );
       await page.keyboard.press("Escape");
-      await expect(page.locator(".chart-tooltip")).toHaveCount(0);
+      await expect(page.locator(".inspection-reading")).toHaveCount(0);
       await page
         .getByRole("button", { name: "View data", exact: true })
         .first()
@@ -111,8 +115,9 @@ try {
       ).toBeDisabled();
       await page.evaluate(async () => {
         const { session } = await import("/src/adapter/session.ts");
-        const { makeFixture, fixtureAction } =
-          await import("/src/development/fixtures.ts");
+        const { makeFixture, fixtureAction } = await import(
+          "/src/development/fixtures.ts"
+        );
         const next = makeFixture();
         next.serverId = "3c37e785-5102-46b4-bf08-294781babd87";
         next.ready.serverId = next.serverId;
@@ -159,8 +164,9 @@ try {
       await go("Backups");
       await page.evaluate(async () => {
         const { session } = await import("/src/adapter/session.ts");
-        const { makeFixture, fixtureAction } =
-          await import("/src/development/fixtures.ts");
+        const { makeFixture, fixtureAction } = await import(
+          "/src/development/fixtures.ts"
+        );
         session.installFixture(
           "unknown-preflight",
           makeFixture(),
@@ -377,9 +383,9 @@ try {
       .locator(".time-series")
       .first()
       .tap({ position: { x: 150, y: 70 } });
-    await expect(touchPage.locator(".chart-tooltip").first()).toContainText(
-      "pinned",
-    );
+    await expect(
+      touchPage.locator(".inspection-reading").first(),
+    ).toContainText("pinned");
     await touchContext.close();
   });
   expect(errors).toEqual([]);

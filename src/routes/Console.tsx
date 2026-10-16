@@ -1,4 +1,11 @@
-import { memo, useEffect, useMemo, useRef, useState } from "react";
+import {
+  memo,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { str, type JsonMap } from "../adapter/control-state";
 import { session, type Prepared } from "../adapter/session";
 import { FormattedText } from "../components/FormattedText";
@@ -10,7 +17,7 @@ import { toast } from "../components/toast";
 import { Icon } from "../components/Icon";
 import { hasScope } from "../presentation/authority";
 import { usePreferences } from "../store/preferences";
-const lineHeight = 28;
+
 type Tab = "console" | "chat" | "plugins";
 const consoleClocks = [false, true].map(
   (utc) =>
@@ -34,20 +41,61 @@ const ConsoleLines = memo(function ConsoleLines({
   wrap,
   tail,
   utc,
+  returnVersion,
+  onFollowChange,
 }: {
   lines: JsonMap[];
   wrap: boolean;
   tail: boolean;
   utc: boolean;
+  returnVersion: number;
+  onFollowChange: (value: boolean) => void;
 }) {
   const [scrollTop, setScrollTop] = useState(0),
     ref = useRef<HTMLDivElement>(null),
     follow = useRef(true),
-    height = 480;
+    ruler = useRef<HTMLDivElement>(null),
+    measured = useRef({ height: 320, row: 28 }),
+    resizing = useRef(false),
+    resizePosition = useRef<number | null>(null);
+  const [geometry, setGeometry] = useState(measured.current),
+    height = geometry.height,
+    lineHeight = geometry.row;
   useEffect(() => {
-    if (tail && follow.current && ref.current)
-      ref.current.scrollTop = ref.current.scrollHeight;
-  }, [lines, tail, wrap]);
+    const el = ref.current,
+      row = ruler.current;
+    if (!el || !row) return;
+    const observer = new ResizeObserver(() => {
+      const next = {
+        height: el.clientHeight,
+        row: row.getBoundingClientRect().height || 28,
+      };
+      const old = measured.current;
+      if (next.height === old.height && next.row === old.row) return;
+      resizing.current = true;
+      resizePosition.current = el.scrollTop / old.row;
+      measured.current = next;
+      setGeometry(next);
+    });
+    observer.observe(el);
+    observer.observe(row);
+    return () => observer.disconnect();
+  }, []);
+  useEffect(() => {
+    follow.current = true;
+    onFollowChange(true);
+    if (ref.current) ref.current.scrollTop = ref.current.scrollHeight;
+  }, [returnVersion]);
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (tail && follow.current) el.scrollTop = el.scrollHeight;
+    else if (resizePosition.current !== null)
+      el.scrollTop = resizePosition.current * geometry.row;
+    resizePosition.current = null;
+    resizing.current = false;
+    setScrollTop(el.scrollTop);
+  }, [lines, tail, wrap, geometry.row, geometry.height]);
   const start = wrap
       ? Math.max(0, lines.length - 400)
       : Math.max(0, Math.floor(scrollTop / lineHeight) - 8),
@@ -57,19 +105,28 @@ const ConsoleLines = memo(function ConsoleLines({
     <div
       ref={ref}
       className={`terminal-scroll ${wrap ? "wrap" : "nowrap"}`}
-      style={{ height }}
       role="region"
       tabIndex={0}
       aria-label="Console output"
       onScroll={(e) => {
         setScrollTop(e.currentTarget.scrollTop);
+        const actualRow =
+          ruler.current?.getBoundingClientRect().height ?? lineHeight;
+        if (
+          resizing.current ||
+          actualRow !== measured.current.row ||
+          e.currentTarget.clientHeight !== measured.current.height
+        )
+          return;
         follow.current =
           e.currentTarget.scrollHeight -
             e.currentTarget.scrollTop -
             e.currentTarget.clientHeight <
-          60;
+          lineHeight * 2;
+        onFollowChange(follow.current);
       }}
     >
+      <div ref={ruler} className="terminal-ruler" aria-hidden="true" />
       <div
         className="terminal-spacer"
         style={wrap ? undefined : { height: lines.length * lineHeight }}
@@ -113,11 +170,16 @@ export default function Console() {
   const snap = useSession(),
     prefs = usePreferences(),
     [tab, setTab] = useState<Tab>("console"),
+    [filtersOpen, setFiltersOpen] = useState(
+      () => matchMedia("(min-width:640px)").matches,
+    ),
     [query, setQuery] = useState(""),
     [pluginQuery, setPluginQuery] = useState(""),
     [level, setLevel] = useState("all"),
     [source, setSource] = useState("all"),
     [paused, setPaused] = useState(false),
+    [following, setFollowing] = useState(true),
+    [returnVersion, setReturnVersion] = useState(0),
     [frozen, setFrozen] = useState<JsonMap[]>([]),
     [cleared, setCleared] = useState(false),
     [wrap, setWrap] = useState(false),
@@ -126,6 +188,12 @@ export default function Console() {
     [mini, setMini] = useState(false),
     [prepared, setPrepared] = useState<Prepared | null>(null),
     [error, setError] = useState("");
+  useEffect(() => {
+    const media = matchMedia("(min-width:640px)");
+    const resize = () => setFiltersOpen(media.matches);
+    media.addEventListener("change", resize);
+    return () => media.removeEventListener("change", resize);
+  }, []);
   const canConsole =
       hasScope(snap, "console.view.full") ||
       hasScope(snap, "console.view.errors"),
@@ -245,7 +313,6 @@ export default function Console() {
         >
           {tab === "console" && (
             <Panel
-              eyebrow="TERMINAL / LIVE STREAM"
               title="Server output"
               description={
                 authority === "HOST"
@@ -276,30 +343,6 @@ export default function Console() {
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Find in output…"
                 />
-                <select
-                  aria-label="Level filter"
-                  value={level}
-                  onChange={(e) => setLevel(e.target.value)}
-                >
-                  <option value="all">All levels</option>
-                  <option value="info">Info</option>
-                  <option value="warn">Warnings</option>
-                  <option value="error">Errors</option>
-                </select>
-                <select
-                  aria-label="Source filter"
-                  value={source}
-                  onChange={(e) => setSource(e.target.value)}
-                >
-                  <option value="all">All sources</option>
-                  {[
-                    ...new Set(
-                      retained.map((line) => str(line.source, "Unknown")),
-                    ),
-                  ].map((item) => (
-                    <option key={item}>{item}</option>
-                  ))}
-                </select>
                 <Button
                   onClick={() => {
                     if (!paused) setFrozen(retained);
@@ -309,30 +352,75 @@ export default function Console() {
                   <Icon name={paused ? "play" : "pause"} />
                   {paused ? "Resume" : "Pause"}
                 </Button>
-                <Button
-                  aria-pressed={wrap}
-                  onClick={() => setWrap((value) => !value)}
+                <details
+                  className="console-filters"
+                  open={filtersOpen}
+                  onToggle={(event) => setFiltersOpen(event.currentTarget.open)}
                 >
-                  {wrap ? "No wrap" : "Wrap"}
-                </Button>
-                <Button disabled={!lines.length} onClick={exportLines}>
-                  <Icon name="download" />
-                  Export
-                </Button>
-                <Button
-                  variant="quiet"
-                  onClick={() => setCleared((value) => !value)}
-                >
-                  {cleared ? "Undo clear" : "Clear view"}
-                </Button>
+                  <summary>Filters & view</summary>
+                  <div className="console-filter-controls">
+                    <select
+                      aria-label="Level filter"
+                      value={level}
+                      onChange={(e) => setLevel(e.target.value)}
+                    >
+                      <option value="all">All levels</option>
+                      <option value="info">Info</option>
+                      <option value="warn">Warnings</option>
+                      <option value="error">Errors</option>
+                    </select>
+                    <select
+                      aria-label="Source filter"
+                      value={source}
+                      onChange={(e) => setSource(e.target.value)}
+                    >
+                      <option value="all">All sources</option>
+                      {[
+                        ...new Set(
+                          retained.map((line) => str(line.source, "Unknown")),
+                        ),
+                      ].map((item) => (
+                        <option key={item}>{item}</option>
+                      ))}
+                    </select>
+                    <Button
+                      aria-pressed={wrap}
+                      onClick={() => setWrap((value) => !value)}
+                    >
+                      {wrap ? "No wrap" : "Wrap"}
+                    </Button>
+                    <Button disabled={!lines.length} onClick={exportLines}>
+                      <Icon name="download" />
+                      Export
+                    </Button>
+                    <Button
+                      variant="quiet"
+                      onClick={() => setCleared((value) => !value)}
+                    >
+                      {cleared ? "Undo clear" : "Clear view"}
+                    </Button>
+                  </div>
+                </details>
               </div>
               <ConsoleLines
                 lines={lines}
                 wrap={wrap}
                 tail={!paused}
                 utc={prefs.timezone === "UTC"}
+                returnVersion={returnVersion}
+                onFollowChange={setFollowing}
               />
               <div className="terminal-status">
+                {(!following || paused) && (
+                  <Button
+                    onClick={() => {
+                      setPaused(false);
+                      setReturnVersion((v) => v + 1);
+                    }}
+                  >
+                    Return to live
+                  </Button>
+                )}
                 <span>
                   {lines.length} matching / {retained.length} retained
                   {wrap ? " · latest 400 rendered" : ""}
@@ -340,7 +428,9 @@ export default function Console() {
                 <span>
                   {paused
                     ? "Display paused · ingestion continues"
-                    : "Live tail · scroll up to inspect"}
+                    : following
+                      ? "Live tail · scroll up to inspect"
+                      : "Inspecting retained output"}
                 </span>
                 <span>{prefs.timezone === "UTC" ? "UTC" : "Local time"}</span>
               </div>
@@ -459,6 +549,12 @@ export default function Console() {
                     />
                     MiniMessage formatting
                   </label>
+                  {!miniAllowed && (
+                    <p className="action-availability">
+                      MiniMessage requires both chat.send.minimessage and the
+                      current Paper capability.
+                    </p>
+                  )}
                   <div className="composer-preview">
                     <span>Message preview</span>
                     <p>

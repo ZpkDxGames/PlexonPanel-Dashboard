@@ -46,7 +46,7 @@ try {
   async function dispatch() {
     const dialog = page.locator("dialog.review-dialog");
     await dialog.getByRole("button", { name: "Dispatch operation" }).click();
-    await expect(dialog).toContainText("Agent result received");
+    await expect(dialog).toContainText(/Agent result received|Host accepted job/);
     await dialog.getByRole("button", { name: "Close", exact: true }).click();
   }
   await page.getByRole("button", { name: "Restart", exact: true }).click();

@@ -1,0 +1,45 @@
+:root[data-text-size="small"] {
+  font-size: 14px;
+}
+:root[data-text-size="large"] {
+  font-size: 18px;
+}
+* {
+  box-sizing: border-box;
+}
+
+:root[data-density="compact"] {
+  --gutter: 20px;
+  --panel-pad: 16px;
+  --row-pad: 12px;
+  --control-height: 2.25rem;
+}
+:root[data-density="spacious"] {
+  --gutter: 24px;
+  --panel-pad: 24px;
+  --row-pad: 20px;
+  --control-height: 2.75rem;
+}
+@media (pointer: coarse) {
+  :root {
+    --control-height: max(44px, 2.75rem);
+  }
+  button,
+  input,
+  select,
+  summary {
+    min-height: 44px;
+  }
+}
+
+@media (pointer: coarse) {
+  button,
+  summary,
+  input:not([type="checkbox"]):not([type="radio"]),
+  select {
+    min-height: 44px !important;
+  }
+  .check-row {
+    min-height: 44px;
+  }
+}
