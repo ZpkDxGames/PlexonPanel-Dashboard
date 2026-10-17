@@ -14,6 +14,7 @@ export class SourceEpochs {
     {
       key: string;
       excluded: WeakSet<Sample>;
+      hasExclusions: boolean;
       cache: WeakMap<Sample[], Sample[]>;
     }
   >();
@@ -31,12 +32,14 @@ export class SourceEpochs {
         this.entries.set(source, {
           key,
           excluded: new WeakSet(),
+          hasExclusions: false,
           cache: new WeakMap(),
         });
       else if (prior.key !== key)
         this.entries.set(source, {
           key,
           excluded: new WeakSet(state.history),
+          hasExclusions: state.history.length > 0,
           cache: new WeakMap(),
         });
     }
@@ -46,6 +49,7 @@ export class SourceEpochs {
     if (!entry) return history;
     const cached = entry.cache.get(history);
     if (cached) return cached;
+    if (!entry.hasExclusions) return history;
     const eligible = history.filter((sample) => !entry.excluded.has(sample));
     const result = eligible.length === history.length ? history : eligible;
     entry.cache.set(history, result);

@@ -1,19 +1,15 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "git": {"deploymentEnabled": {"design/strata-next-gen-20261016": false, "main": false}},
-  "framework": "vite",
+  "git": {
+    "deploymentEnabled": {
+      "design/strata-next-gen-20261016": false,
+      "main": true,
+      "work/v5-full-release": false,
+      "release/v5-nextjs-20261017": false
+    }
+  },
+  "framework": "nextjs",
   "installCommand": "npm ci",
   "buildCommand": "npm run build",
-  "outputDirectory": "dist",
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
-  "headers": [{
-    "source": "/(.*)",
-    "headers": [
-      { "key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://crafatar.com https://mc-heads.net https://minotar.net; connect-src 'self' https://tonimserver.ddns.net wss://tonimserver.ddns.net; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests" },
-      { "key": "X-Content-Type-Options", "value": "nosniff" },
-      { "key": "Referrer-Policy", "value": "no-referrer" },
-      { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=(), payment=(), usb=()" },
-      { "key": "Cross-Origin-Opener-Policy", "value": "same-origin" }
-    ]
-  }]
+  "outputDirectory": ".next"
 }

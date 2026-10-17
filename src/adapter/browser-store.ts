@@ -1,4 +1,4 @@
-import { safeCache, type ControlState } from "./control-state";
+import { type ControlState } from "./control-state";
 import { validScopes } from "./scopes";
 export interface RelayCredential {
   protocolVersion: 3;
@@ -16,8 +16,26 @@ const DB = "plexonpanel-browser-v3",
 let selectionRevision = 0;
 function openDatabase(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open(DB, 1);
-    request.onupgradeneeded = () => request.result.createObjectStore(STORE);
+    const request = indexedDB.open(DB, 2);
+    request.onupgradeneeded = () => {
+      const store = request.result.objectStoreNames.contains(STORE)
+        ? request.transaction!.objectStore(STORE)
+        : request.result.createObjectStore(STORE);
+      const cursor = store.openCursor();
+      cursor.onsuccess = () => {
+        const entry = cursor.result;
+        if (!entry) return;
+        const key = String(entry.key);
+        if (
+          key !== "selected" &&
+          key !== "relay-origin" &&
+          !key.startsWith("credential:") &&
+          !key.startsWith("label:")
+        )
+          entry.delete();
+        entry.continue();
+      };
+    };
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error);
     request.onblocked = () =>
@@ -96,13 +114,13 @@ async function writeSelection(id: string, revision: number): Promise<void> {
 function valid(c: RelayCredential | undefined): c is RelayCredential {
   return Boolean(
     c &&
-      c.protocolVersion === 3 &&
-      typeof c.serverId === "string" &&
-      typeof c.deviceId === "string" &&
-      typeof c.accessToken === "string" &&
-      c.accessToken.length < 8192 &&
-      validScopes(c.scopes) &&
-      Date.parse(c.expiresAt) > Date.now(),
+    c.protocolVersion === 3 &&
+    typeof c.serverId === "string" &&
+    typeof c.deviceId === "string" &&
+    typeof c.accessToken === "string" &&
+    c.accessToken.length < 8192 &&
+    validScopes(c.scopes) &&
+    Date.parse(c.expiresAt) > Date.now(),
   );
 }
 export async function listRelayCredentials(): Promise<RelayCredential[]> {
@@ -137,15 +155,20 @@ export async function saveRelayCredential(c: RelayCredential): Promise<void> {
 export async function loadControlCache(
   id: string,
 ): Promise<ControlState | null> {
-  const cached = await read<ControlState>(`cache:${id}`);
-  return cached &&
-    cached.serverId === id &&
-    Date.now() - cached.updatedAt < 3600000
-    ? safeCache(cached)
-    : null;
+  await remove(`cache:${id}`);
+  return null;
 }
 export async function saveControlCache(state: ControlState): Promise<void> {
-  await write(`cache:${state.serverId}`, safeCache(state));
+  await remove(`cache:${state.serverId}`);
+}
+export async function readBrowserRelayOrigin(): Promise<string> {
+  return (await read<string>("relay-origin")) ?? "";
+}
+export async function writeBrowserRelayOrigin(
+  value: string | null,
+): Promise<void> {
+  if (value === null) await remove("relay-origin");
+  else await write("relay-origin", value);
 }
 export async function clearBrowserWorkspace(serverId?: string): Promise<void> {
   const db = await openDatabase();

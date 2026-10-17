@@ -1,3 +1,6 @@
+import { useHostHistory } from "../components/terminal/useHostHistory";
+import { VirtualConsole } from "../components/terminal/VirtualConsole";
+import { BootSessionBadge } from "../components/PresenceTimeline";
 import {
   memo,
   useEffect,
@@ -36,142 +39,15 @@ function stamp(value: unknown, utc = false) {
     ? consoleClocks[Number(utc)].format(at)
     : "--:--:--.---";
 }
-const ConsoleLines = memo(function ConsoleLines({
-  lines,
-  wrap,
-  tail,
-  utc,
-  returnVersion,
-  onFollowChange,
-}: {
-  lines: JsonMap[];
-  wrap: boolean;
-  tail: boolean;
-  utc: boolean;
-  returnVersion: number;
-  onFollowChange: (value: boolean) => void;
-}) {
-  const [scrollTop, setScrollTop] = useState(0),
-    ref = useRef<HTMLDivElement>(null),
-    follow = useRef(true),
-    ruler = useRef<HTMLDivElement>(null),
-    measured = useRef({ height: 320, row: 28 }),
-    resizing = useRef(false),
-    resizePosition = useRef<number | null>(null);
-  const [geometry, setGeometry] = useState(measured.current),
-    height = geometry.height,
-    lineHeight = geometry.row;
-  useEffect(() => {
-    const el = ref.current,
-      row = ruler.current;
-    if (!el || !row) return;
-    const observer = new ResizeObserver(() => {
-      const next = {
-        height: el.clientHeight,
-        row: row.getBoundingClientRect().height || 28,
-      };
-      const old = measured.current;
-      if (next.height === old.height && next.row === old.row) return;
-      resizing.current = true;
-      resizePosition.current = el.scrollTop / old.row;
-      measured.current = next;
-      setGeometry(next);
-    });
-    observer.observe(el);
-    observer.observe(row);
-    return () => observer.disconnect();
-  }, []);
-  useEffect(() => {
-    follow.current = true;
-    onFollowChange(true);
-    if (ref.current) ref.current.scrollTop = ref.current.scrollHeight;
-  }, [returnVersion]);
-  useLayoutEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    if (tail && follow.current) el.scrollTop = el.scrollHeight;
-    else if (resizePosition.current !== null)
-      el.scrollTop = resizePosition.current * geometry.row;
-    resizePosition.current = null;
-    resizing.current = false;
-    setScrollTop(el.scrollTop);
-  }, [lines, tail, wrap, geometry.row, geometry.height]);
-  const start = wrap
-      ? Math.max(0, lines.length - 400)
-      : Math.max(0, Math.floor(scrollTop / lineHeight) - 8),
-    count = wrap ? 400 : Math.ceil(height / lineHeight) + 16,
-    visible = lines.slice(start, start + count);
-  return (
-    <div
-      ref={ref}
-      className={`terminal-scroll ${wrap ? "wrap" : "nowrap"}`}
-      role="region"
-      tabIndex={0}
-      aria-label="Console output"
-      onScroll={(e) => {
-        setScrollTop(e.currentTarget.scrollTop);
-        const actualRow =
-          ruler.current?.getBoundingClientRect().height ?? lineHeight;
-        if (
-          resizing.current ||
-          actualRow !== measured.current.row ||
-          e.currentTarget.clientHeight !== measured.current.height
-        )
-          return;
-        follow.current =
-          e.currentTarget.scrollHeight -
-            e.currentTarget.scrollTop -
-            e.currentTarget.clientHeight <
-          lineHeight * 2;
-        onFollowChange(follow.current);
-      }}
-    >
-      <div ref={ruler} className="terminal-ruler" aria-hidden="true" />
-      <div
-        className="terminal-spacer"
-        style={wrap ? undefined : { height: lines.length * lineHeight }}
-      >
-        <div
-          style={
-            wrap
-              ? undefined
-              : { transform: `translateY(${start * lineHeight}px)` }
-          }
-        >
-          {visible.map((line, index) => (
-            <div
-              className="terminal-line"
-              key={str(line.id, `${start + index}`)}
-              title={`Timestamp: ${line.capturedAt ? "server capture" : "browser receipt"}`}
-            >
-              <time>{stamp(line.capturedAt ?? line.receivedAt, utc)}</time>
-              <span
-                className={`level level-${str(line.level, "INFO").toLowerCase()}`}
-              >
-                {str(line.level, "INFO")}
-              </span>
-              <span className="line-source">{str(line.source, "Unknown")}</span>
-              <span className="line-message">
-                <FormattedText value={str(line.content ?? line.rawText, "")} />
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
-      {!lines.length && (
-        <Empty title="The console is quiet">
-          No matching lines have been received for this device.
-        </Empty>
-      )}
-    </div>
-  );
-});
+const ConsoleLines = VirtualConsole;
 export default function Console() {
   const snap = useSession(),
     prefs = usePreferences(),
     [tab, setTab] = useState<Tab>("console"),
     [filtersOpen, setFiltersOpen] = useState(
-      () => matchMedia("(min-width:640px)").matches,
+      () =>
+        typeof matchMedia === "function" &&
+        matchMedia("(min-width:640px)").matches,
     ),
     [query, setQuery] = useState(""),
     [pluginQuery, setPluginQuery] = useState(""),
@@ -199,8 +75,23 @@ export default function Console() {
       hasScope(snap, "console.view.errors"),
     canChat = hasScope(snap, "chat.view"),
     canPlugins = hasScope(snap, "plugins.view");
-  const retained = canConsole ? snap.state.console : [],
-    current = canConsole ? (paused ? frozen : retained) : [];
+  const frozenEpoch = useRef<string | undefined>(undefined);
+  useEffect(() => {
+    setPaused(false);
+    setFrozen([]);
+    setCleared(false);
+  }, [snap.state.bootEpochId, snap.revision]);
+  const hostHistory = useHostHistory(query, level);
+  const retained = canConsole ? hostHistory.lines : [],
+    current = canConsole
+      ? paused && frozenEpoch.current === snap.state.bootEpochId
+        ? hasScope(snap, "console.view.full")
+          ? frozen
+          : frozen.filter((row) =>
+              ["WARN", "ERROR"].includes(String(row.level)),
+            )
+        : retained
+      : [];
   const lines = useMemo(
     () =>
       cleared
@@ -336,6 +227,7 @@ export default function Console() {
                 </Status>
               }
             >
+              <BootSessionBadge />
               <div className="console-toolbar">
                 <input
                   aria-label="Search console"
@@ -345,7 +237,10 @@ export default function Console() {
                 />
                 <Button
                   onClick={() => {
-                    if (!paused) setFrozen(retained);
+                    if (!paused) {
+                      frozenEpoch.current = snap.state.bootEpochId;
+                      setFrozen(retained);
+                    }
                     setPaused((value) => !value);
                   }}
                 >
@@ -359,16 +254,23 @@ export default function Console() {
                 >
                   <summary>Filters & view</summary>
                   <div className="console-filter-controls">
-                    <select
-                      aria-label="Level filter"
-                      value={level}
-                      onChange={(e) => setLevel(e.target.value)}
+                    <div
+                      className="segmented"
+                      role="group"
+                      aria-label="Console severity"
                     >
-                      <option value="all">All levels</option>
-                      <option value="info">Info</option>
-                      <option value="warn">Warnings</option>
-                      <option value="error">Errors</option>
-                    </select>
+                      {["all", "debug", "info", "warn", "error"].map(
+                        (value) => (
+                          <button
+                            key={value}
+                            aria-pressed={level === value}
+                            onClick={() => setLevel(value)}
+                          >
+                            {value.toUpperCase()}
+                          </button>
+                        ),
+                      )}
+                    </div>
                     <select
                       aria-label="Source filter"
                       value={source}
@@ -402,6 +304,24 @@ export default function Console() {
                   </div>
                 </details>
               </div>
+              <div className="console-toolbar">
+                <Button
+                  disabled={!hostHistory.more || hostHistory.busy}
+                  onClick={() => void hostHistory.older()}
+                >
+                  Load older from Host
+                </Button>
+                <Button
+                  disabled={hostHistory.busy}
+                  onClick={() => void hostHistory.refresh()}
+                >
+                  Refresh history
+                </Button>
+                <span className="subtle">VPS SQLite · volatile tab memory</span>
+              </div>
+              {hostHistory.error ? (
+                <p role="status">{hostHistory.error}</p>
+              ) : null}
               <ConsoleLines
                 lines={lines}
                 wrap={wrap}
@@ -423,7 +343,7 @@ export default function Console() {
                 )}
                 <span>
                   {lines.length} matching / {retained.length} retained
-                  {wrap ? " · latest 400 rendered" : ""}
+                  {wrap ? " · measured wrapped rows" : ""}
                 </span>
                 <span>
                   {paused

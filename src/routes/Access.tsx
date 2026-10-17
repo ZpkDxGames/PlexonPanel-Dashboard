@@ -1,3 +1,4 @@
+import { useVirtualizer } from "@tanstack/react-virtual";
 import { useEffect, useRef, useState } from "react";
 import { record, records, str, type JsonMap } from "../adapter/control-state";
 import { session, type Prepared, type Kind } from "../adapter/session";
@@ -77,6 +78,14 @@ export default function Access() {
   const visible = audit.filter((entry) =>
     JSON.stringify(entry).toLowerCase().includes(filter.toLowerCase()),
   );
+  const auditScroll = useRef<HTMLDivElement>(null);
+  const virtualAudit = useVirtualizer({
+    count: visible.length,
+    getScrollElement: () => auditScroll.current,
+    estimateSize: () => 64,
+    overscan: 6,
+  });
+  const auditItems = virtualAudit.getVirtualItems();
   const revoke = (id: string) => {
     try {
       setPrepared(session.prepare("devices.revoke", { deviceId: id }, "PAPER"));
@@ -102,10 +111,22 @@ export default function Access() {
               className={view === key ? "active" : ""}
               onClick={() => setView(key)}
               onKeyDown={(event) => {
-                if (!["ArrowRight", "ArrowLeft", "Home", "End"].includes(event.key)) return;
+                if (
+                  !["ArrowRight", "ArrowLeft", "Home", "End"].includes(
+                    event.key,
+                  )
+                )
+                  return;
                 event.preventDefault();
                 const keys = ["audit", "devices", "grant"];
-                const index = event.key === "Home" ? 0 : event.key === "End" ? 2 : (keys.indexOf(key) + (event.key === "ArrowRight" ? 1 : 2)) % 3;
+                const index =
+                  event.key === "Home"
+                    ? 0
+                    : event.key === "End"
+                      ? 2
+                      : (keys.indexOf(key) +
+                          (event.key === "ArrowRight" ? 1 : 2)) %
+                        3;
                 setView(keys[index]);
                 document.getElementById(`access-view-${keys[index]}`)?.focus();
               }}
@@ -171,6 +192,8 @@ export default function Access() {
           </div>
           <div
             className="table-region"
+            ref={auditScroll}
+            style={{ maxHeight: 500, overflow: "auto" }}
             tabIndex={0}
             role="region"
             aria-label="Audit records"
@@ -186,14 +209,28 @@ export default function Access() {
                 </tr>
               </thead>
               <tbody>
+                {auditItems.length && auditItems[0].start > 0 ? (
+                  <tr aria-hidden="true">
+                    <td
+                      colSpan={5}
+                      style={{ height: auditItems[0].start, padding: 0 }}
+                    />
+                  </tr>
+                ) : null}
                 {visible.length ? (
-                  visible.map((entry, index) => {
+                  auditItems.map((item) => {
+                    const entry = visible[item.index],
+                      index = item.index;
                     const outcome = str(
                       entry.outcome,
                       str(entry.status, "Unknown"),
                     );
                     return (
-                      <tr key={`${str(entry.timestamp)}:${index}`}>
+                      <tr
+                        key={`${str(entry.timestamp)}:${index}`}
+                        data-index={index}
+                        ref={virtualAudit.measureElement}
+                      >
                         <td data-label="Recorded">
                           <time title={str(entry.timestamp)}>
                             {stamp(entry.timestamp)}
@@ -236,6 +273,21 @@ export default function Access() {
                     </td>
                   </tr>
                 )}
+                {auditItems.length &&
+                virtualAudit.getTotalSize() - (auditItems.at(-1)?.end ?? 0) >
+                  0 ? (
+                  <tr aria-hidden="true">
+                    <td
+                      colSpan={5}
+                      style={{
+                        height:
+                          virtualAudit.getTotalSize() -
+                          (auditItems.at(-1)?.end ?? 0),
+                        padding: 0,
+                      }}
+                    />
+                  </tr>
+                ) : null}
               </tbody>
             </table>
           </div>

@@ -1,21 +1,39 @@
 {
-  "name": "plexonpanel-command-center",
+  "name": "plexonpanel-v5-workbench",
   "private": true,
   "type": "module",
-  "engines": { "node": "24.x" },
+  "engines": {
+    "node": "24.x"
+  },
   "scripts": {
-    "dev": "vite --host 127.0.0.1 --port 4173",
-    "build": "tsc --noEmit && vite build && node scripts/identity.mjs",
+    "dev": "next dev --webpack --hostname 127.0.0.1 --port 4173",
+    "build": "node scripts/v5-identity.mjs && next build",
     "check": "tsc --noEmit && node --import tsx --test tests/*.test.ts",
-    "test:browser": "node scripts/browser-check.mjs",
-    "test:perf": "node scripts/performance.mjs"
+    "test:browser": "node scripts/v5-browser.mjs",
+    "test:perf": "node --import tsx scripts/v5-production-performance.mjs",
+    "start": "next start --hostname 127.0.0.1 --port 4173",
+    "typecheck": "tsc --noEmit",
+    "test:flow": "node --import tsx scripts/v5-flow.mjs",
+    "test:interactions": "node scripts/v5-interactions.mjs"
   },
   "dependencies": {
     "@fontsource-variable/jetbrains-mono": "5.2.8",
     "@fontsource-variable/manrope": "5.2.8",
     "motion": "14.1.0",
     "react": "19.3.0",
-    "react-dom": "19.3.0"
+    "react-dom": "19.3.0",
+    "next": "16.4.2",
+    "tailwindcss": "4.3.3",
+    "@tailwindcss/postcss": "4.3.3",
+    "radix-ui": "1.8.1",
+    "lucide-react": "1.59.0",
+    "@tanstack/react-virtual": "3.14.21",
+    "uplot": "1.6.32",
+    "sonner": "2.0.8",
+    "cmdk": "1.1.1",
+    "clsx": "2.1.1",
+    "tailwind-merge": "3.7.0",
+    "class-variance-authority": "0.7.1"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",
@@ -26,6 +44,7 @@
     "fake-indexeddb": "6.2.5",
     "tsx": "4.23.15",
     "typescript": "7.0.2",
-    "vite": "8.3.4"
+    "prettier": "3.9.10",
+    "ws": "8.22.0"
   }
 }

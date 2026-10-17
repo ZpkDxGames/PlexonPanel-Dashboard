@@ -1,1 +1,1 @@
-export const DASHBOARD_LABEL = "PlexonPanel candidate";
+export const DASHBOARD_LABEL = "PlexonPanel 5.0 Workbench";

@@ -1,4 +1,7 @@
-import { memo, useMemo, useState } from "react";
+import { useHostHistory } from "./terminal/useHostHistory";
+import { BootSessionBadge } from "./PresenceTimeline";
+import { records } from "../adapter/control-state";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
 import { useSession } from "../hooks";
 import { usePreferences } from "../store/preferences";
 import { hasScope } from "../presentation/authority";
@@ -17,7 +20,21 @@ export function ConsolePreview() {
   const allowed =
     hasScope(snap, "console.view.full") ||
     hasScope(snap, "console.view.errors");
-  const current = allowed ? (paused ? frozen : snap.state.console) : emptyLines;
+  const history = useHostHistory("", "all"),
+    frozenEpoch = useRef<string | undefined>(undefined),
+    full = hasScope(snap, "console.view.full");
+  const visible = allowed
+    ? paused && frozenEpoch.current === snap.state.bootEpochId
+      ? frozen
+      : history.lines
+    : emptyLines;
+  const current = full
+    ? visible
+    : visible.filter((row) => ["WARN", "ERROR"].includes(String(row.level)));
+  useEffect(() => {
+    setPaused(false);
+    setFrozen([]);
+  }, [snap.state.bootEpochId, snap.revision]);
   const lines = useMemo(() => current.slice(-8), [current]);
   const authority = snap.state.ready?.consoleAuthority ?? "UNAVAILABLE";
   return (
@@ -30,6 +47,7 @@ export function ConsolePreview() {
         </button>
       }
     >
+      <BootSessionBadge />
       <div
         className="preview-terminal"
         role="region"
@@ -52,6 +70,15 @@ export function ConsolePreview() {
           </Empty>
         )}
       </div>
+      {hasScope(snap, "players.view") ? (
+        <div className="v5-presence-pills">
+          {records(snap.state.sessionEvents?.events, 6).map((event) => (
+            <span key={String(event.eventId)}>
+              {str(event.name)} · {str(event.state)}
+            </span>
+          ))}
+        </div>
+      ) : null}
       <div className="preview-terminal-footer">
         <Status
           tone={
@@ -74,7 +101,10 @@ export function ConsolePreview() {
           className="text-link"
           aria-pressed={paused}
           onClick={() => {
-            if (!paused) setFrozen(snap.state.console.slice(-8));
+            if (!paused) {
+              frozenEpoch.current = snap.state.bootEpochId;
+              setFrozen(history.lines.slice(-8));
+            }
             setPaused(!paused);
           }}
         >

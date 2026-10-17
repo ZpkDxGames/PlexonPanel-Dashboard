@@ -119,6 +119,10 @@ export default function Fleet() {
                       {row.state.ready?.server.minecraftVersion ??
                         "unavailable"}
                     </span>
+                    <small className="mono">
+                      Boot{" "}
+                      {row.state.bootEpochId?.slice(0, 8) ?? "not reported"}
+                    </small>
                   </div>
                   <Status tone={row.phase === "live" ? "success" : "neutral"}>
                     {row.phase}

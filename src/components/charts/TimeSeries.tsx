@@ -1,3 +1,4 @@
+"use client";
 import {
   createContext,
   memo,
@@ -9,37 +10,34 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type { Sample } from "../../adapter/control-state";
-import { chartMaximum, chartTimeAt } from "./geometry";
-import {
-  displaySegments,
-  finite,
-  historyFor,
-  sourceFor,
-  type MetricKey,
-} from "../../presentation/telemetry";
+import uPlot from "uplot";
+import { records, type Sample } from "../../adapter/control-state";
 import { usePlotHistory } from "../../presentation/PlotHistory";
+import { sourceFor } from "../../presentation/telemetry";
+import { canvasData, type CanvasSeries } from "../../presentation/canvas-data";
 import { usePreferences } from "../../store/preferences";
-
-import { nearestObservation } from "../../presentation/nextgen/inspection";
-
-type Series = { key: MetricKey; label: string; color: string; unit: string };
+import { useSession } from "../../hooks";
 export type ChartEvidence = {
   capturedAt: string | null;
   receivedAt: number | null;
   cadence: number | null;
   label: string;
 };
-const Crosshair = createContext<{
-  at: number | null;
-  setAt: (at: number | null) => void;
-}>({ at: null, setAt: () => {} });
+type Group = {
+  key: string;
+  plots: Set<uPlot>;
+  zoom: [number, number] | null;
+  applying: boolean;
+};
+const Crosshair = createContext<Group | null>(null);
 export function CrosshairGroup({ children }: { children: ReactNode }) {
-  const [at, setAt] = useState<number | null>(null);
-  const value = useMemo(() => ({ at, setAt }), [at]);
+  const key = useId(),
+    value = useMemo<Group>(
+      () => ({ key, plots: new Set(), zoom: null, applying: false }),
+      [key],
+    );
   return <Crosshair.Provider value={value}>{children}</Crosshair.Provider>;
 }
-
 export const TimeSeries = memo(function TimeSeries({
   samples,
   series,
@@ -48,13 +46,13 @@ export const TimeSeries = memo(function TimeSeries({
   threshold,
   title,
   source = "Paper",
-  height: preferredHeight = 230,
+  height = 230,
   mobileHeight,
   evidence,
   windowStart = -Infinity,
 }: {
   samples: Sample[];
-  series: Series[];
+  series: CanvasSeries[];
   yMin?: number;
   yMax?: number;
   threshold?: number;
@@ -65,582 +63,422 @@ export const TimeSeries = memo(function TimeSeries({
   evidence?: ChartEvidence;
   windowStart?: number;
 }) {
-  const prefs = usePreferences();
-  const epochHistories = usePlotHistory(samples);
-  const [table, setTable] = useState(false),
-    [hidden, setHidden] = useState<Set<MetricKey>>(new Set()),
-    [width, setWidth] = useState(600),
-    [pinned, setPinned] = useState<number | null>(null),
-    [localAt, setLocalAt] = useState<number | null>(null);
-  const height =
-    width < 420
-      ? (mobileHeight ?? Math.min(preferredHeight, 260))
-      : preferredHeight;
-  const touchClick = useRef(false);
-  const pointerFrame = useRef(0);
-  useEffect(() => () => cancelAnimationFrame(pointerFrame.current), []);
-  const svgRef = useRef<SVGSVGElement>(null),
-    id = useId().replaceAll(":", ""),
-    crosshair = useContext(Crosshair);
-  useEffect(() => {
-    const svg = svgRef.current;
-    if (!svg) return;
-    const observer = new ResizeObserver(([entry]) =>
-      setWidth(Math.max(220, Math.round(entry.contentRect.width))),
+  const prefs = usePreferences(),
+    snap = useSession(),
+    histories = usePlotHistory(samples),
+    group = useContext(Crosshair),
+    element = useRef<HTMLDivElement>(null),
+    plot = useRef<uPlot | null>(null),
+    [visible, setVisible] = useState(true),
+    [table, setTable] = useState(false);
+  const signature = JSON.stringify(series),
+    expanded = useMemo(
+      () =>
+        series.some((s) => s.key === "mspt") &&
+        !series.some((s) => s.key === "msptP99")
+          ? [
+              ...series,
+              {
+                key: "msptP95" as const,
+                label: "p95",
+                color: "var(--chart-2)",
+                unit: "ms",
+              },
+              {
+                key: "msptP99" as const,
+                label: "p99",
+                color: "var(--chart-3)",
+                unit: "ms",
+              },
+            ]
+          : series,
+      [signature],
     );
-    observer.observe(svg);
+  const epoch = `${snap.revision}:${snap.state.bootEpochId}:${snap.state.ready?.server.paperSession}:${snap.state.ready?.server.hostSession}:${snap.state.ready?.agents.paper}:${snap.state.ready?.agents.host}`,
+    epochSeen = useRef(epoch);
+  const retainedProjection = useRef<ReturnType<typeof canvasData>>({
+    data: [[], ...expanded.map(() => [])],
+    events: [],
+  });
+  const sourceProjection = useRef<{
+    epoch: string;
+    windowStart: number;
+    signature: string;
+    payloads: unknown[];
+    first: (number | null | undefined)[];
+    result: ReturnType<typeof canvasData>;
+  } | null>(null);
+  const projected = useMemo<ReturnType<typeof canvasData>>(() => {
+    if (!visible)
+      return epochSeen.current === epoch
+        ? retainedProjection.current
+        : { data: [[], ...expanded.map(() => [])], events: [] };
+    const sources = [...new Set(expanded.map((item) => sourceFor[item.key]))];
+    const payloads = sources.map(
+      (source) =>
+        ({
+          paperHealth: snap.state.server,
+          paperSystem: snap.state.system,
+          hostSystem: snap.state.hostSystem,
+          service: snap.state.service.resources,
+        })[source],
+    );
+    const first = sources.map((source) => {
+      const row = (histories?.[source] ?? samples)[0];
+      return row?.sources ? row.sources[source] : row?.at;
+    });
+    const previous = sourceProjection.current;
+    // Another producer's packet cannot change an unchanged source's curve.
+    // Earliest retained capture, window and epoch still invalidate this reuse.
+    if (
+      samples === snap.state.history &&
+      previous &&
+      previous.epoch === epoch &&
+      previous.windowStart === windowStart &&
+      previous.signature === signature &&
+      payloads.every((value, i) => value === previous.payloads[i]) &&
+      first.every((value, i) => value === previous.first[i])
+    ) {
+      retainedProjection.current = previous.result;
+      return previous.result;
+    }
+    const result = canvasData(histories ?? {}, samples, expanded, windowStart);
+    sourceProjection.current = {
+      epoch,
+      windowStart,
+      signature,
+      payloads,
+      first,
+      result,
+    };
+    retainedProjection.current = result;
+    return result;
+  }, [histories, samples, expanded, windowStart, visible, epoch]);
+  const latest = useRef(projected);
+  latest.current = projected;
+  const presence = useRef(snap.state.presenceDeltas);
+  presence.current = snap.state.presenceDeltas;
+  const operations = useRef(snap.state.sessionEvents?.serverEvents);
+  operations.current = snap.state.sessionEvents?.serverEvents;
+  const drawnStamp = useRef("");
+  useEffect(() => {
+    const el = element.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setVisible(entry.isIntersecting),
+      { rootMargin: "100px" },
+    );
+    observer.observe(el);
     return () => observer.disconnect();
   }, []);
-  const signature = JSON.stringify(series);
-  const wanted = new Set(series.map((item) => sourceFor[item.key]));
-  const paperHealth = wanted.has("paperHealth")
-    ? (epochHistories?.paperHealth ?? samples)
-    : null;
-  const paperSystem = wanted.has("paperSystem")
-    ? (epochHistories?.paperSystem ?? samples)
-    : null;
-  const hostSystem = wanted.has("hostSystem")
-    ? (epochHistories?.hostSystem ?? samples)
-    : null;
-  const service = wanted.has("service")
-    ? (epochHistories?.service ?? samples)
-    : null;
-  const projected = useMemo(() => {
-    const inputs = { paperHealth, paperSystem, hostSystem, service };
-    return series.map((item) => ({
-      item,
-      points: historyFor(
-        inputs[sourceFor[item.key]] ?? [],
-        sourceFor[item.key],
-        windowStart,
-      ),
-    }));
-  }, [signature, windowStart, paperHealth, paperSystem, hostSystem, service]);
-  const all = useMemo(() => {
-    if (projected.length === 1)
-      return projected[0].points.filter((sample) =>
-        finite(sample[projected[0].item.key]),
-      );
-    const map = new Map<number, Sample>();
-    for (const entry of projected)
-      for (const sample of entry.points)
-        if (finite(sample[entry.item.key])) map.set(sample.at, sample);
-    return [...map.values()].sort((a, b) => a.at - b.at);
-  }, [projected]);
-  const observed = useMemo(
-    () =>
-      projected.flatMap(({ item, points }) =>
-        points.map((sample) => sample[item.key]).filter(finite),
-      ),
-    [projected],
-  );
-  const visible = projected.filter(({ item }) => !hidden.has(item.key));
-  const minAt = all[0]?.at ?? 0,
-    maxAt = all.at(-1)?.at ?? minAt + 1;
-  const maximum = chartMaximum(observed, yMax, threshold, yMin),
-    byteAxis = series.every((item) => item.unit === "bytes");
-  const divisor = byteAxis
-    ? maximum >= 2 ** 30
-      ? 2 ** 30
-      : maximum >= 2 ** 20
-        ? 2 ** 20
-        : maximum >= 1024
-          ? 1024
-          : 1
-    : 1;
-  const unit = byteAxis
-    ? divisor === 2 ** 30
-      ? "GiB"
-      : divisor === 2 ** 20
-        ? "MiB"
-        : divisor === 1024
-          ? "KiB"
-          : "B"
-    : (series[0]?.unit ?? "");
-  const numberFormatters = useMemo(
-    () => [
-      new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 }),
-      new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 }),
-    ],
-    [],
-  );
-  const format = (value: number, digits = 1) =>
-    numberFormatters[digits === 2 ? 1 : 0].format(value / divisor);
-  const clockFormatters = useMemo(
-    () => ({
-      short: new Intl.DateTimeFormat(undefined, {
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false,
-        timeZone: prefs.timezone === "UTC" ? "UTC" : undefined,
-      }),
-      precise: new Intl.DateTimeFormat(undefined, {
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-        hour12: false,
-        timeZone: prefs.timezone === "UTC" ? "UTC" : undefined,
-      }),
-    }),
-    [prefs.timezone],
-  );
-  const time = (at: number, seconds = false) =>
-    (seconds ? clockFormatters.precise : clockFormatters.short).format(at);
-  const top = 30,
-    bottom = height - 30,
-    left = 42,
-    right = width - 8;
-  // A lone observation is a point in the center, never a fabricated flat timeline.
-  const x = (at: number) =>
-    maxAt === minAt
-      ? (left + right) / 2
-      : left + ((at - minAt) / (maxAt - minAt)) * (right - left);
-  const y = (value: number) =>
-    bottom - ((value - yMin) / Math.max(1, maximum - yMin)) * (bottom - top);
-  const focusAt = pinned ?? crosshair.at ?? localAt;
-  const pinExpired =
-    pinned !== null && !all.some((sample) => sample.at === pinned);
-  const nearest =
-    focusAt === null || pinExpired ? null : nearestObservation(all, focusAt);
-  const inspect = (at: number | null) => {
-    setLocalAt(at);
-    crosshair.setAt(at);
-  };
-  const move = (clientX: number, rect: DOMRect) => {
-    if (pinned !== null || !all.length) return;
-    const nextAt = chartTimeAt(
-      clientX,
-      rect.left,
-      rect.width,
-      width,
-      left,
-      right,
-      minAt,
-      maxAt,
-    );
-    cancelAnimationFrame(pointerFrame.current);
-    pointerFrame.current = requestAnimationFrame(() => inspect(nextAt));
-  };
-  const step = (direction: number) => {
-    if (!all.length) return;
-    const index = nearest
-      ? all.findIndex((sample) => sample.at === nearest.at)
-      : -1;
-    const next =
-      index < 0
-        ? direction > 0
-          ? 0
-          : all.length - 1
-        : Math.min(all.length - 1, Math.max(0, index + direction));
-    if (pinned !== null) setPinned(all[next].at);
-    inspect(all[next].at);
-  };
-  const traces = useMemo(
-    () =>
-      visible.map(({ item, points }) => (
-        <g key={item.key}>
-          {displaySegments(
-            points,
-            item.key,
-            Math.max(100, Math.floor(width * 0.8)),
-          ).map((segment, index) => {
-            const line = segment
-              .map(
-                (sample, i) =>
-                  `${i ? "L" : "M"}${x(sample.at).toFixed(2)},${y(sample[item.key] as number).toFixed(2)}`,
-              )
-              .join("");
-            return (
-              <g key={index}>
-                {segment.length > 1 && (
-                  <path
-                    className="chart-area"
-                    d={`${line}L${x(segment.at(-1)!.at)},${bottom}L${x(segment[0].at)},${bottom}Z`}
-                    fill={`url(#${id}-${item.key})`}
-                  />
-                )}
-                <path
-                  className="chart-line"
-                  d={line}
-                  stroke={item.color}
-                  fill="none"
-                />
-                {segment.length === 1 && (
-                  <circle
-                    cx={x(segment[0].at)}
-                    cy={y(segment[0][item.key] as number)}
-                    r="3"
-                    fill={item.color}
-                  />
-                )}
-              </g>
-            );
-          })}
-        </g>
-      )),
-    [projected, hidden, width, minAt, maxAt, maximum, yMin, height, id],
-  );
-  const exact = (points: Sample[], key: MetricKey) =>
-    nearest
-      ? points.find((sample) => sample.at === nearest.at && finite(sample[key]))
-      : undefined;
-  return (
-    <div className="chart-block">
-      <div className="chart-legend">
-        {series.map((item) => (
-          <button
-            key={item.key}
-            className={hidden.has(item.key) ? "muted" : ""}
-            aria-pressed={!hidden.has(item.key)}
-            aria-label={`Show ${item.label}`}
-            onClick={() =>
-              setHidden((current) => {
-                const next = new Set(current);
-                next.has(item.key) ? next.delete(item.key) : next.add(item.key);
-                return next;
-              })
-            }
-          >
-            <i style={{ background: item.color }} />
-            {item.label}
-            <span className="legend-unit">{unit}</span>
-          </button>
-        ))}
-        <button
-          className="table-toggle"
-          aria-expanded={table}
-          aria-controls={`${id}-table`}
-          onClick={() => setTable((value) => !value)}
-        >
-          {table ? "Hide data" : "View data"}
-        </button>
-      </div>
-      <div className="chart-plot">
-        <svg
-          ref={svgRef}
-          className="time-series"
-          role="img"
-          tabIndex={0}
-          aria-label={`${title}. ${all.length} observations, ${unit}. Gaps over ten seconds remain disconnected. Arrow keys inspect, Enter pins, Escape clears.`}
-          viewBox={`0 0 ${width} ${height}`}
-          style={{ height }}
-          onPointerDown={(event) => {
-            if (event.pointerType === "touch" && all.length) {
-              const rect = event.currentTarget.getBoundingClientRect();
-              const at = chartTimeAt(
-                event.clientX,
-                rect.left,
-                rect.width,
-                width,
-                left,
-                right,
-                minAt,
-                maxAt,
-              );
-              touchClick.current = true;
-              const actual = nearestObservation(all, at)?.at ?? at;
-              inspect(actual);
-              setPinned(actual);
-            }
-          }}
-          onPointerMove={(event) =>
-            move(event.clientX, event.currentTarget.getBoundingClientRect())
-          }
-          onPointerLeave={() => {
-            if (pinned === null) inspect(null);
-          }}
-          onClick={() => {
-            if (touchClick.current) {
-              touchClick.current = false;
+  useEffect(() => {
+    const el = element.current;
+    if (!el) return;
+    const style = getComputedStyle(document.documentElement),
+      color = (s: string) =>
+        s.replace(/var\(([^)]+)\)/g, (_, name) =>
+          style.getPropertyValue(name).trim(),
+        );
+    const axisFont = `${Math.round({ small: 14, standard: 16, large: 18 }[prefs.textSize] * 0.7)}px monospace`;
+    const bytes = expanded.every((s) => s.unit === "bytes"),
+      format = (v: number) =>
+        bytes ? `${(v / 2 ** 30).toFixed(1)}G` : v.toFixed(1);
+    const data = [...latest.current.data] as typeof projected.data;
+    if (threshold !== undefined) data.push(data[0].map(() => threshold));
+    const p95 = expanded.findIndex((s) => s.key === "msptP95") + 1,
+      p99 = expanded.findIndex((s) => s.key === "msptP99") + 1;
+    const options: uPlot.Options = {
+      width: Math.max(220, el.clientWidth),
+      height:
+        el.clientWidth < 420 ? (mobileHeight ?? Math.min(height, 220)) : height,
+      cursor: {
+        sync: group ? { key: group.key } : undefined,
+        drag: { x: true, y: false },
+      },
+      select: { show: true, left: 0, top: 0, width: 0, height: 0 },
+      legend: { show: true },
+      scales: {
+        x: { time: true },
+        y: {
+          auto: true,
+          range: (_u, min, max) => [
+            Math.min(yMin, min ?? yMin),
+            Math.max(yMax ?? 0, max ?? 1, threshold ?? 0, 1) * 1.08,
+          ],
+        },
+      },
+      axes: [
+        {
+          stroke: color("var(--faint)"),
+          grid: { show: false },
+          font: axisFont,
+          size: 42,
+        },
+        {
+          stroke: color("var(--faint)"),
+          grid: { stroke: color("var(--line)"), width: 1 },
+          font: axisFont,
+          size: 44,
+          values: (_u, ticks) => ticks.map(format),
+        },
+      ],
+      series: [
+        {},
+        ...expanded.map((s) => ({
+          label: s.label,
+          stroke: color(s.color),
+          width: 1.25,
+          spanGaps: false,
+          points: { show: false },
+          value: (_u: uPlot, v: number | null) => (v == null ? "—" : format(v)),
+        })),
+        ...(threshold === undefined
+          ? []
+          : [
+              {
+                label: `${threshold} ms reference`,
+                stroke: color("var(--warning)"),
+                width: 1,
+                dash: [4, 4],
+                points: { show: false },
+              },
+            ]),
+      ],
+      bands:
+        p95 > 0 && p99 > 0
+          ? [{ series: [p99, p95], fill: color("var(--chart-2)") + "22" }]
+          : [],
+      tzDate:
+        prefs.timezone === "UTC"
+          ? (ts) => uPlot.tzDate(new Date(ts * 1000), "Etc/UTC")
+          : undefined,
+      hooks: {
+        setSelect: [
+          (u) => {
+            if (!group || group.applying || u.select.width < 8) return;
+            const min = u.posToVal(u.select.left, "x"),
+              max = u.posToVal(u.select.left + u.select.width, "x");
+            if (!Number.isFinite(min) || !Number.isFinite(max) || max <= min)
               return;
+            group.zoom = [min, max];
+            group.applying = true;
+            try {
+              for (const other of group.plots)
+                if (other !== u) other.setScale("x", { min, max });
+            } finally {
+              group.applying = false;
             }
-            if (nearest) {
-              setPinned(pinned === null ? nearest.at : null);
+          },
+        ],
+        draw: [
+          (u) => {
+            const ctx = u.ctx;
+            ctx.save();
+            ctx.strokeStyle = color("var(--chart-2)");
+            ctx.globalAlpha = 0.55;
+            const marks = [
+              ...latest.current.events,
+              ...records(operations.current, 100).map(
+                (event) => Date.parse(String(event.capturedAt)) / 1000,
+              ),
+              ...(presence.current ?? [])
+                .slice(-100)
+                .map((e) => Date.parse(String(e.observedAt)) / 1000),
+            ];
+            const pixels = new Set<number>();
+            for (const at of marks) {
+              if (
+                !Number.isFinite(at) ||
+                at < (u.scales.x.min ?? 0) ||
+                at > (u.scales.x.max ?? 0)
+              )
+                continue;
+              const x = Math.round(u.valToPos(at, "x", true));
+              if (pixels.has(x)) continue;
+              pixels.add(x);
+              ctx.beginPath();
+              ctx.moveTo(x, u.bbox.top);
+              ctx.lineTo(x, u.bbox.top + 8);
+              ctx.stroke();
             }
-          }}
-          onBlur={() => {
-            if (pinned === null) inspect(null);
-          }}
-          onKeyDown={(event) => {
-            if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
-              event.preventDefault();
-              step(event.key === "ArrowLeft" ? -1 : 1);
-            }
-            if (event.key === "Home" || event.key === "End") {
-              event.preventDefault();
-              const sample = event.key === "Home" ? all[0] : all.at(-1);
-              if (sample) {
-                inspect(sample.at);
-                if (pinned !== null) setPinned(sample.at);
+            ctx.restore();
+          },
+        ],
+      },
+    };
+    const dual =
+      expanded.some((item) => item.unit === "TPS") &&
+      expanded.some((item) => item.unit === "ms");
+    if (dual) {
+      options.scales!.tps = { range: () => [0, 20] };
+      options.scales!.mspt = {
+        range: (_u, _min, max) => [0, Math.max(50, max ?? 0) * 1.08],
+      };
+      expanded.forEach((item, index) => {
+        options.series[index + 1].scale = item.unit === "TPS" ? "tps" : "mspt";
+      });
+      if (threshold !== undefined) options.series.at(-1)!.scale = "mspt";
+      options.axes![1].scale = "tps";
+      options.axes!.push({
+        ...options.axes![1],
+        scale: "mspt",
+        side: 1,
+        label: "ms",
+        labelSize: 12,
+        grid: { show: false },
+      });
+    }
+    if (prefs.chartFill && expanded.length === 1)
+      options.series[1].fill = color(expanded[0].color) + "0a";
+    if (!prefs.chartFill) options.bands = [];
+    const chart = new uPlot(options, data, el);
+    plot.current = chart;
+    drawnStamp.current = "";
+    group?.plots.add(chart);
+    const observer = new ResizeObserver(() =>
+      chart.setSize({
+        width: Math.max(220, el.clientWidth),
+        height:
+          el.clientWidth < 420
+            ? (mobileHeight ?? Math.min(height, 220))
+            : height,
+      }),
+    );
+    observer.observe(el);
+    return () => {
+      observer.disconnect();
+      group?.plots.delete(chart);
+      chart.destroy();
+      plot.current = null;
+    };
+  }, [
+    expanded,
+    threshold,
+    yMin,
+    yMax,
+    height,
+    mobileHeight,
+    prefs.theme,
+    prefs.accent,
+    prefs.timezone,
+    prefs.textSize,
+    prefs.chartFill,
+    group,
+  ]);
+  useEffect(() => {
+    const chart = plot.current;
+    if (!chart) return;
+    if (epochSeen.current !== epoch) {
+      epochSeen.current = epoch;
+      if (group) group.zoom = null;
+      if (!visible) {
+        retainedProjection.current = {
+          data: [[], ...expanded.map(() => [])],
+          events: [],
+        };
+        latest.current = retainedProjection.current;
+      }
+      chart.setData([[], ...expanded.map(() => [])]);
+    }
+    if (!visible) return;
+    const stamp = JSON.stringify([
+      epoch,
+      windowStart,
+      threshold,
+      presence.current?.at(-1)?.eventId,
+      records(operations.current, 100).at(0)?.eventId,
+      ...projected.data.map((row) => [row.length, row[0], row.at(-1)]),
+    ]);
+    if (drawnStamp.current === stamp) return;
+    drawnStamp.current = stamp;
+    const data = [...projected.data] as typeof projected.data;
+    if (threshold !== undefined) data.push(data[0].map(() => threshold));
+    if (group) group.applying = true;
+    try {
+      chart.setData(data);
+      if (group?.zoom)
+        chart.setScale("x", { min: group.zoom[0], max: group.zoom[1] });
+    } finally {
+      if (group) group.applying = false;
+    }
+  }, [projected, visible, epoch, expanded, threshold, group]);
+  const rawEvidence = useMemo(
+    () =>
+      table
+        ? canvasData(histories ?? {}, samples, expanded, windowStart, false)
+            .data
+        : projected.data,
+    [table, histories, samples, expanded, windowStart, projected],
+  );
+  const n = rawEvidence[0].length,
+    rawIndexes = Array.from(
+      { length: Math.min(50, n) },
+      (_, i) => n - Math.min(50, n) + i,
+    );
+  return (
+    <section className="v5-chart" aria-label={title}>
+      <header className="v5-chart-head">
+        <div>
+          <span>{source}</span>
+          <br />
+          <strong>{title}</strong>
+        </div>
+        <span>{evidence?.label ?? "Capture time"}</span>
+      </header>
+      <div
+        className="v5-chart-canvas"
+        ref={element}
+        role="img"
+        aria-label={`${title}. ${n} retained source observations. Raw evidence table available below.`}
+      />
+      <footer className="v5-chart-footer">
+        <span>Drag to zoom · GC / presence / operation markers</span>
+        <button aria-expanded={table} onClick={() => setTable((v) => !v)}>
+          Raw evidence
+        </button>
+        <button
+          onClick={() => {
+            if (group) {
+              group.zoom = null;
+              group.applying = true;
+              try {
+                for (const chart of group.plots) chart.setData(chart.data);
+              } finally {
+                group.applying = false;
               }
             }
-            if (event.key === "Escape") {
-              setPinned(null);
-              inspect(null);
-            }
-            if (event.key === "Enter" && nearest) {
-              event.preventDefault();
-              setPinned(pinned === null ? nearest.at : null);
-            }
           }}
         >
-          <defs>
-            {series.map((item) => (
-              <linearGradient
-                id={`${id}-${item.key}`}
-                key={item.key}
-                x1="0"
-                y1="0"
-                x2="0"
-                y2="1"
-              >
-                <stop offset="0" stopColor={item.color} stopOpacity=".14" />
-                <stop offset="1" stopColor={item.color} stopOpacity="0" />
-              </linearGradient>
-            ))}
-          </defs>
-          <text x={left} y={14}>
-            {unit}
-          </text>
-          {[0, 0.25, 0.5, 0.75, 1].map((ratio) => {
-            const value = yMin + (maximum - yMin) * (1 - ratio),
-              position = top + (bottom - top) * ratio;
-            return (
-              <g key={ratio}>
-                <line
-                  x1={left}
-                  x2={right}
-                  y1={position}
-                  y2={position}
-                  className="gridline"
-                />
-                <text x={left - 8} y={position + 3} textAnchor="end">
-                  {format(value)}
-                </text>
-              </g>
-            );
-          })}
-          {threshold !== undefined && (
-            <g>
-              <rect
-                className="threshold-band"
-                x={left}
-                y={top}
-                width={right - left}
-                height={Math.max(0, y(threshold) - top)}
-              />
-              <line
-                x1={left}
-                x2={right}
-                y1={y(threshold)}
-                y2={y(threshold)}
-                className="threshold"
-              />
-              <text x={right - 4} y={y(threshold) - 6} textAnchor="end">
-                {threshold} {unit} budget
-              </text>
-            </g>
-          )}
-          {traces}
-          {all.length > 0 && (
-            <>
-              <text x={left} y={height - 5}>
-                {time(minAt)}
-              </text>
-              {maxAt !== minAt && (
-                <text x={right} y={height - 5} textAnchor="end">
-                  {time(maxAt)}
-                </text>
-              )}
-              {width > 450 && maxAt !== minAt && (
-                <text x={(left + right) / 2} y={height - 5} textAnchor="middle">
-                  {time((maxAt + minAt) / 2)}
-                </text>
-              )}
-            </>
-          )}
-          {nearest && (
-            <g>
-              <line
-                className="crosshair"
-                x1={x(nearest.at)}
-                x2={x(nearest.at)}
-                y1={top}
-                y2={bottom}
-              />
-              {visible.map(({ item, points }) => {
-                const found = exact(points, item.key);
-                return found ? (
-                  <circle
-                    key={item.key}
-                    cx={x(found.at)}
-                    cy={y(found[item.key] as number)}
-                    r="4"
-                    fill={item.color}
-                    stroke="var(--instrument)"
-                    strokeWidth="2"
-                  />
-                ) : null;
-              })}
-            </g>
-          )}
-        </svg>
-        {(!all.length || !visible.length) && (
-          <div className="chart-empty">
-            <strong>
-              {!all.length ? "No observed signal" : "All signals hidden"}
-            </strong>
-            <span>
-              {!all.length
-                ? "This source has not reported a measurement in this window."
-                : "Select a legend to restore a signal."}
-            </span>
-          </div>
-        )}
-      </div>
-      <div className="inspection-shelf">
-        {nearest && visible.length > 0 && (
-          <div className="inspection-reading" role="status">
-            <strong>
-              {time(nearest.at, true)} {pinned !== null ? "· pinned" : ""}
-            </strong>
-            {visible.map(({ item, points }) => {
-              const found = exact(points, item.key);
-              return (
-                <span key={item.key}>
-                  <i style={{ background: item.color }} />
-                  {item.label}
-                  <b>
-                    {found
-                      ? `${format(found[item.key] as number, 2)} ${unit}`
-                      : "No sample"}
-                  </b>
-                </span>
-              );
-            })}
-            <small>{source} · source capture time</small>
-          </div>
-        )}
-        {!nearest && (
-          <p
-            className="inspection-hint"
-            role={pinExpired ? "status" : undefined}
-          >
-            {pinExpired
-              ? "Pinned sample is outside this source window. Clear pin to inspect current observations."
-              : "Inspect an actual observation with touch, pointer or Previous / Next."}
-          </p>
-        )}
-        {pinExpired && (
-          <button
-            className="text-link"
-            onClick={() => {
-              setPinned(null);
-              inspect(null);
-            }}
-          >
-            Clear pin
-          </button>
-        )}
-      </div>
-      <div id={`${id}-table`} hidden={!table}>
-        {table && (
-          <div
-            className="table-region"
-            role="region"
-            tabIndex={0}
-            aria-label={`${title} sample table`}
-          >
-            <table>
-              <caption>
-                Latest 50 actual source observations ·{" "}
-                {prefs.timezone === "UTC" ? "UTC" : "browser time"}
-              </caption>
-              <thead>
-                <tr>
-                  <th>Captured</th>
-                  {series.map((item) => (
-                    <th key={item.key}>
-                      {item.label} ({unit})
-                    </th>
+          Reset zoom
+        </button>
+      </footer>
+      {table ? (
+        <div className="v5-chart-table">
+          <table>
+            <caption>Latest 50 actual observations</caption>
+            <thead>
+              <tr>
+                <th>Captured at</th>
+                {expanded.map((s) => (
+                  <th key={s.key}>
+                    {s.label} ({s.unit})
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {rawIndexes.map((i) => (
+                <tr key={rawEvidence[0][i]}>
+                  <td>{new Date(rawEvidence[0][i] * 1000).toISOString()}</td>
+                  {expanded.map((s, j) => (
+                    <td key={s.key}>{rawEvidence[j + 1][i] ?? "—"}</td>
                   ))}
                 </tr>
-              </thead>
-              <tbody>
-                {all.slice(-50).map((sample) => (
-                  <tr key={sample.at}>
-                    <td>{time(sample.at, true)}</td>
-                    {projected.map(({ item, points }) => {
-                      const found = points.find(
-                        (point) => point.at === sample.at,
-                      );
-                      return (
-                        <td key={item.key}>
-                          {found && finite(found[item.key])
-                            ? format(found[item.key] as number, 2)
-                            : "Unknown"}
-                        </td>
-                      );
-                    })}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
-      <footer className="chart-provenance">
-        {" "}
-        <div className="sample-tools">
-          <button
-            aria-label={`Inspect previous ${title} sample`}
-            onClick={() => step(-1)}
-          >
-            ← Previous
-          </button>
-          <button
-            aria-label={`Inspect next ${title} sample`}
-            onClick={() => step(1)}
-          >
-            Next →
-          </button>
-          {nearest && (
-            <button
-              onClick={() => setPinned(pinned === null ? nearest.at : null)}
-            >
-              {pinned === null ? "Pin sample" : "Unpin"}
-            </button>
-          )}
+              ))}
+            </tbody>
+          </table>
         </div>
-        <span>{source}</span>
-        <span>{all.length} observations</span>
-        <span>
-          {all.length
-            ? `${((maxAt - minAt) / 60000).toFixed(1)} min`
-            : "No window"}
-        </span>
-        <details>
-          <summary>Source details</summary>
-          <p>
-            Capture:{" "}
-            {evidence?.capturedAt ??
-              (all.length ? new Date(maxAt).toISOString() : "Unavailable")}
-            <br />
-            Browser receipt:{" "}
-            {evidence?.receivedAt
-              ? new Date(evidence.receivedAt).toISOString()
-              : "Unavailable"}
-            <br />
-            Source cadence:{" "}
-            {evidence?.cadence ? `${evidence.cadence} ms` : "Not reported"}
-            <br />
-            Freshness: {evidence?.label ?? "Retained observations"}
-            <br />
-            Display reduction preserves extrema and gaps; the table shows
-            original samples.
-          </p>
-        </details>
-      </footer>
-    </div>
+      ) : null}
+    </section>
   );
 });

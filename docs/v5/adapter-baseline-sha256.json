@@ -1,0 +1,22 @@
+{
+  "src/adapter/dashboard-version.ts": "645070d5cf6d48adea0038437faf7550cae7e6b145cfb2621e9434462b978f8a",
+  "src/adapter/fleet-contract.ts": "75cff5dbe80f7217fd9e26aace04f21bbd2f807fa185b4c527e535abc3f2caf6",
+  "src/adapter/telemetry-freshness.ts": "c477211e1dd7d9389d1c07670bf57bd49a9d3027c71740e37945275327cbc28e",
+  "src/adapter/transfers.ts": "619b1e8acccdc38512bd8fbba3c7f845a453005dd74b6bdb80e418ed0adc4142",
+  "src/adapter/backup-readiness.ts": "3fbcc3491f25eff4411f8864d284a5783225fabea0e58a037b2500acdf5eb64a",
+  "src/adapter/device-grant.ts": "12ac78acd7c7a1163e051e506d4164914ca94fad2111cd6466e11dd4d7645413",
+  "src/adapter/relay-config.ts": "d31fd4802f26705abeba1571917d163547ee9e6611ea8703685016cde52f0a42",
+  "src/adapter/session.ts": "93b5308e874e6008c3b92d9c5de8207b5dd76da1ff7be95bbc7ef06eaa58f33b",
+  "src/adapter/browser-store.ts": "600e7e9870e9a375914d37a233702f485a0985c03150f42ff6027cddbe2bf137",
+  "src/adapter/control-state.ts": "99e2d696869f17afc77a4863a1903384527faf5cd583a55b82a08ddb9bd40720",
+  "src/adapter/fleet-feed.ts": "9d7017200f6b606281f5e436ef7de69c1ab8ac9d3944b33dac2b295a9e39269c",
+  "src/adapter/data-source.ts": "3d1d3942338ca3b7f1a6ac1e109ddff6545882e430fb4ebdabe3e38cd4ebca67",
+  "src/adapter/history.ts": "437526d5259373282df4f00410997e11a6333d7e2232a1a30a4c47f2f5b21865",
+  "src/adapter/maintenance.ts": "99d8e30d26bcb7c078d174ca62d0113868b01eff5edd28bcbd1f419fab630ae9",
+  "src/adapter/scopes.ts": "bd9daf3f7967803a707c259edf3c556c3cd06c2ace740140cdce78d39995387a",
+  "src/adapter/deadline.ts": "4dee4a5576c106e150885908655674e459fac6973d5c2018ea79cc7c0a93e00b",
+  "src/presentation/authority.ts": "751ca8789c735a16c57098b57df671ec535344387e3fc053953a5b7ce94b7fb7",
+  "src/presentation/epochs.ts": "6e5927703ab86d2e7b4254e6de1829e1ce34092829301dc8c3ffaf50dd344e6e",
+  "src/presentation/review-policy.ts": "efe5c9b3a12de9044a54a15f9c97c805746d7c2ee5a2d540425b1ad54390ab58",
+  "src/features/capabilities.ts": "1feaf72e3bfe29aae1e15b67de7d91b22e229e1b923c498c63131f99c26af71f"
+}

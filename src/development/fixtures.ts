@@ -50,10 +50,26 @@ export function makeFixture(mode = "healthy", now = Date.now()): ControlState {
       fleetState: "BOUND",
     },
   };
+  state.bootEpochId = "a".repeat(32);
+  state.bootStartedAt = new Date(now - 7800000).toISOString();
+  state.sessionEvents = {
+    bootEpochId: state.bootEpochId,
+    bootStartedAt: state.bootStartedAt,
+    onlineCount: 24,
+    events: [],
+    activePlayers: [],
+  };
   state.server = {
     capturedAt,
     tps: [19.87, 19.93, 19.96],
+    loadedChunks: 866,
+    entities: 1692,
     averageTickMillis: 31.4,
+    msptP95: 42,
+    msptP99: 47,
+    msptMin: 12,
+    msptMax: 51,
+    tickSampleCount: 100,
     onlinePlayers: 24,
     maxPlayers: 80,
     serverName: state.ready.server.serverName,
@@ -81,6 +97,8 @@ export function makeFixture(mode = "healthy", now = Date.now()): ControlState {
     physicalMemoryTotalBytes: 16 * 2 ** 30,
   };
   state.service = {
+    bootEpochId: state.bootEpochId,
+    bootStartedAt: state.bootStartedAt,
     state: mode === "stopped" ? "inactive" : "active",
     minecraftReady: mode !== "stopped",
     resources: {
@@ -89,9 +107,10 @@ export function makeFixture(mode = "healthy", now = Date.now()): ControlState {
       source: "SYSTEMD_CGROUP",
       cpuAvailable: true,
       cpuUnit: "PERCENT_OF_ONE_CORE",
-      cpuPercent: 146.2,
+      cpuPercent: mode === "stopped" ? null : 146.2,
       memoryAvailable: true,
-      memoryBytes: 4.1 * 2 ** 30,
+      memoryBytes: mode === "stopped" ? null : 4.1 * 2 ** 30,
+      memoryMaxBytes: 12 * 2 ** 30,
     },
   };
   state.receipts = {
@@ -103,7 +122,7 @@ export function makeFixture(mode = "healthy", now = Date.now()): ControlState {
   state.updatedAt = now;
   state.telemetryUpdatedAt = now;
   state.worlds = [
-    { name: "world", loadedChunks: 682, entities: 1432 },
+    { name: "world", loadedChunks: 682, entities: 1432, tileEntities: 312 },
     { name: "world_nether", loadedChunks: 148, entities: 218 },
     { name: "world_the_end", loadedChunks: 36, entities: 42 },
   ];
@@ -174,6 +193,13 @@ export function makeFixture(mode = "healthy", now = Date.now()): ControlState {
           : lag
             ? 65 + Math.sin(i) * 8
             : 28 + Math.sin(i / 13) * 7,
+      msptP95: 40 + Math.sin(i / 13) * 8,
+      msptP99: 46 + Math.sin(i / 13) * 9,
+      heapCommitted: 6 * 2 ** 30,
+      heapMax: 8 * 2 ** 30,
+      serviceMemoryMax: 12 * 2 ** 30,
+      chunks: 860 + (i % 10),
+      entities: 1692 + (i % 20),
       hostCpu: 26 + Math.sin(i / 14) * 8,
       processCpu: 40 + Math.sin(i / 13) * 12,
       heap: (3 + Math.sin(i / 20) * 0.5) * 2 ** 30,
@@ -195,6 +221,21 @@ export function makeFixture(mode = "healthy", now = Date.now()): ControlState {
     state.system = {};
     state.players = [];
   }
+  state.sessionEvents = {
+    ...state.sessionEvents,
+    onlineCount: mode === "stopped" ? 0 : state.players.length,
+    activePlayers: state.players.slice(0, 3),
+    events: state.players.slice(0, 3).map((p, i) => ({
+      eventId: `fixture-event-${i}`,
+      sessionId: `fixture-presence-${i}`,
+      uuid: p.uuid,
+      name: p.name,
+      state: "JOINED",
+      observedAt: new Date(now - 120000 - i * 1000).toISOString(),
+      sessionStartedAt: new Date(now - 120000 - i * 1000).toISOString(),
+      termination: "OPEN",
+    })),
+  };
   return state;
 }
 let content = "view-distance: 8\nsimulation-distance: 6\nmax-players: 80\n";
@@ -234,6 +275,18 @@ export async function fixtureAction(
     data = {
       settings: parameters.settings ?? {
         schemaVersion: 1,
+        schedule: {
+          backups: {
+            enabled: false,
+            cadence: "DAILY",
+            weekdays: [],
+            time: "04:00",
+            intervalHours: 24,
+            countdownMinutes: 15,
+            skipIfEmptySinceLastBackup: false,
+            forceAfterHours: 168,
+          },
+        },
         timezone: "America/Sao_Paulo",
         restart: {
           schedule: {

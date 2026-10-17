@@ -1,3 +1,4 @@
+import { DriveBackupStatus } from "../components/DriveBackupStatus";
 import { useMemo, useState } from "react";
 import { useSession, useNow } from "../hooks";
 import { number, record, str } from "../adapter/control-state";
@@ -146,119 +147,10 @@ export default function Overview() {
   );
   return (
     <>
-      <section className="server-banner" aria-label="Selected Minecraft server">
-        <div className="server-banner-identity">
-          <span className="voxel-emblem">
-            <Icon name="server" />
-          </span>
-          <div>
-            <div className="server-title-line">
-              <h2>
-                {String(
-                  state.ready?.server.serverName ??
-                    snap.labels[state.serverId] ??
-                    state.serverId,
-                )}
-              </h2>
-              <Status
-                tone={
-                  service.usable && str(state.service.state) === "active"
-                    ? "success"
-                    : "neutral"
-                }
-              >
-                {service.usable
-                  ? str(state.service.state, "Unknown")
-                  : "Service unknown"}
-              </Status>
-            </div>
-          </div>
-        </div>
-        <div className="lifecycle-buttons">
-          {[
-            ["Start", "server.start", "play"],
-            ["Restart", "server.restart", "refresh"],
-            ["Stop", "server.stop", "stop"],
-          ].map(([label, action, icon]) => (
-            <Button
-              key={action}
-              variant={label === "Stop" ? "danger" : "secondary"}
-              disabled={!!session.reason(action, "HOST")}
-              title={session.reason(action, "HOST")}
-              onClick={() => lifecycle(action)}
-            >
-              <Icon name={icon} />
-              {label}
-            </Button>
-          ))}
-        </div>
-      </section>
-      <ActionAvailability
-        reason={[
-          ...new Set(
-            ["server.start", "server.restart", "server.stop"]
-              .map((a) => session.reason(a, "HOST"))
-              .filter(Boolean),
-          ),
-        ].join(" ")}
-      />
-      <section
-        className="metric-strip"
-        aria-label="Current runtime measurements"
-      >
-        {[
-          {
-            label: "Tick rate",
-            value: tps?.toFixed(2) ?? "—",
-            unit: "TPS",
-            key: "tps" as const,
-            detail: `Paper · ${paper.kind}`,
-            icon: "performance",
-          },
-          {
-            label: "Mean tick time",
-            value: mspt?.toFixed(1) ?? "—",
-            unit: "ms",
-            key: "mspt" as const,
-            detail: `Paper · ${paper.kind}`,
-            icon: "clock",
-          },
-          {
-            label: "Online players",
-            value: players?.toLocaleString() ?? "—",
-            unit: capacity !== null ? `/ ${capacity}` : "players",
-            key: "players" as const,
-            detail:
-              peak === null ? "No retained peak" : `Observed peak ${peak}`,
-            icon: "players",
-          },
-          {
-            label: "JVM heap",
-            value: heap.value,
-            unit: heap.unit,
-            key: "heap" as const,
-            detail: `Paper JVM · ${system.kind}`,
-            icon: "server",
-          },
-        ].map((row) => (
-          <article className="stat-cell" key={row.key}>
-            <div className="stat-label">
-              <Icon name={row.icon} />
-              {row.label}
-            </div>
-            <div className="stat-reading">
-              <strong>{row.value}</strong>
-              <span>{row.unit}</span>
-              <Sparkline samples={state.history} metric={row.key} />
-            </div>
-            <small>{row.detail}</small>
-          </article>
-        ))}
-      </section>
       <CrosshairGroup>
         <div className="overview-grid">
           <Panel
-            title="Usage instrument"
+            title="Runtime and memory"
             className="usage-panel"
             action={
               <button
@@ -270,68 +162,185 @@ export default function Overview() {
             }
           >
             <div className="usage-controls">
-              <div className="segmented" aria-label="Overview metric">
-                {metrics.map((item) => (
-                  <button
-                    key={item.key}
-                    className={metric === item.key ? "active" : ""}
-                    aria-pressed={metric === item.key}
-                    onClick={() => setMetric(item.key)}
-                  >
-                    {item.label}
-                  </button>
-                ))}
-              </div>
+              <span className="subtle">
+                Independent Paper health and JVM capture clocks
+              </span>
               <select
                 aria-label="Overview time range"
                 value={minutes}
                 onChange={(e) => setMinutes(Number(e.target.value))}
               >
-                {[1, 5, 15, 30].map((value) => (
-                  <option key={value} value={value}>
-                    {value} minutes
+                {[1, 5, 15, 35].map((n) => (
+                  <option key={n} value={n}>
+                    {n} minutes
                   </option>
                 ))}
               </select>
             </div>
-            <div className="usage-reading">
-              <strong>
-                {currentSummary.mean === null
-                  ? "—"
-                  : current.unit === "bytes"
-                    ? formatBytes(currentSummary.mean)
-                    : `${currentSummary.mean.toFixed(2)} ${current.unit}`}
-              </strong>
-              <span>Observed mean · {currentSummary.count} actual samples</span>
+            <div className="overview-hero-charts">
+              <TimeSeries
+                title="TPS and tick-time envelope"
+                source="PAPER HEALTH · TPS LEFT / MSPT RIGHT"
+                samples={state.history}
+                series={[
+                  {
+                    key: "tps",
+                    label: "TPS",
+                    unit: "TPS",
+                    color: "var(--chart-4)",
+                  },
+                  {
+                    key: "mspt",
+                    label: "Mean MSPT",
+                    unit: "ms",
+                    color: "var(--chart-1)",
+                  },
+                ]}
+                threshold={50}
+                height={128}
+                mobileHeight={170}
+                windowStart={cutoff}
+                evidence={paper}
+              />
+              <TimeSeries
+                title="JVM memory allocation"
+                source="PAPER JVM"
+                samples={state.history}
+                series={[
+                  {
+                    key: "heap",
+                    label: "Used",
+                    unit: "bytes",
+                    color: "var(--chart-2)",
+                  },
+                  {
+                    key: "heapCommitted",
+                    label: "Committed",
+                    unit: "bytes",
+                    color: "var(--chart-3)",
+                  },
+                  {
+                    key: "heapMax",
+                    label: "Maximum",
+                    unit: "bytes",
+                    color: "var(--chart-4)",
+                  },
+                ]}
+                height={128}
+                mobileHeight={170}
+                windowStart={cutoff}
+                evidence={system}
+              />
             </div>
-            <TimeSeries
-              key={current.key}
-              title={current.title}
-              samples={state.history}
-              series={usageSeries}
-              yMax={current.key === "tps" ? 20 : undefined}
-              height={190}
-              mobileHeight={240}
-              windowStart={cutoff}
-              evidence={sourceEvidence(state, current.source, now)}
-              source={
-                current.source === "service"
-                  ? "Host · Minecraft cgroup"
-                  : current.source === "paperSystem"
-                    ? "Paper JVM"
-                    : "Paper"
-              }
-            />
-            <p className="chart-footnote">
-              {current.key === "tps"
-                ? `20 TPS reference · observed low ${stats.min?.toFixed(2) ?? "—"} TPS.`
-                : current.key === "serviceCpu"
-                  ? "Percent of one CPU core. Service usage can exceed 100%."
-                  : "Java heap usage is separate from service and node memory."}{" "}
-              Missing samples remain gaps.
-            </p>
           </Panel>
           <ConsolePreview />
+          <section
+            className="metric-strip"
+            aria-label="Current runtime measurements"
+          >
+            <article className="stat-cell v5-kpi">
+              <div className="stat-label">TPS / MSPT p95</div>
+              <div className="stat-reading">
+                <strong>{tps?.toFixed(2) ?? "—"}</strong>
+                <span>
+                  TPS ·{" "}
+                  {number(
+                    state.server.msptP95 ?? state.server.p95TickMillis,
+                  )?.toFixed(1) ?? "—"}{" "}
+                  ms p95
+                </span>
+              </div>
+              <small>Paper · {paper.kind}</small>
+            </article>
+            <article className="stat-cell v5-kpi">
+              <div className="stat-label">Online players / capacity</div>
+              <div className="stat-reading">
+                <strong>{players ?? "—"}</strong>
+                <span>/ {capacity ?? "—"}</span>
+              </div>
+              <small>Paper roster · {paper.kind}</small>
+            </article>
+            <article className="stat-cell v5-kpi">
+              <div className="stat-label">Service cgroup CPU / memory</div>
+              <div className="stat-reading">
+                <strong>
+                  {service.usable && state.service.state === "active"
+                    ? (number(resources.cpuPercent)?.toFixed(1) ?? "—")
+                    : "—"}
+                  %
+                </strong>
+                <span>
+                  {service.usable && state.service.state === "active"
+                    ? formatBytes(number(resources.memoryBytes))
+                    : "Unavailable"}
+                </span>
+              </div>
+              <small>Host · % of one core · {service.kind}</small>
+            </article>
+            <DriveBackupStatus />
+          </section>
+          <div className="v5-overview-lifecycle">
+            <section
+              className="server-banner"
+              aria-label="Selected Minecraft server"
+            >
+              <div className="server-banner-identity">
+                <span className="voxel-emblem">
+                  <Icon name="server" />
+                </span>
+                <div>
+                  <div className="server-title-line">
+                    <h2>
+                      {String(
+                        state.ready?.server.serverName ??
+                          snap.labels[state.serverId] ??
+                          state.serverId,
+                      )}
+                    </h2>
+                    <Status
+                      tone={
+                        service.usable && str(state.service.state) === "active"
+                          ? "success"
+                          : "neutral"
+                      }
+                    >
+                      {service.usable
+                        ? str(state.service.state, "Unknown")
+                        : "Service unknown"}
+                    </Status>
+                  </div>
+                </div>
+              </div>
+              <div className="lifecycle-buttons">
+                {[
+                  ["Start", "server.start", "play"],
+                  ["Restart", "server.restart", "refresh"],
+                  ["Stop", "server.stop", "stop"],
+                ].map(([label, action, icon]) => (
+                  <Button
+                    key={action}
+                    variant={label === "Stop" ? "danger" : "secondary"}
+                    disabled={!!session.reason(action, "HOST")}
+                    title={session.reason(action, "HOST")}
+                    onClick={() => lifecycle(action)}
+                  >
+                    <Icon name={icon} />
+                    {label}
+                  </Button>
+                ))}
+              </div>
+            </section>
+            <ActionAvailability
+              reason={[
+                ...new Set(
+                  ["server.start", "server.restart", "server.stop"]
+                    .map((a) => session.reason(a, "HOST"))
+                    .filter(Boolean),
+                ),
+              ].join(" ")}
+            />
+          </div>
+
           <Panel
             title="Infrastructure layers"
             className="resource-summary"
@@ -426,7 +435,7 @@ export default function Overview() {
                       <div>
                         <b>{entities?.toLocaleString() ?? "—"}</b>
                         <small>
-                          entities ·{" "}
+                          entities · {number(world.tileEntities) ?? "—"} tiles ·{" "}
                           {density === null
                             ? "density unavailable"
                             : `${density.toFixed(2)}/chunk`}
@@ -509,8 +518,8 @@ export default function Overview() {
               evidence={paper}
             />
             <p className="chart-footnote">
-              50 ms is the tick budget for 20 TPS. Means only; no inferred
-              percentiles.
+              50 ms is the tick budget for 20 TPS. Mean and reported p95/p99
+              retain their original Paper capture clock.
             </p>
           </Panel>
           <Panel
