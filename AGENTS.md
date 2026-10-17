@@ -1,3 +1,7 @@
+# Owner superseding directive
+
+The current owner instruction in docs/v5/MASTER_DIRECTIVE.md supersedes historical framework, browser-cache and manual-only backup restrictions below. Existing trust and deployment boundaries remain.
+
 # PlexonPanel Next Generation — agent contract
 
 Planning package v1.0 · 2026-10-16 · selected concept: **Strata**.
@@ -77,3 +81,13 @@ For every UI decision, state the source, target/authority, interaction, narrow l
 Stop mutation work for unexpected production access, secrets exposure, backend requirement, broken identity isolation, data falsification or unsafe auto-retry. Continue unrelated presentation work when safe. Revert the offending stage on the feature branch; never delete credentials or change source truth to make a screenshot pass.
 
 Finish with a review-ready PR, immutable base/head SHAs, full parity report, before/after desktop/mobile dark/light screenshots, exact test/performance logs, accessibility limitations and rollback instructions. Mark tests `PASS`, `FAIL`, `BLOCKED` or `NOT_EXECUTED`; source review is not runtime acceptance. Await separate owner authorization for merge/production.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+## This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

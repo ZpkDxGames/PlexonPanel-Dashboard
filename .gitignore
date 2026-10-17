@@ -8,3 +8,9 @@ artifacts/
 .DS_Store
 
 .vercel
+
+.next/
+next-env.d.ts
+*.tsbuildinfo
+quality/
+public/build.json

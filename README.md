@@ -1,46 +1,53 @@
-# PlexonPanel · Strata
+# PlexonPanel 5.0 · Obsidian Telemetry Workbench
 
-> **Strata implementation:** All eight workspaces have the new frontend. The owner authorized source integration into main via [PR #91](https://github.com/ZpkDxGames/PlexonPanel-Dashboard/pull/91). Automatic Vercel deployment is disabled for main and the feature branch pending separate production authorization. P7 remains incomplete: mixed-source steady timing fails and browser measurement gates are blocked. See [review and evidence](docs/next-gen/REVIEW.md), [delivery status](docs/next-gen/DELIVERY_STATUS.md) and [performance](docs/next-gen/PERFORMANCE.md). Historical verification text below is not the new implementation's acceptance claim.
+Next.js App Router, React 19, Tailwind CSS, shadcn-style Radix primitives, Lucide, cmdk/Sonner, TanStack Virtual and synchronized uPlot graphs across eight operational workspaces. Protocol 3 pairing, signed agent identities, scoped capabilities, authority generations and reviewed exact targets remain authoritative.
 
-A reference-led Minecraft server management interface built with React 19, TypeScript and Vite. A persistent sidebar, console-led Overview, source-aware instrumentation and substantial player profiles replace Operations Desk's presentation while preserving Protocol 3, stored pairing, immutable grants and reviewed server operations.
-
-![Control Room desktop and mobile preview](docs/releases/control-room-preview.jpg)
-
-Screens depict labelled development fixtures. Production data still comes exclusively from authenticated Paper/Host sessions.
+The owner directive in [docs/v5/MASTER_DIRECTIVE.md](docs/v5/MASTER_DIRECTIVE.md) supersedes historical framework, operational browser-cache and manual-only backup restrictions. Older planning documents remain historical evidence.
 
 ## Run
 
 Node 24.x:
 
-```sh
+```bash
 npm ci
-cp .env.example .env.local
-npm run dev
+NEXT_PUBLIC_PLEXON_RELAY_URL=https://your-relay.example npm run build
+npm start
 ```
 
-Set only the public `VITE_PLEXON_RELAY_URL`. Never put signing keys, access tokens or service secrets into frontend variables. Development-only visual review: `http://127.0.0.1:4173/?fixture=healthy#Overview`.
+Set the public relay origin consistently at build and runtime, matching the existing paired relay. A per-request CSP nonce allows only that configured HTTPS/WSS origin. No credentials belong in public environment variables. The Vercel framework is nextjs; main Git deployment is enabled by the owner’s 2026-10-17 release authorization; staging branches remain disabled. The installed public VITE_PLEXON_RELAY_URL is accepted at build time when NEXT_PUBLIC_PLEXON_RELAY_URL is absent.
 
-## Verify
+Origin-bound credentials, selected server and directory/relay metadata remain in IndexedDB. Its version-2 migration purges operational caches. Only the eight appearance/privacy preferences use localStorage. Console, chat, presence, telemetry and audit stay in bounded volatile memory and are queried again after reload. No service worker or browser log database is introduced.
 
-```sh
+## Workspaces
+
+| View | Operational behavior |
+| --- | --- |
+| Fleet | Passive bounded connections, exact selection and authenticated node attribution |
+| Overview | Source evidence, tick percentiles, boot metadata, world footprint and reviewed lifecycle actions |
+| Performance | Eight synchronized signals plus separate JVM, cgroup and node memory; raw evidence, real gaps and GC/presence markers |
+| Players | Virtual roster, exact UUID inspector, existing gameplay/moderation builders and Host boot-session timeline |
+| Console & Chat | Measured virtual rows, Host SQLite search/severity/cursors, volatile chat hydration, reviewed commands and existing inventory |
+| Backups | Durable Host job and recovery evidence, manual cold backup, periodic schedule/retention editor and exact archive actions |
+| Access & Audit | Signed scope/capability intersection, protected device revocation and virtual audit records |
+| Settings | All eight preferences, relay/pairing recovery and redacted JSON diagnostics |
+
+Paper owns gameplay and pairing. Host owns the fixed systemd unit, private session storage and cold backups. A queued acknowledgement is not completion. Mutations are never automatically retried, and no browser input chooses shell commands, rclone flags, credentials or systemd units.
+
+## Verification
+
+```bash
 npm run check
 npm run build
+npx playwright install --with-deps chromium
+npm run test:browser
+npm run test:interactions
 npm run test:perf
-npx playwright install firefox
-node scripts/qa-local.mjs
-node scripts/qa-local.mjs scripts/control-plane-check.mjs
-node scripts/qa-local.mjs scripts/reconstruction-check.mjs
-node scripts/qa-local.mjs scripts/reference-check.mjs
-node scripts/qa-local.mjs scripts/review-confirmation-check.mjs
-node scripts/qa-local.mjs scripts/visual-proofs.mjs
-node scripts/qa-local.mjs scripts/extended-visual-proofs.mjs
-MOZ_DISABLE_CONTENT_SANDBOX=1 node scripts/production-check.mjs
 ```
 
-The production artifact excludes fixture data and always requires pairing for an unpaired browser. Browser scripts are localhost-only; the UI cannot issue live operations through development fixtures.
+Browser fixtures are development-only and prominently labeled. The production benchmark must be built with `NEXT_PUBLIC_PLEXON_RELAY_URL=https://tonimserver.ddns.net`; all relay traffic is intercepted and no operational relay is contacted. It loads 8192 raw captures, 2500 console rows and 11 canvases with viewport-aware redraw. PLEXON_CHROME_PATH can select an installed browser.
 
-## Review and release
+`npm run test:flow` additionally uses the adjacent Java25 Host build and actual SQLite store through a synthetic loopback relay. Set PLEXON_HOST_JAR and PLEXON_JAVA if defaults differ. It never launches HostMain, systemd, RCON or Google Drive.
 
-Read [verification](docs/NEW_DASHBOARD_VERIFICATION.md), [parity](docs/FEATURE_PARITY_MATRIX.md), [compatibility](docs/NEW_DASHBOARD_COMPATIBILITY.md), [design](docs/NEW_DASHBOARD_DESIGN.md), [risks](docs/NEW_DASHBOARD_RISKS.md), and [rollout/rollback](docs/NEW_DASHBOARD_ROLLOUT.md).
+## Release boundary
 
-This branch is a review candidate. Production cutover requires release-specific authorization and real paired-server acceptance. No backend deployment or server-state migration is included.
+The supplied archives omit the relay implementation. Its additive events.session.list, chat.history and session.epoch_reset routing must be certified against the deployed relay; scope-checked server.status fallbacks support the two reads. Actual journald/RCON/Drive/provider isolation and Vercel origin authorization remain installation checks. No live deployment, branch push, credential or VPS change is implied. See [docs/v5/RELEASE_VERIFICATION.md](docs/v5/RELEASE_VERIFICATION.md).

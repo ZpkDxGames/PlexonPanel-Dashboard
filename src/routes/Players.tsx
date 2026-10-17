@@ -1,3 +1,5 @@
+import { VirtualRows } from "../components/VirtualRows";
+import { PresenceTimeline } from "../components/PresenceTimeline";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { number, str, type JsonMap } from "../adapter/control-state";
 import { session, type Prepared } from "../adapter/session";
@@ -125,6 +127,7 @@ export default function Players() {
   };
   return (
     <>
+      <PresenceTimeline />
       <div hidden={inspecting}>
         <div className="community-intro">
           <div>
@@ -181,38 +184,42 @@ export default function Players() {
           </div>
           <div className="roster">
             {players.length ? (
-              players.map((player) => (
-                <button
-                  key={player.uuid}
-                  className={`player-row ${inspecting && active?.uuid === player.uuid ? "selected" : ""}`}
-                  aria-label={`Inspect ${player.name}`}
-                  onClick={(event) => {
-                    returnFocus.current = event.currentTarget;
-                    setSelected(player.uuid);
-                    setPlayerTab("interact");
-                    setInspecting(true);
-                  }}
-                >
-                  <span className="player-directory-name">
-                    <PlayerHead uuid={player.uuid} name={player.name} />
-                    <span className="player-identity">
-                      <strong>{player.name}</strong>
-                      <small>{player.uuid}</small>
+              <VirtualRows
+                rows={players}
+                getKey={(player) => player.uuid}
+                render={(player) => (
+                  <button
+                    key={player.uuid}
+                    className={`player-row ${inspecting && active?.uuid === player.uuid ? "selected" : ""}`}
+                    aria-label={`Inspect ${player.name}`}
+                    onClick={(event) => {
+                      returnFocus.current = event.currentTarget;
+                      setSelected(player.uuid);
+                      setPlayerTab("interact");
+                      setInspecting(true);
+                    }}
+                  >
+                    <span className="player-directory-name">
+                      <PlayerHead uuid={player.uuid} name={player.name} />
+                      <span className="player-identity">
+                        <strong>{player.name}</strong>
+                        <small>{player.uuid}</small>
+                      </span>
                     </span>
-                  </span>
-                  <span className="world-tag">{player.world}</span>
-                  <span className="session-duration">
-                    {duration(player.onlineMs)}
-                  </span>
-                  <span className="ping">
-                    <i aria-hidden="true" />
-                    {player.ping === null ? "—" : `${player.ping} ms`}
-                  </span>
-                  <span className="roster-inspect">
-                    Inspect <Icon name="arrow" />
-                  </span>
-                </button>
-              ))
+                    <span className="world-tag">{player.world}</span>
+                    <span className="session-duration">
+                      {duration(player.onlineMs)}
+                    </span>
+                    <span className="ping">
+                      <i aria-hidden="true" />
+                      {player.ping === null ? "—" : `${player.ping} ms`}
+                    </span>
+                    <span className="roster-inspect">
+                      Inspect <Icon name="arrow" />
+                    </span>
+                  </button>
+                )}
+              />
             ) : (
               <Empty
                 title={
@@ -347,12 +354,29 @@ export default function Players() {
                           aria-pressed={playerTab === key}
                           onClick={() => setPlayerTab(key)}
                           onKeyDown={(event) => {
-                            if (!["ArrowRight", "ArrowLeft", "Home", "End"].includes(event.key)) return;
+                            if (
+                              ![
+                                "ArrowRight",
+                                "ArrowLeft",
+                                "Home",
+                                "End",
+                              ].includes(event.key)
+                            )
+                              return;
                             event.preventDefault();
                             const keys = ["interact", "moderate", "commands"];
-                            const index = event.key === "Home" ? 0 : event.key === "End" ? 2 : (keys.indexOf(key) + (event.key === "ArrowRight" ? 1 : 2)) % 3;
+                            const index =
+                              event.key === "Home"
+                                ? 0
+                                : event.key === "End"
+                                  ? 2
+                                  : (keys.indexOf(key) +
+                                      (event.key === "ArrowRight" ? 1 : 2)) %
+                                    3;
                             setPlayerTab(keys[index]);
-                            document.getElementById(`player-tool-${keys[index]}`)?.focus();
+                            document
+                              .getElementById(`player-tool-${keys[index]}`)
+                              ?.focus();
                           }}
                         >
                           {label}

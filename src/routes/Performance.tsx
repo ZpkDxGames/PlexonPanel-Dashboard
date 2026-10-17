@@ -1,352 +1,229 @@
-import { useMemo, useState } from "react";
+"use client";
+import { useState } from "react";
 import { useSession, useNow } from "../hooks";
-import { number } from "../adapter/control-state";
+import { CrosshairGroup, TimeSeries } from "../components/charts/TimeSeries";
 import {
   sourceEvidence,
-  historyFor,
-  observedSummary,
-  gcMovement,
+  sourceFor,
+  type MetricKey,
 } from "../presentation/telemetry";
-import { CrosshairGroup, TimeSeries } from "../components/charts/TimeSeries";
-import { Status } from "../components/ui";
-import { Coverage } from "../components/Telemetry";
-import { usePlotHistory } from "../presentation/PlotHistory";
-import { Icon } from "../components/Icon";
-const plots = [
+import type { CanvasSeries } from "../presentation/canvas-data";
+const tracks: {
+  key: MetricKey;
+  title: string;
+  source: string;
+  unit: string;
+  color: string;
+}[] = [
   {
+    key: "tps",
+    title: "Tick rate",
+    source: "PAPER HEALTH",
+    unit: "TPS",
+    color: "var(--chart-1)",
+  },
+  {
+    key: "mspt",
+    title: "Tick duration envelope",
+    source: "PAPER HEALTH",
+    unit: "ms",
+    color: "var(--chart-1)",
+  },
+  {
+    key: "serviceCpu",
     title: "Minecraft service CPU",
-    source: "service" as const,
-    key: "serviceCpu" as const,
-    label: "Cgroup CPU",
+    source: "SYSTEMD CGROUP · % OF ONE CORE",
     unit: "% of one core",
-    color: "var(--chart-1)",
-    description: "Host · exact systemd cgroup. 150% equals 1.5 cores.",
+    color: "var(--chart-3)",
   },
   {
-    title: "Paper process CPU",
-    source: "paperSystem" as const,
-    key: "processCpu" as const,
-    label: "Paper process",
-    unit: "%",
-    color: "var(--chart-2)",
-    description: "Paper JVM process · independent of Host process CPU.",
-  },
-  {
+    key: "hostCpu",
     title: "Node CPU",
-    source: "hostSystem" as const,
-    key: "hostCpu" as const,
-    label: "Node total",
+    source: "HOST HARDWARE",
     unit: "%",
     color: "var(--chart-4)",
-    description: "Host · machine total. Shared across instances on this node.",
   },
   {
+    key: "heap",
     title: "JVM heap",
-    source: "paperSystem" as const,
-    key: "heap" as const,
-    label: "Paper heap",
-    unit: "bytes",
-    color: "var(--chart-1)",
-    description: "Paper · Java heap usage, separate from process RSS.",
-  },
-  {
-    title: "Minecraft service memory",
-    source: "service" as const,
-    key: "serviceMemory" as const,
-    label: "Cgroup memory",
+    source: "PAPER JVM",
     unit: "bytes",
     color: "var(--chart-2)",
-    description: "Host · memory accounted to the Minecraft service cgroup.",
   },
   {
-    title: "Node memory",
-    source: "hostSystem" as const,
-    key: "memory" as const,
-    label: "Node used",
+    key: "serviceMemory",
+    title: "Minecraft service memory",
+    source: "SYSTEMD CGROUP",
     unit: "bytes",
+    color: "var(--chart-3)",
+  },
+  {
+    key: "chunks",
+    title: "Loaded chunks",
+    source: "PAPER HEALTH",
+    unit: "chunks",
+    color: "var(--chart-3)",
+  },
+  {
+    key: "entities",
+    title: "World entities",
+    source: "PAPER HEALTH",
+    unit: "entities",
     color: "var(--chart-4)",
-    description: "Host · total used memory on the machine.",
+  },
+];
+const focusTracks = [
+  ...tracks,
+  {
+    key: "processCpu" as const,
+    title: "Paper process CPU",
+    source: "PAPER JVM · PROCESS NORMALIZED",
+    unit: "%",
+    color: "var(--chart-2)",
+  },
+];
+const memory: { title: string; source: string; series: CanvasSeries[] }[] = [
+  {
+    title: "JVM heap allocation",
+    source: "PAPER JVM",
+    series: [
+      { key: "heap", label: "Used", color: "var(--chart-2)", unit: "bytes" },
+      {
+        key: "heapCommitted",
+        label: "Committed",
+        color: "var(--chart-3)",
+        unit: "bytes",
+      },
+      {
+        key: "heapMax",
+        label: "Maximum",
+        color: "var(--chart-4)",
+        unit: "bytes",
+      },
+    ],
+  },
+  {
+    title: "Service memory accounting",
+    source: "SYSTEMD CGROUP",
+    series: [
+      {
+        key: "serviceMemory",
+        label: "MemoryCurrent",
+        color: "var(--chart-3)",
+        unit: "bytes",
+      },
+      {
+        key: "serviceMemoryMax",
+        label: "MemoryMax",
+        color: "var(--chart-2)",
+        unit: "bytes",
+      },
+    ],
+  },
+  {
+    title: "Node physical RAM",
+    source: "HOST HARDWARE",
+    series: [
+      {
+        key: "memory",
+        label: "Physical used",
+        color: "var(--chart-4)",
+        unit: "bytes",
+      },
+    ],
   },
 ];
 export default function Performance() {
   const { state } = useSession(),
     now = useNow(),
-    [minutes, setMinutes] = useState(15),
-    [selected, setSelected] = useState("tps"),
-    [allSignals, setAllSignals] = useState(false);
-  const epochs = usePlotHistory();
-  const cutoff = Math.floor(now / 10000) * 10000 - minutes * 60000,
-    samples = state.history;
-  const health = useMemo(
-    () => historyFor(epochs?.paperHealth ?? samples, "paperHealth", cutoff),
-    [samples, cutoff, epochs],
-  );
-  const instruments = [
-    {
-      title: "Tick rate",
-      source: "paperHealth" as const,
-      key: "tps" as const,
-      label: "Tick rate",
-      unit: "TPS",
-      color: "var(--chart-1)",
-      description: "Paper · Minecraft runtime tick frequency.",
-    },
-    {
-      title: "Mean tick duration",
-      source: "paperHealth" as const,
-      key: "mspt" as const,
-      label: "Mean tick duration",
-      unit: "ms",
-      color: "var(--chart-2)",
-      description: "Paper · observed average tick duration, not a percentile.",
-    },
-    ...plots,
-  ];
-  const active =
-      instruments.find((plot) => plot.key === selected) ?? instruments[0],
-    summary = observedSummary(
-      historyFor(epochs?.[active.source] ?? samples, active.source, cutoff),
-      active.key,
-    ),
-    gcRate = gcMovement(
-      historyFor(epochs?.paperSystem ?? samples, "paperSystem", cutoff),
-    );
-  const display = (value: number | null, unit = active.unit) =>
-    value === null
-      ? "—"
-      : unit === "bytes"
-        ? `${(value / 2 ** 30).toFixed(2)} GiB`
-        : `${value.toFixed(unit === "TPS" ? 2 : 1)} ${unit}`;
+    [minutes, setMinutes] = useState(5),
+    [compare, setCompare] = useState(true),
+    [focus, setFocus] = useState<MetricKey>("tps");
+  const cutoff = Math.floor(now / 10000) * 10000 - minutes * 60000;
   return (
     <CrosshairGroup>
       <div className="analysis-toolbar">
+        <div className="segmented">
+          <button aria-pressed={compare} onClick={() => setCompare(true)}>
+            Compare 8 signals
+          </button>
+          <button aria-pressed={!compare} onClick={() => setCompare(false)}>
+            Single focus
+          </button>
+        </div>
         <div className="segmented" aria-label="Time range">
-          {[1, 5, 15, 30].map((value) => (
+          {[1, 5, 15, 35].map((n) => (
             <button
-              key={value}
-              aria-pressed={minutes === value}
-              className={minutes === value ? "active" : ""}
-              onClick={() => setMinutes(value)}
+              key={n}
+              aria-pressed={minutes === n}
+              onClick={() => setMinutes(n)}
             >
-              {value}m
+              {n}m
             </button>
           ))}
         </div>
-        <span className="subtle">Source capture time · retained session</span>
-        <button
-          className={`button ${allSignals ? "primary" : "secondary"}`}
-          aria-pressed={allSignals}
-          onClick={() => setAllSignals((value) => !value)}
-        >
-          {allSignals ? "Focus one signal" : "Compare all signals"}
-        </button>
+        {!compare ? (
+          <select
+            aria-label="Focus signal"
+            value={focus}
+            onChange={(e) => setFocus(e.target.value as MetricKey)}
+          >
+            {focusTracks.map((t) => (
+              <option key={t.key} value={t.key}>
+                {t.title}
+              </option>
+            ))}
+          </select>
+        ) : null}
       </div>
-      <label className="mobile-signal-picker">
-        <span className="eyebrow">SELECT AN INSTRUMENT</span>
-        <select
-          aria-label="Performance signal"
-          value={selected}
-          onChange={(e) => {
-            setSelected(e.target.value);
-            setAllSignals(false);
-          }}
-        >
-          {["Runtime", "Compute", "Memory"].map((category) => (
-            <optgroup label={category} key={category}>
-              {instruments
-                .filter((plot) =>
-                  category === "Runtime"
-                    ? plot.source === "paperHealth"
-                    : category === "Memory"
-                      ? plot.unit === "bytes"
-                      : plot.source !== "paperHealth" && plot.unit !== "bytes",
-                )
-                .map((plot) => (
-                  <option key={plot.key} value={plot.key}>
-                    {plot.title}
-                  </option>
-                ))}
-            </optgroup>
-          ))}
-        </select>
-      </label>
-      <div className="analysis-workspace">
-        <section className="signal-catalog" aria-label="Signal catalog">
-          {instruments.map((plot) => (
-            <button
-              key={plot.key}
-              className={selected === plot.key ? "active" : ""}
-              aria-pressed={selected === plot.key}
-              onClick={() => {
-                setSelected(plot.key);
-                setAllSignals(false);
-              }}
-            >
-              <span
-                className="signal-indicator"
-                style={{ background: plot.color }}
-              />
-              <span>
-                <strong>{plot.title}</strong>
-                <small>
-                  {plot.source === "paperHealth"
-                    ? "Paper runtime"
-                    : plot.source === "paperSystem"
-                      ? "Paper JVM"
-                      : plot.source === "service"
-                        ? "Host · Minecraft cgroup"
-                        : "Host · node total"}
-                </small>
-              </span>
-              <Icon name="chevron" />
-            </button>
-          ))}
-        </section>
-        <section className="analysis-focus">
-          <header className="analysis-title">
-            <div>
-              <span className="eyebrow">
-                {allSignals
-                  ? "CAPTURE-ALIGNED SIGNALS"
-                  : `${active.source === "paperHealth" ? "PAPER RUNTIME" : active.source === "paperSystem" ? "PAPER JVM" : active.source === "service" ? "MINECRAFT SERVICE" : "HOST NODE"} / ${active.unit === "bytes" ? "MEMORY" : "INSTRUMENT"}`}
-              </span>
-              <h2>{allSignals ? "Signal comparison" : active.title}</h2>
-              <p>
-                {allSignals
-                  ? "Independent units and scales. Inspection synchronizes by actual capture time."
-                  : active.description}
-              </p>
-            </div>
-            <Status
-              tone={
-                sourceEvidence(state, active.source, now).kind === "live"
-                  ? "success"
-                  : "neutral"
-              }
-            >
-              {sourceEvidence(state, active.source, now).kind}
-            </Status>
-          </header>
-          {!allSignals && (
-            <>
-              <div className="analysis-summary">
-                <div>
-                  <span>OBSERVED MEAN</span>
-                  <strong>{display(summary.mean)}</strong>
-                </div>
-                <div>
-                  <span>LOWEST</span>
-                  <strong>{display(summary.min)}</strong>
-                </div>
-                <div>
-                  <span>HIGHEST</span>
-                  <strong>{display(summary.max)}</strong>
-                </div>
-                <div>
-                  <span>ACTUAL SAMPLES</span>
-                  <strong>{summary.count.toLocaleString()}</strong>
-                </div>
-              </div>
-              <TimeSeries
-                key={active.key}
-                title={active.title}
-                source={active.description}
-                samples={samples}
-                windowStart={cutoff}
-                series={[
-                  {
-                    key: active.key,
-                    label: active.label,
-                    unit: active.unit,
-                    color: active.color,
-                  },
-                ]}
-                height={360}
-                yMax={
-                  active.key === "tps"
-                    ? 20
-                    : active.unit === "%"
-                      ? 100
-                      : undefined
-                }
-                threshold={active.key === "mspt" ? 50 : undefined}
-                evidence={sourceEvidence(state, active.source, now)}
-              />
-              <div className="analysis-explanation">
-                <Icon name="performance" />
-                <p>
-                  {active.key === "serviceCpu"
-                    ? "This scale is percent of one core. A reading above 100% is valid; 150% represents 1.5 cores."
-                    : active.key === "mspt"
-                      ? "50 ms is the tick budget for 20 TPS. The observations are means; no percentiles or causes are inferred."
-                      : active.unit === "bytes"
-                        ? "Binary memory units. Node, service cgroup and JVM heap account for different scopes and should be read separately."
-                        : "Inspect with the arrow keys or touch a sample to pin it. Missing measurements and source boundaries remain disconnected."}
-                </p>
-              </div>
-            </>
-          )}
-          {allSignals && (
-            <div className="comparison-tracks">
-              {instruments.map((plot) => (
-                <section className="comparison-track" key={plot.key}>
-                  <header>
-                    <h3>{plot.title}</h3>
-                    <p>{plot.description}</p>
-                  </header>
-                  <TimeSeries
-                    title={plot.title}
-                    source={plot.description}
-                    samples={samples}
-                    windowStart={cutoff}
-                    series={[
-                      {
-                        key: plot.key,
-                        label: plot.label,
-                        unit: plot.unit,
-                        color: plot.color,
-                      },
-                    ]}
-                    height={190}
-                    yMax={
-                      plot.key === "tps"
-                        ? 20
-                        : plot.unit === "%"
-                          ? 100
-                          : undefined
-                    }
-                    threshold={plot.key === "mspt" ? 50 : undefined}
-                    evidence={sourceEvidence(state, plot.source, now)}
-                  />
-                </section>
-              ))}
-            </div>
-          )}
-        </section>
+      <div className="v5-session">
+        <strong>Independent source clocks</strong> · Crosshairs and brush zoom
+        synchronize. Gaps remain gaps. Service CPU may exceed 100%. Violet ticks
+        mark observed GC or player events.
       </div>
-      <section className="observation-ledger">
-        <div>
-          <span className="eyebrow">TICK BUDGET / PAPER</span>
-          <h2>Tick budget observations</h2>
-          <Coverage samples={health} />
-          <p>
-            {health.filter((s) => s.mspt !== null && s.mspt > 50).length}{" "}
-            samples above 50 ms in this window. Unobserved periods have no
-            inferred state.
-          </p>
-        </div>
-        <div>
-          <span className="eyebrow">GARBAGE COLLECTION / PAPER</span>
-          <h2>
-            {gcRate === null ? "—" : gcRate.toFixed(1)} <small>ms/min</small>
-          </h2>
-          <p>
-            Cumulative pause movement across the observed window. A counter
-            reset makes the rate unavailable. Current collections:{" "}
-            {number(state.system.gcCollections)?.toLocaleString() ??
-              "Unavailable"}
-            .
-          </p>
+      <div className="v5-signal-grid">
+        {(compare ? tracks : focusTracks)
+          .filter((t) => compare || t.key === focus)
+          .map((t) => (
+            <TimeSeries
+              key={t.key}
+              title={t.title}
+              source={t.source}
+              samples={state.history}
+              series={[
+                {
+                  key: t.key,
+                  label: t.key === "mspt" ? "Mean" : t.title,
+                  color: t.color,
+                  unit: t.unit,
+                },
+              ]}
+              windowStart={cutoff}
+              threshold={t.key === "mspt" ? 50 : undefined}
+              yMax={t.key === "tps" ? 20 : undefined}
+              evidence={sourceEvidence(state, sourceFor[t.key], now)}
+              height={220}
+            />
+          ))}
+      </div>
+      <section className="v5-memory-attribution">
+        <h2>Memory attribution</h2>
+        <p>
+          Separate producer clocks: heap allocation, complete service cgroup,
+          and physical node RAM.
+        </p>
+        <div className="v5-memory-grid">
+          {memory.map((t) => (
+            <TimeSeries
+              key={t.title}
+              title={t.title}
+              source={t.source}
+              samples={state.history}
+              series={t.series}
+              windowStart={cutoff}
+              height={210}
+            />
+          ))}
         </div>
       </section>
     </CrosshairGroup>

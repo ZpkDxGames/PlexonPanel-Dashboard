@@ -1,3 +1,4 @@
+import { BackupScheduleCard } from "../components/BackupScheduleCard";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import {
   number,
@@ -304,9 +305,12 @@ export default function Backups() {
                   Review upload retry
                 </Button>
               )}
-              <ActionAvailability reason={session.reason("backup.full.retry-upload", "HOST")} />
+              <ActionAvailability
+                reason={session.reason("backup.full.retry-upload", "HOST")}
+              />
               <span>
-                Upload retry reuses the existing archive without another shutdown.
+                Upload retry reuses the existing archive without another
+                shutdown.
               </span>
             </div>
           )}
@@ -426,6 +430,7 @@ export default function Backups() {
           </div>
         </Panel>
       </aside>
+      <BackupScheduleCard />
       <div className="backup-create-preflight">
         <section className="backup-titlebar">
           <div>
@@ -443,9 +448,11 @@ export default function Backups() {
                 value={countdown}
                 onChange={(e) => setCountdown(Number(e.target.value))}
               >
-                {[1800, 900, 600, 300].map((seconds) => (
+                {[1800, 900, 600, 300, 0].map((seconds) => (
                   <option key={seconds} value={seconds}>
-                    {seconds / 60} minutes
+                    {seconds === 0
+                      ? "No countdown · Host must verify empty"
+                      : `${seconds / 60} minutes`}
                   </option>
                 ))}
               </select>
@@ -543,7 +550,9 @@ export default function Backups() {
               >
                 Refresh evidence
               </Button>
-              <ActionAvailability reason={session.reason("backup.preflight", "HOST")} />
+              <ActionAvailability
+                reason={session.reason("backup.preflight", "HOST")}
+              />
             </div>
             <p className="preflight-note">
               Unknown or expired checks keep creation disabled. A provider
@@ -653,10 +662,12 @@ export default function Backups() {
                           </div>
                           <ActionAvailability
                             reason={[
-                              ...new Set([
-                                session.reason("backup.full.verify", "HOST"),
-                                session.reason("backup.full.delete", "HOST"),
-                              ].filter(Boolean)),
+                              ...new Set(
+                                [
+                                  session.reason("backup.full.verify", "HOST"),
+                                  session.reason("backup.full.delete", "HOST"),
+                                ].filter(Boolean),
+                              ),
                             ].join(" ")}
                           />
                         </td>

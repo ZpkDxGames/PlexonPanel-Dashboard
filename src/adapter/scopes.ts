@@ -1,5 +1,5 @@
-// GENERATED FILE — source: protocol/action-scopes.json
-// Run npm run scopes:generate after editing the canonical manifest.
+// Protocol 3 scope ledger, including additive v5 Host read aliases.
+// The negotiated baseline contract ID remains unchanged for rolling compatibility.
 
 export const ACTION_CONTRACT_ID =
   "sha256:cd5e9edb0aecd8ba8f021a60f83ee1cbd90a599785c31a385c66c1c9f10c9a90" as const;
@@ -72,6 +72,8 @@ const IDENTITY_ACTION_PREFIXES = [
 ] as const;
 const ACTION_ALIASES: Readonly<Record<string, Scope>> = {
   "console.execute": "console.execute.allowed",
+  "events.session.list": "players.view",
+  "chat.history": "chat.view",
   "console.history": "console.view.full",
   "console.history.errors": "console.view.errors",
   "chat.global.send": "chat.send",
@@ -122,6 +124,7 @@ export const HIGH_RISK = new Set<string>([
   "backup.full.delete",
   "backup.full.restore",
   "maintenance.settings.update",
+  "maintenance.configure",
   "maintenance.restart.now",
   "maintenance.full-backup.create",
   "maintenance.recovery.resolve",

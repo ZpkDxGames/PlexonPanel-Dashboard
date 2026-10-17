@@ -114,6 +114,22 @@ export default function Settings() {
       setSaving(false);
     }
   };
+  const exportDiagnostics = () => {
+    const report = {
+      dashboard: "PlexonPanel 5.0",
+      protocolVersion: 3,
+      generatedAt: new Date().toISOString(),
+      diagnostics: diagnostics(snap.state).split("\n"),
+    };
+    const url = URL.createObjectURL(
+      new Blob([JSON.stringify(report, null, 2)], { type: "application/json" }),
+    );
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "plexonpanel-redacted-diagnostics.json";
+    link.click();
+    URL.revokeObjectURL(url);
+  };
   const copy = () => {
     void navigator.clipboard
       .writeText(diagnostics(snap.state))
@@ -429,7 +445,14 @@ export default function Settings() {
             <Panel
               eyebrow="BUILD / CONNECTION EVIDENCE"
               title="Build & connection evidence"
-              action={<Button onClick={copy}>Copy redacted diagnostics</Button>}
+              action={
+                <div className="v5-schedule-actions">
+                  <Button onClick={copy}>Copy redacted diagnostics</Button>
+                  <Button onClick={exportDiagnostics}>
+                    Export redacted JSON
+                  </Button>
+                </div>
+              }
             >
               <dl className="diagnostic-grid">
                 <dt>Dashboard</dt>
