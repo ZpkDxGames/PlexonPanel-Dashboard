@@ -87,7 +87,10 @@ export default function Players() {
   const command = (permission?: "set" | "unset") => {
     if (!active || !selected) return;
     try {
-      if (!permission && template.includes("{player}"))
+      if (
+        !permission &&
+        (!template.includes("{uuid}") || template.includes("{player}"))
+      )
         throw new Error(
           "Use {uuid} to bind this command to the exact player identity.",
         );

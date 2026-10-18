@@ -155,7 +155,16 @@ export default function Fleet() {
                 <code className="break-all text-[10px]">{n.nodeId}</code>
                 <span className="font-mono text-xs">
                   {valueLabel(n.cpu, "%")} CPU · {valueLabel(n.memory, "bytes")}{" "}
-                  RAM
+                  RAM · Disk free{" "}
+                  {valueLabel(
+                    number(n.state.hostSystem.diskFreeBytes),
+                    "bytes",
+                  )}{" "}
+                  /{" "}
+                  {valueLabel(
+                    number(n.state.hostSystem.diskTotalBytes),
+                    "bytes",
+                  )}
                 </span>
               </div>
             ))

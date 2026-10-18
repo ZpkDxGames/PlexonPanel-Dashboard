@@ -32,3 +32,5 @@ Machine-readable local results: [evidence/rebuild-checks.json](evidence/rebuild-
 The first remote build caught the removed-last-public-asset clean-checkout case; the identity script now creates `public/` and a fresh-directory regression test covers it. The Vercel preview subsequently reports Ready. Preview content and build logs are protected by Vercel team permissions unavailable to this connection (403), so production acceptance additionally verifies the public deployment's exact build commit, HTML security headers and anonymous desktop/mobile rendering. Deployment Protection is preserved.
 
 Light mode uses a darker series palette for readable chart contrast. Persistent Turbopack build caching is disabled after repeated local cache-database corruption; production builds compile successfully without that cache. This does not change browser operational-storage policy.
+
+Final parity review: explicit action/scope capability denials take precedence in the authority matrix; inspector command templates require `{uuid}`; the verified-node ledger includes disk free/total values when reported, and unknown values remain unknown.

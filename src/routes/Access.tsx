@@ -46,10 +46,10 @@ export default function Access() {
       kind === "PAPER"
         ? snap.state.ready?.server.paperCapabilities
         : snap.state.ready?.server.hostCapabilities;
-    return caps?.[action] === true || caps?.[scope] === true
-      ? "Advertised"
-      : caps?.[action] === false || caps?.[scope] === false
-        ? "Disabled"
+    return caps?.[action] === false || caps?.[scope] === false
+      ? "Disabled"
+      : caps?.[action] === true || caps?.[scope] === true
+        ? "Advertised"
         : "Not advertised";
   };
   return (
