@@ -1,707 +1,389 @@
+"use client";
+import { useState } from "react";
+import { CloudUpload, HardDrive, RefreshCw, ShieldCheck } from "lucide-react";
+import { useNow, useSession } from "../hooks";
+import { number, record, records, str } from "../adapter/control-state";
+import { useQuery } from "../features/useQuery";
+import { ActionButton, useOperation } from "../features/operations";
 import { BackupScheduleCard } from "../components/BackupScheduleCard";
-import { useEffect, useRef, useState, type CSSProperties } from "react";
-import {
-  number,
-  record,
-  records,
-  str,
-  type JsonMap,
-} from "../adapter/control-state";
-import { session, type Prepared } from "../adapter/session";
-import { ActionReview } from "../features/ActionReview";
-import { Button, Notice, Panel, Status } from "../components/ui";
-import { Icon } from "../components/Icon";
-import { SectionLabel } from "../components/Telemetry";
-import { useSession, useNow } from "../hooks";
-import { bytes } from "../store/selectors";
-import { useTimestamp } from "../presentation/nextgen/time";
-import { ActionAvailability } from "../components/nextgen/ActionAvailability";
+import { PageHeader } from "../components/PageHeader";
+import { Button } from "../components/ui/button";
+import { Card, CardHeader, CardContent } from "../components/ui/card";
+import { Badge } from "../components/ui/badge";
+import { Field, Select } from "../components/ui/input";
+import { Empty, Notice } from "../components/ui/empty";
+import { valueLabel } from "../components/charts/TelemetryChart";
 const phases = [
-  ["QUEUED", "Queued"],
-  ["PREFLIGHT", "Preflight"],
-  ["COUNTDOWN", "Player warning"],
-  ["FINAL_SAVE", "Final save"],
-  ["STOPPING_SERVER", "Stopping service"],
-  ["WAITING_FOR_STOP", "Shutdown proof"],
-  ["ARCHIVING", "Archive"],
-  ["HASHING", "SHA-256"],
-  ["VERIFYING_LOCAL", "Local verification"],
-  ["UPLOADING_REMOTE", "Upload"],
-  ["VERIFYING_REMOTE", "Remote verification"],
-  ["CLEANING_LOCAL", "Disk cleanup"],
-  ["STARTING_SERVER", "Start service"],
-  ["VERIFYING_STARTUP", "Startup readiness"],
-  ["COMPLETED", "Complete"],
-] as const;
-const terminal = new Set([
+  "QUEUED",
+  "PREFLIGHT",
+  "COUNTDOWN",
+  "FINAL_SAVE",
+  "STOPPING_SERVER",
+  "WAITING_FOR_STOP",
+  "ARCHIVING",
+  "HASHING",
+  "VERIFYING_LOCAL",
+  "UPLOADING_REMOTE",
+  "VERIFYING_REMOTE",
+  "CLEANING_LOCAL",
+  "STARTING_SERVER",
+  "VERIFYING_STARTUP",
   "COMPLETED",
-  "DEGRADED",
-  "FAILED",
-  "RECOVERY_REQUIRED",
-  "IDLE",
-]);
-function size(value: unknown) {
-  const reading = bytes(value);
-  return reading.available
-    ? `${reading.value} ${reading.unit}`
-    : "Not reported";
-}
+];
 export default function Backups() {
-  const stamp = useTimestamp();
   const snap = useSession(),
     now = useNow(),
-    [preflight, setPreflight] = useState<JsonMap>({}),
-    [operation, setOperation] = useState<JsonMap>({}),
-    [backups, setBackups] = useState<JsonMap[]>([]),
-    [error, setError] = useState(""),
-    [prepared, setPrepared] = useState<Prepared | null>(null),
+    op = useOperation(),
     [countdown, setCountdown] = useState(900),
-    [loading, setLoading] = useState(false),
-    [checkedAt, setCheckedAt] = useState(0),
-    [statusAt, setStatusAt] = useState(0),
-    [reads, setReads] = useState<
-      Record<string, { state: string; error: string; at: number }>
-    >({});
-  const mounted = useRef(true),
-    sequence = useRef(0),
-    fullPending = useRef(false);
-  const refresh = async (statusOnly = false) => {
-    if (statusOnly && fullPending.current) return;
-    const ticket = ++sequence.current;
-    if (!statusOnly) fullPending.current = true;
-    if (!statusOnly) {
-      setLoading(true);
-      setReads((old) =>
-        Object.fromEntries(
-          ["preflight", "status", "inventory"].map((key) => [
-            key,
-            { state: "loading", error: "", at: old[key]?.at ?? 0 },
-          ]),
-        ),
-      );
-    }
-    setError("");
-    const tasks = statusOnly
-      ? [session.query("maintenance.status", {}, "HOST")]
-      : [
-          session.query("backup.preflight", {}, "HOST"),
-          session.query("maintenance.status", {}, "HOST"),
-          session.query("backup.full.list", {}, "HOST"),
-        ];
-    const results = await Promise.allSettled(tasks);
-    if (!mounted.current || ticket !== sequence.current) return;
-    const nextReads: Record<
-      string,
-      { state: string; error: string; at: number }
-    > = {};
-    results.forEach((result, index) => {
-      const key = statusOnly
-        ? "status"
-        : ["preflight", "status", "inventory"][index];
-      if (result.status === "rejected" || result.value.status !== "SUCCESS") {
-        const message =
-          result.status === "rejected"
-            ? result.reason instanceof Error
-              ? result.reason.message
-              : "Host query unavailable."
-            : result.value.message || result.value.code;
-        nextReads[key] = { state: "failed", error: message, at: 0 };
-        if (key === "preflight") setCheckedAt(0);
-        return;
-      }
-      nextReads[key] = { state: "received", error: "", at: Date.now() };
-      const data = record(result.value.data);
-      if (statusOnly || index === 1) {
-        setOperation(record(data.currentOperation));
-        setStatusAt(Date.now());
-      } else if (index === 0) {
-        setPreflight(data);
-        setCheckedAt(Date.now());
-      } else setBackups(records(data.backups));
-    });
-    setReads((old) => ({ ...old, ...nextReads }));
-    fullPending.current = false;
-    setLoading(false);
-  };
-  useEffect(() => {
-    mounted.current = true;
-    if (snap.phase === "live") void refresh();
-    return () => {
-      mounted.current = false;
-      sequence.current++;
-      fullPending.current = false;
-    };
-  }, [snap.phase, snap.revision]);
-  const phase = str(operation.phase, "IDLE"),
-    jobId = str(operation.jobId, ""),
-    active = !terminal.has(phase);
-  useEffect(() => {
-    if (!active || snap.phase !== "live") return;
-    const timer = setInterval(() => {
-      if (!document.hidden) void refresh(true);
-    }, 3000);
-    return () => clearInterval(timer);
-  }, [active, snap.phase, snap.revision]);
-  const fresh = checkedAt > 0 && now - checkedAt <= 30000,
-    ready =
-      fresh &&
-      reads.preflight?.state === "received" &&
-      preflight.hostAuthenticated === true &&
-      preflight.operationBusy === false &&
-      preflight.recoveryRequired === false &&
-      preflight.backupRootWritable === true &&
-      preflight.commandChannelConfigured === true;
-  const raw = snap.state.backupProgress,
+    preflight = useQuery("backup.preflight"),
+    status = useQuery("maintenance.status", "HOST", {}, 3000),
+    inventory = useQuery("backup.full.list"),
+    provider = useQuery("provider.status");
+  const current = record(status.data.currentOperation),
+    phase = str(current.phase, "UNKNOWN"),
+    jobId = str(current.jobId, ""),
     progress =
-      raw && jobId && str(raw.jobId, "") === jobId && active ? raw : null,
-    progressPhase = str(progress?.phase, phase),
-    value = number(progress?.progress),
-    processed = number(progress?.bytesUploaded ?? progress?.bytes),
+      snap.state.backupProgress?.jobId === jobId && jobId
+        ? snap.state.backupProgress
+        : null;
+  const ready =
+    preflight.at > 0 &&
+    now - preflight.at <= 30000 &&
+    preflight.data.hostAuthenticated === true &&
+    preflight.data.operationBusy === false &&
+    preflight.data.recoveryRequired === false &&
+    preflight.data.backupRootWritable === true &&
+    preflight.data.commandChannelConfigured === true;
+  const processed = number(progress?.bytesUploaded ?? progress?.bytes),
     total = number(progress?.totalBytes),
-    durablePercent = number(operation.progressPercent);
-  const ratio =
-    value !== null
-      ? Math.max(0, Math.min(1, value))
-      : processed !== null && total !== null && total > 0
+    rawPercent = number(current.progressPercent),
+    ratio =
+      processed !== null && total !== null && total > 0
         ? Math.max(0, Math.min(1, processed / total))
-        : durablePercent !== null
-          ? Math.max(0, Math.min(1, durablePercent / 100))
+        : rawPercent !== null
+          ? Math.max(0, Math.min(1, rawPercent / 100))
           : null;
-  const prepare = (action: string, parameters: JsonMap) => {
-    try {
-      setPrepared(session.prepare(action, parameters, "HOST"));
-    } catch (cause) {
-      setError(
-        cause instanceof Error ? cause.message : "Operation unavailable.",
-      );
-    }
-  };
-  const gate = (value: unknown, inverse = false) =>
-    value === true
-      ? inverse
-        ? "Blocked"
-        : "Ready"
-      : value === false
-        ? inverse
-          ? "Ready"
-          : "Blocked"
-        : "Unknown";
-  const gates = [
-    ["Host authenticated", gate(preflight.hostAuthenticated)],
-    ["Operation clear", gate(preflight.operationBusy, true)],
-    ["Recovery clear", gate(preflight.recoveryRequired, true)],
-    ["Storage writable", gate(preflight.backupRootWritable)],
-    ["Command channel", gate(preflight.commandChannelConfigured)],
-  ];
-  const title =
-    phase === "IDLE"
-      ? ready
-        ? "Create a full restore point"
-        : "Backup readiness"
-      : phase === "DEGRADED"
-        ? "Your off-site copy needs attention."
-        : phase === "RECOVERY_REQUIRED"
-          ? "Host recovery requires attention."
-          : `Operation / ${phase.replaceAll("_", " ").toLowerCase()}`;
+  const backups = records(inventory.data.backups),
+    refresh = () => {
+      void preflight.refresh();
+      void status.refresh();
+      void inventory.refresh();
+      void provider.refresh();
+    };
   return (
-    <>
-      <aside className="job-book">
-        {" "}
-        <Panel
-          eyebrow="DURABLE HOST WORKFLOW"
-          title={phase === "IDLE" ? "No reported operation" : "Latest Host job"}
-          description={
-            jobId
-              ? `Job ${jobId}`
-              : "The Host owns every phase, including recovery."
-          }
-          action={
-            <Status
+    <div className="space-y-5">
+      <PageHeader
+        title="Backups"
+        description="Verified cold backups. Local certainty, off-site resilience."
+        action={
+          <Button variant="outline" onClick={refresh}>
+            <RefreshCw />
+            Refresh evidence
+          </Button>
+        }
+      />
+      <Card
+        className={
+          phase === "RECOVERY_REQUIRED"
+            ? "border-rose-500/40"
+            : "border-primary/20"
+        }
+      >
+        <CardContent>
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <span className="rounded-xl bg-primary/10 p-3 text-primary">
+                <CloudUpload size={22} />
+              </span>
+              <div>
+                <p className="text-[10px] text-muted-foreground">
+                  HOST MAINTENANCE
+                </p>
+                <h2 className="mt-1 text-base font-semibold">
+                  {phase === "IDLE"
+                    ? "Ready for your next restore point"
+                    : phase === "UNKNOWN"
+                      ? "Awaiting durable job status"
+                      : phase.replaceAll("_", " ")}
+                </h2>
+                <p className="mt-1 text-[10px] text-muted-foreground">
+                  {jobId || status.error || "No durable operation ID reported"}
+                </p>
+              </div>
+            </div>
+            <Badge
               tone={
-                phase === "DEGRADED"
+                phase === "DEGRADED" || phase === "RECOVERY_REQUIRED"
                   ? "warning"
-                  : phase === "FAILED" || phase === "RECOVERY_REQUIRED"
-                    ? "error"
-                    : phase === "COMPLETED"
-                      ? "success"
-                      : active
-                        ? "info"
-                        : "neutral"
+                  : phase === "COMPLETED"
+                    ? "success"
+                    : "neutral"
               }
             >
               {phase}
-            </Status>
-          }
-        >
-          <p className="read-evidence">
-            {reads.status?.error
-              ? `Status read unavailable: ${reads.status.error}. Showing last received evidence.`
-              : statusAt
-                ? `Host status · ${Math.max(0, Math.floor((now - statusAt) / 1000))}s since receipt${now - statusAt > 30000 ? " · stale" : ""}`
-                : "No durable Host status received."}
-          </p>
-          <div className="operation-register">
-            <div>
-              <span>Local verification</span>
-              <Status
-                tone={
-                  operation.localBackupVerified === true ? "success" : "neutral"
-                }
-              >
-                {operation.localBackupVerified === true
-                  ? "Verified"
-                  : operation.localBackupVerified === false
-                    ? "Not verified"
-                    : "Unknown"}
-              </Status>
-            </div>
-            <div>
-              <span>Remote verification</span>
-              <Status
-                tone={
-                  operation.remoteBackupVerified === true
-                    ? "success"
-                    : "warning"
-                }
-              >
-                {operation.remoteBackupVerified === true
-                  ? "Verified"
-                  : operation.remoteBackupVerified === false
-                    ? "Not verified"
-                    : "Unknown"}
-              </Status>
-            </div>
+            </Badge>
           </div>
-          {operation.message !== undefined && (
-            <div className="operation-message">
-              <Notice
-                tone={phase === "DEGRADED" ? "warning" : "neutral"}
-                title={str(operation.errorCode, "Host status")}
-              >
-                {str(operation.message)}
-              </Notice>
-            </div>
-          )}
-          {phase === "DEGRADED" && (
-            <div className="degraded-summary">
-              <div>
-                <strong>
-                  {operation.localBackupVerified === true
-                    ? "Local archive verified. Off-site verification is incomplete."
-                    : "The Host reported a degraded operation."}
-                </strong>
-              </div>
-              {operation.retryable === true && (
-                <Button
-                  disabled={
-                    !!session.reason("backup.full.retry-upload", "HOST")
-                  }
-                  onClick={() =>
-                    prepare("backup.full.retry-upload", {
-                      backupId: str(operation.backupId),
-                    })
-                  }
-                >
-                  Review upload retry
-                </Button>
-              )}
-              <ActionAvailability
-                reason={session.reason("backup.full.retry-upload", "HOST")}
-              />
-              <span>
-                Upload retry reuses the existing archive without another
-                shutdown.
-              </span>
-            </div>
-          )}
-          <details className="phase-details">
-            <summary>Phase details · {phase}</summary>
-            <div
-              className="phase-timeline"
-              aria-label="Backup operation phases"
-            >
-              {[
-                ["Prepare", 0, 3],
-                ["Stop", 3, 6],
-                ["Archive", 6, 9],
-                ["Off-site", 9, 12],
-                ["Return online", 12, 15],
-              ].map(([label, start, end]) => (
-                <details className="phase-group" key={String(label)}>
-                  <summary>
-                    {label}
-                    {phases
-                      .slice(Number(start), Number(end))
-                      .some(([key]) => key === phase)
-                      ? " · reported now"
-                      : ""}
-                  </summary>
-                  {phases
-                    .slice(Number(start), Number(end))
-                    .map(([key, title]) => (
-                      <div
-                        key={key}
-                        aria-current={key === phase ? "step" : undefined}
-                        className={key === phase ? "current" : "pending"}
-                      >
-                        <i />
-                        {title}
-                        <small>{key}</small>
-                      </div>
-                    ))}
-                </details>
-              ))}
-            </div>
-          </details>
-          {active && (
-            <section
-              className={`backup-progress ${ratio === null ? "indeterminate" : ""}`}
-            >
-              <header>
-                <div>
-                  <span>Reported Host progress</span>
-                  <strong>{progressPhase.replaceAll("_", " ")}</strong>
-                </div>
-                <strong>
-                  {ratio === null ? "—" : `${Math.round(ratio * 100)}%`}
-                </strong>
-              </header>
+          {ratio !== null && (
+            <div className="mt-5">
               <div
-                className="progress-track"
                 role="progressbar"
-                aria-label="Reported backup progress"
+                aria-label="Current Host job progress"
+                aria-valuenow={Math.round(ratio * 100)}
                 aria-valuemin={0}
                 aria-valuemax={100}
-                aria-valuenow={
-                  ratio === null ? undefined : Math.round(ratio * 100)
+                className="h-1.5 overflow-hidden rounded-full bg-muted"
+              >
+                <div
+                  className="h-full rounded-full bg-primary"
+                  style={{ width: `${ratio * 100}%` }}
+                />
+              </div>
+              <p className="mt-2 font-mono text-[10px] text-muted-foreground">
+                {processed !== null
+                  ? valueLabel(processed, "bytes")
+                  : "Processed bytes not reported"}
+                {total !== null ? ` / ${valueLabel(total, "bytes")}` : ""} ·{" "}
+                {valueLabel(number(progress?.bytesPerSecond), "bytes")}/s
+              </p>
+            </div>
+          )}
+          <div className="mt-5 flex flex-wrap gap-1.5">
+            {phases.map((p) => (
+              <span
+                key={p}
+                className={`rounded border px-2 py-1 font-mono text-[8px] ${p === phase ? "border-primary/30 bg-primary/10 text-primary" : "text-muted-foreground"}`}
+              >
+                {p.replaceAll("_", " ")}
+              </span>
+            ))}
+          </div>
+          {typeof current.message === "string" && (
+            <p className="mt-4 text-xs text-muted-foreground">
+              {str(current.message)}
+            </p>
+          )}
+          {current.retryable === true && (
+            <div className="mt-4">
+              <ActionButton
+                action="backup.full.retry-upload"
+                variant="outline"
+                onClick={() =>
+                  op.prepare("backup.full.retry-upload", {
+                    backupId: str(current.backupId),
+                  })
                 }
               >
-                <i style={{ "--progress": ratio ?? 0 } as CSSProperties} />
-              </div>
-              <div className="backup-progress-meta">
-                <span>
-                  Processed
-                  <strong>
-                    {size(processed)} / {size(total)}
-                  </strong>
-                </span>
-                <span>
-                  Transfer rate
-                  <strong>
-                    {number(progress?.bytesPerSecond) === null
-                      ? "Not reported"
-                      : `${size(progress?.bytesPerSecond)}/s`}
-                  </strong>
-                </span>
-                <span>
-                  Provider
-                  <strong>
-                    {str(progress?.providerState, "Not reported")}
-                  </strong>
-                </span>
-              </div>
-              {phase === "COUNTDOWN" && (
-                <p className="subtle">
-                  Host countdown:{" "}
-                  {number(operation.remainingSeconds) ?? "Not reported"} seconds
-                  remaining.
-                </p>
-              )}
-            </section>
+                Retry verified local upload
+              </ActionButton>
+            </div>
           )}
-          {operation.restartRecoveryRequired !== undefined && (
-            <p className="read-evidence">
-              Restart recovery:{" "}
-              {operation.restartRecoveryRequired === true
-                ? "Required · follow the Host operator procedure"
-                : operation.restartRecoveryRequired === false
-                  ? "Not required by Host"
-                  : "Unknown"}
+        </CardContent>
+      </Card>
+      <div className="grid items-start gap-5 xl:grid-cols-2">
+        <Card>
+          <CardHeader
+            title="Manual full backup"
+            description="Save → stop → archive → verify → Drive → restart"
+            icon={<HardDrive size={17} className="text-primary" />}
+          />
+          <CardContent className="space-y-5">
+            <p className="text-xs leading-6 text-muted-foreground">
+              The Host Companion controls the entire operation and restarts
+              Minecraft after the cold archive, including when a Drive upload
+              fails.
             </p>
-          )}
-          <div className="journal-footnote">
-            <p>
-              Workflow order only. The highlighted phase is reported by the
-              Host; earlier stages may have been skipped.
-            </p>
-            {statusAt
-              ? `Host status read ${stamp(statusAt)}. Closing this browser does not cancel a job.`
-              : "No durable Host status received."}
-          </div>
-        </Panel>
-      </aside>
-      <BackupScheduleCard />
-      <div className="backup-create-preflight">
-        <section className="backup-titlebar">
-          <div>
-            <span className="eyebrow">MANUAL FULL BACKUPS</span>
-            <h2>{title}</h2>
-            <p>
-              A full backup saves your worlds, stops the exact service, verifies
-              the archive and off-site copy, then brings Minecraft back online.
-            </p>
-          </div>
-          <div className="backup-create">
-            <label className="field">
-              Player warning countdown
-              <select
+            <div className="space-y-3 rounded-xl border bg-background p-4">
+              {[
+                ["Host authenticated", "hostAuthenticated", true],
+                ["Operation clear", "operationBusy", false],
+                ["Recovery clear", "recoveryRequired", false],
+                ["Storage writable", "backupRootWritable", true],
+                ["Command channel", "commandChannelConfigured", true],
+              ].map(([label, key, wanted]) => (
+                <div
+                  key={String(key)}
+                  className="flex justify-between gap-3 text-[11px]"
+                >
+                  <span className="text-muted-foreground">{label}</span>
+                  <Badge
+                    tone={
+                      preflight.data[String(key)] === wanted
+                        ? "success"
+                        : typeof preflight.data[String(key)] === "boolean"
+                          ? "danger"
+                          : "neutral"
+                    }
+                  >
+                    {preflight.data[String(key)] === wanted
+                      ? "Ready"
+                      : typeof preflight.data[String(key)] === "boolean"
+                        ? "Blocked"
+                        : "Unknown"}
+                  </Badge>
+                </div>
+              ))}
+              <div className="flex justify-between gap-3 text-[11px]">
+                <span className="text-muted-foreground">Google Drive</span>
+                <span>{str(provider.data.status, "Not reported")}</span>
+              </div>
+              <p className="text-[10px] text-muted-foreground">
+                Disk headroom:{" "}
+                {valueLabel(number(preflight.data.usableBytes), "bytes")}
+              </p>
+            </div>
+            {preflight.error && <Notice>{preflight.error}</Notice>}
+            <Field label="Player warning countdown">
+              <Select
                 value={countdown}
                 onChange={(e) => setCountdown(Number(e.target.value))}
               >
-                {[1800, 900, 600, 300, 0].map((seconds) => (
-                  <option key={seconds} value={seconds}>
-                    {seconds === 0
-                      ? "No countdown · Host must verify empty"
-                      : `${seconds / 60} minutes`}
+                {[1800, 900, 600, 300, 0].map((v) => (
+                  <option key={v} value={v}>
+                    {v
+                      ? `${v / 60} minutes`
+                      : "Immediate · Host must prove zero players"}
                   </option>
                 ))}
-              </select>
-            </label>
-            <Button
-              variant="primary"
-              disabled={
-                !ready ||
-                !!session.reason("maintenance.full-backup.create", "HOST")
-              }
-              title={
+              </Select>
+            </Field>
+            <ActionButton
+              action="maintenance.full-backup.create"
+              blocked={
                 !ready
-                  ? "Refresh and pass every authoritative preflight check."
-                  : session.reason("maintenance.full-backup.create", "HOST")
+                  ? "Refresh and pass current Host preflight before creating a backup."
+                  : ""
               }
               onClick={() =>
-                prepare("maintenance.full-backup.create", {
+                op.prepare("maintenance.full-backup.create", {
                   countdownSeconds: countdown,
                 })
               }
             >
-              <Icon name="backups" />
-              Review new backup
-            </Button>
-          </div>
-          <ActionAvailability
-            reason={
-              !ready
-                ? "Creation requires fresh successful Host preflight. Unknown or expired checks keep creation disabled."
-                : session.reason("maintenance.full-backup.create", "HOST")
-            }
-          />
-        </section>
-        <div className="readiness-band">
-          {" "}
-          <Panel
-            eyebrow="HOST EVIDENCE"
-            title="Preflight checklist"
-            description={
-              fresh
-                ? "Authoritative checks from the Host."
-                : "Refresh evidence before creating a backup."
-            }
-          >
-            {reads.preflight?.error && (
-              <p className="read-error" role="status">
-                Preflight unavailable: {reads.preflight.error}. Unreported
-                checks remain Unknown.
-              </p>
-            )}
-            <dl className="preflight-facts">
-              <dt>Provider</dt>
-              <dd>
-                {str(preflight.provider, "Unknown")} ·{" "}
-                {str(preflight.providerStatus, "Unknown")}
-                {!fresh && " · last received / not current readiness"}
-              </dd>
-              <dt>Source size</dt>
-              <dd>{size(preflight.sourceBytes)}</dd>
-              <dt>Source entries</dt>
-              <dd>
-                {number(preflight.entryCount)?.toLocaleString() ?? "Unknown"}
-              </dd>
-              <dt>Usable storage</dt>
-              <dd>{size(preflight.usableBytes)}</dd>
-              <dt>Required storage</dt>
-              <dd>{size(preflight.requiredBytes)}</dd>
-            </dl>
-            <dl className="gate-list">
-              {gates.map(([label, value]) => (
-                <div className="gate-item" key={label}>
-                  <dt>{label}</dt>
-                  <dd>
-                    <Status
-                      tone={
-                        fresh && value === "Ready"
-                          ? "success"
-                          : value === "Blocked"
-                            ? "error"
-                            : "neutral"
-                      }
-                    >
-                      {fresh ? value : "Unknown"}
-                    </Status>
-                  </dd>
-                </div>
-              ))}
-            </dl>
-            <div className="panel-actions">
-              <Button
-                loading={loading}
-                disabled={!!session.reason("backup.preflight", "HOST")}
-                title={session.reason("backup.preflight", "HOST")}
-                onClick={() => void refresh()}
-              >
-                Refresh evidence
-              </Button>
-              <ActionAvailability
-                reason={session.reason("backup.preflight", "HOST")}
-              />
-            </div>
-            <p className="preflight-note">
-              Unknown or expired checks keep creation disabled. A provider
-              connectivity check does not certify an off-site backup.
-            </p>
-          </Panel>
-        </div>
+              <CloudUpload />
+              Fully Backup Now
+            </ActionButton>
+          </CardContent>
+        </Card>
+        <BackupScheduleCard />
       </div>
-      <div className="backup-workspace">
-        <div className="archive-book">
-          {" "}
-          <SectionLabel
-            index=""
-            title="Archive inventory"
-            detail={`${backups.length} reported restore points`}
-          />
-          <Panel>
-            <p className="read-evidence">
-              {reads.inventory?.error
-                ? `Inventory read unavailable: ${reads.inventory.error}. Last received records retained.`
-                : reads.inventory?.state === "received"
-                  ? `Host inventory received ${stamp(reads.inventory.at)}. Availability is separate from verification.`
-                  : "Reading authorized Host inventory…"}
-            </p>
-            <div
-              className="backup-table table-region"
-              tabIndex={0}
-              role="region"
-              aria-label="Backup archive inventory"
-            >
-              <table>
-                <thead>
-                  <tr>
-                    <th>Restore point</th>
-                    <th>Created</th>
-                    <th>Archive size</th>
-                    <th>Local copy</th>
-                    <th>Off-site copy</th>
-                    <th>Operations</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {backups.length ? (
-                    backups.map((backup) => (
-                      <tr key={str(backup.backupId)}>
-                        <td>
-                          <strong>{str(backup.filename)}</strong>
-                          <small>{str(backup.backupId)}</small>
-                        </td>
-                        <td>
-                          <time title={str(backup.timestamp)}>
-                            {stamp(backup.timestamp)}
-                          </time>
-                        </td>
-                        <td>{size(backup.archiveBytes)}</td>
-                        <td>
-                          <Status
-                            tone={backup.local === true ? "success" : "neutral"}
-                          >
-                            {backup.local === true
-                              ? "Available"
-                              : backup.local === false
-                                ? "Absent"
-                                : "Unknown"}
-                          </Status>
-                        </td>
-                        <td>
-                          <Status
-                            tone={
-                              backup.offsite === true ? "success" : "warning"
+      <Card>
+        <CardHeader
+          title="Restore points"
+          description="Verification is reported separately from archive availability"
+          icon={<ShieldCheck size={17} className="text-muted-foreground" />}
+        />
+        {inventory.error && (
+          <div className="p-4">
+            <Notice>{inventory.error}</Notice>
+          </div>
+        )}
+        {backups.length ? (
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[650px] text-left text-xs">
+              <thead className="bg-background text-[9px] uppercase tracking-wider text-muted-foreground">
+                <tr>
+                  <th className="p-4">Restore point</th>
+                  <th className="p-4">Size</th>
+                  <th className="p-4">Verification</th>
+                  <th className="p-4">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {backups.map((b) => (
+                  <tr key={str(b.backupId)} className="border-t">
+                    <td className="max-w-72 p-4">
+                      <p className="font-medium">{str(b.filename)}</p>
+                      <p className="mt-2 font-mono text-[9px] text-muted-foreground">
+                        {str(b.backupId)}
+                      </p>
+                      <p className="mt-1 break-all font-mono text-[8px] text-muted-foreground">
+                        SHA-256 {str(b.sha256, "not reported")}
+                      </p>
+                    </td>
+                    <td className="p-4 font-mono text-[10px]">
+                      {valueLabel(number(b.archiveBytes), "bytes")}
+                    </td>
+                    <td className="p-4">
+                      <Badge
+                        tone={
+                          b.remoteVerified === true ||
+                          b.remoteBackupVerified === true
+                            ? "success"
+                            : "neutral"
+                        }
+                      >
+                        {b.remoteVerified === true ||
+                        b.remoteBackupVerified === true
+                          ? "VERIFIED REMOTE"
+                          : b.localVerified === true ||
+                              b.localBackupVerified === true
+                            ? "VERIFIED LOCAL"
+                            : "Unverified"}
+                      </Badge>
+                      <p className="mt-2 text-[9px] text-muted-foreground">
+                        {b.local === true
+                          ? "Local available"
+                          : "Local unreported"}{" "}
+                        ·{" "}
+                        {b.offsite === true
+                          ? "Off-site available"
+                          : "Off-site unreported"}
+                      </p>
+                    </td>
+                    <td className="p-4">
+                      <div className="flex gap-2">
+                        <ActionButton
+                          action="backup.full.verify"
+                          size="sm"
+                          variant="outline"
+                          onClick={() =>
+                            op.prepare("backup.full.verify", {
+                              backupId: str(b.backupId),
+                            })
+                          }
+                        >
+                          Verify
+                        </ActionButton>
+                        <ActionButton
+                          action="backup.full.delete"
+                          size="sm"
+                          variant="destructive"
+                          onClick={() =>
+                            op.prepare("backup.full.delete", {
+                              backupId: str(b.backupId),
+                            })
+                          }
+                        >
+                          Delete
+                        </ActionButton>
+                        {b.retryUploadAvailable === true && (
+                          <ActionButton
+                            action="backup.full.retry-upload"
+                            size="sm"
+                            variant="outline"
+                            onClick={() =>
+                              op.prepare("backup.full.retry-upload", {
+                                backupId: str(b.backupId),
+                              })
                             }
                           >
-                            {backup.offsite === true
-                              ? "Available"
-                              : backup.offsite === false
-                                ? "Absent"
-                                : "Unknown"}
-                          </Status>
-                        </td>
-                        <td>
-                          <div className="button-row">
-                            <Button
-                              disabled={
-                                !!session.reason("backup.full.verify", "HOST")
-                              }
-                              onClick={() =>
-                                prepare("backup.full.verify", {
-                                  backupId: str(backup.backupId),
-                                })
-                              }
-                            >
-                              Verify
-                            </Button>
-                            <Button
-                              variant="danger"
-                              disabled={
-                                !!session.reason("backup.full.delete", "HOST")
-                              }
-                              onClick={() =>
-                                prepare("backup.full.delete", {
-                                  backupId: str(backup.backupId),
-                                })
-                              }
-                            >
-                              Delete
-                            </Button>
-                          </div>
-                          <ActionAvailability
-                            reason={[
-                              ...new Set(
-                                [
-                                  session.reason("backup.full.verify", "HOST"),
-                                  session.reason("backup.full.delete", "HOST"),
-                                ].filter(Boolean),
-                              ),
-                            ].join(" ")}
-                          />
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan={6}>
-                        {reads.inventory?.state === "received"
-                          ? "Host reported an empty archive inventory."
-                          : "No current authorized inventory received."}
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </Panel>
-        </div>
-      </div>
-      {error && (
-        <div className="page-notice">
-          <Notice tone="error" title="Host evidence unavailable">
-            {error}
-          </Notice>
-        </div>
-      )}
-      <ActionReview
-        prepared={prepared}
-        onClose={() => {
-          setPrepared(null);
-          void refresh();
-        }}
-      />
-    </>
+                            Retry upload
+                          </ActionButton>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <Empty title="No restore points received">
+            Read the Host inventory to inspect available archives.
+          </Empty>
+        )}
+      </Card>
+      {op.review}
+    </div>
   );
 }

@@ -41,7 +41,7 @@ function Head({
     skinProvider === "disabled" || failed || name.startsWith(".");
   return (
     <span
-      className={`player-head ${large ? "large" : ""}`}
+      className={`relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-lg border bg-primary/10 font-mono text-primary ${large ? "size-16 text-xl" : "size-8 text-xs"}`}
       title={
         unverified
           ? "Default head · skin unverified"
@@ -50,7 +50,7 @@ function Head({
     >
       {!unverified && (
         <img
-          className={loaded ? "loaded" : ""}
+          className={`absolute inset-0 size-full object-cover ${loaded ? "opacity-100" : "opacity-0"}`}
           src={source(skinProvider, uuid)}
           alt=""
           width={64}

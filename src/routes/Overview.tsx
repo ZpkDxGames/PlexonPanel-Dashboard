@@ -1,584 +1,380 @@
-import { DriveBackupStatus } from "../components/DriveBackupStatus";
-import { useMemo, useState } from "react";
+"use client";
+import { useState } from "react";
+import Link from "next/link";
+import {
+  Activity,
+  ArrowUpRight,
+  Box,
+  Cpu,
+  Globe2,
+  MemoryStick,
+  Play,
+  RotateCw,
+  Square,
+  Users,
+} from "lucide-react";
+import { session } from "../adapter/session";
 import { useSession, useNow } from "../hooks";
 import { number, record, str } from "../adapter/control-state";
-import { session, type Prepared } from "../adapter/session";
-import { bytes, entityDensity } from "../store/selectors";
-import {
-  sourceEvidence,
-  historyFor,
-  observedSummary,
-} from "../presentation/telemetry";
+import { sourceEvidence } from "../presentation/telemetry";
 import { hasScope } from "../presentation/authority";
-import { usePlotHistory } from "../presentation/PlotHistory";
-import { Button, Panel, Status, Empty } from "../components/ui";
-import { Icon } from "../components/Icon";
-import { Sparkline, Coverage } from "../components/Telemetry";
+import { Card, CardContent, CardHeader } from "../components/ui/card";
+import { Badge } from "../components/ui/badge";
+import { Button } from "../components/ui/button";
+import { Select } from "../components/ui/input";
+import {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+} from "../components/ui/tabs";
+import {
+  TelemetryChart,
+  tickSeries,
+  memorySeries,
+  computeSeries,
+  valueLabel,
+} from "../components/charts/TelemetryChart";
+import { ConsolePanel } from "../components/terminal/ConsolePanel";
+import { useOperation } from "../features/operations";
 import { PlayerHead } from "../components/PlayerHead";
-import { ConsolePreview } from "../components/ConsolePreview";
-import { CrosshairGroup, TimeSeries } from "../components/charts/TimeSeries";
-import { ActionReview } from "../features/ActionReview";
-import { navigate } from "../router";
-import { ActionAvailability } from "../components/nextgen/ActionAvailability";
-const metrics = [
-  {
-    key: "tps" as const,
-    title: "Paper tick rate",
-    label: "Tick rate",
-    unit: "TPS",
-    source: "paperHealth" as const,
-    color: "var(--chart-1)",
-  },
-  {
-    key: "serviceCpu" as const,
-    title: "Minecraft service CPU",
-    label: "Service CPU",
-    unit: "% of one core",
-    source: "service" as const,
-    color: "var(--chart-3)",
-  },
-  {
-    key: "heap" as const,
-    title: "Paper JVM heap",
-    label: "JVM heap",
-    unit: "bytes",
-    source: "paperSystem" as const,
-    color: "var(--chart-2)",
-  },
-];
-const tickDuration = [
-  {
-    key: "mspt" as const,
-    label: "Mean tick time",
-    unit: "ms",
-    color: "var(--chart-2)",
-  },
-];
 export default function Overview() {
   const snap = useSession(),
     now = useNow(),
-    state = snap.state;
-  const [prepared, setPrepared] = useState<Prepared | null>(null),
-    [metric, setMetric] = useState("tps"),
+    state = snap.state,
+    op = useOperation();
+  const [tab, setTab] = useState("ticks"),
     [minutes, setMinutes] = useState(15);
-  const epochs = usePlotHistory();
   const paper = sourceEvidence(state, "paperHealth", now),
-    system = sourceEvidence(state, "paperSystem", now),
-    host = sourceEvidence(state, "hostSystem", now),
-    service = sourceEvidence(state, "service", now);
-  const connected = Boolean(state.ready?.agents.paper),
+    jvm = sourceEvidence(state, "paperSystem", now),
+    svc = sourceEvidence(state, "service", now),
     resources = record(state.service.resources);
-  const tps = connected
+  const tps = paper.usable
       ? number(Array.isArray(state.server.tps) ? state.server.tps[0] : null)
       : null,
-    mspt = connected ? number(state.server.averageTickMillis) : null,
-    players = connected ? number(state.server.onlinePlayers) : null,
-    capacity = connected ? number(state.server.maxPlayers) : null;
-  const heap = bytes(connected ? state.system.jvmHeapUsedBytes : null);
-  const health = useMemo(
-    () => historyFor(epochs?.paperHealth ?? state.history, "paperHealth"),
-    [state.history, epochs],
+    mspt = paper.usable ? number(state.server.averageTickMillis) : null,
+    online = paper.usable ? number(state.server.onlinePlayers) : null,
+    max = paper.usable ? number(state.server.maxPlayers) : null;
+  const cpu =
+      svc.usable && resources.cpuAvailable === true
+        ? number(resources.cpuPercent)
+        : null,
+    heap = jvm.usable ? number(state.system.jvmHeapUsedBytes) : null,
+    heapMax = jvm.usable ? number(state.system.jvmHeapMaximumBytes) : null;
+  const running = state.service.state === "active",
+    status =
+      running && state.ready?.agents.paper
+        ? "Online"
+        : ["inactive", "failed"].includes(String(state.service.state))
+          ? "Stopped"
+          : "Awaiting status";
+  const name = String(
+    state.ready?.server.serverName ?? snap.labels[state.serverId] ?? "Server",
   );
-  const stats = useMemo(() => observedSummary(health, "tps"), [health]);
-  const peak = useMemo(() => observedSummary(health, "players").max, [health]);
-  const spikes = useMemo(
-    () => health.filter((s) => s.mspt !== null && s.mspt > 50).length,
-    [health],
-  );
-  const current = metrics.find((item) => item.key === metric) ?? metrics[0];
-  const usageSeries = useMemo(() => [current], [current]);
-  const cutoff = Math.floor(now / 10000) * 10000 - minutes * 60000;
-  const currentSummary = useMemo(
-    () =>
-      observedSummary(
-        historyFor(
-          epochs?.[current.source] ?? state.history,
-          current.source,
-          cutoff,
-        ),
-        current.key,
-      ),
-    [state.history, epochs, current, cutoff],
-  );
-  const canPlayers = hasScope(snap, "players.view");
-  const lifecycle = (action: string) => {
-    try {
-      setPrepared(session.prepare(action, {}, "HOST"));
-    } catch {
-      /* The disabled reason remains visible. */
-    }
-  };
-  const knownHeap = system.usable
-      ? number(state.system.jvmHeapUsedBytes)
-      : null,
-    maxHeap = number(state.system.jvmHeapMaximumBytes);
-  const knownMemory = host.usable
-      ? number(state.hostSystem.physicalMemoryUsedBytes)
-      : null,
-    maxMemory = number(state.hostSystem.physicalMemoryTotalBytes);
-  const formatBytes = (value: number | null) => {
-    const b = bytes(value);
-    return b.available ? `${b.value} ${b.unit}` : "Unavailable";
-  };
-  const resourceRow = (
-    label: string,
-    value: number | null,
-    max: number | null,
-    source: string,
-  ) => (
-    <div className="resource-row">
-      <div>
-        <strong>{label}</strong>
-        <small>{source}</small>
-      </div>
-      <b>
-        {formatBytes(value)}
-        {max !== null && max > 0 ? <small> / {formatBytes(max)}</small> : null}
-      </b>
-      {value !== null && max !== null && max > 0 && value <= max ? (
-        <meter min={0} max={max} value={value} aria-label={label} />
-      ) : (
-        <span className="resource-unavailable">
-          Capacity{" "}
-          {max === null || max <= 0 ? "not reported" : "not currently usable"}
-        </span>
-      )}
-    </div>
-  );
+  const cards = [
+    {
+      title: "Tick Performance",
+      icon: Activity,
+      value: tps === null ? "—" : tps.toFixed(2),
+      unit: "TPS",
+      detail:
+        mspt === null
+          ? "Waiting for Paper"
+          : `${mspt.toFixed(1)} ms mean · ${valueLabel(state.server.msptP95, "ms")} p95`,
+      tag: paper.kind,
+      color: "text-primary",
+    },
+    {
+      title: "Online Players",
+      icon: Users,
+      value: online === null ? "—" : String(online),
+      unit: max === null ? "players" : `/ ${max}`,
+      detail: "Live Paper roster",
+      tag: paper.kind,
+      color: "text-sky-500",
+    },
+    {
+      title: "Compute Load",
+      icon: Cpu,
+      value: cpu === null ? "—" : cpu.toFixed(1),
+      unit: "%",
+      detail: "Minecraft service · % of one core",
+      tag: svc.kind,
+      color: "text-violet-400",
+    },
+    {
+      title: "Memory Allocation",
+      icon: MemoryStick,
+      value: heap === null ? "—" : (heap / 2 ** 30).toFixed(1),
+      unit: "GiB",
+      detail:
+        heapMax === null
+          ? "JVM heap · capacity unreported"
+          : `JVM heap · ${(heapMax / 2 ** 30).toFixed(1)} GiB maximum`,
+      tag: jvm.kind,
+      color: "text-amber-500",
+    },
+  ];
   return (
-    <>
-      <CrosshairGroup>
-        <div className="overview-grid">
-          <Panel
-            title="Runtime and memory"
-            className="usage-panel"
-            action={
-              <button
-                className="text-link"
-                onClick={() => navigate("Performance")}
+    <div className="space-y-5">
+      <div
+        className="flex flex-wrap items-center justify-between gap-4"
+        data-testid="server-header"
+      >
+        <div className="flex min-w-0 items-center gap-4">
+          <span className="hidden rounded-xl border bg-card p-3 text-primary sm:inline-flex">
+            <ServerGlyph />
+          </span>
+          <div>
+            <div className="flex flex-wrap items-center gap-3">
+              <h1 className="text-2xl font-semibold tracking-tight">{name}</h1>
+              <Badge
+                dot
+                tone={
+                  status === "Online"
+                    ? "success"
+                    : status === "Stopped"
+                      ? "neutral"
+                      : "warning"
+                }
               >
-                All signals <Icon name="arrow" />
-              </button>
-            }
-          >
-            <div className="usage-controls">
-              <span className="subtle">
-                Independent Paper health and JVM capture clocks
-              </span>
-              <select
-                aria-label="Overview time range"
-                value={minutes}
-                onChange={(e) => setMinutes(Number(e.target.value))}
+                {status}
+              </Badge>
+            </div>
+            <p className="mt-2 text-[11px] text-muted-foreground">
+              Your server at a glance <span className="mx-1.5">·</span> Paper{" "}
+              {state.ready?.server.minecraftVersion ?? "version pending"}
+            </p>
+          </div>
+        </div>
+        <div
+          className="flex flex-col items-end gap-2"
+          aria-label="Server lifecycle controls"
+        >
+          <div className="flex gap-2">
+            {[
+              { action: "server.start", label: "Start", icon: Play },
+              { action: "server.restart", label: "Restart", icon: RotateCw },
+              { action: "server.stop", label: "Stop", icon: Square },
+            ].map((item) => (
+              <Button
+                key={item.action}
+                variant={
+                  item.action === "server.stop" ? "destructive" : "outline"
+                }
+                disabled={!!session.reason(item.action, "HOST")}
+                title={session.reason(item.action, "HOST")}
+                onClick={() => op.prepare(item.action)}
               >
-                {[1, 5, 15, 35].map((n) => (
-                  <option key={n} value={n}>
-                    {n} minutes
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="overview-hero-charts">
-              <TimeSeries
-                title="TPS and tick-time envelope"
-                source="PAPER HEALTH · TPS LEFT / MSPT RIGHT"
-                samples={state.history}
-                series={[
-                  {
-                    key: "tps",
-                    label: "TPS",
-                    unit: "TPS",
-                    color: "var(--chart-4)",
-                  },
-                  {
-                    key: "mspt",
-                    label: "Mean MSPT",
-                    unit: "ms",
-                    color: "var(--chart-1)",
-                  },
-                ]}
-                threshold={50}
-                height={128}
-                mobileHeight={170}
-                windowStart={cutoff}
-                evidence={paper}
-              />
-              <TimeSeries
-                title="JVM memory allocation"
-                source="PAPER JVM"
-                samples={state.history}
-                series={[
-                  {
-                    key: "heap",
-                    label: "Used",
-                    unit: "bytes",
-                    color: "var(--chart-2)",
-                  },
-                  {
-                    key: "heapCommitted",
-                    label: "Committed",
-                    unit: "bytes",
-                    color: "var(--chart-3)",
-                  },
-                  {
-                    key: "heapMax",
-                    label: "Maximum",
-                    unit: "bytes",
-                    color: "var(--chart-4)",
-                  },
-                ]}
-                height={128}
-                mobileHeight={170}
-                windowStart={cutoff}
-                evidence={system}
-              />
-            </div>
-          </Panel>
-          <ConsolePreview />
-          <section
-            className="metric-strip"
-            aria-label="Current runtime measurements"
-          >
-            <article className="stat-cell v5-kpi">
-              <div className="stat-label">TPS / MSPT p95</div>
-              <div className="stat-reading">
-                <strong>{tps?.toFixed(2) ?? "—"}</strong>
-                <span>
-                  TPS ·{" "}
-                  {number(
-                    state.server.msptP95 ?? state.server.p95TickMillis,
-                  )?.toFixed(1) ?? "—"}{" "}
-                  ms p95
-                </span>
+                <item.icon />
+                {item.label}
+              </Button>
+            ))}
+          </div>
+          <p className="max-w-md text-right text-[10px] leading-4 text-muted-foreground">
+            {[
+              ...new Set(
+                ["server.start", "server.restart", "server.stop"]
+                  .map((action) => session.reason(action, "HOST"))
+                  .filter(Boolean),
+              ),
+            ].join(" ")}
+          </p>
+        </div>
+      </div>
+      <div
+        className="grid grid-cols-2 gap-3 xl:grid-cols-4"
+        data-testid="overview-kpis"
+      >
+        {cards.map((card) => (
+          <Card key={card.title}>
+            <CardContent className="p-4 xl:p-5">
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-[11px] font-medium text-muted-foreground">
+                  {card.title}
+                </p>
+                <card.icon size={15} className={card.color} />
               </div>
-              <small>Paper · {paper.kind}</small>
-            </article>
-            <article className="stat-cell v5-kpi">
-              <div className="stat-label">Online players / capacity</div>
-              <div className="stat-reading">
-                <strong>{players ?? "—"}</strong>
-                <span>/ {capacity ?? "—"}</span>
-              </div>
-              <small>Paper roster · {paper.kind}</small>
-            </article>
-            <article className="stat-cell v5-kpi">
-              <div className="stat-label">Service cgroup CPU / memory</div>
-              <div className="stat-reading">
-                <strong>
-                  {service.usable && state.service.state === "active"
-                    ? (number(resources.cpuPercent)?.toFixed(1) ?? "—")
-                    : "—"}
-                  %
+              <p className="mb-3 mt-4 flex flex-wrap items-baseline gap-2 font-mono tabular-nums">
+                <strong className="text-[28px] font-medium leading-none tracking-tight">
+                  {card.value}
                 </strong>
-                <span>
-                  {service.usable && state.service.state === "active"
-                    ? formatBytes(number(resources.memoryBytes))
-                    : "Unavailable"}
+                <span className="text-xs text-muted-foreground">
+                  {card.unit}
                 </span>
+              </p>
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-[9px] text-muted-foreground">
+                  {card.detail}
+                </p>
+                <span
+                  className={`size-1 shrink-0 rounded-full ${card.tag === "live" ? "bg-primary" : "bg-amber-400"}`}
+                  title={card.tag}
+                />
               </div>
-              <small>Host · % of one core · {service.kind}</small>
-            </article>
-            <DriveBackupStatus />
-          </section>
-          <div className="v5-overview-lifecycle">
-            <section
-              className="server-banner"
-              aria-label="Selected Minecraft server"
-            >
-              <div className="server-banner-identity">
-                <span className="voxel-emblem">
-                  <Icon name="server" />
-                </span>
-                <div>
-                  <div className="server-title-line">
-                    <h2>
-                      {String(
-                        state.ready?.server.serverName ??
-                          snap.labels[state.serverId] ??
-                          state.serverId,
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+      <div className="grid min-w-0 gap-5 xl:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+        <Card aria-label="Server performance">
+          <CardHeader
+            title="Server performance"
+            icon={<Activity size={16} className="text-primary" />}
+            action={
+              <div className="flex items-center gap-2">
+                <Select
+                  className="h-8 w-20 text-[10px]"
+                  aria-label="Chart time range"
+                  value={minutes}
+                  onChange={(e) => setMinutes(Number(e.target.value))}
+                >
+                  {[1, 5, 15, 35].map((v) => (
+                    <option key={v} value={v}>
+                      {v} min
+                    </option>
+                  ))}
+                </Select>
+                <Link
+                  href="/performance"
+                  aria-label="Open performance analyzer"
+                  className="rounded p-2 text-muted-foreground hover:text-foreground"
+                >
+                  <ArrowUpRight size={14} />
+                </Link>
+              </div>
+            }
+          />
+          <Tabs value={tab} onValueChange={setTab}>
+            <div className="px-4 pt-4">
+              <TabsList aria-label="Overview chart">
+                <TabsTrigger value="ticks">Tick &amp; MSPT</TabsTrigger>
+                <TabsTrigger value="memory">Memory Tiers</TabsTrigger>
+                <TabsTrigger value="compute">CPU &amp; Chunks</TabsTrigger>
+              </TabsList>
+            </div>
+            {(["ticks", "memory", "compute"] as const).map((value) => (
+              <TabsContent key={value} value={value} className="mt-0">
+                <TelemetryChart
+                  state={state}
+                  series={
+                    value === "ticks"
+                      ? tickSeries
+                      : value === "memory"
+                        ? memorySeries
+                        : computeSeries
+                  }
+                  since={Math.floor(now / 10000) * 10000 - minutes * 60000}
+                  height={360}
+                  label={
+                    value === "ticks"
+                      ? "Tick performance"
+                      : value === "memory"
+                        ? "Memory tiers"
+                        : "CPU and chunks"
+                  }
+                />
+              </TabsContent>
+            ))}
+          </Tabs>
+        </Card>
+        <ConsolePanel compact />
+      </div>
+      <div className="grid gap-5 lg:grid-cols-2">
+        <Card>
+          <CardHeader
+            title="World activity"
+            description="Loaded chunks and entities reported by Paper"
+            icon={<Globe2 size={16} className="text-muted-foreground" />}
+          />
+          <CardContent className="space-y-4">
+            {state.worlds.length ? (
+              state.worlds.map((w) => (
+                <div
+                  key={str(w.name)}
+                  className="flex items-center justify-between gap-3"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="rounded-lg border bg-muted/50 p-2 text-muted-foreground">
+                      <Globe2 size={16} />
+                    </span>
+                    <span className="text-xs font-medium">{str(w.name)}</span>
+                  </div>
+                  <div className="text-right font-mono text-[10px]">
+                    <p>
+                      {valueLabel(
+                        paper.usable ? number(w.loadedChunks) : null,
+                        "chunks",
                       )}
-                    </h2>
-                    <Status
-                      tone={
-                        service.usable && str(state.service.state) === "active"
-                          ? "success"
-                          : "neutral"
-                      }
-                    >
-                      {service.usable
-                        ? str(state.service.state, "Unknown")
-                        : "Service unknown"}
-                    </Status>
+                    </p>
+                    <p className="mt-1 text-muted-foreground">
+                      {valueLabel(
+                        paper.usable ? number(w.entities) : null,
+                        "entities",
+                      )}{" "}
+                      ·{" "}
+                      {valueLabel(
+                        paper.usable ? number(w.tileEntities) : null,
+                        "tiles",
+                      )}
+                    </p>
                   </div>
                 </div>
-              </div>
-              <div className="lifecycle-buttons">
-                {[
-                  ["Start", "server.start", "play"],
-                  ["Restart", "server.restart", "refresh"],
-                  ["Stop", "server.stop", "stop"],
-                ].map(([label, action, icon]) => (
-                  <Button
-                    key={action}
-                    variant={label === "Stop" ? "danger" : "secondary"}
-                    disabled={!!session.reason(action, "HOST")}
-                    title={session.reason(action, "HOST")}
-                    onClick={() => lifecycle(action)}
-                  >
-                    <Icon name={icon} />
-                    {label}
-                  </Button>
-                ))}
-              </div>
-            </section>
-            <ActionAvailability
-              reason={[
-                ...new Set(
-                  ["server.start", "server.restart", "server.stop"]
-                    .map((a) => session.reason(a, "HOST"))
-                    .filter(Boolean),
-                ),
-              ].join(" ")}
-            />
-          </div>
-
-          <Panel
-            title="Infrastructure layers"
-            className="resource-summary"
-            action={<Icon name="performance" />}
-          >
-            <div className="resource-list strata-layers">
-              {resourceRow(
-                "Minecraft service memory",
-                service.usable &&
-                  resources.scope === "MINECRAFT_SERVICE" &&
-                  resources.memoryAvailable === true
-                  ? number(resources.memoryBytes)
-                  : null,
-                null,
-                `Host cgroup · ${service.kind}`,
-              )}
-              {resourceRow(
-                "JVM heap",
-                knownHeap,
-                maxHeap,
-                `Paper · ${system.kind}`,
-              )}
-              {resourceRow(
-                "Node memory",
-                knownMemory,
-                maxMemory,
-                `Host node · ${host.kind}`,
-              )}
-              <div className="resource-row">
-                <div>
-                  <strong>Minecraft service CPU</strong>
-                  <small>Host cgroup · {service.kind}</small>
-                </div>
-                <b>
-                  {service.usable &&
-                  resources.scope === "MINECRAFT_SERVICE" &&
-                  resources.cpuAvailable === true &&
-                  resources.cpuUnit === "PERCENT_OF_ONE_CORE"
-                    ? `${number(resources.cpuPercent)?.toFixed(1) ?? "—"}%`
-                    : "Unavailable"}
-                  <small> of one core</small>
-                </b>
-                <span className="resource-unavailable">
-                  150% = 1.5 cores · no 100% clamp
-                </span>
-              </div>
-            </div>
-            <details className="inline-disclosure">
-              <summary>Paper process & source evidence</summary>
-              <dl className="identity-facts">
-                <dt>Paper process CPU</dt>
-                <dd>
-                  {system.usable
-                    ? `${number(state.system.processCpuPercent)?.toFixed(1) ?? "—"}%`
-                    : "Unavailable"}
-                </dd>
-                <dt>Host node CPU</dt>
-                <dd>
-                  {host.usable
-                    ? `${number(state.hostSystem.hostCpuPercent)?.toFixed(1) ?? "—"}%`
-                    : "Unavailable"}
-                </dd>
-                <dt>Paper capture</dt>
-                <dd>{paper.capturedAt ?? "Unavailable"}</dd>
-                <dt>Host capture</dt>
-                <dd>{host.capturedAt ?? "Unavailable"}</dd>
-              </dl>
-            </details>
-          </Panel>
-          <Panel
-            title="Loaded worlds"
-            eyebrow="PAPER SNAPSHOT"
-            className="world-panel"
-          >
-            <div className="world-list">
-              {state.worlds.length && connected ? (
-                state.worlds.map((world) => {
-                  const entities = number(world.entities),
-                    chunks = number(world.loadedChunks),
-                    density = entityDensity(entities, chunks);
-                  return (
-                    <article className="world-row" key={str(world.name)}>
-                      <span className="world-icon">
-                        <Icon name="overview" />
-                      </span>
-                      <div>
-                        <strong>{str(world.name)}</strong>
-                        <small>
-                          {chunks?.toLocaleString() ?? "Unknown"} loaded chunks
-                        </small>
-                      </div>
-                      <div>
-                        <b>{entities?.toLocaleString() ?? "—"}</b>
-                        <small>
-                          entities · {number(world.tileEntities) ?? "—"} tiles ·{" "}
-                          {density === null
-                            ? "density unavailable"
-                            : `${density.toFixed(2)}/chunk`}
-                        </small>
-                      </div>
-                    </article>
-                  );
-                })
-              ) : (
-                <Empty title="World telemetry unavailable">
-                  Waiting for a Paper snapshot.
-                </Empty>
-              )}
-            </div>
-          </Panel>
-          <Panel
+              ))
+            ) : (
+              <p className="text-xs text-muted-foreground">
+                Waiting for world observations
+              </p>
+            )}
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader
             title="Active players"
-            className="active-players"
+            description="Exact identities from the current Paper roster"
+            icon={<Users size={16} className="text-muted-foreground" />}
             action={
-              <button className="text-link" onClick={() => navigate("Players")}>
-                View all <Icon name="arrow" />
-              </button>
+              <Link
+                href="/players"
+                className="flex items-center gap-1 text-[10px] text-primary"
+              >
+                View all
+                <ArrowUpRight size={12} />
+              </Link>
             }
-          >
-            <div className="active-player-list">
-              {canPlayers && connected && state.players.length ? (
-                state.players.slice(0, 4).map((player) => (
-                  <button
-                    className="active-player"
-                    key={str(player.uuid)}
-                    onClick={() => navigate("Players")}
-                  >
-                    <PlayerHead
-                      uuid={str(player.uuid)}
-                      name={str(player.name)}
-                    />
-                    <span>
-                      <strong>{str(player.name)}</strong>
-                      <small>{str(player.world, "World not reported")}</small>
+          />
+          <CardContent>
+            <div className="space-y-3">
+              {hasScope(snap, "players.view") &&
+                state.players.slice(0, 4).map((p) => (
+                  <div key={str(p.uuid)} className="flex items-center gap-3">
+                    <PlayerHead uuid={str(p.uuid)} name={str(p.name)} />
+                    <span className="flex-1 text-xs font-medium">
+                      {str(p.name)}
                     </span>
-                    <Icon name="chevron" />
-                  </button>
-                ))
-              ) : (
-                <Empty
-                  title={
-                    !canPlayers
-                      ? "Roster access restricted"
-                      : !connected
-                        ? "Paper unavailable"
-                        : "No players reported"
-                  }
-                >
-                  {!canPlayers
-                    ? "Requires players.view."
-                    : "Player presence comes from Paper."}
-                </Empty>
+                    <span className="text-[10px] text-muted-foreground">
+                      {str(p.world)}
+                    </span>
+                    <span className="font-mono text-[10px] text-primary">
+                      {valueLabel(number(p.ping), "ms")}
+                    </span>
+                  </div>
+                ))}
+              {(!hasScope(snap, "players.view") || !state.players.length) && (
+                <p className="text-xs text-muted-foreground">
+                  {hasScope(snap, "players.view")
+                    ? "No players reported in the current roster"
+                    : "This device needs players.view"}
+                </p>
               )}
             </div>
-          </Panel>
-          <Panel
-            title="Tick health"
-            eyebrow="PAPER / MEAN DURATION"
-            className="tick-health"
-          >
-            <div className="tick-health-summary">
-              <strong>
-                {mspt?.toFixed(1) ?? "—"}
-                <small> ms</small>
-              </strong>
-              <span>{spikes} retained samples above 50 ms</span>
-            </div>
-            <Coverage samples={epochs?.paperHealth ?? state.history} />
-            <TimeSeries
-              title="Paper mean tick duration"
-              samples={state.history}
-              series={tickDuration}
-              threshold={50}
-              height={170}
-              evidence={paper}
-            />
-            <p className="chart-footnote">
-              50 ms is the tick budget for 20 TPS. Mean and reported p95/p99
-              retain their original Paper capture clock.
-            </p>
-          </Panel>
-          <Panel
-            title="Instance details"
-            className="server-info"
-            action={<Icon name="server" />}
-          >
-            <div className="server-info-game">
-              <span className="game-cube" aria-hidden="true">
-                <i />
-                <i />
-                <i />
-              </span>
-              <div>
-                <strong>Minecraft</strong>
-                <span>Paper server instance</span>
-              </div>
-            </div>
-            <dl className="identity-facts">
-              <dt>Minecraft version</dt>
-              <dd>{state.ready?.server.minecraftVersion ?? "Unavailable"}</dd>
-              <dt>Instance key</dt>
-              <dd>{state.ready?.server.instanceKey ?? "Legacy instance"}</dd>
-              <dt>Server ID</dt>
-              <dd>
-                <code>{state.serverId || "Unavailable"}</code>
-              </dd>
-              <dt>Paper version</dt>
-              <dd>{state.ready?.server.pluginVersion ?? "Unavailable"}</dd>
-              <dt>Host version</dt>
-              <dd>{state.ready?.server.hostVersion ?? "Unavailable"}</dd>
-              <dt>Service state</dt>
-              <dd>
-                {service.usable ? str(state.service.state) : "Unavailable"}
-              </dd>
-            </dl>
-          </Panel>
-          <Panel title="Quick tools" className="quick-tools">
-            <div className="quick-tool-grid">
-              {[
-                ["Performance", "performance", "Inspect signals"],
-                ["Backups", "backups", "Restore points"],
-                ["Access", "access", "Device access"],
-              ].map(([route, icon, label]) => (
-                <button
-                  key={route}
-                  onClick={() =>
-                    navigate(route as "Performance" | "Backups" | "Access")
-                  }
-                >
-                  <Icon name={icon} />
-                  <span>{label}</span>
-                </button>
-              ))}
-            </div>
-          </Panel>
-        </div>
-      </CrosshairGroup>
-      <ActionReview prepared={prepared} onClose={() => setPrepared(null)} />
-    </>
+          </CardContent>
+        </Card>
+      </div>
+      {op.review}
+    </div>
   );
+}
+function ServerGlyph() {
+  return <Box size={22} strokeWidth={1.5} />;
 }

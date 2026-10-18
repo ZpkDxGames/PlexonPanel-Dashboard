@@ -1,3 +1,5 @@
+> Historical evidence for the prior release. The owner rejected that visual design; see VISUAL_REBUILD_DIRECTIVE.md and VISUAL_REBUILD_VERIFICATION.md for the current sidebar rebuild.
+
 # v5 parity and protected-change audit
 
 The supplied owner directive governs this implementation. Legacy restrictions on Next.js, Tailwind, browser log caches and periodic backups are superseded. The deployment, identity, source-truth and reviewed-mutation safeguards remain.

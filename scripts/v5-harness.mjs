@@ -44,6 +44,14 @@ export async function harness(
     return await run({ browser, origin, output });
   } finally {
     await browser?.close();
-    server.kill("SIGTERM");
+    if (server.exitCode === null)
+      await new Promise((resolve) => {
+        const timer = setTimeout(() => server.kill("SIGKILL"), 5000);
+        server.once("exit", () => {
+          clearTimeout(timer);
+          resolve();
+        });
+        server.kill("SIGTERM");
+      });
   }
 }

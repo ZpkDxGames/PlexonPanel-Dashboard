@@ -3,40 +3,47 @@ import { useRef, type ReactNode } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 export function VirtualRows<T>({
   rows,
-  render,
   getKey,
-  height = 460,
+  render,
+  height = 420,
+  label = "Records",
 }: {
   rows: T[];
-  render: (row: T, index: number) => ReactNode;
-  getKey: (row: T, index: number) => string;
+  getKey: (row: T) => string;
+  render: (row: T) => ReactNode;
   height?: number;
+  label?: string;
 }) {
-  const scroll = useRef<HTMLDivElement>(null),
-    virtual = useVirtualizer({
-      count: rows.length,
-      getScrollElement: () => scroll.current,
-      estimateSize: () => 76,
-      overscan: 5,
-      getItemKey: (i) => getKey(rows[i], i),
-    });
+  const scroll = useRef<HTMLDivElement>(null);
+  const virtual = useVirtualizer({
+    count: rows.length,
+    getScrollElement: () => scroll.current,
+    estimateSize: () => 68,
+    overscan: 6,
+    getItemKey: (i) => getKey(rows[i]),
+  });
   return (
-    <div ref={scroll} className="virtual-scroll" style={{ maxHeight: height }}>
-      <div style={{ height: virtual.getTotalSize(), position: "relative" }}>
+    <div
+      ref={scroll}
+      role="region"
+      aria-label={label}
+      tabIndex={0}
+      className="overflow-auto"
+      style={{ height }}
+    >
+      <div
+        className="relative w-full"
+        style={{ height: virtual.getTotalSize() }}
+      >
         {virtual.getVirtualItems().map((item) => (
           <div
             key={item.key}
             ref={virtual.measureElement}
             data-index={item.index}
-            style={{
-              position: "absolute",
-              left: 0,
-              top: 0,
-              width: "100%",
-              transform: `translateY(${item.start}px)`,
-            }}
+            className="absolute left-0 top-0 w-full"
+            style={{ transform: `translateY(${item.start}px)` }}
           >
-            {render(rows[item.index], item.index)}
+            {render(rows[item.index])}
           </div>
         ))}
       </div>

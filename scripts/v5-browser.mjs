@@ -68,6 +68,20 @@ await harness(async ({ browser, origin, output }) => {
           path: `${output}/${route}-${viewport}-${theme}.png`,
           fullPage: true,
         });
+        if (route === "overview") {
+          assert.equal(await page.locator("details").count(), 0);
+          assert.equal(
+            await page.locator("[data-testid=telemetry-chart]").count(),
+            1,
+          );
+          if (width === 1440) {
+            const box = await page.getByTestId("overview-kpis").boundingBox();
+            assert(
+              box.y + box.height < height,
+              "Overview KPIs must be visible above the fold",
+            );
+          }
+        }
         const result = {
           route,
           viewport,
@@ -82,7 +96,7 @@ await harness(async ({ browser, origin, output }) => {
               summary: n.failureSummary,
             })),
           })),
-          canvas: await page.locator("canvas").count(),
+          charts: await page.locator("[data-testid=telemetry-chart]").count(),
         };
         results.push(result);
         errors.length = 0;

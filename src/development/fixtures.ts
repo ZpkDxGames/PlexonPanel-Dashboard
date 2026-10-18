@@ -34,7 +34,7 @@ export function makeFixture(mode = "healthy", now = Date.now()): ControlState {
     consoleAuthority: mode === "offline" ? "UNAVAILABLE" : "HOST",
     server: {
       fingerprint: "fixture",
-      serverName: "Survival · São Paulo",
+      serverName: "TonimSMP",
       pluginVersion: "5.0.0",
       hostVersion: "5.0.0",
       minecraftVersion: "1.21.8",

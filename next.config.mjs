@@ -9,6 +9,7 @@ export default {
       publicRelayOrigin(process.env),
   },
   poweredByHeader: false,
+  devIndicators: false,
   reactStrictMode: true,
   experimental: { cpus: 2 },
   async headers() {

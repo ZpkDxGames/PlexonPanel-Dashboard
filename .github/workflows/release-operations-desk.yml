@@ -1,4 +1,4 @@
-name: Verify v5 Workbench
+name: Verify v5 sidebar dashboard
 on:
   pull_request:
   push:
@@ -26,9 +26,18 @@ jobs:
       - run: npm run build
         env:
           NEXT_PUBLIC_PLEXON_RELAY_URL: https://tonimserver.ddns.net
-      - run: npx playwright install --with-deps chromium
+      - name: Install pinned browser
+        run: |
+          npx playwright install-deps chromium
+          curl --fail --location --retry 3 --output "$RUNNER_TEMP/plexon-chrome.zip" https://storage.googleapis.com/chrome-for-testing-public/155.0.8059.84/linux64/chrome-headless-shell-linux64.zip
+          printf '%s  %s\n' a5d71b91aa996fef00517cd212b2dfb816b43055edefbe727e6fd562d4ae1f9c "$RUNNER_TEMP/plexon-chrome.zip" | sha256sum --check
+          unzip -q "$RUNNER_TEMP/plexon-chrome.zip" -d "$RUNNER_TEMP/plexon-browser"
+          echo "PLEXON_CHROME_PATH=$RUNNER_TEMP/plexon-browser/chrome-headless-shell-linux64/chrome-headless-shell" >> "$GITHUB_ENV"
       - run: npm run test:browser
       - run: npm run test:interactions
       - run: npm run test:perf
+        env:
+          NEXT_PUBLIC_PLEXON_RELAY_URL: https://tonimserver.ddns.net
+      - run: node scripts/v5-production-security.mjs
         env:
           NEXT_PUBLIC_PLEXON_RELAY_URL: https://tonimserver.ddns.net
