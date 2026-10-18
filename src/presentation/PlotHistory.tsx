@@ -1,3 +1,4 @@
+import { useSession } from "../hooks";
 import {
   createContext,
   useContext,
@@ -47,4 +48,17 @@ export function PlotHistoryProvider({
 export function usePlotHistory(raw?: Sample[]) {
   const value = useContext(History);
   return value && (!raw || raw === value.raw) ? value.sources : null;
+}
+
+export function SessionPlotHistoryProvider({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  const snap = useSession();
+  return (
+    <PlotHistoryProvider state={snap.state} revision={snap.revision}>
+      {children}
+    </PlotHistoryProvider>
+  );
 }

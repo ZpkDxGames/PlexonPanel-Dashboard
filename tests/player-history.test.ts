@@ -36,3 +36,23 @@ test("missing history, disabled source and malformed cursors cannot imply eviden
     null,
   );
 });
+
+test("Host player inspection keeps exact UUID and current boot isolation", async () => {
+  const { bootPlayerEvents } =
+    await import("../src/presentation/player-history");
+  const data = {
+    bootEpochId: "boot-a",
+    events: [
+      { playerUuid: "uuid-a", action: "JOINED", eventId: "a" },
+      { playerUuid: "uuid-b", action: "JOINED", eventId: "b" },
+      { playerUuid: "uuid-a", action: "LEFT", eventId: "c" },
+      { uuid: "uuid-a", action: "JOINED", eventId: "paper" },
+    ],
+  };
+  assert.deepEqual(
+    bootPlayerEvents(data, "boot-a", "uuid-a").map((e) => e.eventId),
+    ["a", "c"],
+  );
+  assert.deepEqual(bootPlayerEvents(data, "boot-b", "uuid-a"), []);
+  assert.deepEqual(bootPlayerEvents(data, undefined, "uuid-a"), []);
+});

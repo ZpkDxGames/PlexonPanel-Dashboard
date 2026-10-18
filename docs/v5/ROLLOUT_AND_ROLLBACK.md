@@ -1,3 +1,5 @@
+> Historical evidence for the prior release. The owner rejected that visual design; see VISUAL_REBUILD_DIRECTIVE.md and VISUAL_REBUILD_VERIFICATION.md for the current sidebar rebuild.
+
 # Rollout and rollback
 
 This package is a locally verified source candidate. It has not been pushed, merged, deployed or installed on a VPS. The owner authorized main-branch merge and production deployment on 2026-10-17. Main Git deployment is now enabled; work/v5-full-release and the release staging branch remain disabled. An explicit .next output overrides any retained Vite/dist project setting. The Next configuration migrates the installed public VITE_PLEXON_RELAY_URL when NEXT_PUBLIC_PLEXON_RELAY_URL is absent. No secret environment keys are exposed.

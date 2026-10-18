@@ -21,3 +21,19 @@ export function playerHistoryPage(value: unknown, uuid: string) {
         : null,
   };
 }
+
+/** The rebuilt inspector consumes only the Host's current boot payload. */
+export function bootPlayerEvents(
+  value: unknown,
+  bootEpochId: string | undefined,
+  uuid: string,
+) {
+  const data = record(value);
+  if (!bootEpochId || data.bootEpochId !== bootEpochId) return [];
+  return records(data.events, 10000).filter(
+    (event) =>
+      event.playerUuid === uuid &&
+      (event.bootEpochId === undefined || event.bootEpochId === bootEpochId) &&
+      ["JOINED", "LEFT"].includes(str(event.action)),
+  );
+}

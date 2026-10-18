@@ -1,3 +1,5 @@
+> Historical evidence for the prior release. The owner rejected that visual design; see VISUAL_REBUILD_DIRECTIVE.md and VISUAL_REBUILD_VERIFICATION.md for the current sidebar rebuild.
+
 # PlexonPanel 5.0: Host session storage, scheduled cold backups and Next.js Workbench
 
 The previous dashboard retained operational console/chat state in IndexedDB and used the Vite shell, while cold backups exposed only manual initiation. This change moves current-boot history to private Host SQLite/atomic JSON, adds opt-in periodic Drive cold backups through the existing Host workflow, and replaces the entry shell with eight Next.js App Router views using Tailwind/Radix, virtual lists and synchronized uPlot telemetry.

@@ -9,8 +9,9 @@ export default {
       publicRelayOrigin(process.env),
   },
   poweredByHeader: false,
+  devIndicators: false,
   reactStrictMode: true,
-  experimental: { cpus: 2 },
+  experimental: { cpus: 2, turbopackFileSystemCacheForBuild: false },
   async headers() {
     return [
       {

@@ -3,9 +3,21 @@ import assert from "node:assert/strict";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { PlotHistoryProvider } from "../src/presentation/PlotHistory";
-import { Sparkline } from "../src/components/Telemetry";
+import { usePlotHistory } from "../src/presentation/PlotHistory";
+import { chartRows } from "../src/presentation/recharts-data";
+import type { Sample } from "../src/adapter/control-state";
+function Sparkline({ samples }: { samples: Sample[]; metric: string }) {
+  const epochs = usePlotHistory(samples);
+  return createElement(
+    "pre",
+    null,
+    JSON.stringify(
+      chartRows(epochs?.paperHealth ?? samples, "paperHealth", ["tps"], 0),
+    ),
+  );
+}
 import { makeFixture } from "../src/development/fixtures";
-test("a passive fleet sparkline never borrows the selected server source history", () => {
+test("a passive fleet chart never borrows the selected server source history", () => {
   const selected = makeFixture(),
     other = makeFixture();
   other.history = other.history.map((s, i) => ({

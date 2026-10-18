@@ -2,27 +2,44 @@ import { Slot } from "radix-ui";
 import { cva, type VariantProps } from "class-variance-authority";
 import type { ComponentProps } from "react";
 import { cn } from "../../lib/utils";
-const variants = cva(
-  "inline-flex items-center justify-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-50 disabled:pointer-events-none",
+const buttonVariants = cva(
+  "inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-lg border text-xs font-semibold transition-colors disabled:pointer-events-none disabled:opacity-40 [&_svg]:size-4",
   {
     variants: {
       variant: {
         default:
-          "bg-[var(--accent)] text-[var(--accent-ink)] border-transparent",
-        outline: "border-[var(--line)] bg-[var(--surface)] text-[var(--ink)]",
-        ghost: "border-transparent text-[var(--ink)] hover:bg-[var(--hover)]",
+          "border-transparent bg-primary text-primary-foreground hover:brightness-110",
+        outline: "border-border bg-card text-foreground hover:bg-muted",
+        secondary:
+          "border-transparent bg-muted text-foreground hover:brightness-110",
+        ghost:
+          "border-transparent text-muted-foreground hover:bg-muted hover:text-foreground",
+        destructive:
+          "border-rose-500/25 bg-rose-500/10 text-rose-700 hover:bg-rose-500/20 dark:text-rose-300",
+      },
+      size: {
+        default: "h-10 px-3.5",
+        sm: "h-8 px-3",
+        icon: "size-10",
+        lg: "h-11 px-5",
       },
     },
-    defaultVariants: { variant: "default" },
+    defaultVariants: { variant: "default", size: "default" },
   },
 );
 export function Button({
   className,
   variant,
-  asChild = false,
+  size,
+  asChild,
   ...props
 }: ComponentProps<"button"> &
-  VariantProps<typeof variants> & { asChild?: boolean }) {
+  VariantProps<typeof buttonVariants> & { asChild?: boolean }) {
   const Comp = asChild ? Slot.Root : "button";
-  return <Comp className={cn(variants({ variant }), className)} {...props} />;
+  return (
+    <Comp
+      className={cn(buttonVariants({ variant, size }), className)}
+      {...props}
+    />
+  );
 }

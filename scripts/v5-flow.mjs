@@ -302,7 +302,7 @@ try {
         .getByLabel("Pairing code", { exact: true })
         .fill("synthetic-code");
       await page
-        .getByRole("button", { name: "Pair server", exact: true })
+        .getByRole("button", { name: "Connect server", exact: true })
         .click();
       await page.locator("#workspace").waitFor();
       await page
@@ -366,7 +366,9 @@ try {
       await page
         .getByText("SQLite history survives browser reload", { exact: true })
         .waitFor();
-      await page.locator('.v5-route-band a[href="/players"]').click();
+      await page
+        .locator('aside[aria-label=Sidebar] a[href="/players"]')
+        .click();
       await page.getByText("ContractPlayer", { exact: true }).waitFor();
       await store("stop");
       epoch = await store("boot", {
@@ -382,13 +384,15 @@ try {
         await page.getByText("ContractPlayer", { exact: true }).count(),
         0,
       );
-      await page.locator('.v5-route-band a[href="/backups"]').click();
-      const toggle = page.getByLabel("Enable periodic backups", {
+      await page
+        .locator('aside[aria-label=Sidebar] a[href="/backups"]')
+        .click();
+      const toggle = page.getByLabel("Enable scheduled backups", {
         exact: true,
       });
-      await toggle.check();
+      await toggle.click();
       await page
-        .getByRole("button", { name: "Review schedule changes", exact: true })
+        .getByRole("button", { name: "Review schedule", exact: true })
         .click();
       await page.getByRole("dialog").waitFor();
       const typed = page.getByRole("dialog").locator("input");

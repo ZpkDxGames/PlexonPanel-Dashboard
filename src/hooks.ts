@@ -33,3 +33,33 @@ export const useNow = () =>
     () => now,
     () => 0,
   );
+
+/** Keep static workspace chrome independent of 4 Hz telemetry publishes. */
+export function useShellSession() {
+  return useSyncExternalStore(
+    session.subscribe,
+    shellSnapshot,
+    session.getServerSnapshot,
+  );
+}
+let previousShell = session.getSnapshot();
+function shellSnapshot() {
+  const next = session.getSnapshot(),
+    a = previousShell;
+  if (
+    next.phase !== a.phase ||
+    next.revision !== a.revision ||
+    next.initialized !== a.initialized ||
+    next.fixture !== a.fixture ||
+    next.error !== a.error ||
+    next.credentials !== a.credentials ||
+    next.labels !== a.labels ||
+    next.relay !== a.relay ||
+    next.state.ready !== a.state.ready ||
+    next.state.serverId !== a.state.serverId ||
+    next.state.bootEpochId !== a.state.bootEpochId ||
+    next.state.bootStartedAt !== a.state.bootStartedAt
+  )
+    previousShell = next;
+  return previousShell;
+}

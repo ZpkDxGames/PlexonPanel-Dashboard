@@ -1,5 +1,8 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readFileSync, mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { execFileSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
 import test from "node:test";
 import { contentSecurityPolicy } from "../src/lib/csp";
 test("production nonce CSP restricts relay HTTP/WSS origins without eval or wildcard", () => {
@@ -53,5 +56,28 @@ test("Next configuration migrates the installed public relay origin without expo
       if (value === undefined) delete process.env[key];
       else process.env[key] = value;
     }
+  }
+});
+
+test("build identity creates the public directory in a clean checkout", () => {
+  const cwd = mkdtempSync(`${tmpdir()}/plexon-identity-`),
+    env: NodeJS.ProcessEnv = {
+      ...process.env,
+      GITHUB_SHA: "0123456789012345678901234567890123456789",
+    };
+  delete env.VERCEL_GIT_COMMIT_SHA;
+  try {
+    execFileSync(
+      process.execPath,
+      [fileURLToPath(new URL("../scripts/v5-identity.mjs", import.meta.url))],
+      { cwd, env },
+    );
+    const identity = JSON.parse(
+      readFileSync(`${cwd}/public/build.json`, "utf8"),
+    );
+    assert.equal(identity.commit, env.GITHUB_SHA);
+    assert.equal(identity.protocolVersion, 3);
+  } finally {
+    rmSync(cwd, { recursive: true, force: true });
   }
 });

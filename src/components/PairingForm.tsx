@@ -1,45 +1,85 @@
 import { useEffect, useId, useState, type FormEvent } from "react";
+import { ArrowRight, Loader2 } from "lucide-react";
 import { session } from "../adapter/session";
 import { useSession } from "../hooks";
-import { Button, Notice } from "./ui";
-
-export function PairingForm({ defaultName = "", onboarding = false }: { defaultName?: string; onboarding?: boolean }) {
-  const snap = useSession();
-  const id = useId();
-  const [origin, setOrigin] = useState(snap.relay.origin);
-  const [name, setName] = useState(defaultName);
-  const [code, setCode] = useState("");
-  const [error, setError] = useState("");
-  const [message, setMessage] = useState("");
-  const pairing = snap.phase === "pairing";
-
+import { Button } from "./ui/button";
+import { Input, Field } from "./ui/input";
+import { Notice } from "./ui/empty";
+export function PairingForm() {
+  const snap = useSession(),
+    id = useId();
+  const [origin, setOrigin] = useState(snap.relay.origin),
+    [name, setName] = useState(""),
+    [code, setCode] = useState(""),
+    [error, setError] = useState("");
   useEffect(() => {
     if (snap.relay.origin) setOrigin(snap.relay.origin);
   }, [snap.relay.origin]);
-
-  async function submit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const deviceName = name.trim();
-    if (!origin || !deviceName || !code) return;
+  const submit = async (e: FormEvent) => {
+    e.preventDefault();
     setError("");
-    setMessage("");
     try {
-      await session.pair(origin, code, deviceName);
+      await session.pair(origin, code, name.trim());
       setCode("");
-      setMessage("Pairing accepted. Establishing the signed server session.");
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Pairing failed.");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Pairing failed");
     }
-  }
-
-  const visibleError = error || (snap.credentials.length === 0 ? snap.error : "");
-
-  return <form className={onboarding ? "pairing-form pairing-form-onboarding" : "settings-body pairing-form"} onSubmit={(event) => void submit(event)}>
-    {!snap.relay.origin && <label className="field" htmlFor={`${id}-origin`}>Relay HTTPS origin<input id={`${id}-origin`} value={origin} onChange={(event) => setOrigin(event.target.value)} placeholder="https://relay.example.com" inputMode="url" autoComplete="url" /></label>}
-    <label className="field" htmlFor={`${id}-name`}>Device name<input id={`${id}-name`} value={name} onChange={(event) => setName(event.target.value.slice(0, 80))} placeholder="My desktop" autoComplete="off" /></label>
-    <label className="field" htmlFor={`${id}-code`}>Pairing code<input id={`${id}-code`} value={code} onChange={(event) => setCode(event.target.value.replace(/\s/g, "").slice(0, 128))} placeholder="Enter the one-time code" autoComplete="one-time-code" autoCapitalize="none" spellCheck={false} inputMode="text" type="password" /></label>
-    <Button variant="primary" type="submit" loading={pairing} disabled={!origin || !code || !name.trim()}>{pairing ? "Pairing securely…" : "Pair server"}</Button>
-    {visibleError && <Notice tone="error" title="Pairing not completed">{visibleError}</Notice>}
-    {message && <Notice tone="success" title="Pairing accepted">{message}</Notice>}
-  </form>;
+  };
+  return (
+    <form onSubmit={(e) => void submit(e)} className="space-y-5">
+      {!snap.relay.origin && (
+        <Field label="Relay HTTPS origin">
+          <Input
+            value={origin}
+            onChange={(e) => setOrigin(e.target.value)}
+            placeholder="https://relay.example.com"
+            inputMode="url"
+          />
+        </Field>
+      )}
+      <Field label="Device name">
+        <Input
+          id={`${id}-name`}
+          value={name}
+          onChange={(e) => setName(e.target.value.slice(0, 80))}
+          placeholder="My desktop"
+          autoComplete="off"
+        />
+      </Field>
+      <Field label="Pairing code">
+        <Input
+          id={`${id}-code`}
+          type="password"
+          value={code}
+          onChange={(e) =>
+            setCode(e.target.value.replace(/\s/g, "").slice(0, 128))
+          }
+          placeholder="Your one-time code"
+          autoComplete="one-time-code"
+          autoCapitalize="none"
+          spellCheck={false}
+        />
+      </Field>
+      <Button
+        className="w-full"
+        type="submit"
+        disabled={!origin || !name.trim() || !code || snap.phase === "pairing"}
+      >
+        {snap.phase === "pairing" ? (
+          <>
+            <Loader2 className="animate-spin" />
+            Pairing securely…
+          </>
+        ) : (
+          <>
+            Connect server
+            <ArrowRight />
+          </>
+        )}
+      </Button>
+      {(error || (!snap.credentials.length && snap.error)) && (
+        <Notice danger>{error || snap.error}</Notice>
+      )}
+    </form>
+  );
 }

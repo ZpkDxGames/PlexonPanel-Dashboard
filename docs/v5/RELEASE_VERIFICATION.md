@@ -1,3 +1,5 @@
+> Historical evidence for the prior release. The owner rejected that visual design; see VISUAL_REBUILD_DIRECTIVE.md and VISUAL_REBUILD_VERIFICATION.md for the current sidebar rebuild.
+
 # PlexonPanel 5.0 verification
 
 Date: 2026-10-17. Scope: local implementation and release candidate packaging, not deployed production certification. Protocol3, configuration schema5, Java25 and Node24 are retained. See PARITY_AND_CHANGE_AUDIT.md, ROLLOUT_AND_ROLLBACK.md, package SOURCE_IDENTITY.json and verification/ evidence.
