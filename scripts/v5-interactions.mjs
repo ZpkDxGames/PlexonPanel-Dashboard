@@ -202,6 +202,21 @@ await harness(
     await page.mouse.down();
     await page.mouse.move(brushBox.x + 150, brushBox.y + 10, { steps: 10 });
     await page.mouse.up();
+    await expect(page.locator("[data-testid=telemetry-chart]")).toHaveAttribute(
+      "data-zoomed",
+      "true",
+    );
+    await page.getByRole("button", { name: "Reset zoom", exact: true }).click();
+    await expect(page.locator("[data-testid=telemetry-chart]")).toHaveAttribute(
+      "data-zoomed",
+      "false",
+    );
+    await traveller.focus();
+    await page.keyboard.press("ArrowRight");
+    await expect(page.locator("[data-testid=telemetry-chart]")).toHaveAttribute(
+      "data-zoomed",
+      "true",
+    );
     await page.getByRole("button", { name: "Reset zoom", exact: true }).click();
     results.push({
       mode: "desktop-interactions",

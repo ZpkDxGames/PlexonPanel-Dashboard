@@ -32,7 +32,7 @@ import {
 } from "../../presentation/telemetry";
 import type { ControlState } from "../../adapter/control-state";
 import { usePreferences } from "../../store/preferences";
-import { bytes } from "../../store/selectors";
+import { valueLabel } from "../../presentation/format";
 export const tickSeries: ChartSeries[] = [
   {
     key: "mspt",
@@ -84,14 +84,6 @@ export const computeSeries: ChartSeries[] = [
     axis: "right",
   },
 ];
-export function valueLabel(value: unknown, unit: string) {
-  if (!finite(value)) return "—";
-  if (unit === "bytes") {
-    const b = bytes(value);
-    return `${b.value} ${b.unit}`;
-  }
-  return `${value.toLocaleString(undefined, { maximumFractionDigits: 1 })}${unit === "%" ? "%" : unit ? ` ${unit}` : ""}`;
-}
 const TelemetryPlot = memo(function TelemetryPlot({
   state,
   epochs,
@@ -186,6 +178,7 @@ const TelemetryPlot = memo(function TelemetryPlot({
       aria-label={`${label}. Missing and restart observations create gaps.`}
       className="min-w-0"
       data-testid="telemetry-chart"
+      data-zoomed={Boolean(domain)}
     >
       <div className="px-2 pt-4 md:px-4" style={{ height }}>
         <ResponsiveContainer

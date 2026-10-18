@@ -79,7 +79,7 @@ const BrushCanvas = memo(function BrushCanvas({
               fill="var(--background)"
               travellerWidth={8}
               tickFormatter={(v) => new Date(v).toLocaleTimeString()}
-              onDragEnd={({ startIndex, endIndex }) => {
+              onChange={({ startIndex, endIndex }) => {
                 const first = data[startIndex ?? 0],
                   last =
                     data[

@@ -6,7 +6,7 @@ import { useNow, useSession } from "../hooks";
 import { session } from "../adapter/session";
 import { number, str } from "../adapter/control-state";
 import { verifiedNodes, sourceEvidence } from "../presentation/telemetry";
-import { valueLabel } from "../components/charts/TelemetryChart";
+import { valueLabel } from "../presentation/format";
 import { Card, CardContent, CardHeader } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";

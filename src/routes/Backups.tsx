@@ -12,7 +12,7 @@ import { Card, CardHeader, CardContent } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
 import { Field, Select } from "../components/ui/input";
 import { Empty, Notice } from "../components/ui/empty";
-import { valueLabel } from "../components/charts/TelemetryChart";
+import { valueLabel } from "../presentation/format";
 const phases = [
   "QUEUED",
   "PREFLIGHT",

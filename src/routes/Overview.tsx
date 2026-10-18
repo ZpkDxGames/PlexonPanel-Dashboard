@@ -1,4 +1,5 @@
 "use client";
+import { valueLabel } from "../presentation/format";
 import { useState } from "react";
 import Link from "next/link";
 import {
@@ -33,7 +34,6 @@ import {
   tickSeries,
   memorySeries,
   computeSeries,
-  valueLabel,
 } from "../components/charts/TelemetryChart";
 import { ConsolePanel } from "../components/terminal/ConsolePanel";
 import { useOperation } from "../features/operations";

@@ -18,11 +18,15 @@ Players retain immutable UUID selection, a boot timeline and reviewed moderation
 
 ## Verification status
 
-- Type checking + 70 unit/contract tests: PASS.
+- Type checking + 71 unit/contract tests: PASS.
 - Next production build: PASS.
-- Production intercepted workload: PASS. 8,192 retained captures, 2,500 console lines, eight Recharts tracks. 240 display frames measured: main-thread work p95 3.94ms, max 45.72ms; frame interval p95 16.8ms; no >50ms tasks or page errors. The aggregate 125ms work windows are separately retained (p95 36.26ms), and are not mislabeled as per-frame latency.
-- Complete 32-case browser matrix: pending final run.
-- State/interaction/focus/UUID/mobile verification: pending final run.
-- Production nonce CSP/no-store/fixture isolation: pending final run.
+- Production intercepted workload: PASS. 8,192 retained captures, 2,500 console lines, eight Recharts tracks. 240 display frames measured: main-thread work p95 4.47ms, max 46.54ms; frame interval p95 16.8ms; no >50ms tasks or page errors. The aggregate 125ms work windows are separately retained (p95 38.88ms), and are not mislabeled as per-frame latency.
+- Complete 32-case browser matrix: PASS, zero page errors, accessibility violations or horizontal overflow.
+- State/interaction/focus/UUID/mobile verification: PASS, including pointer/keyboard brush zoom and 22 secondary-panel/theme cases.
+- Production nonce CSP/no-store/fixture isolation: PASS. Per-request nonces are applied to Next scripts and only the exact relay HTTPS/WSS origins are allowed.
 
 Browser tests use labeled development fixtures or fully intercepted production transport. They do not pair to or mutate the real relay, Host, Paper, systemd, RCON, or Google Drive. Browser rendering uses pinned Chrome for Testing 155.0.8059.84; CI checks the archive SHA-256 before use. React checklist review covers hooks, identity-bound state, stable source projections, safe text, focus and accessible controls.
+
+Machine-readable local results: [evidence/rebuild-checks.json](evidence/rebuild-checks.json). Final immutable source and CI status: [PR93](https://github.com/ZpkDxGames/PlexonPanel-Dashboard/pull/93).
+
+The first remote build caught the removed-last-public-asset clean-checkout case; the identity script now creates `public/` and a fresh-directory regression test covers it. The Vercel preview subsequently reports Ready. Preview content and build logs are protected by Vercel team permissions unavailable to this connection (403), so production acceptance additionally verifies the public deployment's exact build commit, HTML security headers and anonymous desktop/mobile rendering. Deployment Protection is preserved.
