@@ -31,8 +31,15 @@ import {
   type Source,
 } from "../../presentation/telemetry";
 import type { ControlState } from "../../adapter/control-state";
-import { usePreferences } from "../../store/preferences";
+import { resolvedTheme, usePreferences } from "../../store/preferences";
 import { valueLabel } from "../../presentation/format";
+const lightPalette: Record<string, string> = {
+  "#2dd4bf": "#0f766e",
+  "#38bdf8": "#0369a1",
+  "#a78bfa": "#6d28d9",
+  "#f59e0b": "#b45309",
+  "#f472b6": "#be185d",
+};
 export const tickSeries: ChartSeries[] = [
   {
     key: "mspt",
@@ -105,6 +112,9 @@ const TelemetryPlot = memo(function TelemetryPlot({
 }) {
   const prefs = usePreferences(),
     id = useId().replace(/:/g, "");
+  const light = resolvedTheme(prefs.theme) === "light";
+  const color = (value: string) =>
+    light ? (lightPalette[value] ?? value) : value;
   const data = useMemo(
     () =>
       Object.fromEntries(
@@ -204,8 +214,16 @@ const TelemetryPlot = memo(function TelemetryPlot({
                   x2="0"
                   y2="1"
                 >
-                  <stop offset="0%" stopColor={s.color} stopOpacity={0.24} />
-                  <stop offset="100%" stopColor={s.color} stopOpacity={0.01} />
+                  <stop
+                    offset="0%"
+                    stopColor={color(s.color)}
+                    stopOpacity={0.24}
+                  />
+                  <stop
+                    offset="100%"
+                    stopColor={color(s.color)}
+                    stopOpacity={0.01}
+                  />
                 </linearGradient>
               ))}
             </defs>
@@ -292,7 +310,7 @@ const TelemetryPlot = memo(function TelemetryPlot({
                           <span className="flex items-center gap-2">
                             <i
                               className="size-1.5 rounded-full"
-                              style={{ background: s.color }}
+                              style={{ background: color(s.color) }}
                             />
                             {s.label}
                           </span>
@@ -315,7 +333,7 @@ const TelemetryPlot = memo(function TelemetryPlot({
               <ReferenceLine
                 yAxisId="right"
                 y={50}
-                stroke="#f59e0b"
+                stroke={color("#f59e0b")}
                 strokeDasharray="4 5"
                 label={{
                   value: "50 ms threshold",
@@ -331,7 +349,7 @@ const TelemetryPlot = memo(function TelemetryPlot({
                 data={data.paperHealth}
                 dataKey="tickBand"
                 stroke="none"
-                fill="#a78bfa"
+                fill={color("#a78bfa")}
                 fillOpacity={0.08}
                 isAnimationActive={false}
                 connectNulls={false}
@@ -347,7 +365,7 @@ const TelemetryPlot = memo(function TelemetryPlot({
                   type="monotone"
                   dataKey={s.key}
                   name={s.label}
-                  stroke={s.color}
+                  stroke={color(s.color)}
                   strokeWidth={2}
                   fill={
                     prefs.chartFill ? `url(#${id}-${s.key})` : "transparent"
@@ -365,7 +383,7 @@ const TelemetryPlot = memo(function TelemetryPlot({
                   type="monotone"
                   dataKey={s.key}
                   name={s.label}
-                  stroke={s.color}
+                  stroke={color(s.color)}
                   fill="transparent"
                   strokeWidth={s.key === "tps" ? 2 : 1.4}
                   strokeDasharray={s.key === "msptP99" ? "4 4" : undefined}
@@ -381,7 +399,7 @@ const TelemetryPlot = memo(function TelemetryPlot({
                 key={`${m.at}:${i}`}
                 x={m.at}
                 yAxisId="left"
-                stroke="#a78bfa"
+                stroke={color("#a78bfa")}
                 strokeOpacity={0.2}
                 strokeDasharray="2 6"
               />
@@ -402,7 +420,7 @@ const TelemetryPlot = memo(function TelemetryPlot({
           >
             <i
               className="h-0.5 w-3 rounded-full"
-              style={{ background: s.color }}
+              style={{ background: color(s.color) }}
             />
             {s.label}
           </span>

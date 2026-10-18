@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-10-18T02:40:55.961026+00:00",
+  "generatedAt": "2026-10-18T03:01:48.365822+00:00",
   "source": "Local release candidate; final immutable revision and CI are recorded in GitHub PR93",
   "baseline": "9c302a5d1f3071297ab773e9f6144ed6980c4346",
-  "unitAndContractTests": 71,
+  "unitAndContractTests": 72,
   "visual": [
     {
       "route": "fleet",
@@ -465,6 +465,12 @@
       "result": "PASS"
     },
     {
+      "mode": "effective-grant-contraction",
+      "pausedLogsClear": "PASS",
+      "playerInspectorCloses": "PASS",
+      "result": "PASS"
+    },
+    {
       "mode": "mobile-large-spacious",
       "navigationTouch44px": "PASS",
       "reviewRestoration": "PASS",
@@ -477,14 +483,14 @@
     "profiling": false,
     "taskWindows": 40,
     "windowMs": 125,
-    "mainThreadWorkP95Ms": 38.88300000000004,
-    "mainThreadWorkMaxMs": 42.095000000000006,
+    "mainThreadWorkP95Ms": 37.685,
+    "mainThreadWorkMaxMs": 39.35200000000003,
     "animationFrameP95Ms": 16.799999999999272,
     "longTasksOver50ms": [],
     "pageErrors": [],
     "displayFramesMeasured": 240,
-    "mainThreadWorkPerFrameP95Ms": 4.466000000000008,
-    "mainThreadWorkPerFrameMaxMs": 46.54399999999998,
+    "mainThreadWorkPerFrameP95Ms": 4.072000000000003,
+    "mainThreadWorkPerFrameMaxMs": 45.572000000000116,
     "mainThreadBudgetUnder16ms": true,
     "virtualConsoleDomRows": 25
   },
@@ -507,7 +513,7 @@
       {
         "route": "backups",
         "status": "PASS",
-        "nonceAppliedToScripts": 21,
+        "nonceAppliedToScripts": 20,
         "noStore": true
       },
       {

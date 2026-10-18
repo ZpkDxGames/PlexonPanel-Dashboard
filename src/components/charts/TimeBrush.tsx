@@ -65,8 +65,8 @@ const BrushCanvas = memo(function BrushCanvas({
           >
             <Area
               dataKey="tps"
-              stroke="#2dd4bf"
-              fill="#2dd4bf"
+              stroke="var(--primary)"
+              fill="var(--primary)"
               fillOpacity={0.04}
               isAnimationActive={false}
               dot={false}

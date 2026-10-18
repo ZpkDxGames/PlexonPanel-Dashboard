@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
   ArrowUpRight,
@@ -11,6 +11,7 @@ import {
   TerminalSquare,
   RefreshCw,
 } from "lucide-react";
+import { hasScope } from "../../presentation/authority";
 import { useSession } from "../../hooks";
 import { session } from "../../adapter/session";
 import { str, type JsonMap } from "../../adapter/control-state";
@@ -22,7 +23,7 @@ import { Button } from "../ui/button";
 import { Card, CardHeader } from "../ui/card";
 import { Badge } from "../ui/badge";
 import { Input } from "../ui/input";
-import { Notice } from "../ui/empty";
+import { Empty, Notice } from "../ui/empty";
 export function ConsolePanel({ compact = false }: { compact?: boolean }) {
   const snap = useSession(),
     prefs = usePreferences(),
@@ -46,11 +47,27 @@ export function ConsolePanel({ compact = false }: { compact?: boolean }) {
       ),
     [history.lines, level, query],
   );
-  const binding = `${snap.state.serverId}:${snap.revision}:${snap.state.bootEpochId}:${snap.state.ready?.device.scopes.join(",")}`;
+  const viewScope = hasScope(snap, "console.view.full")
+    ? "full"
+    : hasScope(snap, "console.view.errors")
+      ? "errors"
+      : "none";
+  const binding = `${viewScope}:${snap.phase}:${snap.state.serverId}:${snap.revision}:${snap.state.bootEpochId}:${snap.state.ready?.device.scopes.join(",")}`;
   const [frozen, setFrozen] = useState<{ binding: string; lines: JsonMap[] }>({
     binding,
     lines,
   });
+  useEffect(() => {
+    setFrozen({ binding, lines: [] });
+    setPaused(false);
+  }, [binding]);
+  const authority = snap.state.ready?.consoleAuthority;
+  const sourceLabel =
+    authority === "HOST"
+      ? "Host history"
+      : authority === "PAPER_FALLBACK"
+        ? "Paper fallback"
+        : "Awaiting source";
   const reason = session.reason("console.execute", "PAPER");
   return (
     <Card className="flex h-full flex-col" aria-label="Console panel">
@@ -59,8 +76,25 @@ export function ConsolePanel({ compact = false }: { compact?: boolean }) {
         icon={<TerminalSquare size={16} className="text-muted-foreground" />}
         action={
           <div className="flex items-center gap-2">
-            <Badge tone={snap.phase === "live" ? "success" : "neutral"} dot>
-              {snap.phase === "live" ? "Streaming" : "Disconnected"}
+            <Badge
+              tone={
+                viewScope === "none"
+                  ? "neutral"
+                  : authority === "PAPER_FALLBACK"
+                    ? "warning"
+                    : snap.phase === "live" && authority === "HOST"
+                      ? "success"
+                      : "neutral"
+              }
+              dot={viewScope !== "none"}
+            >
+              {viewScope === "none"
+                ? "Restricted"
+                : authority === "PAPER_FALLBACK"
+                  ? "Paper fallback"
+                  : snap.phase === "live" && authority === "HOST"
+                    ? "Streaming"
+                    : sourceLabel}
             </Badge>
             {compact && (
               <Link
@@ -155,25 +189,33 @@ export function ConsolePanel({ compact = false }: { compact?: boolean }) {
         </div>
       )}
       <div className="min-h-0 flex-1">
-        <VirtualConsole
-          key={`${snap.revision}:${snap.state.bootEpochId ?? "unknown"}`}
-          lines={paused && frozen.binding === binding ? frozen.lines : lines}
-          height={compact ? 324 : 470}
-          wrap={wrap}
-          tail={!paused}
-          utc={prefs.timezone === "UTC"}
-          returnVersion={returnVersion}
-          onFollowChange={setFollowing}
-        />
+        {viewScope === "none" ? (
+          <Empty title="Console access restricted">
+            This device needs console.view.full or console.view.errors.
+          </Empty>
+        ) : (
+          <VirtualConsole
+            key={`${snap.revision}:${snap.state.bootEpochId ?? "unknown"}`}
+            lines={paused && frozen.binding === binding ? frozen.lines : lines}
+            height={compact ? 324 : 470}
+            wrap={wrap}
+            tail={!paused}
+            utc={prefs.timezone === "UTC"}
+            returnVersion={returnVersion}
+            onFollowChange={setFollowing}
+          />
+        )}
       </div>
       <div className="flex min-h-8 flex-wrap items-center justify-between gap-2 border-t bg-terminal px-4 py-1.5 text-[9px] text-muted-foreground">
         <span className="inline-flex items-center gap-1.5">
           <span className="size-1 rounded-full bg-primary" />
-          {paused
-            ? "Display paused"
-            : following
-              ? "Following live"
-              : "Inspecting history"}
+          {viewScope === "none"
+            ? "Viewing restricted"
+            : paused
+              ? "Display paused"
+              : following
+                ? "Following live"
+                : "Inspecting history"}
         </span>
         {!following || paused ? (
           <button
@@ -186,7 +228,11 @@ export function ConsolePanel({ compact = false }: { compact?: boolean }) {
             Return to live ↓
           </button>
         ) : (
-          <span>Host SQLite · {lines.length.toLocaleString()} lines</span>
+          <span>
+            {viewScope === "none"
+              ? "No viewing grant"
+              : `${sourceLabel} · ${lines.length.toLocaleString()} lines`}
+          </span>
         )}
         {!compact && (
           <button

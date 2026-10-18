@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Users } from "lucide-react";
 import { useSession } from "../hooks";
 import { number, str, type JsonMap } from "../adapter/control-state";
@@ -72,6 +72,9 @@ export default function Players() {
     [roster, query, world, sort],
   );
   // Keep the selected immutable identity even when it leaves. Never select the next row.
+  useEffect(() => {
+    if (!allowed) setSelected(null);
+  }, [allowed]);
   const active = selected && roster.find((p) => p.uuid === selected.uuid),
     prepare = (action: string, extra: JsonMap = {}) => {
       if (active)
@@ -190,7 +193,7 @@ export default function Players() {
       </Card>
       <PresenceTimeline />
       <Dialog
-        open={!!selected}
+        open={!!selected && allowed}
         onOpenChange={(open) => {
           if (!open) setSelected(null);
         }}

@@ -23,6 +23,10 @@ test("console removes only duplicate leading metadata and preserves plugin tags 
     "Player said [06:31:47 INFO]: hello",
   );
   assert.equal(
+    consoleMessage("[06:31:47 ERROR]: \n  stack frame"),
+    "\n  stack frame",
+  );
+  assert.equal(
     consoleMessage("[06:31:47 INFO]: <script>alert(1)</script>"),
     "<script>alert(1)</script>",
   );

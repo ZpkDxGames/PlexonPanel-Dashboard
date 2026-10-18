@@ -305,6 +305,37 @@ await harness(
       cases: 22,
       result: "PASS",
     });
+    await page.goto(`${origin}/console?fixture=healthy`, {
+      waitUntil: "networkidle",
+    });
+    await page.locator("#workspace").waitFor();
+    await page
+      .getByRole("button", { name: "Pause console", exact: true })
+      .click();
+    assert((await page.locator("[data-log-row]").count()) > 0);
+    await page.evaluate(() => {
+      const snapshot = window.__PLEXON_TEST__.snapshot();
+      snapshot.grant.scopes = [];
+    });
+    await expect(page.locator("[data-log-row]")).toHaveCount(0);
+    await page.goto(`${origin}/players?fixture=healthy`, {
+      waitUntil: "networkidle",
+    });
+    await page.locator("#workspace").waitFor();
+    await page
+      .getByRole("button", { name: "Inspect AntônioNeto", exact: true })
+      .click();
+    await page.evaluate(() => {
+      const snapshot = window.__PLEXON_TEST__.snapshot();
+      snapshot.grant.scopes = [];
+    });
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+    results.push({
+      mode: "effective-grant-contraction",
+      pausedLogsClear: "PASS",
+      playerInspectorCloses: "PASS",
+      result: "PASS",
+    });
     await context.close();
     const mobile = await browser.newContext({
       viewport: { width: 390, height: 844 },
