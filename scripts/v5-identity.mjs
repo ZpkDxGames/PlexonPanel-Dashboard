@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import { writeFileSync } from "node:fs";
+import { mkdirSync, writeFileSync } from "node:fs";
 let commit = process.env.VERCEL_GIT_COMMIT_SHA ?? process.env.GITHUB_SHA;
 if (!commit)
   try {
@@ -9,6 +9,7 @@ if (!commit)
   } catch {
     commit = "archive-source";
   }
+mkdirSync("public", { recursive: true });
 writeFileSync(
   "public/build.json",
   JSON.stringify(
