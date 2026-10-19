@@ -10,7 +10,15 @@ artifacts/
 .vercel
 
 .next/
-next-env.d.ts
 *.tsbuildinfo
-quality/
-public/build.json
+
+# Local rebuild snapshots and browser verification output
+.purge/
+evidence/
+Verification/
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+screenshots/
+screenshot-bundles/

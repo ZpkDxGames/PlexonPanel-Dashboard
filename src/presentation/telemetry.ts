@@ -9,14 +9,7 @@ import { classifyTelemetry } from "../adapter/telemetry-freshness";
 import { validFleetUuid } from "../adapter/fleet-contract";
 
 export type MetricKey =
-  | "chunks"
-  | "entities"
   | "tps"
-  | "msptP95"
-  | "msptP99"
-  | "heapCommitted"
-  | "heapMax"
-  | "serviceMemoryMax"
   | "mspt"
   | "hostCpu"
   | "processCpu"
@@ -28,15 +21,8 @@ export type MetricKey =
   | "serviceMemory";
 export type Source = "paperHealth" | "paperSystem" | "hostSystem" | "service";
 export const sourceFor: Record<MetricKey, Source> = {
-  chunks: "paperHealth",
-  entities: "paperHealth",
   tps: "paperHealth",
   mspt: "paperHealth",
-  msptP95: "paperHealth",
-  msptP99: "paperHealth",
-  heapCommitted: "paperSystem",
-  heapMax: "paperSystem",
-  serviceMemoryMax: "service",
   players: "paperHealth",
   processCpu: "paperSystem",
   heap: "paperSystem",
@@ -89,9 +75,7 @@ export function sourceEvidence(
     ...classifyTelemetry({
       capturedAt: payload.capturedAt,
       receivedAt: receipt,
-      connected:
-        !!state.ready?.agents[paper ? "paper" : "host"] &&
-        (source !== "service" || state.service.state === "active"),
+      connected: !!state.ready?.agents[paper ? "paper" : "host"],
       now,
     }),
     capturedAt:

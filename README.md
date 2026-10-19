@@ -1,28 +1,33 @@
-# PlexonPanel 5.0
+# PlexonPanel — Obsidian Mission Deck
 
-A Next.js App Router dashboard for Paper and the 24/7 Linux Host Companion over signed Protocol 3.
+A completely rebuilt presentation layer over the unchanged Protocol 3 core: 64px navigation rail, a 56px mission header, four 148px instruments, a flush telemetry studio and eight operational workspaces.
 
-The dashboard uses a 240px collapsible left sidebar, grouped navigation, a KPI-first Overview, Recharts telemetry, and a virtualized live terminal with an integrated reviewed command bar. The old Strata interface, CSS, custom charts, planning assets, and visual locks have been removed.
+Read `AGENTS.md`, `SKILL.md` and [architecture decisions](docs/MISSION_DECK_ARCHITECTURE.md) before editing. The root contract supersedes the older visual specifications.
 
-## Development
+Use Node 24:
 
-Use Node 24. Run `npm ci`, `npm run dev`, `npm run check`, and `npm run build`.
+```sh
+npm ci
+npm run dev
+```
 
-Set the public `NEXT_PUBLIC_PLEXON_RELAY_URL` HTTPS origin for deployment. The installed legacy public `VITE_PLEXON_RELAY_URL` remains a migration fallback. No private service credentials belong in the dashboard.
+Set the relay origin with `NEXT_PUBLIC_PLEXON_RELAY_URL` (legacy `VITE_PLEXON_RELAY_URL` is supported). The existing CSP allows `tonimserver.ddns.net` HTTPS/WSS; coordinate origin changes with that allowlist. Existing browser pairing and signed target/scoping semantics remain in the adapter.
 
-## Verification
+```sh
+npm run verify:purge
+npm run typecheck
+npm run lint
+npm test
+npm run build
+npx playwright install chromium
+npm run verify:production
+npm run verify:structure
+```
 
-- `npm run check`: type checking and adapter, authority, storage, projection and contract tests.
-- `npm run test:browser`: all eight routes, desktop/mobile, dark/light, accessibility, reflow and Overview placement checks.
-- `npm run test:interactions`: denied/offline/stale/skew states, sidebar, chart tabs, shared brush, command palette, exact UUID selection, review focus and mobile navigation.
-- `npm run test:perf`: a production build with all relay traffic intercepted; full 8,192-point retention, 2,500 console lines and eight Recharts tracks; actual display-frame work and aggregate 125ms utilization are measured separately.
-- `node scripts/v5-production-security.mjs`: production nonce CSP, exact relay origins, no-store HTML and fixture exclusion.
-- `npm run test:flow`: optional browser → synthetic loopback relay → real Java HostSessionStore SQLite/JSON contract. Requires the matching Java 25 Host JAR through `PLEXON_HOST_JAR` and `PLEXON_JAVA`.
+`CHROME_PATH` can select a locally installed Chromium executable. `EVIDENCE_DIR` sets the screenshot and receipt destination. CI runs the production smoke test and the full structural browser suite.
 
-Set `PLEXON_CHROME_PATH` to an installed Chrome/Chromium executable when needed. CI installs a pinned Chrome for Testing binary. Fixtures are development-only; production bundles exclude fixture hooks and data.
+The structural suite covers all eight routes at 1545×911, 1280×800, 1920×1080 and 390×844 in both themes. Development fixtures include `?fixture=structural`, `host-stale`, `volume`, `healthy`, `stale`, `partial`, `stopped`, `offline`, `denied`, `starting`, `stopping` and `unknown`. Production ignores fixture parameters.
 
-## Trust and data boundaries
+The scope matrix is inspect-only because the current action contract provides no scope-editing action. Preferences retain the store's exact eight keys and valid values. The analyzer's 2h selector cannot exceed the headless core's 35-minute retention window. Console/chat and command history remain memory-only. Restore obtains the Host confirmation token before the full typed review.
 
-Mutations use `session.reason` → `session.prepare` → ActionReview → `session.execute`. A queued receipt is not completion. Credentials remain origin-bound in IndexedDB. Console, chat and player events are never persisted in browser storage. Source clocks and epoch gaps remain independent; absent values remain unknown.
-
-The backend SQLite/session-reset and manual/periodic Google Drive cold-backup implementation is already merged in PlexonPanel main. This visual rebuild changes only the dashboard.
+The delivered package includes an offline visual comparison viewer and exact verification receipts. The backend source is unchanged. Its Gradle/Java 25 checks and real VPS/relay/server operational validation remain subject to the limits recorded in the verification report. This source package does not deploy or alter running services.

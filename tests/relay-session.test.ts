@@ -63,6 +63,7 @@ test("stored protocol 3 pairing reconnects, receives telemetry, completes a boun
     socket.receive({type: "server.event", serverId: credential.serverId, agentKind: "PAPER", agentSession: "fixture-paper", eventType: "telemetry.server", body: {capturedAt: new Date().toISOString(), tps: [17.25], onlinePlayers: 4}});
     await until(() => {const tps = session.getSnapshot().state.server.tps; return Array.isArray(tps) && tps[0] === 17.25;});
     assert.equal((await session.query("console.history", {limit: 10}, "HOST")).status, "SUCCESS");
+    assert.deepEqual((await Promise.all([session.query("console.history",{limit:20},"HOST"),session.query("console.history",{stream:"chat"},"HOST")])).map(r=>r.status),["SUCCESS","SUCCESS"]);
     await session.setRelayOrigin("https://wrong.integration.test");
     await until(() => session.getSnapshot().phase === "configuration-required");
     assert.equal((await loadRelayCredential())?.serverId, credential.serverId);

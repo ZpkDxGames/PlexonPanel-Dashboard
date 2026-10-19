@@ -1,15 +1,9 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "git": {
-    "deploymentEnabled": {
-      "design/strata-next-gen-20261016": false,
-      "main": true,
-      "work/v5-full-release": false,
-      "release/v5-nextjs-20261017": false
-    }
-  },
   "framework": "nextjs",
+  "git": {
+    "deploymentEnabled": true
+  },
   "installCommand": "npm ci",
-  "buildCommand": "npm run build",
-  "outputDirectory": ".next"
+  "buildCommand": "npm run build"
 }

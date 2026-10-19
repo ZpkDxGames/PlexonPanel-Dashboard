@@ -18,24 +18,9 @@ function openDatabase(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
     const request = indexedDB.open(DB, 2);
     request.onupgradeneeded = () => {
-      const store = request.result.objectStoreNames.contains(STORE)
-        ? request.transaction!.objectStore(STORE)
-        : request.result.createObjectStore(STORE);
-      const cursor = store.openCursor();
-      cursor.onsuccess = () => {
-        const entry = cursor.result;
-        if (!entry) return;
-        const key = String(entry.key);
-        if (
-          key !== "selected" &&
-          key !== "relay-origin" &&
-          !key.startsWith("credential:") &&
-          !key.startsWith("label:")
-        )
-          entry.delete();
-        entry.continue();
-      };
-    };
+ if(!request.result.objectStoreNames.contains(STORE)) request.result.createObjectStore(STORE);
+ const cursor=request.transaction!.objectStore(STORE).openCursor();cursor.onsuccess=()=>{const c=cursor.result;if(c){if(String(c.key).startsWith("cache:"))c.delete();c.continue();}};
+};
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error);
     request.onblocked = () =>
@@ -114,13 +99,13 @@ async function writeSelection(id: string, revision: number): Promise<void> {
 function valid(c: RelayCredential | undefined): c is RelayCredential {
   return Boolean(
     c &&
-    c.protocolVersion === 3 &&
-    typeof c.serverId === "string" &&
-    typeof c.deviceId === "string" &&
-    typeof c.accessToken === "string" &&
-    c.accessToken.length < 8192 &&
-    validScopes(c.scopes) &&
-    Date.parse(c.expiresAt) > Date.now(),
+      c.protocolVersion === 3 &&
+      typeof c.serverId === "string" &&
+      typeof c.deviceId === "string" &&
+      typeof c.accessToken === "string" &&
+      c.accessToken.length < 8192 &&
+      validScopes(c.scopes) &&
+      Date.parse(c.expiresAt) > Date.now(),
   );
 }
 export async function listRelayCredentials(): Promise<RelayCredential[]> {
@@ -155,20 +140,10 @@ export async function saveRelayCredential(c: RelayCredential): Promise<void> {
 export async function loadControlCache(
   id: string,
 ): Promise<ControlState | null> {
-  await remove(`cache:${id}`);
-  return null;
+  await remove(`cache:${id}`);return null;
 }
 export async function saveControlCache(state: ControlState): Promise<void> {
   await remove(`cache:${state.serverId}`);
-}
-export async function readBrowserRelayOrigin(): Promise<string> {
-  return (await read<string>("relay-origin")) ?? "";
-}
-export async function writeBrowserRelayOrigin(
-  value: string | null,
-): Promise<void> {
-  if (value === null) await remove("relay-origin");
-  else await write("relay-origin", value);
 }
 export async function clearBrowserWorkspace(serverId?: string): Promise<void> {
   const db = await openDatabase();

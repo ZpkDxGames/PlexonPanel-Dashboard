@@ -1,7 +1,11 @@
-# Reference Control Room candidate
+# Mission Deck progress
 
-Complete frontend implementation on `design/reference-control-room`, based on `cea185cca07d9892967215baed097bedbe0e77ca`.
+Done: complete UI/App Router purge and reconstruction, typed bindings, architectural primitives, four blueprints, eight workspaces, pairing, global reviewed mutations, Host restore tokens, source-specific freshness, rich logs and preference-aware time formatting.
 
-All eight workspaces, full player profile, scoped read-only history, console/chat/plugins, settings modules and entry/recovery use the new reference-led presentation. Integration and retained histories remain source-driven.
+Verification: 89 unit/contract tests pass; typecheck, lint and purge pass. All 25 structural invariants pass across 64 route/theme/viewport configurations with zero axe violations. Production build and browser smoke pass. All 27 preserved core file checksums match the input source.
 
-See `docs/NEW_DASHBOARD_VERIFICATION.md`, `docs/FEATURE_PARITY_MATRIX.md`, `docs/NEW_DASHBOARD_COMPATIBILITY.md` and `docs/NEW_DASHBOARD_ROLLOUT.md` for actual executed checks and pending live acceptance. This is a review candidate, not a production cutover.
+Decisions: actual headless exports take precedence over illustrative signatures; preference controls honor the exact eight keys and stored unions; scope inspection is read-only because no scope-update action exists; the 2h view cannot exceed the core's 35-minute retention. See docs/MISSION_DECK_ARCHITECTURE.md.
+
+Environment limits: backend Gradle tasks could not execute because the distribution download is blocked and Java 25 is unavailable. No real relay/server/backup operation was attempted. Backend source is unchanged.
+
+Next: review the packaged before/after viewer and certify the existing relay, server and backup environment before deployment.

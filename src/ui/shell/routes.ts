@@ -1,0 +1,56 @@
+import {
+  Network,
+  Activity,
+  Gauge,
+  Users,
+  TerminalSquare,
+  ArchiveRestore,
+  ShieldCheck,
+  Settings,
+} from "lucide-react";
+export const ROUTES = [
+  { key: 1, id: "fleet", href: "/fleet", label: "Fleet", icon: Network },
+  {
+    key: 2,
+    id: "overview",
+    href: "/overview",
+    label: "Overview",
+    icon: Activity,
+  },
+  {
+    key: 3,
+    id: "performance",
+    href: "/performance",
+    label: "Performance",
+    icon: Gauge,
+  },
+  { key: 4, id: "players", href: "/players", label: "Players", icon: Users },
+  {
+    key: 5,
+    id: "console",
+    href: "/console",
+    label: "Console & chat",
+    icon: TerminalSquare,
+  },
+  {
+    key: 6,
+    id: "backups",
+    href: "/backups",
+    label: "Backups",
+    icon: ArchiveRestore,
+  },
+  {
+    key: 7,
+    id: "access",
+    href: "/access",
+    label: "Access & audit",
+    icon: ShieldCheck,
+  },
+  {
+    key: 8,
+    id: "settings",
+    href: "/settings",
+    label: "Settings",
+    icon: Settings,
+  },
+] as const;

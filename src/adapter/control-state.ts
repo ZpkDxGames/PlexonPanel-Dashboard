@@ -42,8 +42,8 @@ export interface Ready {
   };
 }
 export interface Sample {
-  chunks?: number | null;
-  entities?: number | null;
+  epoch?: string;
+  p95?: number | null; p99?: number | null; committed?:number|null; heapMax?:number|null; chunks?:number|null;entities?:number|null;
   at: number;
   sources?: {
     paperHealth: number | null;
@@ -51,11 +51,6 @@ export interface Sample {
     hostSystem: number | null;
     service: number | null;
   };
-  msptP95?: number | null;
-  msptP99?: number | null;
-  heapCommitted?: number | null;
-  heapMax?: number | null;
-  serviceMemoryMax?: number | null;
   serviceCpu?: number | null;
   serviceMemory?: number | null;
   tps: number | null;
@@ -82,9 +77,6 @@ export function compatibleActionTarget(
 }
 export interface ControlState {
   serverId: string;
-  bootEpochId?: string;
-  bootStartedAt?: string;
-  sessionEvents?: JsonMap;
   ready: Ready | null;
   server: JsonMap;
   system: JsonMap;
@@ -173,11 +165,7 @@ export function applyControlMessage(
 ): ControlState {
   if (message.serverId !== state.serverId) return state;
   if (message.type === "dashboard.ready") {
-    if (
-      message.protocolVersion !== 3 ||
-      !record(message.device).deviceId ||
-      !Array.isArray(record(message.device).scopes)
-    )
+    if (message.protocolVersion !== 3 || !record(message.device).deviceId)
       return state;
     const ready = message as unknown as Ready,
       previousSession = state.ready?.server.paperSession,
@@ -194,19 +182,6 @@ export function applyControlMessage(
     return {
       ...state,
       ready,
-      console: ready.device.scopes.includes("console.view.full")
-        ? state.console
-        : ready.device.scopes.includes("console.view.errors")
-          ? state.console.filter((row) =>
-              ["WARN", "ERROR"].includes(String(row.level)),
-            )
-          : [],
-      chat: ready.device.scopes.includes("chat.view") ? state.chat : [],
-      sessionEvents:
-        ready.device.scopes.includes("players.view") &&
-        ready.server.hostSession === state.ready?.server.hostSession
-          ? state.sessionEvents
-          : undefined,
       receipts: {
         paperHealth:
           ready.agents.paper && samePaperSession && !state.cached
@@ -255,10 +230,7 @@ export function applyControlMessage(
         state.ready?.server.hostSession === ready.server.hostSession
           ? state.service
           : {},
-      players:
-        preserveRoster && ready.device.scopes.includes("players.view")
-          ? state.players
-          : [],
+      players: preserveRoster ? state.players : [],
       inventoryIds: preserveRoster
         ? state.inventoryIds
         : { ...state.inventoryIds, players: undefined },
@@ -285,23 +257,17 @@ export function applyControlMessage(
     agentSession !== state.ready.server.paperSession
   )
     return state;
-  if (
-    kind === "PAPER" &&
-    state.bootStartedAt &&
-    [
-      "telemetry.server",
-      "telemetry.system",
-      "players.presence",
-      "chat.message",
-    ].includes(String(message.eventType))
-  ) {
-    const at = capturedAtMillis(body.capturedAt ?? body.observedAt),
-      start = capturedAtMillis(state.bootStartedAt);
-    if (at !== null && start !== null && at < start) return state;
-  }
   const receivedAt = Date.now();
   let next = { ...state, updatedAt: receivedAt, cached: false };
   switch (message.eventType) {
+    case "session.epoch_reset": {
+      if(kind!=="HOST")return state;
+      const epoch=String(body.epoch??body.invocationId??"");if(!epoch||epoch===state.service.invocationId)return state;
+      next={...next,server:{},system:{},worlds:[],players:[],pendingPlayerSnapshot:undefined,presenceDeltas:[],presenceEventIds:[],console:[],chat:[],receipts:{...next.receipts,paperHealth:undefined,paperSystem:undefined},service:{...next.service,invocationId:epoch}};
+      const last=state.history.at(-1);if(last)next.history=appendHistory(state.history,{...last,at:receivedAt,epoch,tps:null,mspt:null,p95:null,p99:null,hostCpu:null,processCpu:null,heap:null,memory:null,players:null,gc:null,serviceCpu:null,serviceMemory:null,sources:{paperHealth:receivedAt,paperSystem:receivedAt,hostSystem:receivedAt,service:receivedAt}});
+      return next;
+    }
+
     case "telemetry.server":
       if (kind !== "PAPER" || supersededCapture(state.server, body))
         return state;
@@ -415,63 +381,17 @@ export function applyControlMessage(
       ].slice(-1024);
       break;
     }
-    case "session.epoch_reset": {
-      if (
-        kind !== "HOST" ||
-        typeof body.bootEpochId !== "string" ||
-        !/^[0-9a-f]{32}$/.test(body.bootEpochId)
-      )
-        return state;
-      next = {
-        ...next,
-        bootEpochId: body.bootEpochId,
-        bootStartedAt: str(body.bootStartedAt, ""),
-        sessionEvents: undefined,
-        console: [],
-        chat: [],
-        players: [],
-        presenceDeltas: [],
-        presenceEventIds: [],
-        pendingPlayerSnapshot: undefined,
-        history: [],
-        server: {},
-        system: {},
-        hostSystem: {},
-        service: {},
-        receipts: undefined,
-      };
-      break;
-    }
-    case "players.presence.current_epoch":
-      if (kind !== "HOST" || body.bootEpochId !== state.bootEpochId)
-        return state;
-      next.sessionEvents = body;
-      break;
-    case "chat.current_epoch":
-      if (kind !== "HOST" || body.bootEpochId !== state.bootEpochId)
-        return state;
-      next.chat = [...records(body.messages, 200), ...state.chat]
-        .filter(
-          (row, i, all) =>
-            all.findIndex((other) => other.messageId === row.messageId) === i,
-        )
-        .slice(-200);
-      break;
     case "console.lines":
-      next.console = mergeConsoleLines(
-        state.console,
-        records(body.lines, 100).filter(
-          (line) =>
-            !state.bootEpochId ||
-            !line.invocationId ||
-            line.invocationId === state.bootEpochId,
-        ),
-      );
+      next.console = mergeConsoleLines(state.console, records(body.lines, 100));
       break;
     case "chat.message":
       next.chat = [...state.chat, body].slice(-200);
       break;
     case "service.status":
+      if(kind==="HOST" && typeof body.invocationId==="string" && body.invocationId && state.service.invocationId && body.invocationId!==state.service.invocationId){
+        const reset=applyControlMessage(state,{...message,eventType:"session.epoch_reset",body:{epoch:body.invocationId}});next={...reset,updatedAt:receivedAt};
+      }
+
       if (kind !== "HOST") return state;
       if (
         supersededCapture(
@@ -480,27 +400,6 @@ export function applyControlMessage(
         )
       )
         return state;
-      if (
-        typeof body.bootEpochId === "string" &&
-        /^[0-9a-f]{32}$/.test(body.bootEpochId) &&
-        body.bootEpochId !== state.bootEpochId
-      )
-        next = {
-          ...next,
-          bootEpochId: body.bootEpochId,
-          bootStartedAt: str(body.bootStartedAt, ""),
-          sessionEvents: undefined,
-          console: [],
-          chat: [],
-          players: [],
-          presenceDeltas: [],
-          presenceEventIds: [],
-          pendingPlayerSnapshot: undefined,
-          history: [],
-          server: {},
-          system: {},
-          hostSystem: {},
-        };
       next.service = body;
       next.receipts = { ...next.receipts, service: receivedAt };
       break;
@@ -520,8 +419,7 @@ export function applyControlMessage(
     message.eventType === "telemetry.system" ||
     message.eventType === "service.status"
   ) {
-    const resources =
-      next.service.state === "active" ? record(next.service.resources) : {};
+    const resources = record(next.service.resources);
     const at =
         capturedAtMillis(
           message.eventType === "service.status"
@@ -534,6 +432,8 @@ export function applyControlMessage(
       tps = Array.isArray(server.tps) ? number(server.tps[0]) : null;
     const sample: Sample = {
       at,
+      epoch: String(next.service.invocationId ?? next.ready?.server.paperSession ?? "current"),
+      p95:number(server.p95TickMillis),p99:number(server.p99TickMillis),committed:number(paper.jvmHeapCommittedBytes),heapMax:number(paper.jvmHeapMaximumBytes),chunks:next.worlds.length?next.worlds.reduce((n,w)=>n+(number(w.loadedChunks)??0),0):null,entities:next.worlds.length?next.worlds.reduce((n,w)=>n+(number(w.entities)??0),0):null,
       sources: {
         paperHealth: capturedAtMillis(server.capturedAt),
         paperSystem: capturedAtMillis(paper.capturedAt),
@@ -556,14 +456,7 @@ export function applyControlMessage(
           ? number(resources.memoryBytes)
           : null,
       tps,
-      chunks: number(server.loadedChunks),
-      entities: number(server.entities),
       mspt: number(server.averageTickMillis),
-      msptP95: number(server.msptP95 ?? server.p95TickMillis),
-      msptP99: number(server.msptP99),
-      heapCommitted: number(paper.jvmHeapCommittedBytes),
-      heapMax: number(paper.jvmHeapMaximumBytes),
-      serviceMemoryMax: number(resources.memoryMaxBytes),
       hostCpu: number(host.hostCpuPercent),
       processCpu: number(paper.processCpuPercent),
       heap: number(paper.jvmHeapUsedBytes),
@@ -585,7 +478,25 @@ function supersededCapture(previous: JsonMap, incoming: JsonMap): boolean {
   return before !== null && (after === null || after < before);
 }
 export function safeCache(state: ControlState): ControlState {
-  return emptyControlState(state.serverId);
+  // Player addresses/locations, files, action parameters and action outputs never enter this cache.
+  return {
+    ...emptyControlState(state.serverId),
+    ...state,
+    players: [],
+    pendingPlayerSnapshot: undefined,
+    presenceDeltas: [],
+    presenceEventIds: [],
+    service: {},
+    backupProgress: null,
+    console: [],
+    chat: [],
+    history: Array.isArray(state.history)
+      ? state.history.slice(-CONTROL_HISTORY_MAX_POINTS)
+      : [],
+    cached: true,
+    paperConnectedAt: undefined,
+    receipts: undefined,
+  };
 }
 export function diagnostics(state: ControlState): string {
   const host = state.ready?.agents.host ? state.hostSystem : {},
@@ -619,7 +530,7 @@ export function diagnostics(state: ControlState): string {
   ].join("\n");
 }
 
-function consoleStrongId(line: JsonMap): string | null {
+export function consoleStrongId(line: JsonMap): string | null {
   const cursor =
     typeof line.journalCursor === "string" ? line.journalCursor : "";
   if (cursor) return `journal:${cursor}`;
@@ -630,10 +541,7 @@ function consoleStrongId(line: JsonMap): string | null {
   return null;
 }
 
-export function mergeConsoleLines(
-  current: JsonMap[],
-  incoming: JsonMap[],
-): JsonMap[] {
+function mergeConsoleLines(current: JsonMap[], incoming: JsonMap[]): JsonMap[] {
   const result: JsonMap[] = [];
   const strongIds = new Set<string>();
   const weakRecent = new Map<string, { at: number; source: string }>();

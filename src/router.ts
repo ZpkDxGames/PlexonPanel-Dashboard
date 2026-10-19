@@ -1,13 +1,4 @@
-export const routes = [
-  "Fleet",
-  "Overview",
-  "Performance",
-  "Players",
-  "Console",
-  "Backups",
-  "Access",
-  "Settings",
-] as const;
+export const routes = ["Fleet", "Overview", "Performance", "Players", "Console", "Backups", "Access", "Settings"] as const;
 export type RouteName = (typeof routes)[number];
 
 export const routeLabels: Record<RouteName, string> = {
@@ -22,21 +13,11 @@ export const routeLabels: Record<RouteName, string> = {
 };
 
 export function routeFromHash(): RouteName {
-  if (typeof location === "undefined") return "Overview";
-  return (
-    routes.find((route) => location.pathname === `/${route.toLowerCase()}`) ??
-    "Overview"
-  );
+  const value = location.hash.slice(1).split("?")[0];
+  return routes.includes(value as RouteName) ? (value as RouteName) : "Overview";
 }
-let navigator: ((route: RouteName) => void) | undefined;
-export function registerNavigator(next: (route: RouteName) => void) {
-  navigator = next;
-  return () => {
-    if (navigator === next) navigator = undefined;
-  };
-}
+
 export function navigate(route: RouteName): void {
-  if (navigator) navigator(route);
-  else if (typeof location !== "undefined")
-    location.assign(`/${route.toLowerCase()}`);
+  if (routeFromHash() === route) window.dispatchEvent(new HashChangeEvent("hashchange"));
+  else location.hash = route;
 }

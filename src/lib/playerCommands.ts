@@ -11,7 +11,7 @@ export function playerCommand(template: string, player: { name: string; uuid: st
 }
 
 export function permissionCommand(input: { player: string; node: string; mode: "set" | "unset"; value?: boolean }): string {
-  if (!safeName.test(input.player) && !safeUuid.test(input.player)) throw new Error("Invalid player name.");
+  if (!safeName.test(input.player)) throw new Error("Invalid player name.");
   if (!/^[a-z0-9*_.-]{1,128}$/i.test(input.node)) throw new Error("Permission nodes may contain letters, digits, dots, dashes, underscores and * only.");
   return input.mode === "unset"
     ? `lp user ${input.player} permission unset ${input.node}`

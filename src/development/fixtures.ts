@@ -34,7 +34,7 @@ export function makeFixture(mode = "healthy", now = Date.now()): ControlState {
     consoleAuthority: mode === "offline" ? "UNAVAILABLE" : "HOST",
     server: {
       fingerprint: "fixture",
-      serverName: "TonimSMP",
+      serverName: "Survival · São Paulo",
       pluginVersion: "5.0.0",
       hostVersion: "5.0.0",
       minecraftVersion: "1.21.8",
@@ -50,28 +50,13 @@ export function makeFixture(mode = "healthy", now = Date.now()): ControlState {
       fleetState: "BOUND",
     },
   };
-  state.bootEpochId = "a".repeat(32);
-  state.bootStartedAt = new Date(now - 7800000).toISOString();
-  state.sessionEvents = {
-    bootEpochId: state.bootEpochId,
-    bootStartedAt: state.bootStartedAt,
-    onlineCount: 24,
-    events: [],
-    activePlayers: [],
-  };
   state.server = {
     capturedAt,
     tps: [19.87, 19.93, 19.96],
-    loadedChunks: 866,
-    entities: 1692,
     averageTickMillis: 31.4,
-    msptP95: 42,
-    msptP99: 47,
-    msptMin: 12,
-    msptMax: 51,
-    tickSampleCount: 100,
     onlinePlayers: 24,
-    maxPlayers: 80,
+    maximumPlayers: 80,
+    p95TickMillis:39.2,p99TickMillis:46.4,
     serverName: state.ready.server.serverName,
   };
   state.system =
@@ -80,6 +65,7 @@ export function makeFixture(mode = "healthy", now = Date.now()): ControlState {
       : {
           capturedAt,
           processCpuPercent: 42.8,
+          processUptimeMillis:7200000,
           jvmHeapUsedBytes: 3.2 * 2 ** 30,
           jvmHeapCommittedBytes: 6 * 2 ** 30,
           jvmHeapMaximumBytes: 8 * 2 ** 30,
@@ -97,8 +83,7 @@ export function makeFixture(mode = "healthy", now = Date.now()): ControlState {
     physicalMemoryTotalBytes: 16 * 2 ** 30,
   };
   state.service = {
-    bootEpochId: state.bootEpochId,
-    bootStartedAt: state.bootStartedAt,
+    invocationId:"fixture-boot-2",
     state: mode === "stopped" ? "inactive" : "active",
     minecraftReady: mode !== "stopped",
     resources: {
@@ -107,10 +92,9 @@ export function makeFixture(mode = "healthy", now = Date.now()): ControlState {
       source: "SYSTEMD_CGROUP",
       cpuAvailable: true,
       cpuUnit: "PERCENT_OF_ONE_CORE",
-      cpuPercent: mode === "stopped" ? null : 146.2,
+      cpuPercent: 146.2,
       memoryAvailable: true,
-      memoryBytes: mode === "stopped" ? null : 4.1 * 2 ** 30,
-      memoryMaxBytes: 12 * 2 ** 30,
+      memoryBytes: 4.1 * 2 ** 30,
     },
   };
   state.receipts = {
@@ -122,7 +106,7 @@ export function makeFixture(mode = "healthy", now = Date.now()): ControlState {
   state.updatedAt = now;
   state.telemetryUpdatedAt = now;
   state.worlds = [
-    { name: "world", loadedChunks: 682, entities: 1432, tileEntities: 312 },
+    { name: "world", loadedChunks: 682, entities: 1432 },
     { name: "world_nether", loadedChunks: 148, entities: 218 },
     { name: "world_the_end", loadedChunks: 36, entities: 42 },
   ];
@@ -152,7 +136,7 @@ export function makeFixture(mode = "healthy", now = Date.now()): ControlState {
     capturedAt: new Date(now - (90 - i) * 1700).toISOString(),
     level: i === 74 ? "WARN" : "INFO",
     content:
-      i === 74
+      i % 11 === 0 ? "[MiniMOTD] Configuration reloaded" : i % 7 === 0 ? "[voicechat] Voice channel is ready" : i === 74
         ? "Can't keep up! Running 1241ms or 24 ticks behind"
         : i === 8
           ? "\u001b[33m[Server thread/WARN]\u001b[0m Chunk save exceeded the target window"
@@ -181,6 +165,9 @@ export function makeFixture(mode = "healthy", now = Date.now()): ControlState {
     const lag = i > 170 && i < 195;
     return {
       at: now - (299 - i) * 3000,
+      epoch:i<140?"fixture-boot-1":"fixture-boot-2",
+      p95:i===140?null:lag?82:38+Math.sin(i/13)*4,p99:i===140?null:lag?88:46+Math.sin(i/13)*4,
+      committed:6*2**30,heapMax:8*2**30,chunks:866+Math.sin(i/20)*20,entities:1692+Math.sin(i/16)*60,
       tps:
         i === 140
           ? null
@@ -193,19 +180,12 @@ export function makeFixture(mode = "healthy", now = Date.now()): ControlState {
           : lag
             ? 65 + Math.sin(i) * 8
             : 28 + Math.sin(i / 13) * 7,
-      msptP95: 40 + Math.sin(i / 13) * 8,
-      msptP99: 46 + Math.sin(i / 13) * 9,
-      heapCommitted: 6 * 2 ** 30,
-      heapMax: 8 * 2 ** 30,
-      serviceMemoryMax: 12 * 2 ** 30,
-      chunks: 860 + (i % 10),
-      entities: 1692 + (i % 20),
       hostCpu: 26 + Math.sin(i / 14) * 8,
       processCpu: 40 + Math.sin(i / 13) * 12,
       heap: (3 + Math.sin(i / 20) * 0.5) * 2 ** 30,
       memory: 7.8 * 2 ** 30,
       players: 20 + (i % 6),
-      gc: 1200 + i,
+      gc: 1200 + Math.floor(i/22)*4,
       serviceCpu: 146.2 + Math.sin(i / 13) * 18,
       serviceMemory: (4.1 + Math.sin(i / 20) * 0.2) * 2 ** 30,
       sources: {
@@ -221,21 +201,6 @@ export function makeFixture(mode = "healthy", now = Date.now()): ControlState {
     state.system = {};
     state.players = [];
   }
-  state.sessionEvents = {
-    ...state.sessionEvents,
-    onlineCount: mode === "stopped" ? 0 : state.players.length,
-    activePlayers: state.players.slice(0, 3),
-    events: state.players.slice(0, 3).map((p, i) => ({
-      eventId: `fixture-event-${i}`,
-      sessionId: `fixture-presence-${i}`,
-      uuid: p.uuid,
-      name: p.name,
-      state: "JOINED",
-      observedAt: new Date(now - 120000 - i * 1000).toISOString(),
-      sessionStartedAt: new Date(now - 120000 - i * 1000).toISOString(),
-      termination: "OPEN",
-    })),
-  };
   return state;
 }
 let content = "view-distance: 8\nsimulation-distance: 6\nmax-players: 80\n";
@@ -274,19 +239,7 @@ export async function fixtureAction(
   )
     data = {
       settings: parameters.settings ?? {
-        schemaVersion: 1,
-        schedule: {
-          backups: {
-            enabled: false,
-            cadence: "DAILY",
-            weekdays: [],
-            time: "04:00",
-            intervalHours: 24,
-            countdownMinutes: 15,
-            skipIfEmptySinceLastBackup: false,
-            forceAfterHours: 168,
-          },
-        },
+        schemaVersion: 2,
         timezone: "America/Sao_Paulo",
         restart: {
           schedule: {
@@ -300,6 +253,7 @@ export async function fixtureAction(
           startupTimeoutSeconds: 180,
         },
         fullRestorePoint: {
+          schedule:{enabled:false,type:"DAILY",weekdays:[],time:"04:00",intervalHours:24},
           retentionMode: "SINGLE_CURRENT",
           retentionCount: 1,
           restartAfter: true,
