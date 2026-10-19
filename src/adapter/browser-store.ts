@@ -1,4 +1,4 @@
-import { safeCache, type ControlState } from "./control-state";
+import { type ControlState } from "./control-state";
 import { validScopes } from "./scopes";
 export interface RelayCredential {
   protocolVersion: 3;
@@ -16,8 +16,11 @@ const DB = "plexonpanel-browser-v3",
 let selectionRevision = 0;
 function openDatabase(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open(DB, 1);
-    request.onupgradeneeded = () => request.result.createObjectStore(STORE);
+    const request = indexedDB.open(DB, 2);
+    request.onupgradeneeded = () => {
+ if(!request.result.objectStoreNames.contains(STORE)) request.result.createObjectStore(STORE);
+ const cursor=request.transaction!.objectStore(STORE).openCursor();cursor.onsuccess=()=>{const c=cursor.result;if(c){if(String(c.key).startsWith("cache:"))c.delete();c.continue();}};
+};
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error);
     request.onblocked = () =>
@@ -137,15 +140,10 @@ export async function saveRelayCredential(c: RelayCredential): Promise<void> {
 export async function loadControlCache(
   id: string,
 ): Promise<ControlState | null> {
-  const cached = await read<ControlState>(`cache:${id}`);
-  return cached &&
-    cached.serverId === id &&
-    Date.now() - cached.updatedAt < 3600000
-    ? safeCache(cached)
-    : null;
+  await remove(`cache:${id}`);return null;
 }
 export async function saveControlCache(state: ControlState): Promise<void> {
-  await write(`cache:${state.serverId}`, safeCache(state));
+  await remove(`cache:${state.serverId}`);
 }
 export async function clearBrowserWorkspace(serverId?: string): Promise<void> {
   const db = await openDatabase();

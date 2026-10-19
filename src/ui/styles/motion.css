@@ -1,0 +1,82 @@
+@keyframes pp-pulse-ring {
+  from {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  to {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+@keyframes pp-sheen {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+@keyframes pp-fade-up {
+  from {
+    transform: translateY(8px);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+.page-content {
+  animation: pp-fade-up 0.24s ease-out;
+}
+.skeleton {
+  background: linear-gradient(
+    100deg,
+    rgb(var(--well)) 30%,
+    rgb(var(--line) / 0.08) 50%,
+    rgb(var(--well)) 70%
+  );
+  background-size: 200% 100%;
+  animation: pp-sheen 1.2s infinite;
+}
+.pp-card:after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: linear-gradient(
+    110deg,
+    transparent 40%,
+    rgb(var(--specular) / 0.035) 50%,
+    transparent 60%
+  );
+  background-size: 200% 100%;
+  animation: pp-sheen 1.2s ease-out 1;
+}
+[data-motion="off"] *,
+[data-motion="off"] *:before,
+[data-motion="off"] *:after,
+[data-motion="reduced"] *,
+[data-motion="reduced"] *:before,
+[data-motion="reduced"] *:after {
+  animation: none !important;
+  transition: none !important;
+  scroll-behavior: auto !important;
+}
+[data-motion="off"] .pp-card:hover,
+[data-motion="reduced"] .pp-card:hover {
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *:before,
+  *:after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+  .pp-card:hover {
+    transform: none;
+  }
+}

@@ -8,3 +8,7 @@ artifacts/
 .DS_Store
 
 .vercel
+
+.next/
+*.tsbuildinfo
+artifacts/

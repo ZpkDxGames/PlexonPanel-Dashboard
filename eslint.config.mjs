@@ -1,0 +1,1 @@
+export default [{files:["**/*.{ts,tsx}"],languageOptions:{parser:(await import("@typescript-eslint/parser")).default,parserOptions:{ecmaVersion:"latest",sourceType:"module",ecmaFeatures:{jsx:true}}}}];

@@ -1,44 +1,13 @@
-# PlexonPanel · Control Room
+# PlexonPanel 5.0
 
-A reference-led Minecraft server management interface built with React 19, TypeScript and Vite. A persistent sidebar, console-led Overview, source-aware instrumentation and substantial player profiles replace Operations Desk's presentation while preserving Protocol 3, stored pairing, immutable grants and reviewed server operations.
+A clean-slate Next.js App Router dashboard over the retained Protocol 3 core. Root AGENTS.md and SKILL.md define the visual and backend contract.
 
-![Control Room desktop and mobile preview](docs/releases/control-room-preview.jpg)
+Use Node 24: `npm ci`, `npm run typecheck`, `npm run lint`, `npm test`, `npm run build`, then `npm start`. Set the public relay origin with NEXT_PUBLIC_PLEXON_RELAY_URL (legacy VITE_PLEXON_RELAY_URL is accepted). The nonce CSP allowlists the current tonimserver.ddns.net HTTPS/WSS origin; coordinate any origin change with the CSP.
 
-Screens depict labelled development fixtures. Production data still comes exclusively from authenticated Paper/Host sessions.
+All presentation lives under src/ui: five surface depths, four KPI visualization footers, independent-source Telemetry Studio, virtual parsed console, reviewed mutations, eight routes, pairing and UUID inspection. The eight original preferences and authorization/target contracts remain intact. Console, chat, commands and control snapshots are never persisted in the browser; the IndexedDB migration purges old control caches.
 
-## Run
+Development fixtures use ?fixture=healthy|stale|skew|partial|stopped|offline|denied and never operate a server. /dev/surfaces and /dev/primitives provide visual proofs. Production ignores those fixture/gallery switches.
 
-Node 24.x:
+Run `node scripts/v5-browser.mjs` after installing Playwright Chromium, or set CHROME_PATH. EVIDENCE_DIR defaults to artifacts/v5. The script self-starts its server and covers every route at all requested sizes, review/pairing, UUID inspection, volatile history, chart fill/motion preferences, state fixtures, three accents and both themes. `node scripts/v5-production.mjs` checks the built application. Verification-only CI and disabled Git-triggered deployment are included.
 
-```sh
-npm ci
-cp .env.example .env.local
-npm run dev
-```
-
-Set only the public `VITE_PLEXON_RELAY_URL`. Never put signing keys, access tokens or service secrets into frontend variables. Development-only visual review: `http://127.0.0.1:4173/?fixture=healthy#Overview`.
-
-## Verify
-
-```sh
-npm run check
-npm run build
-npm run test:perf
-npx playwright install firefox
-node scripts/qa-local.mjs
-node scripts/qa-local.mjs scripts/control-plane-check.mjs
-node scripts/qa-local.mjs scripts/reconstruction-check.mjs
-node scripts/qa-local.mjs scripts/reference-check.mjs
-node scripts/qa-local.mjs scripts/review-confirmation-check.mjs
-node scripts/qa-local.mjs scripts/visual-proofs.mjs
-node scripts/qa-local.mjs scripts/extended-visual-proofs.mjs
-MOZ_DISABLE_CONTENT_SANDBOX=1 node scripts/production-check.mjs
-```
-
-The production artifact excludes fixture data and always requires pairing for an unpaired browser. Browser scripts are localhost-only; the UI cannot issue live operations through development fixtures.
-
-## Review and release
-
-Read [verification](docs/NEW_DASHBOARD_VERIFICATION.md), [parity](docs/FEATURE_PARITY_MATRIX.md), [compatibility](docs/NEW_DASHBOARD_COMPATIBILITY.md), [design](docs/NEW_DASHBOARD_DESIGN.md), [risks](docs/NEW_DASHBOARD_RISKS.md), and [rollout/rollback](docs/NEW_DASHBOARD_ROLLOUT.md).
-
-This branch is a review candidate. Production cutover requires release-specific authorization and real paired-server acceptance. No backend deployment or server-state migration is included.
+Read docs/V5_IMPLEMENTATION.md and the matched backend docs/V5_SESSION_STORE_AND_PERIODIC_BACKUPS.md for migration and real-data adaptations. This handoff includes source, matched JARs, hashes, visual evidence and executed receipts. Live VPS/relay/RCON/Drive scheduling, failure recovery, restore/rollback and ARM64 runtime still require environment certification. Nothing is deployed by this handoff.

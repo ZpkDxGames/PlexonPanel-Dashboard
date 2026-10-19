@@ -42,6 +42,8 @@ export interface Ready {
   };
 }
 export interface Sample {
+  epoch?: string;
+  p95?: number | null; p99?: number | null; committed?:number|null; heapMax?:number|null; chunks?:number|null;entities?:number|null;
   at: number;
   sources?: {
     paperHealth: number | null;
@@ -258,6 +260,14 @@ export function applyControlMessage(
   const receivedAt = Date.now();
   let next = { ...state, updatedAt: receivedAt, cached: false };
   switch (message.eventType) {
+    case "session.epoch_reset": {
+      if(kind!=="HOST")return state;
+      const epoch=String(body.epoch??body.invocationId??"");if(!epoch||epoch===state.service.invocationId)return state;
+      next={...next,server:{},system:{},worlds:[],players:[],pendingPlayerSnapshot:undefined,presenceDeltas:[],presenceEventIds:[],console:[],chat:[],receipts:{...next.receipts,paperHealth:undefined,paperSystem:undefined},service:{...next.service,invocationId:epoch}};
+      const last=state.history.at(-1);if(last)next.history=appendHistory(state.history,{...last,at:receivedAt,epoch,tps:null,mspt:null,p95:null,p99:null,hostCpu:null,processCpu:null,heap:null,memory:null,players:null,gc:null,serviceCpu:null,serviceMemory:null,sources:{paperHealth:receivedAt,paperSystem:receivedAt,hostSystem:receivedAt,service:receivedAt}});
+      return next;
+    }
+
     case "telemetry.server":
       if (kind !== "PAPER" || supersededCapture(state.server, body))
         return state;
@@ -378,6 +388,10 @@ export function applyControlMessage(
       next.chat = [...state.chat, body].slice(-200);
       break;
     case "service.status":
+      if(kind==="HOST" && typeof body.invocationId==="string" && body.invocationId && state.service.invocationId && body.invocationId!==state.service.invocationId){
+        const reset=applyControlMessage(state,{...message,eventType:"session.epoch_reset",body:{epoch:body.invocationId}});next={...reset,updatedAt:receivedAt};
+      }
+
       if (kind !== "HOST") return state;
       if (
         supersededCapture(
@@ -418,6 +432,8 @@ export function applyControlMessage(
       tps = Array.isArray(server.tps) ? number(server.tps[0]) : null;
     const sample: Sample = {
       at,
+      epoch: String(next.service.invocationId ?? next.ready?.server.paperSession ?? "current"),
+      p95:number(server.p95TickMillis),p99:number(server.p99TickMillis),committed:number(paper.jvmHeapCommittedBytes),heapMax:number(paper.jvmHeapMaximumBytes),chunks:next.worlds.length?next.worlds.reduce((n,w)=>n+(number(w.loadedChunks)??0),0):null,entities:next.worlds.length?next.worlds.reduce((n,w)=>n+(number(w.entities)??0),0):null,
       sources: {
         paperHealth: capturedAtMillis(server.capturedAt),
         paperSystem: capturedAtMillis(paper.capturedAt),
@@ -472,8 +488,8 @@ export function safeCache(state: ControlState): ControlState {
     presenceEventIds: [],
     service: {},
     backupProgress: null,
-    console: records(state.console, CONSOLE_HISTORY_MAX_LINES).slice(-500),
-    chat: records(state.chat, 200).slice(-100),
+    console: [],
+    chat: [],
     history: Array.isArray(state.history)
       ? state.history.slice(-CONTROL_HISTORY_MAX_POINTS)
       : [],
@@ -514,7 +530,7 @@ export function diagnostics(state: ControlState): string {
   ].join("\n");
 }
 
-function consoleStrongId(line: JsonMap): string | null {
+export function consoleStrongId(line: JsonMap): string | null {
   const cursor =
     typeof line.journalCursor === "string" ? line.journalCursor : "";
   if (cursor) return `journal:${cursor}`;

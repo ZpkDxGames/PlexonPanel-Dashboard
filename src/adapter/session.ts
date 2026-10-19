@@ -89,6 +89,7 @@ let raw = snapshot.state,
   connection = 0;
 const pending = new Set<string>();
 const queries = new Map<string, Promise<ActionCompletion>>();
+const queryTails = new Map<string, Promise<ActionCompletion>>();
 let fixtureAction:
   | ((action: string, parameters: JsonMap) => Promise<ActionCompletion>)
   | undefined;
@@ -119,6 +120,8 @@ function flush() {
 function receive(message: JsonMap) {
   if (
     message.type === "dashboard.ready" &&
+    message.serverId === raw.serverId &&
+    !raw.service.invocationId &&
     record(message.server).paperSession !== raw.ready?.server.paperSession
   )
     raw = { ...raw, history: [] };
@@ -521,9 +524,14 @@ export const session = {
   async query(action: string, parameters: JsonMap = {}, kind: Kind = "PAPER") {
     const prepared = this.prepare(action, parameters, kind);
     const key = `${snapshot.revision}:${kind}:${action}:${JSON.stringify(parameters)}`;
-    const existing = queries.get(key); if (existing) return existing;
-    const response = this.execute(prepared); queries.set(key, response);
-    try { return await response; } finally { if (queries.get(key) === response) queries.delete(key); }
+    const existing = queries.get(key); if(existing)return existing;
+    // Differing read parameters share the existing per-action execution lane.
+    // execute revalidates the authority and target captured before queueing.
+    const lane=`${prepared.target.serverId}:${action}`, previous=queryTails.get(lane);
+    const response=(previous?previous.catch(()=>undefined):Promise.resolve()).then(()=>this.execute(prepared));
+    queries.set(key,response);queryTails.set(lane,response);
+    try{return await response;}finally{if(queries.get(key)===response)queries.delete(key);if(queryTails.get(lane)===response)queryTails.delete(lane);}
+
   },
   installFixture(
     name: string,
