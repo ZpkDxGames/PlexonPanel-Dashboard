@@ -684,7 +684,7 @@ try {
       "core " + path,
     );
   check(21, true, "purge storage scan");
-  check(24, true, "94 unit tests separately recorded");
+  check(24, true, "95 unit tests separately recorded");
   for (const [id, count] of Object.entries(coverage))
     assert.ok(count > 0, `Uncovered invariant ${id}`);
   await fs.writeFile(

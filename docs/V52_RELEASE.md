@@ -8,6 +8,8 @@ All native selects are replaced by the portaled PpSelect listbox, with keyboard 
 
 PlayerHead prioritizes applied texture metadata, uses usernames for offline UUIDs, advances through provider fallbacks, and resets fallback progress when identity or provider changes. The skin proxy accepts bounded UUID/name/texture identities and size parameters, uses fixed HTTPS hosts with redirects rejected, and checks PNG signatures and a 256 KiB response limit within a six-second total timeout.
 
+The UI binding reconciles a join-derived roster row with skin metadata only from the exact matching UUID, session and observed event time; a newer authoritative inventory remains in control. This preserves the locked core while showing applied skins immediately on join.
+
 The companion backend change adds nullable `skinTexture` and `onlineMode` telemetry with compatible constructors. Applied Paper profile metadata is captured on the Bukkit thread, with no synchronous skin API or storage requests. Install the newly built Paper JAR to supply texture metadata; username fallbacks also work with older agents.
 
 Verification commands:

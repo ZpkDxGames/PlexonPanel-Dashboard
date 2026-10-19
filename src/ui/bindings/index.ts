@@ -33,6 +33,7 @@ import {
 } from "../../presentation/telemetry";
 import { SourceEpochs } from "../../presentation/epochs";
 import { useNow } from "../../hooks";
+import { withAppliedSkins } from "./skins";
 export * from "./pure";
 export { useViewSync } from "./view-sync";
 export { session, useNow };
@@ -61,7 +62,7 @@ export function scopedSnapshot(raw: SessionSnapshot): SessionSnapshot {
           ? s.service
           : { invocationId: s.service.invocationId },
       players: players
-        ? s.players.map((p) => ({
+        ? withAppliedSkins(s.players, s.presenceDeltas ?? []).map((p) => ({
             ...p,
             ...(!can("players.location")
               ? {

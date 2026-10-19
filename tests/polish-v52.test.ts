@@ -1,4 +1,6 @@
 import test from "node:test";
+import { scopedSnapshot, type SessionSnapshot } from "../src/ui/bindings";
+import { makeFixture } from "../src/development/fixtures";
 import assert from "node:assert/strict";
 import React from "react";
 import { renderToString } from "react-dom/server";
@@ -12,6 +14,7 @@ import {
   useViewSync,
 } from "../src/ui/bindings/view-sync";
 import {
+  withAppliedSkins,
   skinCandidates,
   skinProxyTargets,
   isOfflineUuid,
@@ -222,4 +225,63 @@ test("skin proxy rejects invalid identities/params before fetch and uses bounded
   } finally {
     globalThis.fetch = original;
   }
+});
+
+test("applied join skins reconcile only the exact active session while fresh inventories and scope filtering remain authoritative", () => {
+  const row = {
+      uuid: offline,
+      sessionId: "current",
+      presenceObservedAt: "now",
+      name: "Notch",
+    },
+    delta = {
+      uuid: offline,
+      sessionId: "current",
+      observedAt: "now",
+      state: "JOINED",
+      skinTexture: hash.toUpperCase(),
+    };
+  assert.equal(withAppliedSkins([row], [delta])[0].skinTexture, hash);
+  assert.equal(
+    withAppliedSkins([row], [{ ...delta, skinTexture: null }])[0].skinTexture,
+    null,
+  );
+  for (const patch of [
+    { sessionId: "old" },
+    { uuid: online },
+    { observedAt: "older" },
+    { state: "LEFT" },
+    { skinTexture: "bad" },
+  ])
+    assert.equal(withAppliedSkins([row], [{ ...delta, ...patch }])[0], row);
+  const inventory = {
+    uuid: offline,
+    sessionId: "current",
+    name: "Notch",
+    skinTexture: "b".repeat(64),
+  };
+  assert.equal(withAppliedSkins([inventory], [delta])[0], inventory);
+  assert.deepEqual(withAppliedSkins([], [delta]), []);
+  assert.ok(!("skinTexture" in row));
+  const state = makeFixture();
+  state.players = [row];
+  state.presenceDeltas = [delta];
+  const raw: SessionSnapshot = {
+    state,
+    initialized: true,
+    phase: "live",
+    error: "",
+    revision: 1,
+    credentials: [],
+    labels: {},
+    fleet: [],
+    fixture: "test",
+    grant: state.ready!.device,
+    relay: { origin: "", source: "unconfigured", error: "" },
+  };
+  assert.equal(scopedSnapshot(raw).state.players[0].skinTexture, hash);
+  const revoked = { ...state.ready!.device, scopes: [] };
+  raw.grant = revoked;
+  state.ready = { ...state.ready!, device: revoked };
+  assert.deepEqual(scopedSnapshot(raw).state.players, []);
 });

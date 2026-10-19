@@ -80,3 +80,34 @@ export function skinCandidates({
   if (n) candidates.push(proxy(n));
   return [...new Set(candidates)];
 }
+
+/** Join-derived rows omit extension fields in the locked core. Reconcile only the
+ * exact current session/event; a later authoritative inventory row wins. */
+export function withAppliedSkins(
+  players: Record<string, unknown>[],
+  deltas: Record<string, unknown>[],
+): Record<string, unknown>[] {
+  const textures = new Map<string, string | null>();
+  const key = (uuid: unknown, session: unknown, at: unknown) =>
+    JSON.stringify([uuid, session, at]);
+  for (const d of deltas) {
+    if (
+      d.state === "JOINED" &&
+      typeof d.uuid === "string" &&
+      typeof d.sessionId === "string" &&
+      typeof d.observedAt === "string" &&
+      (d.skinTexture === null ||
+        (typeof d.skinTexture === "string" && validTexture(d.skinTexture)))
+    ) {
+      textures.set(
+        key(d.uuid, d.sessionId, d.observedAt),
+        typeof d.skinTexture === "string" ? d.skinTexture.toLowerCase() : null,
+      );
+    }
+  }
+  return players.map((p) => {
+    if (typeof p.presenceObservedAt !== "string") return p;
+    const id = key(p.uuid, p.sessionId, p.presenceObservedAt);
+    return textures.has(id) ? { ...p, skinTexture: textures.get(id) } : p;
+  });
+}
