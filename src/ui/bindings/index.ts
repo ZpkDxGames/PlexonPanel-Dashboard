@@ -34,6 +34,7 @@ import {
 import { SourceEpochs } from "../../presentation/epochs";
 import { useNow } from "../../hooks";
 export * from "./pure";
+export { useViewSync } from "./view-sync";
 export { session, useNow };
 export type { Kind, SessionSnapshot, Preferences };
 export type { Prepared } from "../../adapter/session";

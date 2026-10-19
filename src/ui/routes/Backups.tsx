@@ -1,8 +1,10 @@
 "use client";
 import { useEffect, useState } from "react";
+import { PpSelect } from "../primitives/Select";
 import { ArchiveRestore, Check, UploadCloud } from "lucide-react";
 import * as Dialog from "@radix-ui/react-dialog";
 import {
+  useViewSync,
   useControl,
   useQuery,
   usePrefs,
@@ -44,7 +46,8 @@ export default function Backups() {
     prefs = usePrefs(),
     review = useReview(),
     [edit, setEdit] = useState(false),
-    [minutes, setMinutes] = useState(5),
+    sync = useViewSync(),
+    minutes = sync.backupCountdownMinutes,
     [enabled, setEnabled] = useState(false),
     [cadence, setCadence] = useState("INTERVAL_HOURS"),
     [hours, setHours] = useState(24),
@@ -232,17 +235,17 @@ export default function Backups() {
               args={{ countdownSeconds: minutes * 60 }}
               extraReason={gate}
             />
-            <select
-              aria-label="Player warning countdown"
-              value={minutes}
-              onChange={(e) => setMinutes(Number(e.target.value))}
-            >
-              {[5, 10, 15, 30].map((n) => (
-                <option key={n} value={n}>
-                  {n} min warning
-                </option>
-              ))}
-            </select>
+            <PpSelect
+              ariaLabel="Player warning countdown"
+              value={String(minutes)}
+              onChange={(v) =>
+                sync.set("backupCountdownMinutes", Number(v) as typeof minutes)
+              }
+              options={[5, 10, 15, 30].map((n) => ({
+                value: String(n),
+                label: `${n} min warning`,
+              }))}
+            />
           </div>
         </div>
         <div className="pp-cell" data-tone="violet">
@@ -369,15 +372,17 @@ export default function Backups() {
               </label>
               <label className="pp-field-row">
                 Cadence
-                <select
+                <PpSelect
+                  ariaLabel="Cadence"
                   value={cadence}
-                  onChange={(e) => setCadence(e.target.value)}
-                >
-                  <option>INTERVAL_HOURS</option>
-                  <option>DAILY</option>
-                  <option>WEEKLY</option>
-                  <option>SELECTED_DAYS</option>
-                </select>
+                  onChange={setCadence}
+                  options={[
+                    "INTERVAL_HOURS",
+                    "DAILY",
+                    "WEEKLY",
+                    "SELECTED_DAYS",
+                  ].map((value) => ({ value, label: value }))}
+                />
               </label>
               {cadence === "INTERVAL_HOURS" ? (
                 <label className="pp-field-row">

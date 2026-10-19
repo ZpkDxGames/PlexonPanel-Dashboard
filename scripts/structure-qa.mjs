@@ -4,6 +4,7 @@ import { createHash } from "node:crypto";
 import assert from "node:assert/strict";
 import { chromium, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+import { polishChecks } from "./polish-checks.mjs";
 const out = process.env.EVIDENCE_DIR ?? "../evidence",
   base = "http://127.0.0.1:4182",
   routes = [
@@ -84,6 +85,11 @@ try {
         await p.goto(`${base}/${route}?fixture=structural`);
         await p.locator(".pp-shell").waitFor();
         await p.waitForTimeout(500);
+        assert.equal(
+          await p.locator("select").count(),
+          0,
+          `${route}: no native selectors`,
+        );
         const geometry = await p.evaluate(() => {
           const visible = (el) =>
             el.getBoundingClientRect().width > 0 &&
@@ -634,18 +640,16 @@ try {
   interactions.push("Host restore token + typed review");
   await p.goto(base + "/settings?fixture=structural");
   await p.locator(".pp-shell").waitFor();
-  await p
-    .getByRole("combobox", { name: "Motion", exact: true })
-    .selectOption("reduced");
+  await p.getByRole("combobox", { name: "Motion", exact: true }).click();
+  await p.getByRole("option", { name: "reduced", exact: true }).click();
   await p.waitForTimeout(100);
   check(
     25,
     (await p.evaluate(() => document.getAnimations().length)) === 0,
     "motion reduced",
   );
-  await p
-    .getByRole("combobox", { name: "Chart fill", exact: true })
-    .selectOption("false");
+  await p.getByRole("combobox", { name: "Chart fill", exact: true }).click();
+  await p.getByRole("option", { name: "Lines", exact: true }).click();
   check(
     25,
     (await p
@@ -665,8 +669,12 @@ try {
   check(25, pairAxe.length === 0, "pairing accessibility");
   interactions.push("OTP auto advance + pairing accessibility");
   await c.close();
+  const polish = await polishChecks(browser, base, out);
+  await fs.writeFile(out + "/polish-v52-receipt.json", JSON.stringify(polish, null, 2));
   execFileSync("bash", ["scripts/verify-purge.sh"]);
-  const core = JSON.parse(await fs.readFile("tests/fixtures/core-sha256.json", "utf8"));
+  const core = JSON.parse(
+    await fs.readFile("tests/fixtures/core-sha256.json", "utf8"),
+  );
   for (const [path, hash] of Object.entries(core))
     check(
       24,
@@ -676,7 +684,7 @@ try {
       "core " + path,
     );
   check(21, true, "purge storage scan");
-  check(24, true, "89 unit tests separately recorded");
+  check(24, true, "94 unit tests separately recorded");
   for (const [id, count] of Object.entries(coverage))
     assert.ok(count > 0, `Uncovered invariant ${id}`);
   await fs.writeFile(

@@ -1,7 +1,7 @@
-import { useState } from "react";
 import Link from "next/link";
 import { Maximize2 } from "lucide-react";
 import {
+  useViewSync,
   useTelemetry,
   observedSummary,
   useLedger,
@@ -279,12 +279,17 @@ export function HorizonSelector({
   );
 }
 export function TelemetryStudio() {
-  const [view, setView] = useState<ChartView>("tick"),
-    [win, setWin] = useState<Horizon>("15m"),
-    [active, setActive] = useState("tps"),
+  const sync = useViewSync(),
+    view = sync.studioView,
+    win = sync.horizon === "2h" ? "35m" : sync.horizon,
+    setWin = (v: Horizon) => sync.set("horizon", v),
+    setActive = (v: string) => sync.set("activeSeries", v),
     t = useTelemetry(win),
     l = useLedger(),
-    metrics = metricList(t, view);
+    metrics = metricList(t, view),
+    active = metrics.some((m) => m.id === sync.activeSeries)
+      ? sync.activeSeries
+      : metrics[0].id;
   return (
     <section className="pp-pane pp-studio" aria-label="Telemetry studio">
       <header className="pp-pane__head">
@@ -292,8 +297,11 @@ export function TelemetryStudio() {
         <Tabs
           value={view}
           onChange={(v) => {
-            setView(v);
-            setActive(v === "tick" ? "tps" : v === "memory" ? "heap" : "cpu");
+            sync.patch({
+              studioView: v,
+              activeSeries:
+                v === "tick" ? "tps" : v === "memory" ? "heap" : "cpu",
+            });
           }}
           label="Studio view"
           items={[

@@ -1,7 +1,12 @@
 "use client";
 import { useState } from "react";
 import { usePrefs, type Preferences } from "../bindings";
-import { InstrumentDeck, PREVIEW_DECK } from "../instruments/InstrumentDeck";
+import { PpSelect } from "../primitives/Select";
+import {
+  PlayerHead,
+  InstrumentDeck,
+  PREVIEW_DECK,
+} from "../instruments/InstrumentDeck";
 import { StudioChart, type ChartData } from "../studio/StudioChart";
 import { ConsoleRow } from "../console/ConsoleRow";
 import { parseLine } from "../console/parse-line";
@@ -136,25 +141,44 @@ export default function Settings() {
                   <strong style={{ fontWeight: 550 }}>{o.title}</strong>
                   <small>{o.detail}</small>
                 </span>
-                <select
-                  aria-label={o.title}
-                  value={String(prefs[o.key])}
-                  onChange={(e) => {
-                    prefs.set(
-                      o.key,
-                      (o.key === "chartFill"
-                        ? e.target.value === "true"
-                        : e.target.value) as never,
-                    );
-                    setSaved("Saved");
-                  }}
-                >
-                  {o.values.map((v) => (
-                    <option value={v.value} key={v.value}>
-                      {v.label}
-                    </option>
-                  ))}
-                </select>
+                <span className="row">
+                  {o.key === "skinProvider" && (
+                    <PlayerHead
+                      uuid="8667ba71-b85a-4004-af54-457a9734eed7"
+                      name="Steve"
+                      skinTexture={null}
+                      provider={prefs.skinProvider}
+                      size={24}
+                    />
+                  )}
+                  <PpSelect
+                    ariaLabel={o.title}
+                    value={String(prefs[o.key])}
+                    onChange={(v) => {
+                      prefs.set(
+                        o.key,
+                        (o.key === "chartFill" ? v === "true" : v) as never,
+                      );
+                      setSaved("Saved");
+                    }}
+                    options={o.values.map((v) => ({
+                      ...v,
+                      leading:
+                        o.key === "accent" ? (
+                          <i
+                            className="pp-swatch"
+                            style={{
+                              background: {
+                                teal: "#2dd4bf",
+                                blue: "#60a5fa",
+                                violet: "#a78bfa",
+                              }[v.value],
+                            }}
+                          />
+                        ) : undefined,
+                    }))}
+                  />
+                </span>
               </label>
             </div>
           ))}
@@ -167,7 +191,7 @@ export default function Settings() {
           <div className="pp-preview">
             <InstrumentDeck data={PREVIEW_DECK} />
             <Pane title="Telemetry preview">
-              <StudioChart data={previewData} />
+              <StudioChart data={previewData} staged={false} />
             </Pane>
             <Pane title="Terminal preview">
               <div

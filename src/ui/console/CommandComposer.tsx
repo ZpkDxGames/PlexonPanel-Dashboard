@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import { CornerDownLeft } from "lucide-react";
 import { session, useControl } from "../bindings";
 import { useReview } from "../primitives/ReviewProvider";
+import { PpSelect } from "../primitives/Select";
 import { Tooltip } from "../primitives/Tooltip";
 export function CommandComposer({ chat = false }: { chat?: boolean }) {
   useControl();
@@ -68,14 +69,15 @@ export function CommandComposer({ chat = false }: { chat?: boolean }) {
         input
       )}
       {chat && (
-        <select
-          aria-label="Chat format"
+        <PpSelect
+          ariaLabel="Chat format"
           value={format}
-          onChange={(e) => setFormat(e.target.value)}
-        >
-          <option>PLAIN</option>
-          <option>MINIMESSAGE</option>
-        </select>
+          onChange={setFormat}
+          options={["PLAIN", "MINIMESSAGE"].map((value) => ({
+            value,
+            label: value,
+          }))}
+        />
       )}
       <button
         className="pp-ctl"

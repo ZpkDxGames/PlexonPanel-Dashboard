@@ -3,6 +3,7 @@ import { useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Download, Pause, Play, X } from "lucide-react";
 import {
+  useViewSync,
   useTelemetry,
   usePrefs,
   useLedger,
@@ -27,11 +28,14 @@ function download(text: string, name: string, type = "text/csv") {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 export default function Performance() {
-  const [window, setWindow] = useState<Horizon>("15m"),
+  const sync = useViewSync(),
+    window = sync.horizon,
+    setWindow = (v: Horizon) => sync.set("horizon", v),
     current = useTelemetry(window),
     [frozen, setFrozen] = useState<TelemetryView | null>(null),
     [crosshair, setCrosshair] = useState<number | null>(null),
-    [active, setActive] = useState("tps"),
+    active = sync.activeSeries,
+    setActive = (v: string) => sync.set("activeSeries", v),
     [drawer, setDrawer] = useState(false),
     [rawOffset, setRawOffset] = useState(0),
     prefs = usePrefs(),
@@ -101,7 +105,11 @@ export default function Performance() {
             </button>
           </div>
         </header>
-        <MetricRibbon metrics={metrics} active={active} onSelect={setActive} />
+        <MetricRibbon
+          metrics={metrics}
+          active={metrics.some((m) => m.id === active) ? active : "tps"}
+          onSelect={setActive}
+        />
         {tracks.map((track) => (
           <div
             className="pp-track-chart"
@@ -111,6 +119,7 @@ export default function Performance() {
             <h3 className="pp-track-title">{track.title}</h3>
             <StudioChart
               data={t}
+              staged={false}
               view={track.view}
               active={active}
               crosshair={crosshair}

@@ -2144,3 +2144,70 @@ small {
     display: none;
   }
 }
+
+/* Portaled selectors stay below the structural box radius threshold. */
+.pp-select-trigger {
+  border-radius: 8px;
+  justify-content: space-between;
+  gap: 12px;
+  text-align: left;
+}
+.pp-select-trigger > svg {
+  flex-shrink: 0;
+  transition: transform 0.15s;
+}
+.pp-select-trigger > svg[data-open="true"] {
+  transform: rotate(180deg);
+}
+.pp-select-menu {
+  z-index: 100;
+  min-width: var(--radix-popover-trigger-width);
+  max-height: min(360px, var(--radix-popover-content-available-height));
+  overflow-y: auto;
+  background: rgb(var(--surface-2) / 0.96);
+  border: 1px solid rgb(var(--line) / 0.16);
+  border-radius: 10px;
+  padding: 4px;
+  box-shadow: 0 18px 40px -12px rgb(0 0 0/0.75);
+}
+.pp-select-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  width: 100%;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: rgb(var(--text));
+  text-align: left;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+.pp-select-item:hover,
+.pp-select-item:focus-visible {
+  background: rgb(var(--line) / 0.08);
+}
+.pp-select-item[aria-selected="true"] {
+  background: rgb(var(--accent) / 0.12);
+}
+.pp-select-item > svg {
+  color: rgb(var(--accent));
+}
+.pp-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.pp-stage-label {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+}
+.pp-studio .pp-chart {
+  min-height: 340px;
+}

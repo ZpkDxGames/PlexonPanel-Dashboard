@@ -4,6 +4,7 @@ import { useVirtualizer } from "@tanstack/react-virtual";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Copy, X, ArrowUpRight } from "lucide-react";
 import {
+  useViewSync,
   useControl,
   useRoster,
   usePrefs,
@@ -43,6 +44,9 @@ export function Inspector({ uuid }: { uuid: string }) {
         <PlayerHead
           uuid={uuid}
           name={String(p?.name ?? "Player")}
+          skinTexture={
+            typeof p?.skinTexture === "string" ? p.skinTexture : null
+          }
           provider={prefs.skinProvider}
           size={48}
         />
@@ -249,7 +253,9 @@ export default function Players() {
   const r = useRoster(),
     prefs = usePrefs(),
     [search, setSearch] = useState(""),
-    [all, setAll] = useState(false),
+    sync = useViewSync(),
+    all = sync.rosterScope === "all",
+    setAll = (v: boolean) => sync.set("rosterScope", v ? "all" : "online"),
     [uuid, setUuid] = useState<string | null>(null),
     scroll = useRef<HTMLDivElement>(null),
     players = useMemo(
@@ -307,6 +313,9 @@ export default function Players() {
                     <PlayerHead
                       uuid={String(p.uuid)}
                       name={String(p.name)}
+                      skinTexture={
+                        typeof p.skinTexture === "string" ? p.skinTexture : null
+                      }
                       provider={prefs.skinProvider}
                     />
                     <span className="grow">{String(p.name)}</span>

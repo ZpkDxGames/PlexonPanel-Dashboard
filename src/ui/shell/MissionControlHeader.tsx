@@ -8,6 +8,7 @@ import {
   duration,
   type Phase,
 } from "../bindings";
+import { PpSelect } from "../primitives/Select";
 import { Tooltip } from "../primitives/Tooltip";
 import { MutationButton } from "../primitives/MutationButton";
 export function AuthorityLedgerPill() {
@@ -120,18 +121,28 @@ export function MissionControlHeader({ onPalette }: { onPalette: () => void }) {
     servers = useServers();
   return (
     <header className="pp-ribbon-bar" role="banner">
-      <select
+      <PpSelect
         className="pp-server-switch"
-        aria-label="Active server"
+        ariaLabel="Active server"
         value={s.id}
-        onChange={(e) => void session.select(e.target.value)}
-      >
-        {servers.map((r) => (
-          <option value={r.id} key={r.id}>
-            {r.name}
-          </option>
-        ))}
-      </select>
+        onChange={(v) => void session.select(v)}
+        options={servers.map((r) => ({
+          value: r.id,
+          label: r.name,
+          leading: (
+            <i
+              className="pp-dot"
+              data-tone={
+                r.phase === "online"
+                  ? "emerald"
+                  : r.phase === "offline"
+                    ? "rose"
+                    : "amber"
+              }
+            />
+          ),
+        }))}
+      />
       <div
         className="pp-ribbon-bar__meta"
         data-tone={

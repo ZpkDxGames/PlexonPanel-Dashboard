@@ -1,7 +1,14 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { Download } from "lucide-react";
-import { useControl, useActiveServer, usePrefs, time } from "../bindings";
+import {
+  useViewSync,
+  useControl,
+  useActiveServer,
+  usePrefs,
+  time,
+} from "../bindings";
+import { PpSelect } from "../primitives/Select";
 import { Tabs } from "../primitives/Tabs";
 import { LiveConsole } from "../console/LiveConsole";
 import { CommandComposer } from "../console/CommandComposer";
@@ -11,12 +18,15 @@ export default function Console() {
   const snap = useControl(),
     server = useActiveServer(),
     prefs = usePrefs(),
-    [tab, setTab] = useState<"console" | "chat" | "plugins">("console"),
-    [level, setLevel] = useState("All"),
+    sync = useViewSync(),
+    tab = sync.idePane,
+    setTab = (v: "console" | "chat" | "plugins") => sync.set("idePane", v),
+    level = sync.ideLevel,
+    setLevel = (v: string) => sync.set("ideLevel", v as typeof level),
     [search, setSearch] = useState(""),
-    [regex, setRegex] = useState(false),
-    [plugin, setPlugin] = useState(""),
-    [wrap, setWrap] = useState(true),
+    regex = sync.ideRegex,
+    plugin = sync.idePlugin,
+    wrap = sync.ideWrap,
     [clearBefore, setClearBefore] = useState(0),
     filter = useRef<HTMLInputElement>(null);
   useEffect(() => {
@@ -34,11 +44,11 @@ export default function Console() {
       }
       if (e.altKey && e.key.toLowerCase() === "r") {
         e.preventDefault();
-        setRegex((v) => !v);
+        sync.set("ideRegex", (v) => !v);
       }
       if (e.altKey && e.key.toLowerCase() === "z") {
         e.preventDefault();
-        setWrap((v) => !v);
+        sync.set("ideWrap", (v) => !v);
       }
       if (
         e.key === "End" &&
@@ -121,24 +131,26 @@ export default function Console() {
         <button
           className="pp-ctl desktop-only"
           aria-pressed={regex}
-          onClick={() => setRegex((v) => !v)}
+          onClick={() => sync.set("ideRegex", (v) => !v)}
         >
           .*
         </button>
-        <select
-          aria-label="Filter plugin"
+        <PpSelect
+          ariaLabel="Filter plugin"
           value={plugin}
-          onChange={(e) => setPlugin(e.target.value)}
-        >
-          <option value="">All plugins</option>
-          {snap.state.plugins.map((p) => (
-            <option key={String(p.name)}>{String(p.name)}</option>
-          ))}
-        </select>
+          onChange={(v) => sync.set("idePlugin", v)}
+          options={[
+            { value: "", label: "All plugins" },
+            ...snap.state.plugins.map((p) => ({
+              value: String(p.name),
+              label: String(p.name),
+            })),
+          ]}
+        />
         <button
           className="pp-ctl desktop-only"
           aria-pressed={wrap}
-          onClick={() => setWrap((v) => !v)}
+          onClick={() => sync.set("ideWrap", (v) => !v)}
         >
           Wrap
         </button>

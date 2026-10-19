@@ -1,3 +1,4 @@
+import { skinCandidates } from "../bindings/skins";
 import { useState } from "react";
 import {
   fmt,
@@ -37,37 +38,54 @@ export function SourceTag({
     </span>
   );
 }
-export function PlayerHead({
-  uuid,
-  name,
-  provider,
-  size = 20,
-}: {
+type PlayerHeadProps = {
   uuid: string;
   name: string;
+  skinTexture?: string | null;
   provider: Preferences["skinProvider"];
   size?: number;
+};
+export function PlayerHead(props: PlayerHeadProps) {
+  const candidates = skinCandidates(props);
+  // A new identity/provider resets fallback progress without a stale failed frame.
+  return (
+    <HeadImage
+      key={JSON.stringify([
+        props.provider,
+        props.uuid,
+        props.name,
+        props.skinTexture,
+        props.size,
+      ])}
+      candidates={candidates}
+      name={props.name}
+      size={props.size ?? 20}
+    />
+  );
+}
+function HeadImage({
+  candidates,
+  name,
+  size,
+}: {
+  candidates: string[];
+  name: string;
+  size: number;
 }) {
-  const [failed, setFailed] = useState(""),
-    key = `${provider}:${uuid}`;
-  const url =
-    provider === "proxy"
-      ? `/api/skins/${uuid}`
-      : provider === "crafatar"
-        ? `https://crafatar.com/avatars/${uuid}?size=${size}&overlay`
-        : provider === "mc-heads"
-          ? `https://mc-heads.net/avatar/${uuid}/${size}`
-          : provider === "minotar"
-            ? `https://minotar.net/avatar/${uuid}/${size}`
-            : "";
+  const [stageIndex, setStageIndex] = useState(0);
   return (
     <span
       className="pp-avatar"
       style={{ width: size, height: size }}
       aria-label={name}
     >
-      {url && failed !== key ? (
-        <img src={url} alt="" onError={() => setFailed(key)} loading="lazy" />
+      {candidates[stageIndex] ? (
+        <img
+          src={candidates[stageIndex]}
+          alt=""
+          onError={() => setStageIndex((i) => i + 1)}
+          loading="lazy"
+        />
       ) : (
         name.slice(0, 2).toUpperCase()
       )}
@@ -86,6 +104,9 @@ export function AvatarStack({ players }: { players: JsonMap[] }) {
               key={String(v.uuid)}
               uuid={String(v.uuid)}
               name={String(v.name)}
+              skinTexture={
+                typeof v.skinTexture === "string" ? v.skinTexture : null
+              }
               provider={p.skinProvider}
             />
           ))

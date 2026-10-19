@@ -4,12 +4,18 @@ import {
   record,
   fmt,
   time,
-  type Sample,
   type Tone,
   type TelemetryView,
 } from "../bindings";
 import { buildRows, buildTimeTicks, type Row } from "../chart/scales";
 import { monotone } from "./geometry";
+import {
+  adaptiveMsptMax,
+  stageBounds,
+  scaleInStage,
+  gapLabelPositions,
+  type StageBounds,
+} from "./stages";
 export type ChartView =
   "tick" | "memory" | "cpu" | "compute" | "gc" | "entities";
 export type ChartData = Pick<
@@ -83,27 +89,43 @@ export function ChartDefs({ prefix }: { prefix: string }) {
     </defs>
   );
 }
-function segments(rows: Row[], key: string) {
+type Gap = { from: number; to: number };
+function segments(rows: Row[], key: string, gaps: Gap[]) {
   const result: Row[][] = [];
   let current: Row[] = [];
-  for (const r of rows) {
-    const prev = current.at(-1);
+  for (const row of rows) {
+    const previous = current.at(-1),
+      inGap = gaps.some((g) => row.t > g.from && row.t < g.to);
     if (
-      typeof r[key] !== "number" ||
-      (prev && (r.epoch !== prev.epoch || r.t - prev.t > 10000))
+      typeof row[key] !== "number" ||
+      inGap ||
+      (previous &&
+        (row.epoch !== previous.epoch ||
+          row.t - previous.t > 10000 ||
+          gaps.some((g) => previous.t <= g.from && row.t >= g.to)))
     ) {
       if (current.length) result.push(current);
       current = [];
     }
-    if (typeof r[key] === "number") current.push(r);
+    if (typeof row[key] === "number" && !inGap) current.push(row);
   }
   if (current.length) result.push(current);
   return result;
 }
+type Series = {
+  key: string;
+  label: string;
+  tone: Tone;
+  rows: Row[];
+  max: number;
+  min?: number;
+};
+type Stage = { label: string; series: Series[]; bounds: StageBounds };
 export function StudioChart({
   data,
   view = "tick",
   active = "tps",
+  staged = true,
   crosshair,
   onCrosshair,
   stale = false,
@@ -111,6 +133,7 @@ export function StudioChart({
   data: ChartData;
   view?: ChartView;
   active?: string;
+  staged?: boolean;
   crosshair?: number | null;
   onCrosshair?: (value: number | null) => void;
   stale?: boolean;
@@ -122,15 +145,14 @@ export function StudioChart({
     id = useId().replaceAll(":", ""),
     { w, h } = size;
   useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const r = new ResizeObserver(([e]) =>
+    if (!ref.current) return;
+    const observer = new ResizeObserver(([e]) =>
       setSize({ w: e.contentRect.width, h: e.contentRect.height }),
     );
-    r.observe(el);
-    return () => r.disconnect();
+    observer.observe(ref.current);
+    return () => observer.disconnect();
   }, []);
-  const rows = buildRows(data.paper),
+  const rows = buildRows(data.paper, Infinity),
     system = buildRows(data.system).system.map((row, i, all) =>
       i === 0 || all[i - 1].epoch !== row.epoch || all[i - 1].gc === null
         ? { ...row, gc: null }
@@ -138,212 +160,147 @@ export function StudioChart({
     ),
     host = buildRows(data.host).host,
     service = buildRows(data.service).service,
-    l = 44,
-    r = 44,
-    top = 16,
+    l = w < 500 ? 30 : 44,
+    r = w < 500 ? 30 : 44,
+    top = 8,
     bottom = h - 25,
     pw = Math.max(1, w - l - r),
     ph = Math.max(1, bottom - top),
     x = (at: number) =>
-      l + ((at - data.since) / Math.max(1, data.now - data.since)) * pw;
-  type Series = {
-    key: string;
-    label: string;
-    tone: Tone;
-    rows: Row[];
-    max: number;
-    min?: number;
-  };
-  const memoryMax = Math.max(
-      1,
-      ...system.map((s) => Number(s.max ?? s.committed ?? s.heap ?? 0)),
-      ...service.map((s) => Number(s.cgroup ?? 0)),
+      l + ((at - data.since) / Math.max(1, data.now - data.since)) * pw,
+    maximum = (rs: Row[], keys: string[], floor: number) =>
+      Math.max(
+        floor,
+        ...rs.flatMap((s) =>
+          keys.map((k) => (typeof s[k] === "number" ? Number(s[k]) : 0)),
+        ),
+      ),
+    memoryMax = Math.max(
+      maximum(system, ["max", "committed", "heap"], 1),
+      maximum(service, ["cgroup"], 1),
     ),
-    cpuMax = Math.max(100, ...service.map((s) => Number(s.cpu ?? 0))),
-    servicePeak = service.some((r) => typeof r.cpu === "number")
-      ? Math.max(
-          ...service.map((r) =>
-            typeof r.cpu === "number" ? r.cpu : -Infinity,
-          ),
-        )
+    heapMax = maximum(system, ["committed", "max", "heap"], 1),
+    cpuMax = Math.max(
+      maximum(service, ["cpu"], 100),
+      maximum(host, ["node"], 100),
+    ),
+    servicePeak = service.some((s) => typeof s.cpu === "number")
+      ? maximum(service, ["cpu"], 0)
       : null,
-    entityMax = Math.max(
-      1,
-      ...rows.paper.flatMap((s) => [
-        Number(s.chunks ?? 0),
-        Number(s.entities ?? 0),
-      ]),
-    );
-  const defs: Record<ChartView, Series[]> = {
-      tick: [
-        {
-          key: "tps",
-          label: "TPS",
-          tone: "emerald",
-          rows: rows.paper,
-          max: 20,
-          min: 15,
-        },
-        {
-          key: "mspt",
-          label: "Mean MSPT",
-          tone: "cyan",
-          rows: rows.paper,
-          max: 60,
-        },
-        { key: "p95", label: "p95", tone: "violet", rows: rows.paper, max: 60 },
-        { key: "p99", label: "p99", tone: "amber", rows: rows.paper, max: 60 },
-      ],
-      memory: [
-        {
-          key: "cgroup",
-          label: "Cgroup",
-          tone: "indigo",
-          rows: service,
-          max: memoryMax,
-        },
-        {
-          key: "committed",
-          label: "Committed",
-          tone: "violet",
-          rows: system,
-          max: memoryMax,
-        },
-        {
-          key: "heap",
-          label: "Heap used",
-          tone: "violet",
-          rows: system,
-          max: memoryMax,
-        },
-      ],
-      compute: [
-        {
-          key: "cpu",
-          label: "Service CPU",
-          tone: "indigo",
-          rows: service,
-          max: cpuMax,
-        },
-        {
-          key: "node",
-          label: "Node CPU",
-          tone: "cyan",
-          rows: host,
-          max: cpuMax,
-        },
-      ],
-      cpu: [
-        {
-          key: "cpu",
-          label: "Service CPU",
-          tone: "indigo",
-          rows: service,
-          max: cpuMax,
-        },
-        {
-          key: "node",
-          label: "Node CPU",
-          tone: "cyan",
-          rows: host,
-          max: cpuMax,
-        },
-        {
-          key: "peak",
-          label: "Service peak",
-          tone: "amber",
-          rows: service.map((r) => ({
-            ...r,
-            peak: typeof r.cpu === "number" ? servicePeak : null,
-          })),
-          max: cpuMax,
-        },
-        {
-          key: "chunks",
-          label: "Chunks",
-          tone: "emerald",
-          rows: rows.paper,
-          max: entityMax,
-        },
-        {
-          key: "entities",
-          label: "Entities",
-          tone: "violet",
-          rows: rows.paper,
-          max: entityMax,
-        },
-      ],
-      gc: [
-        {
-          key: "gc",
-          label: "GC Δ ms",
-          tone: "rose",
-          rows: system,
-          max: Math.max(10, ...system.map((s) => Number(s.gc ?? 0))),
-        },
-      ],
-      entities: [
-        {
-          key: "chunks",
-          label: "Chunks",
-          tone: "cyan",
-          rows: rows.paper,
-          max: entityMax,
-        },
-        {
-          key: "entities",
-          label: "Entities",
-          tone: "violet",
-          rows: rows.paper,
-          max: entityMax,
-        },
-      ],
-    },
-    series = defs[view];
-  const y = (value: number, s: Series) =>
-    bottom -
-    ((Math.min(s.max, Math.max(s.min ?? 0, value)) - (s.min ?? 0)) /
-      Math.max(1, s.max - (s.min ?? 0))) *
-      ph;
-  const cursor = crosshair === undefined ? hover : crosshair;
-  const nearestRow =
-    cursor == null
-      ? null
-      : series[0].rows.reduce<Row | null>(
-          (a, p) =>
-            typeof p[series[0].key] !== "number"
-              ? a
-              : !a || Math.abs(p.t - cursor) < Math.abs(a.t - cursor)
-                ? p
-                : a,
-          null,
-        );
-  const sampleAt = nearestRow?.t ?? null;
-  const readoutSeries =
+    entityMax = maximum(rows.paper, ["chunks", "entities"], 1),
+    msptMax = adaptiveMsptMax(
+      rows.paper.flatMap((s) => [s.mspt, s.p95, s.p99]),
+    ),
+    gcMax = maximum(system, ["gc"], 0) * 1.2,
+    item = (
+      key: string,
+      label: string,
+      tone: Tone,
+      rs: Row[],
+      max: number,
+      min = 0,
+    ): Series => ({ key, label, tone, rows: rs, max, min }),
+    tps = item("tps", "TPS", "emerald", rows.paper, 20, 15),
+    envelope = [
+      item("mspt", "Mean MSPT", "cyan", rows.paper, msptMax),
+      item("p95", "p95", "violet", rows.paper, msptMax),
+      item("p99", "p99", "amber", rows.paper, msptMax),
+    ],
+    gc = item("gc", "GC Δ ms", "rose", system, Math.max(5, gcMax)),
+    heap = item("heap", "Heap used", "violet", system, heapMax),
+    committed = item("committed", "Committed", "cyan", system, memoryMax),
+    cgroup = item("cgroup", "Cgroup", "indigo", service, memoryMax),
+    compute = [
+      item("cpu", "Service CPU", "indigo", service, cpuMax),
+      item("node", "Node CPU", "cyan", host, cpuMax),
+    ],
+    peak = item(
+      "peak",
+      "Service peak",
+      "amber",
+      service.map((s) => ({
+        ...s,
+        peak: typeof s.cpu === "number" ? servicePeak : null,
+      })),
+      cpuMax,
+    ),
+    counts = [
+      item("chunks", "Chunks", "emerald", rows.paper, entityMax),
+      item("entities", "Entities", "violet", rows.paper, entityMax),
+    ],
+    isStaged = staged && ["tick", "memory", "cpu"].includes(view);
+  const groups =
     view === "tick"
-      ? [
-          ...series,
-          {
-            key: "gc",
-            label: "GC Δ ms",
-            tone: "rose" as Tone,
-            rows: system,
-            max: 100,
-          },
-        ]
-      : series;
-  const cx = sampleAt == null ? null : x(sampleAt),
+      ? [[tps], envelope, [gc]]
+      : view === "memory"
+        ? [[heap], [committed], [cgroup]]
+        : view === "cpu"
+          ? [[...compute, peak], counts]
+          : view === "compute"
+            ? [compute]
+            : view === "gc"
+              ? [[gc]]
+              : [counts];
+  const labels =
+    view === "tick"
+      ? ["TPS", "MSPT (MEAN / P95–P99)", "GC Δ"]
+      : view === "memory"
+        ? ["JVM HEAP USED", "JVM COMMITTED", "SERVICE CGROUP"]
+        : view === "cpu"
+          ? ["COMPUTE LOAD (%)", "WORLD LOAD (COUNT)"]
+          : [""];
+  const bounds = isStaged
+    ? stageBounds(
+        top,
+        bottom,
+        view === "tick" ? [26, 52, 22] : view === "cpu" ? [52, 48] : [1, 1, 1],
+      )
+    : [{ top, bottom, plotTop: top + 7, plotBottom: bottom }];
+  const stages: Stage[] = isStaged
+    ? groups.map((series, i) => ({
+        label: labels[i],
+        series,
+        bounds: bounds[i],
+      }))
+    : [
+        {
+          label: "",
+          series: groups
+            .flat()
+            .filter((s) => view !== "tick" || s.key !== "gc"),
+          bounds: bounds[0],
+        },
+      ];
+  const series = stages.flatMap((s) => s.series),
+    cursor = crosshair === undefined ? hover : crosshair,
+    nearest =
+      cursor == null
+        ? null
+        : series
+            .flatMap((s) => s.rows.filter((r) => typeof r[s.key] === "number"))
+            .reduce<Row | null>(
+              (a, p) =>
+                !a || Math.abs(p.t - cursor) < Math.abs(a.t - cursor) ? p : a,
+              null,
+            ),
+    sampleAt = nearest?.t ?? null,
+    cx = sampleAt == null ? null : x(sampleAt),
     ticks = buildTimeTicks(
       data.since,
       data.now,
       (t, seconds) => time(t, prefs.timezone, seconds),
       w < 500 ? 3 : 7,
+    ),
+    uniqueGaps = rows.gaps,
+    gapLabels = gapLabelPositions(uniqueGaps.map((g) => x(g.to))),
+    hasFocus = series.some(
+      (s) => s.key === active || (active === "max" && s.key === "cgroup"),
     );
-  const uniqueGaps = rows.gaps;
   return (
     <div
       ref={ref}
       className="pp-chart pp-well"
+      data-staged={isStaged}
       onPointerMove={(e) => {
         const rect = e.currentTarget.getBoundingClientRect(),
           at =
@@ -361,7 +318,7 @@ export function StudioChart({
       <svg
         viewBox={`0 0 ${w} ${h}`}
         role="img"
-        aria-label={`${view} telemetry; ${data.paper.length} samples. ${series.map((s) => `${s.label} range ${fmt(Math.min(...s.rows.filter((r) => typeof r[s.key] === "number").map((r) => Number(r[s.key]))))} to ${fmt(Math.max(...s.rows.filter((r) => typeof r[s.key] === "number").map((r) => Number(r[s.key]))))}`).join("; ")}`}
+        aria-label={`${view} telemetry; ${data.paper.length} samples. ${isStaged ? `${stages.length} separate stages.` : ""} ${series.map((s) => `${s.label} range ${s.min ?? 0} to ${fmt(s.max)}`).join("; ")}`}
       >
         <ChartDefs prefix={id} />
         <defs>
@@ -369,44 +326,6 @@ export function StudioChart({
             <rect x={l} y={top} width={pw} height={ph} />
           </clipPath>
         </defs>
-        {[0, 0.25, 0.5, 0.75, 1].map((f) => (
-          <g key={f}>
-            <line
-              x1={l}
-              x2={w - r}
-              y1={top + ph * f}
-              y2={top + ph * f}
-              stroke="rgb(var(--line)/.07)"
-            />
-            <text
-              x={w - r + 9}
-              y={top + ph * f + 3}
-              fontSize="9"
-              fill="rgb(var(--faint))"
-            >
-              {fmt(
-                (view === "tick"
-                  ? 60
-                  : view === "cpu"
-                    ? entityMax
-                    : series[0].max) *
-                  (1 - f),
-                0,
-              )}
-            </text>
-            {view === "tick" && (f === 0 || f === 1) && (
-              <text
-                x={l - 9}
-                y={top + ph * f + 3}
-                textAnchor="end"
-                fontSize="9"
-                fill="rgb(var(--emerald))"
-              >
-                {f === 0 ? "20" : "15"}
-              </text>
-            )}
-          </g>
-        ))}
         {ticks.ticks.map((t) => (
           <g key={t}>
             <line
@@ -427,8 +346,187 @@ export function StudioChart({
             </text>
           </g>
         ))}
+        {stages.map((stage, stageIndex) => {
+          const b = stage.bounds,
+            focused = stage.series.some(
+              (s) =>
+                s.key === active || (active === "max" && s.key === "cgroup"),
+            ),
+            y = (value: number, s: Series) =>
+              scaleInStage(value, s.min ?? 0, s.max, b);
+          return (
+            <g
+              key={stageIndex}
+              data-stage={stageIndex + 1}
+              data-stage-top={b.plotTop}
+              data-stage-bottom={b.plotBottom}
+              opacity={stale ? 0.55 : !hasFocus || focused ? 1 : 0.78}
+            >
+              {isStaged && (
+                <>
+                  <line
+                    x1={l}
+                    x2={w - r}
+                    y1={b.top}
+                    y2={b.top}
+                    stroke="rgb(var(--line)/.12)"
+                  />
+                  <text
+                    x={l + 6}
+                    y={b.top + 11}
+                    className="pp-stage-label"
+                    fill="rgb(var(--muted))"
+                  >
+                    STAGE {String(stageIndex + 1).padStart(2, "0")} ·{" "}
+                    {stage.label}
+                  </text>
+                </>
+              )}
+              {[0, 0.5, 1].map((f) => (
+                <g key={f}>
+                  <line
+                    x1={l}
+                    x2={w - r}
+                    y1={b.plotTop + (b.plotBottom - b.plotTop) * f}
+                    y2={b.plotTop + (b.plotBottom - b.plotTop) * f}
+                    stroke="rgb(var(--line)/.06)"
+                  />
+                  <text
+                    x={w - r + 6}
+                    y={b.plotTop + (b.plotBottom - b.plotTop) * f + 3}
+                    fontSize="9"
+                    fill="rgb(var(--faint))"
+                  >
+                    {fmt(
+                      (stage.series[0].min ?? 0) +
+                        (stage.series[0].max - (stage.series[0].min ?? 0)) *
+                          (1 - f),
+                      stage.series[0].max < 5 ? 1 : 0,
+                    )}
+                  </text>
+                </g>
+              ))}
+              <g clipPath={`url(#${id}-clip)`}>
+                {view === "tick" &&
+                  stage.series.some((s) => s.key === "p95") &&
+                  segments(rows.paper, "p95", uniqueGaps).flatMap((seg, i) => {
+                    // A missing bound starts a new band too; never bridge an unavailable sample.
+                    return segments(seg, "p99", uniqueGaps).map((valid, j) => {
+                      const lower = valid.map((p) => ({
+                          x: x(p.t),
+                          y: y(Number(p.p95), envelope[1]),
+                        })),
+                        upper = [...valid]
+                          .reverse()
+                          .map((p) => ({
+                            x: x(p.t),
+                            y: y(Number(p.p99), envelope[2]),
+                          }));
+                      return (
+                        <path
+                          key={`${i}-${j}`}
+                          data-band="p95-p99"
+                          d={`${monotone(lower)}L${upper.map((p) => `${p.x},${p.y}`).join("L")}Z`}
+                          fill={`url(#${id}-band-p95p99)`}
+                        />
+                      );
+                    });
+                  })}
+                {stage.series.map((s) =>
+                  segments(s.rows, s.key, uniqueGaps).map((seg, i) => {
+                    const points = seg.map((p) => ({
+                        x: x(p.t),
+                        y: y(Number(p[s.key]), s),
+                      })),
+                      line = monotone(points),
+                      isActive = active === s.key;
+                    return (
+                      <g key={`${s.key}-${i}`}>
+                        {s.key !== "gc" && s.key !== "peak" && (
+                          <path
+                            data-area={s.key}
+                            d={`${line}L${points.at(-1)!.x},${b.plotBottom}L${points[0].x},${b.plotBottom}Z`}
+                            fill={`url(#${id}-grad-${s.tone})`}
+                          />
+                        )}
+                        {s.key === "gc" ? (
+                          points.map((p, j) => (
+                            <line
+                              key={j}
+                              data-impulse="gc"
+                              x1={p.x}
+                              x2={p.x}
+                              y1={b.plotBottom}
+                              y2={p.y}
+                              stroke="rgb(var(--rose))"
+                              strokeWidth="2"
+                            />
+                          ))
+                        ) : (
+                          <path
+                            data-series={s.key}
+                            data-epoch={seg[0].epoch}
+                            data-from={seg[0].t}
+                            data-to={seg.at(-1)!.t}
+                            d={line}
+                            fill="none"
+                            stroke={`rgb(var(--${s.tone}))`}
+                            strokeWidth={isActive ? 1.8 : 1.4}
+                            strokeDasharray={
+                              s.key === "peak" ? "4 4" : undefined
+                            }
+                            vectorEffect="non-scaling-stroke"
+                            className="pp-chart-line"
+                            filter={isActive ? `url(#${id}-glow)` : undefined}
+                          />
+                        )}
+                      </g>
+                    );
+                  }),
+                )}
+                {view === "memory" && (!isStaged || stageIndex === 2) && (
+                  <line
+                    data-memory-limit="true"
+                    x1={l}
+                    x2={w - r}
+                    y1={y(maximum(system, ["max"], memoryMax), cgroup)}
+                    y2={y(maximum(system, ["max"], memoryMax), cgroup)}
+                    stroke="rgb(var(--violet)/.6)"
+                    strokeDasharray="4 4"
+                  />
+                )}
+                {view === "tick" &&
+                  stage.series.some((s) => s.key === "mspt") && (
+                    <g data-budget="50">
+                      <line
+                        x1={l}
+                        x2={w - r}
+                        y1={msptMax >= 45 ? y(50, envelope[0]) : b.plotTop + 2}
+                        y2={msptMax >= 45 ? y(50, envelope[0]) : b.plotTop + 2}
+                        stroke="rgb(var(--amber)/.6)"
+                        strokeDasharray="5 5"
+                      />
+                      <text
+                        x={l + 5}
+                        y={
+                          (msptMax >= 45 ? y(50, envelope[0]) : b.plotTop + 2) +
+                          11
+                        }
+                        fontSize="9"
+                        fill="rgb(var(--amber))"
+                      >
+                        {msptMax >= 45
+                          ? "50 ms budget"
+                          : `50 ms budget · scale 0–${msptMax} ms`}
+                      </text>
+                    </g>
+                  )}
+              </g>
+            </g>
+          );
+        })}
         <g clipPath={`url(#${id}-clip)`}>
-          {uniqueGaps.map((g) => (
+          {uniqueGaps.map((g, i) => (
             <g key={g.id}>
               <rect
                 data-gap="true"
@@ -446,132 +544,23 @@ export function StudioChart({
                 stroke="rgb(var(--rose)/.45)"
                 strokeDasharray="3 4"
               />
-              <text
-                x={x(g.to) + 5}
-                y={top + 12}
-                fontSize="9"
-                fill="rgb(var(--muted))"
-              >
-                restart · epoch{" "}
-                {rows.paper.find((s) => s.t >= g.to)?.epoch.slice(0, 8)}
-              </text>
+              {gapLabels[i] && (
+                <text
+                  data-epoch-label="true"
+                  x={x(g.to) + 5}
+                  y={bottom - 4}
+                  fontSize="9"
+                  fill="rgb(var(--muted))"
+                >
+                  restart · epoch{" "}
+                  {rows.paper.find((s) => s.t >= g.to)?.epoch.slice(0, 8)}
+                </text>
+              )}
             </g>
           ))}
-          {view === "tick" &&
-            segments(rows.paper, "p95").flatMap((seg, i) => {
-              const valid = seg.filter((s) => typeof s.p99 === "number");
-              if (!valid.length) return [];
-              const lower = valid.map((p) => ({
-                  x: x(p.t),
-                  y: y(Number(p.p95), series[2]),
-                })),
-                upper = [...valid]
-                  .reverse()
-                  .map((p) => ({ x: x(p.t), y: y(Number(p.p99), series[3]) }));
-              return (
-                <path
-                  key={i}
-                  data-band="p95-p99"
-                  d={`${monotone(lower)}L${upper.map((p) => `${p.x},${p.y}`).join("L")}Z`}
-                  fill={`url(#${id}-band-p95p99)`}
-                />
-              );
-            })}
-          {series.map((s) =>
-            segments(s.rows, s.key).map((seg, i) => {
-              const points = seg.map((p) => ({
-                  x: x(p.t),
-                  y: y(Number(p[s.key]), s),
-                })),
-                line = monotone(points),
-                isActive =
-                  active === s.key || (active === "mean" && s.key === "mspt");
-              return (
-                <g
-                  key={`${s.key}-${i}`}
-                  opacity={stale ? 0.55 : isActive ? 1 : 0.55}
-                >
-                  <path
-                    data-area={s.key}
-                    d={`${line}L${points.at(-1)!.x},${bottom}L${points[0].x},${bottom}Z`}
-                    fill={`url(#${id}-grad-${s.tone})`}
-                  />
-                  {view === "gc" ? (
-                    points.map((p, i) => (
-                      <line
-                        key={i}
-                        x1={p.x}
-                        x2={p.x}
-                        y1={bottom}
-                        y2={p.y}
-                        stroke="rgb(var(--rose))"
-                        strokeWidth="2"
-                      />
-                    ))
-                  ) : (
-                    <path
-                      data-series={s.key}
-                      data-epoch={seg[0].epoch}
-                      data-from={seg[0].t}
-                      data-to={seg.at(-1)!.t}
-                      d={line}
-                      fill="none"
-                      stroke={`rgb(var(--${s.tone}))`}
-                      strokeWidth={isActive ? 1.8 : 1.4}
-                      vectorEffect="non-scaling-stroke"
-                      className="pp-chart-line"
-                      filter={isActive ? `url(#${id}-glow)` : undefined}
-                    />
-                  )}
-                </g>
-              );
-            }),
-          )}
-          {view === "memory" && (
-            <line
-              data-memory-limit="true"
-              x1={l}
-              x2={w - r}
-              y1={y(
-                Number(
-                  system.find((s) => typeof s.max === "number")?.max ??
-                    memoryMax,
-                ),
-                series[0],
-              )}
-              y2={y(
-                Number(
-                  system.find((s) => typeof s.max === "number")?.max ??
-                    memoryMax,
-                ),
-                series[0],
-              )}
-              stroke="rgb(var(--violet)/.5)"
-              strokeDasharray="4 4"
-            />
-          )}
-          {view === "tick" && (
-            <g data-budget="50">
-              <line
-                x1={l}
-                x2={w - r}
-                y1={y(50, series[1])}
-                y2={y(50, series[1])}
-                stroke="rgb(var(--amber)/.65)"
-                strokeDasharray="5 5"
-              />
-              <text
-                x={l + 5}
-                y={y(50, series[1]) - 6}
-                fontSize="9"
-                fill="rgb(var(--amber))"
-              >
-                50 ms budget
-              </text>
-            </g>
-          )}
           {cx != null && (
             <line
+              data-crosshair="true"
               x1={cx}
               x2={cx}
               y1={top}
@@ -596,34 +585,33 @@ export function StudioChart({
         >
           <b>{time(sampleAt, prefs.timezone)}</b>
           <dl>
-            {readoutSeries.map((s) => {
-              const values = s.rows.filter((p) => typeof p[s.key] === "number"),
-                row =
-                  sampleAt == null
-                    ? null
-                    : values.reduce<Row | null>(
-                        (a, p) =>
-                          !a ||
-                          Math.abs(p.t - sampleAt) < Math.abs(a.t - sampleAt)
-                            ? p
-                            : a,
-                        null,
-                      );
-              return (
-                <div key={s.key}>
-                  <dt>{s.label}</dt>
-                  <dd>
-                    {fmt(
-                      view === "tick" && s.key !== "gc"
-                        ? (record(data.paper.find((p) => p.at === row?.t))[
-                            s.key
-                          ] ?? row?.[s.key])
-                        : row?.[s.key],
-                    )}
-                  </dd>
-                </div>
-              );
-            })}
+            {(view === "tick" && !isStaged ? [...series, gc] : series).map(
+              (s) => {
+                const row = s.rows
+                  .filter((p) => typeof p[s.key] === "number")
+                  .reduce<Row | null>(
+                    (a, p) =>
+                      !a || Math.abs(p.t - sampleAt) < Math.abs(a.t - sampleAt)
+                        ? p
+                        : a,
+                    null,
+                  );
+                return (
+                  <div key={s.key}>
+                    <dt>{s.label}</dt>
+                    <dd>
+                      {fmt(
+                        view === "tick" && s.key !== "gc"
+                          ? (record(data.paper.find((p) => p.at === row?.t))[
+                              s.key
+                            ] ?? row?.[s.key])
+                          : row?.[s.key],
+                      )}
+                    </dd>
+                  </div>
+                );
+              },
+            )}
           </dl>
         </div>
       )}

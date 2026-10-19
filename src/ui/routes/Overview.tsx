@@ -2,7 +2,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { ArrowUpRight, Globe2 } from "lucide-react";
-import { useRoster, usePrefs, duration, fmt } from "../bindings";
+import { useRoster, useViewSync, usePrefs, duration, fmt } from "../bindings";
 import {
   ConnectedInstrumentDeck,
   PlayerHead,
@@ -13,8 +13,11 @@ import { LiveConsole } from "../console/LiveConsole";
 export default function Overview() {
   const r = useRoster(),
     prefs = usePrefs(),
-    [channel, setChannel] = useState<"console" | "events">("console"),
-    [level, setLevel] = useState("All"),
+    sync = useViewSync(),
+    channel = sync.dockFeed,
+    setChannel = (v: "console" | "events") => sync.set("dockFeed", v),
+    level = sync.dockLevel,
+    setLevel = (v: string) => sync.set("dockLevel", v as typeof level),
     [search, setSearch] = useState("");
   return (
     <div className="pp-overview">
@@ -82,6 +85,9 @@ export default function Overview() {
                 <PlayerHead
                   uuid={String(p.uuid)}
                   name={String(p.name)}
+                  skinTexture={
+                    typeof p.skinTexture === "string" ? p.skinTexture : null
+                  }
                   provider={prefs.skinProvider}
                 />
                 <span className="grow">{String(p.name)}</span>
