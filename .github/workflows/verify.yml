@@ -10,6 +10,8 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
+      - name: Install purge-check dependency
+        run: sudo apt-get update && sudo apt-get install --yes ripgrep
       - run: npm run verify:purge && npm run typecheck && npm run lint && npm test && npm run build
       - run: npx playwright install --with-deps chromium
       - run: npm run verify:production
