@@ -8,6 +8,7 @@ import { Tooltip } from "../primitives/Tooltip";
 import { ROUTES } from "./routes";
 import { MissionControlHeader } from "./MissionControlHeader";
 import { CommandPalette } from "./CommandPalette";
+import { PlayerEventsFeeder } from "../players/PlayerEventsFeeder";
 export function AppShell({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false),
     [palette, setPalette] = useState(false),
@@ -51,7 +52,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     return () => window.removeEventListener("keydown", key);
   }, [router]);
   return (
-    <>
+    <PlayerEventsFeeder>
       <div className="pp-shell" data-rail={open ? "open" : "compact"}>
         <nav className="pp-rail" aria-label="Primary">
           <Link
@@ -114,6 +115,6 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
       </div>
       <CommandPalette open={palette} onOpenChange={setPalette} />
-    </>
+    </PlayerEventsFeeder>
   );
 }

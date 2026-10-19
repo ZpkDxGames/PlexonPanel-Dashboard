@@ -10,6 +10,7 @@ import {
 import { TelemetryStudio } from "../studio/TelemetryStudio";
 import { Tabs } from "../primitives/Tabs";
 import { LiveConsole } from "../console/LiveConsole";
+import { PlayerEventsDock } from "../players/PlayerEventsDock";
 export default function Overview() {
   const r = useRoster(),
     prefs = usePrefs(),
@@ -43,30 +44,32 @@ export default function Overview() {
               Open console <ArrowUpRight size={13} />
             </Link>
           </header>
-          <div className="pp-console-toolbar">
-            <div className="pp-seg" role="group" aria-label="Severity">
-              {["All", "Info", "Warn", "Error"].map((l) => (
-                <button
-                  key={l}
-                  aria-pressed={level === l}
-                  onClick={() => setLevel(l)}
-                >
-                  {l}
-                </button>
-              ))}
-            </div>
-            <input
-              aria-label="Filter overview logs"
-              placeholder="Filter this boot…"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-          </div>
-          <LiveConsole
-            mode="compact"
-            channel={channel}
-            filters={{ level, search }}
-          />
+          {channel === "events" ? (
+            <PlayerEventsDock />
+          ) : (
+            <>
+              <div className="pp-console-toolbar">
+                <div className="pp-seg" role="group" aria-label="Severity">
+                  {["All", "Info", "Warn", "Error"].map((l) => (
+                    <button
+                      key={l}
+                      aria-pressed={level === l}
+                      onClick={() => setLevel(l)}
+                    >
+                      {l}
+                    </button>
+                  ))}
+                </div>
+                <input
+                  aria-label="Filter overview logs"
+                  placeholder="Filter this boot…"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                />
+              </div>
+              <LiveConsole mode="compact" filters={{ level, search }} />
+            </>
+          )}
         </section>
         <section className="pp-pane">
           <header className="pp-pane__head">

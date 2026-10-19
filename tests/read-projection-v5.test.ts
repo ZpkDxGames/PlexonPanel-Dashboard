@@ -128,3 +128,23 @@ test("retained location and address vanish immediately after read scope shrink",
   assert.equal(view.state.players[0].address, undefined);
   assert.ok(raw.state.players[0].position);
 });
+test("current presence is visible with roster or overview access, without history access", () => {
+  for (const scope of ["players.view", "overview.view"] as const) {
+    const s = snapshot(),
+      device = { ...s.state.ready!.device, scopes: [scope] };
+    s.grant = device;
+    s.state.ready = { ...s.state.ready!, device };
+    s.state.presenceDeltas = [
+      {
+        name: "ZpkDxGames",
+        state: "JOINED",
+        observedAt: "2026-10-19T18:00:00Z",
+      },
+    ];
+    assert.equal(scopedSnapshot(s).state.presenceDeltas.length, 1, scope);
+    const denied = { ...device, scopes: [] };
+    s.grant = denied;
+    s.state.ready = { ...s.state.ready!, device: denied };
+    assert.deepEqual(scopedSnapshot(s).state.presenceDeltas, []);
+  }
+});

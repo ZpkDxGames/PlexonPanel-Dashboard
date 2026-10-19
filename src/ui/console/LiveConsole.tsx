@@ -1,18 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import {
-  session,
-  useControl,
-  useQuery,
-  records,
-  time,
-  usePrefs,
-  type JsonMap,
-} from "../bindings";
+import { useControl, time, usePrefs, type JsonMap } from "../bindings";
 import { presentLine } from "./present-line";
 import { ConsoleRow } from "./ConsoleRow";
-import { consoleRowId, parseLine } from "./parse-line";
-import { historyWindow, retainHistoryPage } from "./history-window";
+
+import { useBootHistory } from "../players/PlayerEventsFeeder";
 export type ConsoleFilters = {
   level?: string;
   search?: string;
@@ -28,7 +20,7 @@ export function LiveConsole({
 }: {
   mode: "compact" | "full";
   filters?: ConsoleFilters;
-  channel?: "console" | "chat" | "events";
+  channel?: "console" | "chat";
   clearBefore?: number;
   wrap?: boolean;
 }) {
@@ -37,52 +29,17 @@ export function LiveConsole({
     scroll = useRef<HTMLDivElement>(null),
     follow = useRef(true),
     [pinned, setPinned] = useState(true),
-    [cursor, setCursor] = useState<string | undefined>(),
-    [older, setOlder] = useState<JsonMap[]>([]),
-    epoch = String(
-      s.service.invocationId ?? s.ready?.server.paperSession ?? "",
-    ),
-    previous = useRef(epoch),
-    historyAction = session.reason("console.history", "HOST")
-      ? "console.history.errors"
-      : "console.history",
-    history = useQuery(
-      historyAction,
-      "HOST",
-      cursor ? { cursor } : {},
-      channel === "console",
-    ),
-    page = records(history.data.lines, 100);
-  useEffect(() => {
-    if (previous.current !== epoch) {
-      setCursor(undefined);
-      setOlder([]);
-      previous.current = epoch;
-    }
-  }, [epoch]);
+    history = useBootHistory(),
+    epoch = history.epoch;
   const rows = useMemo(() => {
     const raw: JsonMap[] =
       channel === "console"
-        ? historyWindow(
-            older,
-            page,
-            s.console,
-            !!cursor,
-            6000,
-            (l) => consoleRowId(l, epoch),
-            (l) => Date.parse(String(l.capturedAt ?? l.timestamp)) || 0,
-          )
-        : channel === "chat"
-          ? s.chat.map((l) => ({
-              ...l,
-              content: `<${String(l.playerName ?? "Player")}> ${String(l.message ?? "")}`,
-              level: "INFO",
-            }))
-          : s.presenceDeltas.map((l) => ({
-              ...l,
-              content: `${String(l.name ?? l.uuid)} ${String(l.state ?? l.eventType ?? "presence changed")}`,
-              level: "INFO",
-            }));
+        ? history.lines
+        : s.chat.map((l) => ({
+            ...l,
+            content: `<${String(l.playerName ?? "Player")}> ${String(l.message ?? "")}`,
+            level: "INFO",
+          }));
     let rx: RegExp | null = null;
     try {
       if (filters.regex && filters.search) rx = new RegExp(filters.search, "i");
@@ -113,10 +70,7 @@ export function LiveConsole({
   }, [
     s.console,
     s.chat,
-    s.presenceDeltas,
-    history.data,
-    older,
-    cursor,
+    history.lines,
     epoch,
     filters.level,
     filters.search,
@@ -140,14 +94,13 @@ export function LiveConsole({
   }, [rows.length, virtual.getTotalSize()]);
   return (
     <div className="pp-console" data-mode={mode} data-wrap={wrap}>
-      {channel === "console" && typeof history.data.nextCursor === "string" && (
+      {channel === "console" && !!history.nextCursor && (
         <button
           className="pp-ctl"
           onClick={() => {
             follow.current = false;
             setPinned(false);
-            setOlder(retainHistoryPage(older, page, 5000));
-            setCursor(String(history.data.nextCursor));
+            history.loadEarlier();
             if (scroll.current) scroll.current.scrollTop = 0;
           }}
         >
@@ -207,12 +160,11 @@ export function LiveConsole({
           </div>
         )}
       </div>
-      {(!pinned || cursor) && (
+      {(!pinned || history.historical) && (
         <button
           className="pp-ctl pp-jump"
           onClick={() => {
-            setCursor(undefined);
-            setOlder([]);
+            history.latest();
             follow.current = true;
             setPinned(true);
             if (scroll.current)

@@ -16,6 +16,8 @@ export function startSession() {
           "offline",
           "denied",
           "structural",
+          "normal-load",
+          "roster-events",
           "host-stale",
           "starting",
           "stopping",
@@ -29,6 +31,8 @@ export function startSession() {
         const s = makeFixture(
           [
             "structural",
+            "normal-load",
+            "roster-events",
             "host-stale",
             "starting",
             "stopping",
@@ -41,6 +45,8 @@ export function startSession() {
         if (
           [
             "structural",
+            "normal-load",
+            "roster-events",
             "host-stale",
             "starting",
             "stopping",
@@ -84,6 +90,27 @@ export function startSession() {
                   ? "deactivating"
                   : "unreported";
           }
+          s.players.push({
+            uuid: "19f50206-26de-410c-a1bc-000000000024",
+            name: "ZpkDxGames",
+            sessionStartedAt: new Date(Date.now() - 180000).toISOString(),
+            ping: 26,
+            world: "world",
+          });
+          s.server.onlinePlayers = s.players.length;
+          s.console.push(
+            ...[
+              ["event-advancement", "[Advancement] Steve: Stone Age", -120000],
+              ["event-death", "[Death] Steve fell from a high place", -90000],
+              ["event-command", "[Command] Steve: /gamemode survival", -60000],
+              ["event-leave", "Alex lost connection: Timed out", -600000],
+            ].map(([id, content, offset]) => ({
+              id,
+              content,
+              level: "INFO",
+              capturedAt: new Date(Date.now() + Number(offset)).toISOString(),
+            })),
+          );
           s.presenceDeltas = [
             {
               eventId: "e1",
@@ -101,6 +128,31 @@ export function startSession() {
             },
           ];
         }
+        if (mode === "normal-load") {
+          s.history = s.history.map((sample, i) => ({
+            ...sample,
+            mspt:
+              sample.mspt === null
+                ? null
+                : 0.4 + Math.abs(Math.sin(i / 13)) * 0.4,
+            p95:
+              sample.p95 === null
+                ? null
+                : 0.9 + Math.abs(Math.sin(i / 13)) * 0.2,
+            p99:
+              sample.p99 === null
+                ? null
+                : 1.2 + Math.abs(Math.sin(i / 13)) * 0.3,
+          }));
+          s.server.averageTickMillis = 0.6;
+          s.server.p95TickMillis = 1.1;
+          s.server.p99TickMillis = 1.5;
+        }
+        if (mode === "roster-events")
+          s.ready!.device.scopes = s.ready!.device.scopes.filter(
+            (scope) =>
+              !scope.startsWith("console.") && scope !== "players.history.view",
+          );
         session.installFixture(mode, s, async (action, args) => {
           if (action === "backup.full.restore.prepare")
             return {

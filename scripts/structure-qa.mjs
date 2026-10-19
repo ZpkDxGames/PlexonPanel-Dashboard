@@ -316,42 +316,48 @@ try {
             "five metric ribbon + indicator",
           );
           const chart = await p
-            .locator(".pp-studio .pp-chart")
+            .locator(".pp-studio .pp-stage__plot")
             .evaluate((el) => {
               const svg = el.querySelector("svg"),
                 a = el.getBoundingClientRect(),
                 b = svg.getBoundingClientRect(),
-                paths = [...svg.querySelectorAll("path[data-series]")],
+                line = svg.querySelector("path.pp-line"),
+                areas = svg.querySelectorAll("path.pp-area"),
                 gaps = [...svg.querySelectorAll("rect[data-gap]")].map((g) => ({
-                  x: +g.getAttribute("x"),
-                  w: +g.getAttribute("width"),
-                }));
+                  from: +g.dataset.from,
+                  to: +g.dataset.to,
+                })),
+                segments = JSON.parse(line?.dataset.segments ?? "[]");
               return {
                 dw: Math.abs(a.width - b.width),
                 dh: Math.abs(a.height - b.height),
-                gradients: svg.querySelectorAll("linearGradient").length,
-                band: !!svg.querySelector('[data-band="p95-p99"]'),
-                budget: !!svg.querySelector('[data-budget="50"]'),
+                gradients: svg.querySelectorAll("linearGradient stop").length,
+                areas: areas.length,
+                lines: svg.querySelectorAll("path.pp-line").length,
                 gaps: gaps.length,
-                crossing: paths.some((path) =>
-                  gaps.some((g) => {
-                    const box = path.getBBox();
-                    return (
-                      box.x < g.x - 0.5 && box.x + box.width > g.x + g.w + 0.5
-                    );
-                  }),
+                segments: segments.length,
+                subpaths: (line?.getAttribute("d").match(/M/g) ?? []).length,
+                crossing: segments.some(([from, to]) =>
+                  gaps.some((g) => from < g.to && to > g.from),
                 ),
               };
             });
+          await p.getByTestId("ribbon-mean").click();
+          const budget = await p
+            .locator('.pp-studio [data-budget="50"]')
+            .count();
+          await p.getByTestId("ribbon-tps").click();
           check(
             16,
             chart.dw <= 1 &&
               chart.dh <= 1 &&
-              chart.gradients > 0 &&
-              chart.band &&
-              chart.budget &&
+              chart.gradients === 3 &&
+              chart.areas === 1 &&
+              chart.lines === 1 &&
               chart.gaps > 0 &&
-              !chart.crossing,
+              chart.segments === chart.subpaths &&
+              !chart.crossing &&
+              budget > 0,
             JSON.stringify(chart),
           );
           if (size.width >= 1545) {
@@ -393,20 +399,44 @@ try {
           );
         }
         if (route === "performance") {
-          const cpuSeries = await p
-            .locator(".pp-track-chart")
-            .nth(3)
-            .locator("path[data-series]")
-            .evaluateAll((els) => [
-              ...new Set(els.map((e) => e.getAttribute("data-series"))),
-            ]);
+          const workbench = await p
+            .locator(".pp-bench")
+            .evaluate((el) => ({
+              stages: el.querySelectorAll(".pp-stage").length,
+              cells: el.querySelectorAll(".pp-deck__cell").length,
+              axes: el.querySelectorAll(".pp-axis").length,
+              readouts: el.querySelectorAll('[data-testid="readout-bar"]')
+                .length,
+              overlaps: [...el.querySelectorAll(".pp-stage")].filter(
+                (s) =>
+                  s.querySelectorAll("path.pp-area").length > 1 ||
+                  s.querySelectorAll("path.pp-line").length > 1,
+              ).length,
+              cpu: [
+                ...el.querySelectorAll('[data-testid="deck-04"] .pp-stage'),
+              ].map((s) => s.dataset.series),
+            }));
           check(
             23,
-            cpuSeries.length === 2 &&
-              cpuSeries.includes("cpu") &&
-              cpuSeries.includes("node"),
-            "CPU track excludes entity/count series",
+            workbench.stages === 9 &&
+              workbench.cells === 4 &&
+              workbench.axes === 1 &&
+              workbench.readouts === 1 &&
+              workbench.overlaps === 0 &&
+              workbench.cpu.join(",") === "svcCpu,nodeCpu",
+            "nine separate lanes, one readout and axis " +
+              JSON.stringify(workbench),
           );
+          const plot = p.locator(".pp-bench__primary .pp-stage__plot");
+          await plot.scrollIntoViewIfNeeded();
+          const box = await plot.boundingBox();
+          await p.mouse.move(box.x + box.width * 0.5, box.y + box.height * 0.5);
+          await expect(p.getByTestId("readout-bar")).toHaveAttribute(
+            "data-state",
+            "scrub",
+          );
+          await expect(p.locator(".pp-bench .pp-cross")).toHaveCount(9);
+          await p.mouse.move(1, 1);
         }
         if (route === "console") {
           check(
@@ -653,7 +683,7 @@ try {
   check(
     25,
     (await p
-      .locator('.pp-preview linearGradient[id*="grad-"] stop')
+      .locator(".pp-preview linearGradient stop")
       .first()
       .getAttribute("stop-opacity")) === "0",
     "chart fill preference",
@@ -670,7 +700,10 @@ try {
   interactions.push("OTP auto advance + pairing accessibility");
   await c.close();
   const polish = await polishChecks(browser, base, out);
-  await fs.writeFile(out + "/polish-v52-receipt.json", JSON.stringify(polish, null, 2));
+  await fs.writeFile(
+    out + "/polish-v53-receipt.json",
+    JSON.stringify(polish, null, 2),
+  );
   execFileSync("bash", ["scripts/verify-purge.sh"]);
   const core = JSON.parse(
     await fs.readFile("tests/fixtures/core-sha256.json", "utf8"),
@@ -684,7 +717,7 @@ try {
       "core " + path,
     );
   check(21, true, "purge storage scan");
-  check(24, true, "95 unit tests separately recorded");
+  check(24, true, "unit regression suite separately recorded");
   for (const [id, count] of Object.entries(coverage))
     assert.ok(count > 0, `Uncovered invariant ${id}`);
   await fs.writeFile(

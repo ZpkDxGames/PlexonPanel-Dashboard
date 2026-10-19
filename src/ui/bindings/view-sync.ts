@@ -5,6 +5,8 @@ export interface ViewSyncState {
   horizon: Horizon;
   studioView: "tick" | "memory" | "cpu";
   activeSeries: string;
+  studioMode: "focus" | "split";
+  playerEventFilter: "all" | "presence" | "advancement" | "death" | "command";
   dockFeed: "console" | "events";
   dockLevel: "All" | "Info" | "Warn" | "Error";
   idePane: "console" | "chat" | "plugins";
@@ -20,6 +22,8 @@ export const DEFAULT_VIEW: Readonly<ViewSyncState> = Object.freeze({
   horizon: "15m",
   studioView: "tick",
   activeSeries: "tps",
+  studioMode: "focus",
+  playerEventFilter: "all",
   dockFeed: "console",
   dockLevel: "All",
   idePane: "console",
@@ -31,9 +35,15 @@ export const DEFAULT_VIEW: Readonly<ViewSyncState> = Object.freeze({
   backupCountdownMinutes: 5,
 });
 const choices: Partial<Record<keyof ViewSyncState, readonly unknown[]>> = {
+  studioMode: ["focus", "split"],
+  playerEventFilter: ["all", "presence", "advancement", "death", "command"],
   horizon: ["1m", "5m", "15m", "35m", "2h"],
   studioView: ["tick", "memory", "cpu"],
   activeSeries: [
+    "mean",
+    "heapUsed",
+    "svcCpu",
+    "nodeCpu",
     "tps",
     "mspt",
     "p95",

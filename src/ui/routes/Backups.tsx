@@ -159,7 +159,7 @@ export default function Backups() {
             >
               <Tooltip content={String(s.label)}>
                 <button
-                  className="pp-stage"
+                  className="pp-pipeline__stage"
                   aria-label={`Stage ${i + 1}: ${s.label}`}
                 >
                   {i < index ? <Check size={11} /> : i + 1}

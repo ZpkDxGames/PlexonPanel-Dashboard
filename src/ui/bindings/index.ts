@@ -41,6 +41,10 @@ export type { Kind, SessionSnapshot, Preferences };
 export type { Prepared } from "../../adapter/session";
 export type Tone = "emerald" | "cyan" | "violet" | "indigo" | "amber" | "rose";
 export type Phase = "online" | "offline" | "starting" | "stopping" | "unknown";
+export function canRead(snap: SessionSnapshot, scope: string) {
+  const grant = reconcileDeviceGrant(snap.grant, snap.state.ready?.device);
+  return Boolean(grant?.metadataMatches && grant.scopes.includes(scope));
+}
 export function scopedSnapshot(raw: SessionSnapshot): SessionSnapshot {
   const grant = reconcileDeviceGrant(raw.grant, raw.state.ready?.device);
   const can = (s: string) =>
@@ -79,7 +83,7 @@ export function scopedSnapshot(raw: SessionSnapshot): SessionSnapshot {
         ? s.inventoryIds
         : { ...s.inventoryIds, players: undefined },
       pendingPlayerSnapshot: undefined,
-      presenceDeltas: can("players.history.view") ? s.presenceDeltas : [],
+      presenceDeltas: players || can("overview.view") ? s.presenceDeltas : [],
       plugins: can("plugins.view") ? s.plugins : [],
       console: can("console.view.full")
         ? s.console
@@ -355,6 +359,7 @@ export function useQuery(
     identity = [
       snap.revision,
       snap.state.serverId,
+      snap.state.service.invocationId,
       snap.state.ready?.server.paperSession,
       snap.state.ready?.server.hostSession,
       snap.state.ready?.device.scopes.join("|"),

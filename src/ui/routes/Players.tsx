@@ -22,6 +22,7 @@ import { Tabs } from "../primitives/Tabs";
 import { MutationButton } from "../primitives/MutationButton";
 import { useReview } from "../primitives/ReviewProvider";
 import { QueryState } from "./shared";
+import { PlayerEventsDock } from "../players/PlayerEventsDock";
 export function Inspector({ uuid }: { uuid: string }) {
   const { state: s } = useControl(),
     prefs = usePrefs(),
@@ -354,7 +355,7 @@ export default function Players() {
             </form>
           )}
         </div>
-        <Timeline events={r.events} />
+        <PlayerEventsDock />
       </section>
       <section className="pp-pane pp-inspector">
         {uuid ? (

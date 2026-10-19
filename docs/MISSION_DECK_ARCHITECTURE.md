@@ -18,7 +18,7 @@ The shell is a 64px rail and 56px header. Below 760px, the rail becomes a 56px b
 | --- | --- |
 | Fleet | Verified node ledger and standalone instance blades |
 | Overview | 148px instruments, full-width studio, 62/38 console and roster/world dock |
-| Performance | Five synchronized chart tracks and a raw-sample drawer |
+| Performance | Selected primary signal, eight subsystem lanes, shared readout/axis and raw-sample drawer |
 | Players | Virtualized roster, epoch-separated events, exact UUID inspector |
 | Console | Full-height four-row terminal, plugin inventory and memory-only chat |
 | Backups | Host's 14 stages, manual/periodic deck, archive ledger |

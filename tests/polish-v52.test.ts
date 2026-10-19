@@ -57,7 +57,7 @@ test("view choices are whitelisted and reject malformed or content-bearing paylo
   assert.equal(state.horizon, "2h");
   assert.equal(state.idePlugin, "LuckPerms");
   assert.equal(state.backupCountdownMinutes, 30);
-  assert.equal(Object.keys(state).length, 12);
+  assert.equal(Object.keys(state).length, 14);
   assert.ok(!JSON.stringify(state).includes("secret"));
   assert.ok(!/console|chat/i.test(VIEW_SYNC_KEY));
 });

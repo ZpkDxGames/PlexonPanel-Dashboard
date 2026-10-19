@@ -1,24 +1,19 @@
 "use client";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
-import { Download, Pause, Play, X } from "lucide-react";
+import { X } from "lucide-react";
 import {
   useViewSync,
   useTelemetry,
   usePrefs,
-  useLedger,
   fmt,
   time,
-  type Horizon,
   type TelemetryView,
 } from "../bindings";
-import { StudioChart, type ChartView } from "../studio/StudioChart";
-import {
-  MetricRibbon,
-  metricList,
-  HorizonSelector,
-} from "../studio/TelemetryStudio";
-import { Title, Table } from "./shared";
+import { shapeTelemetry } from "../telemetry/series";
+import { PerformanceWorkbench } from "../telemetry/PerformanceWorkbench";
+import { crosshair } from "../telemetry/crosshair";
+import { Table } from "./shared";
 function download(text: string, name: string, type = "text/csv") {
   const a = document.createElement("a"),
     url = URL.createObjectURL(new Blob([text], { type }));
@@ -29,113 +24,40 @@ function download(text: string, name: string, type = "text/csv") {
 }
 export default function Performance() {
   const sync = useViewSync(),
-    window = sync.horizon,
-    setWindow = (v: Horizon) => sync.set("horizon", v),
-    current = useTelemetry(window),
+    current = useTelemetry(sync.horizon),
     [frozen, setFrozen] = useState<TelemetryView | null>(null),
-    [crosshair, setCrosshair] = useState<number | null>(null),
-    active = sync.activeSeries,
-    setActive = (v: string) => sync.set("activeSeries", v),
     [drawer, setDrawer] = useState(false),
     [rawOffset, setRawOffset] = useState(0),
     prefs = usePrefs(),
-    ledger = useLedger(),
     t = frozen ?? current,
-    nearest =
-      crosshair == null
-        ? null
-        : t.paper.reduce(
-            (a, p) =>
-              Math.abs(p.at - crosshair) < Math.abs(a.at - crosshair) ? p : a,
-            t.paper[0],
-          ),
-    metrics = metricList(
-      nearest
-        ? {
-            ...t,
-            tps: nearest.tps,
-            mspt: nearest.mspt,
-            p95: nearest.p95 ?? null,
-            p99: nearest.p99 ?? null,
-          }
-        : t,
-      "tick",
+    span = {
+      "1m": 60000,
+      "5m": 300000,
+      "15m": 900000,
+      "35m": 2100000,
+      "2h": 7200000,
+    }[sync.horizon],
+    domainT = useMemo(
+      () => [t.now - span, t.now] as [number, number],
+      [t.now, span],
     ),
-    tracks: { view: ChartView; title: string; height: number }[] = [
-      { view: "tick", title: "01 / Tick & MSPT", height: 140 },
-      { view: "gc", title: "02 / GC pauses · interval delta", height: 72 },
-      { view: "memory", title: "03 / Memory tiers · GiB", height: 120 },
-      { view: "compute", title: "04 / Service and node CPU", height: 110 },
-      {
-        view: "entities",
-        title: "05 / Loaded chunks and entities",
-        height: 110,
-      },
-    ];
+    samples = useMemo(
+      () => shapeTelemetry(t).filter((s) => s.t >= domainT[0]),
+      [t.paper, t.system, t.host, t.service, domainT],
+    );
   return (
-    <div className="pp-page">
-      <Title
-        code="R03 / Telemetry"
-        title="Read the whole signal."
-        detail="Five tracks. One clock. Explicit boundaries between boots."
+    <div className="pp-page pp-performance">
+      <PerformanceWorkbench
+        samples={samples}
+        domainT={domainT}
+        paused={!!frozen}
+        retained={t.raw.length}
+        onTogglePause={() => {
+          setFrozen(frozen ? null : structuredClone(current));
+          crosshair.set(null);
+        }}
+        onRawSamples={() => setDrawer(true)}
       />
-      <section className="pp-pane pp-analyzer">
-        <header className="pp-pane__head">
-          <h2>Analyzer</h2>
-          <div className="row push">
-            <HorizonSelector value={window} onChange={setWindow} extended />
-            <button
-              className="pp-ctl"
-              aria-label={frozen ? "Resume analyzer" : "Pause analyzer"}
-              aria-pressed={!!frozen}
-              onClick={() =>
-                setFrozen(frozen ? null : structuredClone(current))
-              }
-            >
-              {frozen ? <Play size={13} /> : <Pause size={13} />}
-              <span>{frozen ? "Resume" : "Pause"}</span>
-            </button>
-            <button
-              className="pp-ctl"
-              aria-label="Open raw samples"
-              onClick={() => setDrawer(true)}
-            >
-              <Download size={13} />
-              <span className="desktop-only">Raw samples</span>
-            </button>
-          </div>
-        </header>
-        <MetricRibbon
-          metrics={metrics}
-          active={metrics.some((m) => m.id === active) ? active : "tps"}
-          onSelect={setActive}
-        />
-        {tracks.map((track) => (
-          <div
-            className="pp-track-chart"
-            key={track.view}
-            style={{ "--track-h": `${track.height}px` } as React.CSSProperties}
-          >
-            <h3 className="pp-track-title">{track.title}</h3>
-            <StudioChart
-              data={t}
-              staged={false}
-              view={track.view}
-              active={active}
-              crosshair={crosshair}
-              onCrosshair={setCrosshair}
-              stale={ledger.paper.state !== "live"}
-            />
-          </div>
-        ))}
-        <footer className="pp-pane__foot muted" style={{ fontSize: 10 }}>
-          {prefs.timezone === "UTC"
-            ? "UTC"
-            : Intl.DateTimeFormat().resolvedOptions().timeZone}{" "}
-          · {t.raw.length} retained samples · 2h requests show only retained
-          history (35m maximum)
-        </footer>
-      </section>
       <Dialog.Root open={drawer} onOpenChange={setDrawer}>
         <Dialog.Portal>
           <Dialog.Overlay className="pp-overlay" />

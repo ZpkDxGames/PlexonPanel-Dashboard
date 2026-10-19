@@ -1,3 +1,9 @@
+import { useMemo, useEffect } from "react";
+import { GROUPS, SERIES, seriesKey, shapeTelemetry } from "../telemetry/series";
+import { Stage } from "../telemetry/Stage";
+import { Ribbon } from "../telemetry/Ribbon";
+import { TimeAxis } from "../telemetry/TimeAxis";
+import { crosshair } from "../telemetry/crosshair";
 import Link from "next/link";
 import { Maximize2 } from "lucide-react";
 import {
@@ -11,7 +17,7 @@ import {
   type Tone,
 } from "../bindings";
 import { Tabs } from "../primitives/Tabs";
-import { StudioChart, type ChartView } from "./StudioChart";
+import { type ChartView } from "./StudioChart";
 type Metric = {
   id: string;
   label: string;
@@ -210,53 +216,7 @@ export function Sparkline({
     </svg>
   );
 }
-export function MetricRibbon({
-  metrics,
-  active,
-  onSelect,
-}: {
-  metrics: Metric[];
-  active: string;
-  onSelect: (id: string) => void;
-}) {
-  return (
-    <div className="pp-ribbon" role="tablist" aria-label="Telemetry series">
-      {metrics.map((m, i) => (
-        <button
-          key={m.id}
-          role="tab"
-          aria-selected={active === m.id}
-          tabIndex={active === m.id ? 0 : -1}
-          data-active={active === m.id}
-          data-tone={m.tone}
-          className="pp-metric"
-          onClick={() => onSelect(m.id)}
-          onKeyDown={(e) => {
-            if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
-              e.preventDefault();
-              const n =
-                (i + (e.key === "ArrowRight" ? 1 : -1) + metrics.length) %
-                metrics.length;
-              onSelect(metrics[n].id);
-              (
-                e.currentTarget.parentElement?.children[n] as HTMLElement
-              )?.focus();
-            }
-          }}
-        >
-          <span className="pp-kicker pp-metric__label">{m.label}</span>
-          <span className="pp-metric__value pp-num">
-            {fmt(m.value)}
-            <span className="pp-metric__unit">{m.unit}</span>
-          </span>
-          {m.value != null && m.values.some((v) => v != null) && (
-            <Sparkline values={m.values} tone={m.tone} ticks={m.id === "gc"} />
-          )}
-        </button>
-      ))}
-    </div>
-  );
-}
+export { Ribbon as MetricRibbon } from "../telemetry/Ribbon";
 export function HorizonSelector({
   value,
   onChange,
@@ -278,40 +238,71 @@ export function HorizonSelector({
     </div>
   );
 }
+export function SignalGroups({
+  value,
+  onChange,
+}: {
+  value: "tick" | "memory" | "cpu";
+  onChange: (value: "tick" | "memory" | "cpu") => void;
+}) {
+  return (
+    <Tabs
+      value={value}
+      onChange={onChange}
+      label="Studio view"
+      items={GROUPS.map((g) => ({ id: g.id, label: g.label }))}
+    />
+  );
+}
 export function TelemetryStudio() {
   const sync = useViewSync(),
-    view = sync.studioView,
     win = sync.horizon === "2h" ? "35m" : sync.horizon,
-    setWin = (v: Horizon) => sync.set("horizon", v),
-    setActive = (v: string) => sync.set("activeSeries", v),
     t = useTelemetry(win),
     l = useLedger(),
-    metrics = metricList(t, view),
-    active = metrics.some((m) => m.id === sync.activeSeries)
-      ? sync.activeSeries
-      : metrics[0].id;
+    samples = useMemo(
+      () => shapeTelemetry(t),
+      [t.paper, t.system, t.host, t.service],
+    ),
+    domainT = useMemo(
+      () => [t.since, t.now] as [number, number],
+      [t.since, t.now],
+    ),
+    group = GROUPS.find((g) => g.id === sync.studioView)!,
+    candidate = seriesKey(sync.activeSeries),
+    selected = group.series.includes(candidate) ? candidate : group.series[0];
+  useEffect(() => {
+    crosshair.set(null);
+    return () => crosshair.set(null);
+  }, []);
   return (
     <section className="pp-pane pp-studio" aria-label="Telemetry studio">
-      <header className="pp-pane__head">
-        <h2 className="pp-pane__title">Telemetry Studio</h2>
-        <Tabs
-          value={view}
-          onChange={(v) => {
+      <header className="pp-pane__head pp-studio__bar">
+        <h2>Telemetry Studio</h2>
+        <SignalGroups
+          value={group.id}
+          onChange={(v) =>
             sync.patch({
               studioView: v,
-              activeSeries:
-                v === "tick" ? "tps" : v === "memory" ? "heap" : "cpu",
-            });
-          }}
-          label="Studio view"
-          items={[
-            { id: "tick", label: "Tick & MSPT" },
-            { id: "memory", label: "Memory tiers" },
-            { id: "cpu", label: "CPU & chunks" },
-          ]}
+              activeSeries: GROUPS.find((g) => g.id === v)!.series[0],
+            })
+          }
         />
         <div className="row push">
-          <HorizonSelector value={win} onChange={setWin} />
+          <div className="pp-seg" role="group" aria-label="Chart view">
+            {(["focus", "split"] as const).map((mode) => (
+              <button
+                key={mode}
+                aria-pressed={sync.studioMode === mode}
+                onClick={() => sync.set("studioMode", mode)}
+              >
+                {mode === "focus" ? "Focus" : "Split"}
+              </button>
+            ))}
+          </div>
+          <HorizonSelector
+            value={win}
+            onChange={(v) => sync.set("horizon", v)}
+          />
           <Link
             href="/performance"
             className="pp-ctl"
@@ -321,13 +312,41 @@ export function TelemetryStudio() {
           </Link>
         </div>
       </header>
-      <MetricRibbon metrics={metrics} active={active} onSelect={setActive} />
-      <StudioChart
-        data={t}
-        view={view}
-        active={active}
-        stale={l.paper.state !== "live"}
+      <Ribbon
+        keys={group.series}
+        selected={selected}
+        onSelect={(v) => sync.set("activeSeries", v)}
+        samples={samples}
       />
+      {sync.studioMode === "focus" ? (
+        <div className="pp-studio__focus" key={selected}>
+          <Stage
+            spec={SERIES[selected]}
+            samples={samples}
+            domainT={domainT}
+            height={300}
+            kicker="SELECTED"
+            selected
+            stale={l.paper.state !== "live" && group.id === "tick"}
+          />
+        </div>
+      ) : (
+        <div className="pp-studio__split">
+          {group.series.map((key, i) => (
+            <Stage
+              key={key}
+              spec={SERIES[key]}
+              samples={samples}
+              domainT={domainT}
+              height={110}
+              kicker={String(i + 1).padStart(2, "0")}
+              selected={key === selected}
+              onSelect={() => sync.set("activeSeries", key)}
+            />
+          ))}
+        </div>
+      )}
+      <TimeAxis domainT={domainT} />
     </section>
   );
 }

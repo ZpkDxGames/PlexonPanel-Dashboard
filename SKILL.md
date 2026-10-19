@@ -1,787 +1,476 @@
 ---
-name: plexonpanel-v5-structural-architect
-description: Clean-slate structural rebuild of the PlexonPanel 5.0 frontend (Minecraft Paper 26.x + Linux VPS Host Companion control plane). Use for ANY task that creates, deletes or restructures src/ui/**, app/**, layout CSS, routes R01-R08, the app chrome, the instrument deck, telemetry studio, console, or any layout primitive. Mandates the "Obsidian Mission Deck" architecture - 64px icon rail, one unified Mission Control ribbon, hairline-divided decks/panes/ribbons, zero card-soup, zero badge spam, zero inline gate paragraphs - mounted on the preserved headless Protocol 3 core.
+name: plexonpanel-v5-telemetry-and-events-architect
+description: Use for ANY change to PlexonPanel 5.0 telemetry charts (Telemetry Studio on /overview, the /performance route) or the Player events dock. Mandates one-series-per-stage charts, a selected-signal ribbon that swaps the chart, a 2-tier bento workbench with a single shared crosshair readout bar, and a unified per-boot player event stream (presence deltas + roster + console parsing) that is never wiped by roster snapshots.
 ---
 
-# PlexonPanel 5.0 - Structural Architect: "The Obsidian Mission Deck"
+# PlexonPanel 5.0 · Telemetry & Events Architect
 
-You are the Staff Frontend Engineer executing a **greenfield visual-layer rebuild**. The previous iteration had a correct *skin* (obsidian palette, semantic hues, specular edges, micro-visualizations) and a failed *skeleton* (box-in-a-box card soup, badge spam, exposed gate paragraphs, 250px dead-space KPI cards, 6-line console towers, generic sidebar + 4 boxes + 2 boxes wireframe). This skill keeps the skin DNA and replaces the skeleton entirely.
-
-**Design thesis:** the screen is ONE instrument, not 20 boxes. Space is divided by **1px hairlines**, not by nested rounded borders. Rounded borders exist at exactly one level (the Deck / Pane). Everything inside a Deck or Pane is flush, hairline-separated, and borderless.
-
-Stack: React 19, Next.js App Router, Tailwind CSS, Radix UI, Motion, `@tanstack/react-virtual`, `lucide-react`, `cmdk`, hand-built SVG telemetry (no chart library required).
+Target agent: **GPT-6.1 Sol**. Repo: `PlexonPanel-Dashboard` (React + TypeScript + Vite, hand-written CSS, no chart library).
+Everything below is a blueprint to copy, adapt to local naming, and wire. Where the repo already has a file with the same responsibility, edit it instead of creating a duplicate, and delete what this skill bans.
 
 ---
 
-## 0. Order of operations (do not reorder)
+## 0. Agent protocol (do this first)
 
-1. **Snapshot** legacy tokens (Section 1.1).
-2. **Purge** (Section 1.2) and run `scripts/verify-purge.sh` until it exits 0.
-3. Create the **bindings layer** (Section 2) - the only place UI touches headless modules.
-4. Write `globals.css` tokens + primitives (Section 3).
-5. Build Blueprint 1 (chrome) -> 2 (deck) -> 3 (studio) -> 4 (console).
-6. Build routes R01-R08, PairingGate, ActionReviewModal (Section 8).
-7. Run the QA checklist in Playwright (Section 9). Do not package until 25/25 pass.
+1. `grep -rn "pp-chart-readout\|pp-ribbon\|TelemetryStudio\|presenceDeltas\|players.history.view\|inventory.players\|console.history" src/` and list every hit. Those are the files you will touch or delete.
+2. Do not add a charting dependency. All charts are SVG written by hand (blueprints below).
+3. Work in this order: **§3 data contracts → §4 Studio → §5 Workbench → §6 player events → §7 QA gate**. Run the QA gate before reporting done.
+4. If a name in this skill collides with an existing export, keep the existing public name and re-export.
 
 ---
 
-## 1. Clean-slate purge mandate
+## 1. Diagnosis (why the current screens are wrong)
 
-### 1.1 Snapshot (before deleting anything)
-
-```bash
-mkdir -p .purge
-cp src/ui/styles/globals.css .purge/globals.legacy.css
-# Extract ONLY: the Tailwind import/directive header, and every :root / [data-theme] / [data-accent]
-# / [data-density] / [data-text-size] / [data-motion] token block. Nothing else survives.
-```
-
-Keep the project's existing Tailwind header exactly (`@import "tailwindcss";` for v4 OR `@tailwind base; @tailwind components; @tailwind utilities;` for v3). If the legacy token blocks cannot be recovered, use the baseline in Section 3.
-
-### 1.2 Delete (hard delete, no "legacy" folder, no commented-out code)
-
-```bash
-git rm -rf src/ui
-git rm -rf app
-rm -rf .next
-mkdir -p src/ui/{shell,primitives,instruments,studio,console,routes,bindings,styles} app
-```
-
-Deleted for good: every component, hook, route view and style under `src/ui/**` and `app/**`, including these legacy class names - they must not exist anywhere after the rebuild:
-
-`.server-hero .kpi-grid .overview-main .below-grid .hero-actions .gate-reason .sidebar .topbar .pp-card--kpi .kpi-grid .pp-card { min-height: 250px }`
-
-Next.js App Router needs `app/layout.tsx` and route files, so they are **recreated** (Section 8), never restored.
-
-### 1.3 Preserved headless surface (read-only - never edit, never re-implement)
-
-| Path | Contract the UI must honor |
-|---|---|
-| `src/adapter/**` | Ed25519/HMAC Protocol 3 WebSocket client; IndexedDB `plexonpanel-browser-v3` device credentials; `/v1/pairings/claim` OTP handshake; `session.reason(action, kind)` fail-closed mutation gate; `session.prepare` -> `ActionReview` -> `session.execute`. **Zero browser storage for console/chat.** |
-| `src/presentation/{authority,epochs,review-policy,telemetry,player-history}.ts` | Independent Paper vs Host freshness clocks; boot-epoch gap preservation on restart; review policy; telemetry shaping; player join/leave history. |
-| `src/store/preferences.ts`, `src/store/selectors.ts` | Exactly 8 locked keys: `theme, density, textSize, accent, motion, chartFill, timezone, skinProvider`. **Do not add a 9th key** (e.g. rail-open state is plain `useState`, session-only). |
-| `src/lib/playerCommands.ts`, `src/lib/textFormat/index.ts` | Player command builders; Minecraft text/color-code formatting. |
-
-### 1.4 `scripts/verify-purge.sh`
-
-```bash
-#!/usr/bin/env bash
-set -e
-BAN='gate-reason|kpi-grid|server-hero|overview-main|below-grid|hero-actions|min-height: ?250px|\.sidebar\b|\.topbar\b'
-if grep -RInE "$BAN" src app --include='*.{ts,tsx,css}' 2>/dev/null; then echo "FAIL: legacy structure found"; exit 1; fi
-# the headless core must not import from the UI tree
-if grep -RInE "from ['\"](@/ui|\.\./ui|\.\./\.\./ui)" src/adapter src/presentation src/store src/lib; then echo "FAIL: core imports UI"; exit 1; fi
-# no browser storage for console/chat
-if grep -RInE "(localStorage|sessionStorage|indexedDB)" src/ui/console src/ui/routes/console* src/ui/routes/chat* 2>/dev/null; then echo "FAIL: storage in console/chat"; exit 1; fi
-echo "purge OK"
-```
+| # | Symptom in screenshots | Root cause | Fix in this skill |
+|---|---|---|---|
+| A | Clicking `TPS / MEAN MSPT / P95 / P99 / GC Δ` in Telemetry Studio does not change the chart; 3 stages stay stacked and STAGE 02 overlays mean+p95+p99 | Ribbon cards are decorative; chart stages are hard-coded per tab group, not driven by a `selected` signal; one stage draws several areas | §4: `selected` state drives a single `<Stage>`; `Stage` accepts exactly one `SeriesSpec` |
+| B | `/performance` is a cramped 5-row stack; Track 01 overlays 4 areas; Track 03 overlays 3 fills; Track 05 overlays 2 | Every track is a multi-series overlay | §5: primary stage + 2×2 deck, every lane is one series |
+| C | X labels repeat 5×; 5 black `.pp-chart-readout` boxes appear on hover and clip across tracks | Each track owns its own axis and tooltip | §5: one clock axis, one readout bar, crosshair is a shared store |
+| D | Player events says "Waiting for events from this boot" while `ZpkDxGames` is online | (1) `presenceDeltas` gated on `players.history.view` instead of `players.view`; (2) each `inventory.players` snapshot **replaced** the retained list; (3) nothing parsed join/leave/advancement/death/command from `console.history` + live `s.console` | §6: single per-boot store, three ingest paths, roster snapshots only diff and never clear |
 
 ---
 
-## 2. Bindings layer (the only seam to the headless core)
+## 2. Non-negotiable laws
 
-Because export names in the preserved modules are authoritative, **first `grep` the real exports**, then create thin typed wrappers in `src/ui/bindings/`. UI components import ONLY from `@/ui/bindings`. Never re-derive freshness, epochs or gates in a component.
+1. **One series per stage.** `Stage` takes `spec: SeriesSpec` (singular). There is no `series[]` prop. If you need two series, render two stages.
+2. **No overlapping area fills.** A stage may contain at most one `path.pp-area`, one `path.pp-line`, or one set of `rect.pp-bar`. Nothing else is filled.
+3. **No floating tooltips.** `.pp-chart-readout` is deleted from CSS, TSX and tests. Hover shows (a) a crosshair line + dot inside each stage and (b) one `ReadoutBar` per workbench plus inline per-stage head values.
+4. **One clock axis per workbench**, rendered by `<TimeAxis>` under the primary stage. Deck cells show only two relative edge labels (`−60s`, `now`).
+5. **Ribbon cards are tabs.** `role="tab"`, `aria-selected`, arrow-key navigation, and the selected signal swaps the chart.
+6. **Shared scales where comparison matters.** Memory lanes share one Y domain; all stages share one X domain (`domainT`) and identical plot padding (`PLOT`).
+7. **Roster snapshots never delete events.** Only a new `bootId` starts a new bucket.
+8. **Permissions:** `players.view` shows live player events; `players.history.view` gates only the "Load earlier" older-history fetch.
+
+---
+
+## 3. Shared contracts: `telemetry/series.ts`
 
 ```ts
-// src/ui/bindings/index.ts  (adapt names to the real exports; shapes below are the UI contract)
-export type Freshness = 'live' | 'stale' | 'offline' | 'gap';           // from presentation/authority.ts
-export type Source = 'paper' | 'host';
-export interface Ledger { paper: { state: Freshness; ageMs: number }; host: { state: Freshness; ageMs: number } }
+// src/telemetry/series.ts
+export interface Sample {
+  t: number;            // epoch ms (UTC)
+  tps: number;
+  mean: number;         // mean MSPT, ms
+  p95: number;          // ms
+  p99: number;          // ms
+  gc: number;           // GC pause delta over the sample interval, ms
+  heapUsed: number;     // GiB
+  committed: number;    // GiB
+  cgroup: number;       // GiB
+  svcCpu: number;       // %
+  nodeCpu: number;      // %
+  chunks: number;
+  entities: number;
+}
 
-export function useLedger(): Ledger;                                     // authority.ts
-export function useActiveServer(): { id: string; name: string; version: string;
-  phase: 'online' | 'offline' | 'starting' | 'stopping' | 'unknown';
-  uptimeMs: number | null; epochId: string | null };                     // selectors.ts + epochs.ts
-export function useServers(): Array<{ id: string; name: string; phase: string }>;
-export function usePrefs(): Prefs & { set<K extends keyof Prefs>(k: K, v: Prefs[K]): void }; // preferences.ts, 8 keys
-export function useTelemetry(window: '1m' | '5m' | '15m' | '35m'): TelemetryView; // telemetry.ts (segments split by epoch gaps)
-export function useRoster(): RosterView;                                 // player-history.ts
-export function useConsoleStream(): ConsoleStreamView;                   // adapter, memory only
-export function useMutation(action: string, kind: string): {
-  reason: string | null;            // session.reason(action, kind): null = allowed, string = exact gate reason
-  begin(args?: unknown): Promise<void>; // session.prepare -> opens ActionReviewModal
+export type SeriesKey =
+  | 'tps' | 'mean' | 'p95' | 'p99' | 'gc'
+  | 'heapUsed' | 'committed' | 'cgroup'
+  | 'svcCpu' | 'nodeCpu' | 'chunks' | 'entities';
+
+export interface SeriesSpec {
+  key: SeriesKey;
+  label: string;
+  unit: string;
+  kind: 'area' | 'bars';
+  color: string;                         // CSS color; must match --pp-c-* tokens
+  peak: 'max' | 'min';                   // which extreme survives decimation
+  accessor: (s: Sample) => number;
+  domain: (all: Sample[]) => [number, number];
+  fmt: (v: number) => string;
+  budget?: { value: number; label: string };
+}
+
+export const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
+
+export function niceCeil(v: number): number {
+  if (v <= 0) return 1;
+  const p = 10 ** Math.floor(Math.log10(v));
+  const n = v / p;
+  return (n <= 1 ? 1 : n <= 2 ? 2 : n <= 5 ? 5 : 10) * p;
+}
+
+const maxOf = (ss: Sample[], f: (s: Sample) => number) => ss.reduce((m, s) => Math.max(m, f(s)), 0);
+const minOf = (ss: Sample[], f: (s: Sample) => number) => ss.reduce((m, s) => Math.min(m, f(s)), Infinity);
+const one = (v: number) => v.toFixed(1);
+
+const msDomain = (f: (s: Sample) => number) => (ss: Sample[]): [number, number] =>
+  [0, Math.max(16, niceCeil(maxOf(ss, f) * 1.15))];
+
+// Memory lanes share ONE domain so heights are comparable without overlapping.
+const memDomain = (ss: Sample[]): [number, number] => {
+  const hi = maxOf(ss, s => Math.max(s.heapUsed, s.committed, s.cgroup));
+  return [0, Math.max(1, niceCeil(hi * 1.1))];
 };
-```
 
-Rule: **a gate reason is data, not layout.** It is only ever rendered inside a Tooltip/`aria-description`, never as a block element.
+export const SERIES: Record<SeriesKey, SeriesSpec> = {
+  tps: {
+    key: 'tps', label: 'TPS', unit: 'TPS', kind: 'area', color: 'var(--pp-c-tps)', peak: 'min',
+    accessor: s => s.tps,
+    domain: ss => [Math.min(15, Math.floor(minOf(ss, s => s.tps))), 20],
+    fmt: one,
+  },
+  mean: {
+    key: 'mean', label: 'Mean MSPT', unit: 'ms', kind: 'area', color: 'var(--pp-c-mean)', peak: 'max',
+    accessor: s => s.mean, domain: msDomain(s => s.mean), fmt: one,
+    budget: { value: 50, label: '50 ms budget' },
+  },
+  p95: {
+    key: 'p95', label: 'p95 MSPT', unit: 'ms', kind: 'area', color: 'var(--pp-c-p95)', peak: 'max',
+    accessor: s => s.p95, domain: msDomain(s => s.p95), fmt: one,
+    budget: { value: 50, label: '50 ms budget' },
+  },
+  p99: {
+    key: 'p99', label: 'p99 MSPT', unit: 'ms', kind: 'area', color: 'var(--pp-c-p99)', peak: 'max',
+    accessor: s => s.p99, domain: msDomain(s => s.p99), fmt: one,
+    budget: { value: 50, label: '50 ms budget' },
+  },
+  gc: {
+    key: 'gc', label: 'GC pauses Δ', unit: 'ms', kind: 'bars', color: 'var(--pp-c-gc)', peak: 'max',
+    accessor: s => s.gc, domain: ss => [0, Math.max(4, niceCeil(maxOf(ss, s => s.gc) * 1.15))], fmt: one,
+  },
+  heapUsed:  { key: 'heapUsed',  label: 'Heap used',   unit: 'GiB', kind: 'area', color: 'var(--pp-c-heap)',   peak: 'max', accessor: s => s.heapUsed,  domain: memDomain, fmt: one },
+  committed: { key: 'committed', label: 'Committed',   unit: 'GiB', kind: 'area', color: 'var(--pp-c-commit)', peak: 'max', accessor: s => s.committed, domain: memDomain, fmt: one },
+  cgroup:    { key: 'cgroup',    label: 'Cgroup',      unit: 'GiB', kind: 'area', color: 'var(--pp-c-cgroup)', peak: 'max', accessor: s => s.cgroup,    domain: memDomain, fmt: one },
+  svcCpu:    { key: 'svcCpu',    label: 'Service CPU', unit: '%',   kind: 'area', color: 'var(--pp-c-svc)',    peak: 'max', accessor: s => s.svcCpu,    domain: () => [0, 100], fmt: one },
+  nodeCpu:   { key: 'nodeCpu',   label: 'Node CPU',    unit: '%',   kind: 'area', color: 'var(--pp-c-node)',   peak: 'max', accessor: s => s.nodeCpu,   domain: () => [0, 100], fmt: one },
+  chunks:    { key: 'chunks',    label: 'Loaded chunks', unit: '',  kind: 'area', color: 'var(--pp-c-chunks)',   peak: 'max', accessor: s => s.chunks,   domain: ss => [0, niceCeil(maxOf(ss, s => s.chunks) * 1.1)],   fmt: v => String(Math.round(v)) },
+  entities:  { key: 'entities',  label: 'Entities',    unit: '',    kind: 'area', color: 'var(--pp-c-entities)', peak: 'max', accessor: s => s.entities, domain: ss => [0, niceCeil(maxOf(ss, s => s.entities) * 1.1)], fmt: v => String(Math.round(v)) },
+};
 
----
+export interface Group { id: 'tick' | 'memory' | 'cpu'; label: string; series: SeriesKey[] }
+export const GROUPS: Group[] = [
+  { id: 'tick',   label: 'Tick & MSPT',   series: ['tps', 'mean', 'p95', 'p99', 'gc'] },
+  { id: 'memory', label: 'Memory tiers',  series: ['heapUsed', 'committed', 'cgroup'] },
+  { id: 'cpu',    label: 'CPU & chunks',  series: ['svcCpu', 'nodeCpu', 'chunks', 'entities'] },
+];
 
-## 3. Tokens and architectural primitives (`src/ui/styles/globals.css`)
-
-### 3.1 Preserved surface and lighting tokens
-
-Keep the legacy token blocks verbatim. Baseline reference (use only if recovery fails). All colors are **space-separated RGB triplets** so `rgb(var(--x) / .08)` works.
-
-```css
-:root, [data-theme="dark"] {
-  --bg:        7 10 14;      /* obsidian floor */
-  --surface-1: 13 18 24;     /* deck/pane cell */
-  --surface-2: 18 25 33;     /* raised control */
-  --surface-3: 9 13 18;      /* recessed well */
-  --line:      190 205 230;  /* hairline source (use at .06-.14) */
-  --text:      232 238 246;
-  --muted:     133 148 168;
-  --faint:     84 98 118;
-
-  --emerald: 52 211 153;  --cyan: 34 211 238;  --violet: 167 139 250;
-  --indigo: 129 140 248;  --amber: 251 191 36; --rose: 251 113 133;
-
-  --accent: var(--emerald);                 /* overridden by [data-accent] */
-  --rail-w: 64px;
-  --hdr-h: 56px;
-  --cell-h: 148px;
-  --ctl-h: 32px;
-  --row-h: 24px;                            /* density-controlled */
-  --fs-base: 13px;                          /* textSize-controlled */
-  --r-box: 14px;                            /* the ONE box radius */
-  --r-ctl: 8px;                             /* controls/tags, always < 12px */
-  --dur: .18s;
+/** Keep first/last; inside each bucket keep the extreme so spikes and dips survive. */
+export function decimate<T>(xs: T[], max: number, val: (t: T) => number, peak: 'max' | 'min'): T[] {
+  if (xs.length <= max || max < 3) return xs;
+  const out: T[] = [];
+  const size = xs.length / max;
+  for (let i = 0; i < max; i++) {
+    const a = Math.floor(i * size);
+    const b = Math.min(xs.length, Math.floor((i + 1) * size));
+    let best = xs[a];
+    for (let j = a + 1; j < b; j++) {
+      if (peak === 'max' ? val(xs[j]) > val(best) : val(xs[j]) < val(best)) best = xs[j];
+    }
+    out.push(best);
+  }
+  out[0] = xs[0];
+  out[out.length - 1] = xs[xs.length - 1];
+  return out;
 }
-[data-theme="light"] {
-  --bg: 244 246 249; --surface-1: 255 255 255; --surface-2: 247 249 252; --surface-3: 238 242 247;
-  --line: 20 32 54; --text: 15 23 36; --muted: 88 100 118; --faint: 140 150 165;
+
+export function sampleAt(ss: Sample[], t: number): Sample | undefined {
+  if (!ss.length) return undefined;
+  let lo = 0, hi = ss.length - 1;
+  while (lo < hi) {
+    const mid = (lo + hi) >> 1;
+    if (ss[mid].t < t) lo = mid + 1; else hi = mid;
+  }
+  const a = ss[lo], b = ss[lo - 1];
+  return b && Math.abs(b.t - t) < Math.abs(a.t - t) ? b : a;
 }
-[data-accent="cyan"]   { --accent: var(--cyan); }
-[data-accent="violet"] { --accent: var(--violet); }
-[data-accent="indigo"] { --accent: var(--indigo); }
-[data-accent="amber"]  { --accent: var(--amber); }
-[data-accent="rose"]   { --accent: var(--rose); }
-[data-density="compact"]     { --row-h: 20px; --ctl-h: 28px; }
-[data-density="comfortable"] { --row-h: 28px; --ctl-h: 36px; }
-[data-text-size="sm"] { --fs-base: 12px; } [data-text-size="lg"] { --fs-base: 14.5px; }
-[data-motion="reduced"] * { animation-duration: .001ms !important; transition-duration: .001ms !important; }
-```
 
-Apply `data-theme/accent/density/text-size/motion` on `<html>` from `usePrefs()` in `app/layout.tsx` (also set via an inline pre-hydration script reading the preference store's existing persistence, so there is no theme flash).
-
-Semantic hue map (fixed): **Tick = emerald, Players = cyan, Compute = indigo, Memory = violet, Warning = amber, Error/Destructive = rose.** Domain tone is applied through `data-tone="emerald|cyan|..."` -> `--tone`.
-
-### 3.2 Architectural layout primitives
-
-```css
-@layer components {
-  /* ---------- tone plumbing ---------- */
-  [data-tone="emerald"] { --tone: var(--emerald); } [data-tone="cyan"]   { --tone: var(--cyan); }
-  [data-tone="indigo"]  { --tone: var(--indigo); }  [data-tone="violet"] { --tone: var(--violet); }
-  [data-tone="amber"]   { --tone: var(--amber); }   [data-tone="rose"]   { --tone: var(--rose); }
-
-  /* ---------- .pp-deck: ONE bordered shell; children are hairline-divided cells ---------- */
-  .pp-deck {
-    display: grid; gap: 1px;                              /* the gap IS the hairline */
-    background: rgb(var(--line) / .10);
-    border: 1px solid rgb(var(--line) / .10);
-    border-radius: var(--r-box); overflow: hidden;
-    box-shadow: inset 0 1px 0 rgb(255 255 255 / .05), 0 28px 56px -36px rgb(0 0 0 / .85);
-  }
-  .pp-deck > .pp-cell {                                    /* cells: NO border, NO radius, NO shadow */
-    position: relative; background: rgb(var(--surface-1)); min-width: 0;
-    background-image:
-      radial-gradient(120% 90% at 0% 0%, rgb(var(--tone, var(--accent)) / .11), transparent 62%),
-      linear-gradient(180deg, rgb(255 255 255 / .035), transparent 38%);
-  }
-  .pp-deck > .pp-cell::before {                            /* top-edge specular highlight */
-    content: ""; position: absolute; inset: 0 0 auto 0; height: 1px;
-    background: linear-gradient(90deg, transparent, rgb(var(--tone, var(--accent)) / .55), transparent);
-    opacity: .7; pointer-events: none;
-  }
-
-  /* ---------- .pp-pane: ONE bordered shell; internals are head / ribbon / body separated by hairlines ---------- */
-  .pp-pane {
-    display: flex; flex-direction: column; min-width: 0; min-height: 0;
-    background: rgb(var(--surface-1));
-    background-image: linear-gradient(180deg, rgb(255 255 255 / .03), transparent 30%);
-    border: 1px solid rgb(var(--line) / .10); border-radius: var(--r-box); overflow: hidden;
-    box-shadow: inset 0 1px 0 rgb(255 255 255 / .05), 0 28px 56px -36px rgb(0 0 0 / .85);
-  }
-  .pp-pane__head {
-    display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 14px; flex: none;
-    border-bottom: 1px solid rgb(var(--line) / .08);
-  }
-  .pp-pane__title { font-size: 13px; font-weight: 600; letter-spacing: -.005em; }
-  .pp-pane__body { flex: 1; min-height: 0; }
-  .pp-pane__foot { border-top: 1px solid rgb(var(--line) / .08); padding: 8px 14px; flex: none; }
-
-  /* ---------- .pp-ribbon: flush metric strip, border-shared cells ---------- */
-  .pp-ribbon {
-    display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr);
-    border-block: 1px solid rgb(var(--line) / .08); flex: none;
-  }
-  .pp-ribbon > * { position: relative; padding: 10px 14px 9px; min-width: 0; }
-  .pp-ribbon > * + * { border-left: 1px solid rgb(var(--line) / .08); }
-  .pp-ribbon > [data-active="true"]::before {              /* 2px glowing top indicator */
-    content: ""; position: absolute; inset: -1px 0 auto 0; height: 2px; background: rgb(var(--tone));
-    box-shadow: 0 0 12px 1px rgb(var(--tone) / .65);
-  }
-
-  /* ---------- .pp-well: recessed, borderless canvas ---------- */
-  .pp-well {
-    background: linear-gradient(180deg, rgb(var(--surface-3)), rgb(var(--surface-3) / .55));
-    box-shadow: inset 0 1px 0 rgb(0 0 0 / .35);
-    border-radius: 0;                                      /* full-bleed inside a pane */
-  }
-
-  /* ---------- .pp-glass: floating overlays ONLY (palette, tooltip, modal, pairing gate) ---------- */
-  .pp-glass {
-    background: rgb(var(--surface-2) / .82); backdrop-filter: blur(18px) saturate(1.4);
-    border: 1px solid rgb(var(--line) / .14); border-radius: 16px;
-    box-shadow: inset 0 1px 0 rgb(255 255 255 / .07), 0 24px 64px -16px rgb(0 0 0 / .75);
-  }
-
-  /* ---------- .pp-card: STANDALONE LEAF ONLY (a fleet blade, a single stat on a sparse route) ---------- */
-  .pp-card { background: rgb(var(--surface-1)); border: 1px solid rgb(var(--line) / .10); border-radius: var(--r-box);
-    box-shadow: inset 0 1px 0 rgb(255 255 255 / .05); }
-
-  /* ---------- micro atoms (all radius < 12px, so they never count as "boxes") ---------- */
-  .pp-kicker { font-size: 10px; font-weight: 600; letter-spacing: .09em; text-transform: uppercase; color: rgb(var(--muted)); }
-  .pp-num    { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; letter-spacing: -.02em; }
-  .pp-tag    { display: inline-flex; align-items: center; gap: 4px; height: 18px; padding: 0 6px; border-radius: 6px;
-    font-size: 10.5px; font-weight: 600; color: rgb(var(--tone, var(--muted))); background: rgb(var(--tone, var(--muted)) / .12); }
-  .pp-dot    { width: 6px; height: 6px; border-radius: 99px; background: rgb(var(--tone, var(--muted))); flex: none; }
-  .pp-kbd    { font: 600 10px/1 ui-monospace, monospace; padding: 3px 5px; border-radius: 5px;
-    background: rgb(var(--line) / .10); color: rgb(var(--muted)); }
-  .pp-ctl    { height: var(--ctl-h); padding: 0 10px; border-radius: var(--r-ctl); font-size: 12.5px; font-weight: 500;
-    display: inline-flex; align-items: center; gap: 6px; background: rgb(var(--surface-2));
-    border: 1px solid rgb(var(--line) / .12); color: rgb(var(--text)); transition: background var(--dur), border-color var(--dur); }
-  .pp-ctl:hover { background: rgb(var(--line) / .08); }
-  .pp-ctl:focus-visible { outline: 2px solid rgb(var(--accent) / .7); outline-offset: 1px; }
-  .pp-ctl[aria-disabled="true"] { opacity: .45; cursor: not-allowed; }
+export function timeDomain(ss: Sample[], rangeMs?: number): [number, number] {
+  if (!ss.length) { const n = Date.now(); return [n - 60_000, n]; }
+  const last = ss[ss.length - 1].t;
+  return [rangeMs ? last - rangeMs : ss[0].t, last];
 }
 ```
 
-### 3.3 Nesting law (enforced by QA #1)
+### 3.1 Shared crosshair store: `telemetry/crosshair.ts`
 
-A "**box**" is any element with `border-width > 0` AND `border-radius >= 12px`. **No box may contain another box.** Legal composition:
-
-```
-Deck  -> Cell -> (atoms, SVG)                      // cells borderless
-Pane  -> Head | Ribbon | Body(Well/Table/List)     // all borderless, hairline-separated
-Page  -> Deck | Pane | Card(leaf)                  // siblings only
-Overlay (.pp-glass) may float above anything; it is not "inside" the page tree.
-```
-
-Banned: `.pp-card` inside `.pp-card`/`.pp-pane`/`.pp-deck`; any per-route `min-height` hack on a cell; any `rounded-xl|2xl|3xl` + `border` inside a Pane or Deck; text badges stating the source (`PAPER`, `HOST`) or `Live` inside a cell (see Section 3.4).
-
-### 3.4 Badge budget (enforced by QA #2-#4)
-
-- **Source** is a single-letter dot tag `P`/`H` at the cell's top-right (`<SourceTag source="paper" />`, 9px) - never the words PAPER/HOST in a cell.
-- **Freshness** is shown ONCE per screen, in the header ledger pill. A cell shows freshness only when *abnormal*: the tag turns amber, the value dims to 55%, and a `stale 12s` micro-label replaces the delta pill. Healthy = silent.
-- The literal string `PAPER` may appear at most 1x per screen and `Live` at most 2x (ledger pill only).
-
----
-
-## 4. Blueprint 1 - Unified Mission Control Chrome
-
-Silhouette (viewport 1545x911 -> main canvas is **1481px**, +200px vs the old 264px sidebar):
-
-```
-┌──┬────────────────────────────────────────────────────────────────────────────────────────────────┐
-│▣ │ ◉ TonimSMP ▾ │ ◌ online  Paper 26.3 · Up 12h 58m · epoch 9a4f6484    ● Paper Live · ● Host Live │ ⌘K │ ▶ ⟳ ■ │ ⛁ Quick Backup │  56px
-│▦ ├────────────────────────────────────────────────────────────────────────────────────────────────┤
-│▤ │                                                                                                │
-│▥ │                                   page canvas  (24px gutters)                                  │
-│… │                                                                                                │
-│⇤ │                                                                                                │
-└──┴────────────────────────────────────────────────────────────────────────────────────────────────┘
- 64px rail (220px only on toggle; session-only useState)
-```
-
-### 4.1 CSS
-
-```css
-@layer components {
-  .pp-shell { display: grid; grid-template-columns: var(--rail-w) minmax(0, 1fr); height: 100dvh;
-    background: rgb(var(--bg)); color: rgb(var(--text)); font-size: var(--fs-base);
-    transition: grid-template-columns var(--dur) ease; }
-  .pp-shell[data-rail="open"] { --rail-w: 220px; }
-  .pp-shell__main { display: grid; grid-template-rows: var(--hdr-h) minmax(0, 1fr); min-width: 0; min-height: 0; }
-  .pp-canvas { overflow: auto; padding: 20px 24px 32px; scrollbar-gutter: stable; }
-  .pp-canvas[data-bleed="true"] { padding: 0; overflow: hidden; }       /* R05 console IDE */
-
-  .pp-rail { display: flex; flex-direction: column; align-items: stretch; gap: 4px; padding: 10px 10px;
-    border-right: 1px solid rgb(var(--line) / .08); background: rgb(var(--surface-1) / .6); min-height: 0; }
-  .pp-rail__item { position: relative; display: flex; align-items: center; gap: 12px; height: 40px; padding: 0 11px;
-    border-radius: 10px; color: rgb(var(--muted)); overflow: hidden; white-space: nowrap; }
-  .pp-rail__item:hover { color: rgb(var(--text)); background: rgb(var(--line) / .07); }
-  .pp-rail__item[aria-current="page"] { color: rgb(var(--accent)); background: rgb(var(--accent) / .10); }
-  .pp-rail__item[aria-current="page"]::before { content: ""; position: absolute; left: -10px; top: 9px; bottom: 9px; width: 3px;
-    border-radius: 0 3px 3px 0; background: rgb(var(--accent)); box-shadow: 0 0 14px rgb(var(--accent) / .8); }
-  .pp-rail__label { opacity: 0; transition: opacity var(--dur); }
-  .pp-shell[data-rail="open"] .pp-rail__label { opacity: 1; }
-  .pp-rail__pip { position: absolute; top: 8px; left: 28px; width: 7px; height: 7px; border-radius: 9px;
-    background: rgb(var(--tone, var(--amber))); box-shadow: 0 0 0 2px rgb(var(--surface-1)); }
-
-  .pp-ribbon-bar { display: grid; grid-template-columns: auto minmax(0, 1fr) auto auto auto; align-items: center; gap: 0;
-    height: var(--hdr-h); padding: 0 14px 0 8px; border-bottom: 1px solid rgb(var(--line) / .08);
-    background: linear-gradient(180deg, rgb(255 255 255 / .035), transparent), rgb(var(--surface-1) / .72);
-    backdrop-filter: blur(12px); }
-  .pp-ribbon-bar > * + * { margin-left: 12px; }
-  .pp-ribbon-bar__sep { width: 1px; height: 24px; background: rgb(var(--line) / .10); }
-
-  .pp-ring { position: relative; width: 14px; height: 14px; border-radius: 99px; background: rgb(var(--tone)); flex: none; }
-  .pp-ring::after { content: ""; position: absolute; inset: -4px; border-radius: 99px; border: 1.5px solid rgb(var(--tone) / .55);
-    animation: pp-ring 2.4s ease-out infinite; }
-  .pp-ring[data-phase="offline"]::after, .pp-ring[data-phase="unknown"]::after { animation: none; opacity: .25; }
-  @keyframes pp-ring { 0% { transform: scale(.7); opacity: .9 } 100% { transform: scale(1.5); opacity: 0 } }
-
-  .pp-power { display: inline-flex; border-radius: var(--r-ctl); overflow: hidden; border: 1px solid rgb(var(--line) / .14); height: var(--ctl-h); }
-  .pp-power > button { display: inline-flex; align-items: center; gap: 6px; padding: 0 11px; font-size: 12.5px; font-weight: 600;
-    background: rgb(var(--surface-2)); color: rgb(var(--text)); }
-  .pp-power > button + button { border-left: 1px solid rgb(var(--line) / .14); }
-  .pp-power > button[data-fg="true"] { background: rgb(var(--tone) / .14); color: rgb(var(--tone)); }
-  .pp-power > button[aria-disabled="true"] { opacity: .4; padding: 0 9px; cursor: not-allowed; }  /* collapsed to icon-only */
-  .pp-power > button[aria-disabled="true"] span { display: none; }
-
-  @media (max-width: 1100px) { .pp-ribbon-bar__meta { display: none; } .pp-ledger__text { display: none; } }
-  @media (max-width: 760px)  { /* rail becomes a 56px bottom tab bar */
-    .pp-shell { grid-template-columns: 1fr; grid-template-rows: minmax(0, 1fr) 56px; }
-    .pp-rail { order: 2; flex-direction: row; border-right: 0; border-top: 1px solid rgb(var(--line) / .08); justify-content: space-around; }
-    .pp-rail__label, .pp-rail__toggle { display: none; } .pp-canvas { padding: 12px; } }
-}
-```
-
-### 4.2 Routes registry and keyboard model (`src/ui/shell/routes.ts`, `useGoShortcuts.ts`)
+One time value for the whole page. Every stage, the readout bar and the ribbon read it.
 
 ```ts
-import { Network, Activity, Gauge, Users, TerminalSquare, ArchiveRestore, ShieldCheck, Settings } from 'lucide-react';
-export const ROUTES = [
-  { key: 1, id: 'fleet',       href: '/fleet',       label: 'Fleet',          icon: Network },
-  { key: 2, id: 'overview',    href: '/overview',    label: 'Overview',       icon: Activity },
-  { key: 3, id: 'performance', href: '/performance', label: 'Performance',    icon: Gauge },
-  { key: 4, id: 'players',     href: '/players',     label: 'Players',        icon: Users },
-  { key: 5, id: 'console',     href: '/console',     label: 'Console & chat', icon: TerminalSquare },
-  { key: 6, id: 'backups',     href: '/backups',     label: 'Backups',        icon: ArchiveRestore },
-  { key: 7, id: 'access',      href: '/access',      label: 'Access & audit', icon: ShieldCheck },
-  { key: 8, id: 'settings',    href: '/settings',    label: 'Settings',       icon: Settings },
-] as const;
-```
+// src/telemetry/crosshair.ts
+import { useSyncExternalStore } from 'react';
 
-```ts
-// useGoShortcuts.ts - "G" then 1-8 within 900ms; ignored while typing in inputs/contenteditable/xterm-like composers
-export function useGoShortcuts() {
-  const router = useRouter();
-  useEffect(() => {
-    let armed = 0;
-    const onKey = (e: KeyboardEvent) => {
-      const t = e.target as HTMLElement;
-      if (t.closest('input,textarea,select,[contenteditable="true"]') || e.metaKey || e.ctrlKey || e.altKey) return;
-      if (e.key.toLowerCase() === 'g') { armed = Date.now(); return; }
-      if (armed && Date.now() - armed < 900) {
-        const r = ROUTES.find(r => String(r.key) === e.key);
-        if (r) { e.preventDefault(); router.push(r.href); }
-        armed = 0;
+type Listener = () => void;
+let current: number | null = null;
+let pending: number | null | undefined;
+let raf = 0;
+const listeners = new Set<Listener>();
+
+export const crosshair = {
+  get: () => current,
+  subscribe(l: Listener) { listeners.add(l); return () => { listeners.delete(l); }; },
+  /** rAF-coalesced so 12 stages repaint at most once per frame */
+  set(v: number | null) {
+    pending = v;
+    if (raf) return;
+    raf = requestAnimationFrame(() => {
+      raf = 0;
+      if (pending !== undefined && pending !== current) {
+        current = pending;
+        listeners.forEach(l => l());
       }
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [router]);
+      pending = undefined;
+    });
+  },
+};
+
+export const useCrosshair = () => useSyncExternalStore(crosshair.subscribe, crosshair.get, crosshair.get);
+```
+
+### 3.2 Small hooks: `telemetry/hooks.ts`
+
+```ts
+// src/telemetry/hooks.ts
+import { RefObject, useLayoutEffect, useState } from 'react';
+
+export function useSize<T extends HTMLElement>(ref: RefObject<T>) {
+  const [size, setSize] = useState({ w: 0, h: 0 });
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const ro = new ResizeObserver(([entry]) => {
+      const w = Math.round(entry.contentRect.width);
+      const h = Math.round(entry.contentRect.height);
+      setSize(p => (p.w === w && p.h === h ? p : { w, h }));
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [ref]);
+  return size;
+}
+
+export function useSessionState<T extends string>(key: string, initial: T): [T, (v: T) => void] {
+  const [v, setV] = useState<T>(() => {
+    try { return (sessionStorage.getItem(key) as T) || initial; } catch { return initial; }
+  });
+  return [v, (n: T) => { setV(n); try { sessionStorage.setItem(key, n); } catch { /* private mode */ } }];
 }
 ```
-
-### 4.3 `AppShell` and `CompactRail`
-
-```tsx
-// src/ui/shell/AppShell.tsx
-'use client';
-export function AppShell({ children }: { children: React.ReactNode }) {
-  const [railOpen, setRailOpen] = useState(false);                // session-only; NOT a preference key
-  useGoShortcuts();
-  return (
-    <Tooltip.Provider delayDuration={120} skipDelayDuration={300}>
-      <div className="pp-shell" data-rail={railOpen ? 'open' : 'compact'}>
-        <CompactRail open={railOpen} onToggle={() => setRailOpen(o => !o)} />
-        <div className="pp-shell__main">
-          <MissionControlHeader />
-          <PageCanvas>{children}</PageCanvas>
-        </div>
-      </div>
-      <ActionReviewHost />   {/* single modal host for every session.prepare result */}
-      <CommandPalette />     {/* cmdk, .pp-glass */}
-    </Tooltip.Provider>
-  );
-}
-```
-
-```tsx
-// src/ui/shell/CompactRail.tsx
-export function CompactRail({ open, onToggle }: { open: boolean; onToggle(): void }) {
-  const pathname = usePathname();
-  const badges = useRailBadges();   // { players?: number, console?: { warn: number; error: number } } -> shown as a 7px pip when compact
-  return (
-    <nav className="pp-rail" aria-label="Primary">
-      <Link href="/overview" className="pp-rail__item" aria-label="PlexonPanel home" data-tone="emerald">
-        <BrandMark className="size-[18px] shrink-0" /><span className="pp-rail__label font-semibold tracking-tight">plexonpanel</span>
-      </Link>
-      <div className="my-2 h-px bg-[rgb(var(--line)/0.08)]" />
-      {ROUTES.map(r => {
-        const active = pathname.startsWith(r.href);
-        const pip = r.id === 'console' ? (badges.console?.error ? 'rose' : badges.console?.warn ? 'amber' : null) : null;
-        return (
-          <Tooltip.Root key={r.id}>
-            <Tooltip.Trigger asChild>
-              <Link href={r.href} className="pp-rail__item" aria-current={active ? 'page' : undefined}>
-                <r.icon className="size-[18px] shrink-0" strokeWidth={1.75} />
-                <span className="pp-rail__label text-[13px] font-medium">{r.label}</span>
-                {pip && <i className="pp-rail__pip" data-tone={pip} />}
-              </Link>
-            </Tooltip.Trigger>
-            {!open && (
-              <Tooltip.Portal>
-                <Tooltip.Content side="right" sideOffset={10} className="pp-glass flex items-center gap-2 px-2.5 py-1.5 text-[12px]">
-                  {r.label}<kbd className="pp-kbd">G</kbd><kbd className="pp-kbd">{r.key}</kbd>
-                </Tooltip.Content>
-              </Tooltip.Portal>
-            )}
-          </Tooltip.Root>
-        );
-      })}
-      <div className="mt-auto" />
-      <button className="pp-rail__item pp-rail__toggle" onClick={onToggle} aria-expanded={open} aria-label="Toggle navigation width">
-        <PanelLeft className="size-[18px] shrink-0" /><span className="pp-rail__label text-[12px]">Collapse</span>
-      </button>
-    </nav>
-  );
-}
-```
-
-Relay/session identity ("Relay connected - Signed Protocol 3 connection - Owner access") moves OUT of the nav into the **ledger pill tooltip** (Section 4.5). The rail carries no prose.
-
-### 4.4 `MissionControlHeader` - one bar, five zones
-
-```tsx
-// src/ui/shell/MissionControlHeader.tsx
-'use client';
-export function MissionControlHeader() {
-  const s = useActiveServer();
-  const tone = s.phase === 'online' ? 'emerald' : s.phase === 'offline' ? 'rose'
-             : s.phase === 'unknown' ? 'amber' : 'cyan';
-  return (
-    <header className="pp-ribbon-bar" role="banner">
-      <ServerSwitcher />                                             {/* zone 1: Radix DropdownMenu, name + chevron, 32px */}
-      <div className="pp-ribbon-bar__meta flex min-w-0 items-center gap-3" data-tone={tone}>   {/* zone 2 */}
-        <span className="pp-ring" data-phase={s.phase} aria-hidden />
-        <span className="text-[12.5px] font-semibold capitalize" style={{ color: 'rgb(var(--tone))' }}>{s.phase}</span>
-        <span className="pp-ribbon-bar__sep" />
-        <span className="truncate text-[12px] text-[rgb(var(--muted))] pp-num">
-          Paper {s.version}{s.uptimeMs != null && <> · Up <Uptime ms={s.uptimeMs} /></>}{s.epochId && <> · epoch <code className="font-mono">{s.epochId.slice(0, 8)}</code></>}
-        </span>
-      </div>
-      <AuthorityLedgerPill />                                        {/* zone 3: ONE pill */}
-      <button className="pp-ctl" onClick={openPalette} aria-label="Open command palette">
-        <Search className="size-3.5" /><span className="hidden xl:inline text-[rgb(var(--muted))]">Jump to…</span><kbd className="pp-kbd">⌘K</kbd>
-      </button>                                                       {/* zone 4 */}
-      <PowerAndBackupGroup phase={s.phase} />                         {/* zone 5 */}
-    </header>
-  );
-}
-```
-
-### 4.5 `AuthorityLedgerPill` (replaces "All sources live", per-card PAPER/HOST/Live badges, and the sidebar relay box)
-
-```tsx
-export function AuthorityLedgerPill() {
-  const { paper, host } = useLedger();
-  const worst = [paper.state, host.state].includes('offline') ? 'rose'
-              : [paper.state, host.state].some(x => x !== 'live') ? 'amber' : 'emerald';
-  const conn = useConnectionInfo();   // { relay: 'connected'|..., protocol: 3, role: 'owner' } from adapter selectors
-  return (
-    <Tooltip.Root>
-      <Tooltip.Trigger asChild>
-        <button className="pp-ctl gap-2.5 px-2.5" data-tone={worst} aria-label={`Paper ${paper.state}, Host ${host.state}`}>
-          <Seg label="Paper" s={paper.state} /><span className="h-3.5 w-px bg-[rgb(var(--line)/0.14)]" /><Seg label="Host" s={host.state} />
-        </button>
-      </Tooltip.Trigger>
-      <Tooltip.Portal>
-        <Tooltip.Content side="bottom" align="end" sideOffset={8} className="pp-glass w-[280px] p-3 text-[12px]">
-          <LedgerRow src="Paper" {...paper} /><LedgerRow src="Host Companion" {...host} />
-          <div className="my-2 h-px bg-[rgb(var(--line)/0.1)]" />
-          <div className="text-[rgb(var(--muted))]">Relay {conn.relay} · Signed Protocol {conn.protocol} · {conn.role} access</div>
-        </Tooltip.Content>
-      </Tooltip.Portal>
-    </Tooltip.Root>
-  );
-}
-const Seg = ({ label, s }: { label: string; s: Freshness }) => (
-  <span className="inline-flex items-center gap-1.5" data-tone={s === 'live' ? 'emerald' : s === 'offline' ? 'rose' : 'amber'}>
-    <i className="pp-dot" /><span className="pp-ledger__text text-[12px]">{label} <b className="font-semibold capitalize">{s}</b></span>
-  </span>
-);
-```
-
-The only place the words "Paper … Live … Host … Live" appear on any screen.
-
-### 4.6 `MutationButton` - tooltip-gated, zero inline gate text
-
-```tsx
-// src/ui/primitives/MutationButton.tsx
-type Props = { action: string; kind: string; icon: LucideIcon; label: string; tone?: Tone;
-  foreground?: boolean; className?: string; args?: unknown };
-
-export const MutationButton = forwardRef<HTMLButtonElement, Props>(function MutationButton(
-  { action, kind, icon: Icon, label, tone, foreground, className, args }, ref) {
-  const m = useMutation(action, kind);               // m.reason === null -> allowed
-  const gated = m.reason !== null;
-  const btn = (
-    <button ref={ref} type="button" data-tone={tone} data-fg={foreground || undefined}
-      aria-disabled={gated || undefined}                           // NOT `disabled`: stays focusable so the tooltip is keyboard reachable
-      aria-description={gated ? m.reason! : undefined}
-      onClick={() => { if (!gated) void m.begin(args); }}          // fail-closed: gated click is a hard no-op
-      className={className}>
-      <Icon className="size-3.5" strokeWidth={2} /><span>{label}</span>
-    </button>
-  );
-  if (!gated) return btn;
-  return (
-    <Tooltip.Root>
-      <Tooltip.Trigger asChild>{btn}</Tooltip.Trigger>
-      <Tooltip.Portal>
-        <Tooltip.Content side="bottom" sideOffset={8} className="pp-glass flex max-w-[260px] items-start gap-2 px-3 py-2 text-[12px] leading-snug">
-          <Info className="mt-px size-3.5 shrink-0 text-[rgb(var(--amber))]" /><span>{m.reason}</span>
-        </Tooltip.Content>
-      </Tooltip.Portal>
-    </Tooltip.Root>
-  );
-});
-```
-
-Never a `<p>`, never a sibling node, never `title=` only. The reason is read from `session.reason()` verbatim - do not paraphrase or cache it.
-
-### 4.7 `PowerAndBackupGroup` - foregrounds the valid state action
-
-```tsx
-export function PowerAndBackupGroup({ phase }: { phase: Phase }) {
-  const online = phase === 'online', offline = phase === 'offline';
-  return (
-    <div className="flex items-center gap-3">
-      <div className="pp-power" role="group" aria-label="Server power">
-        <MutationButton action="server.start"   kind="lifecycle" icon={Play}      label="Start"   tone="emerald" foreground={offline} />
-        <MutationButton action="server.restart" kind="lifecycle" icon={RotateCw}  label="Restart" tone="amber"   foreground={online} />
-        <MutationButton action="server.stop"    kind="lifecycle" icon={Square}     label="Stop"    tone="rose"    foreground={online} />
-      </div>
-      <MutationButton action="backup.quick" kind="backup" icon={ArchiveRestore} label="Quick Backup" tone="indigo"
-        className="pp-ctl !border-[rgb(var(--indigo)/0.5)] !bg-[linear-gradient(180deg,rgb(var(--indigo)/0.9),rgb(var(--indigo)/0.65))] !text-white shadow-[0_6px_20px_-6px_rgb(var(--indigo)/0.8)]" />
-    </div>
-  );
-}
-```
-
-Behavior matrix: online -> Restart/Stop foreground, Start collapses to a dimmed icon-only segment (tooltip carries "Start requires a confirmed stopped service."); offline -> Start foreground, Restart/Stop collapse; starting/stopping/unknown -> all three dimmed with their own gate reasons. **Header height is invariant at 56px in every state.** Action ids above are placeholders - use the real ids exported by the adapter.
 
 ---
 
-## 5. Blueprint 2 - The 4-Cell Hairline Instrument Deck
+## 4. Separated-Selected StudioChart (`/overview` Telemetry Studio)
 
-One `.pp-deck`, four `.pp-cell`s, **148px tall**, 1px dividers produced by the deck `gap`. No cell borders, no radius, no repeated footers, no `min-height` overrides. Dead vertical space is impossible because the viz row is pinned to the cell bottom and the metric row is fixed-height.
+### 4.1 Behaviour contract
 
-```
-┌───────────────────────┬───────────────────────┬───────────────────────┬───────────────────────┐
-│ TICK PERFORMANCE   P• │ ONLINE PLAYERS     P• │ COMPUTE LOAD       H• │ MEMORY ALLOCATION  P• │
-│ 20.00 TPS  [p95 11.1] │ 1 /10     [↗ peak 1]  │ 24.4 %    [of 1 core] │ 1.1 GiB    [28% heap] │
-│                       │                       │                       │                       │
-│ ▮▮▮▮▮▮▮▮▮▮▮▮▮ ·20.0   │ (☺)(+)  ▬▬▬▬▬▬▬▬▬▬▬▬▬  │ svc  ▬▬▬▬▬▬▬▬▬▬ 24.4% │ ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬  │
-│ 9.9 ms mean · 50 budget│ capacity 1/10         │ node ▬▬▬▬▬▬▬▬▬▬  7.9% │ ● used ● commit ● cg  │
-└───────────────────────┴───────────────────────┴───────────────────────┴───────────────────────┘
-```
+- The group tabs (`Tick & MSPT`, `Memory tiers`, `CPU & chunks`) choose which **ribbon set** is shown.
+- The ribbon shows one card per series in the group. **Clicking a card sets `selected`.**
+- **Focus view (default):** exactly one `<Stage>` for `selected`, full height (300 px), own Y scale, own gradient, own budget line, its own accent colour. Switching cards remounts the stage (`key={selected}`) with a 140 ms fade.
+- **Split view (optional toggle):** one `<Stage>` per series in the group, each with its own scale, stacked, hairline-divided, never overlapping. The selected stage gets an accent left rail. Clicking a stage head also selects it.
+- Banned: any stage that draws more than one series; any `STAGE 02` style combined mean/p95/p99 overlay.
+- Selected signal and view mode persist in `sessionStorage` (`pp.studio.signal`, `pp.studio.view`).
 
-### 5.1 CSS
-
-```css
-@layer components {
-  .pp-deck--instruments { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-  @media (max-width: 1180px) { .pp-deck--instruments { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-  @media (max-width: 560px)  { .pp-deck--instruments { grid-template-columns: minmax(0, 1fr); } }
-
-  .pp-inst { display: grid; grid-template-rows: 16px 40px minmax(0, 1fr); row-gap: 6px;
-    height: var(--cell-h); padding: 14px 16px 0; }                        /* rows: label / metric / viz-flush-bottom */
-  .pp-inst__top   { display: flex; align-items: center; justify-content: space-between; }
-  .pp-inst__metric { display: flex; align-items: baseline; gap: 6px; min-width: 0; }
-  .pp-inst__value { font-size: 28px; line-height: 1; font-weight: 600; }
-  .pp-inst__unit  { font-size: 12px; color: rgb(var(--muted)); font-weight: 500; }
-  .pp-inst__delta { margin-left: auto; align-self: center; }
-  .pp-inst__viz   { align-self: end; margin: 0 -16px; padding: 0 16px 12px; min-height: 0; }  /* flush to cell edges */
-  .pp-inst[data-stale="true"] .pp-inst__value { opacity: .55; }
-  .pp-src { font: 600 9px/1 ui-monospace, monospace; letter-spacing: .06em; color: rgb(var(--faint)); display: inline-flex; gap: 4px; align-items: center; }
-  .pp-src[data-stale="true"] { color: rgb(var(--amber)); }
-}
-```
-
-### 5.2 Shared atoms
+### 4.2 `Stage.tsx` (the only chart primitive)
 
 ```tsx
-// src/ui/instruments/atoms.tsx
-export const SourceTag = ({ source, stale, ageS }: { source: Source; stale?: boolean; ageS?: number }) => (
-  <span className="pp-src" data-stale={stale || undefined} data-tone={stale ? 'amber' : undefined}
-        aria-label={`${source} source${stale ? `, stale ${ageS}s` : ''}`}>
-    {stale ? <>stale {ageS}s</> : null}<i className="pp-dot" style={{ background: stale ? 'rgb(var(--amber))' : 'rgb(var(--faint))' }} />{source === 'paper' ? 'P' : 'H'}
-  </span>
-);
+// src/telemetry/Stage.tsx
+import { useId, useMemo, useRef } from 'react';
+import { SeriesSpec, Sample, clamp, decimate, sampleAt } from './series';
+import { crosshair, useCrosshair } from './crosshair';
+import { useSize } from './hooks';
 
-export function Instrument({ label, tone, source, value, unit, delta, children }: InstrumentProps) {
-  const f = useLedger()[source];
-  const stale = f.state !== 'live';
+/** Identical on every stage so X positions line up across the whole page. */
+export const PLOT = { l: 12, r: 46, t: 18, b: 6 } as const;
+
+export interface StageProps {
+  spec: SeriesSpec;                 // exactly one series. Do not widen this to an array.
+  samples: Sample[];
+  domainT: [number, number];        // shared X domain
+  height?: number | 'fill';         // px, or fill parent flex slot
+  minHeight?: number;
+  kicker?: string;                  // e.g. "SELECTED" or "01"
+  selected?: boolean;
+  onSelect?: () => void;
+  testId?: string;
+}
+
+const fmtTick = (v: number) => (Number.isInteger(v) ? String(v) : v.toFixed(1));
+
+export function Stage({
+  spec, samples, domainT, height = 'fill', minHeight = 64, kicker, selected, onSelect, testId,
+}: StageProps) {
+  const plotRef = useRef<HTMLDivElement>(null);
+  const { w, h: measured } = useSize(plotRef);
+  const uid = useId().replace(/:/g, '');
+  const hoverT = useCrosshair();
+
+  const H = height === 'fill' ? Math.max(minHeight, measured) : height;
+
+  const m = useMemo(() => {
+    const [d0, d1] = spec.domain(samples);
+    const iw = Math.max(1, w - PLOT.l - PLOT.r);
+    const ih = Math.max(1, H - PLOT.t - PLOT.b);
+    const [t0, t1] = domainT;
+    const sx = (t: number) => PLOT.l + ((t - t0) / (t1 - t0 || 1)) * iw;
+    const sy = (v: number) => PLOT.t + ih - ((v - d0) / (d1 - d0 || 1)) * ih;
+    const base = PLOT.t + ih;
+    const pts = decimate(samples, Math.max(3, Math.floor(iw)), spec.accessor, spec.peak);
+
+    let line = '', area = '';
+    if (spec.kind === 'area' && pts.length > 1) {
+      line = pts
+        .map((s, i) => `${i ? 'L' : 'M'}${sx(s.t).toFixed(1)},${sy(clamp(spec.accessor(s), d0, d1)).toFixed(1)}`)
+        .join('');
+      area = `${line}L${sx(pts[pts.length - 1].t).toFixed(1)},${base}L${sx(pts[0].t).toFixed(1)},${base}Z`;
+    }
+    const barW = Math.max(1.5, Math.min(4, (iw / Math.max(1, pts.length)) * 0.6));
+    const bars = spec.kind === 'bars'
+      ? pts.filter(s => spec.accessor(s) > 0).map(s => ({ x: sx(s.t) - barW / 2, y: sy(spec.accessor(s)), w: barW }))
+      : [];
+    return { d0, d1, iw, ih, sx, sy, base, line, area, bars, ticks: [d0, (d0 + d1) / 2, d1] };
+  }, [samples, spec, w, H, domainT]);
+
+  const last = samples[samples.length - 1];
+  const hs = hoverT == null ? undefined : sampleAt(samples, hoverT);
+  const shown = hs ?? last;
+  const budget = spec.budget;
+  const budgetInside = !!budget && budget.value >= m.d0 && budget.value <= m.d1;
+  const budgetOff = !!budget && !budgetInside;
+
+  const onMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    const r = e.currentTarget.getBoundingClientRect();
+    const ratio = clamp((e.clientX - r.left - PLOT.l) / m.iw, 0, 1);
+    const t = domainT[0] + ratio * (domainT[1] - domainT[0]);
+    const s = sampleAt(samples, t);
+    if (s) crosshair.set(s.t);
+  };
+
   return (
-    <div className="pp-cell pp-inst" data-tone={tone} data-stale={stale || undefined}>
-      <div className="pp-inst__top"><span className="pp-kicker">{label}</span><SourceTag source={source} stale={stale} ageS={Math.round(f.ageMs / 1000)} /></div>
-      <div className="pp-inst__metric">
-        <span className="pp-inst__value pp-num">{value}</span><span className="pp-inst__unit">{unit}</span>
-        {!stale && delta && <span className="pp-tag pp-inst__delta">{delta}</span>}
+    <section
+      className="pp-stage"
+      data-series={spec.key}
+      data-selected={selected ? 'true' : undefined}
+      data-testid={testId ?? `stage-${spec.key}`}
+      style={height === 'fill' ? { flex: '1 1 0', minHeight } : undefined}
+    >
+      <header className="pp-stage__head" onClick={onSelect} role={onSelect ? 'button' : undefined}>
+        {kicker && <span className="pp-stage__kicker">{kicker}</span>}
+        <span className="pp-stage__label">{spec.label}</span>
+        {budgetOff && <span className="pp-stage__chip">▲ {budget!.label} · off scale</span>}
+        <span className="pp-stage__value" data-state={hs ? 'scrub' : 'live'}>
+          {shown ? spec.fmt(spec.accessor(shown)) : '–'}
+          {spec.unit && <small>{spec.unit}</small>}
+        </span>
+      </header>
+
+      <div
+        ref={plotRef}
+        className="pp-stage__plot"
+        style={height === 'fill' ? undefined : { height }}
+        onPointerMove={onMove}
+        onPointerLeave={() => crosshair.set(null)}
+      >
+        {w > 0 && (
+          <svg className="pp-stage__svg" width={w} height={H} role="img" aria-label={`${spec.label} over time`}>
+            <defs>
+              <linearGradient id={`fill-${uid}`} x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stopColor={spec.color} stopOpacity="0.46" />
+                <stop offset="0.65" stopColor={spec.color} stopOpacity="0.12" />
+                <stop offset="1" stopColor={spec.color} stopOpacity="0" />
+              </linearGradient>
+            </defs>
+
+            {m.ticks.map((v, i) => (
+              <g key={i}>
+                <line className="pp-grid" x1={PLOT.l} x2={w - PLOT.r} y1={m.sy(v)} y2={m.sy(v)} />
+                <text className="pp-ytick" x={w - PLOT.r + 8} y={m.sy(v) + 3.5}>{fmtTick(v)}</text>
+              </g>
+            ))}
+
+            {budgetInside && (
+              <>
+                <line className="pp-budget" x1={PLOT.l} x2={w - PLOT.r} y1={m.sy(budget!.value)} y2={m.sy(budget!.value)} />
+                <text className="pp-budget-label" x={PLOT.l + 4} y={m.sy(budget!.value) - 4}>{budget!.label}</text>
+              </>
+            )}
+
+            {spec.kind === 'area' && (
+              <>
+                <path className="pp-area" d={m.area} fill={`url(#fill-${uid})`} />
+                <path className="pp-line" d={m.line} stroke={spec.color} />
+              </>
+            )}
+            {spec.kind === 'bars' &&
+              m.bars.map((b, i) => (
+                <rect key={i} className="pp-bar" x={b.x} y={b.y} width={b.w} height={Math.max(1, m.base - b.y)} fill={spec.color} />
+              ))}
+
+            {hs && (
+              <>
+                <line className="pp-cross" x1={m.sx(hs.t)} x2={m.sx(hs.t)} y1={PLOT.t} y2={m.base} />
+                <circle className="pp-dot" cx={m.sx(hs.t)} cy={m.sy(clamp(spec.accessor(hs), m.d0, m.d1))} r="3.5" stroke={spec.color} />
+              </>
+            )}
+          </svg>
+        )}
       </div>
-      <div className="pp-inst__viz">{children}</div>
-    </div>
-  );
-}
-```
-
-### 5.3 `InstrumentDeck`
-
-```tsx
-export function InstrumentDeck() {
-  const t = useTelemetry('1m'); const r = useRoster();
-  return (
-    <section className="pp-deck pp-deck--instruments" aria-label="Instruments">
-      <Instrument label="Tick performance" tone="emerald" source="paper" value={fmt(t.tps.now, 2)} unit="TPS" delta={`p95 ${fmt(t.mspt.p95, 1)} ms`}>
-        <EqualizerBars samples={t.tickSamples} target={20} />
-        <div className="mt-1.5 flex justify-between text-[11px] text-[rgb(var(--muted))] pp-num"><span>{fmt(t.mspt.mean, 1)} ms mean</span><span>50 ms budget</span></div>
-      </Instrument>
-      <Instrument label="Online players" tone="cyan" source="paper" value={r.online} unit={`/ ${r.capacity}`} delta={`peak ${r.peak}`}>
-        <AvatarStack players={r.players} max={6} /><CapacityTrack value={r.online} max={r.capacity} />
-      </Instrument>
-      <Instrument label="Compute load" tone="indigo" source="host" value={fmt(t.cpu.service, 1)} unit="%" delta={t.cpu.cores > 1 ? `of ${t.cpu.cores} cores` : 'of 1 core'}>
-        <DualGauge rows={[{ label: 'svc', value: t.cpu.service, cores: t.cpu.cores }, { label: 'node', value: t.cpu.node, cores: t.cpu.cores }]} />
-      </Instrument>
-      <Instrument label="Memory allocation" tone="violet" source="paper" value={fmt(t.mem.heapUsedGiB, 1)} unit="GiB" delta={`${t.mem.heapPct}% heap`}>
-        <SegmentedMemoryBar tiers={t.mem.tiers} max={t.mem.maxBytes} />
-      </Instrument>
     </section>
   );
 }
 ```
 
-### 5.4 Embedded visualizations (all SVG/CSS, 44px max height, flush)
-
-**EqualizerBars** - last 30 tick-window samples; bar height = TPS/20; bars under 20 TPS shift emerald -> amber (<19) -> rose (<15); dashed `20.0` reference line at the top with a 9px right-aligned label.
+### 4.3 `Ribbon.tsx` (tabs that drive the chart)
 
 ```tsx
-export function EqualizerBars({ samples, target }: { samples: number[]; target: number }) {
-  const n = 30, data = samples.slice(-n), W = 100, H = 28, gap = 1.4, bw = (W - gap * (n - 1)) / n;
+// src/telemetry/Ribbon.tsx
+import { KeyboardEvent, useMemo } from 'react';
+import { SERIES, SeriesKey, Sample, sampleAt } from './series';
+import { useCrosshair } from './crosshair';
+
+function Spark({ samples, k }: { samples: Sample[]; k: SeriesKey }) {
+  const spec = SERIES[k];
+  const tail = samples.slice(-60);
+  const d = useMemo(() => {
+    if (tail.length < 2) return '';
+    const vals = tail.map(spec.accessor);
+    const lo = Math.min(...vals), hi = Math.max(...vals);
+    const span = hi - lo || 1;
+    return vals.map((v, i) => `${i ? 'L' : 'M'}${(i / (vals.length - 1) * 64).toFixed(1)},${(18 - ((v - lo) / span) * 16 - 1).toFixed(1)}`).join('');
+  }, [tail, spec]);
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" className="h-7 w-full" role="img" aria-label={`TPS history, target ${target}`}>
-      <line x1="0" x2={W} y1="1" y2="1" stroke="rgb(var(--emerald)/.45)" strokeWidth=".5" strokeDasharray="2 2" vectorEffect="non-scaling-stroke" />
-      {data.map((v, i) => {
-        const h = Math.max(2, (Math.min(v, target) / target) * (H - 2)); const c = v >= 19 ? 'emerald' : v >= 15 ? 'amber' : 'rose';
-        return <rect key={i} x={(n - data.length + i) * (bw + gap)} y={H - h} width={bw} height={h} rx=".8" fill={`rgb(var(--${c}) / ${.35 + .65 * (i / n)})`} />;
-      })}
+    <svg className="pp-spark" viewBox="0 0 64 20" width="64" height="20" aria-hidden="true">
+      <path d={d} fill="none" stroke={spec.color} strokeWidth="1.4" strokeLinejoin="round" />
     </svg>
   );
 }
-```
 
-**AvatarStack** - up to 6 overlapping 20px avatars (`-8px` margin, 2px `surface-1` ring) via `skinProvider` preference (fall back to initials on error), `+N` overflow chip, then **CapacityTrack**: 4px track, cyan fill `online/capacity`, tick for peak. **Zero players** renders a muted "No one online" micro-line in the same 44px slot (no layout jump).
-
-**DualGauge** - two 4px rows `svc` / `node`; value 0-100% fills the base track (`indigo` / `cyan`); **burst support**: when `value > 100` (multi-core), the base track is full and a second overlay segment of width `(value-100)/(100*(cores-1))` renders in amber from the left with a `×N` micro-label. Row layout `grid-template-columns: 28px minmax(0,1fr) 44px` (label / track / `24.4%` tabular right-aligned).
-
-**SegmentedMemoryBar** - one 6px rounded track, three **nested-by-extent** segments over one scale (`max`): `heap used` (violet 100%), `heap committed` (violet 45%), `cgroup` (indigo 50%); an `|` max marker; compact inline legend in a single 11px line: `● 1.1 used  ● 1.7 commit  ● 2.8 cg · max 4.0 GiB` (3 dots, no rows, no list). Total viz height 28px.
-
----
-
-## 6. Blueprint 3 - De-Nested Telemetry Studio
-
-One `.pp-pane`. Inside: head -> ribbon -> chart well. **No nested bordered rounded elements.**
-
-```
-┌ Telemetry Studio   [Tick & MSPT | Memory Tiers | CPU & Chunks]                  [1m 5m 15m 35m] [⤢] ┐ 44px
-├──────────────────┬──────────────────┬──────────────────┬──────────────────┬──────────────────┤
-▔▔▔▔▔▔▔▔ (2px glow on active series)
-│ TPS              │ MEAN MSPT        │ P95 MSPT         │ P99 MSPT         │ GC PAUSES        │ ribbon: 64px
-│ 20.0        ▁▁▂▁ │ 10.0 ms    ▂▃▂▃  │ 11.3 ms    ▂▅▃▆  │ —  ms            │ 0.0 ms  Δ  ▏▏▏▏  │
-├──────────────────┴──────────────────┴──────────────────┴──────────────────┴──────────────────┤
-│  TPS 20 ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈  MSPT ms 60 │
-│  ░░░ gradient area ░░░  ▒▒ p95–p99 band ▒▒   ╱╱╱ epoch gap ╱╱╱   - - - 50 ms budget - - -      │ full-bleed
-└──────────────────────────────────────────────────────────────────────────────────────────────┘
-```
-
-### 6.1 CSS
-
-```css
-@layer components {
-  .pp-studio { min-height: 430px; }
-  .pp-studio .pp-pane__head { gap: 16px; }
-  .pp-tabs { display: inline-flex; gap: 2px; padding: 2px; border-radius: 9px; background: rgb(var(--surface-3)); }
-  .pp-tabs [role="tab"] { height: 26px; padding: 0 10px; border-radius: 7px; font-size: 12px; font-weight: 500; color: rgb(var(--muted)); }
-  .pp-tabs [role="tab"][data-state="active"] { background: rgb(var(--surface-2)); color: rgb(var(--text)); box-shadow: inset 0 1px 0 rgb(255 255 255 / .08); }
-  .pp-seg { display: inline-flex; border-radius: 8px; overflow: hidden; border: 1px solid rgb(var(--line) / .12); }
-  .pp-seg button { height: 26px; padding: 0 9px; font: 600 11.5px/1 ui-monospace, monospace; color: rgb(var(--muted)); }
-  .pp-seg button + button { border-left: 1px solid rgb(var(--line) / .12); }
-  .pp-seg button[aria-pressed="true"] { background: rgb(var(--accent) / .14); color: rgb(var(--accent)); }
-
-  .pp-metric { display: grid; grid-template-columns: minmax(0, 1fr) 56px; grid-template-rows: 14px 30px; column-gap: 8px; height: 64px; cursor: pointer; }
-  .pp-metric:hover { background: rgb(var(--line) / .035); }
-  .pp-metric__label { grid-column: 1 / -1; }
-  .pp-metric__value { font-size: 22px; font-weight: 600; align-self: end; line-height: 1; }
-  .pp-metric__unit  { font-size: 11px; color: rgb(var(--muted)); margin-left: 3px; font-weight: 500; }
-  .pp-metric svg    { align-self: end; justify-self: end; width: 56px; height: 22px; }
-
-  .pp-chart { position: relative; flex: 1; min-height: 300px; }
-  .pp-chart svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+export interface RibbonProps {
+  keys: SeriesKey[];
+  selected: SeriesKey;
+  onSelect: (k: SeriesKey) => void;
+  samples: Sample[];
 }
-```
 
-### 6.2 `TelemetryStudio`
+export function Ribbon({ keys, selected, onSelect, samples }: RibbonProps) {
+  const hoverT = useCrosshair();
+  const shown = hoverT == null ? samples[samples.length - 1] : sampleAt(samples, hoverT);
 
-```tsx
-// src/ui/studio/TelemetryStudio.tsx
-'use client';
-const HORIZONS = ['1m', '5m', '15m', '35m'] as const;
-const VIEWS = [{ id: 'tick', label: 'Tick & MSPT' }, { id: 'memory', label: 'Memory Tiers' }, { id: 'cpu', label: 'CPU & Chunks' }] as const;
+  const onKey = (e: KeyboardEvent<HTMLDivElement>) => {
+    const i = keys.indexOf(selected);
+    if (e.key === 'ArrowRight') { onSelect(keys[(i + 1) % keys.length]); e.preventDefault(); }
+    if (e.key === 'ArrowLeft')  { onSelect(keys[(i - 1 + keys.length) % keys.length]); e.preventDefault(); }
+  };
 
-export function TelemetryStudio({ expandHref = '/performance' }: { expandHref?: string }) {
-  const [view, setView] = useState<'tick' | 'memory' | 'cpu'>('tick');
-  const [win, setWin] = useState<typeof HORIZONS[number]>('15m');
-  const [active, setActive] = useState<string>('tps');                   // metric ribbon doubles as series selector
-  const t = useTelemetry(win);
   return (
-    <section className="pp-pane pp-studio" aria-label="Telemetry studio">
-      <header className="pp-pane__head">
-        <h2 className="pp-pane__title">Telemetry Studio</h2>
-        <Tabs.Root value={view} onValueChange={v => setView(v as typeof view)}>
-          <Tabs.List className="pp-tabs" aria-label="Studio view">{VIEWS.map(v => <Tabs.Trigger key={v.id} value={v.id}>{v.label}</Tabs.Trigger>)}</Tabs.List>
-        </Tabs.Root>
-        <div className="ml-auto flex items-center gap-2">
-          <div className="pp-seg" role="group" aria-label="Time horizon">
-            {HORIZONS.map(h => <button key={h} aria-pressed={h === win} onClick={() => setWin(h)}>{h}</button>)}
-          </div>
-          <Link href={expandHref} className="pp-ctl !px-2" aria-label="Open Performance analyzer"><Maximize2 className="size-3.5" /></Link>
-        </div>
-      </header>
-      <MetricRibbon t={t} active={active} onSelect={setActive} />
-      <div className="pp-chart pp-well"><ChartDefs /><StudioChart view={view} t={t} active={active} win={win} /></div>
-    </section>
-  );
-}
-```
-
-### 6.3 `MetricRibbon` (replaces 5 nested cards; zero `[PAPER]` badges)
-
-```tsx
-const METRICS = [
-  { id: 'tps',   label: 'TPS',        tone: 'emerald', unit: '',   get: (t: TelemetryView) => t.tps },
-  { id: 'mean',  label: 'Mean MSPT',  tone: 'cyan',    unit: 'ms', get: (t: TelemetryView) => t.mspt.meanSeries },
-  { id: 'p95',   label: 'p95 MSPT',   tone: 'violet',  unit: 'ms', get: (t: TelemetryView) => t.mspt.p95Series },
-  { id: 'p99',   label: 'p99 MSPT',   tone: 'amber',   unit: 'ms', get: (t: TelemetryView) => t.mspt.p99Series },
-  { id: 'gc',    label: 'GC pauses',  tone: 'rose',    unit: 'ms', get: (t: TelemetryView) => t.gc },
-] as const;
-
-export function MetricRibbon({ t, active, onSelect }: { t: TelemetryView; active: string; onSelect(id: string): void }) {
-  return (
-    <div className="pp-ribbon" role="tablist" aria-label="Series">
-      {METRICS.map(m => {
-        const s = m.get(t); const isActive = active === m.id;
+    <div
+      className="pp-ribbon" role="tablist" aria-label="Telemetry signal"
+      style={{ ['--n' as string]: keys.length }} onKeyDown={onKey}
+    >
+      {keys.map(k => {
+        const spec = SERIES[k];
+        const active = k === selected;
         return (
-          <button key={m.id} role="tab" aria-selected={isActive} data-active={isActive} data-tone={m.tone} onClick={() => onSelect(m.id)}
-                  className="pp-metric text-left">
-            <span className="pp-kicker pp-metric__label">{m.label}</span>
-            <span className="pp-metric__value pp-num">{s.now == null ? '—' : fmt(s.now, 1)}<span className="pp-metric__unit">{m.unit}</span></span>
-            {m.id === 'gc' ? <GcTicks series={s.series} /> : <Sparkline series={s.series} tone={m.tone} dim={!isActive} />}
+          <button
+            key={k} role="tab" type="button" className="pp-ribbon__card"
+            data-series={k} data-active={active || undefined} data-testid={`ribbon-${k}`}
+            aria-selected={active} tabIndex={active ? 0 : -1} onClick={() => onSelect(k)}
+          >
+            <span className="pp-ribbon__label">{spec.label.toUpperCase()}</span>
+            <span className="pp-ribbon__value">
+              {shown ? spec.fmt(spec.accessor(shown)) : '–'}
+              {spec.unit && <small>{spec.unit}</small>}
+            </span>
+            <Spark samples={samples} k={k} />
           </button>
         );
       })}
@@ -790,483 +479,1005 @@ export function MetricRibbon({ t, active, onSelect }: { t: TelemetryView; active
 }
 ```
 
-`—` for unavailable p99 (no sample window): the cell renders no sparkline (not an empty dashed box). `Sparkline` is a 56x22 SVG polyline with gradient fill; **`GcTicks`** is vertical rose ticks.
-
-### 6.4 `ChartDefs` - gradients, band, hatch (rendered once, referenced by id)
+### 4.4 `TelemetryStudio.tsx`
 
 ```tsx
-export function ChartDefs() {
-  const fill = usePrefs().chartFill;   // use the real union from preferences.ts, e.g. 'gradient' | 'flat' | 'none'
-  const a = fill === 'none' ? 0 : fill === 'flat' ? .16 : .38;
-  const stops = (c: string) => (<><stop offset="0%" stopColor={`rgb(var(--${c}))`} stopOpacity={a} /><stop offset="55%" stopColor={`rgb(var(--${c}))`} stopOpacity={a * .35} /><stop offset="100%" stopColor={`rgb(var(--${c}))`} stopOpacity="0" /></>);
+// src/telemetry/TelemetryStudio.tsx
+import { useMemo } from 'react';
+import { GROUPS, SERIES, Sample, SeriesKey, timeDomain } from './series';
+import { Ribbon } from './Ribbon';
+import { Stage } from './Stage';
+import { TimeAxis } from './TimeAxis';
+import { useSessionState } from './hooks';
+
+const RANGES = [['1m', 60_000], ['5m', 300_000], ['15m', 900_000], ['35m', 2_100_000]] as const;
+
+export function TelemetryStudio({ samples, tz }: { samples: Sample[]; tz: string }) {
+  const [groupId, setGroupId] = useSessionState<'tick' | 'memory' | 'cpu'>('pp.studio.group', 'tick');
+  const [selected, setSelected] = useSessionState<SeriesKey>('pp.studio.signal', 'tps');
+  const [view, setView] = useSessionState<'focus' | 'split'>('pp.studio.view', 'focus');
+  const [range, setRange] = useSessionState<string>('pp.studio.range', '1m');
+
+  const group = GROUPS.find(g => g.id === groupId) ?? GROUPS[0];
+  const sel: SeriesKey = group.series.includes(selected) ? selected : group.series[0];
+  const rangeMs = RANGES.find(r => r[0] === range)?.[1] ?? 60_000;
+
+  const windowed = useMemo(() => {
+    if (!samples.length) return samples;
+    const cut = samples[samples.length - 1].t - rangeMs;
+    return samples.filter(s => s.t >= cut);
+  }, [samples, rangeMs]);
+  const domainT = useMemo(() => timeDomain(windowed, rangeMs), [windowed, rangeMs]);
+
   return (
-    <svg width="0" height="0" aria-hidden style={{ position: 'absolute' }}>
-      <defs>
-        {(['emerald', 'cyan', 'violet', 'amber', 'rose', 'indigo'] as const).map(c =>
-          <linearGradient key={c} id={`pp-grad-${c}`} x1="0" y1="0" x2="0" y2="1">{stops(c)}</linearGradient>)}
-        <linearGradient id="pp-band-p95p99" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="rgb(var(--violet))" stopOpacity=".28" /><stop offset="1" stopColor="rgb(var(--violet))" stopOpacity=".08" /></linearGradient>
-        <pattern id="pp-hatch-gap" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-          <rect width="7" height="7" fill="rgb(var(--rose)/.04)" /><line x1="0" y1="0" x2="0" y2="7" stroke="rgb(var(--rose)/.35)" strokeWidth="1.2" />
-        </pattern>
-        <filter id="pp-glow" x="-10%" y="-30%" width="120%" height="160%"><feGaussianBlur stdDeviation="2.2" result="b" /><feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge></filter>
-      </defs>
-    </svg>
-  );
-}
-```
-
-### 6.5 `StudioChart` - full-bleed canvas contract
-
-Implementation rules (write a ~150-line component; no chart lib needed):
-
-- `ResizeObserver` on `.pp-chart` -> `{w,h}`; margins `{l:44, r:44, t:16, b:22}`; x = time (`now-win` .. `now`), left y = TPS (domain 15-20, ticks 15/20), right y = MSPT ms (domain 0-60, ticks 0/15/30/45/60). Axis labels 10px `--faint`; gridlines 1px `rgb(var(--line)/.06)`; **no outer border and no radius on the canvas**.
-- **Data arrives pre-split into segments by boot epoch** (`t.segments: Array<{ epochId; points }>`). Draw each segment as its own path - **never connect across an epoch gap**. Between segments draw `<rect fill="url(#pp-hatch-gap)">` spanning the gap plus a 1px rose dashed boundary and a 10px label `restart · epoch 9a4f6484`.
-- Layers (z-order): gridlines -> gap hatch -> **p95-p99 band** (`path` between the p95 and p99 series, `url(#pp-band-p95p99)`) -> area fills (`url(#pp-grad-<tone>)`) -> lines (1.75px, `filter="url(#pp-glow)"` for the active series only; inactive series at 40% opacity) -> **50 ms budget line** (right-axis y(50), dashed, amber `.7`, label `50 ms budget` left-aligned above the line) -> crosshair + tooltip.
-- Line smoothing: monotone-X cubic only (no overshoot); when `motion==='reduced'` skip draw-in animation, otherwise animate `stroke-dashoffset` once on mount (600ms).
-- Crosshair: pointermove snaps to nearest sample, renders a 1px vertical hairline and a `.pp-glass` readout (`HH:mm:ss` in the **timezone preference**) with all five metric values. Tooltip clamps inside the canvas.
-- Empty/stale: if Paper is not `live`, overlay a centered 12px muted label `Paper telemetry stale — showing last known window` at the top-left of the canvas and desaturate lines to 55% (no banner box).
-- Accessibility: `role="img"` + `aria-label` summarizing current/min/max; a visually-hidden `<table>` of the latest 20 samples.
-- Views: `memory` -> stacked-by-extent tiers (heap used / committed / cgroup, with max line); `cpu` -> service vs node CPU on left axis + loaded chunks/entities on right axis. Same layers, same ribbon (swap `METRICS` per view via a `METRICS_BY_VIEW` map; the ribbon is always 5 cells).
-
----
-
-## 7. Blueprint 4 - Ergonomic Wide-Ratio Live Console
-
-Root cause of the 6-line towers: (1) the console lived in a ~380px column; (2) every row spent ~150px on `INFO` + `Server` + a bare timestamp column; (3) the formatter allowed no break opportunities inside `[/168.194.144.215:33319]` or `([minecraft:overworld]454.33…, 73.0, 1168.18…)` so the browser broke mid-token by character. Fix all three.
-
-### 7.1 Row anatomy and grid definitions
-
-```
-Compact (Overview dock, pane ≈ 880–940px wide at 1545 viewport):
-  columns: 56px   12px   minmax(0,1fr)
-          [time] [sev•] [ <PluginChip/>? message… ]
-  01:56:31  ●   NEGUINCOMCEROL[/168.194.144.215:33319] logged in with entity id 186275 at
-                ([minecraft:overworld]454.3393893031386, 73.0, 1168.182264153791)         ← 2 lines max
-
-Full (/console, ≥1280px wide):
-  columns: 68px   44px      auto-chip    minmax(0,1fr)  → expressed as 3 tracks (chip is inline inside track 3)
-          [time] [sev tag] [ chip + message… ]
-```
-
-```css
-@layer components {
-  .pp-console { container-type: inline-size; font: 12px/1.45 ui-monospace, "JetBrains Mono", "SF Mono", Menlo, monospace; letter-spacing: -.012em; }
-  .pp-crow { display: grid; align-items: start; column-gap: 8px; padding: 1px 14px; min-height: 20px; }
-  .pp-console[data-mode="compact"] .pp-crow { grid-template-columns: 56px 12px minmax(0, 1fr); }
-  .pp-console[data-mode="full"]    .pp-crow { grid-template-columns: 68px 44px minmax(0, 1fr); }
-  .pp-crow:hover { background: rgb(var(--line) / .045); }
-  .pp-crow__t   { color: rgb(var(--faint)); font-variant-numeric: tabular-nums; padding-top: 1px; user-select: none; }
-  .pp-crow__sev { display: flex; justify-content: center; padding-top: 7px; }              /* compact: 6px dot only */
-  .pp-console[data-mode="full"] .pp-crow__sev { justify-content: flex-start; padding-top: 1px; }
-  .pp-crow__msg { min-width: 0; overflow-wrap: anywhere; word-break: normal; text-wrap: pretty; white-space: pre-wrap; hyphens: manual; }
-  .pp-crow[data-sev="warn"]  .pp-crow__msg { color: rgb(var(--amber)); }
-  .pp-crow[data-sev="error"] .pp-crow__msg { color: rgb(var(--rose)); }
-  .pp-crow[data-sev="error"] { background: rgb(var(--rose) / .06); box-shadow: inset 2px 0 0 rgb(var(--rose)); }
-  .pp-crow[data-sev="warn"]  { box-shadow: inset 2px 0 0 rgb(var(--amber) / .7); }
-  .pp-chip { display: inline-flex; vertical-align: baseline; height: 16px; padding: 0 5px; margin-right: 6px; border-radius: 5px;
-    font: 600 10px/16px ui-monospace, monospace; background: rgb(var(--tone) / .13); color: rgb(var(--tone)); max-width: 120px; overflow: hidden; text-overflow: ellipsis; }
-  @container (max-width: 520px) { .pp-console[data-mode="compact"] .pp-crow { grid-template-columns: 12px minmax(0, 1fr); } .pp-console .pp-crow__t { display: none; } }
-}
-```
-
-### 7.2 Collapse rules (the "boilerplate token")
-
-| Source/severity | Compact render | Full render |
-|---|---|---|
-| `INFO` + source `Server` (the default) | dot only (`--faint`), **no chip, no "INFO", no "Server"** | dot + `INFO` in 10px faint (no chip) |
-| `INFO` + plugin source (EssentialsX, LuckPerms…) | dot + `PluginChip` | tag + `PluginChip` |
-| `WARN` | amber dot + amber row accent | amber `WARN` tag |
-| `ERROR` | rose dot + rose row wash | rose `ERROR` tag |
-| Stack-trace continuation lines | no time/sev, indented 12px, `--muted` | same |
-
-Colors for plugin chips: stable hash of the plugin name -> one of `cyan|violet|indigo|emerald` (never amber/rose - reserved for severity).
-
-### 7.3 Soft-break formatter (`src/ui/console/softBreak.ts`)
-
-Run **after** `src/lib/textFormat` produces its tokens: walk text nodes only and inject `<wbr/>` so wrapping occurs at semantic boundaries instead of mid-token.
-
-```ts
-const BREAK_AFTER = /([\/,:\]\)\[=&?_-])(?=[^\s])/g;           // after / , : ] ) [ = & ? _ -
-const BREAK_DIGITS = /(\d{6})(?=\d)/g;                          // long float tails: break every 6 digits
-export const softBreak = (s: string) =>
-  s.replace(BREAK_AFTER, '$1\u200B').replace(BREAK_DIGITS, '$1\u200B');   // U+200B ZWSP: no markup, copy-safe via onCopy strip
-```
-
-Strip U+200B in the row's `onCopy` handler so copied logs stay exact. Do not alter stored message content.
-
-### 7.4 `LiveConsole`, `ConsoleRow`, `PluginChip`
-
-```tsx
-// src/ui/console/LiveConsole.tsx   (used compact in Overview, full in /console)
-export function LiveConsole({ mode, filters }: { mode: 'compact' | 'full'; filters: ConsoleFilters }) {
-  const { lines, loadEarlier, hasEarlier, streaming } = useConsoleStream();     // memory only - NO browser storage
-  const rows = useMemo(() => applyFilters(lines, filters), [lines, filters]);
-  const parentRef = useRef<HTMLDivElement>(null);
-  const v = useVirtualizer({ count: rows.length, getScrollElement: () => parentRef.current, estimateSize: () => 20, overscan: 24, measureElement: el => el.getBoundingClientRect().height });
-  const stick = useStickToBottom(parentRef, rows.length);                        // pauses when user scrolls up; "Jump to latest" chip appears
-  return (
-    <div className="pp-console flex min-h-0 flex-1 flex-col" data-mode={mode}>
-      {hasEarlier && <button className="pp-ctl m-2 self-start text-[12px]" onClick={loadEarlier}>Load earlier from this boot</button>}
-      <div ref={parentRef} className="pp-well min-h-0 flex-1 overflow-auto py-1.5" role="log" aria-live={stick.pinned ? 'polite' : 'off'}>
-        <div style={{ height: v.getTotalSize(), position: 'relative' }}>
-          {v.getVirtualItems().map(vi => (
-            <div key={rows[vi.index].id} data-index={vi.index} ref={v.measureElement} style={{ position: 'absolute', inset: '0 0 auto 0', transform: `translateY(${vi.start}px)` }}>
-              <ConsoleRow line={rows[vi.index]} mode={mode} />
-            </div>))}
+    <section className="pp-studio" aria-label="Telemetry Studio">
+      <header className="pp-studio__bar">
+        <h2>Telemetry Studio</h2>
+        <div className="pp-seg" role="tablist" aria-label="Signal group">
+          {GROUPS.map(g => (
+            <button key={g.id} role="tab" aria-selected={g.id === group.id} data-active={g.id === group.id || undefined}
+              onClick={() => { setGroupId(g.id); setSelected(g.series[0]); }}>
+              {g.label}
+            </button>
+          ))}
         </div>
-      </div>
-      {!stick.pinned && <button className="pp-glass absolute bottom-14 right-4 px-3 py-1.5 text-[12px]" onClick={stick.jump}>Jump to latest ↓</button>}
-    </div>
+        <div className="pp-studio__spacer" />
+        <div className="pp-seg" role="group" aria-label="View">
+          <button data-active={view === 'focus' || undefined} onClick={() => setView('focus')}>Focus</button>
+          <button data-active={view === 'split' || undefined} onClick={() => setView('split')}>Split</button>
+        </div>
+        <div className="pp-seg" role="group" aria-label="Range">
+          {RANGES.map(([id]) => (
+            <button key={id} data-active={id === range || undefined} onClick={() => setRange(id)}>{id}</button>
+          ))}
+        </div>
+      </header>
+
+      <Ribbon keys={group.series} selected={sel} onSelect={setSelected} samples={windowed} />
+
+      {view === 'focus' ? (
+        <div className="pp-studio__focus" key={sel} data-series={sel}>
+          <Stage spec={SERIES[sel]} samples={windowed} domainT={domainT} height={300} kicker="SELECTED" selected />
+        </div>
+      ) : (
+        <div className="pp-studio__split" key={group.id}>
+          {group.series.map((k, i) => (
+            <Stage key={k} spec={SERIES[k]} samples={windowed} domainT={domainT} height={110}
+              kicker={String(i + 1).padStart(2, '0')} selected={k === sel} onSelect={() => setSelected(k)} />
+          ))}
+        </div>
+      )}
+
+      <TimeAxis domainT={domainT} tz={tz} />
+    </section>
   );
 }
-
-export const ConsoleRow = memo(function ConsoleRow({ line, mode }: { line: ConsoleLine; mode: 'compact' | 'full' }) {
-  const boilerplate = line.sev === 'info' && line.source === 'Server';
-  return (
-    <div className="pp-crow" data-sev={line.sev} onCopy={stripZwsp}>
-      <time className="pp-crow__t" dateTime={line.iso}>{fmtTime(line.ts, usePrefs().timezone)}</time>
-      <span className="pp-crow__sev">
-        {mode === 'full' && line.sev !== 'info' ? <span className="pp-tag" data-tone={SEV_TONE[line.sev]}>{line.sev.toUpperCase()}</span>
-         : mode === 'full' ? <span className="text-[10px] text-[rgb(var(--faint))]">INFO</span>
-         : <i className="pp-dot" data-tone={line.sev === 'info' ? undefined : SEV_TONE[line.sev]} style={line.sev === 'info' ? { background: 'rgb(var(--faint))' } : undefined} />}
-      </span>
-      <span className="pp-crow__msg">
-        {!boilerplate && <PluginChip name={line.source} />}
-        {renderMc(softBreak, line.text)}   {/* src/lib/textFormat tokens -> spans, with softBreak applied to text nodes */}
-      </span>
-    </div>
-  );
-});
-
-export const PluginChip = ({ name }: { name: string }) => <span className="pp-chip" data-tone={hashTone(name)} title={name}>{name}</span>;
 ```
 
-### 7.5 `CommandComposer` (sticky bottom, Warp-style)
+### 4.5 `TimeAxis.tsx` (rendered once per chart area)
 
 ```tsx
-export function CommandComposer() {
-  const m = useMutation('console.command', 'command');          // real action id from adapter
-  const [text, setText] = useState(''); const hist = useRef<string[]>([]); const idx = useRef(-1);   // history in MEMORY only
-  const gated = m.reason !== null;
+// src/telemetry/TimeAxis.tsx
+import { useMemo, useRef } from 'react';
+import { PLOT } from './Stage';
+import { useSize } from './hooks';
+
+const STEPS = [1, 2, 5, 10, 15, 30, 60, 120, 300, 600, 900, 1800, 3600].map(s => s * 1000);
+
+export function niceTimeTicks(t0: number, t1: number, target = 6): number[] {
+  const span = t1 - t0;
+  const step = STEPS.find(s => span / s <= target) ?? STEPS[STEPS.length - 1];
+  const out: number[] = [];
+  for (let t = Math.ceil(t0 / step) * step; t <= t1; t += step) out.push(t);
+  return out;
+}
+
+export function TimeAxis({ domainT, tz }: { domainT: [number, number]; tz: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const { w } = useSize(ref);
+  const fmt = useMemo(
+    () => new Intl.DateTimeFormat('en-GB', { timeZone: tz, hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23' }),
+    [tz],
+  );
+  const iw = Math.max(1, w - PLOT.l - PLOT.r);
+  const ticks = useMemo(() => niceTimeTicks(domainT[0], domainT[1]), [domainT]);
+
   return (
-    <form className="sticky bottom-0 flex items-center gap-2 border-t border-[rgb(var(--line)/0.10)] bg-[rgb(var(--surface-1)/0.9)] px-3 py-2 backdrop-blur"
-          onSubmit={e => { e.preventDefault(); if (gated || !text.trim()) return; hist.current.unshift(text); idx.current = -1; void m.begin({ command: text }); setText(''); }}>
-      <span className="font-mono text-[12px] text-[rgb(var(--accent))]">›</span>
-      <Tooltip.Root>
-        <Tooltip.Trigger asChild>
-          <input value={text} onChange={e => setText(e.target.value)} aria-disabled={gated || undefined} readOnly={gated}
-            placeholder={gated ? 'Console commands unavailable' : 'Run a console command…  (↑ history · ⏎ review & send)'}
-            onKeyDown={e => { if (e.key === 'ArrowUp') { idx.current = Math.min(idx.current + 1, hist.current.length - 1); setText(hist.current[idx.current] ?? ''); e.preventDefault(); } }}
-            className="h-8 min-w-0 flex-1 bg-transparent font-mono text-[12.5px] outline-none placeholder:text-[rgb(var(--faint))]" />
-        </Tooltip.Trigger>
-        {gated && <Tooltip.Portal><Tooltip.Content className="pp-glass px-3 py-2 text-[12px]" side="top">{m.reason}</Tooltip.Content></Tooltip.Portal>}
-      </Tooltip.Root>
-      <button className="pp-ctl" aria-disabled={gated || !text.trim() || undefined}><CornerDownLeft className="size-3.5" />Send</button>
-    </form>
+    <div className="pp-axis" ref={ref} aria-hidden="true">
+      {ticks.map(t => (
+        <span key={t} style={{ left: PLOT.l + ((t - domainT[0]) / (domainT[1] - domainT[0] || 1)) * iw }}>
+          {fmt.format(t)}
+        </span>
+      ))}
+    </div>
   );
 }
 ```
 
-Every command still goes `session.prepare -> ActionReview -> session.execute` (review policy decides if a confirm step is shown). The Overview dock embeds the console **without** the composer (a "Open console ↗" link in the pane head instead).
+### 4.6 CSS: tokens, ribbon, stage, studio (`telemetry.css`)
+
+```css
+/* src/telemetry/telemetry.css */
+:root {
+  --pp-surface-0: #07090c;
+  --pp-surface-1: #0b0e12;
+  --pp-surface-2: #10141a;
+  --pp-surface-3: #161b23;
+  --pp-hairline: rgba(255, 255, 255, 0.07);
+  --pp-hairline-strong: rgba(255, 255, 255, 0.13);
+  --pp-text: #e7ecf3;
+  --pp-text-dim: #8b95a5;
+  --pp-text-faint: #5b6574;
+  --pp-mono: "JetBrains Mono", "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --pp-c-tps: #34d399;
+  --pp-c-mean: #2dd4bf;
+  --pp-c-p95: #a78bfa;
+  --pp-c-p99: #fbbf24;
+  --pp-c-gc: #fb7185;
+  --pp-c-heap: #a78bfa;
+  --pp-c-commit: #60a5fa;
+  --pp-c-cgroup: #38bdf8;
+  --pp-c-svc: #a78bfa;
+  --pp-c-node: #22d3ee;
+  --pp-c-chunks: #34d399;
+  --pp-c-entities: #c4b5fd;
+}
+
+/* accent per series: drives ribbon underline, stage rail, readout chip */
+[data-series="tps"]       { --pp-accent: var(--pp-c-tps); }
+[data-series="mean"]      { --pp-accent: var(--pp-c-mean); }
+[data-series="p95"]       { --pp-accent: var(--pp-c-p95); }
+[data-series="p99"]       { --pp-accent: var(--pp-c-p99); }
+[data-series="gc"]        { --pp-accent: var(--pp-c-gc); }
+[data-series="heapUsed"]  { --pp-accent: var(--pp-c-heap); }
+[data-series="committed"] { --pp-accent: var(--pp-c-commit); }
+[data-series="cgroup"]    { --pp-accent: var(--pp-c-cgroup); }
+[data-series="svcCpu"]    { --pp-accent: var(--pp-c-svc); }
+[data-series="nodeCpu"]   { --pp-accent: var(--pp-c-node); }
+[data-series="chunks"]    { --pp-accent: var(--pp-c-chunks); }
+[data-series="entities"]  { --pp-accent: var(--pp-c-entities); }
+
+/* ---------- segmented controls ---------- */
+.pp-seg { display: inline-flex; padding: 2px; gap: 2px; border: 1px solid var(--pp-hairline-strong); border-radius: 8px; background: var(--pp-surface-1); }
+.pp-seg button { font: 500 12px/1 var(--pp-mono); color: var(--pp-text-dim); padding: 7px 10px; border: 0; border-radius: 6px; background: transparent; cursor: pointer; }
+.pp-seg button:hover { color: var(--pp-text); }
+.pp-seg button[data-active], .pp-seg button[aria-selected="true"] { color: var(--pp-text); background: var(--pp-surface-3); box-shadow: inset 0 0 0 1px var(--pp-hairline-strong); }
+
+/* ---------- studio shell ---------- */
+.pp-studio { border: 1px solid var(--pp-hairline-strong); border-radius: 14px; background: linear-gradient(180deg, var(--pp-surface-2), var(--pp-surface-1)); overflow: hidden; }
+.pp-studio__bar { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-bottom: 1px solid var(--pp-hairline); }
+.pp-studio__bar h2 { margin: 0 8px 0 0; font: 600 14px/1 system-ui, sans-serif; color: var(--pp-text); }
+.pp-studio__spacer { flex: 1; }
+.pp-studio__focus { animation: pp-swap 140ms ease-out; }
+.pp-studio__split { display: flex; flex-direction: column; }
+.pp-studio__split > .pp-stage + .pp-stage { border-top: 1px solid var(--pp-hairline); }
+@keyframes pp-swap { from { opacity: 0; transform: translateY(2px); } to { opacity: 1; transform: none; } }
+
+/* ---------- ribbon ---------- */
+.pp-ribbon { display: grid; grid-template-columns: repeat(var(--n, 5), minmax(0, 1fr)); border-bottom: 1px solid var(--pp-hairline); background: var(--pp-surface-1); }
+.pp-ribbon__card { position: relative; display: grid; grid-template-columns: 1fr auto; grid-template-rows: auto auto; align-items: end; gap: 4px 8px; text-align: left; padding: 12px 14px 10px; border: 0; background: transparent; color: var(--pp-text); cursor: pointer; transition: background 120ms; }
+.pp-ribbon__card + .pp-ribbon__card { border-left: 1px solid var(--pp-hairline); }
+.pp-ribbon__card:hover { background: rgba(255, 255, 255, 0.025); }
+.pp-ribbon__card::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 2px; background: transparent; }
+.pp-ribbon__card[data-active] { background: linear-gradient(180deg, color-mix(in srgb, var(--pp-accent) 10%, transparent), transparent 70%); }
+.pp-ribbon__card[data-active]::before { background: var(--pp-accent); box-shadow: 0 0 12px var(--pp-accent); }
+.pp-ribbon__card:focus-visible { outline: 2px solid var(--pp-accent); outline-offset: -2px; }
+.pp-ribbon__label { grid-column: 1 / -1; font: 600 10px/1 var(--pp-mono); letter-spacing: 0.08em; color: var(--pp-text-dim); }
+.pp-ribbon__card[data-active] .pp-ribbon__label { color: var(--pp-text); }
+.pp-ribbon__value { font: 600 26px/1 system-ui, sans-serif; font-variant-numeric: tabular-nums; }
+.pp-ribbon__value small { margin-left: 4px; font: 500 12px var(--pp-mono); color: var(--pp-text-dim); }
+.pp-spark { justify-self: end; opacity: 0.85; }
+
+/* ---------- stage (one series) ---------- */
+.pp-stage { position: relative; display: flex; flex-direction: column; min-width: 0; background: var(--pp-surface-0); overflow: hidden; }
+.pp-stage[data-selected="true"]::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 2px; background: var(--pp-accent); z-index: 1; }
+.pp-stage__head { display: flex; align-items: baseline; gap: 10px; padding: 8px 14px 0 14px; font: 600 10px/1 var(--pp-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--pp-text-dim); }
+.pp-stage__head[role="button"] { cursor: pointer; }
+.pp-stage__kicker { color: var(--pp-text-faint); }
+.pp-stage__label { color: var(--pp-text); }
+.pp-stage__chip { margin-left: 4px; padding: 3px 6px; border-radius: 999px; border: 1px solid var(--pp-hairline-strong); color: var(--pp-c-p99); letter-spacing: 0.04em; text-transform: none; }
+.pp-stage__value { margin-left: auto; padding-right: 46px; font: 600 13px/1 var(--pp-mono); letter-spacing: 0; color: var(--pp-accent); font-variant-numeric: tabular-nums; }
+.pp-stage__value[data-state="scrub"] { color: var(--pp-text); }
+.pp-stage__value small { margin-left: 3px; font-size: 10px; color: var(--pp-text-dim); }
+.pp-stage__plot { position: relative; flex: 1 1 auto; min-height: 0; touch-action: pan-y; cursor: crosshair; }
+.pp-stage__svg { display: block; }
+
+.pp-grid { stroke: var(--pp-hairline); stroke-width: 1; shape-rendering: crispEdges; }
+.pp-ytick { font: 500 10px var(--pp-mono); fill: var(--pp-text-faint); }
+.pp-budget { stroke: var(--pp-c-p99); stroke-width: 1; stroke-dasharray: 4 4; opacity: 0.7; }
+.pp-budget-label { font: 500 10px var(--pp-mono); fill: var(--pp-c-p99); opacity: 0.85; }
+.pp-line { fill: none; stroke-width: 1.5; stroke-linejoin: round; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+.pp-bar { opacity: 0.92; }
+.pp-cross { stroke: rgba(255, 255, 255, 0.45); stroke-width: 1; shape-rendering: crispEdges; pointer-events: none; }
+.pp-dot { fill: var(--pp-surface-0); stroke-width: 2; pointer-events: none; }
+
+/* ---------- time axis ---------- */
+.pp-axis { position: relative; height: 22px; border-top: 1px solid var(--pp-hairline); background: var(--pp-surface-0); }
+.pp-axis span { position: absolute; top: 6px; transform: translateX(-50%); font: 500 10px var(--pp-mono); color: var(--pp-text-faint); white-space: nowrap; }
+
+@media (prefers-reduced-motion: reduce) { .pp-studio__focus { animation: none; } }
+@media (max-width: 720px) { .pp-ribbon { grid-template-columns: repeat(2, minmax(0, 1fr)); } .pp-ribbon__card:nth-child(odd) { border-left: 0; } }
+```
 
 ---
 
-## 8. Route-by-route structural wireframes and grid specs
+## 5. R03 `/performance` · 2-Tier Bento Telemetry Workbench
 
-### 8.0 App Router skeleton (recreated from scratch)
-
-```
-app/
-  layout.tsx              // <html data-theme data-accent data-density data-text-size data-motion>, fonts, <Providers/>
-  page.tsx                // redirect('/overview')
-  (gate)/pair/page.tsx    // PairingGate (no AppShell)
-  (workspace)/layout.tsx  // <AuthBoundary><AppShell>{children}</AppShell></AuthBoundary>  -> unpaired => /pair
-  (workspace)/{fleet,overview,performance,players,console,backups,access,settings}/page.tsx
-```
-
-`AuthBoundary` reads credential presence from `src/adapter` (IndexedDB `plexonpanel-browser-v3`); it never reads or writes storage itself. Every `page.tsx` is a thin client component rendering `src/ui/routes/<Route>.tsx`. Set `document.title = "<Route> · <Server> · PlexonPanel"`.
-
-Page canvas helpers (shared): `.pp-page { display: grid; gap: 16px; align-content: start; }` - gap between sibling Decks/Panes is 16px, always.
-
-### R01 · Fleet - node ledger strip + instance blades
+### 5.1 Layout
 
 ```
-┌ DECK (hardware ledger, one cell per VPS node) ──────────────────────────────────────────────┐
-│ node-sp-01  Host 1.4.2 ● │ CPU ▬▬▬▬ 31% │ MEM ▬▬▬▬ 5.2/8 GiB │ DISK ▬▬ 44% │ 3 instances  │   ← 1 cell/node, 72px
-├─────────────────────────────────────────────────────────────────────────────────────────────┤
- blades (grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px)
- ┌ .pp-card ────────────────┐ ┌ .pp-card ────────────────┐
- │ ◉ TonimSMP   online      │ │ ◉ Creative    offline    │   blade = ONE .pp-card, internals hairline-divided
- │ Paper 26.3 · 1/10 · 20.0 │ │ Paper 26.2 · —           │   (head / 3-stat row / 24px sparkline), no inner boxes
- │ ▁▂▂▃▂▂▁▂▃  (TPS)         │ │                          │
- └──────────────────────────┘ └──────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────────┐
+│ BAR      Analyzer      [1m 5m 15m 35m]   [Pause]  [Raw samples]          │ 44px
+├──────────────────────────────────────────────────────────────────────────┤
+│ READOUT  15:16:57 SCRUB │ TPS 20.0 │ MSPT 7.4 · p95 8.9 · p99 10.7 │ …   │ 36px, sticky, ONE
+├──────────────────────────────────────────────────────────────────────────┤
+│ TIER 1   Ribbon (tick group, 5 tabs)                                     │ 72px
+│          Primary Stage: selected signal, full width                      │ 280px
+│          TimeAxis (the ONLY clock axis)                                  │ 22px
+├─────────────────────────────────┬────────────────────────────────────────┤
+│ TIER 2   02 · GC pauses Δ       │ 03 · Memory tiers (3 lanes, 1 scale)   │
+│          1 lane                 │ heap / committed / cgroup              │ ~200px
+├─────────────────────────────────┼────────────────────────────────────────┤
+│          04 · Service & node CPU│ 05 · Chunks & entities                 │ ~200px
+│          2 lanes                │ 2 lanes                                │
+├─────────────────────────────────┴────────────────────────────────────────┤
+│ FOOT     America/Sao_Paulo · 614 retained samples · 2h shows retained…   │
+└──────────────────────────────────────────────────────────────────────────┘
 ```
 
-- Ledger deck: `.pp-deck` with `grid-template-columns: repeat(auto-fit, minmax(360px, 1fr))`; each node is a `.pp-cell` (height 72px): left identity, then 3 inline `MiniBar`s (label / 4px track / value). Groups instances **by node** via the selectors; host-down nodes show their cell in `amber` tone with the blades beneath dimmed.
-- Blade click -> set active server, navigate `/overview`. Blades never contain `.pp-card`/`.pp-pane`.
+Hairline dividers come from `gap: 1px` on a hairline-coloured grid background, with no per-cell borders.
 
-### R02 · Overview - Mission deck
+### 5.2 `ReadoutBar.tsx` (the single readout)
 
+```tsx
+// src/telemetry/ReadoutBar.tsx
+import { useMemo } from 'react';
+import { SERIES, SeriesKey, Sample, sampleAt } from './series';
+import { useCrosshair } from './crosshair';
+
+const SEGMENTS: { label: string; keys: SeriesKey[] }[] = [
+  { label: 'Tick',    keys: ['tps', 'mean', 'p95', 'p99'] },
+  { label: 'GC',      keys: ['gc'] },
+  { label: 'Memory',  keys: ['heapUsed', 'committed', 'cgroup'] },
+  { label: 'CPU',     keys: ['svcCpu', 'nodeCpu'] },
+  { label: 'World',   keys: ['chunks', 'entities'] },
+];
+
+export function ReadoutBar({ samples, tz }: { samples: Sample[]; tz: string }) {
+  const hoverT = useCrosshair();
+  const s = hoverT == null ? samples[samples.length - 1] : sampleAt(samples, hoverT);
+  const clock = useMemo(
+    () => new Intl.DateTimeFormat('en-GB', { timeZone: tz, hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23' }),
+    [tz],
+  );
+  if (!s) return <div className="pp-readout-bar" data-testid="readout-bar" />;
+  const scrub = hoverT != null;
+
+  return (
+    <div className="pp-readout-bar" data-state={scrub ? 'scrub' : 'live'} data-testid="readout-bar" role="status" aria-live="off">
+      <span className="pp-readout-bar__clock">{clock.format(s.t)}</span>
+      <span className="pp-readout-bar__mode">{scrub ? 'SCRUB' : 'LIVE'}</span>
+      {SEGMENTS.map(seg => (
+        <span className="pp-readout-bar__seg" key={seg.label}>
+          <i>{seg.label}</i>
+          {seg.keys.map(k => {
+            const spec = SERIES[k];
+            return (
+              <span key={k} data-series={k} className="pp-readout-bar__kv">
+                <em>{spec.label.replace(' MSPT', '').replace(' pauses Δ', ' Δ')}</em>
+                <b>{spec.fmt(spec.accessor(s))}</b>
+                {spec.unit && <small>{spec.unit}</small>}
+              </span>
+            );
+          })}
+        </span>
+      ))}
+    </div>
+  );
+}
 ```
- MissionControlHeader (global, 56px)
- ┌ DECK · InstrumentDeck · 4 cells · 148px ─────────────────────────────────────────────────┐
- └───────────────────────────────────────────────────────────────────────────────────────────┘
- ┌ PANE · Telemetry Studio · min-height 430px (full width) ─────────────────────────────────┐
- └───────────────────────────────────────────────────────────────────────────────────────────┘
- ┌ PANE · Console dock (62%) ───────────────────────────┐ ┌ PANE · Roster + Worlds (38%) ──┐
- │ [Console | Player events]   filters   ⤢ Open console │ │ Active roster · 1 / 10         │
- │ 01:56:31 ● NEGUINCOMCEROL[/168.194.144.215:33319]…   │ ├────────────────────────────────┤  ← hairline split,
- │ 01:56:31 ● lost connection: Disconnected             │ │ Worlds                         │    not 2 nested boxes
- └──────────────────────────────────────────────────────┘ └────────────────────────────────┘
+
+### 5.3 `DeckCell.tsx`
+
+```tsx
+// src/telemetry/DeckCell.tsx
+import { SERIES, Sample, SeriesKey } from './series';
+import { Stage } from './Stage';
+
+export function DeckCell({
+  index, title, keys, samples, domainT, rangeLabel,
+}: {
+  index: string; title: string; keys: SeriesKey[];
+  samples: Sample[]; domainT: [number, number]; rangeLabel: string;
+}) {
+  return (
+    <article className="pp-deck__cell" data-testid={`deck-${index}`}>
+      <header className="pp-deck__head">
+        <span>{index}</span>
+        <h3>{title}</h3>
+      </header>
+      <div className="pp-deck__lanes">
+        {keys.map(k => (
+          // every lane = exactly one series; lanes are divided by hairlines, never layered
+          <Stage key={k} spec={SERIES[k]} samples={samples} domainT={domainT} height="fill" minHeight={keys.length > 2 ? 44 : 64} />
+        ))}
+      </div>
+      <footer className="pp-deck__edge" aria-hidden="true">
+        <span>−{rangeLabel}</span><span>now</span>
+      </footer>
+    </article>
+  );
+}
 ```
+
+### 5.4 `PerformanceWorkbench.tsx`
+
+```tsx
+// src/telemetry/PerformanceWorkbench.tsx
+import { useMemo, useState } from 'react';
+import { GROUPS, SERIES, Sample, SeriesKey, timeDomain } from './series';
+import { Ribbon } from './Ribbon';
+import { Stage } from './Stage';
+import { TimeAxis } from './TimeAxis';
+import { ReadoutBar } from './ReadoutBar';
+import { DeckCell } from './DeckCell';
+import { useSessionState } from './hooks';
+
+const RANGES = [['1m', 60_000], ['5m', 300_000], ['15m', 900_000], ['35m', 2_100_000], ['2h', 7_200_000]] as const;
+
+export function PerformanceWorkbench({
+  samples, tz, paused, onTogglePause, onRawSamples,
+}: {
+  samples: Sample[]; tz: string; paused: boolean;
+  onTogglePause: () => void; onRawSamples: () => void;
+}) {
+  const [range, setRange] = useSessionState<string>('pp.perf.range', '1m');
+  const [selected, setSelected] = useSessionState<SeriesKey>('pp.perf.signal', 'tps');
+  const rangeMs = RANGES.find(r => r[0] === range)?.[1] ?? 60_000;
+
+  const windowed = useMemo(() => {
+    if (!samples.length) return samples;
+    const cut = samples[samples.length - 1].t - rangeMs;
+    return samples.filter(s => s.t >= cut);
+  }, [samples, rangeMs]);
+  const domainT = useMemo(() => timeDomain(windowed, rangeMs), [windowed, rangeMs]);
+  const tick = GROUPS[0];
+
+  return (
+    <section className="pp-bench" aria-label="Performance workbench">
+      <header className="pp-bench__bar">
+        <h2>Analyzer</h2>
+        <div className="pp-bench__spacer" />
+        <div className="pp-seg" role="group" aria-label="Range">
+          {RANGES.map(([id]) => (
+            <button key={id} data-active={id === range || undefined} onClick={() => setRange(id)}>{id}</button>
+          ))}
+        </div>
+        <button className="pp-btn" onClick={onTogglePause}>{paused ? 'Resume' : 'Pause'}</button>
+        <button className="pp-btn" onClick={onRawSamples}>Raw samples</button>
+      </header>
+
+      <ReadoutBar samples={windowed} tz={tz} />
+
+      {/* TIER 1: primary selected-signal stage */}
+      <div className="pp-bench__primary">
+        <Ribbon keys={tick.series} selected={tick.series.includes(selected) ? selected : 'tps'} onSelect={setSelected} samples={windowed} />
+        <div key={selected} className="pp-bench__primary-stage">
+          <Stage spec={SERIES[tick.series.includes(selected) ? selected : 'tps']} samples={windowed} domainT={domainT} height={280} kicker="01 · SELECTED" selected />
+        </div>
+        <TimeAxis domainT={domainT} tz={tz} />
+      </div>
+
+      {/* TIER 2: 2x2 hairline-divided subsystem deck */}
+      <div className="pp-deck">
+        <DeckCell index="02" title="GC pauses · interval Δ" keys={['gc']} samples={windowed} domainT={domainT} rangeLabel={range} />
+        <DeckCell index="03" title="Memory tiers · GiB" keys={['heapUsed', 'committed', 'cgroup']} samples={windowed} domainT={domainT} rangeLabel={range} />
+        <DeckCell index="04" title="Service and node CPU · %" keys={['svcCpu', 'nodeCpu']} samples={windowed} domainT={domainT} rangeLabel={range} />
+        <DeckCell index="05" title="Loaded chunks and entities" keys={['chunks', 'entities']} samples={windowed} domainT={domainT} rangeLabel={range} />
+      </div>
+
+      <footer className="pp-bench__foot">
+        {tz} · {samples.length} retained samples
+        {rangeMs > 2_100_000 && ' · 2h requests show only retained history (35m maximum)'}
+      </footer>
+    </section>
+  );
+}
+```
+
+### 5.5 CSS: bench, readout bar, deck (`workbench.css`)
 
 ```css
-.pp-overview { display: grid; gap: 16px; grid-template-rows: auto auto minmax(380px, 1fr); }
-.pp-dock     { display: grid; gap: 16px; grid-template-columns: minmax(0, 1.62fr) minmax(300px, 1fr); min-height: 380px; }
-@media (max-width: 1100px) { .pp-dock { grid-template-columns: minmax(0, 1fr); } }
+/* src/telemetry/workbench.css */
+.pp-bench { display: flex; flex-direction: column; border: 1px solid var(--pp-hairline-strong); border-radius: 14px; background: var(--pp-surface-1); overflow: clip; }
+.pp-bench__bar { display: flex; align-items: center; gap: 10px; height: 44px; padding: 0 14px; border-bottom: 1px solid var(--pp-hairline); }
+.pp-bench__bar h2 { margin: 0; font: 600 14px/1 system-ui, sans-serif; color: var(--pp-text); }
+.pp-bench__spacer { flex: 1; }
+.pp-btn { font: 500 12px/1 system-ui, sans-serif; color: var(--pp-text); padding: 8px 12px; border: 1px solid var(--pp-hairline-strong); border-radius: 8px; background: var(--pp-surface-2); cursor: pointer; }
+.pp-btn:hover { background: var(--pp-surface-3); }
+.pp-bench__primary { border-bottom: 1px solid var(--pp-hairline); }
+.pp-bench__primary-stage { animation: pp-swap 140ms ease-out; }
+.pp-bench__foot { padding: 8px 14px; border-top: 1px solid var(--pp-hairline); font: 500 11px var(--pp-mono); color: var(--pp-text-faint); }
+
+/* ---- single shared readout bar ---- */
+.pp-readout-bar {
+  position: sticky; top: 0; z-index: 5;
+  display: flex; align-items: center; gap: 0; height: 36px; padding: 0 14px;
+  overflow-x: auto; white-space: nowrap; scrollbar-width: none;
+  border-bottom: 1px solid var(--pp-hairline);
+  background: color-mix(in srgb, var(--pp-surface-0) 92%, transparent);
+  backdrop-filter: blur(8px);
+  font: 500 11px var(--pp-mono); color: var(--pp-text-dim);
+}
+.pp-readout-bar::-webkit-scrollbar { display: none; }
+.pp-readout-bar__clock { color: var(--pp-text); font-weight: 600; margin-right: 8px; font-variant-numeric: tabular-nums; }
+.pp-readout-bar__mode { padding: 3px 6px; margin-right: 12px; border-radius: 4px; font-size: 9px; letter-spacing: 0.1em; color: var(--pp-c-tps); background: rgba(52, 211, 153, 0.12); }
+.pp-readout-bar[data-state="scrub"] .pp-readout-bar__mode { color: var(--pp-c-p99); background: rgba(251, 191, 36, 0.12); }
+.pp-readout-bar__seg { display: inline-flex; align-items: baseline; gap: 10px; padding: 0 12px; border-left: 1px solid var(--pp-hairline); }
+.pp-readout-bar__seg > i { font-style: normal; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--pp-text-faint); }
+.pp-readout-bar__kv em { font-style: normal; margin-right: 4px; color: var(--pp-text-dim); }
+.pp-readout-bar__kv b { color: var(--pp-accent); font-variant-numeric: tabular-nums; }
+.pp-readout-bar__kv small { margin-left: 2px; font-size: 9px; color: var(--pp-text-faint); }
+
+/* ---- 2x2 hairline deck ---- */
+.pp-deck { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: minmax(200px, auto); gap: 1px; background: var(--pp-hairline); }
+.pp-deck__cell { display: flex; flex-direction: column; min-width: 0; min-height: 200px; background: var(--pp-surface-0); }
+.pp-deck__head { display: flex; align-items: baseline; gap: 8px; padding: 10px 14px 4px; font: 600 10px/1 var(--pp-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--pp-text-faint); }
+.pp-deck__head h3 { margin: 0; font: inherit; color: var(--pp-text-dim); }
+.pp-deck__lanes { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; }
+.pp-deck__lanes > .pp-stage + .pp-stage { border-top: 1px solid var(--pp-hairline); }
+.pp-deck__edge { display: flex; justify-content: space-between; padding: 4px 46px 8px 12px; font: 500 10px var(--pp-mono); color: var(--pp-text-faint); }
+
+/* compact stage tuning inside the deck */
+.pp-deck .pp-stage__head { padding-top: 6px; }
+.pp-deck .pp-stage__value { font-size: 12px; }
+
+@media (max-width: 960px) { .pp-deck { grid-template-columns: minmax(0, 1fr); } }
 ```
 
-- At 1545px viewport: canvas 1481 - 48 gutters = 1433; dock console pane ≈ 874px -> message track ≈ 780px ≈ 108 mono chars -> the 112-char join/coordinates line wraps to **2 lines max**.
-- Dock left pane head: Radix Tabs `Console | Player events` + severity segmented filter `All · Info · Warn · Error` (counts as plain numbers, no colored count pills) + filter input (32px) + `Open console ↗`. **Player event stream** = join/leave/death/advancement rows using the same `.pp-crow` grid (compact), source chip omitted.
-- Right pane: head `Active roster` + `1 / 10`; body = 36px rows (avatar 20px, name, ping dot, session time); `border-top` hairline then `Worlds` section = 32px rows (name, environment tone dot, loaded chunks, entities, players). One `.pp-pane`, two sections.
-- Overview shows **no page title bar** - the header and instrument deck are the page identity.
+### 5.6 Deletions (must be completed)
 
-### R03 · Performance - synchronized multi-track analyzer
-
-```
- ┌ PANE ─────────────────────────────────────────────────────────────────────────────────────┐
- │ Analyzer   [1m 5m 15m 35m 2h]   [Pause ⏸]  [Raw samples ⤓]                              │ head
- ├ ribbon (flush, 5–6 metrics, selectable, values at crosshair when hovering) ──────────────┤
- │ track 1  Tick & MSPT       (140px)  area+band+budget line                                │
- │ ─────────────────────────────────────────────────────────────────────────────────────────│ hairline
- │ track 2  GC pauses          (72px)  rose ticks                                           │
- │ track 3  Memory tiers      (120px)  stacked-by-extent                                    │
- │ track 4  CPU service/node  (110px)  burst-aware                                          │
- │ track 5  Chunks / entities (110px)                                                       │
- │ shared x-axis (timezone pref) ───────────────────────────────────────────────────────────│
- └───────────────────────────────────────────────────────────────────────────────────────────┘
-        raw sample drawer: Radix Dialog as right drawer (480px) with virtualized table
-```
-
-- All tracks share ONE x-scale and ONE crosshair via a `CrosshairContext`; hovering any track draws the vertical hairline across all and fills the ribbon with the sampled values. Tracks are separated by hairlines inside one pane (no per-track boxes). Epoch gaps hatched across **all** tracks at the same x-range.
-- Raw sample drawer: columns `time · epoch · TPS · mean · p95 · p99 · GC · heap used · cpu`; sticky head; CSV export builds client-side from memory.
-
-### R04 · Players - master-detail workbench
-
-```css
-.pp-players { display: grid; grid-template-columns: minmax(340px, 440px) minmax(0, 1fr); gap: 16px; height: calc(100dvh - var(--hdr-h) - 52px); }
-@media (max-width: 1280px) { .pp-players { grid-template-columns: minmax(0, 1fr); } /* inspector becomes a Radix Dialog slide-over (right, 520px) */ }
-```
-
-```
- ┌ PANE · Roster ───────────────────────┐ ┌ PANE · Inspector ─────────────────────────────────────────────┐
- │ [🔍 Search name / UUID]   [Online|All] │ │ (☺) NEGUINCOMCEROL            ● online · session 00:14:03      │
- ├ live roster (virtualized, 44px rows) ─┤ │ UUID  8f3c…-…-…  [copy]  [exact, monospace, selectable]         │
- │ (☺) NEGUINCOMCEROL     ● 38ms    14m │ ├ tabs: Overview | Sessions | Actions ─────────────────────────────┤
- ├ boot-session timeline ────────────────┤ │ Overview: position, world, gamemode, ping sparkline            │
- │ ── epoch 9a4f6484 (this boot) ──────  │ │ Sessions: joins/leaves from player-history.ts (gap-aware)       │
- │ 01:56:31 ▶ NEGUINCOMCEROL joined      │ │ Actions: kick / message / etc via playerCommands.ts →          │
- │ ── epoch 77c0be12 (previous boot) ─── │ │          MutationButton (gated tooltips) → ActionReview        │
- └───────────────────────────────────────┘ └────────────────────────────────────────────────────────────────┘
-```
-
-- Left pane: head (search + segmented filter), roster list (`flex:1`), then hairline, then the join/leave timeline with **epoch separators** (`── epoch <8hex> ──` row, 24px, centered, muted) so restarts never visually merge sessions.
-- Inspector shows the **exact full UUID** (never truncated; `user-select: all`), skin via `skinProvider`, and all actions through `src/lib/playerCommands.ts`. Empty state (no selection): centered 13px muted line "Select a player", no illustration box.
-
-### R05 · Console & Chat - full-viewport docked terminal IDE
-
-`PageCanvas data-bleed="true"` (zero padding, no page scroll). One pane that is the whole viewport:
-
-```css
-.pp-ide { display: grid; grid-template-rows: 36px 44px minmax(0, 1fr) auto; height: 100%; border: 0; border-radius: 0; box-shadow: none; }
-```
-
-```
- ┌ row 1 (36px)  boot-epoch status bar ──────────────────────────────────────────────────────────┐
- │ epoch 9a4f6484 · booted 13:12 · 184 lines · ● streaming      [Console | Chat | Plugins]        │
- ├ row 2 (44px)  filter ribbon ───────────────────────────────────────────────────────────────────┤
- │ [All 184 · Info 174 · Warn 10 · Error 0]  [🔍 filter…  regex ⌥R]  [Plugin ▾]  [Wrap ⌥Z] [⤓]  │
- ├ row 3 (1fr)   virtualized stream, 1 line per entry, mode="full" grid (68px 44px 1fr) ─────────┤
- ├ row 4 (auto)  CommandComposer (sticky) ────────────────────────────────────────────────────────┤
-```
-
-- **Console** sub-pane = `LiveConsole mode="full"`. **Chat** sub-pane = same grid with `[time][·][ <player> message ]` rows (player name colored from the Minecraft formatter), composer sends chat via its own gated action. **Plugins** sub-pane = inventory table (name, version, enabled dot, authors) in the `.pp-well` with a sticky head; no cards.
-- Chat and console are **memory-only**: reload clears them; the `Load earlier from this boot` button re-requests via the adapter (still memory-only). No `localStorage`, `sessionStorage`, or IndexedDB writes in this subtree (verify-purge enforces it).
-- Shortcuts: `/` focus filter, `⌘/Ctrl+L` clear view (view only), `End` jump to latest.
-
-### R06 · Backups - pipeline rail + schedule deck + restore ledger
-
-```
- ┌ PANE · Pipeline ──────────────────────────────────────────────────────────────────────────┐
- │ ①──②──③──④──⑤──⑥──⑦──⑧──⑨──⑩──⑪──⑫──⑬──⑭   (14 stages; names from the adapter's stage enum)   │
- │ ●━━━●━━━●━━━◉ ┄ ┄ ┄ ┄ ┄ ┄ ┄ ┄ ┄ ┄    "Stage 4 / 14 · Archiving world" · elapsed 00:41           │
- └───────────────────────────────────────────────────────────────────────────────────────────┘
- ┌ DECK (2 cells, 1px divider) ──────────────────────────────────────────────────────────────┐
- │ Manual                                   │ Periodic · Google Drive                         │
- │ [Quick Backup]  scope · retention note   │ every 6h · next 18:00 · retention 14 · [Edit]    │
- └──────────────────────────────────────────┴─────────────────────────────────────────────────┘
- ┌ PANE · Restore points (ledger table) ─────────────────────────────────────────────────────┐
- │ Created · Kind (manual/periodic) · Size · Destination · ✔ Verified · Restore ▸             │
- └───────────────────────────────────────────────────────────────────────────────────────────┘
-```
-
-- Rail: `display: grid; grid-template-columns: repeat(14, minmax(0, 1fr))`; done = accent filled node + solid connector, current = pulsing ring (`pp-ring`), pending = hairline dot + dashed connector. Under 900px: show only current ±1 with `…` and the "Stage n / 14" text. Stage labels live in tooltips (`aria-label`), the active label in the caption line.
-- Schedule deck: `grid-template-columns: repeat(2, minmax(0,1fr))` -> `1fr` under 900px. Editing uses the standard `ActionReviewModal`. Restore is a destructive `MutationButton` (rose) and **always** shows the full review (review-policy override).
-- Ledger: row 40px, `✔ verified` as emerald check icon + `aria-label` (no badge pill); unverified = muted dash.
-
-### R07 · Access & Audit - 3-pane security workbench
-
-```css
-.pp-access { display: grid; grid-template-columns: minmax(280px, 340px) minmax(0, 1fr) minmax(340px, 440px); gap: 16px; height: calc(100dvh - var(--hdr-h) - 52px); }
-@media (max-width: 1360px) { .pp-access { grid-template-columns: minmax(280px, 340px) minmax(0, 1fr); } .pp-access > :last-child { grid-column: 1 / -1; height: 420px; } }
-@media (max-width: 860px)  { .pp-access { grid-template-columns: minmax(0, 1fr); height: auto; } }
-```
-
-- **Paired devices (blades pane):** each device is a 64px hairline-separated row (not a card): icon, label, last seen, fingerprint (`ed25519:ab12…`), `current` micro-tag on this browser, `Revoke` (gated, rose).
-- **Scope authority matrix (center):** rows = scopes/actions, columns = roles/devices; cell = 28px toggle glyph; hover shows the gate/authority tooltip; editing batches into one `session.prepare` and one `ActionReview`. Sticky first column + sticky head inside a `.pp-well`.
-- **Audit ledger (right):** dual-source - segmented `All · Panel · Host`; each entry shows time (timezone pref), actor, action, result, and a single-letter source tag (`P`/`H`, never full words) and a chain-verified check; virtualized, 36px rows; filter input in head.
-
-### R08 · Settings - preference studio (exactly the 8 locked keys)
-
-```css
-.pp-settings { display: grid; grid-template-columns: minmax(0, 560px) minmax(0, 1fr); gap: 16px; align-items: start; }
-.pp-settings__preview { position: sticky; top: 0; }
-@media (max-width: 1100px) { .pp-settings { grid-template-columns: minmax(0, 1fr); } .pp-settings__preview { position: static; order: -1; } }
-```
-
-- Left `.pp-pane`: sections separated by hairlines (`Appearance: theme, accent, density, textSize` · `Motion & charts: motion, chartFill` · `Time & identity: timezone, skinProvider`). Each row: label + helper line (left), control (right, 32px): `theme` segmented (System/Dark/Light), `accent` 6 swatches (24px, ring on selected), `density` segmented, `textSize` segmented, `motion` segmented, `chartFill` segmented with 24px glyph previews, `timezone` combobox (cmdk, searchable IANA list, "Browser (America/Sao_Paulo)" first), `skinProvider` select (+ live avatar sample).
-- Right sticky `.pp-pane` **live preview**: renders a miniature real `InstrumentDeck` (static sample data) + a 160px `StudioChart` fed by a fixed sample series, + 3 console rows, all using the *actual* components so changes show instantly. Preview content never touches real telemetry.
-- Writes go through `usePrefs().set()` only; no "Save" button (instant apply, `aria-live` "Saved" micro-toast).
-
-### 8.9 PairingGate (outside the shell)
-
-Full-screen `bg-[rgb(var(--bg))]` + radial accent glow. Centered `.pp-glass` panel `w-[440px]`, three hairline-separated sections: (1) brand + "Pair this browser" kicker, (2) **6-cell OTP input** (6 independent 48x56px inputs, paste-fills all, auto-advance, `inputmode="numeric"`, `autocomplete="one-time-code"`), (3) status line + `Claim device` button. Flow: submit -> adapter `/v1/pairings/claim` -> Ed25519 keypair generated + stored by the adapter in IndexedDB `plexonpanel-browser-v3` -> redirect `/overview`. States: idle / claiming (spinner inside button, inputs readOnly) / error (inline 12px rose line **inside the section, single line**, cells shake once unless `motion=reduced`) / expired code (offer "Request new code" text link). No marketing copy, no extra cards.
-
-### 8.10 ActionReviewModal (single global host)
-
-Radix `Dialog` + `.pp-glass`, `w-[min(560px,92vw)]`. Structure (hairline-separated, zero nested boxes):
-
-```
- ┌ head: icon · "Review: Restart server"  · risk tone dot (from review-policy)                   ┐
- ├ summary: plain-language effect (1–2 lines)                                                       │
- ├ details: definition-list rows (Target · Scope · Affected players · Reversible?)                  │
- ├ warnings (only if present): amber list rows with ⚠ glyphs, no yellow boxes                        │
- ├ foot: [Cancel]                                                    [Confirm & execute (tone)]     ┘
-```
-
-- Opened only by `useMutation().begin()` after `session.prepare` resolves with an `ActionReview`; `Confirm` calls `session.execute` with the **review token** from prepare; if the review expires or authority freshness degrades mid-review (`useLedger()` leaves `live`), disable Confirm via `aria-disabled` and show the reason in a Tooltip (fail-closed).
-- Destructive tone = rose confirm button; focus starts on **Cancel** for destructive actions, on Confirm otherwise. `Esc` cancels. Execution progress: confirm button shows spinner; result appears as a one-line toast (`aria-live`), never a modal-in-modal.
+- Delete the `.pp-chart-readout` selector, element and any `position:absolute` tooltip code.
+- Delete every multi-series track component (the old 5-row Track stack and any `areas=[...]` prop).
+- Delete per-track axis rendering. Only `<TimeAxis>` under the primary stage remains.
+- Route `/performance` renders `<PerformanceWorkbench>`; `/overview` renders `<TelemetryStudio>`.
 
 ---
 
-## 9. The "Anti-Card-Soup and Structural Harmony" QA checklist (25 invariants)
+## 6. Unified Boot Player Event Stream: `player-events.ts`
 
-Run every check at viewports **1545x911**, **1280x800**, **1920x1080** and (for #22) **390x844**, in dark and light theme, with a seeded telemetry fixture that includes: one online server, one epoch gap, a 112-char join log line, a stale Host clock scenario, and a gated-Start scenario. **All 25 must pass before packaging.** Failing any = fix, re-run, never waive.
+### 6.1 Rules
 
-| # | Invariant | Pass condition |
-|---|---|---|
-| 1 | No nested boxes | `noNestedBoxes()` (below) returns `[]` on every route |
-| 2 | Source-badge budget | text `PAPER` appears <= 1x, `HOST` <= 1x per screen; zero `PAPER`/`HOST` inside `.pp-cell`, `.pp-ribbon`, `.pp-inst` |
-| 3 | Live budget | text `Live` <= 2 matches per screen (ledger pill only); no `• Live` anywhere else |
-| 4 | Healthy = silent | with all clocks live, no `stale` text and no amber source tags in the Instrument Deck |
-| 5 | Zero inline gate paragraphs | no element matching `.gate-reason` or any `<p>` adjacent to a `[aria-disabled]` lifecycle button; gate reason only inside a Tooltip |
-| 6 | Header invariance | `header[role=banner]` height == 56px in online/offline/starting/stopping/unknown states and with Start gated |
-| 7 | Gate tooltip works | focus (Tab) on dimmed Start shows its exact `session.reason()` text; click does not call `session.prepare` |
-| 8 | Valid action foregrounded | online -> Restart+Stop `data-fg=true`, Start collapsed icon-only; offline -> Start `data-fg=true` |
-| 9 | Compact rail | `.pp-rail` width == 64px by default; 220px only after toggle; `G`,`2` navigates to /overview; tooltip shows `G 2` |
-| 10 | Width recovered | at 1545 viewport, main canvas content width >= 1425px (old layout: ~1250) |
-| 11 | Instrument deck geometry | exactly 4 `.pp-cell` in `.pp-deck--instruments`, each `getBoundingClientRect().height == 148` at >=1180px; no cell has a border or radius |
-| 12 | Hairline dividers | deck cell gap computes to 1px; deck `background` hairline alpha between .08 and .12; no per-cell `border-width > 0` |
-| 13 | Instrument anatomy | each cell has label, source dot, one 28px value, unit, and a viz whose bottom is within 12px of the cell bottom (no dead zone > 24px between metric row and viz) |
-| 14 | Studio de-nesting | `.pp-studio` contains exactly 1 bordered-radius element (itself); the 5 `.pp-metric` have `border-width: 0` except ribbon dividers (left 1px) |
-| 15 | Ribbon + indicator | exactly 5 metric cells; exactly 1 has `data-active=true` with a `::before` 2px indicator; `—` p99 renders no empty dashed box |
-| 16 | Chart canvas integrity | chart SVG fills `.pp-chart` (diff <= 1px); contains `linearGradient`, p95-p99 band path, 50 ms budget line, and hatched gap `rect` where the fixture has an epoch gap; **no path crosses the gap x-range** |
-| 17 | Console wrap | at 1545px Overview, the fixture 112-char coords line occupies **<= 2 lines** (`rowHeight <= 2*line-height+4`); at 1920px **<= 2**; at `/console` 1545px **1 line** for the fixture's <= 130-char lines |
-| 18 | Boilerplate collapsed | no row in compact mode renders text `INFO` or `Server` for `info`+`Server` lines; plugin lines show a `.pp-chip` |
-| 19 | Message width share | in compact mode, the message track is >= 80% of the row width (`msg.width / row.width >= .80`) |
-| 20 | Console IDE | `/console` has no page scroll (`document.scrollingElement.scrollHeight <= innerHeight`), composer is sticky at the bottom, stream is virtualized (DOM rows < 120 with 5,000 fixture lines) |
-| 21 | No storage in console/chat | after exercising console + chat, `localStorage`/`sessionStorage` contain no console/chat keys and no IndexedDB writes to console/chat stores; `verify-purge.sh` passes |
-| 22 | Responsive integrity | at 390px: rail becomes a 56px bottom bar, no horizontal page scroll (`scrollWidth <= clientWidth`), deck is 1 column, header meta hidden |
-| 23 | Route silhouettes | R01-R08 each match their grid spec: R02 has Deck -> Pane -> dock(2 panes); R04 columns `~340-440 / 1fr`; R05 `.pp-ide` 4 rows; R06 rail has 14 nodes; R07 3 panes at >=1360px; R08 2 columns with sticky preview |
-| 24 | Core preserved | `git diff --stat` shows **no changes** under `src/adapter`, `src/presentation`, `src/store`, `src/lib`; preferences store still has exactly 8 keys; pairing, prepare/review/execute flows pass their existing tests |
-| 25 | Accessibility and motion | axe: 0 serious/critical on all routes; all interactive elements keyboard reachable with visible focus ring; `data-motion=reduced` -> no running animations (`document.getAnimations().length === 0`); AA contrast >= 4.5:1 for text in both themes |
+1. **One bucket per `bootId`** (the epoch shown in the top bar, e.g. `445990ff`). A new `bootId` creates a new bucket; the last two buckets are retained.
+2. Three ingest paths feed the same bucket: **retained presence deltas**, **roster snapshots**, **console lines** (history **and** live).
+3. A roster snapshot **only diffs** against the previous roster and appends join/leave events. It **never clears or replaces** events.
+4. Players already online when the panel opens get a **synthesized `online` event** at read time from their `sessionStartedAt`, so the dock is never empty while the roster is non-empty.
+5. Dedupe is by `(kind, player, time window, detail)` with source priority `console > presence > roster`; detail is merged from the loser.
+6. Gate on `players.view` for display. `players.history.view` only gates fetching older history ("Load earlier").
+7. Mount the feeder at **app-shell level** so events accumulate even when the user is on another route.
+8. Never display IP addresses. The `logged in … /ip:port` console line is parsed for a login time only.
 
-### 9.1 Playwright helpers (copy into `tests/structure/helpers.ts`)
+### 6.2 `player-events.ts`
 
 ```ts
-import type { Page } from '@playwright/test';
+// src/players/player-events.ts
+import { useMemo, useSyncExternalStore } from 'react';
 
-/** #1 - returns descriptors of boxes nested in boxes. A "box" = border>0 && radius>=12px. Controls/tags are <12px so they never count. */
-export async function noNestedBoxes(page: Page) {
-  return page.evaluate(() => {
-    const isBox = (el: Element) => {
-      const cs = getComputedStyle(el);
-      const bw = ['Top', 'Right', 'Bottom', 'Left'].some(s => parseFloat((cs as any)[`border${s}Width`]) > 0);
-      const r = Math.max(...['TopLeft', 'TopRight', 'BottomLeft', 'BottomRight'].map(c => parseFloat((cs as any)[`border${c}Radius`]) || 0));
-      return bw && r >= 12 && cs.display !== 'none';
+/* ───────────────────────── types ───────────────────────── */
+export type PlayerEventKind = 'join' | 'leave' | 'advancement' | 'death' | 'command' | 'online';
+export type PlayerEventSource = 'presence' | 'console' | 'roster';
+
+export interface PlayerEvent {
+  id: string;
+  bootId: string;
+  ts: number;                 // epoch ms UTC
+  kind: PlayerEventKind;
+  player: string;
+  detail?: string;
+  source: PlayerEventSource;
+}
+
+export interface ConsoleLine {
+  seq: number;
+  ts?: number;                // epoch ms when the host provides it
+  clock?: string;             // "HH:MM:SS" in the host/display timezone when ts is missing
+  level?: string;
+  text: string;
+}
+export interface RosterPlayer { name: string; uuid?: string; sessionStartedAt?: number; }
+export interface PresenceDelta { ts: number; kind: 'join' | 'leave'; player: string; uuid?: string; }
+export interface ParseCtx { bootId: string; tz: string; anchor: number; }
+
+/* ───────────────────────── text cleaning & clock ───────────────────────── */
+const ANSI = /\u001b\[[0-9;]*[A-Za-z]/g;
+const MC_COLOR = /§[0-9a-fk-or]/gi;
+export const cleanLine = (s: string) => s.replace(ANSI, '').replace(MC_COLOR, '').trim();
+
+/** "[15:14:15 INFO]: x"  or  "[15:14:15] [Server thread/INFO]: x" */
+const PREFIX = /^\[(\d{2}:\d{2}:\d{2})(?: (?:INFO|WARN|ERROR|DEBUG))?\](?: \[[^\]]+\])?:?\s*/;
+/** Floodgate/Bedrock names may start with "."; Java names are 3-16 of [A-Za-z0-9_] */
+const NAME = '(\\.?[A-Za-z0-9_]{1,16})';
+
+function tzOffsetMs(at: number, tz: string): number {
+  const p = new Intl.DateTimeFormat('en-US', {
+    timeZone: tz, hourCycle: 'h23', year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', second: '2-digit',
+  }).formatToParts(at);
+  const g = (t: string) => Number(p.find(x => x.type === t)!.value);
+  return Date.UTC(g('year'), g('month') - 1, g('day'), g('hour'), g('minute'), g('second')) - Math.floor(at / 1000) * 1000;
+}
+
+/** Turn "15:18:20" (display tz) into epoch ms near `anchor` (never in the future by >60s). */
+export function resolveClock(clock: string, anchor: number, tz: string): number {
+  const [h, m, s] = clock.split(':').map(Number);
+  const off = tzOffsetMs(anchor, tz);
+  const local = new Date(anchor + off);
+  let t = Date.UTC(local.getUTCFullYear(), local.getUTCMonth(), local.getUTCDate(), h, m, s) - off;
+  if (t > anchor + 60_000) t -= 86_400_000;
+  return t;
+}
+
+/* ───────────────────────── console rules ───────────────────────── */
+const DEATH = [
+  'was (?:slain|shot|killed|blown up|pummeled|pricked|impaled|squashed|fireballed|doomed|burnt|struck|skewered|stung|poked|obliterated|squished|knocked)',
+  'drowned', 'died', 'suffocated', 'starved', 'withered away', 'froze to death', 'burned to death', 'blew up',
+  'fell (?:from|off|out|while)', 'hit the ground too hard', 'tried to swim in lava', 'went up in flames',
+  'walked into (?:fire|a cactus)', 'experienced kinetic energy', 'discovered the floor was lava', 'didn.t want to live',
+  'left the confines', 'was (?:killed|pricked) by', 'fell out of the world',
+].join('|');
+
+interface Rule { kind: PlayerEventKind; re: RegExp; detail?: (m: RegExpExecArray) => string | undefined }
+
+const RULES: Rule[] = [
+  // Companion-plugin tagged lines: "[Advancement] Name: Stone Age", "[Death] Name fell from a high place", "[Command] Name: /gamemode creative"
+  { kind: 'advancement', re: new RegExp(`^\\[Advancement\\]\\s+${NAME}\\s*[:\\-–]?\\s*(.*)$`),
+    detail: m => m[2].replace(/^has (?:made the advancement|completed the challenge|reached the goal)\s*/i, '').replace(/^\[|\]$/g, '').trim() || undefined },
+  { kind: 'death', re: new RegExp(`^\\[Death\\]\\s+${NAME}\\s*[:\\-–]?\\s*(.*)$`), detail: m => m[2].trim() || undefined },
+  { kind: 'command', re: new RegExp(`^\\[Command\\]\\s+${NAME}\\s*[:\\-–]?\\s*(.*)$`), detail: m => m[2].trim() || undefined },
+
+  // Vanilla / Paper
+  { kind: 'advancement', re: new RegExp(`^${NAME} has (?:made the advancement|completed the challenge|reached the goal) \\[(.+)\\]$`), detail: m => m[2] },
+  { kind: 'command', re: new RegExp(`^${NAME} issued server command: (\\/.+)$`), detail: m => m[2] },
+  { kind: 'join', re: new RegExp(`^${NAME} joined the game$`) },
+  { kind: 'join', re: new RegExp(`^${NAME}\\[\\/[^\\]]+\\] logged in with entity id \\d+ at \\(.*\\)$`) }, // login time only; the IP is dropped
+  { kind: 'leave', re: new RegExp(`^${NAME} lost connection: (.+)$`), detail: m => m[2] },
+  { kind: 'leave', re: new RegExp(`^${NAME} left the game$`) },
+  { kind: 'death', re: new RegExp(`^${NAME} (?:${DEATH})(?:\\s.*)?$`), detail: m => m[0].slice(m[1].length).trim() },
+];
+
+export function parseConsoleLine(line: ConsoleLine, ctx: ParseCtx): PlayerEvent | null {
+  let text = cleanLine(line.text);
+  let clock = line.clock;
+  const pm = PREFIX.exec(text);
+  if (pm) { clock ??= pm[1]; text = text.slice(pm[0].length); }
+  if (!text || text.startsWith('<') || text.startsWith('[Not Secure]')) return null; // chat is never an event
+
+  for (const rule of RULES) {
+    const m = rule.re.exec(text);
+    if (!m) continue;
+    const ts = line.ts ?? (clock ? resolveClock(clock, ctx.anchor, ctx.tz) : ctx.anchor);
+    return {
+      id: `${ctx.bootId}:c:${line.seq}`,
+      bootId: ctx.bootId, ts, kind: rule.kind, player: m[1],
+      detail: rule.detail?.(m), source: 'console',
     };
-    const bad: string[] = [];
-    document.querySelectorAll('body *:not([role="dialog"] *):not([data-radix-popper-content-wrapper] *)').forEach(el => {
-      if (!isBox(el)) return;
-      let p = el.parentElement;
-      while (p) { if (isBox(p)) { bad.push(`${(el as HTMLElement).className} ⊂ ${(p as HTMLElement).className}`); break; } p = p.parentElement; }
-    });
-    return bad;
-  });
+  }
+  return null;
 }
 
-export async function textCount(page: Page, re: RegExp) {
-  return page.evaluate(src => {
-    const rx = new RegExp(src.source, src.flags.includes('g') ? src.flags : src.flags + 'g');
-    return (document.body.innerText.match(rx) || []).length;
-  }, { source: re.source, flags: re.flags });
+/* ───────────────────────── store ───────────────────────── */
+const WINDOW_MS: Record<PlayerEventKind, number> = {
+  join: 15_000, leave: 15_000, online: 15_000, advancement: 2_000, death: 2_000, command: 2_000,
+};
+const RANK: Record<PlayerEventSource, number> = { console: 3, presence: 2, roster: 1 };
+const MAX_EVENTS = 500;
+const DETAIL_KINDS = new Set<PlayerEventKind>(['advancement', 'death', 'command']);
+
+interface Bucket {
+  bootId: string;
+  events: PlayerEvent[];          // newest first
+  roster: Map<string, RosterPlayer>;
+  rosterSeeded: boolean;
+  seenConsoleSeq: Set<number>;
+  version: number;
 }
 
-export const heights = (page: Page, sel: string) =>
-  page.$$eval(sel, els => els.map(e => Math.round(e.getBoundingClientRect().height)));
+const buckets = new Map<string, Bucket>();
+const order: string[] = [];
+const listeners = new Set<() => void>();
+const notify = () => listeners.forEach(l => l());
 
-/** #17 - number of rendered lines for a console row containing `needle`. */
-export async function consoleLines(page: Page, needle: string) {
-  return page.evaluate(n => {
-    const row = [...document.querySelectorAll('.pp-crow__msg')].find(e => e.textContent?.includes(n)) as HTMLElement | undefined;
-    if (!row) return -1;
-    const lh = parseFloat(getComputedStyle(row).lineHeight);
-    return Math.round(row.getBoundingClientRect().height / lh);
-  }, needle);
+function bucket(bootId: string): Bucket {
+  let b = buckets.get(bootId);
+  if (!b) {
+    b = { bootId, events: [], roster: new Map(), rosterSeeded: false, seenConsoleSeq: new Set(), version: 0 };
+    buckets.set(bootId, b);
+    order.push(bootId);
+    while (order.length > 2) buckets.delete(order.shift()!);
+  }
+  return b;
+}
+
+function insert(b: Bucket, ev: PlayerEvent) {
+  const win = WINDOW_MS[ev.kind];
+  const dup = b.events.find(e =>
+    e.kind === ev.kind &&
+    e.player.toLowerCase() === ev.player.toLowerCase() &&
+    Math.abs(e.ts - ev.ts) <= win &&
+    (!DETAIL_KINDS.has(ev.kind) || (e.detail ?? '') === (ev.detail ?? '')),
+  );
+  if (dup) {
+    if (RANK[ev.source] > RANK[dup.source]) { dup.ts = ev.ts; dup.source = ev.source; dup.id = ev.id; }
+    dup.detail ??= ev.detail;           // e.g. keep "Disconnected" from "lost connection"
+    return;
+  }
+  b.events.push(ev);
+  b.events.sort((a, c) => c.ts - a.ts);
+  if (b.events.length > MAX_EVENTS) b.events.length = MAX_EVENTS;
+}
+
+/* ── ingest 1: console history + live stream (idempotent by seq) ── */
+export function ingestConsole(bootId: string, lines: ConsoleLine[], ctx: Omit<ParseCtx, 'bootId'>) {
+  const b = bucket(bootId);
+  let changed = false;
+  for (const line of lines) {
+    if (b.seenConsoleSeq.has(line.seq)) continue;
+    b.seenConsoleSeq.add(line.seq);
+    const ev = parseConsoleLine(line, { ...ctx, bootId });
+    if (ev) { insert(b, ev); changed = true; }
+  }
+  if (b.seenConsoleSeq.size > 20_000) b.seenConsoleSeq = new Set([...b.seenConsoleSeq].slice(-10_000));
+  if (changed) { b.version++; notify(); }
+}
+
+/* ── ingest 2: retained presence deltas from the Host ── */
+export function ingestPresence(bootId: string, deltas: PresenceDelta[]) {
+  const b = bucket(bootId);
+  for (const d of deltas) {
+    insert(b, { id: `${bootId}:p:${d.kind}:${d.player}:${d.ts}`, bootId, ts: d.ts, kind: d.kind, player: d.player, source: 'presence' });
+  }
+  if (deltas.length) { b.version++; notify(); }
+}
+
+/* ── ingest 3: roster snapshots. DIFF ONLY. NEVER CLEAR EVENTS. ── */
+export function ingestRoster(bootId: string, players: RosterPlayer[], now = Date.now()) {
+  const b = bucket(bootId);
+  const next = new Map(players.map(p => [p.name.toLowerCase(), p]));
+  if (b.rosterSeeded) {
+    for (const [key, p] of next) {
+      if (!b.roster.has(key)) insert(b, { id: `${bootId}:r:join:${p.name}:${now}`, bootId, ts: p.sessionStartedAt ?? now, kind: 'join', player: p.name, source: 'roster' });
+    }
+    for (const [key, p] of b.roster) {
+      if (!next.has(key)) insert(b, { id: `${bootId}:r:leave:${p.name}:${now}`, bootId, ts: now, kind: 'leave', player: p.name, source: 'roster' });
+    }
+  }
+  b.roster = next;
+  b.rosterSeeded = true;
+  b.version++;
+  notify();
+}
+
+/* ── read: events + synthesized "online" rows for players with no known join ── */
+export function selectEvents(bootId: string | undefined, now = Date.now()): PlayerEvent[] {
+  if (!bootId) return [];
+  const b = buckets.get(bootId);
+  if (!b) return [];
+  const out = [...b.events];
+  for (const p of b.roster.values()) {
+    const since = p.sessionStartedAt ?? now;
+    const hasJoin = b.events.some(e => e.kind === 'join' && e.player.toLowerCase() === p.name.toLowerCase() && e.ts >= since - 15_000);
+    if (!hasJoin) out.push({ id: `${bootId}:o:${p.name}`, bootId, ts: since, kind: 'online', player: p.name, detail: 'Online since panel opened', source: 'roster' });
+  }
+  return out.sort((a, c) => c.ts - a.ts);
+}
+
+export function usePlayerEvents(bootId: string | undefined) {
+  const version = useSyncExternalStore(
+    l => { listeners.add(l); return () => { listeners.delete(l); }; },
+    () => (bootId ? buckets.get(bootId)?.version ?? 0 : 0),
+    () => 0,
+  );
+  return useMemo(() => selectEvents(bootId), [bootId, version]); // eslint-disable-line react-hooks/exhaustive-deps
+}
+
+/** test helper */
+export function __resetPlayerEvents() { buckets.clear(); order.length = 0; }
+```
+
+### 6.3 Wiring (app shell, not a route component)
+
+```tsx
+// src/players/PlayerEventsFeeder.tsx
+import { useEffect } from 'react';
+import { ingestConsole, ingestPresence, ingestRoster } from './player-events';
+
+/**
+ * Mount ONCE in the authenticated app shell so events keep accumulating across routes.
+ * Replace the `host` calls with the repo's actual Host client / store selectors.
+ */
+export function PlayerEventsFeeder({ bootId, tz, host, can }: {
+  bootId?: string; tz: string;
+  host: {
+    onConsoleHistory(cb: (lines: any[]) => void): () => void;   // Host `console.history`
+    onConsoleLive(cb: (line: any) => void): () => void;         // live `s.console`
+    onPlayersInventory(cb: (players: any[]) => void): () => void; // `inventory.players`
+    onPresenceDeltas(cb: (deltas: any[]) => void): () => void;
+  };
+  can: (perm: string) => boolean;
+}) {
+  const allowed = can('players.view');            // <- was players.history.view (the bug)
+
+  useEffect(() => {
+    if (!bootId || !allowed) return;
+    const ctx = () => ({ tz, anchor: Date.now() });
+    const offs = [
+      host.onConsoleHistory(lines => ingestConsole(bootId, lines, ctx())),
+      host.onConsoleLive(line => ingestConsole(bootId, [line], ctx())),
+      host.onPlayersInventory(players => ingestRoster(bootId, players)),   // diff only, never wipes
+      host.onPresenceDeltas(deltas => ingestPresence(bootId, deltas)),
+    ];
+    return () => offs.forEach(off => off());
+  }, [bootId, allowed, tz, host]);
+
+  return null;
+}
+
+// "Load earlier" is the ONLY thing players.history.view gates:
+//   const canLoadEarlier = can('players.history.view');
+```
+
+Notes for wiring:
+- The console dock already receives history + live lines; **reuse that same subscription** instead of opening a second stream. If a user lacks console permission and the Host does not send console lines, the stream still works from presence deltas and roster. Do not add client-side gating on console-derived events beyond what the Host sends.
+- When `bootId` changes (server restart), the old bucket is kept for the previous boot only; the dock shows the current boot.
+
+### 6.4 `PlayerEventsDock.tsx`
+
+```tsx
+// src/players/PlayerEventsDock.tsx
+import { useMemo, useState } from 'react';
+import { PlayerEvent, PlayerEventKind, usePlayerEvents } from './player-events';
+
+const FILTERS: { id: 'all' | PlayerEventKind | 'presence'; label: string }[] = [
+  { id: 'all', label: 'All' },
+  { id: 'presence', label: 'Joins & leaves' },
+  { id: 'advancement', label: 'Advancements' },
+  { id: 'death', label: 'Deaths' },
+  { id: 'command', label: 'Commands' },
+];
+
+const GLYPH: Record<PlayerEventKind, { icon: string; verb: string }> = {
+  join: { icon: '→', verb: 'joined' },
+  online: { icon: '●', verb: 'is online' },
+  leave: { icon: '←', verb: 'left' },
+  advancement: { icon: '★', verb: 'earned' },
+  death: { icon: '✕', verb: 'died' },
+  command: { icon: '/', verb: 'ran' },
+};
+
+export function PlayerEventsDock({ bootId, tz, rosterCount }: { bootId?: string; tz: string; rosterCount: number }) {
+  const events = usePlayerEvents(bootId);
+  const [filter, setFilter] = useState<(typeof FILTERS)[number]['id']>('all');
+  const clock = useMemo(
+    () => new Intl.DateTimeFormat('en-GB', { timeZone: tz, hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23' }),
+    [tz],
+  );
+
+  const shown = events.filter(e =>
+    filter === 'all' ? true
+    : filter === 'presence' ? e.kind === 'join' || e.kind === 'leave' || e.kind === 'online'
+    : e.kind === filter);
+
+  return (
+    <div className="pp-pe" data-testid="player-events">
+      <div className="pp-pe__filters" role="group" aria-label="Filter player events">
+        {FILTERS.map(f => (
+          <button key={f.id} data-active={f.id === filter || undefined} onClick={() => setFilter(f.id)}>{f.label}</button>
+        ))}
+        <span className="pp-pe__count">{events.length} events · boot {bootId?.slice(0, 8)}</span>
+      </div>
+
+      {shown.length === 0 ? (
+        <p className="pp-pe__empty">
+          {rosterCount > 0 ? 'No matching events for this filter yet.' : 'No player activity on this boot yet.'}
+        </p>
+      ) : (
+        <ol className="pp-pe__list">
+          {shown.map((e: PlayerEvent) => (
+            <li key={e.id} data-kind={e.kind} data-source={e.source}>
+              <time dateTime={new Date(e.ts).toISOString()}>{clock.format(e.ts)}</time>
+              <span className="pp-pe__icon" aria-hidden="true">{GLYPH[e.kind].icon}</span>
+              <span className="pp-pe__text">
+                <b>{e.player}</b> {GLYPH[e.kind].verb}
+                {e.detail && <code>{e.detail}</code>}
+              </span>
+            </li>
+          ))}
+        </ol>
+      )}
+    </div>
+  );
 }
 ```
 
-### 9.2 Example specs
+```css
+/* src/players/player-events.css */
+.pp-pe { display: flex; flex-direction: column; min-height: 0; height: 100%; }
+.pp-pe__filters { display: flex; align-items: center; gap: 4px; padding: 8px 12px; border-bottom: 1px solid var(--pp-hairline); }
+.pp-pe__filters button { font: 500 11px/1 var(--pp-mono); padding: 6px 8px; border: 0; border-radius: 6px; color: var(--pp-text-dim); background: transparent; cursor: pointer; }
+.pp-pe__filters button[data-active] { color: var(--pp-text); background: var(--pp-surface-3); }
+.pp-pe__count { margin-left: auto; font: 500 10px var(--pp-mono); color: var(--pp-text-faint); }
+.pp-pe__empty { margin: 0; padding: 20px 14px; font: 500 12px var(--pp-mono); color: var(--pp-text-faint); }
+.pp-pe__list { list-style: none; margin: 0; padding: 0; overflow-y: auto; }
+.pp-pe__list li { display: grid; grid-template-columns: 64px 18px 1fr; gap: 8px; align-items: baseline; padding: 7px 14px; border-bottom: 1px solid var(--pp-hairline); content-visibility: auto; contain-intrinsic-size: 0 32px; }
+.pp-pe__list time { font: 500 11px var(--pp-mono); color: var(--pp-text-faint); font-variant-numeric: tabular-nums; }
+.pp-pe__icon { text-align: center; font: 600 12px var(--pp-mono); color: var(--pp-text-dim); }
+.pp-pe__text { font: 400 13px/1.35 system-ui, sans-serif; color: var(--pp-text-dim); }
+.pp-pe__text b { color: var(--pp-text); font-weight: 600; }
+.pp-pe__text code { margin-left: 8px; padding: 2px 6px; border-radius: 4px; font: 500 11px var(--pp-mono); color: var(--pp-text); background: var(--pp-surface-3); }
+.pp-pe__list li[data-kind="join"] .pp-pe__icon, .pp-pe__list li[data-kind="online"] .pp-pe__icon { color: var(--pp-c-tps); }
+.pp-pe__list li[data-kind="leave"] .pp-pe__icon { color: var(--pp-text-faint); }
+.pp-pe__list li[data-kind="advancement"] .pp-pe__icon { color: var(--pp-c-p99); }
+.pp-pe__list li[data-kind="death"] .pp-pe__icon { color: var(--pp-c-gc); }
+.pp-pe__list li[data-kind="command"] .pp-pe__icon { color: var(--pp-c-commit); }
+```
+
+### 6.5 Unit tests (`player-events.test.ts`, vitest)
 
 ```ts
-test('R02 anti-card-soup', async ({ page }) => {
-  await page.setViewportSize({ width: 1545, height: 911 });
-  await page.goto('/overview');
-  expect(await noNestedBoxes(page)).toEqual([]);                                                // #1
-  expect(await textCount(page, /\bPAPER\b/)).toBeLessThanOrEqual(1);                            // #2
-  expect(await textCount(page, /\bLive\b/)).toBeLessThanOrEqual(2);                             // #3
-  expect(await heights(page, '.pp-deck--instruments > .pp-cell')).toEqual([148, 148, 148, 148]); // #11
-  expect(await page.locator('.gate-reason').count()).toBe(0);                                   // #5
-  expect((await page.locator('header[role=banner]').boundingBox())!.height).toBe(56);           // #6
-  expect(await consoleLines(page, 'logged in with entity id')).toBeLessThanOrEqual(2);          // #17
+import { beforeEach, describe, expect, it } from 'vitest';
+import {
+  __resetPlayerEvents, ingestConsole, ingestPresence, ingestRoster, parseConsoleLine, selectEvents,
+} from './player-events';
+
+const tz = 'America/Sao_Paulo';
+const anchor = Date.UTC(2026, 9, 19, 18, 30, 0); // 15:30:00 in Sao Paulo
+const ctx = { bootId: 'b1', tz, anchor };
+const L = (seq: number, text: string) => ({ seq, text });
+
+beforeEach(() => __resetPlayerEvents());
+
+describe('parseConsoleLine', () => {
+  it('parses join/leave/login/lost connection', () => {
+    expect(parseConsoleLine(L(1, '[15:14:20 INFO]: ZpkDxGames joined the game'), ctx)).toMatchObject({ kind: 'join', player: 'ZpkDxGames' });
+    expect(parseConsoleLine(L(2, '[15:14:20 INFO]: ZpkDxGames[/10.0.0.5:5555] logged in with entity id 12 at (1.0, 64.0, 2.0)'), ctx)).toMatchObject({ kind: 'join' });
+    expect(parseConsoleLine(L(3, '[15:20:00 INFO]: ZpkDxGames lost connection: Disconnected'), ctx)).toMatchObject({ kind: 'leave', detail: 'Disconnected' });
+    expect(parseConsoleLine(L(4, '[15:20:00 INFO]: ZpkDxGames left the game'), ctx)).toMatchObject({ kind: 'leave' });
+  });
+  it('never exposes the ip address', () => {
+    const ev = parseConsoleLine(L(2, '[15:14:20 INFO]: A[/10.0.0.5:5555] logged in with entity id 12 at (1.0, 64.0, 2.0)'), ctx)!;
+    expect(JSON.stringify(ev)).not.toContain('10.0.0.5');
+  });
+  it('parses advancements, deaths and commands (vanilla and tagged)', () => {
+    expect(parseConsoleLine(L(5, '[15:21:00 INFO]: Steve has made the advancement [Stone Age]'), ctx)).toMatchObject({ kind: 'advancement', detail: 'Stone Age' });
+    expect(parseConsoleLine(L(6, '[Advancement] Steve: Diamonds!'), ctx)).toMatchObject({ kind: 'advancement', detail: 'Diamonds!' });
+    expect(parseConsoleLine(L(7, '[15:22:00 INFO]: Steve fell from a high place'), ctx)).toMatchObject({ kind: 'death' });
+    expect(parseConsoleLine(L(8, '[Death] Steve was slain by Zombie'), ctx)).toMatchObject({ kind: 'death', detail: 'was slain by Zombie' });
+    expect(parseConsoleLine(L(9, '[15:23:00 INFO]: Steve issued server command: /gamemode creative'), ctx)).toMatchObject({ kind: 'command', detail: '/gamemode creative' });
+    expect(parseConsoleLine(L(10, '[Command] Steve: /tp 0 64 0'), ctx)).toMatchObject({ kind: 'command', detail: '/tp 0 64 0' });
+  });
+  it('ignores chat and noise', () => {
+    expect(parseConsoleLine(L(11, '[15:24:00 INFO]: <Steve> I died lol'), ctx)).toBeNull();
+    expect(parseConsoleLine(L(12, '[15:24:00 INFO]: [Not Secure] <Steve> joined the game'), ctx)).toBeNull();
+    expect(parseConsoleLine(L(13, '[15:24:00 WARN]: Advanced terminal features are not available'), ctx)).toBeNull();
+  });
+  it('resolves the HH:MM:SS clock in the display timezone', () => {
+    const ev = parseConsoleLine(L(14, '[15:14:20 INFO]: A joined the game'), ctx)!;
+    expect(new Date(ev.ts).toISOString()).toBe('2026-10-19T18:14:20.000Z');
+  });
 });
 
-test('gated Start is a tooltip, never a paragraph', async ({ page }) => {                        // #5 #7
-  await page.goto('/overview');                                                                   // fixture: server online
-  const start = page.getByRole('button', { name: 'Start' });
-  await expect(start).toHaveAttribute('aria-disabled', 'true');
-  await start.focus();
-  await expect(page.getByRole('tooltip')).toContainText('Start requires a confirmed stopped service.');
-  expect(await page.locator('header[role=banner]').evaluate(h => h.getBoundingClientRect().height)).toBe(56);
+describe('store', () => {
+  it('dedupes login + join + presence delta into one event', () => {
+    ingestConsole('b1', [L(1, '[15:14:20 INFO]: A[/1.1.1.1:1] logged in with entity id 1 at (0, 0, 0)'), L(2, '[15:14:20 INFO]: A joined the game')], { tz, anchor });
+    ingestPresence('b1', [{ ts: Date.UTC(2026, 9, 19, 18, 14, 24), kind: 'join', player: 'A' }]);
+    expect(selectEvents('b1').filter(e => e.kind === 'join')).toHaveLength(1);
+  });
+  it('merges the lost-connection reason into the leave event', () => {
+    ingestConsole('b1', [L(1, '[15:20:00 INFO]: A lost connection: Timed out'), L(2, '[15:20:00 INFO]: A left the game')], { tz, anchor });
+    const leaves = selectEvents('b1').filter(e => e.kind === 'leave');
+    expect(leaves).toHaveLength(1);
+    expect(leaves[0].detail).toBe('Timed out');
+  });
+  it('roster snapshots never wipe retained events (regression for "Waiting for events")', () => {
+    ingestPresence('b1', [{ ts: anchor - 60_000, kind: 'join', player: 'ZpkDxGames' }]);
+    ingestRoster('b1', [{ name: 'ZpkDxGames', sessionStartedAt: anchor - 60_000 }], anchor);
+    ingestRoster('b1', [{ name: 'ZpkDxGames', sessionStartedAt: anchor - 60_000 }], anchor + 5_000);
+    ingestRoster('b1', [{ name: 'ZpkDxGames', sessionStartedAt: anchor - 60_000 }], anchor + 10_000);
+    expect(selectEvents('b1').length).toBeGreaterThan(0);
+  });
+  it('synthesizes an "online" row for a player already on the roster', () => {
+    ingestRoster('b1', [{ name: 'ZpkDxGames', sessionStartedAt: anchor - 180_000 }], anchor);
+    const evs = selectEvents('b1');
+    expect(evs).toHaveLength(1);
+    expect(evs[0]).toMatchObject({ kind: 'online', player: 'ZpkDxGames' });
+  });
+  it('console ingest is idempotent by seq', () => {
+    const lines = [L(1, '[15:14:20 INFO]: A joined the game')];
+    ingestConsole('b1', lines, { tz, anchor });
+    ingestConsole('b1', lines, { tz, anchor });
+    expect(selectEvents('b1')).toHaveLength(1);
+  });
+  it('a new boot starts a fresh bucket', () => {
+    ingestPresence('b1', [{ ts: anchor, kind: 'join', player: 'A' }]);
+    expect(selectEvents('b2')).toHaveLength(0);
+  });
 });
 ```
 
 ---
 
-## 10. Definition of done
+## 7. QA gate (must pass before "done")
 
-1. `scripts/verify-purge.sh` exits 0 and `git diff` shows zero changes in the preserved core.
-2. All 25 invariants pass at all required viewports and both themes.
-3. Screenshots of R01-R08 (1545x911, dark) attached to the PR, side-by-side with the legacy screenshot, demonstrating: one header, one deck, one studio, wide console, zero inline gate text.
-4. No `TODO`, no commented-out legacy code, no unused primitives (`.pp-card` count in the codebase <= number of Fleet blades + documented leaf cases).
+### 7.1 Playwright (`e2e/telemetry.spec.ts`)
 
+```ts
+import { expect, test } from '@playwright/test';
+
+const SIGNALS = ['tps', 'mean', 'p95', 'p99', 'gc'] as const;
+
+test('Studio: clicking a ribbon card isolates that signal', async ({ page }) => {
+  await page.goto('/overview');
+  await page.getByRole('button', { name: 'Focus' }).click();
+  for (const key of SIGNALS) {
+    await page.getByTestId(`ribbon-${key}`).click();
+    await expect(page.getByTestId(`ribbon-${key}`)).toHaveAttribute('aria-selected', 'true');
+    await expect(page.locator('.pp-studio .pp-stage')).toHaveCount(1);
+    await expect(page.locator('.pp-studio .pp-stage')).toHaveAttribute('data-series', key);
+    expect(await page.locator('.pp-studio .pp-stage path.pp-area').count()).toBeLessThanOrEqual(1);
+  }
+});
+
+test('Studio: split view is one series per stage, no overlap', async ({ page }) => {
+  await page.goto('/overview');
+  await page.getByRole('button', { name: 'Split' }).click();
+  await expect(page.locator('.pp-studio .pp-stage')).toHaveCount(5);
+  const perStage = await page.$$eval('.pp-studio .pp-stage', els =>
+    els.map(e => e.querySelectorAll('path.pp-area').length + (e.querySelector('rect.pp-bar') ? 1 : 0)));
+  expect(perStage.every(n => n <= 1)).toBe(true);
+});
+
+test('Workbench: single readout, single axis, shared crosshair', async ({ page }) => {
+  await page.goto('/performance');
+  await expect(page.locator('.pp-chart-readout')).toHaveCount(0);
+  await expect(page.getByTestId('readout-bar')).toHaveCount(1);
+  await expect(page.locator('.pp-axis')).toHaveCount(1);
+  await expect(page.locator('.pp-deck .pp-deck__cell')).toHaveCount(4);
+  await expect(page.locator('.pp-bench .pp-stage')).toHaveCount(9); // 1 primary + 1 + 3 + 2 + 2
+
+  const plot = page.locator('.pp-bench__primary .pp-stage__plot');
+  const box = (await plot.boundingBox())!;
+  await page.mouse.move(box.x + box.width * 0.5, box.y + box.height * 0.5);
+  await expect(page.getByTestId('readout-bar')).toHaveAttribute('data-state', 'scrub');
+
+  // every stage shows a crosshair; no floating black boxes anywhere
+  await expect(page.locator('.pp-bench .pp-cross')).toHaveCount(9);
+  const overlaps = await page.$$eval('.pp-bench .pp-stage', els =>
+    els.filter(e => e.querySelectorAll('path.pp-area').length > 1).length);
+  expect(overlaps).toBe(0);
+});
+
+test('Player events: shows the online roster player, never "Waiting"', async ({ page }) => {
+  await page.goto('/overview');
+  await page.getByRole('tab', { name: 'Player events' }).click();
+  await expect(page.getByTestId('player-events')).not.toContainText('Waiting for events');
+  await expect(page.getByTestId('player-events').locator('li').first()).toBeVisible();
+});
+```
+
+### 7.2 Visual checklist (screenshot at 1555×916 and 1280×800)
+
+- Studio: clicking each of the 5 ribbon cards visibly replaces the chart. Y-axis, colour and budget line change per signal. No `STAGE 0x` labels.
+- `/performance`: primary stage on top, 2×2 deck beneath, hairline dividers only (no card shadows inside the deck), exactly one row of clock labels.
+- Hover: a vertical line appears in all 9 stages at the same X, and the readout bar updates. No black floating boxes. Nothing clips across borders.
+- MSPT budget (50 ms) is **off-scale** at normal load, so the chip `▲ 50 ms budget · off scale` appears instead of a squashed line.
+- Memory lanes: 3 lanes on one shared scale; heights are comparable; no fill overlaps another fill.
+- Player events with `ZpkDxGames` online shows at least an `● ZpkDxGames is online` row, plus real join/command/advancement/death rows as they stream in.
+
+### 7.3 Definition of done
+
+1. `tsc --noEmit`, `eslint`, `vitest run`, `playwright test e2e/telemetry.spec.ts` all green.
+2. `grep -rn "pp-chart-readout" src/` returns nothing.
+3. `grep -rn "players.history.view" src/` appears only on the "Load earlier" path.
+4. No file in `src/telemetry` has a `series: SeriesSpec[]` prop on a stage.
+5. PR description lists deleted components and the before/after screenshots.

@@ -16,8 +16,8 @@ export async function polishChecks(browser, base, out) {
   const p = await c.newPage(),
     errors = [];
   p.on("pageerror", (e) => errors.push(e.message));
-  const go = async (route) => {
-    await p.goto(`${base}/${route}?fixture=structural`);
+  const go = async (route, fixture = "structural") => {
+    await p.goto(`${base}/${route}?fixture=${fixture}`);
     await p.locator(".pp-shell").waitFor();
   };
   const select = async (label, value) => {
@@ -32,10 +32,8 @@ export async function polishChecks(browser, base, out) {
   await p.getByRole("tab", { name: "Memory tiers", exact: true }).click();
   await p.getByRole("tab", { name: /^Committed/ }).click();
   await p.getByRole("tab", { name: "Player events", exact: true }).click();
-  await p
-    .getByRole("group", { name: "Severity", exact: true })
-    .getByRole("button", { name: "Warn", exact: true })
-    .click();
+  await p.getByRole("button", { name: "Deaths", exact: true }).click();
+  await p.getByRole("button", { name: "Split", exact: true }).click();
   await p.reload();
   await expect(
     p.getByRole("tab", { name: "Memory tiers", exact: true }),
@@ -53,10 +51,36 @@ export async function polishChecks(browser, base, out) {
       .getByRole("button", { name: "1m", exact: true }),
   ).toHaveAttribute("aria-pressed", "true");
   await expect(
-    p
-      .getByRole("group", { name: "Severity", exact: true })
-      .getByRole("button", { name: "Warn", exact: true }),
+    p.getByRole("button", { name: "Deaths", exact: true }),
   ).toHaveAttribute("aria-pressed", "true");
+  await expect(
+    p.getByRole("button", { name: "Split", exact: true }),
+  ).toHaveAttribute("aria-pressed", "true");
+  await p.getByRole("button", { name: "All", exact: true }).click();
+  await expect(p.getByTestId("player-events")).toContainText("ZpkDxGames");
+  await expect(p.getByTestId("player-events")).toContainText("is online");
+  await expect(p.getByTestId("player-events")).toContainText("Stone Age");
+  await expect(p.getByTestId("player-events")).toContainText(
+    "fell from a high place",
+  );
+  await expect(p.getByTestId("player-events")).not.toContainText(
+    "168.194.144.215",
+  );
+  await p.screenshot({
+    path: `${out}/states/player-events-v53.png`,
+    fullPage: true,
+  });
+  const retainedEvents = await p
+    .getByTestId("player-events")
+    .locator("li")
+    .count();
+  await p.getByRole("link", { name: "Performance", exact: true }).click();
+  await expect(p.locator(".pp-bench")).toBeVisible();
+  await p.getByRole("link", { name: "Overview", exact: true }).click();
+  await expect(p.getByTestId("player-events").locator("li")).toHaveCount(
+    retainedEvents,
+  );
+  await expect(p.getByTestId("player-events")).toContainText("Stone Age");
   await go("performance");
   await expect(
     p
@@ -74,29 +98,154 @@ export async function polishChecks(browser, base, out) {
       .getByRole("button", { name: "35m", exact: true }),
   ).toHaveAttribute("aria-pressed", "true");
   await p.getByRole("tab", { name: "Tick & MSPT", exact: true }).click();
-  assert.equal(await p.locator(".pp-studio [data-stage]").count(), 3);
-  const geometry = await p.locator(".pp-studio").evaluate((el) => {
-    const stages = [...el.querySelectorAll("[data-stage]")].map((g) => ({
-      top: Number(g.getAttribute("data-stage-top")),
-      bottom: Number(g.getAttribute("data-stage-bottom")),
-      paths: [...g.querySelectorAll("[data-area]")].map((p) => ({
-        key: p.getAttribute("data-area"),
-        y: p.getBBox().y,
-        bottom: p.getBBox().y + p.getBBox().height,
-      })),
+  await p.getByRole("button", { name: "Focus", exact: true }).click();
+  const geometry = [];
+  for (const key of ["tps", "mean", "p95", "p99", "gc"]) {
+    await p.getByTestId(`ribbon-${key}`).click();
+    await expect(p.getByTestId(`ribbon-${key}`)).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    await expect(p.locator(".pp-studio .pp-stage")).toHaveCount(1);
+    await expect(p.locator(".pp-studio .pp-stage")).toHaveAttribute(
+      "data-series",
+      key,
+    );
+    const stage = await p.locator(".pp-studio .pp-stage").evaluate((el) => ({
+      series: el.dataset.series,
+      areas: el.querySelectorAll("path.pp-area").length,
+      lines: el.querySelectorAll("path.pp-line").length,
+      bars: el.querySelectorAll("rect.pp-bar").length,
+      height: el.querySelector(".pp-stage__plot").getBoundingClientRect()
+        .height,
     }));
-    return stages;
+    assert.ok(stage.areas <= 1 && stage.lines <= 1);
+    assert.ok(Math.abs(stage.height - 300) < 0.1);
+    geometry.push(stage);
+    if (key === "mean")
+      await expect(p.locator(".pp-studio line.pp-budget")).toHaveCount(1);
+  }
+  await p.getByTestId("ribbon-tps").focus();
+  await p.keyboard.press("ArrowRight");
+  await expect(p.getByTestId("ribbon-mean")).toBeFocused();
+  await p.keyboard.press("End");
+  await expect(p.getByTestId("ribbon-gc")).toBeFocused();
+  await p.keyboard.press("Home");
+  await expect(p.getByTestId("ribbon-tps")).toBeFocused();
+  await p.screenshot({
+    path: `${out}/states/focus-tps-v53.png`,
+    fullPage: true,
   });
-  for (const stage of geometry)
-    for (const path of stage.paths)
-      assert.ok(
-        path.y >= stage.top - 1 && path.bottom <= stage.bottom + 1,
-        `${path.key} stays in stage`,
-      );
-  await p.screenshot({ path: `${out}/states/staged-tick-v52.png` });
+  await p.getByRole("button", { name: "Split", exact: true }).click();
+  await expect(p.locator(".pp-studio .pp-stage")).toHaveCount(5);
+  const split = await p.locator(".pp-studio .pp-stage").evaluateAll((els) =>
+    els.map((el) => ({
+      areas: el.querySelectorAll("path.pp-area").length,
+      height: el.querySelector(".pp-stage__plot").getBoundingClientRect()
+        .height,
+    })),
+  );
+  assert.ok(split.every((s) => s.areas <= 1 && Math.abs(s.height - 110) < 0.1));
+  await p.locator('.pp-studio .pp-stage[data-series="p99"] button').click();
+  await expect(p.getByTestId("ribbon-p99")).toHaveAttribute(
+    "aria-selected",
+    "true",
+  );
+  await p.screenshot({
+    path: `${out}/states/split-tick-v53.png`,
+    fullPage: true,
+  });
+  await p.getByRole("tab", { name: "Memory tiers", exact: true }).click();
+  await expect(p.locator(".pp-studio .pp-stage")).toHaveCount(3);
+  const scales = await p
+    .locator(".pp-studio .pp-stage__svg")
+    .evaluateAll((els) =>
+      els.map((el) => el.getAttribute("aria-label").split("scale ")[1]),
+    );
+  assert.equal(new Set(scales).size, 1);
   await p.getByRole("tab", { name: "CPU & chunks", exact: true }).click();
-  assert.equal(await p.locator(".pp-studio [data-stage]").count(), 2);
-  await p.screenshot({ path: `${out}/states/staged-cpu-v52.png` });
+  await expect(p.locator(".pp-studio .pp-stage")).toHaveCount(4);
+  await go("performance");
+  await expect(p.getByTestId("readout-bar")).toHaveCount(1);
+  await expect(p.locator(".pp-axis")).toHaveCount(1);
+  await expect(p.locator(".pp-bench .pp-deck__cell")).toHaveCount(4);
+  await expect(p.locator(".pp-bench .pp-stage")).toHaveCount(9);
+  await p.getByRole("tab", { name: "Tick & MSPT", exact: true }).click();
+  const plot = p.locator(".pp-bench__primary .pp-stage__plot");
+  await plot.scrollIntoViewIfNeeded();
+  const box = await plot.boundingBox();
+  await p.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await expect(p.getByTestId("readout-bar")).toHaveAttribute(
+    "data-state",
+    "scrub",
+  );
+  await expect(p.locator(".pp-bench .pp-cross")).toHaveCount(9);
+  const overlaps = await p
+    .locator(".pp-bench .pp-stage")
+    .evaluateAll(
+      (els) =>
+        els.filter(
+          (el) =>
+            el.querySelectorAll("path.pp-area").length > 1 ||
+            el.querySelectorAll("path.pp-line").length > 1,
+        ).length,
+    );
+  assert.equal(overlaps, 0);
+  await p.screenshot({
+    path: `${out}/states/workbench-scrub-v53.png`,
+    fullPage: true,
+  });
+  await p.mouse.move(1, 1);
+  await p.getByRole("button", { name: "Pause analyzer", exact: true }).click();
+  const before = await p.locator(".pp-bench .pp-axis").textContent();
+  await p.waitForTimeout(1100);
+  assert.equal(await p.locator(".pp-bench .pp-axis").textContent(), before);
+  await p.getByRole("button", { name: "Resume analyzer", exact: true }).click();
+  await p
+    .getByRole("button", { name: "Open raw samples", exact: true })
+    .click();
+  await expect(p.getByRole("dialog")).toContainText("Export CSV");
+  await p
+    .getByRole("button", { name: "Close raw samples", exact: true })
+    .click();
+  for (const size of [
+    { width: 1555, height: 916 },
+    { width: 1280, height: 800 },
+  ]) {
+    await p.setViewportSize(size);
+    await p.screenshot({
+      path: `${out}/states/workbench-${size.width}-v53.png`,
+      fullPage: true,
+    });
+    await go("overview");
+    await p.getByRole("button", { name: "Focus", exact: true }).click();
+    await p.screenshot({
+      path: `${out}/states/studio-${size.width}-v53.png`,
+      fullPage: true,
+    });
+    await go("performance");
+  }
+  await p.setViewportSize({ width: 1545, height: 911 });
+  await go("overview", "normal-load");
+  await p.getByRole("tab", { name: "Tick & MSPT", exact: true }).click();
+  await p.getByTestId("ribbon-mean").click();
+  await expect(p.locator(".pp-studio .pp-stage__chip")).toContainText(
+    "50 ms budget · off scale",
+  );
+  await expect(p.locator(".pp-studio line.pp-budget")).toHaveCount(0);
+  await p
+    .locator(".pp-studio")
+    .screenshot({ path: `${out}/states/normal-load-budget-v53.png` });
+  await go("overview", "roster-events");
+  await p.getByRole("tab", { name: "Player events", exact: true }).click();
+  await expect(p.getByTestId("player-events")).toContainText("ZpkDxGames");
+  await expect(p.getByTestId("player-events")).toContainText("is online");
+  await expect(
+    p.getByRole("button", { name: "Load earlier player events" }),
+  ).toHaveCount(0);
+  await p
+    .getByTestId("player-events")
+    .screenshot({ path: `${out}/states/roster-without-history-scope-v53.png` });
   await go("console");
   await p.getByRole("tab", { name: "Chat", exact: true }).click();
   await p
@@ -134,10 +283,19 @@ export async function polishChecks(browser, base, out) {
     p.getByRole("button", { name: ".*", exact: true }),
   ).toHaveAttribute("aria-pressed", "false");
   await go("players");
-  await p.getByRole("button", { name: "All", exact: true }).click();
+  await p
+    .locator(".pp-roster-list")
+    .locator("..")
+    .getByRole("button", { name: "All", exact: true })
+    .first()
+    .click();
   await p.reload();
   await expect(
-    p.getByRole("button", { name: "All", exact: true }),
+    p
+      .locator(".pp-roster-list")
+      .locator("..")
+      .getByRole("button", { name: "All", exact: true })
+      .first(),
   ).toHaveAttribute("aria-pressed", "true");
   await go("backups");
   await select("Player warning countdown", "15 min warning");
@@ -177,7 +335,7 @@ export async function polishChecks(browser, base, out) {
     await trigger.click();
     const violations = (await new AxeBuilder({ page: p }).analyze()).violations;
     assert.deepEqual(violations, [], `${theme} select accessibility`);
-    await p.screenshot({ path: `${out}/states/select-${theme}-v52.png` });
+    await p.screenshot({ path: `${out}/states/select-${theme}-v53.png` });
     await p.keyboard.press("Escape");
     await expect(trigger).toBeFocused();
   }
@@ -198,7 +356,18 @@ export async function polishChecks(browser, base, out) {
     keyboardListbox: true,
     selectAxeThemes: 2,
     stageGeometry: geometry,
-    storageKeys: 12,
+    playerEvents: true,
+    sharedWorkbenchCrosshair: 9,
+    storageKeys: 14,
     pageErrors: errors,
   };
+}
+
+if (
+  process.argv[1] &&
+  (await import("node:path")).resolve(process.argv[1]) ===
+    (await import("node:url")).fileURLToPath(import.meta.url)
+) {
+  const { runPolish } = await import("./polish-runner.mjs");
+  await runPolish(polishChecks);
 }
