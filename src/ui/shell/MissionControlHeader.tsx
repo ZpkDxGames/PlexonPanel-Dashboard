@@ -1,3 +1,10 @@
+"use client";
+import { useState } from "react";
+import { createPortal } from "react-dom";
+import { useRouter } from "next/navigation";
+import { useMaintenanceCountdown, formatMmSs } from "../bindings/maintenance";
+import { deriveCreateGate } from "../bindings/backups-model";
+import { record } from "../bindings";
 import { Play, RotateCw, Square, ArchiveRestore, Search } from "lucide-react";
 import {
   session,
@@ -76,6 +83,53 @@ export function AuthorityLedgerPill() {
   );
 }
 export function PowerAndBackupGroup({ phase }: { phase: Phase }) {
+  const d = useMaintenanceCountdown(),
+    router = useRouter(),
+    [pending, setPending] = useState(false),
+    [error, setError] = useState("");
+  const full = record(record(d.config.data.settings).fullRestorePoint),
+    gate = deriveCreateGate({
+      jobBusy: d.jobBusy,
+      preflight: d.preflight,
+      mode: "AUTO",
+      allowLocalFallback: full.allowLocalFallback === true,
+    }),
+    reason =
+      d.recoveryRequired || d.preflight?.recoveryRequired
+        ? "Host recovery gate is active — resolve on Backups page."
+        : session.reason("backup.create", "HOST") ||
+          (d.preflightBusy
+            ? "Waiting for current Host preflight."
+            : gate.blocked
+              ? `${gate.code}: ${gate.title}${gate.resolution === "SWITCH_TO_LOCAL" ? " Open Backups to use Local VPS only." : ""}`
+              : "");
+  const quick = (
+    <button
+      className="pp-ctl pp-quick"
+      aria-label="Quick Backup"
+      aria-disabled={!!reason || pending || undefined}
+      onClick={() => {
+        if (reason) {
+          router.push("/backups");
+          return;
+        }
+        if (pending) return;
+        setPending(true);
+        setError("");
+        void d
+          .invoke("backup.create", {
+            countdownSeconds: 300,
+            destinationMode: "AUTO",
+          })
+          .then(() => d.refresh())
+          .catch((e) => setError((e as Error).message))
+          .finally(() => setPending(false));
+      }}
+    >
+      <ArchiveRestore size={14} aria-hidden />
+      <span>Quick Backup</span>
+    </button>
+  );
   return (
     <div className="pp-power-group">
       <div className="pp-power" role="group" aria-label="Server power">
@@ -106,19 +160,28 @@ export function PowerAndBackupGroup({ phase }: { phase: Phase }) {
           foreground={phase === "online"}
         />
       </div>
-      <MutationButton
-        action="backup.create"
-        label="Quick Backup"
-        icon={ArchiveRestore}
-        args={{ countdownSeconds: 300 }}
-        className="pp-quick"
-      />
+      {reason ? <Tooltip content={reason}>{quick}</Tooltip> : quick}
+      {error &&
+        createPortal(
+          <div role="alert" className="pp-glass pp-toast">
+            {error}
+            <button
+              className="pp-ctl"
+              aria-label="Dismiss backup error"
+              onClick={() => setError("")}
+            >
+              ×
+            </button>
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }
 export function MissionControlHeader({ onPalette }: { onPalette: () => void }) {
   const s = useActiveServer(),
-    servers = useServers();
+    servers = useServers(),
+    countdown = useMaintenanceCountdown();
   return (
     <header className="pp-ribbon-bar" role="banner">
       <PpSelect
@@ -169,6 +232,30 @@ export function MissionControlHeader({ onPalette }: { onPalette: () => void }) {
         <Search size={14} />
         <kbd className="pp-kbd">⌘K</kbd>
       </button>
+      {countdown.countdownState === "ACTIVE" &&
+        countdown.remainingSeconds !== null && (
+          <span
+            className="pp-countdown-pill"
+            role="timer"
+            aria-live="off"
+            data-testid="countdown-pill"
+            data-kind={countdown.countdownKind ?? undefined}
+            aria-label={`${countdown.countdownKind === "RESTART" ? "Restart" : countdown.countdownKind === "STOP" ? "Stop" : "Backup"} in ${formatMmSs(countdown.remainingSeconds)}`}
+          >
+            <span aria-hidden="true">⟳</span>
+            <span className="pp-countdown-pill__label">
+              {countdown.countdownKind === "RESTART"
+                ? "Restart"
+                : countdown.countdownKind === "STOP"
+                  ? "Stop"
+                  : "Backup"}{" "}
+              in
+            </span>
+            <span className="pp-countdown-pill__time">
+              {formatMmSs(countdown.remainingSeconds)}
+            </span>
+          </span>
+        )}
       <PowerAndBackupGroup phase={s.phase} />
     </header>
   );

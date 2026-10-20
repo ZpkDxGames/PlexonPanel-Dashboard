@@ -25,3 +25,4 @@ export { reviewPolicy } from "../../presentation/review-policy";
 export { SCOPES } from "../../adapter/scopes";
 export { validateMaintenance } from "../../adapter/maintenance";
 export type { MaintenanceSettings } from "../../adapter/maintenance";
+export type { ActionCompletion } from "../../adapter/data-source";

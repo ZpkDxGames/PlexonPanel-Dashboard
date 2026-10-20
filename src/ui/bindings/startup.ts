@@ -5,9 +5,12 @@ export function startSession() {
   startup = (async () => {
     if (process.env.NODE_ENV === "development") {
       const mode = new URL(location.href).searchParams.get("fixture");
+      const { DURABILITY_FIXTURES, durabilityFixture } =
+        await import("../fixtures/durability");
       if (
         mode &&
         [
+          ...DURABILITY_FIXTURES,
           "healthy",
           "stale",
           "skew",
@@ -30,6 +33,7 @@ export function startSession() {
         setFixtureMode(mode);
         const s = makeFixture(
           [
+            ...DURABILITY_FIXTURES,
             "structural",
             "normal-load",
             "roster-events",
@@ -44,6 +48,7 @@ export function startSession() {
         );
         if (
           [
+            ...DURABILITY_FIXTURES,
             "structural",
             "normal-load",
             "roster-events",
@@ -153,6 +158,16 @@ export function startSession() {
             (scope) =>
               !scope.startsWith("console.") && scope !== "players.history.view",
           );
+        if (mode === "overview-one-player") {
+          s.players[0] = { ...s.players[0], name: "NEGUINCOMCEROL" };
+          s.console.push({
+            id: "inspect-event",
+            content: "neguincomcerol joined the game",
+            level: "INFO",
+            capturedAt: new Date().toISOString(),
+          });
+        }
+        const handle = durabilityFixture(mode, fixtureAction);
         session.installFixture(mode, s, async (action, args) => {
           if (action === "backup.full.restore.prepare")
             return {
@@ -167,7 +182,7 @@ export function startSession() {
                 expiresInSeconds: 60,
               },
             };
-          return fixtureAction(action, args);
+          return handle(action, args);
         });
         return;
       }

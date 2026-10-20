@@ -10,9 +10,11 @@ import {
 import { TelemetryStudio } from "../studio/TelemetryStudio";
 import { Tabs } from "../primitives/Tabs";
 import { LiveConsole } from "../console/LiveConsole";
+import { usePlayerInspect } from "../bindings/usePlayerInspect";
 import { PlayerEventsDock } from "../players/PlayerEventsDock";
 export default function Overview() {
-  const r = useRoster(),
+  const inspect = usePlayerInspect(),
+    r = useRoster(),
     prefs = usePrefs(),
     sync = useViewSync(),
     channel = sync.dockFeed,
@@ -80,10 +82,17 @@ export default function Overview() {
           </header>
           <div style={{ maxHeight: 205, overflow: "auto" }}>
             {r.players.slice(0, 6).map((p) => (
-              <Link
-                href="/players"
+              <button
+                type="button"
                 key={String(p.uuid)}
-                className="pp-list-row"
+                className="pp-list-row pp-row--interactive"
+                aria-label={`Inspect ${p.name}`}
+                onClick={() =>
+                  inspect({
+                    uuid: typeof p.uuid === "string" ? p.uuid : null,
+                    name: String(p.name ?? ""),
+                  })
+                }
               >
                 <PlayerHead
                   uuid={String(p.uuid)}
@@ -100,7 +109,7 @@ export default function Overview() {
                 <span className="faint pp-num" style={{ fontSize: 10 }}>
                   {duration(p.onlineDurationMillis)}
                 </span>
-              </Link>
+              </button>
             ))}
             {!r.players.length && (
               <div className="pp-empty">No players in the current roster</div>

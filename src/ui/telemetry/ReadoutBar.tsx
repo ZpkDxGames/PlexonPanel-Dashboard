@@ -45,8 +45,12 @@ export function ReadoutBar({ samples }: { samples: Sample[] }) {
                     : null;
             return (
               <span key={key} className="pp-readout-bar__kv">
-                <em>
-                  {spec.label.replace(" MSPT", "").replace(" pauses Δ", " Δ")}
+                <em title={spec.label} aria-label={spec.label}>
+                  {key === "chunks"
+                    ? "Chunks"
+                    : spec.label
+                        .replace(" MSPT", "")
+                        .replace(" pauses Δ", " Δ")}
                 </em>
                 <b style={{ color: spec.color }}>{spec.fmt(value)}</b>
                 <small>{spec.unit}</small>

@@ -22,6 +22,7 @@ import { Tabs } from "../primitives/Tabs";
 import { MutationButton } from "../primitives/MutationButton";
 import { useReview } from "../primitives/ReviewProvider";
 import { QueryState } from "./shared";
+import { matchesSelection, toSelectionKey } from "../bindings/player-selection";
 import { PlayerEventsDock } from "../players/PlayerEventsDock";
 export function Inspector({ uuid }: { uuid: string }) {
   const { state: s } = useControl(),
@@ -243,7 +244,8 @@ function Timeline({ events }: { events: JsonMap[] }) {
   );
 }
 export default function Players() {
-  const [narrow, setNarrow] = useState(false);
+  const [narrow, setNarrow] = useState(false),
+    appliedSelection = useRef("");
   useEffect(() => {
     const q = matchMedia("(max-width:1280px)"),
       apply = () => setNarrow(q.matches);
@@ -272,6 +274,20 @@ export default function Players() {
       estimateSize: () => 44,
       overscan: 10,
     });
+  useEffect(() => {
+    const key = sync.selectedPlayerUuid;
+    if (!key || appliedSelection.current === key) return;
+    const index = players.findIndex((p) =>
+      matchesSelection(
+        { uuid: String(p.uuid ?? ""), name: String(p.name ?? "") },
+        key,
+      ),
+    );
+    if (index < 0) return;
+    appliedSelection.current = key;
+    setUuid(String(players[index].uuid));
+    v.scrollToIndex(index, { align: "center" });
+  }, [sync.selectedPlayerUuid, players, v]);
   return (
     <div className="pp-players">
       <section className="pp-pane">
@@ -309,7 +325,15 @@ export default function Players() {
                       right: 0,
                     }}
                     aria-pressed={uuid === p.uuid}
-                    onClick={() => setUuid(String(p.uuid))}
+                    onClick={() => {
+                      const key = toSelectionKey({
+                        uuid: String(p.uuid),
+                        name: String(p.name),
+                      });
+                      appliedSelection.current = key;
+                      sync.patch({ selectedPlayerUuid: key });
+                      setUuid(String(p.uuid));
+                    }}
                   >
                     <PlayerHead
                       uuid={String(p.uuid)}
@@ -336,8 +360,11 @@ export default function Players() {
               className="pad"
               onSubmit={(e) => {
                 e.preventDefault();
-                if (/^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(search))
+                if (/^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(search)) {
                   setUuid(search);
+                  sync.patch({ selectedPlayerUuid: search.toLowerCase() });
+                  appliedSelection.current = search.toLowerCase();
+                }
               }}
             >
               <small className="muted">
@@ -357,7 +384,7 @@ export default function Players() {
         </div>
         <PlayerEventsDock />
       </section>
-      <section className="pp-pane pp-inspector">
+      <section className="pp-pane pp-inspector" data-testid="player-inspector">
         {uuid ? (
           <Inspector key={uuid} uuid={uuid} />
         ) : (
@@ -369,7 +396,11 @@ export default function Players() {
       <Dialog.Root
         open={!!uuid && narrow}
         onOpenChange={(open) => {
-          if (!open) setUuid(null);
+          if (!open) {
+            setUuid(null);
+            sync.patch({ selectedPlayerUuid: "" });
+            appliedSelection.current = "";
+          }
         }}
       >
         <Dialog.Portal>

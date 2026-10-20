@@ -2383,15 +2383,20 @@ button.pp-stage__head {
 }
 .pp-readout-bar {
   display: flex;
-  align-items: center;
-  gap: 8px;
+  align-items: baseline;
+  flex-wrap: wrap;
+  column-gap: 14px;
+  row-gap: 4px;
   position: sticky;
   top: 0;
   z-index: 4;
-  height: 38px;
-  padding: 0 14px;
-  white-space: nowrap;
-  overflow-x: auto;
+  height: auto;
+  min-height: 38px;
+  min-width: 0;
+  max-width: 100%;
+  padding: 8px 14px;
+  white-space: normal;
+  overflow: visible;
   scrollbar-width: none;
   border-bottom: 1px solid rgb(var(--line) / 0.1);
   background: rgb(var(--well) / 0.97);
@@ -2655,4 +2660,482 @@ button.pp-stage__head {
 .pp-deck__lanes .pp-stage__head {
   min-height: 20px;
   padding-top: 4px;
+}
+
+.pp-readout-bar > * {
+  min-width: 0;
+  white-space: nowrap;
+  flex: 0 0 auto;
+}
+
+/* ═════ v6.0 · Obsidian Durability Workbench ═════════════════════════════ */
+.pp-durability {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.pp-durability__head {
+  height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px;
+  border-bottom: 1px solid rgb(var(--line) / 0.08);
+}
+.pp-durability__spacer {
+  flex: 1 1 auto;
+}
+
+/* status dot — NOT a badge; never counted by the badge-budget checks */
+.pp-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  font:
+    600 11px/1.2 "JetBrains Mono Variable",
+    monospace;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgb(var(--muted));
+}
+.pp-state::before {
+  content: "";
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.pp-state[data-tone="ok"] {
+  color: rgb(var(--emerald));
+}
+.pp-state[data-tone="warn"] {
+  color: rgb(var(--amber));
+}
+.pp-state[data-tone="bad"] {
+  color: rgb(var(--rose));
+}
+
+/* recovery band — flush, square, hairlines; 2px left accent only */
+.pp-gate-band {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 16px;
+  border: 0;
+  border-radius: 0;
+  border-bottom: 1px solid rgb(var(--line) / 0.08);
+  border-left: 2px solid rgb(var(--amber));
+  background: color-mix(in srgb, rgb(var(--amber)) 7%, transparent);
+}
+.pp-gate-band__text {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  font-size: 12px;
+}
+.pp-gate-band__sub {
+  color: rgb(var(--muted));
+}
+
+/* 14-stage rail: reuse the existing node markup/classes if the invariants flag these nodes */
+.pp-backup-rail {
+  list-style: none;
+  margin: 0;
+  padding: 18px 16px 8px;
+  display: flex;
+  align-items: center;
+}
+.pp-backup-rail > li {
+  flex: 1 1 0;
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+.pp-backup-rail > li + li::before {
+  content: "";
+  position: absolute;
+  left: -50%;
+  right: 50%;
+  top: 50%;
+  height: 1px;
+  background: rgb(var(--line) / 0.12);
+}
+.pp-backup-rail > li[data-state="done"]::before,
+.pp-backup-rail > li[data-state="current"]::before {
+  background: rgb(var(--accent));
+}
+.pp-pipeline__stage {
+  position: relative;
+  z-index: 1;
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid rgb(var(--line) / 0.16);
+  background: rgb(var(--surface-1));
+  font:
+    600 10px/1 "JetBrains Mono Variable",
+    monospace;
+  color: rgb(var(--muted));
+}
+.pp-backup-rail > li[data-state="done"] .pp-pipeline__stage {
+  color: rgb(var(--emerald));
+  border-color: currentColor;
+}
+.pp-backup-rail > li[data-state="current"] .pp-pipeline__stage {
+  color: rgb(var(--accent));
+  border-color: currentColor;
+}
+.pp-backup-rail > li[data-state="failed"] .pp-pipeline__stage {
+  color: rgb(var(--rose));
+  border-color: currentColor;
+}
+.pp-backup-rail > li[data-state="skipped"] .pp-pipeline__stage {
+  opacity: 0.45;
+  border-style: dashed;
+}
+.pp-rail__caption {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  padding: 4px 16px 14px;
+  font-size: 12px;
+  color: rgb(var(--muted));
+}
+
+/* 4-cell preflight ribbon — hairline-separated, zero radius */
+.pp-durability .pp-ribbon {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border-top: 1px solid rgb(var(--line) / 0.08);
+}
+.pp-durability .pp-ribbon__cell {
+  display: grid;
+  align-content: start;
+  gap: 4px;
+  min-width: 0;
+  padding: 12px 16px;
+  border: 0;
+  border-radius: 0;
+  border-right: 1px solid rgb(var(--line) / 0.08);
+}
+.pp-durability .pp-ribbon__cell:last-child {
+  border-right: 0;
+}
+.pp-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@media (max-width: 1100px) {
+  .pp-durability .pp-ribbon {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .pp-durability .pp-ribbon__cell:nth-child(2) {
+    border-right: 0;
+  }
+  .pp-durability .pp-ribbon__cell:nth-child(n + 3) {
+    border-top: 1px solid rgb(var(--line) / 0.08);
+  }
+}
+@media (max-width: 640px) {
+  .pp-durability .pp-ribbon {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .pp-durability .pp-ribbon__cell {
+    border-right: 0;
+  }
+  .pp-durability .pp-ribbon__cell + .pp-ribbon__cell {
+    border-top: 1px solid rgb(var(--line) / 0.08);
+  }
+}
+
+/* 2-cell execution deck — action row pinned to the bottom, can never overlap the footer */
+.pp-deck--exec {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.pp-deck--exec .pp-deck__cell {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  row-gap: 12px;
+  min-height: 176px;
+  min-width: 0;
+  padding: 16px;
+  border: 0;
+  border-radius: 0;
+}
+.pp-deck--exec .pp-deck__cell + .pp-deck__cell {
+  border-left: 1px solid rgb(var(--line) / 0.08);
+}
+.pp-deck__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 12px 16px;
+}
+.pp-deck__actions {
+  align-self: end;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+@media (max-width: 860px) {
+  .pp-deck--exec {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .pp-deck--exec .pp-deck__cell + .pp-deck__cell {
+    border-left: 0;
+    border-top: 1px solid rgb(var(--line) / 0.08);
+  }
+}
+
+/* ledger */
+.pp-table__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+/* weekday pills (inside the Dialog) */
+.pp-wk {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+}
+.pp-wk__pill {
+  height: 30px;
+  border: 1px solid rgb(var(--line) / 0.12);
+  border-radius: 6px;
+  background: transparent;
+  color: rgb(var(--muted));
+  font:
+    600 11px/1 "JetBrains Mono Variable",
+    monospace;
+  cursor: pointer;
+}
+.pp-wk__pill[aria-pressed="true"] {
+  color: rgb(var(--accent));
+  border-color: currentColor;
+  background: color-mix(in srgb, currentColor 10%, transparent);
+}
+.pp-wk__pill:focus-visible {
+  outline: 2px solid rgb(var(--accent));
+  outline-offset: 2px;
+}
+
+.pp-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* Adapt the existing pipeline markup without changing the navigation rail. */
+.pp-durability__head {
+  flex: none;
+  min-height: 44px;
+}
+.pp-durability__head h2 {
+  font-size: 12px;
+  margin: 0;
+  white-space: nowrap;
+}
+.pp-durability__head .pp-ctl {
+  font-size: 11px;
+  padding: 0 8px;
+}
+.pp-durability .pp-backup-rail {
+  flex-direction: row;
+  width: auto;
+  border: 0;
+  gap: 0;
+  background: transparent;
+}
+.pp-durability .pp-backup-rail > li {
+  display: flex;
+}
+.pp-durability .pp-backup-rail > li::after {
+  display: none;
+}
+.pp-durability .pp-pipeline__stage {
+  border: 0;
+  outline: 1px solid currentColor;
+}
+.pp-durability .pp-backup-rail > li[data-state="skipped"] .pp-pipeline__stage {
+  outline-style: dashed;
+}
+.pp-durability .pp-rail__caption {
+  overflow-wrap: anywhere;
+}
+.pp-durability .pp-ribbon {
+  border-bottom: 0;
+}
+.pp-durability .pp-ribbon__cell + .pp-ribbon__cell {
+  border-left: 0;
+}
+.pp-durability .pp-ribbon__cell .pp-state {
+  line-height: 1.5;
+}
+.pp-durability .pp-ribbon__cell small {
+  font-size: 10px;
+  line-height: 1.5;
+}
+.pp-durability__notice {
+  padding: 10px 16px;
+  font-size: 12px;
+  color: rgb(var(--amber));
+  background: rgb(var(--amber) / 0.05);
+  overflow-wrap: anywhere;
+}
+.pp-deck--exec {
+  gap: 0;
+}
+.pp-deck--exec .pp-field,
+.pp-schedule-dialog .pp-field {
+  display: grid;
+  gap: 8px;
+  font-size: 11px;
+  min-width: 0;
+}
+.pp-deck--exec .pp-deck__controls {
+  align-content: start;
+}
+.pp-deck--exec .pp-seg button {
+  font-size: 10px;
+  padding: 0 9px;
+}
+.pp-schedule-dialog .pp-form {
+  display: grid;
+  gap: 18px;
+}
+.pp-table__actions .pp-ctl {
+  font-size: 10px;
+  padding: 0 8px;
+}
+.pp-countdown-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 24px;
+  padding: 0 10px;
+  flex: none;
+  border: 1px solid rgb(var(--amber) / 0.45);
+  border-radius: 999px;
+  color: rgb(var(--amber));
+  background: rgb(var(--amber) / 0.08);
+  font:
+    600 11px/1 "JetBrains Mono Variable",
+    monospace;
+  letter-spacing: 0.04em;
+  animation: pp-countdown-pulse 1.6s ease-in-out infinite;
+}
+.pp-countdown-pill__time {
+  font-variant-numeric: tabular-nums;
+}
+@keyframes pp-countdown-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.62;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pp-countdown-pill {
+    animation: none;
+  }
+}
+@media (max-width: 1100px) {
+  .pp-countdown-pill__label {
+    display: none;
+  }
+}
+.pp-row--interactive {
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+}
+.pp-row--interactive:hover {
+  background: rgb(var(--accent) / 0.06);
+}
+.pp-row--interactive:focus-visible {
+  outline: 2px solid rgb(var(--accent));
+  outline-offset: -2px;
+}
+@media (max-width: 760px) {
+  .pp-countdown-pill {
+    padding: 0 6px;
+    gap: 4px;
+    font-size: 10px;
+  }
+  .pp-ribbon-bar:has(.pp-countdown-pill) .pp-server-switch {
+    max-width: 100px;
+  }
+  .pp-durability__head {
+    gap: 6px;
+    padding: 0 10px;
+  }
+  .pp-durability__head h2 {
+    font-size: 11px;
+    white-space: normal;
+  }
+  .pp-durability__head h2 .muted,
+  .pp-durability__head > .pp-state {
+    display: none;
+  }
+  .pp-durability__head .pp-ctl {
+    font-size: 10px;
+    padding: 0 5px;
+  }
+  .pp-gate-band {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .pp-gate-band .pp-ctl {
+    white-space: normal;
+    height: auto;
+    min-height: 32px;
+  }
+  .pp-durability .pp-backup-rail {
+    padding: 14px 8px 8px;
+  }
+  .pp-durability .pp-pipeline__stage {
+    width: 19px;
+    height: 19px;
+    font-size: 9px;
+  }
+}
+
+/* Keep native list semantics while exposing each named event as a keyboard-operable row. */
+.pp-pe__list li.pp-pe__item {
+  display: block;
+  padding: 0;
+}
+.pp-pe__inspect {
+  display: grid;
+  grid-template-columns: 64px 18px minmax(0, 1fr);
+  gap: 8px;
+  align-items: baseline;
+  padding: 7px 14px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+}
+@media (max-width: 600px) {
+  .pp-pe__inspect {
+    grid-template-columns: 54px 12px minmax(0, 1fr);
+    gap: 5px;
+    padding: 7px 10px;
+  }
 }

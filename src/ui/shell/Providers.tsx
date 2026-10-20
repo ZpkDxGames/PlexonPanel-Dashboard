@@ -5,6 +5,7 @@ import { PreferencesBridge, useControl } from "../bindings";
 import { startSession } from "../bindings/startup";
 import { ReviewProvider } from "../primitives/ReviewProvider";
 import { AppShell } from "./AppShell";
+import { DurabilityProvider } from "../bindings/maintenance";
 export function Providers({ children }: { children: ReactNode }) {
   useEffect(() => {
     void startSession();
@@ -34,7 +35,9 @@ export function AuthBoundary({ children }: { children: ReactNode }) {
     );
   return (
     <ReviewProvider key={`${snap.revision}:${snap.state.serverId}`}>
-      <AppShell>{children}</AppShell>
+      <DurabilityProvider>
+        <AppShell>{children}</AppShell>
+      </DurabilityProvider>
     </ReviewProvider>
   );
 }

@@ -1,5 +1,6 @@
 "use client";
 import { usePrefs, useViewSync, useRoster, time } from "../bindings";
+import { usePlayerInspect } from "../bindings/usePlayerInspect";
 import { useBootHistory } from "./PlayerEventsFeeder";
 import { usePlayerEvents, type PlayerEventKind } from "./player-events";
 const FILTERS = [
@@ -18,7 +19,8 @@ const GLYPH: Record<PlayerEventKind, { icon: string; verb: string }> = {
   command: { icon: "/", verb: "ran" },
 };
 export function PlayerEventsDock() {
-  const boot = useBootHistory(),
+  const inspect = usePlayerInspect(),
+    boot = useBootHistory(),
     events = usePlayerEvents(boot.allowed ? boot.bootId : undefined),
     sync = useViewSync(),
     prefs = usePrefs(),
@@ -74,17 +76,32 @@ export function PlayerEventsDock() {
           aria-label="Current boot player events"
         >
           {shown.map((e) => (
-            <li key={e.id} data-kind={e.kind} data-source={e.source}>
-              <time dateTime={new Date(e.ts).toISOString()}>
-                {time(e.ts, prefs.timezone)}
-              </time>
-              <span className="pp-pe__icon" aria-hidden="true">
-                {GLYPH[e.kind].icon}
-              </span>
-              <span className="pp-pe__text">
-                <b>{e.player}</b> {GLYPH[e.kind].verb}
-                {e.detail && <code>{e.detail}</code>}
-              </span>
+            <li
+              key={e.id}
+              data-kind={e.kind}
+              data-source={e.source}
+              className="pp-pe__item"
+            >
+              <button
+                type="button"
+                className="pp-pe__inspect pp-row--interactive"
+                disabled={!e.player}
+                aria-label={e.player ? `Inspect ${e.player}` : undefined}
+                onClick={() => {
+                  if (e.player) inspect({ name: e.player });
+                }}
+              >
+                <time dateTime={new Date(e.ts).toISOString()}>
+                  {time(e.ts, prefs.timezone)}
+                </time>
+                <span className="pp-pe__icon" aria-hidden="true">
+                  {GLYPH[e.kind].icon}
+                </span>
+                <span className="pp-pe__text">
+                  <b>{e.player}</b> {GLYPH[e.kind].verb}
+                  {e.detail && <code>{e.detail}</code>}
+                </span>
+              </button>
             </li>
           ))}
         </ol>

@@ -79,8 +79,13 @@ export function validateViewSync(value: unknown): ViewSyncState {
     if (
       choices[key]?.includes(v) ||
       ((key === "ideWrap" || key === "ideRegex") && typeof v === "boolean") ||
-      (key === "selectedPlayerUuid" && typeof v === "string" && v.length <= 64 &&
-        (v === "" || /^(?:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|[0-9a-f]{32}|name:[a-z0-9_]{1,16})$/i.test(v))) ||
+      (key === "selectedPlayerUuid" &&
+        typeof v === "string" &&
+        v.length <= 64 &&
+        (v === "" ||
+          /^(?:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|[0-9a-f]{32}|name:[a-z0-9_]{1,16})$/i.test(
+            v,
+          ))) ||
       (key === "idePlugin" &&
         typeof v === "string" &&
         v.length <= 128 &&
