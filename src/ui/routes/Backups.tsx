@@ -353,6 +353,7 @@ export default function Backups() {
             >
               <span
                 className="pp-pipeline__stage"
+                role="img"
                 aria-label={`Stage ${s.index}: ${s.label}, ${s.state}`}
               >
                 {s.state === "done" ? <Check size={11} /> : s.index}

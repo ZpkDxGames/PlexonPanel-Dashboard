@@ -25,6 +25,8 @@ export async function durabilityChecks(browser, base, out) {
     readouts = [],
     headers = [],
     screens = [],
+    recoveryViews = [],
+    scheduleViews = [],
     errors = [];
   const mark = (name) => invariants[name]++;
   await fs.mkdir(out + "/states", { recursive: true });
@@ -76,6 +78,29 @@ export async function durabilityChecks(browser, base, out) {
     await expect(
       p.getByRole("button", { name: "Create full backup", exact: true }),
     ).toBeDisabled();
+    for (const [width, height] of [
+      [1545, 911],
+      [1280, 800],
+      [1920, 1080],
+      [390, 844],
+    ]) {
+      await p.setViewportSize({ width, height });
+      assert.equal(await p.locator(NATIVE).count(), 0);
+      assert.equal(await p.locator("p.gate-reason").count(), 0);
+      assert.deepEqual(
+        (await new AxeBuilder({ page: p }).analyze()).violations,
+        [],
+        `${theme} ${width} recovery axe`,
+      );
+      recoveryViews.push({
+        theme,
+        width,
+        height,
+        violations: 0,
+        nativeControls: 0,
+      });
+    }
+    await p.setViewportSize({ width: 1545, height: 911 });
     await p.screenshot({
       path: `${out}/states/v60-recovery-${theme}.png`,
       fullPage: true,
@@ -198,6 +223,35 @@ export async function durabilityChecks(browser, base, out) {
     mark("backupsNoNativeControls");
     let violations = (await new AxeBuilder({ page: p }).analyze()).violations;
     assert.deepEqual(violations, [], `${theme} schedule axe`);
+    scheduleViews.push({
+      theme,
+      width: 1545,
+      height: 911,
+      violations: 0,
+      nativeControls: 0,
+    });
+    for (const [width, height] of [
+      [1280, 800],
+      [1920, 1080],
+      [390, 844],
+    ]) {
+      await p.setViewportSize({ width, height });
+      assert.equal(await p.locator(NATIVE).count(), 0);
+      mark("backupsNoNativeControls");
+      assert.deepEqual(
+        (await new AxeBuilder({ page: p }).analyze()).violations,
+        [],
+        `${theme} ${width} schedule axe`,
+      );
+      scheduleViews.push({
+        theme,
+        width,
+        height,
+        violations: 0,
+        nativeControls: 0,
+      });
+    }
+    await p.setViewportSize({ width: 1545, height: 911 });
     await p.screenshot({
       path: `${out}/states/v60-schedule-${theme}.png`,
       fullPage: true,
@@ -255,6 +309,7 @@ export async function durabilityChecks(browser, base, out) {
       [1024, 800],
       [1280, 800],
       [1545, 911],
+      [1920, 1080],
       [390, 844],
     ]) {
       await p.setViewportSize({ width, height });
@@ -352,7 +407,7 @@ export async function durabilityChecks(browser, base, out) {
       0,
     );
     console.log(
-      `PASS v6 ${theme}: gates, schedule, readouts, 32 countdown headers, and player navigation`,
+      `PASS v6 ${theme}: gates, schedule, readouts, 40 countdown headers, and player navigation`,
     );
     await c.close();
   }
@@ -363,6 +418,7 @@ export async function durabilityChecks(browser, base, out) {
     readouts,
     headers,
     screens,
+    stateAccessibility: { recovery: recoveryViews, schedule: scheduleViews },
     errors,
     compatibility: {
       legacyHost: true,
