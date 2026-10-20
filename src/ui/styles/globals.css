@@ -932,7 +932,8 @@ small {
 .pp-seg button + button {
   border-left: 1px solid rgb(var(--line) / 0.12);
 }
-.pp-seg button[aria-pressed="true"] {
+.pp-seg button[aria-pressed="true"],
+.pp-seg button[role="radio"][aria-checked="true"] {
   background: rgb(var(--accent) / 0.13);
   color: rgb(var(--accent));
 }
@@ -3138,4 +3139,8 @@ button.pp-stage__head {
     gap: 5px;
     padding: 7px 10px;
   }
+}
+/* Destination radios retain the shared segment skin and accessible text contrast. */
+.pp-deck--exec .pp-seg button[role="radio"][aria-checked="true"] {
+  color: rgb(var(--text));
 }

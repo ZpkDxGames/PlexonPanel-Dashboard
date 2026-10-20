@@ -50,6 +50,7 @@ test("maintenance handles old countdown keys, missing and malformed values, reco
   assert.equal(s.remainingAtSnapshot, 300);
   assert.ok(s.jobBusy);
   assert.equal(remainingCountdown(normalizeMaintenance({}, 0), 4000), null);
+  assert.ok(normalizeMaintenance({ operationBusy: true }, 0).jobBusy);
   assert.ok(
     normalizeMaintenance({ jobRecoveryRequired: true }, 0).recoveryRequired,
   );

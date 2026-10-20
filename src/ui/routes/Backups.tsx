@@ -428,7 +428,45 @@ export default function Backups() {
                     key={m.value}
                     role="radio"
                     aria-checked={mode === m.value}
-                    aria-pressed={mode === m.value}
+                    data-mode={m.value}
+                    tabIndex={mode === m.value ? 0 : -1}
+                    onKeyDown={(event) => {
+                      if (
+                        ![
+                          "ArrowLeft",
+                          "ArrowRight",
+                          "ArrowUp",
+                          "ArrowDown",
+                          "Home",
+                          "End",
+                        ].includes(event.key)
+                      )
+                        return;
+                      event.preventDefault();
+                      const options = MODES.filter(
+                          (option) => !legacy || option.value === "AUTO",
+                        ),
+                        index = options.findIndex(
+                          (option) => option.value === mode,
+                        );
+                      const next =
+                        event.key === "Home"
+                          ? 0
+                          : event.key === "End"
+                            ? options.length - 1
+                            : (index +
+                                (["ArrowLeft", "ArrowUp"].includes(event.key)
+                                  ? -1
+                                  : 1) +
+                                options.length) %
+                              options.length;
+                      setMode(options[next].value);
+                      event.currentTarget.parentElement
+                        ?.querySelector<HTMLButtonElement>(
+                          `[data-mode="${options[next].value}"]`,
+                        )
+                        ?.focus();
+                    }}
                     disabled={legacy && m.value !== "AUTO"}
                     onClick={() => setMode(m.value)}
                   >

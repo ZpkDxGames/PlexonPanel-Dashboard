@@ -54,6 +54,7 @@ export function normalizeMaintenance(
     snapshotAt: nowPerf,
     jobBusy:
       active ||
+      r.operationBusy === true ||
       ![
         "",
         "IDLE",

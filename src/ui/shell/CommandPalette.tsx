@@ -45,7 +45,7 @@ export function CommandPalette({
           run: () =>
             void review(
               a.action,
-              a.action === "backup.create" ? { countdownSeconds: 300 } : {},
+              a.action === "backup.create" ? { countdownSeconds: 300, destinationMode: "AUTO" } : {},
             ),
         })),
     ],

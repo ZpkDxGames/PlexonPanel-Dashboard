@@ -1,10 +1,14 @@
 import { spawn } from "node:child_process";
 import { chromium } from "@playwright/test";
 import fs from "node:fs/promises";
-export async function runPolish(polishChecks) {
-  const out = process.env.EVIDENCE_DIR ?? "../evidence-v53",
+export async function runPolish(
+  polishChecks,
+  receiptName = "polish-v53-receipt.json",
+) {
+  const out = process.env.EVIDENCE_DIR ?? "../evidence-v60",
     base = "http://127.0.0.1:4182";
   await fs.mkdir(out + "/states", { recursive: true });
+  const log = await fs.open(out + "/polish-development-server.log", "w");
   const server = spawn(
     process.execPath,
     [
@@ -16,7 +20,7 @@ export async function runPolish(polishChecks) {
       "-p",
       "4182",
     ],
-    { stdio: "ignore" },
+    { stdio: ["ignore", log.fd, log.fd], detached: true },
   );
   let browser;
   try {
@@ -32,14 +36,17 @@ export async function runPolish(polishChecks) {
     });
     const receipt = await polishChecks(browser, base, out);
     await fs.writeFile(
-      out + "/polish-v53-receipt.json",
+      out + "/" + receiptName,
       JSON.stringify(receipt, null, 2),
     );
     console.log(
-      "PASS v5.3 selected signals, shared workbench, player events, selectors and persistence",
+      "PASS selected signals, workbench, player events, persistence and v6 durability checks",
     );
   } finally {
     await browser?.close();
-    server.kill();
+    try {
+      process.kill(-server.pid, "SIGTERM");
+    } catch {}
+    await log.close();
   }
 }

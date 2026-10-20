@@ -1,3 +1,4 @@
+import { durabilityChecks } from "./durability-checks.mjs";
 import assert from "node:assert/strict";
 import { expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
@@ -349,7 +350,9 @@ export async function polishChecks(browser, base, out) {
   assert.ok(!JSON.stringify(stored).includes("Hello players"));
   assert.deepEqual(errors, []);
   await c.close();
+  const durability = await durabilityChecks(browser, base, out);
   return {
+    durability,
     viewReloads: true,
     crossRouteHorizon: true,
     crossTabStorage: true,
@@ -358,7 +361,7 @@ export async function polishChecks(browser, base, out) {
     stageGeometry: geometry,
     playerEvents: true,
     sharedWorkbenchCrosshair: 9,
-    storageKeys: 14,
+    storageKeys: 15,
     pageErrors: errors,
   };
 }

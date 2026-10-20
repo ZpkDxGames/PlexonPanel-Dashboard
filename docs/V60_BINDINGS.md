@@ -52,3 +52,10 @@ The illustrative STOPPING_SERVER enum does not exist: it is a durable job phase 
 ## Execution notes
 
 The attached user prompt explicitly authorizes both main pushes and takes precedence over the playbook’s no-push guideline. Host first, Dashboard second. The optional automatic recovery reconciliation is not enabled. Production VPS service installation and real world/archive operations require access not present in this workspace; CI and fixture receipts must not be represented as a live staging Host smoke test.
+
+
+## UI adaptations pinned by browser checks
+
+The pipeline reuses `.pp-pipeline` with `.pp-backup-rail`; `.pp-rail` already names the navigation. The appended four-cell ribbon rules are scoped to `.pp-durability`, preserving the five-cell telemetry ribbons. Destination buttons reuse `.pp-seg`, with the native button radio role, checked state, roving focus and arrow/Home/End navigation. Player events retain native list items and use native buttons inside them; assigning a button role directly to a list item fails axe and is not retained. Unknown-selection tests exclude only Next’s built-in empty route-announcer alert; all application error alerts remain covered.
+
+The countdown/status and preflight provider is shared between the header and route, polls only while visible, ticks from a monotonic receipt timestamp, and retains session scope/generation checks. A failed preflight refresh removes stale actionable green data. The global header always sends AUTO and 300 seconds; the legacy workbench omits unsupported optional mode parameters.

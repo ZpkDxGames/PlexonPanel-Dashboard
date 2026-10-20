@@ -22,7 +22,7 @@ await fs.mkdir(out + "/states", { recursive: true });
 const receipts = [],
   interactions = [],
   coverage = Object.fromEntries(
-    Array.from({ length: 25 }, (_, i) => [i + 1, 0]),
+    Array.from({ length: 30 }, (_, i) => [i + 1, 0]),
   );
 function check(id, value, detail) {
   assert.ok(value, `Invariant ${id}: ${detail}`);
@@ -40,7 +40,7 @@ const log = await fs.open(out + "/development-server.log", "w"),
       "-p",
       "4182",
     ],
-    { stdio: ["ignore", log.fd, log.fd] },
+    { stdio: ["ignore", log.fd, log.fd], detached: true },
   );
 let browser;
 try {
@@ -399,23 +399,20 @@ try {
           );
         }
         if (route === "performance") {
-          const workbench = await p
-            .locator(".pp-bench")
-            .evaluate((el) => ({
-              stages: el.querySelectorAll(".pp-stage").length,
-              cells: el.querySelectorAll(".pp-deck__cell").length,
-              axes: el.querySelectorAll(".pp-axis").length,
-              readouts: el.querySelectorAll('[data-testid="readout-bar"]')
-                .length,
-              overlaps: [...el.querySelectorAll(".pp-stage")].filter(
-                (s) =>
-                  s.querySelectorAll("path.pp-area").length > 1 ||
-                  s.querySelectorAll("path.pp-line").length > 1,
-              ).length,
-              cpu: [
-                ...el.querySelectorAll('[data-testid="deck-04"] .pp-stage'),
-              ].map((s) => s.dataset.series),
-            }));
+          const workbench = await p.locator(".pp-bench").evaluate((el) => ({
+            stages: el.querySelectorAll(".pp-stage").length,
+            cells: el.querySelectorAll(".pp-deck__cell").length,
+            axes: el.querySelectorAll(".pp-axis").length,
+            readouts: el.querySelectorAll('[data-testid="readout-bar"]').length,
+            overlaps: [...el.querySelectorAll(".pp-stage")].filter(
+              (s) =>
+                s.querySelectorAll("path.pp-area").length > 1 ||
+                s.querySelectorAll("path.pp-line").length > 1,
+            ).length,
+            cpu: [
+              ...el.querySelectorAll('[data-testid="deck-04"] .pp-stage'),
+            ].map((s) => s.dataset.series),
+          }));
           check(
             23,
             workbench.stages === 9 &&
@@ -700,6 +697,14 @@ try {
   interactions.push("OTP auto advance + pairing accessibility");
   await c.close();
   const polish = await polishChecks(browser, base, out);
+  for (const [offset, name] of [
+    "backupsNoNativeControls",
+    "backupsNoHero",
+    "readoutBarNoClip",
+    "headerHeight56WithCountdown",
+    "gateReasonInlineZero",
+  ].entries())
+    check(26 + offset, polish.durability.invariants[name] > 0, name);
   await fs.writeFile(
     out + "/polish-v53-receipt.json",
     JSON.stringify(polish, null, 2),
@@ -729,7 +734,9 @@ try {
     JSON.stringify(
       {
         result: "PASS",
-        invariants: 25,
+        invariants: 30,
+        preservedInvariants: 25,
+        newInvariants: 5,
         configurations: receipts.length,
         coverage,
         interactions,
@@ -739,7 +746,7 @@ try {
     ),
   );
   console.log(
-    "PASS: 25/25 invariants; " +
+    "PASS: 30/30 invariants (25 preserved + 5 durability); " +
       receipts.length +
       " route/theme/viewport configurations",
   );
@@ -759,6 +766,8 @@ try {
   throw e;
 } finally {
   await browser?.close();
-  server.kill();
+  try {
+    process.kill(-server.pid, "SIGTERM");
+  } catch {}
   await log.close();
 }
