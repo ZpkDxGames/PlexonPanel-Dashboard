@@ -3,6 +3,10 @@
 **Version**: `5.0.0` Structural Architecture Release ("The Obsidian Mission Deck")
 **Binding Design & Structural Playbook**: `SKILL.md` (`plexonpanel-v5-structural-architect`)
 
+## v6.0 maintenance authority
+
+The attached `plexonpanel-v6-fullstack-durability-and-polish-architect` playbook governs this release. Preserve the v5.3 UI and all 27 locked core files. Do not repeat the original purge. Only `/backups` is authorized for a view rewrite; other changes are surgical. The user explicitly authorizes commits and pushes to both main branches, Host first, overriding the playbook’s no-push guideline. See `docs/V60_BINDINGS.md`.
+
 ## v5.3 maintenance authority
 
 The initial clean-slate rebuild has been completed. For the authorized v5.3 telemetry and player-event changes, the installed `SKILL.md` (`plexonpanel-v5-telemetry-and-events-architect`) supersedes the original chart blueprint below: one signal per Stage, selected-signal Focus/Split Studio, a nine-lane Performance workbench, and unified volatile boot events. Do not repeat the initial UI purge for maintenance work. Preserve the 25 structural invariant groups and all 27 locked core files; the chart assertions must verify the v5.3 layout. See `docs/V53_TELEMETRY_EVENTS.md` for the current seams and verification commands.
