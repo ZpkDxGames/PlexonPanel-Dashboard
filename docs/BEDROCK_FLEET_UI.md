@@ -1,33 +1,43 @@
-# Bedrock Fleet UI — staged integration
+# Bedrock fleet monitoring
 
-Status: **development branch only**. These UI changes do not register a server or deploy a Bedrock Host.
+The dashboard uses the existing browser pairing page and fleet selector for Paper and Bedrock. The relay administrator prepares Bedrock enrollment for the configured Bedrock Host. A browser claims the expiring code through `POST /v1/pairings/claim`. The relay validates the resulting credential on `GET /v1/dashboard/session` and on the authenticated `/v1/dashboard` WebSocket. This path uses Protocol 3 and the existing fleet and action contract IDs.
 
-## Design
+| Evidence | Paper | Bedrock |
+| --- | --- | --- |
+| Room authority | Paper agent and paired Linux Host | Explicit `HOST_ONLY` room with a pinned Bedrock Host |
+| Game evidence | Paper TPS, JVM heap, roster and chat | Version only when observed for the current container boot. Gameplay readiness and players remain unavailable in this release. |
+| Process status | Authenticated systemd service | Docker container state and uptime, with independent status and resource timestamps |
+| Resource metrics | JVM and systemd service metrics | Docker CPU percentage per core and container RAM usage and limit |
+| Console | Existing console authority, filters, command review and backfill | Bounded recent Docker log window as plain text |
+| Operations | Existing reviewed Paper and Linux Host actions | Read-only monitoring |
 
-Existing fleet cards are Paper-focused: they show TPS and JVM heap. A Bedrock Host must emit a **signed, explicitly declared** `edition: "BEDROCK"` before a card may show Bedrock presentation. Existing legacy Paper plugin identities continue to render as Java. Edition must not be guessed from instance names, versions or user-controlled labels.
+## Adapter and UI boundaries
 
-This branch adds `src/ui/bedrock/edition.ts` and uses it in `src/ui/routes/Fleet.tsx`:
-
-- Paper/legacy: existing TPS, Players, JVM Heap presentation unchanged.
-- Explicit Bedrock: Container CPU, Players, Container Memory; no JVM/TPS labels.
-- Container CPU/memory come only from `state.service.containerCpuPercent`, `state.service.containerMemoryBytes`, plus timestamp `state.service.containerStatsCapturedAt`.
-- Timestamp missing, stale (>30 seconds) or implausibly future: CPU/memory unavailable (`—`), never zero.
-- The player count must be separately corroborated by the Bedrock Host; an online container alone cannot prove a Bedrock server or a player count is available.
-- Existing `ready.server.minecraftVersion` supplies the display version only once the Host has validated it.
-- No new direct browser-to-Docker or browser-to-VPS API.
-
-## Implementation dependencies
-
-1. Design and audit a root-owned, exactly-container-pinned local Docker broker; keep Docker socket inaccessible to the browser-facing Host.
-2. Introduce Bedrock Host Ed25519 identity, standalone owner enrollment and relay HOST_ONLY room acceptance. The existing relay currently assumes Paper-bound authorization; do **not** spoof Paper.
-3. Validate signed edition and runtime telemetry fields at the boundary; route through the existing per-server session and fleet adapter without changing the action contract unsafely.
-4. Add a Bedrock-only inspection/status fixture and end-to-end tests. The UI branch alone will not show a new server until relay enrollment exists.
-5. Phase lifecycle, console, allowlist, backups and settings separately behind scoped capabilities.
+- `src/adapter/bedrock-room.ts` validates the additive `bedrock-host-v1` room, status and log window. A ready frame must contain explicit `BEDROCK`, `DOCKER` and `HOST_ONLY` metadata with a matching server ID, verified node ID and pinned `tonimbedrock` instance key. A previously authenticated Bedrock authority cannot change its node or fall back to Paper on the same room connection.
+- `src/adapter/session.ts`, `src/adapter/fleet-feed.ts` and `src/adapter/control-state.ts` handle selected and passive room projections. Only a selected connection retains logs. Events require the matching current Host session and room identity, the advertised read capability and the matching device scope. Host replacement, relay loss or revocation clears read evidence. Historical core hash assertions remain active and pin the three updated adapter files.
+- Bedrock status is distinct from the Paper server and service objects. `src/ui/bedrock/edition.ts` expires evidence after 30 seconds and marks missing, stale or invalid values unavailable. CPU percentage can exceed 100% across multiple cores. The node hardware ledger uses verified node samples and counts a shared node once.
+- `src/ui/routes/Fleet.tsx` extends the existing cards and selector. `src/ui/bedrock/Workspace.tsx` provides the selected container and console views in the existing shell. Console logs are memory-only. Java-only actions and data stay in the existing Java workspaces.
+- Lifecycle, console input, player administration, configuration, backup and restore require their own backend release gates. The dashboard refuses all generic actions for a Bedrock room. No separate API sends requests from browsers to the Docker broker.
 
 ## Verification
 
-Run `npm ci`, `npm run typecheck`, `npm run lint`, `npm test`, `npm run build` and the project's structural checks. The new `tests/bedrock-edition.test.ts` covers explicit edition, legacy fallback, fresh stats and stale/invalid values.
+Use Node 24. From the dashboard root run:
 
-## Release policy
+```sh
+npm ci
+npm run typecheck
+npm run lint
+npm run verify:purge
+npm test
+npm run build
+npx playwright install chromium
+npm run verify:production
+npm run verify:structure
+npm --prefix relay ci
+npm --prefix relay run build
+node scripts/bedrock-qa.mjs
+```
 
-No changes to production `main`, live Vercel deployment, existing Paper session code, relay, Docker container or VPS services until staging and explicit approval. Read backend contract `ZpkDxGames/PlexonPanel/docs/BEDROCK_HOST_INTEGRATION.md` from the matching development branch.
+Set `CHROME_PATH` to use a local Chromium executable or `EVIDENCE_DIR` to choose where browser receipts and screenshots go. The mixed-edition browser test runs a real TCP relay locally. It generates one Bedrock pairing code and uses three fixture Paper rooms with signed credentials. Its telemetry and logs are fixtures, and the browser uses the same HTTP and WebSocket paths as deployed clients.
+
+The local test sets `NEXT_PUBLIC_PLEXON_RELAY_URL` to the fixture's exact HTTP loopback origin. Only development builds allow this extra origin via CSP. The production CSP continues to allow the known HTTPS/WSS relay origins. A different isolated staging hostname requires an explicit staging CSP configuration.

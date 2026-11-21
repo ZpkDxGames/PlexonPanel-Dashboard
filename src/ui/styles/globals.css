@@ -3144,3 +3144,30 @@ button.pp-stage__head {
 .pp-deck--exec .pp-seg button[role="radio"][aria-checked="true"] {
   color: rgb(var(--text));
 }
+
+.pp-bedrock-signals {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+  margin: 0;
+}
+
+.pp-bedrock-signals .pp-cell {
+  padding: 14px 16px;
+  border: 1px solid rgb(var(--line) / .12);
+  border-top-width: 0;
+  border-left-width: 0;
+  border-radius: 0;
+}
+
+.pp-bedrock-signals dd {
+  margin: 4px 0 0;
+  overflow-wrap: anywhere;
+}
+
+.pp-crow.pp-bedrock-log {
+  grid-template-columns: 64px minmax(0, 1fr);
+}
+
+.pp-bedrock-log .pp-crow__msg {
+  overflow-wrap: anywhere;
+}

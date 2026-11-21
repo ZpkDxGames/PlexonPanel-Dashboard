@@ -13,6 +13,8 @@ jobs:
       - name: Install purge-check dependency
         run: sudo apt-get update && sudo apt-get install --yes ripgrep
       - run: npm run verify:purge && npm run typecheck && npm run lint && npm test && npm run build
+      - name: Verify standalone Protocol 3 relay
+        run: npm run relay:test && npm run relay:standalone:smoke && npm run relay:standalone:package
       - run: npx playwright install --with-deps chromium
       - run: npm run verify:production
         env:
@@ -20,6 +22,15 @@ jobs:
       - run: npm run verify:structure
         env:
           EVIDENCE_DIR: artifacts/mission-deck
+      - name: Verify mixed Java and Bedrock fleet in Chromium
+        run: node scripts/bedrock-qa.mjs
+        env:
+          EVIDENCE_DIR: artifacts/mission-deck/bedrock
+      - uses: actions/upload-artifact@v4
+        with:
+          name: plexonpanel-standalone-relay
+          path: artifacts/plexonpanel-relay/
+          if-no-files-found: error
       - uses: actions/upload-artifact@v4
         if: always()
         with:

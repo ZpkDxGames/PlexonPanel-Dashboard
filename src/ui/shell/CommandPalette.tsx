@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import * as Dialog from "@radix-ui/react-dialog";
 import { ROUTES } from "./routes";
-import { useServers, session } from "../bindings";
+import { useActiveServer, useServers, session } from "../bindings";
 import { useReview } from "../primitives/ReviewProvider";
 export function CommandPalette({
   open,
@@ -13,20 +13,21 @@ export function CommandPalette({
 }) {
   const router = useRouter(),
     servers = useServers(),
+    active = useActiveServer(),
     review = useReview(),
     [query, setQuery] = useState(""),
     [selected, setSelected] = useState(0);
   const all = [
       ...ROUTES.map((r) => ({
         id: r.href,
-        label: r.label,
+        label: active.edition === "BEDROCK" && r.id === "console" ? "Console" : r.label,
         detail: `G ${r.key}`,
         run: () => router.push(r.href),
       })),
       ...servers.map((s) => ({
         id: s.id,
         label: s.name,
-        detail: "Instance",
+        detail: s.edition === "BEDROCK" ? "Bedrock / Docker" : "Instance",
         run: () => {
           if (!s.selected) void session.select(s.id);
           router.push("/overview");

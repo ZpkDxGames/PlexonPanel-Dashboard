@@ -36,6 +36,7 @@ import { FleetFeed, type FleetSnapshot } from "./fleet-feed";
 import { classifyTelemetry } from "./telemetry-freshness";
 import { browserRelayConfiguration, saveRelayPreference, RelayConfigurationError, type RelayConfiguration } from "./relay-config";
 import { deadlineDelay } from "./deadline";
+import { acceptsBedrockReady } from "./bedrock-room";
 export type Kind = "HOST" | "PAPER";
 export function connectionPhaseLabel(phase: string): string {
   return ({"configuration-required": "Configure relay", "storage-error": "Browser storage blocked", revoked: "Pairing revoked or expired", incompatible: "Incompatible relay session", unpaired: "Not paired", pairing: "Pairing browser", connecting: "Connecting", reconnecting: "Reconnecting", live: "Relay connected"} as Record<string, string>)[phase] ?? phase;
@@ -199,9 +200,14 @@ async function connect(credential: RelayCredential, revision: number) {
             message.protocolVersion !== 3 ||
             (message.actionContract !== undefined &&
               message.actionContract !== ACTION_CONTRACT_ID) ||
+            !acceptsBedrockReady(raw.bedrock, message) ||
             !effective?.metadataMatches
           ) {
             incompatible = true;
+            if (raw.bedrock) {
+              raw = { ...raw, ready: null, bedrock: { identity: raw.bedrock.identity } };
+              publish({ phase: "incompatible", state: raw, grant: null });
+            }
             publish({
               error: "Protocol or signed grant mismatch. Actions blocked.",
             });
@@ -266,7 +272,10 @@ async function connect(credential: RelayCredential, revision: number) {
       unbindLiveSocket(candidate);
       if (!current()) return;
       socket = null;
-      raw = { ...raw, ready: null, players: [], receipts: undefined };
+      raw = {
+        ...raw, ready: null, players: [], receipts: undefined,
+        ...(raw.bedrock ? { bedrock: { identity: raw.bedrock.identity } } : {}),
+      };
       const closeReason = event.reason.trim();
       publish({
         state: raw,
@@ -335,11 +344,13 @@ export const session = {
     }
   },
   async select(id: string) {
+    const bedrock = (raw.serverId === id ? raw : snapshot.fleet.find((entry) => entry.serverId === id)?.state)?.bedrock;
     cleanup();
     fleet.updateRoster([], "");
     connection++;
     const revision = snapshot.revision + 1;
     raw = emptyControlState(id);
+    if (bedrock) raw.bedrock = { identity: bedrock.identity };
     publish({
       state: raw,
       revision,
@@ -412,6 +423,7 @@ export const session = {
     const ready = raw.ready;
     if (!ready || snapshot.phase !== "live")
       return "Connect this server to enable actions.";
+    if (raw.bedrock) return "This Bedrock room supports read-only monitoring.";
     const grant = reconcileDeviceGrant(snapshot.grant, ready.device);
     if (!grant) return "The signed device grant is unavailable.";
     if (
