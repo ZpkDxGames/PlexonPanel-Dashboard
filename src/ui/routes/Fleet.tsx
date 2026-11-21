@@ -12,6 +12,7 @@ import {
 } from "../bindings";
 import { Sparkline } from "../studio/TelemetryStudio";
 import { Title } from "./shared";
+import { instanceEdition, bedrockContainerMetrics } from "../bedrock/edition";
 export default function Fleet() {
   const servers = useServers(),
     now = useNow(),
@@ -109,7 +110,24 @@ export default function Fleet() {
         </span>
       </div>
       <div className="pp-blades">
-        {servers.map((s) => (
+        {servers.map((s) => {
+          const edition = instanceEdition(s.state?.ready?.server);
+          const container = edition === "BEDROCK"
+            ? bedrockContainerMetrics(s.state?.service, now)
+            : null;
+          const players = `${fmt(s.state?.server.onlinePlayers, 0)} / ${fmt(s.state?.server.maximumPlayers, 0)}`;
+          const stats = edition === "BEDROCK"
+            ? [
+                ["CPU", container?.cpuPercent == null ? "—" : `${fmt(container.cpuPercent, 1)}%`],
+                ["PLAYERS", players],
+                ["MEMORY", container?.memoryBytes == null ? "—" : gib(container.memoryBytes)],
+              ]
+            : [
+                ["TPS", Array.isArray(s.state?.server.tps) ? fmt(s.state.server.tps[0], 2) : "—"],
+                ["PLAYERS", players],
+                ["HEAP", gib(s.state?.system.jvmHeapUsedBytes)],
+              ];
+          return (
           <button
             className="pp-card pp-blade"
             key={s.id}
@@ -136,7 +154,7 @@ export default function Fleet() {
                 {String(
                   s.state?.ready?.server.minecraftVersion ??
                     "Version unavailable",
-                )}
+                )}{edition === "BEDROCK" ? " · Bedrock" : ""}
               </span>
               <span
                 data-tone={s.phase === "online" ? "emerald" : "amber"}
@@ -146,19 +164,7 @@ export default function Fleet() {
               </span>
             </div>
             <div className="stats">
-              {[
-                [
-                  "TPS",
-                  Array.isArray(s.state?.server.tps)
-                    ? fmt(s.state.server.tps[0], 2)
-                    : "—",
-                ],
-                [
-                  "PLAYERS",
-                  `${fmt(s.state?.server.onlinePlayers, 0)} / ${fmt(s.state?.server.maximumPlayers, 0)}`,
-                ],
-                ["HEAP", gib(s.state?.system.jvmHeapUsedBytes)],
-              ].map(([k, v]) => (
+              {stats.map(([k, v]) => (
                 <div key={k}>
                   <small className="pp-kicker">{k}</small>
                   <strong className="pp-num">{v}</strong>
@@ -172,7 +178,8 @@ export default function Fleet() {
               />
             </div>
           </button>
-        ))}
+          );
+        })}
       </div>
       <div className="pp-fleet-caption">
         Instances are grouped by their verified node association. Unknown values
