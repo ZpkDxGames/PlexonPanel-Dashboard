@@ -96,6 +96,6 @@ export async function createMixedFixture(options = {}) {
       await samples(host);
       interval = setInterval(() => { if (host.socket.readyState === WebSocket.OPEN) void samples(host).catch(() => {}); }, 1_000);
     }
-    return { ...fleet, registration, code, host, attach, samples, browser, javaBrowser: fleet.browser, claim, close };
+    return { ...fleet, registration, code, host, attach, samples, browser, attachJava: fleet.attach, javaBrowser: fleet.browser, claim, close };
   } catch (error) { await close(); throw error; }
 }

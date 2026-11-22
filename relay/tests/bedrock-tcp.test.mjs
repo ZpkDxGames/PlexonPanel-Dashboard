@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 import { once } from "node:events";
 import { test } from "node:test";
 import { signDashboardAccess, verifyDashboardAccess } from "../dist/security.js";
+import { createStandaloneRelay } from "../dist/standalone/server.js";
 import { createMixedFixture, hostKeys } from "./support/bedrock-fixture.mjs";
 
 async function waitForClose(socket) {
@@ -99,4 +100,83 @@ test("Bedrock admission denies other signers, identity substitutions and signed 
     });
     assert.equal(await waitForClose(stale.socket), 4008);
   } finally { await f.close(); }
+});
+
+test("standalone restart and registration rollback retain Bedrock revocation and Paper room access", async () => {
+  const f = await createMixedFixture({ autoHost: false,
+    componentVersion: (id, kind) => id === "alpha" || (id === "charlie" && kind === "HOST") ? "5.0.0" : "6.0.0",
+  });
+  const { bedrock, ...config } = f.relay.config;
+  const port = f.relay.server.address().port;
+  let relay = f.relay;
+
+  async function restart(registration) {
+    await relay.close();
+    relay = createStandaloneRelay({ ...config, port, ...(registration ? { bedrock: registration } : {}) });
+    await relay.start();
+  }
+
+  async function assertRevoked(credential) {
+    assert.equal((await session(f, credential.accessToken)).status, 401);
+    const socket = new WebSocket(credential.websocketUrl, {
+      protocols: ["plexonpanel-v3", `auth.${credential.accessToken}`], headers: { origin: f.origin },
+    });
+    const outcome = await new Promise((resolve, reject) => {
+      const timer = setTimeout(() => {
+        reject(new Error("No decision on the revoked WebSocket upgrade"));
+        socket.close();
+      }, 3000);
+      function settle(accepted) {
+        clearTimeout(timer);
+        socket.close();
+        resolve(accepted);
+      }
+      socket.addEventListener("open", () => settle(true), { once: true });
+      socket.addEventListener("error", () => settle(false), { once: true });
+      socket.addEventListener("close", () => settle(false), { once: true });
+    });
+    assert.equal(outcome, false);
+  }
+
+  async function assertJavaRoomsReconnect() {
+    for (const room of f.rooms) {
+      await f.attachJava(room, "PAPER");
+      await f.attachJava(room, "HOST");
+      await f.sync(room);
+    }
+    const browsers = await Promise.all(f.rooms.map((_, index) => f.javaBrowser(index)));
+    await f.telemetry();
+    await Promise.all(browsers.map(async ({ socket, next }, index) => {
+      const event = await next(message => message.eventType === "service.status");
+      assert.equal(event.serverId, f.rooms[index].serverId);
+      assert.equal((await session(f, f.credentials[index].accessToken)).status, 200);
+      socket.close();
+    }));
+  }
+
+  try {
+    const host = await f.attach();
+    const claim = await f.claim();
+    assert.equal(claim.status, 200);
+    const credential = await claim.json();
+    const browser = await f.browser(credential);
+    assert.equal((await browser.next(message => message.type === "dashboard.ready")).server.hostSession, host.session);
+    const stopped = once(browser.socket, "close");
+    await restart({ ...bedrock, revokedDevices: [credential.deviceId] });
+    assert.equal((await stopped)[0].code, 1001);
+    assert.notEqual((await f.attach()).session, host.session);
+    await assertRevoked(credential);
+    assert.equal((await f.claim()).status, 403);
+    await assertJavaRoomsReconnect();
+
+    // Rolling back the registration file must not restore a revoked row in the retained sidecar.
+    await restart(bedrock);
+    await assertRevoked(credential);
+    await restart();
+    await assertRevoked(credential);
+    await assertJavaRoomsReconnect();
+  } finally {
+    await relay.close();
+    await f.close();
+  }
 });
