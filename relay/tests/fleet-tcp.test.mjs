@@ -3,6 +3,8 @@ import { randomUUID } from "node:crypto";
 import { once } from "node:events";
 import { test } from "node:test";
 import { publicKeyFingerprint } from "../dist/protocol.js";
+import { FLEET_CONTRACT_ID } from "../dist/fleet-contract.js";
+import { assertFleetAssociation, assertNodeTelemetry, fleetFromHello } from "../dist/fleet-association.js";
 import { createFleetFixture, inbox } from "./support/fleet-fixture.mjs";
 
 test("actual standalone TCP fleet isolates two signed rooms, completions and credential revocation", async () => {
@@ -71,4 +73,40 @@ test("legacy HTTP pairing requires signed Paper approval and consumes the code o
   } finally {
     await fixture.close();
   }
+});
+
+test("available 6.0 agents and mixed 5.0/6.0 peers use the same signed Java routing", async () => {
+  const fixture = await createFleetFixture({
+    componentVersion: (key, kind) => key === "bravo" && kind === "PAPER" ? "5.0.0" : "6.0.0",
+  });
+  try {
+    for (const [index, room] of fixture.rooms.entries()) {
+      const browser = await fixture.browser(index);
+      await fixture.telemetry();
+      const status = await browser.next((message) => message.eventType === "service.status");
+      assert.equal(status.serverId, room.serverId);
+      assert.equal(status.body.nodeId, room.nodeId);
+      const requestId = randomUUID();
+      browser.socket.send(JSON.stringify({ type: "dashboard.action", requestId, action: "server.start", parameters: {} }));
+      const result = await browser.next((message) => message.eventType === "action.result" && message.body.requestId === requestId);
+      assert.equal(result.serverId, room.serverId);
+      assert.deepEqual(fixture.requests.filter((request) => request.requestId === requestId)
+        .map((request) => [request.serverId, request.kind]), [[room.serverId, "HOST"]]);
+    }
+  } finally {
+    await fixture.close();
+  }
+});
+
+test("6.0 still requires the fleet identity and rejects future or substituted Java authority", () => {
+  const serverId = randomUUID();
+  const nodeId = randomUUID();
+  const hello = { pluginVersion: "6.0.0", fleetContract: FLEET_CONTRACT_ID, nodeId, instanceKey: "alpha", serverName: "Alpha" };
+  const fleet = fleetFromHello(serverId, hello);
+  assert.equal(fleet.nodeId, nodeId);
+  assert.throws(() => fleetFromHello(serverId, { pluginVersion: "6.0.0" }), /fleet contract/);
+  assert.throws(() => fleetFromHello(serverId, { ...hello, pluginVersion: "6.1.0" }), /component version/);
+  assert.equal(fleetFromHello(serverId, { pluginVersion: "4.0.0" }), undefined);
+  assert.throws(() => assertFleetAssociation({ pluginVersion: "4.0.0" }, { pluginVersion: "6.0.0", fleet }, undefined), /downgrade/);
+  assert.throws(() => assertNodeTelemetry({ pluginVersion: "6.0.0", fleet }, { nodeId: randomUUID() }, "HOST"), /identity mismatch/);
 });

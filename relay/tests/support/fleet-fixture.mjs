@@ -32,7 +32,7 @@ export function inbox(socket, signed = false) {
     });
   };
 }
-export async function createFleetFixture({ port = 0, origin = "http://127.0.0.1:3000", separateNodes = false, bedrock, paperRooms = 2 } = {}) {
+export async function createFleetFixture({ port = 0, origin = "http://127.0.0.1:3000", separateNodes = false, bedrock, paperRooms = 2, componentVersion = () => "5.0.0" } = {}) {
   const directory = await mkdtemp(join(tmpdir(), "plexonpanel-fleet-tcp-"));
   const relayKeys = keys(); const nodeId = randomUUID();
   const config = await loadStandaloneConfig({ PLEXON_RELAY_HOST: "127.0.0.1", PLEXON_RELAY_PORT: "8787",
@@ -58,7 +58,7 @@ export async function createFleetFixture({ port = 0, origin = "http://127.0.0.1:
       return messages;
     } };
     await agent.send("agent.hello", { agentKind: kind, protocolVersion: 3, publicKey: key.publicKey,
-      publicKeyFingerprint: await publicKeyFingerprint(key.publicKey), pluginVersion: "5.0.0", paperVersion: "Paper fixture",
+      publicKeyFingerprint: await publicKeyFingerprint(key.publicKey), pluginVersion: componentVersion(room.key, kind), paperVersion: "Paper fixture",
       minecraftVersion: "26.2", javaVersion: "25", operatingSystem: "Linux fixture",
       capabilities: Object.fromEntries(SCOPES.map(scope => [scope, true])), hostPublicKey: kind === "PAPER" ? room.hostKeys.publicKey : "",
       fleetContract: FLEET_CONTRACT_ID, nodeId: room.nodeId, instanceKey: room.key, serverName: room.name });
