@@ -1,5 +1,9 @@
 import { DASHBOARD_LABEL } from "./dashboard-version";
 import type { Scope } from "./scopes";
+import {
+  acceptsBedrockReady, applyBedrockEvent, bedrockReadyIdentity,
+  retainBedrockRead, type BedrockRoom,
+} from "./bedrock-room";
 import { capturedAtMillis, classifyTelemetry } from "./telemetry-freshness";
 export { capturedAtMillis } from "./telemetry-freshness";
 export type JsonMap = Record<string, unknown>;
@@ -78,6 +82,7 @@ export function compatibleActionTarget(
 export interface ControlState {
   serverId: string;
   ready: Ready | null;
+  bedrock?: BedrockRoom;
   server: JsonMap;
   system: JsonMap;
   hostSystem: JsonMap;
@@ -167,8 +172,18 @@ export function applyControlMessage(
   if (message.type === "dashboard.ready") {
     if (message.protocolVersion !== 3 || !record(message.device).deviceId)
       return state;
-    const ready = message as unknown as Ready,
-      previousSession = state.ready?.server.paperSession,
+    if (!acceptsBedrockReady(state.bedrock, message)) return state;
+    const ready = message as unknown as Ready;
+    const identity = bedrockReadyIdentity(message);
+    if (identity) {
+      return {
+        ...emptyControlState(state.serverId),
+        ready,
+        bedrock: retainBedrockRead(state.bedrock ?? { identity }, state.ready, ready),
+        updatedAt: Date.now(),
+      };
+    }
+    const previousSession = state.ready?.server.paperSession,
       nextSession = ready.server.paperSession,
       samePaperSession =
         typeof nextSession === "string"
@@ -241,6 +256,11 @@ export function applyControlMessage(
     };
   }
   if (message.type !== "server.event") return state;
+  if (state.bedrock) {
+    const now = Date.now();
+    const bedrock = applyBedrockEvent(state.bedrock, state.ready, message, now);
+    return bedrock === state.bedrock ? state : { ...state, bedrock, updatedAt: now };
+  }
   const body = record(message.body),
     kind = message.agentKind === "HOST" ? "HOST" : "PAPER";
   const agentSession =

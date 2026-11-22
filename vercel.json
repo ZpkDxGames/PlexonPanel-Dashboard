@@ -2,7 +2,9 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
   "git": {
-    "deploymentEnabled": true
+    "deploymentEnabled": {
+      "development/bedrock-host-integration-v1": false
+    }
   },
   "installCommand": "npm ci",
   "buildCommand": "npm run build"

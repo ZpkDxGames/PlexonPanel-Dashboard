@@ -8,10 +8,11 @@ export function PairingGate() {
     router = useRouter(),
     [code, setCode] = useState(Array(6).fill("") as string[]),
     [name, setName] = useState("My browser"),
-    [origin, setOrigin] = useState(snap.relay.origin),
+    [editedOrigin, setOrigin] = useState<string | null>(null),
     [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
     refs = useRef<(HTMLInputElement | null)[]>([]);
+  const origin = editedOrigin ?? snap.relay.origin;
   function paste(value: string) {
     const chars = value.replace(/\D/g, "").slice(0, 6).split("");
     setCode(Array.from({ length: 6 }, (_, i) => chars[i] ?? ""));

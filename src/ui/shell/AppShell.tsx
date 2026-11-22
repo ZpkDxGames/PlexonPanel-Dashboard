@@ -9,16 +9,19 @@ import { ROUTES } from "./routes";
 import { MissionControlHeader } from "./MissionControlHeader";
 import { CommandPalette } from "./CommandPalette";
 import { PlayerEventsFeeder } from "../players/PlayerEventsFeeder";
+import { BedrockWorkspace } from "../bedrock/Workspace";
 export function AppShell({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false),
     [palette, setPalette] = useState(false),
     pathname = usePathname(),
     router = useRouter(),
     server = useActiveServer();
+  const bedrockWorkspace = server.edition === "BEDROCK" && pathname !== "/fleet" && pathname !== "/settings";
   useEffect(() => {
     const route = ROUTES.find((r) => r.href === pathname);
-    document.title = `${route?.label ?? "Workspace"} · ${server.name} · PlexonPanel`;
-  }, [pathname, server.name]);
+    const label = server.edition === "BEDROCK" && route?.id === "console" ? "Console" : route?.label;
+    document.title = `${label ?? "Workspace"} · ${server.name} · PlexonPanel`;
+  }, [pathname, server.edition, server.name]);
   useEffect(() => {
     let armed = 0;
     function key(e: KeyboardEvent) {
@@ -69,7 +72,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               side="right"
               content={
                 <span className="row">
-                  {r.label}
+                  {server.edition === "BEDROCK" && r.id === "console" ? "Console" : r.label}
                   <kbd className="pp-kbd">G</kbd>
                   <kbd className="pp-kbd">{r.key}</kbd>
                 </span>
@@ -78,11 +81,11 @@ export function AppShell({ children }: { children: ReactNode }) {
               <Link
                 className="pp-rail__item"
                 href={r.href}
-                aria-label={r.label}
+                aria-label={server.edition === "BEDROCK" && r.id === "console" ? "Console" : r.label}
                 aria-current={pathname === r.href ? "page" : undefined}
               >
                 <r.icon size={20} strokeWidth={1.65} />
-                <span className="pp-rail__label">{r.label}</span>
+                <span className="pp-rail__label">{server.edition === "BEDROCK" && r.id === "console" ? "Console" : r.label}</span>
               </Link>
             </Tooltip>
           ))}
@@ -105,12 +108,12 @@ export function AppShell({ children }: { children: ReactNode }) {
           >
             {["/overview", "/players", "/console", "/access"].includes(
               pathname,
-            ) && (
+            ) && !(bedrockWorkspace && pathname === "/overview") && (
               <h1 className="sr-only">
-                {ROUTES.find((r) => r.href === pathname)?.label}
+                {bedrockWorkspace && pathname === "/console" ? "Console" : ROUTES.find((r) => r.href === pathname)?.label}
               </h1>
             )}
-            {children}
+            {bedrockWorkspace ? <BedrockWorkspace path={pathname} /> : children}
           </main>
         </div>
       </div>

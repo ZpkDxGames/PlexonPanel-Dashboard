@@ -11,7 +11,7 @@ test("production CSP permits only the verified relay HTTP and WebSocket origins"
   assert.ok(csp);
   assert.match(
     csp,
-    /connect-src 'self' https:\/\/tonimserver\.ddns\.net wss:\/\/tonimserver\.ddns\.net;/,
+    /connect-src 'self' https:\/\/tonimserver\.ddns\.net wss:\/\/tonimserver\.ddns\.net\$\{developmentRelaySources\(\)\};/,
   );
   assert.doesNotMatch(csp, /connect-src[^;]*\*/);
 });

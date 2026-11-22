@@ -12,6 +12,10 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint src/ui app proxy.ts",
     "test": "node --import tsx --test tests/*.test.ts",
+    "relay:build": "tsc -p relay/tsconfig.json",
+    "relay:test": "npm run relay:build && node --test relay/tests/*.test.mjs",
+    "relay:standalone:smoke": "npm run relay:build && node relay/tests/standalone-smoke.mjs",
+    "relay:standalone:package": "npm run relay:build && node relay/scripts/package-standalone.mjs",
     "verify:purge": "bash scripts/verify-purge.sh",
     "verify:structure": "node scripts/structure-qa.mjs",
     "verify:production": "node scripts/production-qa.mjs"

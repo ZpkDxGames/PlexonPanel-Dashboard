@@ -8,10 +8,12 @@ import {
   verifiedNodes,
   fmt,
   gib,
+  duration,
   session,
 } from "../bindings";
 import { Sparkline } from "../studio/TelemetryStudio";
 import { Title } from "./shared";
+import { bedrockContainerView } from "../bedrock/edition";
 export default function Fleet() {
   const servers = useServers(),
     now = useNow(),
@@ -109,7 +111,24 @@ export default function Fleet() {
         </span>
       </div>
       <div className="pp-blades">
-        {servers.map((s) => (
+        {servers.map((s) => {
+          const isBedrock = s.edition === "BEDROCK";
+          const container = isBedrock
+            ? bedrockContainerView(s.state?.bedrock, s.state?.ready?.agents.host === true, now)
+            : null;
+          const players = `${fmt(s.state?.server.onlinePlayers, 0)} / ${fmt(s.state?.server.maximumPlayers, 0)}`;
+          const stats = isBedrock
+            ? [
+                ["CPU", container?.cpuPercent == null ? "—" : `${fmt(container.cpuPercent, 1)}%`],
+                ["PLAYERS", "—"],
+                ["CONTAINER RAM", container?.memoryBytes == null ? "—" : gib(container.memoryBytes)],
+              ]
+            : [
+                ["TPS", Array.isArray(s.state?.server.tps) ? fmt(s.state.server.tps[0], 2) : "—"],
+                ["PLAYERS", players],
+                ["HEAP", gib(s.state?.system.jvmHeapUsedBytes)],
+              ];
+          return (
           <button
             className="pp-card pp-blade"
             key={s.id}
@@ -134,31 +153,19 @@ export default function Fleet() {
             >
               <span className="muted">
                 {String(
-                  s.state?.ready?.server.minecraftVersion ??
+                  (isBedrock ? container?.version : s.state?.ready?.server.minecraftVersion) ??
                     "Version unavailable",
-                )}
+                )}{isBedrock ? " · Bedrock / Docker" : ""}
               </span>
               <span
                 data-tone={s.phase === "online" ? "emerald" : "amber"}
                 className="tone"
               >
-                {s.phase}
+                {isBedrock ? container?.state ?? "unavailable" : s.phase}
               </span>
             </div>
             <div className="stats">
-              {[
-                [
-                  "TPS",
-                  Array.isArray(s.state?.server.tps)
-                    ? fmt(s.state.server.tps[0], 2)
-                    : "—",
-                ],
-                [
-                  "PLAYERS",
-                  `${fmt(s.state?.server.onlinePlayers, 0)} / ${fmt(s.state?.server.maximumPlayers, 0)}`,
-                ],
-                ["HEAP", gib(s.state?.system.jvmHeapUsedBytes)],
-              ].map(([k, v]) => (
+              {stats.map(([k, v]) => (
                 <div key={k}>
                   <small className="pp-kicker">{k}</small>
                   <strong className="pp-num">{v}</strong>
@@ -166,13 +173,21 @@ export default function Fleet() {
               ))}
             </div>
             <div style={{ height: 48, padding: "12px 16px" }}>
-              <Sparkline
-                values={s.state?.history.map((h) => h.tps) ?? []}
-                tone="emerald"
-              />
+              {isBedrock ? (
+                <span className="muted">
+                  Up {duration(container?.uptimeMs ?? null)} · {container?.ageMs == null
+                    ? "Sample unavailable" : `Sample ${Math.floor(container.ageMs / 1_000)}s ago`}
+                </span>
+              ) : (
+                <Sparkline
+                  values={s.state?.history.map((h) => h.tps) ?? []}
+                  tone="emerald"
+                />
+              )}
             </div>
           </button>
-        ))}
+          );
+        })}
       </div>
       <div className="pp-fleet-caption">
         Instances are grouped by their verified node association. Unknown values

@@ -16,6 +16,7 @@ import { MAXIMUM_FLEET_CONNECTIONS } from "./fleet-contract";
 import { ACTION_CONTRACT_ID } from "./scopes";
 import { RelayConfigurationError } from "./relay-config";
 import { deadlineDelay } from "./deadline";
+import { acceptsBedrockReady } from "./bedrock-room";
 
 export type FleetPhase =
   | "connecting"
@@ -48,6 +49,7 @@ const passiveEvents = new Set([
   "telemetry.server",
   "telemetry.system",
   "service.status",
+  "bedrock.status",
 ]);
 
 /** Room-bound read subscriptions. They never enter the action channel or persist a credential in a snapshot. */
@@ -165,7 +167,12 @@ export class FleetFeed {
     entry.snapshot = {
       ...entry.snapshot,
       phase: "reconnecting",
-      state: { ...entry.snapshot.state, ready: null },
+      state: {
+        ...entry.snapshot.state, ready: null,
+        ...(entry.snapshot.state.bedrock
+          ? { bedrock: { identity: entry.snapshot.state.bedrock.identity } }
+          : {}),
+      },
     };
     entry.attempt++;
     entry.retry = setTimeout(
@@ -248,6 +255,7 @@ export class FleetFeed {
               message.protocolVersion !== 3 ||
               (message.actionContract !== undefined &&
                 message.actionContract !== ACTION_CONTRACT_ID) ||
+              !acceptsBedrockReady(entry.snapshot.state.bedrock, message) ||
               !effective?.metadataMatches ||
               typeof record(message.agents).paper !== "boolean" ||
               typeof record(message.agents).host !== "boolean"

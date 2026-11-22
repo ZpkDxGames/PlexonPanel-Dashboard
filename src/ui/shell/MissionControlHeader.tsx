@@ -21,6 +21,19 @@ import { MutationButton } from "../primitives/MutationButton";
 export function AuthorityLedgerPill() {
   const l = useLedger(),
     snap = useControl();
+  if (snap.state.bedrock) {
+    const connected = snap.phase === "live" && snap.state.ready?.agents.host === true;
+    return (
+      <Tooltip content={`Signed Protocol 3 · Bedrock Host ${connected ? "connected" : "unavailable"}`}>
+        <button className="pp-ctl pp-ledger" aria-label={`Bedrock Host ${connected ? "connected" : "unavailable"}`}>
+          <span data-tone={connected ? "emerald" : "amber"}>
+            <i className="pp-dot" />
+            <span className="pp-ledger__text">Bedrock Host</span>
+          </span>
+        </button>
+      </Tooltip>
+    );
+  }
   return (
     <Tooltip
       content={
@@ -191,7 +204,7 @@ export function MissionControlHeader({ onPalette }: { onPalette: () => void }) {
         onChange={(v) => void session.select(v)}
         options={servers.map((r) => ({
           value: r.id,
-          label: r.name,
+          label: r.edition === "BEDROCK" ? r.name + " · Bedrock" : r.name,
           leading: (
             <i
               className="pp-dot"
@@ -217,11 +230,15 @@ export function MissionControlHeader({ onPalette }: { onPalette: () => void }) {
         }
       >
         <i className="pp-ring" data-phase={s.phase} />
-        <span className="phase">{s.phase}</span>
-        <span className="detail">
-          {s.version} · Up {duration(s.uptimeMs)} · epoch{" "}
-          <code>{s.epochId.slice(0, 8) || "—"}</code>
-        </span>
+        <span className="phase">{s.edition === "BEDROCK" ? s.containerState ?? "unavailable" : s.phase}</span>
+        {s.edition === "BEDROCK" ? (
+          <span className="detail">Docker · {s.version} · Up {duration(s.uptimeMs)}</span>
+        ) : (
+          <span className="detail">
+            {s.version} · Up {duration(s.uptimeMs)} · epoch{" "}
+            <code>{s.epochId.slice(0, 8) || "—"}</code>
+          </span>
+        )}
       </div>
       <AuthorityLedgerPill />
       <button
@@ -232,7 +249,7 @@ export function MissionControlHeader({ onPalette }: { onPalette: () => void }) {
         <Search size={14} />
         <kbd className="pp-kbd">⌘K</kbd>
       </button>
-      {countdown.countdownState === "ACTIVE" &&
+      {s.edition !== "BEDROCK" && countdown.countdownState === "ACTIVE" &&
         countdown.remainingSeconds !== null && (
           <span
             className="pp-countdown-pill"
@@ -256,7 +273,7 @@ export function MissionControlHeader({ onPalette }: { onPalette: () => void }) {
             </span>
           </span>
         )}
-      <PowerAndBackupGroup phase={s.phase} />
+      {s.edition !== "BEDROCK" && <PowerAndBackupGroup phase={s.phase} />}
     </header>
   );
 }

@@ -34,6 +34,7 @@ import {
 import { SourceEpochs } from "../../presentation/epochs";
 import { useNow } from "../../hooks";
 import { withAppliedSkins } from "./skins";
+import { bedrockContainerView, instanceEdition } from "../bedrock/edition";
 export * from "./pure";
 export { useViewSync } from "./view-sync";
 export { session, useNow };
@@ -56,6 +57,13 @@ export function scopedSnapshot(raw: SessionSnapshot): SessionSnapshot {
     ...raw,
     state: {
       ...s,
+      ...(s.bedrock ? {
+        bedrock: {
+          identity: s.bedrock.identity,
+          status: can("server.status") ? s.bedrock.status : undefined,
+          logs: can("console.view.full") ? s.bedrock.logs : undefined,
+        },
+      } : {}),
       server: telemetry || can("overview.view") ? s.server : {},
       system: telemetry ? s.system : {},
       hostSystem: telemetry ? s.hostSystem : {},
@@ -204,8 +212,17 @@ export function serverState(
 export function useActiveServer() {
   const snap = useControl(),
     p = useEvidence("paperHealth"),
-    h = useEvidence("service");
-  const phase = serverState(snap.state, p.usable, h.usable);
+    h = useEvidence("service"),
+    now = useNow();
+  const room = snap.state.bedrock;
+  const container = bedrockContainerView(room, snap.phase === "live" && snap.state.ready?.agents.host === true, now);
+  const phase = room
+    ? container.gameplayReady === true
+      ? "online"
+      : ["absent", "created", "dead", "exited"].includes(container.state ?? "")
+        ? "stopped"
+        : container.state === "restarting" ? "starting" : "unknown"
+    : serverState(snap.state, p.usable, h.usable);
   return {
     id: snap.state.serverId,
     name: String(
@@ -213,9 +230,11 @@ export function useActiveServer() {
         snap.labels[snap.state.serverId] ??
         "Select instance",
     ),
-    version: String(snap.state.ready?.server.minecraftVersion ?? "—"),
+    edition: room ? "BEDROCK" as const : instanceEdition(snap.state.ready?.server),
+    containerState: container.state,
+    version: room ? container.version ?? "—" : String(snap.state.ready?.server.minecraftVersion ?? "—"),
     phase: (phase === "stopped" ? "offline" : phase) as Phase,
-    uptimeMs: number(snap.state.system.processUptimeMillis),
+    uptimeMs: room ? container.uptimeMs : number(snap.state.system.processUptimeMillis),
     epochId: String(
       snap.state.service.invocationId ??
         snap.state.ready?.server.paperSession ??
@@ -238,6 +257,7 @@ export function useServers() {
             f.state.serverId,
         ),
         phase: f.phase,
+        edition: f.state.bedrock ? "BEDROCK" as const : instanceEdition(f.state.ready?.server),
         state: f.state,
         selected: false,
       })),
@@ -251,6 +271,7 @@ export function useServers() {
         id: c.serverId,
         name: s.labels[c.serverId] ?? c.serverId,
         phase: "unknown",
+        edition: "UNKNOWN" as const,
         state: null,
         selected: false,
       })),
