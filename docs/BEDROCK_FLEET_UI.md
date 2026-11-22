@@ -33,8 +33,9 @@ npm run build
 npx playwright install chromium
 npm run verify:production
 npm run verify:structure
-npm --prefix relay ci
-npm --prefix relay run build
+npm run relay:test
+npm run relay:standalone:smoke
+npm run relay:standalone:package
 node scripts/bedrock-qa.mjs
 ```
 

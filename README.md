@@ -31,4 +31,4 @@ The structural suite covers all eight routes at 1545×911, 1280×800, 1920×1080
 
 The scope matrix is inspect-only because the current action contract provides no scope-editing action. Preferences retain the store's exact eight keys and valid values. The analyzer's 2h selector cannot exceed the headless core's 35-minute retention window. Console/chat and command history remain memory-only. Restore obtains the Host confirmation token before the full typed review.
 
-The delivered package includes an offline visual comparison viewer and exact verification receipts. The backend source is unchanged. Its Gradle/Java 25 checks and real VPS/relay/server operational validation remain subject to the limits recorded in the verification report. This source package does not deploy or alter running services.
+The Bedrock integration uses the same dashboard and selector. The isolated relay build accepts signed 5.0 and 6.0 Paper/Host peers alongside its separate Bedrock Host room. [Bedrock fleet and browser verification](docs/BEDROCK_FLEET_UI.md) · [Standalone relay build](relay/README.md)
